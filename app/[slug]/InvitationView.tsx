@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
@@ -19,6 +19,7 @@ export default function InvitationView({
   const [coverVisible, setCoverVisible] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /** User tapped — start music and let the envelope animate. */
   const handleOpen = useCallback(() => {
@@ -35,6 +36,7 @@ export default function InvitationView({
             audio.volume = vol;
             if (vol >= 0.5) clearInterval(fade);
           }, 200); // ~5s to reach full volume
+          fadeIntervalRef.current = fade;
         }).catch(() => {});
         audioRef.current = audio;
       } catch {
@@ -42,6 +44,21 @@ export default function InvitationView({
       }
     }
   }, [invitation.audio]);
+
+  /** Stop music and clean up when leaving the invitation page. */
+  useEffect(() => {
+    return () => {
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+        fadeIntervalRef.current = null;
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   /**
    * The envelope's internal animation sequence is done.
