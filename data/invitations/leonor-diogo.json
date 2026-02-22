@@ -38,7 +38,7 @@
   },
   "audio": {
     "enabled": true,
-    "src": "/audio/perfect.mp3",
+    "src": "/audio/music.mp3",
     "artist": "Ed Sheeran",
     "title": "Perfect"
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, type MutableRefObject } from "react";
 import { motion } from "framer-motion";
 import { Play, Pause } from "lucide-react";
 import type { AudioConfig, TemplateTheme } from "@/lib/types";
@@ -37,11 +37,15 @@ interface DirectProps {
   title: string;
   artist: string;
   theme: AudioPlayerTheme;
+  /** Optional external audio ref — when provided the player uses this
+   *  already-playing Audio element instead of creating its own. */
+  externalAudioRef?: MutableRefObject<HTMLAudioElement | null>;
 }
 
 interface IntegrationProps {
   audio: AudioConfig;
   theme: TemplateTheme;
+  externalAudioRef?: MutableRefObject<HTMLAudioElement | null>;
 }
 
 type AudioPlayerProps = DirectProps | IntegrationProps;
@@ -61,15 +65,24 @@ export default function AudioPlayer(props: AudioPlayerProps) {
   const playerTheme = isIntegrationProps(props)
     ? derivePlayerTheme(props.theme)
     : props.theme;
+  const externalAudioRef = props.externalAudioRef;
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const internalAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // -----------------------------------------------------------------------
+  // Determine whether we own the audio element or an external one was given
+  // -----------------------------------------------------------------------
+  const hasExternal = !!externalAudioRef;
+
+  // Create our own Audio element only when there's no external ref
   useEffect(() => {
+    if (hasExternal) return;
+
     const audio = new Audio(src);
     audio.loop = true;
     audio.preload = "metadata";
-    audioRef.current = audio;
+    internalAudioRef.current = audio;
 
     const handleEnded = () => setIsPlaying(false);
     audio.addEventListener("ended", handleEnded);
@@ -79,10 +92,40 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       audio.pause();
       audio.src = "";
     };
-  }, [src]);
+  }, [src, hasExternal]);
+
+  // Sync playing state with external audio (it may already be playing)
+  useEffect(() => {
+    if (!hasExternal) return;
+    const audio = externalAudioRef?.current;
+    if (!audio) return;
+
+    // Check initial state — the envelope already started playback
+    setIsPlaying(!audio.paused);
+
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    const handleEnded = () => setIsPlaying(false);
+
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [hasExternal, externalAudioRef]);
+
+  // Helper to get the active audio element
+  const getAudio = useCallback((): HTMLAudioElement | null => {
+    if (hasExternal) return externalAudioRef?.current ?? null;
+    return internalAudioRef.current;
+  }, [hasExternal, externalAudioRef]);
 
   const togglePlay = useCallback(() => {
-    const audio = audioRef.current;
+    const audio = getAudio();
     if (!audio) return;
 
     if (isPlaying) {
@@ -97,7 +140,7 @@ export default function AudioPlayer(props: AudioPlayerProps) {
           setIsPlaying(false);
         });
     }
-  }, [isPlaying]);
+  }, [isPlaying, getAudio]);
 
   return (
     <motion.div

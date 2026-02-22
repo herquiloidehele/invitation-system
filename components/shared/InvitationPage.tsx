@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MutableRefObject } from "react";
 import { motion, type Variants } from "framer-motion";
 import { CalendarPlus, MapPin, Heart, Shirt, Gift } from "lucide-react";
 
@@ -79,9 +79,11 @@ function AnimatedSection({
 interface InvitationPageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
+  /** Shared audio ref from the envelope-open playback. */
+  audioRef?: MutableRefObject<HTMLAudioElement | null>;
 }
 
-export default function InvitationPage({ invitation, theme }: InvitationPageProps) {
+export default function InvitationPage({ invitation, theme, audioRef }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
 
   const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 44;
@@ -114,6 +116,7 @@ export default function InvitationPage({ invitation, theme }: InvitationPageProp
               title={invitation.audio.title}
               artist={invitation.audio.artist}
               theme={toAudioTheme(theme)}
+              externalAudioRef={audioRef}
             />
           </div>
         )}

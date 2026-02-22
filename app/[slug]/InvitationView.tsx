@@ -67,7 +67,7 @@ export default function InvitationView({
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <InvitationPage invitation={invitation} theme={theme} />
+            <InvitationPage invitation={invitation} theme={theme} audioRef={audioRef} />
           </motion.div>
         )}
       </AnimatePresence>
