@@ -24,7 +24,7 @@ interface EnvelopeCoverProps {
 
 const T = {
   /** Top flap swings open (3D rotation) */
-  flapOpen:   { dur: 2.4,  del: 0.2  },
+  flapOpen:   { dur: 5.4,  del: 0.2  },
   /** Wax seal cracks & dissolves */
   sealBreak:  { dur: 1.6,  del: 0.6  },
   /** Monogram fades away */
@@ -32,9 +32,9 @@ const T = {
   /** "Toque para Abrir" fades */
   ctaFade:    { dur: 0.6,  del: 0.1  },
   /** Bottom flap drops */
-  bottomDrop: { dur: 1.5,  del: 2.4  },
+  bottomDrop: { dur: 2.4,  del: 2.4  },
   /** Entire scene fades to transparent */
-  sceneFade:  { dur: 1.4,  del: 3.8  },
+  sceneFade:  { dur: 0.4,  del: 3.8  },
 } as const;
 
 /** Milliseconds from tap until onAnimationComplete fires */
@@ -95,9 +95,9 @@ function TopFlap({ color, opening }: { color: string; opening: boolean }) {
               <stop offset="100%" stopColor={color} />
             </linearGradient>
           </defs>
-          <polygon points="0,0 390,0 195,440" fill="url(#tfg)" />
-          <line x1="0" y1="0" x2="195" y2="440" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-          <line x1="390" y1="0" x2="195" y2="440" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+          <path d="M0 0L390 0L215 410Q195 440 175 410Z" fill="url(#tfg)" />
+          <line x1="0" y1="0" x2="175" y2="410" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+          <line x1="390" y1="0" x2="215" y2="410" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
         </svg>
         {/* Back face (revealed as flap rotates open) */}
         <svg
@@ -106,7 +106,7 @@ function TopFlap({ color, opening }: { color: string; opening: boolean }) {
           preserveAspectRatio="none"
           style={{ backfaceVisibility: "hidden", transform: "rotateX(180deg)" }}
         >
-          <polygon points="0,0 390,0 195,440" fill={brightness(color, 20)} />
+          <path d="M0 0L390 0L215 410Q195 440 175 410Z" fill={brightness(color, 20)} />
         </svg>
       </motion.div>
     </motion.div>
@@ -133,7 +133,7 @@ function BottomFlap({ color, opening }: { color: string; opening: boolean }) {
             <stop offset="100%" stopColor={brightness(color, 6)} />
           </linearGradient>
         </defs>
-        <polygon points="0,400 390,400 195,0" fill="url(#bfg)" />
+        <path d="M0 400L390 400L215 30Q195 0 175 30Z" fill="url(#bfg)" />
       </svg>
     </motion.div>
   );
