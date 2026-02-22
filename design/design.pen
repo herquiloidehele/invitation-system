@@ -1,0 +1,4215 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "u6SjZ",
+      "x": 0,
+      "y": -400,
+      "name": "Components",
+      "gap": 40,
+      "children": [
+        {
+          "type": "frame",
+          "id": "vhtAp",
+          "name": "CTA Button",
+          "reusable": true,
+          "fill": "#C9A962",
+          "cornerRadius": 50,
+          "gap": 10,
+          "padding": [
+            14,
+            28
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "7Cy3a",
+              "name": "ctaIcon",
+              "width": 18,
+              "height": 18,
+              "iconFontName": "map-pin",
+              "iconFontFamily": "lucide",
+              "fill": "#FFFFFF"
+            },
+            {
+              "type": "text",
+              "id": "323zf",
+              "name": "ctaLabel",
+              "fill": "#FFFFFF",
+              "content": "Button Label",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RHmsc",
+          "name": "Outline Button",
+          "reusable": true,
+          "cornerRadius": 50,
+          "stroke": {
+            "thickness": 1.5,
+            "fill": "#C9A962"
+          },
+          "gap": 10,
+          "padding": [
+            14,
+            28
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "3R4Fq",
+              "name": "outIcon",
+              "width": 18,
+              "height": 18,
+              "iconFontName": "calendar",
+              "iconFontFamily": "lucide",
+              "fill": "#C9A962"
+            },
+            {
+              "type": "text",
+              "id": "YLAIp",
+              "name": "outLabel",
+              "fill": "#C9A962",
+              "content": "Button Label",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "68WKZ",
+          "name": "Audio Player",
+          "reusable": true,
+          "fill": "#00000066",
+          "cornerRadius": 50,
+          "gap": 12,
+          "padding": [
+            10,
+            16
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "6WJuB",
+              "name": "playBtn",
+              "width": 32,
+              "height": 32,
+              "fill": "#FFFFFFCC",
+              "cornerRadius": 16,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "QWEhr",
+                  "x": 10,
+                  "y": 9,
+                  "name": "playIcon",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "play",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1C"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "mXeMg",
+              "name": "songInfo",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "rf9pG",
+                  "name": "songTitle",
+                  "fill": "#FFFFFF",
+                  "content": "Perfect",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "EDqzn",
+                  "name": "songArtist",
+                  "fill": "#FFFFFFAA",
+                  "content": "Ed Sheeran",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "PVbLY",
+          "name": "Schedule Item",
+          "reusable": true,
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "SfU3w",
+              "name": "schedTime",
+              "width": 60,
+              "layout": "vertical",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pXqoT",
+                  "name": "schedHour",
+                  "fill": "#C9A962",
+                  "content": "16:00",
+                  "fontFamily": "Cormorant Garamond",
+                  "fontSize": 22,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "t24dd",
+                  "name": "schedPeriod",
+                  "fill": "#6E6E70",
+                  "content": "Cerimónia",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "500",
+                  "letterSpacing": 1
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "sBPzx",
+              "name": "schedDivider",
+              "fill": "#C9A96240",
+              "width": 1,
+              "height": 36
+            },
+            {
+              "type": "text",
+              "id": "VhAEX",
+              "name": "schedDesc",
+              "fill": "#F5F5F0",
+              "content": "Igreja de São Pedro",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "B5a9N",
+          "name": "Template Card",
+          "reusable": true,
+          "clip": true,
+          "width": 170,
+          "fill": "#242426",
+          "cornerRadius": 16,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#3A3A3C"
+          },
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "tE43t",
+              "name": "cardImg",
+              "width": "fill_container",
+              "height": 220,
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "BIYrK",
+              "name": "cardContent",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                14,
+                16
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "xRtJ0",
+                  "name": "cardTitle",
+                  "fill": "#F5F5F0",
+                  "content": "Pink Floral",
+                  "fontFamily": "Cormorant Garamond",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "0zWT6",
+                  "name": "cardDesc",
+                  "fill": "#6E6E70",
+                  "content": "Romantic & Elegant",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "PgfbK",
+                  "name": "cardBtn",
+                  "width": "fill_container",
+                  "fill": "#C9A962",
+                  "cornerRadius": 20,
+                  "padding": [
+                    8,
+                    16
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gfrSy",
+                      "name": "cardBtnTxt",
+                      "fill": "#1A1A1C",
+                      "content": "Preview",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "04Gpn",
+      "x": 0,
+      "y": 0,
+      "name": "Gallery Homepage",
+      "clip": true,
+      "width": 390,
+      "fill": "#1A1A1C",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "sK8Cc",
+          "name": "Hero Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            60,
+            28,
+            40,
+            28
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "V461M",
+              "name": "heroIcon",
+              "width": 28,
+              "height": 28,
+              "iconFontName": "heart",
+              "iconFontFamily": "lucide",
+              "fill": "#C9A962"
+            },
+            {
+              "type": "text",
+              "id": "0gOJx",
+              "name": "heroTitle",
+              "fill": "#F5F5F0",
+              "content": "Convites Digitais",
+              "textAlign": "center",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 36,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "k40Yb",
+              "name": "heroSub",
+              "fill": "#6E6E70",
+              "textGrowth": "fixed-width",
+              "width": 300,
+              "content": "Crie convites de casamento interativos e memoráveis",
+              "lineHeight": 1.6,
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "id": "2QKP7",
+              "name": "heroDivider",
+              "fill": "#C9A96260",
+              "width": 60,
+              "height": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "eA2vn",
+          "name": "Templates Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            0,
+            28,
+            40,
+            28
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "wMJ4z",
+              "name": "sectionLabel",
+              "fill": "#6E6E70",
+              "content": "ESCOLHA SEU MODELO",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "500",
+              "letterSpacing": 3
+            },
+            {
+              "type": "frame",
+              "id": "XpE3Q",
+              "name": "Cards Grid",
+              "width": "fill_container",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "PSs9x",
+                  "name": "Column 1",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 14,
+                  "children": [
+                    {
+                      "id": "rG950",
+                      "type": "ref",
+                      "ref": "B5a9N",
+                      "width": "fill_container",
+                      "name": "card1",
+                      "descendants": {
+                        "tE43t": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "./images/generated-1771720956622.png",
+                            "mode": "fill"
+                          }
+                        },
+                        "xRtJ0": {
+                          "content": "Pink Floral"
+                        },
+                        "0zWT6": {
+                          "content": "Romântico & Elegante"
+                        }
+                      }
+                    },
+                    {
+                      "id": "jnK96",
+                      "type": "ref",
+                      "ref": "B5a9N",
+                      "width": "fill_container",
+                      "name": "card3",
+                      "descendants": {
+                        "tE43t": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "./images/generated-1771720970563.png",
+                            "mode": "fill"
+                          }
+                        },
+                        "xRtJ0": {
+                          "content": "Boho Chic"
+                        },
+                        "0zWT6": {
+                          "content": "Rústico & Natural"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "IQyo2",
+                  "name": "Column 2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 14,
+                  "children": [
+                    {
+                      "id": "MexBh",
+                      "type": "ref",
+                      "ref": "B5a9N",
+                      "width": "fill_container",
+                      "name": "card2",
+                      "descendants": {
+                        "tE43t": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "./images/generated-1771720963185.png",
+                            "mode": "fill"
+                          }
+                        },
+                        "xRtJ0": {
+                          "content": "Modern Minimal"
+                        },
+                        "0zWT6": {
+                          "content": "Limpo & Sofisticado"
+                        }
+                      }
+                    },
+                    {
+                      "id": "7x3e3",
+                      "type": "ref",
+                      "ref": "B5a9N",
+                      "width": "fill_container",
+                      "name": "card4",
+                      "descendants": {
+                        "tE43t": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "./images/generated-1771720977176.png",
+                            "mode": "fill"
+                          }
+                        },
+                        "xRtJ0": {
+                          "content": "Midnight Elegance"
+                        },
+                        "0zWT6": {
+                          "content": "Luxuoso & Dramático"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "KPaQv",
+          "name": "Footer",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": [
+            24,
+            28
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "mrndt",
+              "name": "footerDivider",
+              "fill": "#3A3A3C",
+              "width": 60,
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "WZc6n",
+              "name": "footerText",
+              "fill": "#4A4A4C",
+              "content": "Feito com amor para o seu grande dia",
+              "textAlign": "center",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 14,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "text",
+              "id": "ka0mW",
+              "name": "footerCopy",
+              "fill": "#3A3A3C",
+              "content": "© 2026 Convites Digitais",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "DgFGI",
+      "x": 500,
+      "y": 0,
+      "name": "Pink Floral - Cover",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": [
+        "#8B1A4A",
+        {
+          "type": "image",
+          "opacity": 0.85,
+          "enabled": true,
+          "url": "",
+          "mode": "fill"
+        }
+      ],
+      "layout": "vertical",
+      "gap": 24,
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "DvgRa",
+          "name": "Cover Overlay",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "radial",
+            "enabled": true,
+            "rotation": 0,
+            "size": {
+              "width": 1,
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#00000080",
+                "position": 0.2
+              },
+              {
+                "color": "#00000020",
+                "position": 1
+              }
+            ]
+          },
+          "layout": "vertical",
+          "gap": 20,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "0MOvD",
+              "name": "Monogram",
+              "width": 120,
+              "height": 120,
+              "cornerRadius": 60,
+              "stroke": {
+                "thickness": 2,
+                "fill": "#FFFFFF60"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ln0NE",
+                  "x": 10,
+                  "y": 10,
+                  "name": "monogramInner",
+                  "width": 100,
+                  "height": 100,
+                  "fill": "#FFFFFF15",
+                  "cornerRadius": 50,
+                  "layout": "none"
+                },
+                {
+                  "type": "text",
+                  "id": "OmD3t",
+                  "x": 24,
+                  "y": 32,
+                  "name": "monogramText",
+                  "fill": "#FFFFFF",
+                  "content": "K&R",
+                  "fontFamily": "Cormorant Garamond",
+                  "fontSize": 40,
+                  "fontWeight": "300"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "A6W8D",
+              "name": "coupleNames",
+              "fill": "#FFFFFF",
+              "content": "Kézia & Rúben",
+              "textAlign": "center",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 32,
+              "fontWeight": "300",
+              "letterSpacing": 2
+            },
+            {
+              "type": "text",
+              "id": "7PiQO",
+              "name": "weddingLabel",
+              "fill": "#FFFFFFBB",
+              "content": "Convidam para o seu casamento",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal",
+              "letterSpacing": 2
+            },
+            {
+              "type": "frame",
+              "id": "NmnLL",
+              "name": "Tap CTA",
+              "cornerRadius": 30,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFFFFF60"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "KVMHr",
+                  "name": "tapIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "mail-open",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "Wmq69",
+                  "name": "tapText",
+                  "fill": "#FFFFFF",
+                  "content": "Toque para Abrir",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "500",
+                  "letterSpacing": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "NXm21",
+      "x": 940,
+      "y": 0,
+      "name": "Pink Floral - Invitation",
+      "clip": true,
+      "width": 390,
+      "fill": "#FFF8F3",
+      "layout": "vertical",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "kWVda",
+          "name": "Hero Image",
+          "width": "fill_container",
+          "height": 300,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./images/generated-1771721067890.png",
+            "mode": "fill"
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "bIzvJ",
+              "x": 0,
+              "y": 0,
+              "name": "Hero Overlay",
+              "width": 390,
+              "height": 300,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FFF8F300",
+                    "position": 0
+                  },
+                  {
+                    "color": "#FFF8F3",
+                    "position": 0.9
+                  }
+                ]
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                0,
+                28,
+                20,
+                28
+              ],
+              "justifyContent": "end",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "FBUE1",
+                  "type": "ref",
+                  "ref": "68WKZ",
+                  "name": "audioRef"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "h9Sfs",
+          "name": "Names Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            32,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "cI7lu",
+              "name": "inviteLabel",
+              "fill": "#8B5E6B",
+              "content": "CONVIDAM PARA O CASAMENTO DE",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500",
+              "letterSpacing": 3
+            },
+            {
+              "type": "text",
+              "id": "A1blP",
+              "name": "brideName",
+              "fill": "#8B1A4A",
+              "content": "Kézia",
+              "textAlign": "center",
+              "fontFamily": "Great Vibes",
+              "fontSize": 52,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "d3VNM",
+              "name": "ampersand",
+              "fill": "#C9A962",
+              "content": "&",
+              "textAlign": "center",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 28,
+              "fontWeight": "300"
+            },
+            {
+              "type": "text",
+              "id": "I8Rec",
+              "name": "groomName",
+              "fill": "#8B1A4A",
+              "content": "Rúben",
+              "textAlign": "center",
+              "fontFamily": "Great Vibes",
+              "fontSize": 52,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "id": "LeVEI",
+              "name": "quoteDivider",
+              "fill": "#C9A96260",
+              "width": 40,
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "99Zfm",
+              "name": "quoteText",
+              "fill": "#8B5E6B",
+              "textGrowth": "fixed-width",
+              "width": 280,
+              "content": "&quot;Duas almas, um só coração&quot;",
+              "textAlign": "center",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 16,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Sn548",
+          "name": "Date Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            40,
+            32,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "mEE0k",
+              "name": "Date Card",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#C9A96240"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                28,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "tUKqN",
+                  "name": "dateSave",
+                  "fill": "#C9A962",
+                  "content": "SAVE THE DATE",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "500",
+                  "letterSpacing": 4
+                },
+                {
+                  "type": "text",
+                  "id": "IJQkd",
+                  "name": "dateDay",
+                  "fill": "#8B1A4A",
+                  "content": "18",
+                  "lineHeight": 0.9,
+                  "fontFamily": "Cormorant Garamond",
+                  "fontSize": 72,
+                  "fontWeight": "300"
+                },
+                {
+                  "type": "text",
+                  "id": "Jfo2f",
+                  "name": "dateMonth",
+                  "fill": "#8B5E6B",
+                  "content": "JULHO",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "letterSpacing": 6
+                },
+                {
+                  "type": "text",
+                  "id": "YTPdJ",
+                  "name": "dateYear",
+                  "fill": "#8B5E6B",
+                  "content": "2026",
+                  "fontFamily": "Cormorant Garamond",
+                  "fontSize": 20,
+                  "fontWeight": "300"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "6tcZf",
+                  "name": "dateDivider",
+                  "fill": "#C9A96240",
+                  "width": 100,
+                  "height": 1
+                },
+                {
+                  "type": "text",
+                  "id": "P7Gn0",
+                  "name": "dateTime",
+                  "fill": "#8B5E6B",
+                  "content": "Sábado · 16:00",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "O4QBo",
+          "name": "Schedule Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            28,
+            32,
+            28
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "u5MoT",
+              "name": "schedLabel",
+              "fill": "#8B5E6B",
+              "content": "PROGRAMAÇÃO",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500",
+              "letterSpacing": 3
+            },
+            {
+              "type": "rectangle",
+              "id": "KoQTj",
+              "name": "schedDivider",
+              "fill": "#C9A96260",
+              "width": 30,
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "kZUG4",
+              "name": "Schedule Card",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#C9A96220"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "id": "7AjLQ",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "sch1",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "16:00"
+                    },
+                    "t24dd": {
+                      "content": "Cerimónia"
+                    },
+                    "VhAEX": {
+                      "content": "Igreja de São Pedro"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "tdy4n",
+                  "name": "divider1",
+                  "fill": "#C9A96215",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "D1qRH",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "sch2",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "17:30"
+                    },
+                    "t24dd": {
+                      "content": "Cocktail"
+                    },
+                    "VhAEX": {
+                      "content": "Jardim da Quinta"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "jg25K",
+                  "name": "divider2",
+                  "fill": "#C9A96215",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "b5FHC",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "sch3",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "19:00"
+                    },
+                    "t24dd": {
+                      "content": "Jantar"
+                    },
+                    "VhAEX": {
+                      "content": "Salão Principal"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "r1P4a",
+                  "name": "divider3",
+                  "fill": "#C9A96215",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "ziyXw",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "sch4",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "22:00"
+                    },
+                    "t24dd": {
+                      "content": "Festa"
+                    },
+                    "VhAEX": {
+                      "content": "Pista de Dança"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "xJbAd",
+          "name": "Info Section",
+          "width": "fill_container",
+          "gap": 14,
+          "padding": [
+            0,
+            28,
+            32,
+            28
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "sFLpN",
+              "name": "Dress Code",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#C9A96220"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": [
+                20,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Dj0kU",
+                  "name": "dressIcon",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "shirt",
+                  "iconFontFamily": "lucide",
+                  "fill": "#C9A962"
+                },
+                {
+                  "type": "text",
+                  "id": "2FJ8V",
+                  "name": "dressLabel",
+                  "fill": "#8B5E6B",
+                  "content": "DRESS CODE",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "500",
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "VQo8P",
+                  "name": "dressValue",
+                  "fill": "#8B1A4A",
+                  "content": "Cocktail Attire",
+                  "textAlign": "center",
+                  "fontFamily": "Cormorant Garamond",
+                  "fontSize": 16,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "J9P4p",
+              "name": "Gift Registry",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#C9A96220"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": [
+                20,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Ro8wz",
+                  "name": "giftIcon",
+                  "width": 24,
+                  "height": 24,
+                  "iconFontName": "gift",
+                  "iconFontFamily": "lucide",
+                  "fill": "#C9A962"
+                },
+                {
+                  "type": "text",
+                  "id": "XHcxn",
+                  "name": "giftLabel",
+                  "fill": "#8B5E6B",
+                  "content": "PRESENTES",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "500",
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "HHObY",
+                  "name": "giftValue",
+                  "fill": "#8B1A4A",
+                  "textGrowth": "fixed-width",
+                  "width": 120,
+                  "content": "A vossa presença é o melhor presente",
+                  "textAlign": "center",
+                  "fontFamily": "Cormorant Garamond",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "FOu35",
+          "name": "CTA Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "ignIK",
+              "name": "ctaSectionLabel",
+              "fill": "#8B5E6B",
+              "content": "CONFIRME SUA PRESENÇA",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500",
+              "letterSpacing": 3
+            },
+            {
+              "type": "rectangle",
+              "id": "4cPN6",
+              "name": "ctaSectionDivider",
+              "fill": "#C9A96260",
+              "width": 30,
+              "height": 1
+            },
+            {
+              "id": "Z8He9",
+              "type": "ref",
+              "ref": "vhtAp",
+              "width": "fill_container",
+              "name": "locationBtn",
+              "descendants": {
+                "7Cy3a": {
+                  "iconFontName": "map-pin"
+                },
+                "323zf": {
+                  "content": "Ver Localização"
+                }
+              }
+            },
+            {
+              "id": "5s0zv",
+              "type": "ref",
+              "ref": "vhtAp",
+              "width": "fill_container",
+              "fill": "#8B1A4A",
+              "name": "rsvpBtn",
+              "descendants": {
+                "7Cy3a": {
+                  "iconFontName": "heart"
+                },
+                "323zf": {
+                  "content": "Confirmar Presença"
+                }
+              }
+            },
+            {
+              "id": "8Wnj7",
+              "type": "ref",
+              "ref": "RHmsc",
+              "width": "fill_container",
+              "stroke": {
+                "thickness": 1.5,
+                "fill": "#8B1A4A"
+              },
+              "name": "calBtn",
+              "descendants": {
+                "3R4Fq": {
+                  "iconFontName": "calendar-plus",
+                  "fill": "#8B1A4A"
+                },
+                "YLAIp": {
+                  "content": "Adicionar ao Calendário",
+                  "fill": "#8B1A4A"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "HHQ6p",
+          "name": "Invitation Footer",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            20,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "rAGUW",
+              "name": "footerFloralDiv",
+              "fill": "#C9A96240",
+              "width": 60,
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "5HcKa",
+              "name": "footerMonogram",
+              "fill": "#C9A96280",
+              "content": "K & R",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 20,
+              "fontWeight": "300"
+            },
+            {
+              "type": "text",
+              "id": "jOfT5",
+              "name": "footerDate",
+              "fill": "#8B5E6B80",
+              "content": "18 · 07 · 2026",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal",
+              "letterSpacing": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "65W5H",
+      "x": 1390,
+      "y": 0,
+      "name": "Modern Minimal - Cover",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "#FAFAF8",
+      "layout": "vertical",
+      "gap": 28,
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "D1hxr",
+          "name": "mmTopLine",
+          "fill": "#D4AF37",
+          "width": 1,
+          "height": 80
+        },
+        {
+          "type": "text",
+          "id": "sBbot",
+          "name": "mmInvLabel",
+          "fill": "#999999",
+          "content": "WEDDING INVITATION",
+          "fontFamily": "Inter",
+          "fontSize": 10,
+          "letterSpacing": 5
+        },
+        {
+          "type": "text",
+          "id": "6cElb",
+          "name": "mmBride",
+          "fill": "#2C2C2C",
+          "content": "Ana",
+          "fontFamily": "Playfair Display",
+          "fontSize": 56
+        },
+        {
+          "type": "text",
+          "id": "Dlxt7",
+          "name": "mmAmp",
+          "fill": "#D4AF37",
+          "content": "&",
+          "fontFamily": "Playfair Display",
+          "fontSize": 24,
+          "fontWeight": "300",
+          "fontStyle": "italic"
+        },
+        {
+          "type": "text",
+          "id": "AP4pT",
+          "name": "mmGroom",
+          "fill": "#2C2C2C",
+          "content": "Miguel",
+          "fontFamily": "Playfair Display",
+          "fontSize": 56
+        },
+        {
+          "type": "frame",
+          "id": "Kzvyk",
+          "name": "mmDateLine",
+          "gap": 16,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "ccRP5",
+              "name": "mmDash1",
+              "fill": "#D4AF37",
+              "width": 40,
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "AyjXX",
+              "name": "mmDateText",
+              "fill": "#999999",
+              "content": "18.07.2026",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "letterSpacing": 3
+            },
+            {
+              "type": "rectangle",
+              "id": "uhIEY",
+              "name": "mmDash2",
+              "fill": "#D4AF37",
+              "width": 40,
+              "height": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "5HSp7",
+          "name": "mmTapFrame",
+          "stroke": {
+            "thickness": 1,
+            "fill": "#D4AF37"
+          },
+          "gap": 8,
+          "padding": [
+            12,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "f5RRw",
+              "name": "mmTapIcon",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "mail-open",
+              "iconFontFamily": "lucide",
+              "fill": "#D4AF37"
+            },
+            {
+              "type": "text",
+              "id": "RbGav",
+              "name": "mmTapText",
+              "fill": "#D4AF37",
+              "content": "OPEN INVITATION",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500",
+              "letterSpacing": 3
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "6yvLX",
+          "name": "mmBottomLine",
+          "fill": "#D4AF37",
+          "width": 1,
+          "height": 80
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "fa51U",
+      "x": 1830,
+      "y": 0,
+      "name": "Modern Minimal - Invitation",
+      "clip": true,
+      "width": 390,
+      "fill": "#FAFAF8",
+      "layout": "vertical",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "FgGYL",
+          "name": "MM Hero",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            60,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "0pWYa",
+              "type": "ref",
+              "ref": "68WKZ",
+              "fill": "#2C2C2C20",
+              "name": "mmAudioRef",
+              "descendants": {
+                "6WJuB": {
+                  "fill": "#D4AF37"
+                },
+                "QWEhr": {
+                  "fill": "#FFFFFF"
+                },
+                "rf9pG": {
+                  "fill": "#2C2C2C"
+                },
+                "EDqzn": {
+                  "fill": "#99999999"
+                }
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "ne2Zd",
+              "name": "mmHeroLine1",
+              "fill": "#D4AF37",
+              "width": 1,
+              "height": 40
+            },
+            {
+              "type": "text",
+              "id": "23Yey",
+              "name": "mmHeroBride",
+              "fill": "#2C2C2C",
+              "content": "Ana",
+              "fontFamily": "Playfair Display",
+              "fontSize": 48,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "fHYev",
+              "name": "mmHeroAmp2",
+              "fill": "#D4AF37",
+              "content": "&",
+              "fontFamily": "Playfair Display",
+              "fontSize": 24,
+              "fontWeight": "300",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "text",
+              "id": "nLL2T",
+              "name": "mmHeroGroom",
+              "fill": "#2C2C2C",
+              "content": "Miguel",
+              "fontFamily": "Playfair Display",
+              "fontSize": 48,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "HwcE5",
+              "name": "mmHeroQuote",
+              "fill": "#999999",
+              "textGrowth": "fixed-width",
+              "width": 260,
+              "content": "&quot;O amor é a poesia dos sentidos&quot;",
+              "textAlign": "center",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 15,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "9m7Zl",
+          "name": "MM Date",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            24,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "8Jcai",
+              "name": "mmDateDash1",
+              "fill": "#D4AF3740",
+              "width": 60,
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "oIBqK",
+              "name": "mmSaveLabel",
+              "fill": "#999999",
+              "content": "SAVE THE DATE",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "letterSpacing": 4
+            },
+            {
+              "type": "frame",
+              "id": "bx2JZ",
+              "name": "mmDateRow",
+              "gap": 20,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "lDNPP",
+                  "name": "mmDateDash2",
+                  "fill": "#D4AF37",
+                  "width": 40,
+                  "height": 1
+                },
+                {
+                  "type": "text",
+                  "id": "wUiGv",
+                  "name": "mmDateBig",
+                  "fill": "#2C2C2C",
+                  "content": "18",
+                  "lineHeight": 0.9,
+                  "fontFamily": "Playfair Display",
+                  "fontSize": 72
+                },
+                {
+                  "type": "rectangle",
+                  "id": "Ox5sv",
+                  "name": "mmDateDash3",
+                  "fill": "#D4AF37",
+                  "width": 40,
+                  "height": 1
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "aQjTU",
+              "name": "mmMonthYear",
+              "fill": "#666666",
+              "content": "JULHO  ·  2026",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "letterSpacing": 4
+            },
+            {
+              "type": "text",
+              "id": "R55d4",
+              "name": "mmTimeText",
+              "fill": "#999999",
+              "content": "Sábado às 16h",
+              "fontFamily": "Cormorant Garamond",
+              "fontSize": 16,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "rectangle",
+              "id": "IcRCS",
+              "name": "mmDateDash4",
+              "fill": "#D4AF3740",
+              "width": 60,
+              "height": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "EBUnM",
+          "name": "MM Schedule",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            24,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "ZOfkl",
+              "name": "mmSchedLabel",
+              "fill": "#999999",
+              "content": "PROGRAMA",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "letterSpacing": 4
+            },
+            {
+              "type": "frame",
+              "id": "ivFFq",
+              "name": "mmSchedList",
+              "width": "fill_container",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "BjZOZ",
+                  "name": "mmS1",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "padding": [
+                    14,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "hAstV",
+                      "name": "mmS1Time",
+                      "fill": "#2C2C2C",
+                      "content": "16:00",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "OPhV9",
+                      "name": "mmS1Dash",
+                      "fill": "#D4AF3730",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "eDEkz",
+                      "name": "mmS1Evt",
+                      "fill": "#666666",
+                      "content": "Cerimónia",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yxWkX",
+                  "name": "mmS2",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "padding": [
+                    14,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wAdWd",
+                      "name": "mmS2Time",
+                      "fill": "#2C2C2C",
+                      "content": "17:30",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "Ugqen",
+                      "name": "mmS2Dash",
+                      "fill": "#D4AF3730",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "jKnXa",
+                      "name": "mmS2Evt",
+                      "fill": "#666666",
+                      "content": "Cocktail",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hNWF5",
+                  "name": "mmS3",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "padding": [
+                    14,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "y9Nti",
+                      "name": "mmS3Time",
+                      "fill": "#2C2C2C",
+                      "content": "19:00",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "TV69H",
+                      "name": "mmS3Dash",
+                      "fill": "#D4AF3730",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "fmBkc",
+                      "name": "mmS3Evt",
+                      "fill": "#666666",
+                      "content": "Jantar",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zAsJy",
+                  "name": "mmS4",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "padding": [
+                    14,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "42Ha4",
+                      "name": "mmS4Time",
+                      "fill": "#2C2C2C",
+                      "content": "22:00",
+                      "fontFamily": "Playfair Display",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "nWT7M",
+                      "name": "mmS4Dash",
+                      "fill": "#D4AF3730",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "mCdBN",
+                      "name": "mmS4Evt",
+                      "fill": "#666666",
+                      "content": "Festa",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kEbe0",
+          "name": "MM Info",
+          "width": "fill_container",
+          "gap": 16,
+          "padding": [
+            24,
+            40
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "srV7Q",
+              "name": "mmDressCard",
+              "width": "fill_container",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#D4AF3740"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Ro8t2",
+                  "name": "mmDressIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "shirt",
+                  "iconFontFamily": "lucide",
+                  "fill": "#D4AF37"
+                },
+                {
+                  "type": "text",
+                  "id": "dIMRf",
+                  "name": "mmDressLbl",
+                  "fill": "#999999",
+                  "content": "DRESS CODE",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "XxZep",
+                  "name": "mmDressVal",
+                  "fill": "#2C2C2C",
+                  "content": "Cocktail Attire",
+                  "textAlign": "center",
+                  "fontFamily": "Playfair Display",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fnEzG",
+              "name": "mmGiftCard",
+              "width": "fill_container",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#D4AF3740"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "kDqUz",
+                  "name": "mmGiftIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "gift",
+                  "iconFontFamily": "lucide",
+                  "fill": "#D4AF37"
+                },
+                {
+                  "type": "text",
+                  "id": "57DYV",
+                  "name": "mmGiftLbl",
+                  "fill": "#999999",
+                  "content": "PRESENTES",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "3C5sk",
+                  "name": "mmGiftVal",
+                  "fill": "#2C2C2C",
+                  "textGrowth": "fixed-width",
+                  "width": 110,
+                  "content": "Sua presença é o melhor presente",
+                  "textAlign": "center",
+                  "fontFamily": "Playfair Display",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "pZqIR",
+          "name": "MM CTAs",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16,
+            50,
+            40,
+            50
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "zt4KK",
+              "name": "mmCtaDivider",
+              "fill": "#D4AF37",
+              "width": 1,
+              "height": 30
+            },
+            {
+              "type": "frame",
+              "id": "3l04R",
+              "name": "mmLocBtn",
+              "width": "fill_container",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#2C2C2C"
+              },
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "5WhJe",
+                  "name": "mmLocIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "map-pin",
+                  "iconFontFamily": "lucide",
+                  "fill": "#2C2C2C"
+                },
+                {
+                  "type": "text",
+                  "id": "RuZ1y",
+                  "name": "mmLocTxt",
+                  "fill": "#2C2C2C",
+                  "content": "VER LOCALIZAÇÃO",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "500",
+                  "letterSpacing": 2
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "MNSEq",
+              "name": "mmRsvpBtn",
+              "width": "fill_container",
+              "fill": "#2C2C2C",
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "IUfZ1",
+                  "name": "mmRsvpIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "heart",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FAFAF8"
+                },
+                {
+                  "type": "text",
+                  "id": "eo5WF",
+                  "name": "mmRsvpTxt",
+                  "fill": "#FAFAF8",
+                  "content": "CONFIRMAR PRESENÇA",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "500",
+                  "letterSpacing": 2
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "voukS",
+              "name": "mmCalBtn",
+              "width": "fill_container",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#D4AF37"
+              },
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "CJw7t",
+                  "name": "mmCalIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "calendar-plus",
+                  "iconFontFamily": "lucide",
+                  "fill": "#D4AF37"
+                },
+                {
+                  "type": "text",
+                  "id": "pw1bn",
+                  "name": "mmCalTxt",
+                  "fill": "#D4AF37",
+                  "content": "ADICIONAR AO CALENDÁRIO",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "500",
+                  "letterSpacing": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BydCK",
+          "name": "MM Footer",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "dQpGY",
+              "name": "mmFooterLine",
+              "fill": "#D4AF3740",
+              "width": 1,
+              "height": 40
+            },
+            {
+              "type": "text",
+              "id": "hbcAI",
+              "name": "mmFooterNames",
+              "fill": "#D4AF3760",
+              "content": "A & M",
+              "fontFamily": "Playfair Display",
+              "fontSize": 18,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "L1U7c",
+              "name": "mmFooterDate",
+              "fill": "#99999980",
+              "content": "18 · 07 · 2026",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "normal",
+              "letterSpacing": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "sFczH",
+      "x": 2280,
+      "y": 0,
+      "name": "Boho Chic - Cover",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1771721284190.png",
+        "mode": "fill"
+      },
+      "layout": "vertical",
+      "gap": 20,
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "RN0EN",
+          "name": "Boho Overlay",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "radial",
+            "enabled": true,
+            "rotation": 0,
+            "size": {
+              "width": 1,
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#F5EDE480",
+                "position": 0
+              },
+              {
+                "color": "#F5EDE420",
+                "position": 1
+              }
+            ]
+          },
+          "layout": "vertical",
+          "gap": 16,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "sPQtF",
+              "name": "bohoWe",
+              "fill": "#8B7355",
+              "content": "JUNTOS PARA SEMPRE",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "letterSpacing": 4
+            },
+            {
+              "type": "text",
+              "id": "VSRrR",
+              "name": "bohoBride",
+              "fill": "#A0715A",
+              "content": "Sofia",
+              "fontFamily": "Homemade Apple",
+              "fontSize": 42,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "FajSq",
+              "name": "bohoAmp",
+              "fill": "#8B9A7A",
+              "content": "&",
+              "fontFamily": "Libre Baskerville",
+              "fontSize": 28,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "text",
+              "id": "z0vWf",
+              "name": "bohoGroom",
+              "fill": "#A0715A",
+              "content": "Pedro",
+              "fontFamily": "Homemade Apple",
+              "fontSize": 42,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "ofcAj",
+              "name": "bohoDatePreview",
+              "fill": "#8B7355",
+              "content": "18 de Julho, 2026",
+              "fontFamily": "Libre Baskerville",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "gvbFU",
+              "name": "bohoTap",
+              "fill": "#A0715A20",
+              "cornerRadius": 30,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#A0715A60"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "r3hmc",
+                  "name": "bohoTapIcon",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "leaf",
+                  "iconFontFamily": "lucide",
+                  "fill": "#A0715A"
+                },
+                {
+                  "type": "text",
+                  "id": "6viMk",
+                  "name": "bohoTapText",
+                  "fill": "#A0715A",
+                  "content": "Toque para Abrir",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "500",
+                  "letterSpacing": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "8nrkN",
+      "x": 2720,
+      "y": 0,
+      "name": "Boho Chic - Invitation",
+      "clip": true,
+      "width": 390,
+      "fill": "#F5EDE4",
+      "layout": "vertical",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "nGAXs",
+          "name": "Boho Hero",
+          "width": "fill_container",
+          "height": 280,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./images/generated-1771721319488.png",
+            "mode": "fill"
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "CJq9x",
+              "x": 0,
+              "y": 0,
+              "name": "bohoHeroOverlay",
+              "width": 390,
+              "height": 280,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#F5EDE400",
+                    "position": 0
+                  },
+                  {
+                    "color": "#F5EDE4",
+                    "position": 0.85
+                  }
+                ]
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                0,
+                28,
+                16,
+                28
+              ],
+              "justifyContent": "end",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "y24ar",
+                  "type": "ref",
+                  "ref": "68WKZ",
+                  "fill": "#A0715A30",
+                  "name": "bohoAudioRef",
+                  "descendants": {
+                    "6WJuB": {
+                      "fill": "#8B9A7A"
+                    },
+                    "QWEhr": {
+                      "fill": "#FFFFFF"
+                    },
+                    "rf9pG": {
+                      "fill": "#A0715A"
+                    },
+                    "EDqzn": {
+                      "fill": "#8B735599"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "CZxEL",
+          "name": "Boho Names",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": [
+            28,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "KfzS4",
+              "name": "bohoInvLabel",
+              "fill": "#8B7355",
+              "content": "CONVIDAM PARA O CASAMENTO",
+              "fontFamily": "Inter",
+              "fontSize": 9,
+              "letterSpacing": 3
+            },
+            {
+              "type": "text",
+              "id": "JDLbQ",
+              "name": "bohoBrideName",
+              "fill": "#A0715A",
+              "content": "Sofia",
+              "fontFamily": "Homemade Apple",
+              "fontSize": 44,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "hHaTi",
+              "name": "bohoAmpersand",
+              "fill": "#8B9A7A",
+              "content": "&",
+              "fontFamily": "Libre Baskerville",
+              "fontSize": 24,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "text",
+              "id": "ja8vs",
+              "name": "bohoGroomName",
+              "fill": "#A0715A",
+              "content": "Pedro",
+              "fontFamily": "Homemade Apple",
+              "fontSize": 44,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "qRSyH",
+              "name": "bohoQuoteDivider",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "4WvQi",
+                  "name": "bohoLeaf1",
+                  "rotation": -45,
+                  "width": 12,
+                  "height": 12,
+                  "iconFontName": "leaf",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B9A7A"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "7P4XU",
+                  "name": "bohoQLine",
+                  "fill": "#8B9A7A60",
+                  "width": 40,
+                  "height": 1
+                },
+                {
+                  "type": "icon_font",
+                  "id": "JTVXL",
+                  "name": "bohoLeaf2",
+                  "rotation": 45,
+                  "flipX": true,
+                  "width": 12,
+                  "height": 12,
+                  "iconFontName": "leaf",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B9A7A"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "LsN1g",
+              "name": "bohoQuote",
+              "fill": "#8B7355",
+              "content": "&quot;Onde há amor, há vida&quot;",
+              "textAlign": "center",
+              "fontFamily": "Libre Baskerville",
+              "fontSize": 14,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "i84gs",
+          "name": "Boho Date",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            40,
+            28,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "hVDPk",
+              "name": "bohoDateCard",
+              "width": "fill_container",
+              "fill": "#FFFFFF80",
+              "cornerRadius": 20,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#A0715A20"
+              },
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                24,
+                20
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "U28qP",
+                  "name": "bohoSaveLabel",
+                  "fill": "#8B9A7A",
+                  "content": "SAVE THE DATE",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 4
+                },
+                {
+                  "type": "text",
+                  "id": "F7BFn",
+                  "name": "bohoDateDay",
+                  "fill": "#A0715A",
+                  "content": "18",
+                  "lineHeight": 0.9,
+                  "fontFamily": "Libre Baskerville",
+                  "fontSize": 64,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "e4lPi",
+                  "name": "bohoDateMonth",
+                  "fill": "#8B7355",
+                  "content": "JULHO · 2026",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "500",
+                  "letterSpacing": 4
+                },
+                {
+                  "type": "frame",
+                  "id": "Rg03w",
+                  "name": "bohoDateLine",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "6HGsX",
+                      "name": "bohoLeaf3",
+                      "width": 10,
+                      "height": 10,
+                      "iconFontName": "leaf",
+                      "iconFontFamily": "lucide",
+                      "fill": "#8B9A7A"
+                    },
+                    {
+                      "type": "text",
+                      "id": "dObJQ",
+                      "name": "bohoDateTimeText",
+                      "fill": "#8B7355",
+                      "content": "Sábado · 16:00",
+                      "fontFamily": "Libre Baskerville",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "w8dlb",
+                      "name": "bohoLeaf4",
+                      "flipX": true,
+                      "width": 10,
+                      "height": 10,
+                      "iconFontName": "leaf",
+                      "iconFontFamily": "lucide",
+                      "fill": "#8B9A7A"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qWYrP",
+          "name": "Boho Schedule",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            28,
+            28,
+            28
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Kmmox",
+              "name": "bohoSchedLbl",
+              "fill": "#8B7355",
+              "content": "PROGRAMAÇÃO",
+              "fontFamily": "Inter",
+              "fontSize": 9,
+              "letterSpacing": 3
+            },
+            {
+              "type": "frame",
+              "id": "F1vmZ",
+              "name": "bohoSchedCard",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "#FFFFFF80",
+              "cornerRadius": 20,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#A0715A20"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "id": "IdsVR",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "bohoSch1",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "16:00",
+                      "fill": "#8B9A7A"
+                    },
+                    "t24dd": {
+                      "content": "Cerimónia",
+                      "fill": "#8B7355"
+                    },
+                    "sBPzx": {
+                      "fill": "#8B9A7A40"
+                    },
+                    "VhAEX": {
+                      "content": "Capela do Bosque",
+                      "fill": "#A0715A"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "IElpT",
+                  "name": "bohoSchDiv1",
+                  "fill": "#A0715A15",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "CY6Lu",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "bohoSch2",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "17:30",
+                      "fill": "#8B9A7A"
+                    },
+                    "t24dd": {
+                      "content": "Cocktail",
+                      "fill": "#8B7355"
+                    },
+                    "sBPzx": {
+                      "fill": "#8B9A7A40"
+                    },
+                    "VhAEX": {
+                      "content": "Jardim Rústico",
+                      "fill": "#A0715A"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "3Id6r",
+                  "name": "bohoSchDiv2",
+                  "fill": "#A0715A15",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "WO9pf",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "bohoSch3",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "19:00",
+                      "fill": "#8B9A7A"
+                    },
+                    "t24dd": {
+                      "content": "Jantar",
+                      "fill": "#8B7355"
+                    },
+                    "sBPzx": {
+                      "fill": "#8B9A7A40"
+                    },
+                    "VhAEX": {
+                      "content": "Celeiro Decorado",
+                      "fill": "#A0715A"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "7WdWY",
+                  "name": "bohoSchDiv3",
+                  "fill": "#A0715A15",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "5JrKQ",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "bohoSch4",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "22:00",
+                      "fill": "#8B9A7A"
+                    },
+                    "t24dd": {
+                      "content": "Festa",
+                      "fill": "#8B7355"
+                    },
+                    "sBPzx": {
+                      "fill": "#8B9A7A40"
+                    },
+                    "VhAEX": {
+                      "content": "Ao Ar Livre",
+                      "fill": "#A0715A"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "lKrHm",
+          "name": "Boho Info",
+          "width": "fill_container",
+          "gap": 14,
+          "padding": [
+            0,
+            28,
+            28,
+            28
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "mV0or",
+              "name": "bohoDressCard",
+              "width": "fill_container",
+              "fill": "#FFFFFF80",
+              "cornerRadius": 20,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#A0715A20"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                18,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "ypIsz",
+                  "name": "bohoDressIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "shirt",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B9A7A"
+                },
+                {
+                  "type": "text",
+                  "id": "lFpEI",
+                  "name": "bohoDressLbl",
+                  "fill": "#8B7355",
+                  "content": "DRESS CODE",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "OyRW1",
+                  "name": "bohoDressVal",
+                  "fill": "#A0715A",
+                  "textGrowth": "fixed-width",
+                  "width": 120,
+                  "content": "Traje Casual Elegante",
+                  "textAlign": "center",
+                  "fontFamily": "Libre Baskerville",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sZhKQ",
+              "name": "bohoGiftCard",
+              "width": "fill_container",
+              "fill": "#FFFFFF80",
+              "cornerRadius": 20,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#A0715A20"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                18,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Qdakp",
+                  "name": "bohoGiftIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "gift",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B9A7A"
+                },
+                {
+                  "type": "text",
+                  "id": "SHG4G",
+                  "name": "bohoGiftLbl",
+                  "fill": "#8B7355",
+                  "content": "PRESENTES",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "b1IBR",
+                  "name": "bohoGiftVal",
+                  "fill": "#A0715A",
+                  "textGrowth": "fixed-width",
+                  "width": 120,
+                  "content": "Sua presença é o melhor presente",
+                  "textAlign": "center",
+                  "fontFamily": "Libre Baskerville",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "c2qHO",
+          "name": "Boho CTAs",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Z8U5S",
+              "name": "bohoLocBtn",
+              "width": "fill_container",
+              "fill": "#8B9A7A",
+              "cornerRadius": 30,
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "ZTODp",
+                  "name": "bohoLocIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "map-pin",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "rSPlz",
+                  "name": "bohoLocTxt",
+                  "fill": "#FFFFFF",
+                  "content": "Ver Localização",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "w0xm3",
+              "name": "bohoRsvpBtn",
+              "width": "fill_container",
+              "fill": "#A0715A",
+              "cornerRadius": 30,
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "f5KCB",
+                  "name": "bohoRsvpIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "heart",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "jM8Tk",
+                  "name": "bohoRsvpTxt",
+                  "fill": "#FFFFFF",
+                  "content": "Confirmar Presença",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XvhSl",
+              "name": "bohoCalBtn",
+              "width": "fill_container",
+              "cornerRadius": 30,
+              "stroke": {
+                "thickness": 1.5,
+                "fill": "#A0715A"
+              },
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "7nU7y",
+                  "name": "bohoCalIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "calendar-plus",
+                  "iconFontFamily": "lucide",
+                  "fill": "#A0715A"
+                },
+                {
+                  "type": "text",
+                  "id": "g2qm5",
+                  "name": "bohoCalTxt",
+                  "fill": "#A0715A",
+                  "content": "Adicionar ao Calendário",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "TYk0N",
+          "name": "Boho Footer",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": [
+            0,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "b7SZg",
+              "name": "bohoFooterLeafRow",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Np1Kr",
+                  "name": "bohoFL1",
+                  "rotation": -45,
+                  "width": 10,
+                  "height": 10,
+                  "iconFontName": "leaf",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B9A7A60"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "V2QQS",
+                  "name": "bohoFooterLine",
+                  "fill": "#A0715A30",
+                  "width": 40,
+                  "height": 1
+                },
+                {
+                  "type": "icon_font",
+                  "id": "6a4XY",
+                  "name": "bohoFL2",
+                  "rotation": 45,
+                  "flipX": true,
+                  "width": 10,
+                  "height": 10,
+                  "iconFontName": "leaf",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B9A7A60"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "oDdBV",
+              "name": "bohoFooterNames",
+              "fill": "#A0715A60",
+              "content": "S & P",
+              "fontFamily": "Homemade Apple",
+              "fontSize": 18,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "lRW92",
+              "name": "bohoFooterDate",
+              "fill": "#8B735560",
+              "content": "18 · 07 · 2026",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "normal",
+              "letterSpacing": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "I1erS",
+      "x": 3170,
+      "y": 0,
+      "name": "Midnight Elegance - Cover",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "#0A0F1A",
+      "layout": "vertical",
+      "gap": 24,
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "cL9YV",
+          "name": "ME Star Overlay",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "radial",
+            "enabled": true,
+            "rotation": 0,
+            "size": {
+              "width": 1,
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#1A2540",
+                "position": 0
+              },
+              {
+                "color": "#0A0F1A",
+                "position": 1
+              }
+            ]
+          },
+          "layout": "vertical",
+          "gap": 20,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "5KigZ",
+              "name": "meTopAccent",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FFD70000",
+                    "position": 0
+                  },
+                  {
+                    "color": "#FFD700",
+                    "position": 1
+                  }
+                ]
+              },
+              "width": 1,
+              "height": 60
+            },
+            {
+              "type": "text",
+              "id": "zpxOp",
+              "name": "meInvLabel",
+              "fill": "#FFD70080",
+              "content": "YOU ARE INVITED",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "letterSpacing": 6
+            },
+            {
+              "type": "frame",
+              "id": "ue65O",
+              "name": "meMonogramFrame",
+              "width": 130,
+              "height": 130,
+              "cornerRadius": 65,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFD70050"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "HJhrO",
+                  "x": 10,
+                  "y": 10,
+                  "name": "meMonogramInner",
+                  "width": 110,
+                  "height": 110,
+                  "cornerRadius": 55,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FFD70030"
+                  },
+                  "layout": "none"
+                },
+                {
+                  "type": "text",
+                  "id": "q8zbD",
+                  "x": 24,
+                  "y": 40,
+                  "name": "meMonogramText",
+                  "fill": "#FFD700",
+                  "content": "L&D",
+                  "fontFamily": "Cinzel",
+                  "fontSize": 36
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "n9j4y",
+              "name": "meBride",
+              "fill": "#FFFFFF",
+              "content": "Leonor",
+              "fontFamily": "Cinzel",
+              "fontSize": 38,
+              "letterSpacing": 4
+            },
+            {
+              "type": "text",
+              "id": "4qKSh",
+              "name": "meAmp",
+              "fill": "#FFD700",
+              "content": "&",
+              "fontFamily": "Lora",
+              "fontSize": 24,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "text",
+              "id": "VGQZ9",
+              "name": "meGroom",
+              "fill": "#FFFFFF",
+              "content": "Diogo",
+              "fontFamily": "Cinzel",
+              "fontSize": 38,
+              "letterSpacing": 4
+            },
+            {
+              "type": "frame",
+              "id": "ywma9",
+              "name": "meDatePreview",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "Ag6Lu",
+                  "name": "meDash1",
+                  "fill": "#FFD70050",
+                  "width": 30,
+                  "height": 1
+                },
+                {
+                  "type": "text",
+                  "id": "CG61j",
+                  "name": "meDateText",
+                  "fill": "#FFD70080",
+                  "content": "18.07.2026",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "letterSpacing": 4
+                },
+                {
+                  "type": "rectangle",
+                  "id": "AVbhp",
+                  "name": "meDash2",
+                  "fill": "#FFD70050",
+                  "width": 30,
+                  "height": 1
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sjZpT",
+              "name": "meTap",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFD70060"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                28
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "fth6x",
+                  "name": "meTapIcon",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "sparkles",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFD700"
+                },
+                {
+                  "type": "text",
+                  "id": "wp5uk",
+                  "name": "meTapText",
+                  "fill": "#FFD700",
+                  "content": "ABRIR CONVITE",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "500",
+                  "letterSpacing": 3
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "5jVHF",
+              "name": "meBottomAccent",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FFD70000",
+                    "position": 0
+                  },
+                  {
+                    "color": "#FFD700",
+                    "position": 1
+                  }
+                ]
+              },
+              "width": 1,
+              "height": 60
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "aNpWo",
+      "x": 3610,
+      "y": 0,
+      "name": "Midnight Elegance - Invitation",
+      "clip": true,
+      "width": 390,
+      "fill": "#0A0F1A",
+      "layout": "vertical",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "pdbfu",
+          "name": "ME Hero",
+          "width": "fill_container",
+          "height": 300,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./images/generated-1771721462752.png",
+            "mode": "fill"
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "4fXH5",
+              "x": 0,
+              "y": 0,
+              "name": "meHeroOverlay",
+              "width": 390,
+              "height": 300,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#0A0F1A00",
+                    "position": 0
+                  },
+                  {
+                    "color": "#0A0F1A",
+                    "position": 0.85
+                  }
+                ]
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                0,
+                28,
+                16,
+                28
+              ],
+              "justifyContent": "end",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "ZZMvo",
+                  "type": "ref",
+                  "ref": "68WKZ",
+                  "fill": "#FFD70020",
+                  "name": "meAudioRef",
+                  "descendants": {
+                    "6WJuB": {
+                      "fill": "#FFD700"
+                    },
+                    "QWEhr": {
+                      "fill": "#0A0F1A"
+                    },
+                    "rf9pG": {
+                      "fill": "#FFD700"
+                    },
+                    "EDqzn": {
+                      "fill": "#FFD70080"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vXoqy",
+          "name": "ME Names",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            32,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Q4lqZ",
+              "name": "meInvLbl",
+              "fill": "#FFD70060",
+              "content": "CONVIDAM PARA O CASAMENTO DE",
+              "fontFamily": "Inter",
+              "fontSize": 9,
+              "letterSpacing": 4
+            },
+            {
+              "type": "text",
+              "id": "A1XFn",
+              "name": "meBrideName",
+              "fill": "#FFFFFF",
+              "content": "Leonor",
+              "fontFamily": "Cinzel",
+              "fontSize": 44,
+              "letterSpacing": 3
+            },
+            {
+              "type": "text",
+              "id": "FZq5j",
+              "name": "meAmpersand",
+              "fill": "#FFD700",
+              "content": "&",
+              "fontFamily": "Lora",
+              "fontSize": 24,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "text",
+              "id": "2gzzw",
+              "name": "meGroomName",
+              "fill": "#FFFFFF",
+              "content": "Diogo",
+              "fontFamily": "Cinzel",
+              "fontSize": 44,
+              "letterSpacing": 3
+            },
+            {
+              "type": "rectangle",
+              "id": "S8Ta0",
+              "name": "meQuoteLine",
+              "fill": "#FFD70040",
+              "width": 40,
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "zWT04",
+              "name": "meQuoteText",
+              "fill": "#FFFFFF60",
+              "textGrowth": "fixed-width",
+              "width": 260,
+              "content": "&quot;O que o amor uniu, ninguém separa&quot;",
+              "textAlign": "center",
+              "fontFamily": "Lora",
+              "fontSize": 14,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "3FHuP",
+          "name": "ME Date",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            40,
+            32,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "EFmcr",
+              "name": "meDateCard",
+              "width": "fill_container",
+              "fill": "#FFFFFF08",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFD70030"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                28,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "f0lwq",
+                  "name": "meSaveLbl",
+                  "fill": "#FFD700",
+                  "content": "SAVE THE DATE",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 5
+                },
+                {
+                  "type": "text",
+                  "id": "sWWIZ",
+                  "name": "meDateDay",
+                  "fill": "#FFFFFF",
+                  "content": "18",
+                  "lineHeight": 0.9,
+                  "fontFamily": "Cinzel",
+                  "fontSize": 72
+                },
+                {
+                  "type": "text",
+                  "id": "R4RDL",
+                  "name": "meDateMonth",
+                  "fill": "#FFD700",
+                  "content": "JULHO",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "letterSpacing": 6
+                },
+                {
+                  "type": "text",
+                  "id": "AojBS",
+                  "name": "meDateYear",
+                  "fill": "#FFFFFF80",
+                  "content": "2026",
+                  "fontFamily": "Cinzel",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "n433V",
+                  "name": "meDateDivider",
+                  "fill": "#FFD70030",
+                  "width": 80,
+                  "height": 1
+                },
+                {
+                  "type": "text",
+                  "id": "z0Vzv",
+                  "name": "meDateTimeVal",
+                  "fill": "#FFFFFF60",
+                  "content": "Sábado · 16:00",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "CltNF",
+          "name": "ME Schedule",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            28,
+            32,
+            28
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "QKjaf",
+              "name": "meSchedLbl",
+              "fill": "#FFD70060",
+              "content": "PROGRAMAÇÃO",
+              "fontFamily": "Inter",
+              "fontSize": 9,
+              "letterSpacing": 4
+            },
+            {
+              "type": "rectangle",
+              "id": "kYiwc",
+              "name": "meSchedDivider",
+              "fill": "#FFD70040",
+              "width": 30,
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "jrKQh",
+              "name": "meSchedCard",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "#FFFFFF05",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFD70020"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "id": "NZ7QP",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "meSch1",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "16:00",
+                      "fill": "#FFD700"
+                    },
+                    "t24dd": {
+                      "content": "Cerimónia",
+                      "fill": "#FFFFFF60"
+                    },
+                    "sBPzx": {
+                      "fill": "#FFD70030"
+                    },
+                    "VhAEX": {
+                      "content": "Igreja do Castelo",
+                      "fill": "#FFFFFF"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "MV5Wl",
+                  "name": "meSchDiv1",
+                  "fill": "#FFD70015",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "hFvs7",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "meSch2",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "17:30",
+                      "fill": "#FFD700"
+                    },
+                    "t24dd": {
+                      "content": "Cocktail",
+                      "fill": "#FFFFFF60"
+                    },
+                    "sBPzx": {
+                      "fill": "#FFD70030"
+                    },
+                    "VhAEX": {
+                      "content": "Terraço Panorâmico",
+                      "fill": "#FFFFFF"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "gPhJ3",
+                  "name": "meSchDiv2",
+                  "fill": "#FFD70015",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "qHaCJ",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "meSch3",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "19:00",
+                      "fill": "#FFD700"
+                    },
+                    "t24dd": {
+                      "content": "Jantar",
+                      "fill": "#FFFFFF60"
+                    },
+                    "sBPzx": {
+                      "fill": "#FFD70030"
+                    },
+                    "VhAEX": {
+                      "content": "Salão Dourado",
+                      "fill": "#FFFFFF"
+                    }
+                  }
+                },
+                {
+                  "type": "rectangle",
+                  "id": "9kEmE",
+                  "name": "meSchDiv3",
+                  "fill": "#FFD70015",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "id": "eMh6x",
+                  "type": "ref",
+                  "ref": "PVbLY",
+                  "width": "fill_container",
+                  "name": "meSch4",
+                  "descendants": {
+                    "pXqoT": {
+                      "content": "22:00",
+                      "fill": "#FFD700"
+                    },
+                    "t24dd": {
+                      "content": "Festa",
+                      "fill": "#FFFFFF60"
+                    },
+                    "sBPzx": {
+                      "fill": "#FFD70030"
+                    },
+                    "VhAEX": {
+                      "content": "Pista VIP",
+                      "fill": "#FFFFFF"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "E5N9q",
+          "name": "ME Info",
+          "width": "fill_container",
+          "gap": 14,
+          "padding": [
+            0,
+            28,
+            32,
+            28
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "wORXD",
+              "name": "meDressCard",
+              "width": "fill_container",
+              "fill": "#FFFFFF05",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFD70030"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "wGAl4",
+                  "name": "meDressIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "shirt",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFD700"
+                },
+                {
+                  "type": "text",
+                  "id": "r0OrR",
+                  "name": "meDressLbl",
+                  "fill": "#FFFFFF50",
+                  "content": "DRESS CODE",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "do6xL",
+                  "name": "meDressVal",
+                  "fill": "#FFFFFF",
+                  "content": "Black Tie",
+                  "textAlign": "center",
+                  "fontFamily": "Cinzel",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "DL0g3",
+              "name": "meGiftCard",
+              "width": "fill_container",
+              "fill": "#FFFFFF05",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFD70030"
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "KjRjN",
+                  "name": "meGiftIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "gift",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFD700"
+                },
+                {
+                  "type": "text",
+                  "id": "nCPPS",
+                  "name": "meGiftLbl",
+                  "fill": "#FFFFFF50",
+                  "content": "PRESENTES",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "kx9Qk",
+                  "name": "meGiftVal",
+                  "fill": "#FFFFFF",
+                  "textGrowth": "fixed-width",
+                  "width": 120,
+                  "content": "A vossa presença é o presente perfeito",
+                  "textAlign": "center",
+                  "fontFamily": "Cinzel",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "pOtPT",
+          "name": "ME CTAs",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "HrDzQ",
+              "name": "meCtaDivider",
+              "fill": "#FFD70040",
+              "width": 1,
+              "height": 30
+            },
+            {
+              "type": "frame",
+              "id": "7XiKQ",
+              "name": "meLocBtn",
+              "width": "fill_container",
+              "fill": "#FFD700",
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "aug62",
+                  "name": "meLocIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "map-pin",
+                  "iconFontFamily": "lucide",
+                  "fill": "#0A0F1A"
+                },
+                {
+                  "type": "text",
+                  "id": "kzjlB",
+                  "name": "meLocTxt",
+                  "fill": "#0A0F1A",
+                  "content": "Ver Localização",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "kwzWf",
+              "name": "meRsvpBtn",
+              "width": "fill_container",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFD700"
+              },
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Q9CFC",
+                  "name": "meRsvpIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "heart",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFD700"
+                },
+                {
+                  "type": "text",
+                  "id": "JcinU",
+                  "name": "meRsvpTxt",
+                  "fill": "#FFD700",
+                  "content": "Confirmar Presença",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pTtyc",
+              "name": "meCalBtn",
+              "width": "fill_container",
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFFFFF30"
+              },
+              "gap": 10,
+              "padding": [
+                14,
+                28
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "2tTMv",
+                  "name": "meCalIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "calendar-plus",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF80"
+                },
+                {
+                  "type": "text",
+                  "id": "O6B20",
+                  "name": "meCalTxt",
+                  "fill": "#FFFFFF80",
+                  "content": "Adicionar ao Calendário",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "8I9uA",
+          "name": "ME Footer",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16,
+            40,
+            40,
+            40
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "rZ49v",
+              "name": "meFooterAccent",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FFD70000",
+                    "position": 0
+                  },
+                  {
+                    "color": "#FFD70060",
+                    "position": 1
+                  }
+                ]
+              },
+              "width": 1,
+              "height": 40
+            },
+            {
+              "type": "text",
+              "id": "fJa1r",
+              "name": "meFooterNames",
+              "fill": "#FFD70040",
+              "content": "L & D",
+              "fontFamily": "Cinzel",
+              "fontSize": 18,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "QQZQh",
+              "name": "meFooterDate",
+              "fill": "#FFFFFF30",
+              "content": "18 · 07 · 2026",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "normal",
+              "letterSpacing": 3
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
