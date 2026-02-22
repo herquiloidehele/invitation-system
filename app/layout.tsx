@@ -63,7 +63,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Convites Digitais",
+  title: "Brindel Studio — Convites Digitais",
   description: "Convites de casamento interativos e memoráveis",
 };
 

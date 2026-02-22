@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Heart } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 const templates = [
   {
@@ -35,6 +35,41 @@ const templates = [
   },
 ];
 
+/* ─── Stagger animation presets ─── */
+const stagger = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+  },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: "easeOut" as const },
+  },
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { duration: 0.6, ease: "easeOut" as const },
+  },
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.85 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: "easeOut" as const },
+  },
+};
+
+/* ─── Template Card ─── */
 function TemplateCard({
   template,
   index,
@@ -43,47 +78,42 @@ function TemplateCard({
   index: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.5,
-        delay: 0.2 + index * 0.1,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
-    >
-      <Link href={`/${template.slug}`} className="block">
-        <div
-          className="overflow-hidden rounded-2xl border border-[#3A3A3C]"
-          style={{ backgroundColor: "#242426" }}
-        >
-          {/* Image area */}
-          <div className="relative h-[220px] w-full overflow-hidden">
+    <motion.div variants={fadeUp}>
+      <Link href={`/${template.slug}`} className="block group">
+        <div className="brindel-card">
+          {/* Image */}
+          <div className="brindel-card-img relative h-[220px] w-full overflow-hidden">
             <img
               src={template.image}
               alt={template.name}
               className="h-full w-full object-cover"
               loading={index < 2 ? "eager" : "lazy"}
             />
+            {/* Subtle warm overlay at bottom for text readability */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-16 pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(61,43,26,0.06), transparent)",
+              }}
+            />
           </div>
 
-          {/* Content area */}
-          <div className="flex flex-col gap-1.5 px-4 py-3.5">
+          {/* Content */}
+          <div className="flex flex-col gap-1.5 px-3.5 py-3">
             <h3
               className="font-display-cormorant text-base font-semibold"
-              style={{ color: "#F5F5F0" }}
+              style={{ color: "var(--brindel-text)" }}
             >
               {template.name}
             </h3>
-            <p className="text-[11px]" style={{ color: "#6E6E70" }}>
+            <p
+              className="text-[11px]"
+              style={{ color: "var(--brindel-text-muted)" }}
+            >
               {template.description}
             </p>
-            <div
-              className="mt-0.5 w-full rounded-[20px] py-2 px-4 text-center text-[11px] font-semibold"
-              style={{ backgroundColor: "#C9A962", color: "#1A1A1C" }}
-            >
-              Preview
-            </div>
+            <div className="brindel-card-btn mt-0.5 w-full">Preview</div>
           </div>
         </div>
       </Link>
@@ -91,61 +121,114 @@ function TemplateCard({
   );
 }
 
+/* ─── Section Label with scroll trigger ─── */
+function SectionLabel() {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-40px" });
+
+  return (
+    <motion.p
+      ref={ref}
+      className="brindel-label text-[11px] font-medium tracking-[3px]"
+      initial={{ opacity: 0, x: -12 }}
+      animate={isInView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      style={
+        isInView
+          ? { animation: "brindel-shimmer 3s ease-in-out 0.6s 1 forwards" }
+          : undefined
+      }
+    >
+      ESCOLHA SEU MODELO
+    </motion.p>
+  );
+}
+
+/* ─── Page ─── */
 export default function Home() {
-  // Arrange templates into 2 columns (left: 0,2 / right: 1,3)
   const leftColumn = [templates[0], templates[2]];
   const rightColumn = [templates[1], templates[3]];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#1A1A1C" }}>
-      <main className="mx-auto w-full max-w-[390px]">
-        {/* Hero Section */}
+    <div className="brindel-page">
+      <main className="relative z-10 mx-auto w-full max-w-[390px]">
+        {/* ━━━ Hero Section ━━━ */}
         <motion.section
-          className="flex flex-col items-center gap-4 px-7 pt-[60px] pb-10"
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="flex flex-col items-center gap-4 px-7 pt-12 pb-9"
+          initial="hidden"
+          animate="show"
+          variants={stagger}
         >
-          <Heart
-            size={28}
-            fill="#C9A962"
-            color="#C9A962"
-            strokeWidth={1.5}
-          />
-          <h1
-            className="font-display-cormorant text-4xl font-semibold text-center"
-            style={{ color: "#F5F5F0", fontSize: "36px" }}
+          {/* Monogram Logo */}
+          <motion.div
+            className="brindel-logo flex items-center justify-center rounded-full"
+            variants={scaleIn}
+            style={{
+              width: 56,
+              height: 56,
+              backgroundColor: "var(--brindel-brown)",
+              boxShadow: "0 4px 24px rgba(150,100,58,0.18)",
+            }}
           >
-            Convites Digitais
-          </h1>
-          <p
-            className="max-w-[300px] text-center text-sm leading-relaxed"
-            style={{ color: "#6E6E70", lineHeight: 1.6 }}
-          >
-            Crie convites de casamento interativos e memoráveis
-          </p>
-          <div
-            className="h-px w-[60px]"
-            style={{ backgroundColor: "#C9A96260" }}
-          />
-        </motion.section>
+            <span
+              className="font-display-cormorant italic font-semibold select-none"
+              style={{
+                fontSize: 30,
+                color: "#fff",
+                lineHeight: 1,
+                marginTop: 2,
+              }}
+            >
+              B
+            </span>
+          </motion.div>
 
-        {/* Templates Section */}
-        <section className="flex flex-col gap-5 px-7 pb-10">
-          <motion.p
-            className="text-[11px] font-medium"
-            style={{ color: "#6E6E70", letterSpacing: "3px" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
+          {/* Title */}
+          <motion.h1
+            className="font-display-cormorant font-semibold text-center"
+            variants={fadeUp}
+            style={{
+              color: "var(--brindel-text)",
+              fontSize: 42,
+              letterSpacing: "2px",
+              lineHeight: 1.1,
+            }}
           >
-            ESCOLHA SEU MODELO
+            Brindel
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            className="max-w-[280px] text-center text-[13px] leading-relaxed"
+            variants={fadeUp}
+            style={{
+              color: "var(--brindel-text-muted)",
+              lineHeight: 1.6,
+            }}
+          >
+            Convites de casamento interativos e memoráveis
           </motion.p>
 
-          {/* 2-column grid */}
-          <div className="grid grid-cols-2 gap-3.5">
+          {/* Divider */}
+          <motion.div className="brindel-divider" variants={fadeIn} />
+        </motion.section>
+
+        {/* ━━━ Templates Section ━━━ */}
+        <section className="flex flex-col gap-[18px] px-7 pb-9">
+          <SectionLabel />
+
+          {/* 2-column masonry grid */}
+          <motion.div
+            className="grid grid-cols-2 gap-3"
+            initial="hidden"
+            animate="show"
+            variants={stagger}
+          >
             {/* Left column */}
-            <div className="flex flex-col gap-3.5">
+            <motion.div
+              className="flex flex-col gap-3"
+              variants={stagger}
+            >
               {leftColumn.map((t) => (
                 <TemplateCard
                   key={t.slug}
@@ -153,9 +236,12 @@ export default function Home() {
                   index={templates.indexOf(t)}
                 />
               ))}
-            </div>
+            </motion.div>
             {/* Right column */}
-            <div className="flex flex-col gap-3.5">
+            <motion.div
+              className="flex flex-col gap-3"
+              variants={stagger}
+            >
               {rightColumn.map((t) => (
                 <TemplateCard
                   key={t.slug}
@@ -163,29 +249,29 @@ export default function Home() {
                   index={templates.indexOf(t)}
                 />
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
-        {/* Footer */}
+        {/* ━━━ Footer ━━━ */}
         <motion.footer
-          className="flex flex-col items-center gap-2 px-7 py-6"
+          className="flex flex-col items-center gap-2 px-7 pt-5 pb-7"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
         >
-          <div
-            className="h-px w-[60px]"
-            style={{ backgroundColor: "#3A3A3C" }}
-          />
+          <div className="brindel-divider" />
           <p
-            className="font-display-cormorant text-sm italic text-center"
-            style={{ color: "#4A4A4C" }}
+            className="font-display-cormorant text-sm italic text-center mt-1"
+            style={{ color: "var(--brindel-text-muted)" }}
           >
             Feito com amor para o seu grande dia
           </p>
-          <p className="text-[10px]" style={{ color: "#3A3A3C" }}>
-            © 2026 Convites Digitais
+          <p
+            className="text-[10px]"
+            style={{ color: "var(--brindel-text-faint)" }}
+          >
+            &copy; 2026 Brindel Studio
           </p>
         </motion.footer>
       </main>
