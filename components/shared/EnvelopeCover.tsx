@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Leaf } from "lucide-react";
 import type { TemplateTheme } from "@/lib/types";
 
 /* ------------------------------------------------------------------ */
@@ -20,36 +19,32 @@ interface EnvelopeCoverProps {
 /* ------------------------------------------------------------------ */
 /*  Timing constants (seconds)                                         */
 /*                                                                     */
-/*  Stretched for a true slow-motion, cinematic feel.                  */
-/*  Total sequence ≈ 5.5 s before the scene fully fades out.           */
+/*  Slow cinematic feel ~5 s. Simplified without side-flaps / letter.  */
 /* ------------------------------------------------------------------ */
 
 const T = {
   /** Top flap swings open (3D rotation) */
-  flapOpen:   { dur: 2.0,  del: 0.2  },
+  flapOpen:   { dur: 2.4,  del: 0.2  },
   /** Wax seal cracks & dissolves */
-  sealBreak:  { dur: 1.4,  del: 0.6  },
+  sealBreak:  { dur: 1.6,  del: 0.6  },
   /** Monogram fades away */
   monoFade:   { dur: 1.0,  del: 0.3  },
   /** "Toque para Abrir" fades */
   ctaFade:    { dur: 0.6,  del: 0.1  },
-  /** Left flap folds out */
-  leftFold:   { dur: 1.5,  del: 1.6  },
-  /** Right flap folds out */
-  rightFold:  { dur: 1.5,  del: 1.8  },
   /** Bottom flap drops */
-  bottomDrop: { dur: 1.3,  del: 2.0  },
-  /** Letter preview rises from inside */
-  letterRise: { dur: 1.6,  del: 2.4  },
+  bottomDrop: { dur: 1.5,  del: 2.4  },
   /** Entire scene fades to transparent */
-  sceneFade:  { dur: 1.2,  del: 4.2  },
+  sceneFade:  { dur: 1.4,  del: 3.8  },
 } as const;
 
 /** Milliseconds from tap until onAnimationComplete fires */
 const TOTAL_MS = (T.sceneFade.del + T.sceneFade.dur) * 1000;
 
-/** The cubic-bezier used everywhere — slow start, buttery smooth land */
-const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+/** Smooth ease-out bezier for a natural, gentle deceleration */
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+/** Snappier ease for elements that need a bit more presence */
+const EASE_OUT: [number, number, number, number] = [0.0, 0.0, 0.2, 1];
 
 /* ------------------------------------------------------------------ */
 /*  Envelope body (the back panel visible behind the flaps)            */
@@ -74,14 +69,18 @@ function TopFlap({ color, opening }: { color: string; opening: boolean }) {
   return (
     <motion.div
       className="absolute top-0 left-0 w-full origin-top"
-      style={{ height: "52%", perspective: "900px", zIndex: 20 }}
+      style={{ height: "52%", perspective: "1000px", zIndex: 20 }}
     >
       <motion.div
         className="h-full w-full origin-top"
         style={{ transformStyle: "preserve-3d" }}
         initial={{ rotateX: 0 }}
         animate={opening ? { rotateX: -180 } : { rotateX: 0 }}
-        transition={{ duration: T.flapOpen.dur, delay: T.flapOpen.del, ease: EASE }}
+        transition={{
+          duration: T.flapOpen.dur,
+          delay: T.flapOpen.del,
+          ease: EASE,
+        }}
       >
         {/* Front face */}
         <svg
@@ -121,7 +120,11 @@ function BottomFlap({ color, opening }: { color: string; opening: boolean }) {
       style={{ height: "48%", zIndex: 10 }}
       initial={{ y: 0, opacity: 1 }}
       animate={opening ? { y: 80, opacity: 0 } : { y: 0, opacity: 1 }}
-      transition={{ duration: T.bottomDrop.dur, delay: T.bottomDrop.del, ease: EASE }}
+      transition={{
+        duration: T.bottomDrop.dur,
+        delay: T.bottomDrop.del,
+        ease: EASE_OUT,
+      }}
     >
       <svg className="h-full w-full" viewBox="0 0 390 400" preserveAspectRatio="none">
         <defs>
@@ -136,49 +139,6 @@ function BottomFlap({ color, opening }: { color: string; opening: boolean }) {
   );
 }
 
-function SideFlap({
-  color,
-  opening,
-  side,
-}: {
-  color: string;
-  opening: boolean;
-  side: "left" | "right";
-}) {
-  const isLeft = side === "left";
-  const t = isLeft ? T.leftFold : T.rightFold;
-  const rotateTarget = isLeft ? -70 : 70;
-  const points = isLeft ? "0,0 210,422 0,844" : "210,0 0,422 210,844";
-  const gradDir = isLeft ? { x1: "0", y1: "0.5", x2: "1", y2: "0.5" }
-                         : { x1: "1", y1: "0.5", x2: "0", y2: "0.5" };
-  const id = isLeft ? "lfg" : "rfg";
-
-  return (
-    <motion.div
-      className={`absolute top-0 h-full ${isLeft ? "left-0 origin-left" : "right-0 origin-right"}`}
-      style={{ width: "54%", zIndex: 8, perspective: "700px" }}
-    >
-      <motion.div
-        className={`h-full w-full ${isLeft ? "origin-left" : "origin-right"}`}
-        style={{ transformStyle: "preserve-3d" }}
-        initial={{ rotateY: 0 }}
-        animate={opening ? { rotateY: rotateTarget } : { rotateY: 0 }}
-        transition={{ duration: t.dur, delay: t.del, ease: EASE }}
-      >
-        <svg className="h-full w-full" viewBox="0 0 210 844" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id={id} {...gradDir}>
-              <stop offset="0%" stopColor={color} />
-              <stop offset="100%" stopColor={brightness(color, 5)} />
-            </linearGradient>
-          </defs>
-          <polygon points={points} fill={`url(#${id})`} />
-        </svg>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /*  Wax seal                                                           */
 /* ------------------------------------------------------------------ */
@@ -186,11 +146,7 @@ function SideFlap({
 function WaxSeal({ opening }: { opening: boolean }) {
   return (
     <motion.div
-      className="relative flex h-[120px] w-[120px] items-center justify-center rounded-full"
-      style={{
-        background: "radial-gradient(circle at 35% 35%, #f5d675, #c9a230 50%, #a07d1c)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.3)",
-      }}
+      className="relative flex h-[125px] w-[125px] items-center justify-center overflow-hidden rounded-full"
       initial={{ scale: 1, opacity: 1, rotate: 0 }}
       animate={
         opening
@@ -199,39 +155,13 @@ function WaxSeal({ opening }: { opening: boolean }) {
       }
       transition={{ duration: T.sealBreak.dur, delay: T.sealBreak.del, ease: EASE }}
     >
-      <div className="absolute inset-2 rounded-full" style={{ border: "2px solid rgba(255,255,255,0.15)" }} />
-      <Leaf size={40} color="rgba(255,255,255,0.85)" strokeWidth={1.2} />
-      <div
-        className="absolute top-2 left-3 h-6 w-10 rounded-full opacity-30"
-        style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.6), transparent)" }}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/wax-seal.png"
+        alt="Wax seal"
+        className="h-full w-full object-cover"
+        draggable={false}
       />
-    </motion.div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Letter preview (rises from inside the envelope)                    */
-/* ------------------------------------------------------------------ */
-
-function LetterPreview({ theme, opening }: { theme: TemplateTheme; opening: boolean }) {
-  return (
-    <motion.div
-      className="absolute top-[15%] right-[10%] bottom-[15%] left-[10%] rounded-lg"
-      style={{
-        background: theme.bg,
-        boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
-        zIndex: 5,
-      }}
-      initial={{ y: 50, opacity: 0, scale: 0.9 }}
-      animate={opening ? { y: -100, opacity: 1, scale: 1.02 } : { y: 50, opacity: 0, scale: 0.9 }}
-      transition={{ duration: T.letterRise.dur, delay: T.letterRise.del, ease: EASE }}
-    >
-      <div className="flex h-full flex-col items-center justify-center gap-3 p-8">
-        <div className="h-[2px] w-8 rounded-full" style={{ backgroundColor: theme.accent, opacity: 0.4 }} />
-        <div className="h-[2px] w-20 rounded-full" style={{ backgroundColor: theme.textPrimary, opacity: 0.15 }} />
-        <div className="h-[2px] w-14 rounded-full" style={{ backgroundColor: theme.textPrimary, opacity: 0.1 }} />
-        <div className="mt-2 h-[2px] w-8 rounded-full" style={{ backgroundColor: theme.accent, opacity: 0.3 }} />
-      </div>
     </motion.div>
   );
 }
@@ -268,11 +198,7 @@ export default function EnvelopeCover({
     >
       <EnvelopeBody color={brightness(theme.envelope.base, -8)} />
 
-      <LetterPreview theme={theme} opening={opening} />
-
       <BottomFlap color={theme.envelope.bottomFlap} opening={opening} />
-      <SideFlap color={theme.envelope.leftFlap} opening={opening} side="left" />
-      <SideFlap color={theme.envelope.rightFlap} opening={opening} side="right" />
       <TopFlap color={theme.envelope.topFlap} opening={opening} />
 
       {/* Center content — monogram, seal, "Toque para Abrir" */}
