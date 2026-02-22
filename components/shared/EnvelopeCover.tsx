@@ -24,7 +24,7 @@ interface EnvelopeCoverProps {
 
 const T = {
   /** Top flap swings open (3D rotation) */
-  flapOpen:   { dur: 5.4,  del: 0.2  },
+  flapOpen:   { dur: 15.4,  del: 0.2  },
   /** Wax seal cracks & dissolves */
   sealBreak:  { dur: 1.6,  del: 0.6  },
   /** Monogram fades away */
@@ -32,9 +32,9 @@ const T = {
   /** "Toque para Abrir" fades */
   ctaFade:    { dur: 0.6,  del: 0.1  },
   /** Bottom flap drops */
-  bottomDrop: { dur: 2.4,  del: 2.4  },
+  bottomDrop: { dur: 15.4,  del: 2.4  },
   /** Entire scene fades to transparent */
-  sceneFade:  { dur: 0.4,  del: 3.8  },
+  sceneFade:  { dur: 0.4,  del: 2.8  },
 } as const;
 
 /** Milliseconds from tap until onAnimationComplete fires */
@@ -42,9 +42,6 @@ const TOTAL_MS = (T.sceneFade.del + T.sceneFade.dur) * 1000;
 
 /** Smooth ease-out bezier for a natural, gentle deceleration */
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-/** Snappier ease for elements that need a bit more presence */
-const EASE_OUT: [number, number, number, number] = [0.0, 0.0, 0.2, 1];
 
 /* ------------------------------------------------------------------ */
 /*  Envelope body (the back panel visible behind the flaps)            */
@@ -68,46 +65,47 @@ function EnvelopeBody({ color }: { color: string }) {
 function TopFlap({ color, opening }: { color: string; opening: boolean }) {
   return (
     <motion.div
-      className="absolute top-0 left-0 w-full origin-top"
-      style={{ height: "50%", perspective: "1000px", zIndex: 20 }}
+      className="absolute top-0 left-0 w-full origin-bottom"
+      style={{ height: "50%", zIndex: 20 }}
+      initial={{ rotateX: 0, y: 0 }}
+      animate={
+        opening
+          ? { rotateX: -75, y: "-40%" }
+          : { rotateX: 0, y: 0 }
+      }
+      transition={{
+        duration: T.flapOpen.dur,
+        delay: T.flapOpen.del,
+        ease: EASE,
+      }}
     >
       <motion.div
-        className="h-full w-full origin-top"
-        style={{ transformStyle: "preserve-3d" }}
-        initial={{ rotateX: 0 }}
-        animate={opening ? { rotateX: -180 } : { rotateX: 0 }}
+        className="h-full w-full"
+        initial={{ filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.12))" }}
+        animate={
+          opening
+            ? { filter: "drop-shadow(0px 30px 40px rgba(0,0,0,0.4))" }
+            : { filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.12))" }
+        }
         transition={{
           duration: T.flapOpen.dur,
           delay: T.flapOpen.del,
           ease: EASE,
         }}
       >
-        {/* Front face */}
         <svg
           className="absolute inset-0 h-full w-full"
           viewBox="0 0 390 400"
           preserveAspectRatio="none"
-          style={{ backfaceVisibility: "hidden", overflow: "visible" }}
+          style={{ overflow: "visible" }}
         >
           <defs>
             <linearGradient id="tfg" x1="0.5" y1="0" x2="0.5" y2="1">
               <stop offset="0%" stopColor={brightness(color, 8)} />
               <stop offset="100%" stopColor={color} />
             </linearGradient>
-            <filter id="top-shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12" />
-            </filter>
           </defs>
-          <path d="M 0 0 L 390 0 L 390 205 L 215 380 Q 195 400 175 380 L 0 205 Z" fill="url(#tfg)" filter="url(#top-shadow)" />
-        </svg>
-        {/* Back face (revealed as flap rotates open) */}
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 390 400"
-          preserveAspectRatio="none"
-          style={{ backfaceVisibility: "hidden", transform: "rotateX(180deg)" }}
-        >
-          <path d="M 0 0 L 390 0 L 390 205 L 215 380 Q 195 400 175 380 L 0 205 Z" fill={brightness(color, 20)} />
+          <path d="M 0 0 L 390 0 L 390 205 L 215 380 Q 195 400 175 380 L 0 205 Z" fill="url(#tfg)" />
         </svg>
       </motion.div>
     </motion.div>
@@ -117,28 +115,49 @@ function TopFlap({ color, opening }: { color: string; opening: boolean }) {
 function BottomFlap({ color, opening }: { color: string; opening: boolean }) {
   return (
     <motion.div
-      className="absolute bottom-0 left-0 w-full"
+      className="absolute bottom-0 left-0 w-full origin-top"
       style={{ height: "50%", zIndex: 10 }}
-      initial={{ y: 0, opacity: 1 }}
-      animate={opening ? { y: 80, opacity: 0 } : { y: 0, opacity: 1 }}
+      initial={{ rotateX: 0, y: 0 }}
+      animate={
+        opening
+          ? { rotateX: 75, y: "30%" }
+          : { rotateX: 0, y: 0 }
+      }
       transition={{
-        duration: T.bottomDrop.dur,
-        delay: T.bottomDrop.del,
-        ease: EASE_OUT,
+        duration: T.flapOpen.dur,
+        delay: T.flapOpen.del,
+        ease: EASE,
       }}
     >
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 390 474" preserveAspectRatio="none" style={{ overflow: "visible" }}>
-        <defs>
-          <linearGradient id="bfg" x1="0.5" y1="1" x2="0.5" y2="0">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={brightness(color, 6)} />
-          </linearGradient>
-          <filter id="bottom-shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="-2" stdDeviation="4" floodOpacity="0.08" />
-          </filter>
-        </defs>
-        <path d="M 0 474 L 390 474 L 390 110 L 225 17 Q 195 0 165 17 L 0 110 Z" fill="url(#bfg)" filter="url(#bottom-shadow)" />
-      </svg>
+      <motion.div
+        className="h-full w-full"
+        initial={{ filter: "drop-shadow(0px -2px 4px rgba(0,0,0,0.08))" }}
+        animate={
+          opening
+            ? { filter: "drop-shadow(0px -30px 40px rgba(0,0,0,0.4))" }
+            : { filter: "drop-shadow(0px -2px 4px rgba(0,0,0,0.08))" }
+        }
+        transition={{
+          duration: T.flapOpen.dur,
+          delay: T.flapOpen.del,
+          ease: EASE,
+        }}
+      >
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox="0 0 390 474"
+          preserveAspectRatio="none"
+          style={{ overflow: "visible" }}
+        >
+          <defs>
+            <linearGradient id="bfg" x1="0.5" y1="1" x2="0.5" y2="0">
+              <stop offset="0%" stopColor={color} />
+              <stop offset="100%" stopColor={brightness(color, 6)} />
+            </linearGradient>
+          </defs>
+          <path d="M 0 474 L 390 474 L 390 110 L 225 17 Q 195 0 165 17 L 0 110 Z" fill="url(#bfg)" />
+        </svg>
+      </motion.div>
     </motion.div>
   );
 }
@@ -194,7 +213,7 @@ export default function EnvelopeCover({
   return (
     <motion.div
       className="fixed inset-0 z-[100] cursor-pointer overflow-hidden"
-      style={{ backgroundColor: theme.envelope.base }}
+      style={{ backgroundColor: theme.envelope.base, perspective: "1200px" }}
       onClick={handleTap}
       /* Exit animation: fast fade-out so there's no gap before the invitation */
       exit={{ opacity: 0 }}
