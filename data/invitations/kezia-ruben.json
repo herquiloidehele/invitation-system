@@ -1,0 +1,46 @@
+{
+  "slug": "kezia-ruben",
+  "template": "pink-floral",
+  "couple": {
+    "bride": "Kézia",
+    "groom": "Rúben",
+    "monogram": "KR"
+  },
+  "date": {
+    "iso": "2026-07-18T16:00:00",
+    "display": "18 de Julho, 2026",
+    "dayOfWeek": "Sábado",
+    "time": "16:00",
+    "day": "18",
+    "month": "JULHO",
+    "year": "2026"
+  },
+  "quote": "Duas almas, um só coração",
+  "location": {
+    "name": "Quinta do Amor Eterno",
+    "address": "Rua das Flores, 123, Porto",
+    "googleMapsUrl": "https://maps.google.com/?q=Porto+Portugal"
+  },
+  "rsvp": {
+    "enabled": true,
+    "deadline": "2026-06-18"
+  },
+  "schedule": [
+    { "time": "16:00", "label": "Cerimónia", "venue": "Igreja de São Pedro" },
+    { "time": "17:30", "label": "Cocktail", "venue": "Jardim da Quinta" },
+    { "time": "19:00", "label": "Jantar", "venue": "Salão Principal" },
+    { "time": "22:00", "label": "Festa", "venue": "Pista de Dança" }
+  ],
+  "dressCode": "Cocktail Attire",
+  "giftRegistry": {
+    "enabled": true,
+    "text": "A vossa presença é o melhor presente"
+  },
+  "audio": {
+    "enabled": true,
+    "src": "/audio/perfect.mp3",
+    "artist": "Ed Sheeran",
+    "title": "Perfect"
+  },
+  "heroImage": "https://images.unsplash.com/photo-1713766056165-666537a07103?w=800&q=80"
+}

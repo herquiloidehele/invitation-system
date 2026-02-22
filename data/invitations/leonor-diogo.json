@@ -1,0 +1,46 @@
+{
+  "slug": "leonor-diogo",
+  "template": "midnight-elegance",
+  "couple": {
+    "bride": "Leonor",
+    "groom": "Diogo",
+    "monogram": "LD"
+  },
+  "date": {
+    "iso": "2026-07-18T17:00:00",
+    "display": "18 de Julho, 2026",
+    "dayOfWeek": "Sábado",
+    "time": "17:00",
+    "day": "18",
+    "month": "JULHO",
+    "year": "2026"
+  },
+  "quote": "Para sempre não é tempo suficiente contigo",
+  "location": {
+    "name": "Palacete dos Marqueses",
+    "address": "Avenida da Liberdade, 200, Lisboa",
+    "googleMapsUrl": "https://maps.google.com/?q=Avenida+da+Liberdade+Lisboa"
+  },
+  "rsvp": {
+    "enabled": true,
+    "deadline": "2026-06-18"
+  },
+  "schedule": [
+    { "time": "17:00", "label": "Cerimónia", "venue": "Capela Dourada" },
+    { "time": "18:30", "label": "Cocktail", "venue": "Salão dos Lustres" },
+    { "time": "20:00", "label": "Jantar", "venue": "Grande Sala de Banquetes" },
+    { "time": "23:00", "label": "Festa", "venue": "Terraço sob as Estrelas" }
+  ],
+  "dressCode": "Black Tie",
+  "giftRegistry": {
+    "enabled": true,
+    "text": "A vossa presença é o melhor presente que nos podem dar"
+  },
+  "audio": {
+    "enabled": true,
+    "src": "/audio/perfect.mp3",
+    "artist": "Ed Sheeran",
+    "title": "Perfect"
+  },
+  "heroImage": "https://images.unsplash.com/photo-1645856050970-fc1150f4f47d?w=800&q=80"
+}
