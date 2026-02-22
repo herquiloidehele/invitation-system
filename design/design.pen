@@ -10372,6 +10372,155 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "MBKCM",
+      "x": 4100,
+      "y": -400,
+      "name": "Invitation Cover",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "#F5F0E8",
+      "layout": "none",
+      "children": [
+        {
+          "type": "path",
+          "id": "QLih8",
+          "x": 0,
+          "y": 404,
+          "name": "Bottom Flap",
+          "geometry": "M0 440l175-410q20-30 40 0l175 410z",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 0,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#EDE7DB",
+                "position": 0
+              },
+              {
+                "color": "#E8E0D2",
+                "position": 1
+              }
+            ]
+          },
+          "width": 390,
+          "height": 440,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#00000015",
+            "offset": {
+              "x": 0,
+              "y": -2
+            },
+            "blur": 8
+          }
+        },
+        {
+          "type": "path",
+          "id": "94Btm",
+          "x": -100,
+          "y": -197,
+          "name": "Top Flap",
+          "geometry": "M0 0l390 0-175 410q-20 30-40 0z",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#F8F4EE",
+                "position": 0
+              },
+              {
+                "color": "#F0EAE0",
+                "position": 1
+              }
+            ]
+          },
+          "width": 590,
+          "height": 666,
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#00000020",
+            "offset": {
+              "x": 0,
+              "y": 4
+            },
+            "blur": 12
+          }
+        },
+        {
+          "type": "frame",
+          "id": "3oLVo",
+          "x": 132,
+          "y": 384,
+          "name": "Wax Seal Stamp",
+          "metadata": {
+            "type": "unsplash",
+            "username": "jobferrera",
+            "link": "https://unsplash.com/@jobferrera",
+            "author": "Job Ferrari"
+          },
+          "width": 130,
+          "height": 130,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "../public/images/wax-seal.png",
+            "mode": "fill"
+          }
+        },
+        {
+          "type": "text",
+          "id": "nlRix",
+          "x": 45,
+          "y": 490,
+          "name": "Invitation Text",
+          "fill": "#8B8178",
+          "textGrowth": "fixed-width",
+          "width": 300,
+          "content": "Esta invitación es\nexclusiva para ti",
+          "lineHeight": 1.6,
+          "textAlign": "center",
+          "fontFamily": "Great Vibes",
+          "fontSize": 24,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "id": "yhXK4",
+          "x": 0,
+          "y": 0,
+          "name": "Flap Edge Top",
+          "fill": "#FFFFFF20",
+          "width": 390,
+          "height": 1
+        },
+        {
+          "type": "rectangle",
+          "id": "jABPp",
+          "x": 0,
+          "y": 843,
+          "name": "Flap Edge Bottom",
+          "fill": "#FFFFFF10",
+          "width": 390,
+          "height": 1
+        }
+      ]
     }
   ]
 }

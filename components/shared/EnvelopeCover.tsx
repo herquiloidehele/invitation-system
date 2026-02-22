@@ -69,7 +69,7 @@ function TopFlap({ color, opening }: { color: string; opening: boolean }) {
   return (
     <motion.div
       className="absolute top-0 left-0 w-full origin-top"
-      style={{ height: "52%", perspective: "1000px", zIndex: 20 }}
+      style={{ height: "50%", perspective: "1000px", zIndex: 20 }}
     >
       <motion.div
         className="h-full w-full origin-top"
@@ -85,28 +85,29 @@ function TopFlap({ color, opening }: { color: string; opening: boolean }) {
         {/* Front face */}
         <svg
           className="absolute inset-0 h-full w-full"
-          viewBox="0 0 390 440"
+          viewBox="0 0 390 400"
           preserveAspectRatio="none"
-          style={{ backfaceVisibility: "hidden" }}
+          style={{ backfaceVisibility: "hidden", overflow: "visible" }}
         >
           <defs>
             <linearGradient id="tfg" x1="0.5" y1="0" x2="0.5" y2="1">
               <stop offset="0%" stopColor={brightness(color, 8)} />
               <stop offset="100%" stopColor={color} />
             </linearGradient>
+            <filter id="top-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12" />
+            </filter>
           </defs>
-          <path d="M0 0L390 0L215 410Q195 440 175 410Z" fill="url(#tfg)" />
-          <line x1="0" y1="0" x2="175" y2="410" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-          <line x1="390" y1="0" x2="215" y2="410" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+          <path d="M 0 0 L 390 0 L 390 205 L 215 380 Q 195 400 175 380 L 0 205 Z" fill="url(#tfg)" filter="url(#top-shadow)" />
         </svg>
         {/* Back face (revealed as flap rotates open) */}
         <svg
           className="absolute inset-0 h-full w-full"
-          viewBox="0 0 390 440"
+          viewBox="0 0 390 400"
           preserveAspectRatio="none"
           style={{ backfaceVisibility: "hidden", transform: "rotateX(180deg)" }}
         >
-          <path d="M0 0L390 0L215 410Q195 440 175 410Z" fill={brightness(color, 20)} />
+          <path d="M 0 0 L 390 0 L 390 205 L 215 380 Q 195 400 175 380 L 0 205 Z" fill={brightness(color, 20)} />
         </svg>
       </motion.div>
     </motion.div>
@@ -117,7 +118,7 @@ function BottomFlap({ color, opening }: { color: string; opening: boolean }) {
   return (
     <motion.div
       className="absolute bottom-0 left-0 w-full"
-      style={{ height: "48%", zIndex: 10 }}
+      style={{ height: "50%", zIndex: 10 }}
       initial={{ y: 0, opacity: 1 }}
       animate={opening ? { y: 80, opacity: 0 } : { y: 0, opacity: 1 }}
       transition={{
@@ -126,14 +127,17 @@ function BottomFlap({ color, opening }: { color: string; opening: boolean }) {
         ease: EASE_OUT,
       }}
     >
-      <svg className="h-full w-full" viewBox="0 0 390 400" preserveAspectRatio="none">
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 390 474" preserveAspectRatio="none" style={{ overflow: "visible" }}>
         <defs>
           <linearGradient id="bfg" x1="0.5" y1="1" x2="0.5" y2="0">
             <stop offset="0%" stopColor={color} />
             <stop offset="100%" stopColor={brightness(color, 6)} />
           </linearGradient>
+          <filter id="bottom-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="-2" stdDeviation="4" floodOpacity="0.08" />
+          </filter>
         </defs>
-        <path d="M0 400L390 400L215 30Q195 0 175 30Z" fill="url(#bfg)" />
+        <path d="M 0 474 L 390 474 L 390 110 L 225 17 Q 195 0 165 17 L 0 110 Z" fill="url(#bfg)" filter="url(#bottom-shadow)" />
       </svg>
     </motion.div>
   );
