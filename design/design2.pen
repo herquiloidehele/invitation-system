@@ -1,0 +1,17 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "GRuhr",
+      "x": 32,
+      "y": -9,
+      "name": "Frame 1",
+      "clip": true,
+      "width": 189,
+      "height": 331,
+      "fill": "#FFFFFF",
+      "layout": "none"
+    }
+  ]
+}
