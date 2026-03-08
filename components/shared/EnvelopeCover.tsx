@@ -3,13 +3,13 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { TemplateTheme } from "@/lib/types";
+import Image from "next/image";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 interface EnvelopeCoverProps {
-  monogram: string;
   theme: TemplateTheme;
   onOpen: () => void;
   /** Called when the full opening animation has finished playing. */
@@ -24,21 +24,15 @@ interface EnvelopeCoverProps {
 
 const T = {
   /** Top flap swings open (3D rotation) */
-  flapOpen:   { dur: 15.4,  del: 0.2  },
-  /** Wax seal cracks & dissolves */
-  sealBreak:  { dur: 1.6,  del: 0.6  },
-  /** Monogram fades away */
-  monoFade:   { dur: 1.0,  del: 0.3  },
-  /** "Toque para Abrir" fades */
-  ctaFade:    { dur: 0.6,  del: 0.1  },
+  flapOpen:   { dur: 10,  del: 1  },
   /** Bottom flap drops */
-  bottomDrop: { dur: 15.4,  del: 2.4  },
+  bottomDrop: { dur: 10,  del: 2  },
   /** Entire scene fades to transparent */
-  sceneFade:  { dur: 0.4,  del: 2.8  },
+  sceneFade:  { dur: 2,  del: 3  },
 } as const;
 
 /** Milliseconds from tap until onAnimationComplete fires */
-const TOTAL_MS = (T.sceneFade.del + T.sceneFade.dur) * 1000;
+const TOTAL_MS = (T.flapOpen.dur - 5) * 1000;
 
 /** Smooth ease-out bezier for a natural, gentle deceleration */
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -52,7 +46,7 @@ function EnvelopeBody({ color }: { color: string }) {
     <div
       className="absolute inset-0"
       style={{
-        background: `linear-gradient(180deg, ${color} 0%, ${brightness(color, -15)} 100%)`,
+        backgroundColor: color,
       }}
     />
   );
@@ -62,16 +56,16 @@ function EnvelopeBody({ color }: { color: string }) {
 /*  Flap components                                                    */
 /* ------------------------------------------------------------------ */
 
-function TopFlap({ color, opening }: { color: string; opening: boolean }) {
+function TopFlap({ opening, image }: { opening: boolean; image: string  }) {
   return (
     <motion.div
       className="absolute top-0 left-0 w-full origin-bottom"
-      style={{ height: "50%", zIndex: 20 }}
-      initial={{ rotateX: 0, y: 0 }}
+      style={{ zIndex: 10 }}
+      initial={{  filter: "drop-shadow(0 0 0 transparent)", transform: "scale(1) translateY(0)" }}
       animate={
         opening
-          ? { rotateX: -75, y: "-40%" }
-          : { rotateX: 0, y: 0 }
+          && { filter: "drop-shadow(0 50px 90px #7f7f7f)", y: "-100%", transform: "scale(1.15) translateY(-25%)" }
+
       }
       transition={{
         duration: T.flapOpen.dur,
@@ -79,113 +73,18 @@ function TopFlap({ color, opening }: { color: string; opening: boolean }) {
         ease: EASE,
       }}
     >
-      <motion.div
-        className="h-full w-full"
-        initial={{ filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.12))" }}
-        animate={
-          opening
-            ? { filter: "drop-shadow(0px 30px 40px rgba(0,0,0,0.4))" }
-            : { filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.12))" }
-        }
-        transition={{
-          duration: T.flapOpen.dur,
-          delay: T.flapOpen.del,
-          ease: EASE,
-        }}
-      >
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 390 400"
-          preserveAspectRatio="none"
-          style={{ overflow: "visible" }}
-        >
-          <defs>
-            <linearGradient id="tfg" x1="0.5" y1="0" x2="0.5" y2="1">
-              <stop offset="0%" stopColor={brightness(color, 8)} />
-              <stop offset="100%" stopColor={color} />
-            </linearGradient>
-          </defs>
-          <path d="M 0 0 L 390 0 L 390 205 L 215 380 Q 195 400 175 380 L 0 205 Z" fill="url(#tfg)" />
-        </svg>
-      </motion.div>
+      <Image src={image} width={500} height={500} alt={"Top Envelop Flap"} className={"w-full h-auto"} />
     </motion.div>
   );
 }
 
-function BottomFlap({ color, opening }: { color: string; opening: boolean }) {
+function BottomFlap({ image }: { opening: boolean, image: string }) {
   return (
-    <motion.div
+    <div
       className="absolute bottom-0 left-0 w-full origin-top"
-      style={{ height: "50%", zIndex: 10 }}
-      initial={{ rotateX: 0, y: 0 }}
-      animate={
-        opening
-          ? { rotateX: 75, y: "30%" }
-          : { rotateX: 0, y: 0 }
-      }
-      transition={{
-        duration: T.flapOpen.dur,
-        delay: T.flapOpen.del,
-        ease: EASE,
-      }}
     >
-      <motion.div
-        className="h-full w-full"
-        initial={{ filter: "drop-shadow(0px -2px 4px rgba(0,0,0,0.08))" }}
-        animate={
-          opening
-            ? { filter: "drop-shadow(0px -30px 40px rgba(0,0,0,0.4))" }
-            : { filter: "drop-shadow(0px -2px 4px rgba(0,0,0,0.08))" }
-        }
-        transition={{
-          duration: T.flapOpen.dur,
-          delay: T.flapOpen.del,
-          ease: EASE,
-        }}
-      >
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 390 474"
-          preserveAspectRatio="none"
-          style={{ overflow: "visible" }}
-        >
-          <defs>
-            <linearGradient id="bfg" x1="0.5" y1="1" x2="0.5" y2="0">
-              <stop offset="0%" stopColor={color} />
-              <stop offset="100%" stopColor={brightness(color, 6)} />
-            </linearGradient>
-          </defs>
-          <path d="M 0 474 L 390 474 L 390 110 L 225 17 Q 195 0 165 17 L 0 110 Z" fill="url(#bfg)" />
-        </svg>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Wax seal                                                           */
-/* ------------------------------------------------------------------ */
-
-function WaxSeal({ opening }: { opening: boolean }) {
-  return (
-    <motion.div
-      className="relative flex h-[125px] w-[125px] items-center justify-center overflow-hidden rounded-full"
-      initial={{ scale: 1, opacity: 1, rotate: 0 }}
-      animate={
-        opening
-          ? { scale: [1, 1.12, 1.08, 0], opacity: [1, 1, 0.8, 0], rotate: [0, -4, 6, 12] }
-          : { scale: 1, opacity: 1, rotate: 0 }
-      }
-      transition={{ duration: T.sealBreak.dur, delay: T.sealBreak.del, ease: EASE }}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/wax-seal.png"
-        alt="Wax seal"
-        className="h-full w-full object-cover"
-        draggable={false}
-      />
-    </motion.div>
+      <Image src={image} width={500} height={500} alt={"Top Envelop Flap"} className={"w-full h-auto"} />
+    </div>
   );
 }
 
@@ -194,7 +93,6 @@ function WaxSeal({ opening }: { opening: boolean }) {
 /* ------------------------------------------------------------------ */
 
 export default function EnvelopeCover({
-  monogram,
   theme,
   onOpen,
   onAnimationComplete,
@@ -219,56 +117,10 @@ export default function EnvelopeCover({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      <EnvelopeBody color={brightness(theme.envelope.base, -8)} />
+      <EnvelopeBody color={theme.envelope.base} />
 
-      <BottomFlap color={theme.envelope.bottomFlap} opening={opening} />
-      <TopFlap color={theme.envelope.topFlap} opening={opening} />
-
-      {/* Center content — monogram, seal, "Toque para Abrir" */}
-      <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-5" style={{ pointerEvents: "none" }}>
-        <motion.span
-          className="text-5xl leading-none sm:text-6xl"
-          style={{
-            fontFamily: theme.displayFont,
-            color: theme.monogramColor,
-            textShadow: "0 2px 12px rgba(0,0,0,0.2)",
-          }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={opening ? { opacity: 0, y: -40, scale: 0.7 } : { opacity: 1, y: 0, scale: 1 }}
-          transition={{
-            duration: opening ? T.monoFade.dur : 0.8,
-            delay: opening ? T.monoFade.del : 0.4,
-            ease: "easeOut",
-          }}
-        >
-          {monogram}
-        </motion.span>
-
-        <WaxSeal opening={opening} />
-
-        <motion.span
-          className="text-base tracking-[0.15em]"
-          style={{
-            fontFamily: theme.bodyFont,
-            fontStyle: "italic",
-            color: theme.tapTextColor,
-            textShadow: "0 1px 8px rgba(0,0,0,0.15)",
-          }}
-          initial={{ opacity: 0 }}
-          animate={
-            opening
-              ? { opacity: 0, y: 20 }
-              : { opacity: [0, 0.6, 1, 0.6], y: 0 }
-          }
-          transition={
-            opening
-              ? { duration: T.ctaFade.dur, delay: T.ctaFade.del }
-              : { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.8 }
-          }
-        >
-          Toque para Abrir
-        </motion.span>
-      </div>
+      <BottomFlap opening={opening} image={theme.envelope.bottomFlap} />
+      <TopFlap opening={opening} image={theme.envelope.topFlap}  />
 
       {/* Slow opacity fade covering the last phase of the animation.
           This is the actual "scene fade" — it makes the envelope gradually
@@ -286,32 +138,3 @@ export default function EnvelopeCover({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  AnimatePresence wrapper (kept for backwards-compatibility)          */
-/* ------------------------------------------------------------------ */
-
-export function EnvelopeCoverAnimated({
-  isOpen,
-  onComplete,
-  ...props
-}: EnvelopeCoverProps & { isOpen: boolean; onComplete?: () => void }) {
-  return (
-    <AnimatePresence onExitComplete={onComplete}>
-      {!isOpen && <EnvelopeCover key="envelope-cover" {...props} />}
-    </AnimatePresence>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Utility                                                            */
-/* ------------------------------------------------------------------ */
-
-function brightness(hex: string, pct: number): string {
-  if (hex.startsWith("rgb")) return hex;
-  const clean = hex.replace("#", "");
-  const n = parseInt(clean, 16);
-  const r = Math.min(255, Math.max(0, ((n >> 16) & 0xff) + Math.round(2.55 * pct)));
-  const g = Math.min(255, Math.max(0, ((n >> 8) & 0xff) + Math.round(2.55 * pct)));
-  const b = Math.min(255, Math.max(0, (n & 0xff) + Math.round(2.55 * pct)));
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
-}

@@ -69,8 +69,6 @@ export interface TemplateTheme {
     base: string;
     topFlap: string;
     bottomFlap: string;
-    leftFlap: string;
-    rightFlap: string;
   };
   // Invitation page colors
   bg: string;
