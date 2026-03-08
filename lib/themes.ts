@@ -6,7 +6,7 @@ export const themes: Record<string, TemplateTheme> = {
     label: "Pink Floral",
     description: "Romântico & Elegante",
     envelope: {
-      base: "#F7F0E8",
+      base: "#f4f1e9",
       topFlap: "/images/top.png",
       bottomFlap: "/images/bottom.png",
     },

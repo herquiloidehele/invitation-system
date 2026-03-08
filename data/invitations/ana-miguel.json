@@ -42,5 +42,6 @@
     "artist": "Ed Sheeran",
     "title": "Perfect"
   },
-  "heroImage": "https://images.unsplash.com/photo-1655045802235-889a17a9d3d4?w=800&q=80"
+  "heroImage": "https://images.unsplash.com/photo-1655045802235-889a17a9d3d4?w=800&q=80",
+  "videoUrl": "/videos/video1.mp4"
 }

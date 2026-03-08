@@ -58,6 +58,7 @@ export interface InvitationData {
   giftRegistry: GiftRegistry;
   audio: AudioConfig;
   heroImage: string;
+  videoUrl?: string;
 }
 
 export interface TemplateTheme {

@@ -22,6 +22,23 @@ const fadeInUp: Variants = {
   },
 };
 
+/** Staggered reveal for the video hero text elements. */
+const heroTextContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.18, delayChildren: 0.4 },
+  },
+};
+
+const heroTextItem: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -91,24 +108,172 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
   return (
     <div style={{ background: theme.bg, color: theme.textPrimary, minHeight: "100dvh" }}>
       {/* ----------------------------------------------------------------- */}
-      {/* 1. Hero Image                                                     */}
+      {/* 1 + 2. Hero (video or image) — full 100dvh                        */}
+      {/* When videoUrl is present the couple names float as an overlay.    */}
+      {/* When only heroImage is present, names are rendered below in the   */}
+      {/* normal document flow (original behaviour).                        */}
       {/* ----------------------------------------------------------------- */}
-      <section className="relative" style={{ height: 300 }}>
-        <img
-          src={invitation.heroImage}
-          alt="Hero"
-          className="h-full w-full object-cover"
-        />
+      <section
+        className="relative overflow-hidden"
+        style={{ height: invitation.videoUrl ? "100dvh" : 300 }}
+      >
+        {/* --- Background media ----------------------------------------- */}
+        {invitation.videoUrl ? (
+          <video
+            src={invitation.videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <img
+            src={invitation.heroImage}
+            alt="Hero"
+            className="h-full w-full object-cover"
+          />
+        )}
 
-        {/* Gradient overlay fading to bg */}
+        {/* --- Dark scrim (video only) ----------------------------------- */}
+        {invitation.videoUrl && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: "rgba(0,0,0,0.42)" }}
+          />
+        )}
+
+        {/* --- Bottom gradient fading into theme bg --------------------- */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
-            background: `linear-gradient(to bottom, transparent 40%, ${theme.bg} 100%)`,
+            background: invitation.videoUrl
+              ? `linear-gradient(to bottom, transparent 45%, ${theme.bg} 100%)`
+              : `linear-gradient(to bottom, transparent 40%, ${theme.bg} 100%)`,
           }}
         />
 
-        {/* Audio player floating at the bottom */}
+        {/* --- Couple names overlay (video mode only) ------------------- */}
+        {invitation.videoUrl && (
+          <motion.div
+            variants={heroTextContainer}
+            initial="hidden"
+            animate="visible"
+            className="absolute inset-x-0 flex flex-col items-center text-center"
+            style={{
+              top: "50%",
+              transform: "translateY(-58%)",
+              padding: "0 40px",
+              zIndex: 10,
+            }}
+          >
+            {/* Label */}
+            <motion.span
+              variants={heroTextItem}
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 10,
+                letterSpacing: 4,
+                textTransform: "uppercase" as const,
+                color: "rgba(255,255,255,0.72)",
+              }}
+            >
+              Convidam para o casamento de
+            </motion.span>
+
+            {/* Bride */}
+            <motion.h1
+              variants={heroTextItem}
+              className="mt-4"
+              style={{
+                fontFamily: theme.displayFont,
+                fontSize: nameFontSize + 8,
+                lineHeight: 1.1,
+                color: "#ffffff",
+                textShadow: "0 2px 32px rgba(0,0,0,0.55)",
+              }}
+            >
+              {invitation.couple.bride}
+            </motion.h1>
+
+            {/* Ampersand */}
+            <motion.span
+              variants={heroTextItem}
+              className="my-1"
+              style={{
+                fontFamily: theme.scriptFont ?? "'Cormorant Garamond', serif",
+                fontSize: 36,
+                color: "rgba(255,255,255,0.85)",
+                textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+              }}
+            >
+              &amp;
+            </motion.span>
+
+            {/* Groom */}
+            <motion.h1
+              variants={heroTextItem}
+              style={{
+                fontFamily: theme.displayFont,
+                fontSize: nameFontSize + 8,
+                lineHeight: 1.1,
+                color: "#ffffff",
+                textShadow: "0 2px 32px rgba(0,0,0,0.55)",
+              }}
+            >
+              {invitation.couple.groom}
+            </motion.h1>
+
+            {/* Date pill */}
+            <motion.div
+              variants={heroTextItem}
+              className="mt-6 flex items-center gap-3"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 11,
+                letterSpacing: 5,
+                textTransform: "uppercase" as const,
+                color: "rgba(255,255,255,0.75)",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 24,
+                  height: 1,
+                  background: "rgba(255,255,255,0.45)",
+                }}
+              />
+              {invitation.date.day}&nbsp;&middot;&nbsp;{invitation.date.month}&nbsp;&middot;&nbsp;{invitation.date.year}
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 24,
+                  height: 1,
+                  background: "rgba(255,255,255,0.45)",
+                }}
+              />
+            </motion.div>
+
+            {/* Quote */}
+            <motion.p
+              variants={heroTextItem}
+              className="mt-4"
+              style={{
+                fontFamily: theme.bodyFont,
+                fontSize: 14,
+                fontStyle: "italic" as const,
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.6)",
+                maxWidth: 280,
+              }}
+            >
+              {invitation.quote}
+            </motion.p>
+          </motion.div>
+        )}
+
+        {/* --- Audio player floating at the bottom ---------------------- */}
         {invitation.audio.enabled && (
           <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2">
             <AudioPlayer
@@ -123,89 +288,91 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
       </section>
 
       {/* ----------------------------------------------------------------- */}
-      {/* 2. Names                                                          */}
+      {/* 2. Names (shown only when there is NO video)                      */}
       {/* ----------------------------------------------------------------- */}
-      <AnimatedSection>
-        <div
-          className="flex flex-col items-center text-center"
-          style={{ padding: "32px 40px" }}
-        >
-          {/* Label */}
-          <span
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 10,
-              letterSpacing: 3,
-              textTransform: "uppercase" as const,
-              color: theme.textSecondary,
-            }}
-          >
-            Convidam para o casamento de
-          </span>
-
-          {/* Bride */}
-          <h1
-            className="mt-4"
-            style={{
-              fontFamily: theme.displayFont,
-              fontSize: nameFontSize,
-              lineHeight: 1.15,
-              color: theme.textPrimary,
-            }}
-          >
-            {invitation.couple.bride}
-          </h1>
-
-          {/* Ampersand */}
-          <span
-            className="my-1"
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 28,
-              color: theme.accent,
-            }}
-          >
-            &amp;
-          </span>
-
-          {/* Groom */}
-          <h1
-            style={{
-              fontFamily: theme.displayFont,
-              fontSize: nameFontSize,
-              lineHeight: 1.15,
-              color: theme.textPrimary,
-            }}
-          >
-            {invitation.couple.groom}
-          </h1>
-
-          {/* Divider */}
+      {!invitation.videoUrl && (
+        <AnimatedSection>
           <div
-            className="mt-6 mb-5"
-            style={{
-              width: 40,
-              height: 1,
-              background: theme.accent,
-              opacity: 0.38,
-            }}
-          />
-
-          {/* Quote */}
-          <p
-            style={{
-              fontFamily: theme.bodyFont,
-              fontSize: 16,
-              fontStyle: "italic" as const,
-              lineHeight: 1.6,
-              color: theme.textSecondary,
-              maxWidth: 300,
-            }}
+            className="flex flex-col items-center text-center"
+            style={{ padding: "32px 40px" }}
           >
-            {invitation.quote}
-          </p>
-        </div>
-      </AnimatedSection>
+            {/* Label */}
+            <span
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 10,
+                letterSpacing: 3,
+                textTransform: "uppercase" as const,
+                color: theme.textSecondary,
+              }}
+            >
+              Convidam para o casamento de
+            </span>
+
+            {/* Bride */}
+            <h1
+              className="mt-4"
+              style={{
+                fontFamily: theme.displayFont,
+                fontSize: nameFontSize,
+                lineHeight: 1.15,
+                color: theme.textPrimary,
+              }}
+            >
+              {invitation.couple.bride}
+            </h1>
+
+            {/* Ampersand */}
+            <span
+              className="my-1"
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: 28,
+                color: theme.accent,
+              }}
+            >
+              &amp;
+            </span>
+
+            {/* Groom */}
+            <h1
+              style={{
+                fontFamily: theme.displayFont,
+                fontSize: nameFontSize,
+                lineHeight: 1.15,
+                color: theme.textPrimary,
+              }}
+            >
+              {invitation.couple.groom}
+            </h1>
+
+            {/* Divider */}
+            <div
+              className="mt-6 mb-5"
+              style={{
+                width: 40,
+                height: 1,
+                background: theme.accent,
+                opacity: 0.38,
+              }}
+            />
+
+            {/* Quote */}
+            <p
+              style={{
+                fontFamily: theme.bodyFont,
+                fontSize: 16,
+                fontStyle: "italic" as const,
+                lineHeight: 1.6,
+                color: theme.textSecondary,
+                maxWidth: 300,
+              }}
+            >
+              {invitation.quote}
+            </p>
+          </div>
+        </AnimatedSection>
+      )}
 
       {/* ----------------------------------------------------------------- */}
       {/* 3. Date Card                                                      */}
