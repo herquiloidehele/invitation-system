@@ -43,3 +43,5 @@ next-env.d.ts
 .idea
 .idea/*
 .opencode
+
+/lib/generated/prisma

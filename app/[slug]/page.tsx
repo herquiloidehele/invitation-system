@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { getInvitation, getAllInvitations } from "@/lib/invitations";
+import { getInvitation } from "@/lib/invitations";
 import { themes } from "@/lib/themes";
 import InvitationView from "./InvitationView";
 
 // ---------------------------------------------------------------------------
-// Static params — pre-generate all invitation pages at build time
+// Force dynamic rendering (data comes from the database now)
 // ---------------------------------------------------------------------------
 
-export async function generateStaticParams() {
-  const invitations = getAllInvitations();
-  return invitations.map((inv) => ({ slug: inv.slug }));
-}
+export const dynamic = "force-dynamic";
 
 // ---------------------------------------------------------------------------
 // Dynamic metadata per invitation
@@ -24,7 +21,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const invitation = getInvitation(slug);
+  const invitation = await getInvitation(slug);
 
   if (!invitation) {
     return { title: "Convite não encontrado" };
@@ -53,7 +50,7 @@ export default async function InvitationSlugPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const invitation = getInvitation(slug);
+  const invitation = await getInvitation(slug);
 
   if (!invitation) {
     notFound();

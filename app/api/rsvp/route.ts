@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { prisma } from "@/lib/db";
 
 // ---------------------------------------------------------------------------
 // Validation schema
@@ -16,33 +15,6 @@ const rsvpSchema = z.object({
   dietaryRestrictions: z.string().optional(),
   message: z.string().optional(),
 });
-
-type RSVPEntry = z.infer<typeof rsvpSchema> & {
-  submittedAt: string;
-};
-
-// ---------------------------------------------------------------------------
-// File-based storage helpers (V1 — no database)
-// ---------------------------------------------------------------------------
-
-const DATA_DIR = join(process.cwd(), "data");
-const RSVP_FILE = join(DATA_DIR, "rsvps.json");
-
-async function readRsvps(): Promise<RSVPEntry[]> {
-  try {
-    const raw = await readFile(RSVP_FILE, "utf-8");
-    return JSON.parse(raw) as RSVPEntry[];
-  } catch {
-    return [];
-  }
-}
-
-async function writeRsvp(entry: RSVPEntry): Promise<void> {
-  await mkdir(DATA_DIR, { recursive: true });
-  const existing = await readRsvps();
-  existing.push(entry);
-  await writeFile(RSVP_FILE, JSON.stringify(existing, null, 2), "utf-8");
-}
 
 // ---------------------------------------------------------------------------
 // POST /api/rsvp
@@ -67,16 +39,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const entry: RSVPEntry = {
-      ...result.data,
-      submittedAt: new Date().toISOString(),
-    };
+    const data = result.data;
 
-    // Log to console for debugging
-    console.log("[RSVP]", JSON.stringify(entry, null, 2));
+    // Verify that the invitation exists
+    const invitation = await prisma.invitation.findUnique({
+      where: { slug: data.invitationSlug },
+    });
 
-    // Persist to local JSON file
-    await writeRsvp(entry);
+    if (!invitation) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Convite não encontrado",
+        },
+        { status: 404 },
+      );
+    }
+
+    // Persist to database
+    await prisma.rsvpResponse.create({
+      data: {
+        invitationSlug: data.invitationSlug,
+        guestName: data.guestName,
+        email: data.email ?? null,
+        attending: data.attending,
+        guestsCount: data.guestsCount,
+        dietaryRestrictions: data.dietaryRestrictions ?? null,
+        message: data.message ?? null,
+      },
+    });
+
+    console.log("[RSVP] Saved:", data.guestName, "for", data.invitationSlug);
 
     return NextResponse.json({
       success: true,

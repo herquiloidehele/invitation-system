@@ -1,21 +1,68 @@
-import type { InvitationData } from "./types";
+import { prisma } from "./db";
+import type { InvitationData, TemplateName } from "./types";
 
-import keziaRuben from "@/data/invitations/kezia-ruben.json";
-import anaMiguel from "@/data/invitations/ana-miguel.json";
-import sofiaPedro from "@/data/invitations/sofia-pedro.json";
-import leonorDiogo from "@/data/invitations/leonor-diogo.json";
-
-const invitations: InvitationData[] = [
-  keziaRuben as InvitationData,
-  anaMiguel as InvitationData,
-  sofiaPedro as InvitationData,
-  leonorDiogo as InvitationData,
-];
-
-export function getInvitation(slug: string): InvitationData | null {
-  return invitations.find((inv) => inv.slug === slug) ?? null;
+/**
+ * Convert a Prisma Invitation row (with Json fields) into the
+ * app-level InvitationData shape expected by all components.
+ */
+function toInvitationData(row: {
+  slug: string;
+  template: string;
+  couple: unknown;
+  date: unknown;
+  quote: string;
+  location: unknown;
+  rsvp: unknown;
+  schedule: unknown;
+  dressCode: string;
+  giftRegistry: unknown;
+  audio: unknown;
+  heroImage: string;
+  videoUrl: string | null;
+  faqs: unknown;
+}): InvitationData {
+  return {
+    slug: row.slug,
+    template: row.template as TemplateName,
+    couple: row.couple as InvitationData["couple"],
+    date: row.date as InvitationData["date"],
+    quote: row.quote,
+    location: row.location as InvitationData["location"],
+    rsvp: row.rsvp as InvitationData["rsvp"],
+    schedule: row.schedule as InvitationData["schedule"],
+    dressCode: row.dressCode,
+    giftRegistry: row.giftRegistry as InvitationData["giftRegistry"],
+    audio: row.audio as InvitationData["audio"],
+    heroImage: row.heroImage,
+    videoUrl: row.videoUrl ?? undefined,
+    faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
+  };
 }
 
-export function getAllInvitations(): InvitationData[] {
-  return invitations;
+export async function getInvitation(
+  slug: string,
+): Promise<InvitationData | null> {
+  const row = await prisma.invitation.findUnique({ where: { slug } });
+  if (!row) return null;
+  return toInvitationData(row);
+}
+
+export async function getAllInvitations(): Promise<InvitationData[]> {
+  const rows = await prisma.invitation.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return rows.map(toInvitationData);
+}
+
+/**
+ * Get raw Prisma rows (useful for admin pages that need id, createdAt, etc.)
+ */
+export async function getAllInvitationRows() {
+  return prisma.invitation.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getInvitationById(id: string) {
+  return prisma.invitation.findUnique({ where: { id } });
 }

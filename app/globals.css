@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-outfit);
   --font-display-great-vibes: var(--font-great-vibes);
   --font-display-playfair: var(--font-playfair-display);
   --font-display-cormorant: var(--font-cormorant-garamond);
@@ -346,9 +346,6 @@ body {
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
   html {
     @apply font-sans;
