@@ -234,7 +234,7 @@ function FAQAccordionItem({
           className="flex-1"
           style={{
             fontFamily: theme.bodyFont,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: 500,
             lineHeight: 1.5,
             color: isOpen ? theme.textPrimary : theme.textSecondary,
@@ -279,9 +279,10 @@ function FAQAccordionItem({
               <p
                 style={{
                   fontFamily: theme.bodyFont,
-                  fontSize: 14,
+                  fontSize: 12,
                   lineHeight: 1.75,
                   color: theme.textSecondary,
+                    opacity: 0.8,
                   margin: 0,
                 }}
               >
@@ -866,7 +867,7 @@ export default function InvitationPage({
             <span
               style={{
                 fontFamily: theme.bodyFont,
-                fontSize: 16,
+                fontSize: 13,
                 fontWeight: 500,
                 color: theme.textPrimary,
               }}
@@ -916,7 +917,7 @@ export default function InvitationPage({
             <span
               style={{
                 fontFamily: theme.bodyFont,
-                fontSize: 16,
+                fontSize: 13,
                 fontWeight: 500,
                 color: theme.textPrimary,
               }}
