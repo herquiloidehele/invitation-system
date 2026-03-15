@@ -147,8 +147,13 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 1.2, ease: "easeOut" }}
-      className="flex items-center gap-3 rounded-full px-4 py-2 shadow-lg backdrop-blur-md"
-      style={{ backgroundColor: playerTheme.bgColor }}
+      className="flex items-center gap-3 rounded-full px-4 py-2 shadow-lg"
+      style={{
+        backgroundColor: playerTheme.bgColor,
+        backdropFilter: "blur(16px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(16px) saturate(1.4)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)",
+      }}
     >
       <button
         onClick={togglePlay}
@@ -174,16 +179,36 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       <div className="flex min-w-0 flex-col pr-1">
         <span
           className="truncate text-sm font-medium leading-tight"
-          style={{ color: playerTheme.titleColor }}
+          style={{ color: playerTheme.titleColor, fontFamily: "var(--font-outfit), 'Outfit', sans-serif" }}
         >
           {title}
         </span>
         <span
           className="truncate text-xs leading-tight"
-          style={{ color: playerTheme.artistColor }}
+          style={{ color: playerTheme.artistColor, fontFamily: "var(--font-outfit), 'Outfit', sans-serif" }}
         >
           {artist}
         </span>
+      </div>
+
+      {/* Animated equalizer bars — visible when playing */}
+      <div
+        className="flex items-end gap-[3px] pl-1"
+        style={{ height: 18, opacity: isPlaying ? 1 : 0.3, transition: "opacity 0.3s ease" }}
+        aria-hidden
+      >
+        {[1, 2, 3, 4].map((n) => (
+          <div
+            key={n}
+            className="w-[3px] rounded-full"
+            style={{
+              backgroundColor: playerTheme.playBtnColor,
+              height: isPlaying ? "100%" : 4,
+              animation: isPlaying ? `eq-bar-${n} 0.8s ease-in-out infinite` : "none",
+              transition: "height 0.3s ease",
+            }}
+          />
+        ))}
       </div>
     </motion.div>
   );

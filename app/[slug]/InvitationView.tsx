@@ -98,6 +98,7 @@ export default function InvitationView({
             theme={theme}
             onOpen={handleOpen}
             onAnimationComplete={handleAnimationComplete}
+            monogram={invitation.couple.monogram}
           />
         )}
       </AnimatePresence>

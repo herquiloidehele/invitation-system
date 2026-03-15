@@ -14,6 +14,10 @@ interface DirectProps {
   accentColor: string;
   textColor: string;
   venueColor: string;
+  /** UI font for labels (replaces hardcoded Inter) */
+  uiFont: string;
+  /** Index in the schedule list — drives staggered entrance delay */
+  index: number;
 }
 
 interface IntegrationProps {
@@ -38,6 +42,8 @@ export default function ScheduleItem(props: ScheduleItemProps) {
   const accentColor = isIntegrationProps(props) ? props.theme.accent : props.accentColor;
   const textColor = isIntegrationProps(props) ? props.theme.textPrimary : props.textColor;
   const venueColor = isIntegrationProps(props) ? props.theme.textSecondary : props.venueColor;
+  const uiFont = isIntegrationProps(props) ? props.theme.uiFont : props.uiFont;
+  const index = isIntegrationProps(props) ? 0 : props.index;
 
   return (
     <motion.div
@@ -45,7 +51,7 @@ export default function ScheduleItem(props: ScheduleItemProps) {
       initial={{ opacity: 0, x: -24 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
     >
       {/* Time column */}
       <div
@@ -76,7 +82,7 @@ export default function ScheduleItem(props: ScheduleItemProps) {
         <span
           className="text-sm font-semibold uppercase tracking-wide"
           style={{
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: uiFont,
             fontVariantCaps: "all-small-caps",
             color: textColor,
           }}
@@ -86,7 +92,7 @@ export default function ScheduleItem(props: ScheduleItemProps) {
         <span
           className="text-sm"
           style={{
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: uiFont,
             color: venueColor,
           }}
         >

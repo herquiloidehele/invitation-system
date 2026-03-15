@@ -91,6 +91,8 @@ export interface TemplateTheme {
   displayFont: string;
   bodyFont: string;
   scriptFont?: string;
+  /** UI font for labels, buttons, small text (replaces hardcoded Inter) */
+  uiFont: string;
   // CTA styling
   ctaPrimaryBg: string;
   ctaPrimaryText: string;
@@ -101,4 +103,11 @@ export interface TemplateTheme {
   // Cover
   monogramColor: string;
   tapTextColor: string;
+  // Atmospheric / decorative (new)
+  /** Subtle radial gradient wash behind key sections */
+  bgGradient?: string;
+  /** Decorative line/dot color between sections */
+  decorativeColor: string;
+  /** Button hover glow color */
+  ctaGlow?: string;
 }

@@ -14,6 +14,8 @@ interface EnvelopeCoverProps {
   onOpen: () => void;
   /** Called when the full opening animation has finished playing. */
   onAnimationComplete?: () => void;
+  /** Couple monogram to display on the envelope face (e.g. "A&M") */
+  monogram?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -96,6 +98,7 @@ export default function EnvelopeCover({
   theme,
   onOpen,
   onAnimationComplete,
+  monogram,
 }: EnvelopeCoverProps) {
   const [opening, setOpening] = useState(false);
 
@@ -118,6 +121,55 @@ export default function EnvelopeCover({
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
       <EnvelopeBody color={theme.envelope.base} />
+
+      {/* Monogram + tap prompt — centered on the envelope face */}
+      {!opening && (
+        <motion.div
+          className="absolute inset-0 z-[5] flex flex-col items-center justify-center gap-3 pointer-events-none"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+        >
+          {monogram && (
+            <span
+              className="text-4xl font-light tracking-widest"
+              style={{
+                fontFamily: theme.displayFont,
+                color: theme.monogramColor,
+                textShadow: "0 2px 12px rgba(0,0,0,0.08)",
+              }}
+            >
+              {monogram}
+            </span>
+          )}
+          <motion.span
+            className="text-xs font-medium uppercase tracking-[0.2em]"
+            style={{
+              fontFamily: theme.uiFont,
+              color: theme.tapTextColor,
+              opacity: 0.7,
+            }}
+            animate={{ opacity: [0.5, 0.9, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            Toque para abrir
+          </motion.span>
+        </motion.div>
+      )}
+
+      {/* Shimmer highlight — diagonal sweep across envelope */}
+      {!opening && (
+        <motion.div
+          className="absolute inset-0 z-[6] pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.12) 55%, transparent 60%)",
+            backgroundSize: "200% 100%",
+          }}
+          animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
+          transition={{ duration: 3.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+        />
+      )}
 
       <BottomFlap opening={opening} image={theme.envelope.bottomFlap} />
       <TopFlap opening={opening} image={theme.envelope.topFlap}  />

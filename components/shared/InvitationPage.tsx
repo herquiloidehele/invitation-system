@@ -2,7 +2,7 @@
 
 import { useState, type MutableRefObject } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import {  MapPin, Heart, Shirt, Gift, ChevronDown, HelpCircle } from "lucide-react";
+import { MapPin, Heart, Shirt, Gift, ChevronDown } from "lucide-react";
 
 import type { InvitationData, TemplateTheme, FAQItem } from "@/lib/types";
 import AudioPlayer from "./AudioPlayer";
@@ -10,19 +10,60 @@ import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
 
 // ---------------------------------------------------------------------------
-// Animation variants
+// Animation variants — each section has its own entrance
 // ---------------------------------------------------------------------------
 
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 0, y: 28 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: "easeOut" as const },
+    transition: { duration: 0.8, ease: EASE },
   },
 };
 
-/** Staggered reveal for the video hero text elements. */
+/** Gentle scale-in for the date card */
+const scaleIn: Variants = {
+  hidden: { opacity: 0, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.9, ease: EASE },
+  },
+};
+
+/** Slide from left for info card 1 */
+const slideFromLeft: Variants = {
+  hidden: { opacity: 0, x: -36 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.7, ease: EASE },
+  },
+};
+
+/** Slide from right for info card 2 */
+const slideFromRight: Variants = {
+  hidden: { opacity: 0, x: 36 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.7, ease: EASE },
+  },
+};
+
+/** Very slow ambient fade for footer */
+const ambientFade: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 1.6, ease: "easeOut" },
+  },
+};
+
+/** Staggered reveal for hero text elements */
 const heroTextContainer: Variants = {
   hidden: {},
   visible: {
@@ -31,11 +72,19 @@ const heroTextContainer: Variants = {
 };
 
 const heroTextItem: Variants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 22 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.9, ease: EASE },
+  },
+};
+
+/** Stagger container for schedule items */
+const staggerContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.1 },
   },
 };
 
@@ -43,7 +92,6 @@ const heroTextItem: Variants = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Script / cursive display fonts get a larger name size for visual impact. */
 function isScriptFont(displayFont: string): boolean {
   const lower = displayFont.toLowerCase();
   return (
@@ -53,7 +101,6 @@ function isScriptFont(displayFont: string): boolean {
   );
 }
 
-/** Map TemplateTheme to the AudioPlayer's expected theme shape. */
 function toAudioTheme(theme: TemplateTheme) {
   return {
     bgColor: theme.cardBg,
@@ -65,20 +112,75 @@ function toAudioTheme(theme: TemplateTheme) {
 }
 
 // ---------------------------------------------------------------------------
-// Reusable animated section wrapper (defined outside render to avoid
-// re-creating on every render).
+// Noise grain overlay SVG (inlined as data URI)
+// ---------------------------------------------------------------------------
+
+const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+
+// ---------------------------------------------------------------------------
+// Decorative section divider
+// ---------------------------------------------------------------------------
+
+function SectionDivider({ theme }: { theme: TemplateTheme }) {
+  return (
+    <div className="flex items-center justify-center gap-3 py-6">
+      <motion.div
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: EASE }}
+        style={{
+          width: 36,
+          height: 1,
+          background: theme.decorativeColor,
+          transformOrigin: "right center",
+        }}
+      />
+      <motion.div
+        initial={{ scale: 0 }}
+        whileInView={{ scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.3, ease: EASE }}
+        style={{
+          width: 5,
+          height: 5,
+          borderRadius: "50%",
+          background: theme.accent,
+          opacity: 0.35,
+        }}
+      />
+      <motion.div
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: EASE }}
+        style={{
+          width: 36,
+          height: 1,
+          background: theme.decorativeColor,
+          transformOrigin: "left center",
+        }}
+      />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Animated section wrappers
 // ---------------------------------------------------------------------------
 
 function AnimatedSection({
   children,
   className = "",
+  variants: customVariants,
 }: {
   children: React.ReactNode;
   className?: string;
+  variants?: Variants;
 }) {
   return (
     <motion.section
-      variants={fadeInUp}
+      variants={customVariants ?? fadeInUp}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
@@ -90,12 +192,11 @@ function AnimatedSection({
 }
 
 // ---------------------------------------------------------------------------
-// FAQ Accordion Item
+// FAQ Accordion Item — redesigned with left accent border
 // ---------------------------------------------------------------------------
 
 function FAQAccordionItem({
   faq,
-  index,
   isOpen,
   onToggle,
   theme,
@@ -109,43 +210,32 @@ function FAQAccordionItem({
   isLast: boolean;
 }) {
   return (
-    <div>
+    <div
+      style={{
+        borderLeft: isOpen
+          ? `2px solid ${theme.accent}`
+          : "2px solid transparent",
+        transition: "border-color 0.35s ease",
+      }}
+    >
       <button
         onClick={onToggle}
-        className="flex w-full cursor-pointer items-start gap-3 text-left transition-colors items-center"
+        className="flex w-full cursor-pointer items-center gap-3 text-left transition-colors"
         style={{
-          padding: "18px 20px",
-          paddingBottom: isOpen ? 0 : 18,
+          padding: "20px 22px",
+          paddingBottom: isOpen ? 4 : 20,
           background: "transparent",
           border: "none",
         }}
       >
-        {/* Question number accent dot */}
-        <span
-          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center"
-          style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 9,
-            fontWeight: 600,
-            letterSpacing: 0.5,
-            color: theme.accent,
-            border: `1.5px solid ${theme.accent}`,
-            borderRadius: "50%",
-            opacity: isOpen ? 1 : 0.5,
-            transition: "opacity 0.3s ease",
-          }}
-        >
-          {index + 1}
-        </span>
-
         {/* Question text */}
         <span
           className="flex-1"
           style={{
             fontFamily: theme.bodyFont,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 500,
-            lineHeight: 1.45,
+            lineHeight: 1.5,
             color: isOpen ? theme.textPrimary : theme.textSecondary,
             transition: "color 0.3s ease",
           }}
@@ -155,20 +245,23 @@ function FAQAccordionItem({
 
         {/* Chevron */}
         <motion.span
-          className="mt-0.5 flex-shrink-0"
+          className="flex-shrink-0"
           animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.35, ease: EASE }}
         >
           <ChevronDown
             size={16}
             color={theme.accent}
-            strokeWidth={2}
-            style={{ opacity: isOpen ? 1 : 0.4, transition: "opacity 0.3s ease" }}
+            strokeWidth={1.5}
+            style={{
+              opacity: isOpen ? 1 : 0.4,
+              transition: "opacity 0.3s ease",
+            }}
           />
         </motion.span>
       </button>
 
-      {/* Answer with AnimatePresence height animation */}
+      {/* Answer */}
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
@@ -176,22 +269,17 @@ function FAQAccordionItem({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{
-              height: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
-              opacity: { duration: 0.25, delay: 0.05 },
+              height: { duration: 0.4, ease: EASE },
+              opacity: { duration: 0.3, delay: 0.05 },
             }}
             style={{ overflow: "hidden" }}
           >
-            <div
-              style={{
-                padding: "8px 20px 20px",
-                paddingLeft: 48, // align with question text (20px + 20px icon + 8px gap)
-              }}
-            >
+            <div style={{ padding: "4px 22px 22px" }}>
               <p
                 style={{
                   fontFamily: theme.bodyFont,
                   fontSize: 14,
-                  lineHeight: 1.7,
+                  lineHeight: 1.75,
                   color: theme.textSecondary,
                   margin: 0,
                 }}
@@ -209,7 +297,7 @@ function FAQAccordionItem({
           style={{
             height: 1,
             background: theme.cardBorder,
-            margin: "0 20px",
+            margin: "0 22px",
           }}
         />
       )}
@@ -218,35 +306,67 @@ function FAQAccordionItem({
 }
 
 // ---------------------------------------------------------------------------
-// Component
+// Main Component
 // ---------------------------------------------------------------------------
 
 interface InvitationPageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
-  /** Shared audio ref from the envelope-open playback. */
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
 }
 
-export default function InvitationPage({ invitation, theme, audioRef }: InvitationPageProps) {
+export default function InvitationPage({
+  invitation,
+  theme,
+  audioRef,
+}: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [ctaHover, setCtaHover] = useState(false);
 
-  const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 44;
+  const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 46;
 
   return (
-    <div style={{ background: theme.bg, color: theme.textPrimary, minHeight: "100dvh" }}>
-      {/* ----------------------------------------------------------------- */}
-      {/* 1 + 2. Hero (video or image) — full 100dvh                        */}
-      {/* When videoUrl is present the couple names float as an overlay.    */}
-      {/* When only heroImage is present, names are rendered below in the   */}
-      {/* normal document flow (original behaviour).                        */}
-      {/* ----------------------------------------------------------------- */}
+    <div
+      style={{
+        background: theme.bg,
+        color: theme.textPrimary,
+        minHeight: "100dvh",
+        position: "relative",
+      }}
+    >
+      {/* ================================================================= */}
+      {/* Atmospheric grain overlay                                         */}
+      {/* ================================================================= */}
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          opacity: 0.018,
+          backgroundImage: GRAIN_SVG,
+          backgroundSize: "200px 200px",
+          animation: "invitation-grain 6s steps(8) infinite",
+          zIndex: 1,
+        }}
+      />
+
+      {/* ================================================================= */}
+      {/* Radial gradient wash                                              */}
+      {/* ================================================================= */}
+      {theme.bgGradient && (
+        <div
+          className="pointer-events-none fixed inset-0"
+          style={{ background: theme.bgGradient }}
+        />
+      )}
+
+      {/* ================================================================= */}
+      {/* 1. Hero — full viewport video or image                            */}
+      {/* ================================================================= */}
       <section
         className="relative overflow-hidden"
         style={{ height: invitation.videoUrl ? "100dvh" : 300 }}
       >
-        {/* --- Background media ----------------------------------------- */}
+        {/* Background media */}
         {invitation.videoUrl ? (
           <video
             src={invitation.videoUrl}
@@ -264,25 +384,25 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
           />
         )}
 
-        {/* --- Dark scrim (video only) ----------------------------------- */}
+        {/* Dark scrim (video only) */}
         {invitation.videoUrl && (
           <div
             className="pointer-events-none absolute inset-0"
-            style={{ background: "rgba(0,0,0,0.42)" }}
+            style={{ background: "rgba(0,0,0,0.38)" }}
           />
         )}
 
-        {/* --- Bottom gradient fading into theme bg --------------------- */}
+        {/* Bottom gradient fading into theme bg */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background: invitation.videoUrl
-              ? `linear-gradient(to bottom, transparent 45%, ${theme.bg} 100%)`
-              : `linear-gradient(to bottom, transparent 40%, ${theme.bg} 100%)`,
+              ? `linear-gradient(to bottom, transparent 40%, ${theme.bg} 100%)`
+              : `linear-gradient(to bottom, transparent 35%, ${theme.bg} 100%)`,
           }}
         />
 
-        {/* --- Couple names overlay (video mode only) ------------------- */}
+        {/* Couple names overlay (video mode) */}
         {invitation.videoUrl && (
           <motion.div
             variants={heroTextContainer}
@@ -300,11 +420,12 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             <motion.span
               variants={heroTextItem}
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: theme.uiFont,
                 fontSize: 10,
-                letterSpacing: 4,
+                fontWeight: 300,
+                letterSpacing: 5,
                 textTransform: "uppercase" as const,
-                color: "rgba(255,255,255,0.72)",
+                color: "rgba(255,255,255,0.65)",
               }}
             >
               Convidam para o casamento de
@@ -313,13 +434,13 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             {/* Bride */}
             <motion.h1
               variants={heroTextItem}
-              className="mt-4"
+              className="mt-5"
               style={{
                 fontFamily: theme.displayFont,
-                fontSize: nameFontSize + 8,
-                lineHeight: 1.1,
+                fontSize: nameFontSize + 10,
+                lineHeight: 1.05,
                 color: "#ffffff",
-                textShadow: "0 2px 32px rgba(0,0,0,0.55)",
+                textShadow: "0 2px 40px rgba(0,0,0,0.5)",
               }}
             >
               {invitation.couple.bride}
@@ -328,12 +449,14 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             {/* Ampersand */}
             <motion.span
               variants={heroTextItem}
-              className="my-1"
+              className="my-2"
               style={{
-                fontFamily: theme.scriptFont ?? "'Cormorant Garamond', serif",
-                fontSize: 36,
-                color: "rgba(255,255,255,0.85)",
-                textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+                fontFamily:
+                  theme.scriptFont ?? "'Cormorant Garamond', serif",
+                fontSize: 34,
+                fontStyle: "italic",
+                color: "rgba(255,255,255,0.75)",
+                textShadow: "0 2px 20px rgba(0,0,0,0.35)",
               }}
             >
               &amp;
@@ -344,10 +467,10 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
               variants={heroTextItem}
               style={{
                 fontFamily: theme.displayFont,
-                fontSize: nameFontSize + 8,
-                lineHeight: 1.1,
+                fontSize: nameFontSize + 10,
+                lineHeight: 1.05,
                 color: "#ffffff",
-                textShadow: "0 2px 32px rgba(0,0,0,0.55)",
+                textShadow: "0 2px 40px rgba(0,0,0,0.5)",
               }}
             >
               {invitation.couple.groom}
@@ -356,30 +479,33 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             {/* Date pill */}
             <motion.div
               variants={heroTextItem}
-              className="mt-6 flex items-center gap-3"
+              className="mt-7 flex items-center gap-4"
               style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 11,
-                letterSpacing: 5,
+                fontFamily: theme.uiFont,
+                fontSize: 10,
+                fontWeight: 300,
+                letterSpacing: 6,
                 textTransform: "uppercase" as const,
-                color: "rgba(255,255,255,0.75)",
+                color: "rgba(255,255,255,0.6)",
               }}
             >
               <span
                 style={{
                   display: "inline-block",
-                  width: 24,
+                  width: 28,
                   height: 1,
-                  background: "rgba(255,255,255,0.45)",
+                  background: "rgba(255,255,255,0.3)",
                 }}
               />
-              {invitation.date.day}&nbsp;&middot;&nbsp;{invitation.date.month}&nbsp;&middot;&nbsp;{invitation.date.year}
+              {invitation.date.day}&nbsp;&middot;&nbsp;
+              {invitation.date.month}&nbsp;&middot;&nbsp;
+              {invitation.date.year}
               <span
                 style={{
                   display: "inline-block",
-                  width: 24,
+                  width: 28,
                   height: 1,
-                  background: "rgba(255,255,255,0.45)",
+                  background: "rgba(255,255,255,0.3)",
                 }}
               />
             </motion.div>
@@ -387,13 +513,13 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             {/* Quote */}
             <motion.p
               variants={heroTextItem}
-              className="mt-4"
+              className="mt-5"
               style={{
                 fontFamily: theme.bodyFont,
                 fontSize: 14,
                 fontStyle: "italic" as const,
-                lineHeight: 1.6,
-                color: "rgba(255,255,255,0.6)",
+                lineHeight: 1.65,
+                color: "rgba(255,255,255,0.5)",
                 maxWidth: 280,
               }}
             >
@@ -402,9 +528,9 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
           </motion.div>
         )}
 
-        {/* --- Audio player floating at the bottom ---------------------- */}
+        {/* Audio player */}
         {invitation.audio.enabled && (
-          <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2">
+          <div className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2">
             <AudioPlayer
               src={invitation.audio.src}
               title={invitation.audio.title}
@@ -416,21 +542,21 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
         )}
       </section>
 
-      {/* ----------------------------------------------------------------- */}
-      {/* 2. Names (shown only when there is NO video)                      */}
-      {/* ----------------------------------------------------------------- */}
+      {/* ================================================================= */}
+      {/* 2. Names (no-video fallback)                                      */}
+      {/* ================================================================= */}
       {!invitation.videoUrl && (
         <AnimatedSection>
           <div
             className="flex flex-col items-center text-center"
-            style={{ padding: "32px 40px" }}
+            style={{ padding: "36px 40px" }}
           >
-            {/* Label */}
             <span
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: theme.uiFont,
                 fontSize: 10,
-                letterSpacing: 3,
+                fontWeight: 300,
+                letterSpacing: 4,
                 textTransform: "uppercase" as const,
                 color: theme.textSecondary,
               }}
@@ -438,61 +564,62 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
               Convidam para o casamento de
             </span>
 
-            {/* Bride */}
             <h1
-              className="mt-4"
+              className="mt-5"
               style={{
                 fontFamily: theme.displayFont,
                 fontSize: nameFontSize,
-                lineHeight: 1.15,
+                lineHeight: 1.1,
                 color: theme.textPrimary,
               }}
             >
               {invitation.couple.bride}
             </h1>
 
-            {/* Ampersand */}
             <span
-              className="my-1"
+              className="my-2"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 28,
+                fontSize: 26,
+                fontStyle: "italic",
                 color: theme.accent,
               }}
             >
               &amp;
             </span>
 
-            {/* Groom */}
             <h1
               style={{
                 fontFamily: theme.displayFont,
                 fontSize: nameFontSize,
-                lineHeight: 1.15,
+                lineHeight: 1.1,
                 color: theme.textPrimary,
               }}
             >
               {invitation.couple.groom}
             </h1>
 
-            {/* Divider */}
-            <div
-              className="mt-6 mb-5"
+            {/* Decorative accent line */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
+              className="mt-7 mb-5"
               style={{
-                width: 40,
+                width: 48,
                 height: 1,
                 background: theme.accent,
-                opacity: 0.38,
+                opacity: 0.3,
               }}
             />
 
-            {/* Quote */}
             <p
               style={{
                 fontFamily: theme.bodyFont,
                 fontSize: 16,
                 fontStyle: "italic" as const,
-                lineHeight: 1.6,
+                lineHeight: 1.65,
                 color: theme.textSecondary,
                 maxWidth: 300,
               }}
@@ -503,25 +630,30 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
         </AnimatedSection>
       )}
 
-      {/* ----------------------------------------------------------------- */}
-      {/* 3. Date Card                                                      */}
-      {/* ----------------------------------------------------------------- */}
-      <AnimatedSection className="px-6 pb-8">
+      {/* ================================================================= */}
+      {/* 3. Date Card — oversized, glassmorphism                           */}
+      {/* ================================================================= */}
+      <AnimatedSection className="px-6 pb-10" variants={scaleIn}>
         <div
-          className="flex flex-col items-center text-center"
+          className="relative flex flex-col items-center text-center"
           style={{
             background: theme.cardBg,
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderRadius: 20,
+            padding: "36px 28px",
+            boxShadow:
+              "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
             border: `1px solid ${theme.cardBorder}`,
-            borderRadius: 16,
-            padding: 28,
           }}
         >
           {/* Save the date label */}
           <span
             style={{
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: theme.uiFont,
               fontSize: 10,
-              letterSpacing: 4,
+              fontWeight: 400,
+              letterSpacing: 5,
               textTransform: "uppercase" as const,
               color: theme.accent,
             }}
@@ -529,15 +661,16 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             Save the Date
           </span>
 
-          {/* Day */}
+          {/* Day — oversized */}
           <span
             className="mt-3"
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 72,
+              fontSize: 96,
               fontWeight: 300,
               lineHeight: 1,
               color: theme.textPrimary,
+              letterSpacing: -2,
             }}
           >
             {invitation.date.day}
@@ -547,10 +680,10 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
           <span
             className="mt-1"
             style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 14,
-              fontWeight: 600,
-              letterSpacing: 6,
+              fontFamily: theme.uiFont,
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: 8,
               textTransform: "uppercase" as const,
               color: theme.textSecondary,
             }}
@@ -564,28 +697,35 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             style={{
               fontFamily: theme.bodyFont,
               fontSize: 20,
-              color: theme.textSecondary,
+              fontWeight: 300,
+              color: theme.textMuted,
             }}
           >
             {invitation.date.year}
           </span>
 
-          {/* Divider */}
-          <div
-            className="my-4"
+          {/* Animated accent line */}
+          <motion.div
+            className="my-5"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.3, ease: EASE }}
             style={{
-              width: 100,
+              width: 80,
               height: 1,
-              background: theme.accent,
-              opacity: 0.25,
+              background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
+              opacity: 0.35,
             }}
           />
 
           {/* Day of week + time */}
           <span
             style={{
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: theme.uiFont,
               fontSize: 13,
+              fontWeight: 300,
+              letterSpacing: 1,
               color: theme.textSecondary,
             }}
           >
@@ -594,56 +734,73 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
         </div>
       </AnimatedSection>
 
-      {/* ----------------------------------------------------------------- */}
+      <SectionDivider theme={theme} />
+
+      {/* ================================================================= */}
       {/* 4. Schedule                                                       */}
-      {/* ----------------------------------------------------------------- */}
+      {/* ================================================================= */}
       {invitation.schedule.length > 0 && (
-        <AnimatedSection className="px-6 pb-8">
-          <div className="flex flex-col items-center">
-            {/* Section label */}
-            <span
+        <>
+          <AnimatedSection className="px-6 pb-2">
+            <div className="flex flex-col items-center">
+              <span
+                style={{
+                  fontFamily: theme.uiFont,
+                  fontSize: 10,
+                  fontWeight: 400,
+                  letterSpacing: 4,
+                  textTransform: "uppercase" as const,
+                  color: theme.textSecondary,
+                }}
+              >
+                Programação
+              </span>
+
+              <motion.div
+                className="mt-3 mb-6"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, ease: EASE }}
+                style={{
+                  width: 28,
+                  height: 1,
+                  background: theme.accent,
+                  opacity: 0.25,
+                }}
+              />
+            </div>
+          </AnimatedSection>
+
+          {/* Schedule card with staggered items */}
+          <motion.div
+            className="px-6 pb-10"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+          >
+            <div
               style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 10,
-                letterSpacing: 3,
-                textTransform: "uppercase" as const,
-                color: theme.textSecondary,
+                background: theme.cardBg,
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                borderRadius: 20,
+                overflow: "hidden",
+                padding: "8px 0",
+                boxShadow:
+                  "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+                border: `1px solid ${theme.cardBorder}`,
               }}
             >
-              Programação
-            </span>
-
-            {/* Small divider */}
-            <div
-              className="mt-3 mb-5"
-              style={{
-                width: 24,
-                height: 1,
-                background: theme.accent,
-                opacity: 0.3,
-              }}
-            />
-          </div>
-
-          {/* Schedule card */}
-          <div
-            style={{
-              background: theme.cardBg,
-              border: `1px solid ${theme.cardBorder}`,
-              borderRadius: 16,
-              overflow: "hidden",
-              padding: "20px 0",
-            }}
-          >
-            {invitation.schedule.map((event, i) => (
-              <div key={i}>
-                {i > 0 && (
-                  <div
-                    className="mx-5"
-                    style={{ height: 1, background: theme.cardBorder }}
-                  />
-                )}
-                <div className="px-5">
+              {invitation.schedule.map((event, i) => (
+                <div key={i}>
+                  {i > 0 && (
+                    <div
+                      className="mx-6"
+                      style={{ height: 1, background: theme.cardBorder }}
+                    />
+                  )}
                   <ScheduleItem
                     time={event.time}
                     label={event.label}
@@ -651,37 +808,57 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
                     accentColor={theme.accent}
                     textColor={theme.textPrimary}
                     venueColor={theme.textSecondary}
+                    uiFont={theme.uiFont}
+                    index={i}
                   />
                 </div>
-              </div>
-            ))}
-          </div>
-        </AnimatedSection>
+              ))}
+            </div>
+          </motion.div>
+
+          <SectionDivider theme={theme} />
+        </>
       )}
 
-      {/* ----------------------------------------------------------------- */}
-      {/* 5. Info Cards (Dress Code + Gift Registry)                        */}
-      {/* ----------------------------------------------------------------- */}
-      <AnimatedSection className="px-6 pb-8">
+      {/* ================================================================= */}
+      {/* 5. Info Cards — glassmorphism, opposing slide-ins                  */}
+      {/* ================================================================= */}
+      <AnimatedSection className="px-6 pb-10">
         <div className="grid grid-cols-2 gap-3">
-          {/* Dress Code */}
-          <div
-            className="flex flex-col items-center gap-2 text-center"
+          {/* Dress Code — slides from left */}
+          <motion.div
+            variants={slideFromLeft}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="flex flex-col items-center gap-3 text-center"
             style={{
               background: theme.cardBg,
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              borderRadius: 16,
+              padding: "24px 14px",
+              boxShadow:
+                "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
               border: `1px solid ${theme.cardBorder}`,
-              borderRadius: 12,
-              padding: "20px 12px",
             }}
           >
-            <Shirt size={24} color={theme.accent} strokeWidth={1.5} />
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-full"
+              style={{
+                background: `${theme.accent}12`,
+              }}
+            >
+              <Shirt size={20} color={theme.accent} strokeWidth={1.5} />
+            </div>
             <span
               style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 10,
-                letterSpacing: 2,
+                fontFamily: theme.uiFont,
+                fontSize: 9,
+                fontWeight: 500,
+                letterSpacing: 3,
                 textTransform: "uppercase" as const,
-                color: theme.textSecondary,
+                color: theme.textMuted,
               }}
             >
               Dress Code
@@ -689,33 +866,49 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             <span
               style={{
                 fontFamily: theme.bodyFont,
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: 500,
                 color: theme.textPrimary,
               }}
             >
               {invitation.dressCode}
             </span>
-          </div>
+          </motion.div>
 
-          {/* Gift Registry */}
-          <div
-            className="flex flex-col items-center gap-2 text-center"
+          {/* Gift Registry — slides from right */}
+          <motion.div
+            variants={slideFromRight}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="flex flex-col items-center gap-3 text-center"
             style={{
               background: theme.cardBg,
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              borderRadius: 16,
+              padding: "24px 14px",
+              boxShadow:
+                "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
               border: `1px solid ${theme.cardBorder}`,
-              borderRadius: 12,
-              padding: "20px 12px",
             }}
           >
-            <Gift size={24} color={theme.accent} strokeWidth={1.5} />
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-full"
+              style={{
+                background: `${theme.accent}12`,
+              }}
+            >
+              <Gift size={20} color={theme.accent} strokeWidth={1.5} />
+            </div>
             <span
               style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 10,
-                letterSpacing: 2,
+                fontFamily: theme.uiFont,
+                fontSize: 9,
+                fontWeight: 500,
+                letterSpacing: 3,
                 textTransform: "uppercase" as const,
-                color: theme.textSecondary,
+                color: theme.textMuted,
               }}
             >
               Lista de Presentes
@@ -723,176 +916,226 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             <span
               style={{
                 fontFamily: theme.bodyFont,
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: 500,
                 color: theme.textPrimary,
               }}
             >
               {invitation.giftRegistry.text}
             </span>
+          </motion.div>
+        </div>
+      </AnimatedSection>
+
+      <SectionDivider theme={theme} />
+
+      {/* ================================================================= */}
+      {/* 6. CTA Section                                                    */}
+      {/* ================================================================= */}
+      <AnimatedSection className="px-6 pb-10">
+        <div className="flex flex-col items-center">
+          <span
+            className="mb-6"
+            style={{
+              fontFamily: theme.uiFont,
+              fontSize: 10,
+              fontWeight: 400,
+              letterSpacing: 4,
+              textTransform: "uppercase" as const,
+              color: theme.textSecondary,
+            }}
+          >
+            Confirme sua presença
+          </span>
+
+          <div className="flex w-full flex-col gap-3">
+            {/* Primary — Ver Localização */}
+            <motion.a
+              href={invitation.location.googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
+              style={{
+                fontFamily: theme.uiFont,
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: 1,
+                background: theme.ctaPrimaryBg,
+                color: theme.ctaPrimaryText,
+                borderRadius: theme.ctaRadius,
+              }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <MapPin size={17} strokeWidth={1.5} />
+              Ver Localização
+            </motion.a>
+
+            {/* Secondary — Confirmar Presença with glow on hover */}
+            <motion.button
+              onClick={() => setRsvpOpen(true)}
+              onMouseEnter={() => setCtaHover(true)}
+              onMouseLeave={() => setCtaHover(false)}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
+              style={{
+                fontFamily: theme.uiFont,
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: 1,
+                background: "transparent",
+                border: `1.5px solid ${theme.ctaSecondaryBorder}`,
+                color: theme.ctaSecondaryText,
+                borderRadius: theme.ctaRadius,
+                // @ts-expect-error CSS variable for pulse-glow keyframe
+                "--cta-glow-color": theme.ctaGlow ?? "transparent",
+                animation: ctaHover
+                  ? "pulse-glow 2s ease-in-out infinite"
+                  : "none",
+              }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Heart size={17} strokeWidth={1.5} />
+              Confirmar Presença
+            </motion.button>
           </div>
         </div>
       </AnimatedSection>
 
-        {/* ----------------------------------------------------------------- */}
-        {/* 6. CTA Section                                                    */}
-        {/* ----------------------------------------------------------------- */}
-        <AnimatedSection className="px-6 pb-8">
-            <div className="flex flex-col items-center">
-                {/* Label */}
-                <span
-                    className="mb-5"
-                    style={{
-                        fontFamily: "'Inter', sans-serif",
-                        fontSize: 10,
-                        letterSpacing: 3,
-                        textTransform: "uppercase" as const,
-                        color: theme.textSecondary,
-                    }}
-                >
-            Confirme sua presença
-          </span>
-
-                {/* Buttons */}
-                <div className="flex w-full flex-col gap-3">
-                    {/* Primary — Ver Localização */}
-                    <a
-                        href={invitation.location.googleMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex w-full items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
-                        style={{
-                            fontFamily: "'Inter', sans-serif",
-                            background: theme.ctaPrimaryBg,
-                            color: theme.ctaPrimaryText,
-                            borderRadius: theme.ctaRadius,
-                        }}
-                    >
-                        <MapPin size={18} />
-                        Ver Localização
-                    </a>
-
-                    {/* Secondary — Confirmar Presença */}
-                    <button
-                        onClick={() => setRsvpOpen(true)}
-                        className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
-                        style={{
-                            fontFamily: "'Inter', sans-serif",
-                            background: "transparent",
-                            border: `1.5px solid ${theme.ctaSecondaryBorder}`,
-                            color: theme.ctaSecondaryText,
-                            borderRadius: theme.ctaRadius,
-                        }}
-                    >
-                        <Heart size={18} />
-                        Confirmar Presença
-                    </button>
-                </div>
-            </div>
-        </AnimatedSection>
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 5b. FAQs                                                          */}
-      {/* ----------------------------------------------------------------- */}
+      {/* ================================================================= */}
+      {/* 7. FAQs                                                           */}
+      {/* ================================================================= */}
       {invitation.faqs && invitation.faqs.length > 0 && (
-        <AnimatedSection className="px-6 pb-8">
-          <div className="flex flex-col items-center">
-            {/* Section label */}
-            <span
+        <>
+          <SectionDivider theme={theme} />
+
+          <AnimatedSection className="px-6 pb-10">
+            <div className="flex flex-col items-center">
+              <span
+                style={{
+                  fontFamily: theme.uiFont,
+                  fontSize: 10,
+                  fontWeight: 400,
+                  letterSpacing: 4,
+                  textTransform: "uppercase" as const,
+                  color: theme.textSecondary,
+                }}
+              >
+                Perguntas Frequentes
+              </span>
+
+              <motion.div
+                className="mt-3 mb-6"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, ease: EASE }}
+                style={{
+                  width: 28,
+                  height: 1,
+                  background: theme.accent,
+                  opacity: 0.25,
+                }}
+              />
+            </div>
+
+            {/* FAQ card */}
+            <div
               style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 10,
-                letterSpacing: 3,
-                textTransform: "uppercase" as const,
-                color: theme.textSecondary,
+                background: theme.cardBg,
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                borderRadius: 20,
+                overflow: "hidden",
+                boxShadow:
+                  "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+                border: `1px solid ${theme.cardBorder}`,
               }}
             >
-              Perguntas Frequentes
-            </span>
-
-            {/* Small divider */}
-            <div
-              className="mt-3 mb-5"
-              style={{
-                width: 24,
-                height: 1,
-                background: theme.accent,
-                opacity: 0.3,
-              }}
-            />
-          </div>
-
-          {/* FAQ card */}
-          <div
-            style={{
-              background: theme.cardBg,
-              border: `1px solid ${theme.cardBorder}`,
-              borderRadius: 16,
-              overflow: "hidden",
-            }}
-          >
-            {invitation.faqs.map((faq, i) => (
-              <FAQAccordionItem
-                key={i}
-                faq={faq}
-                index={i}
-                isOpen={openFaqIndex === i}
-                onToggle={() => setOpenFaqIndex(openFaqIndex === i ? null : i)}
-                theme={theme}
-                isLast={i === (invitation.faqs?.length ?? 0) - 1}
-              />
-            ))}
-          </div>
-        </AnimatedSection>
+              {invitation.faqs.map((faq, i) => (
+                <FAQAccordionItem
+                  key={i}
+                  faq={faq}
+                  index={i}
+                  isOpen={openFaqIndex === i}
+                  onToggle={() =>
+                    setOpenFaqIndex(openFaqIndex === i ? null : i)
+                  }
+                  theme={theme}
+                  isLast={i === (invitation.faqs?.length ?? 0) - 1}
+                />
+              ))}
+            </div>
+          </AnimatedSection>
+        </>
       )}
 
-
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 7. Footer                                                         */}
-      {/* ----------------------------------------------------------------- */}
-      <AnimatedSection>
-        <footer className="flex flex-col items-center pb-10 pt-4">
-          {/* Divider */}
-          <div
-            className="mb-5"
+      {/* ================================================================= */}
+      {/* 8. Footer — monogram with decorative ring                         */}
+      {/* ================================================================= */}
+      <AnimatedSection variants={ambientFade}>
+        <footer className="flex flex-col items-center pb-12 pt-6">
+          {/* Decorative accent line */}
+          <motion.div
+            className="mb-8"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: EASE }}
             style={{
-              width: 40,
+              width: 48,
               height: 1,
-              background: theme.accent,
+              background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
               opacity: 0.2,
             }}
           />
 
-          {/* Monogram */}
-          <span
-            style={{
-              fontFamily: theme.displayFont,
-              fontSize: 20,
-              color: theme.textMuted,
-            }}
+          {/* Monogram with decorative ring */}
+          <div
+            className="relative flex items-center justify-center"
+            style={{ width: 64, height: 64 }}
           >
-            {invitation.couple.monogram}
-          </span>
+            {/* Rotating ring */}
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                border: `1px dashed ${theme.decorativeColor}`,
+                animation: "slow-rotate 30s linear infinite",
+                opacity: 0.5,
+              }}
+            />
+            <span
+              style={{
+                fontFamily: theme.displayFont,
+                fontSize: 22,
+                color: theme.textMuted,
+                letterSpacing: 2,
+              }}
+            >
+              {invitation.couple.monogram}
+            </span>
+          </div>
 
           {/* Date */}
           <span
-            className="mt-2"
+            className="mt-4"
             style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 11,
-              letterSpacing: 2,
+              fontFamily: theme.uiFont,
+              fontSize: 10,
+              fontWeight: 300,
+              letterSpacing: 3,
               color: theme.textMuted,
             }}
           >
-            {invitation.date.day} &middot; {invitation.date.month} &middot; {invitation.date.year}
+            {invitation.date.day} &middot; {invitation.date.month} &middot;{" "}
+            {invitation.date.year}
           </span>
         </footer>
       </AnimatedSection>
 
-      {/* ----------------------------------------------------------------- */}
+      {/* ================================================================= */}
       {/* RSVP Modal                                                        */}
-      {/* ----------------------------------------------------------------- */}
+      {/* ================================================================= */}
       <RSVPModal
         open={rsvpOpen}
         onClose={() => setRsvpOpen(false)}

@@ -7,7 +7,8 @@ import {
   Libre_Baskerville,
   Cinzel,
   Lora,
-  Inter,
+  Outfit,
+  DM_Serif_Display,
 } from "next/font/google";
 import "./globals.css";
 
@@ -56,10 +57,17 @@ const lora = Lora({
   variable: "--font-lora",
 });
 
-const inter = Inter({
-  weight: ["400", "500", "600"],
+const outfit = Outfit({
+  weight: ["300", "400", "500", "600"],
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-outfit",
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  weight: ["400"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-dm-serif-display",
 });
 
 export const metadata: Metadata = {
@@ -75,7 +83,7 @@ export default function RootLayout({
   return (
     <html lang="pt">
       <body
-        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${inter.variable} antialiased`}
+        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} antialiased`}
       >
         {children}
       </body>

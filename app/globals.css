@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-outfit);
   --font-display-great-vibes: var(--font-great-vibes);
   --font-display-playfair: var(--font-playfair-display);
   --font-display-cormorant: var(--font-cormorant-garamond);
@@ -9,6 +9,7 @@
   --font-display-baskerville: var(--font-libre-baskerville);
   --font-display-cinzel: var(--font-cinzel);
   --font-display-lora: var(--font-lora);
+  --font-display-dm-serif: var(--font-dm-serif-display);
 }
 
 :root {
@@ -43,7 +44,7 @@ html {
 }
 
 body {
-  font-family: var(--font-inter);
+  font-family: var(--font-outfit);
   background: #1A1A1C;
   color: #F5F5F0;
   overflow-x: hidden;
@@ -53,7 +54,72 @@ body {
   text-wrap: balance;
 }
 
-/* Brindel Gallery page styles */
+/* ===================================================================
+   Invitation page atmospheric animations
+   =================================================================== */
+
+/* Noise grain overlay */
+@keyframes invitation-grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1%, -1%); }
+  30% { transform: translate(1%, -2%); }
+  50% { transform: translate(-2%, 1%); }
+  70% { transform: translate(2%, -1%); }
+  90% { transform: translate(-1%, 2%); }
+}
+
+/* Gentle floating for decorative elements */
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Accent line shimmer — draws in from center */
+@keyframes accent-draw {
+  0% { transform: scaleX(0); opacity: 0.2; }
+  60% { opacity: 0.5; }
+  100% { transform: scaleX(1); opacity: 0.25; }
+}
+
+/* Slow rotation for decorative ring */
+@keyframes slow-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Equalizer bar animations for audio player */
+@keyframes eq-bar-1 {
+  0%, 100% { height: 3px; }
+  50% { height: 14px; }
+}
+@keyframes eq-bar-2 {
+  0%, 100% { height: 7px; }
+  50% { height: 18px; }
+}
+@keyframes eq-bar-3 {
+  0%, 100% { height: 5px; }
+  50% { height: 11px; }
+}
+@keyframes eq-bar-4 {
+  0%, 100% { height: 4px; }
+  50% { height: 15px; }
+}
+
+/* Subtle pulse-glow for CTA buttons on hover */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--cta-glow-color, rgba(255,255,255,0.08)); }
+  50% { box-shadow: 0 0 24px 6px var(--cta-glow-color, rgba(255,255,255,0.08)); }
+}
+
+/* Envelope monogram/tap text breathing */
+@keyframes gentle-breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ===================================================================
+   Brindel Gallery page styles
+   =================================================================== */
 
 @keyframes brindel-float {
   0%, 100% { transform: translateY(0); }

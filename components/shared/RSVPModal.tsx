@@ -26,10 +26,68 @@ const rsvpSchema = z.object({
 type RSVPFormData = z.output<typeof rsvpSchema>;
 
 // ---------------------------------------------------------------------------
-// Theme helper
+// Modal palette — always light & readable, themed only via accent / CTA
 // ---------------------------------------------------------------------------
 
-interface RSVPTheme {
+interface ModalPalette {
+  /** Card background — always opaque light */
+  cardBg: string;
+  /** Input / field background */
+  fieldBg: string;
+  /** Primary text (headings, input values) */
+  text: string;
+  /** Secondary text (labels, hints) */
+  textSoft: string;
+  /** Muted text (deadlines, placeholders) */
+  textMuted: string;
+  /** Field & card borders */
+  border: string;
+  /** Accent from theme (checkmark, active ring) */
+  accent: string;
+  /** CTA button bg */
+  ctaBg: string;
+  /** CTA button text */
+  ctaText: string;
+  /** CTA border-radius */
+  ctaRadius: string;
+  /** Close icon / secondary elements */
+  iconColor: string;
+  /** UI font */
+  uiFont: string;
+  /** Display font for headings */
+  displayFont: string;
+  /** Body font for couple label */
+  bodyFont: string;
+}
+
+/** Build a high-contrast light palette, pulling only branding colors from the
+ *  invitation theme. This guarantees readability on every template. */
+function buildModalPalette(theme: TemplateTheme | RSVPThemeLegacy): ModalPalette {
+  // Detect if the source is a full TemplateTheme (has uiFont) or legacy RSVPTheme
+  const isTemplate = "uiFont" in theme;
+  return {
+    cardBg: "#FFFFFF",
+    fieldBg: "#F8F8F7",
+    text: "#323232",
+    textSoft: "#6B6B6B",
+    textMuted: "#A0A0A0",
+    border: "#E5E5E3",
+    accent: theme.accent,
+    ctaBg: theme.ctaPrimaryBg,
+    ctaText: theme.ctaPrimaryText,
+    ctaRadius: theme.ctaRadius,
+    iconColor: "#999999",
+    uiFont: isTemplate ? (theme as TemplateTheme).uiFont : "'Outfit', sans-serif",
+    displayFont: "'Inter', serif",
+    bodyFont: theme.bodyFont,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Legacy direct-theme interface (kept for backward compat)
+// ---------------------------------------------------------------------------
+
+interface RSVPThemeLegacy {
   bg: string;
   cardBg: string;
   primary: string;
@@ -52,7 +110,7 @@ interface DirectProps {
   isOpen: boolean;
   onClose: () => void;
   invitationSlug: string;
-  theme: RSVPTheme;
+  theme: RSVPThemeLegacy;
 }
 
 interface IntegrationProps {
@@ -78,11 +136,10 @@ export default function RSVPModal(props: RSVPModalProps) {
   const isOpen = isIntegration(props) ? props.open : props.isOpen;
   const onClose = props.onClose;
   const slug = isIntegration(props) ? props.invitation.slug : props.invitationSlug;
-  const theme: RSVPTheme = props.theme;
   const deadline = isIntegration(props) ? props.invitation.rsvp.deadline : undefined;
-  const coupleLabel = isIntegration(props)
-    ? `${props.invitation.couple.bride} & ${props.invitation.couple.groom}`
-    : undefined;
+
+  // Build a guaranteed high-contrast light palette
+  const p = buildModalPalette(props.theme);
 
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
 
@@ -140,23 +197,27 @@ export default function RSVPModal(props: RSVPModalProps) {
     onClose();
   };
 
+  // UI font — prefer the theme's bodyFont (which is Outfit in our refined themes)
+  const uiFont = p.uiFont;
+
   // Shared input styles
   const inputClass =
     "w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-offset-1";
 
   const inputStyle = {
-    fontFamily: "'Inter', sans-serif" as const,
-    backgroundColor: theme.bg,
-    borderColor: theme.cardBorder,
-    color: theme.textPrimary,
+    fontFamily: uiFont,
+    backgroundColor: p.fieldBg,
+    borderColor: p.border,
+    color: p.text,
   };
 
   const labelStyle = {
-    fontFamily: "'Inter', sans-serif" as const,
-    fontSize: 12,
-    fontWeight: 500 as const,
-    letterSpacing: 0.5,
-    color: theme.textSecondary,
+    fontFamily: uiFont,
+    fontSize: 11 as const,
+    fontWeight: 600 as const,
+    letterSpacing: 1,
+    textTransform: "uppercase" as const,
+    color: p.textSoft,
   };
 
   return (
@@ -179,25 +240,24 @@ export default function RSVPModal(props: RSVPModalProps) {
           <motion.div
             className="relative z-10 flex max-h-[90dvh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl shadow-2xl sm:rounded-2xl"
             style={{
-              backgroundColor:
-                theme.cardBg === "transparent" ? theme.bg : theme.cardBg,
+              backgroundColor: p.cardBg,
             }}
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 300 }}
+            initial={{ y: "100%", opacity: 0.8 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", damping: 32, stiffness: 340, mass: 0.8 }}
           >
             {/* Header */}
             <div
               className="flex items-center justify-between border-b px-5 py-4"
-              style={{ borderColor: theme.cardBorder }}
+              style={{ borderColor: p.border }}
             >
               <h2
                 className="text-base font-semibold"
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 20,
-                  color: theme.textPrimary,
+                  fontFamily: p.displayFont,
+                  fontSize: 18,
+                  color: p.text,
                 }}
               >
                 Confirmar Presença
@@ -207,7 +267,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                 aria-label="Fechar"
                 className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-black/5"
               >
-                <X size={18} color={theme.textSecondary} />
+                <X size={18} color={p.iconColor} />
               </button>
             </div>
 
@@ -220,27 +280,27 @@ export default function RSVPModal(props: RSVPModalProps) {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  <CheckCircle size={48} color={theme.accent} strokeWidth={1.5} />
+                  <CheckCircle size={48} color={p.accent} strokeWidth={1.5} />
                   <p
                     className="text-lg font-medium"
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      color: theme.textPrimary,
+                      fontFamily: p.displayFont,
+                      color: p.text,
                     }}
                   >
                     Obrigado!
                   </p>
-                  <p className="text-sm" style={{ color: theme.textSecondary }}>
+                  <p className="text-sm" style={{ color: p.textSoft }}>
                     Sua confirmação foi registrada com sucesso.
                   </p>
                   <button
                     onClick={handleClose}
                     className="mt-4 px-6 py-2 text-sm font-medium"
                     style={{
-                      fontFamily: "'Inter', sans-serif",
-                      background: theme.ctaPrimaryBg,
-                      color: theme.ctaPrimaryText,
-                      borderRadius: theme.ctaRadius,
+                      fontFamily: uiFont,
+                      background: p.ctaBg,
+                      color: p.ctaText,
+                      borderRadius: p.ctaRadius,
                     }}
                   >
                     Fechar
@@ -259,23 +319,23 @@ export default function RSVPModal(props: RSVPModalProps) {
                   <p
                     className="text-lg font-medium"
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      color: theme.textPrimary,
+                      fontFamily: p.displayFont,
+                      color: p.text,
                     }}
                   >
                     Erro ao enviar
                   </p>
-                  <p className="text-sm" style={{ color: theme.textSecondary }}>
+                  <p className="text-sm" style={{ color: p.textSoft }}>
                     Tente novamente em alguns instantes.
                   </p>
                   <button
                     onClick={() => setSubmitState("idle")}
                     className="mt-4 px-6 py-2 text-sm font-medium"
                     style={{
-                      fontFamily: "'Inter', sans-serif",
-                      background: theme.ctaPrimaryBg,
-                      color: theme.ctaPrimaryText,
-                      borderRadius: theme.ctaRadius,
+                      fontFamily: uiFont,
+                      background: p.ctaBg,
+                      color: p.ctaText,
+                      borderRadius: p.ctaRadius,
                     }}
                   >
                     Tentar novamente
@@ -289,27 +349,14 @@ export default function RSVPModal(props: RSVPModalProps) {
                   onSubmit={handleSubmit(onSubmit)}
                   className="flex flex-col gap-4"
                 >
-                  {/* Couple label */}
-                  {coupleLabel && (
-                    <p
-                      className="mb-1 text-center text-sm"
-                      style={{
-                        fontFamily: theme.bodyFont,
-                        color: theme.textSecondary,
-                      }}
-                    >
-                      Casamento de {coupleLabel}
-                    </p>
-                  )}
-
                   {/* Deadline */}
                   {deadline && (
                     <p
                       className="mb-2 text-center"
                       style={{
-                        fontFamily: "'Inter', sans-serif",
-                        fontSize: 11,
-                        color: theme.textMuted,
+                        fontFamily: uiFont,
+                        fontSize: 13,
+                        color: p.textMuted,
                       }}
                     >
                       Confirme até {deadline}
@@ -358,14 +405,14 @@ export default function RSVPModal(props: RSVPModalProps) {
                         style={{
                           borderColor:
                             attending === "yes"
-                              ? theme.accent
-                              : theme.cardBorder,
+                              ? p.accent
+                              : p.border,
                           backgroundColor:
                             attending === "yes"
-                              ? theme.accent + "15"
+                              ? p.accent + "15"
                               : "transparent",
-                          color: theme.textPrimary,
-                          fontFamily: "'Inter', sans-serif",
+                          color: p.text,
+                          fontFamily: uiFont,
                         }}
                       >
                         <input
@@ -381,14 +428,14 @@ export default function RSVPModal(props: RSVPModalProps) {
                         style={{
                           borderColor:
                             attending === "no"
-                              ? theme.accent
-                              : theme.cardBorder,
+                              ? p.accent
+                              : p.border,
                           backgroundColor:
                             attending === "no"
-                              ? theme.accent + "15"
+                              ? p.accent + "15"
                               : "transparent",
-                          color: theme.textPrimary,
-                          fontFamily: "'Inter', sans-serif",
+                          color: p.text,
+                          fontFamily: uiFont,
                         }}
                       >
                         <input
@@ -453,10 +500,10 @@ export default function RSVPModal(props: RSVPModalProps) {
                     disabled={submitState === "loading"}
                     className="mt-2 flex w-full items-center justify-center gap-2 px-6 py-3 text-sm font-medium transition-opacity disabled:opacity-60"
                     style={{
-                      fontFamily: "'Inter', sans-serif",
-                      background: theme.ctaPrimaryBg,
-                      color: theme.ctaPrimaryText,
-                      borderRadius: theme.ctaRadius,
+                      fontFamily: uiFont,
+                      background: p.ctaBg,
+                      color: p.ctaText,
+                      borderRadius: p.ctaRadius,
                     }}
                   >
                     {submitState === "loading" ? (
