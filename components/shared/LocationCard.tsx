@@ -1,36 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
+import { lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { MapPin, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 import type { LocationInfo, TemplateTheme } from "@/lib/types";
 
+// Lazy-load the map to avoid SSR issues with Leaflet (it requires `window`)
+const MinimalistMap = lazy(() => import("./MinimalistMap"));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-/**
- * Build a Google Maps embed URL from coordinates or a search query.
- * Uses the free "place" embed mode (no API key required for basic usage).
- */
-function buildEmbedUrl(location: LocationInfo): string {
-  if (location.latitude != null && location.longitude != null) {
-    const q = `${location.latitude},${location.longitude}`;
-    return `https://www.google.com/maps?q=${q}&z=15&output=embed`;
-  }
-  // Fallback: extract query from the googleMapsUrl
-  try {
-    const url = new URL(location.googleMapsUrl);
-    const q = url.searchParams.get("q") ?? location.address;
-    return `https://www.google.com/maps?q=${encodeURIComponent(q)}&z=15&output=embed`;
-  } catch {
-    return `https://www.google.com/maps?q=${encodeURIComponent(location.address)}&z=15&output=embed`;
-  }
-}
 
 /**
  * Detect whether the user is on an Apple platform (iOS / macOS)
@@ -65,7 +49,8 @@ interface LocationCardProps {
 }
 
 export default function LocationCard({ location, theme }: LocationCardProps) {
-  const embedUrl = useMemo(() => buildEmbedUrl(location), [location]);
+  const hasCoordinates =
+    location.latitude != null && location.longitude != null;
 
   return (
     <motion.div
@@ -146,27 +131,40 @@ export default function LocationCard({ location, theme }: LocationCardProps) {
         </span>
       </div>
 
-      {/* Map embed preview */}
-      <div className="px-5 pb-4">
-        <div
-          className="relative w-full overflow-hidden"
-          style={{
-            height: 180,
-            borderRadius: 12,
-            border: `1px solid ${theme.cardBorder}`,
-          }}
-        >
-          <iframe
-            src={embedUrl}
-            title={`Mapa — ${location.name}`}
-            className="absolute inset-0 h-full w-full"
-            style={{ border: 0, filter: "saturate(0.85)" }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            allowFullScreen={false}
-          />
+      {/* Map preview */}
+      {hasCoordinates && (
+        <div className="px-5 pb-4">
+          <div
+            className="relative w-full overflow-hidden"
+            style={{
+              height: 180,
+              borderRadius: 12,
+              border: `1px solid ${theme.cardBorder}`,
+            }}
+          >
+            <Suspense
+              fallback={
+                <div
+                  className="flex h-full w-full items-center justify-center"
+                  style={{ background: theme.cardBg }}
+                >
+                  <MapPin
+                    size={24}
+                    color={theme.textMuted}
+                    strokeWidth={1.5}
+                  />
+                </div>
+              }
+            >
+              <MinimalistMap
+                latitude={location.latitude!}
+                longitude={location.longitude!}
+                theme={theme}
+              />
+            </Suspense>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Open in external maps button */}
       <div className="px-5 pb-5">

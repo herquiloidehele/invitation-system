@@ -911,7 +911,7 @@ export default function InvitationPage({
                 color: theme.textMuted,
               }}
             >
-              Lista de Presentes
+              Presentes
             </span>
             <span
               style={{
