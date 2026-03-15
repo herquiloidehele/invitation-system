@@ -949,6 +949,29 @@ export default function InvitationPage({
           </span>
 
           <div className="flex w-full flex-col gap-3">
+
+              {/* Secondary — Confirmar Presença with glow on hover */}
+              <motion.button
+                  onClick={() => setRsvpOpen(true)}
+                  onMouseEnter={() => setCtaHover(true)}
+                  onMouseLeave={() => setCtaHover(false)}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
+                  style={{
+                      fontFamily: theme.uiFont,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      letterSpacing: 1,
+                      background: theme.ctaPrimaryBg,
+                      color: theme.ctaPrimaryText,
+                      borderRadius: theme.ctaRadius,
+                  }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+              >
+                  <Heart size={17} strokeWidth={1.5} />
+                  Confirmar Presença
+              </motion.button>
+
             {/* Primary — Ver Localização */}
             <motion.a
               href={invitation.location.googleMapsUrl}
@@ -956,13 +979,19 @@ export default function InvitationPage({
               rel="noopener noreferrer"
               className="flex w-full items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
               style={{
-                fontFamily: theme.uiFont,
-                fontSize: 13,
-                fontWeight: 500,
-                letterSpacing: 1,
-                background: theme.ctaPrimaryBg,
-                color: theme.ctaPrimaryText,
-                borderRadius: theme.ctaRadius,
+                  fontFamily: theme.uiFont,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  letterSpacing: 1,
+                  background: "transparent",
+                  border: `1.5px solid ${theme.ctaSecondaryBorder}`,
+                  color: theme.ctaSecondaryText,
+                  borderRadius: theme.ctaRadius,
+                  // @ts-expect-error CSS variable for pulse-glow keyframe
+                  "--cta-glow-color": theme.ctaGlow ?? "transparent",
+                  animation: ctaHover
+                      ? "pulse-glow 2s ease-in-out infinite"
+                      : "none",
               }}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
@@ -970,34 +999,6 @@ export default function InvitationPage({
               <MapPin size={17} strokeWidth={1.5} />
               Ver Localização
             </motion.a>
-
-            {/* Secondary — Confirmar Presença with glow on hover */}
-            <motion.button
-              onClick={() => setRsvpOpen(true)}
-              onMouseEnter={() => setCtaHover(true)}
-              onMouseLeave={() => setCtaHover(false)}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
-              style={{
-                fontFamily: theme.uiFont,
-                fontSize: 13,
-                fontWeight: 500,
-                letterSpacing: 1,
-                background: "transparent",
-                border: `1.5px solid ${theme.ctaSecondaryBorder}`,
-                color: theme.ctaSecondaryText,
-                borderRadius: theme.ctaRadius,
-                // @ts-expect-error CSS variable for pulse-glow keyframe
-                "--cta-glow-color": theme.ctaGlow ?? "transparent",
-                animation: ctaHover
-                  ? "pulse-glow 2s ease-in-out infinite"
-                  : "none",
-              }}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Heart size={17} strokeWidth={1.5} />
-              Confirmar Presença
-            </motion.button>
           </div>
         </div>
       </AnimatedSection>
