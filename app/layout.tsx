@@ -8,9 +8,11 @@ import {
   Cinzel,
   Lora,
   Outfit,
-  DM_Serif_Display,
-} from "next/font/google";
+  DM_Serif_Display, Geist } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const greatVibes = Great_Vibes({
   weight: ["400"],
@@ -81,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt">
+    <html lang="pt" className={cn("font-sans", geist.variable)}>
       <body
         className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} antialiased`}
       >
