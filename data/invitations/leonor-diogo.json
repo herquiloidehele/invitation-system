@@ -19,7 +19,9 @@
   "location": {
     "name": "Palacete dos Marqueses",
     "address": "Avenida da Liberdade, 200, Lisboa",
-    "googleMapsUrl": "https://maps.google.com/?q=Avenida+da+Liberdade+Lisboa"
+    "googleMapsUrl": "https://maps.google.com/?q=Avenida+da+Liberdade+Lisboa",
+    "latitude": 38.7223,
+    "longitude": -9.1393
   },
   "rsvp": {
     "enabled": true,

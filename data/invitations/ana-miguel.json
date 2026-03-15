@@ -19,7 +19,9 @@
   "location": {
     "name": "Palácio de Cristal",
     "address": "Rua de Dom Manuel II, Porto",
-    "googleMapsUrl": "https://maps.google.com/?q=Palacio+de+Cristal+Porto"
+    "googleMapsUrl": "https://maps.google.com/?q=Palacio+de+Cristal+Porto",
+    "latitude": 41.1481,
+    "longitude": -8.6273
   },
   "rsvp": {
     "enabled": true,

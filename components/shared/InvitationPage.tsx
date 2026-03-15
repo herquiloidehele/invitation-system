@@ -2,12 +2,13 @@
 
 import { useState, type MutableRefObject } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { MapPin, Heart, Shirt, Gift, ChevronDown } from "lucide-react";
+import { Heart, Shirt, Gift, ChevronDown } from "lucide-react";
 
 import type { InvitationData, TemplateTheme, FAQItem } from "@/lib/types";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
+import LocationCard from "./LocationCard";
 
 // ---------------------------------------------------------------------------
 // Animation variants — each section has its own entrance
@@ -322,7 +323,6 @@ export default function InvitationPage({
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-  const [ctaHover, setCtaHover] = useState(false);
 
   const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 46;
 
@@ -930,77 +930,10 @@ export default function InvitationPage({
       <SectionDivider theme={theme} />
 
       {/* ================================================================= */}
-      {/* 6. CTA Section                                                    */}
+      {/* 5b. Location Card Section                                         */}
       {/* ================================================================= */}
       <AnimatedSection className="px-6 pb-10">
-        <div className="flex flex-col items-center">
-          <span
-            className="mb-6"
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 10,
-              fontWeight: 400,
-              letterSpacing: 4,
-              textTransform: "uppercase" as const,
-              color: theme.textSecondary,
-            }}
-          >
-            Confirme sua presença
-          </span>
-
-          <div className="flex w-full flex-col gap-3">
-
-              {/* Secondary — Confirmar Presença with glow on hover */}
-              <motion.button
-                  onClick={() => setRsvpOpen(true)}
-                  onMouseEnter={() => setCtaHover(true)}
-                  onMouseLeave={() => setCtaHover(false)}
-                  className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
-                  style={{
-                      fontFamily: theme.uiFont,
-                      fontSize: 13,
-                      fontWeight: 500,
-                      letterSpacing: 1,
-                      background: theme.ctaPrimaryBg,
-                      color: theme.ctaPrimaryText,
-                      borderRadius: theme.ctaRadius,
-                  }}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-              >
-                  <Heart size={17} strokeWidth={1.5} />
-                  Confirmar Presença
-              </motion.button>
-
-            {/* Primary — Ver Localização */}
-            <motion.a
-              href={invitation.location.googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
-              style={{
-                  fontFamily: theme.uiFont,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  letterSpacing: 1,
-                  background: "transparent",
-                  border: `1.5px solid ${theme.ctaSecondaryBorder}`,
-                  color: theme.ctaSecondaryText,
-                  borderRadius: theme.ctaRadius,
-                  // @ts-expect-error CSS variable for pulse-glow keyframe
-                  "--cta-glow-color": theme.ctaGlow ?? "transparent",
-                  animation: ctaHover
-                      ? "pulse-glow 2s ease-in-out infinite"
-                      : "none",
-              }}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <MapPin size={17} strokeWidth={1.5} />
-              Ver Localização
-            </motion.a>
-          </div>
-        </div>
+        <LocationCard location={invitation.location} theme={theme} />
       </AnimatedSection>
 
       {/* ================================================================= */}
@@ -1070,6 +1003,52 @@ export default function InvitationPage({
           </AnimatedSection>
         </>
       )}
+
+        <SectionDivider theme={theme} />
+
+        {/* ================================================================= */}
+        {/* 6. CTA Section                                                    */}
+        {/* ================================================================= */}
+        <AnimatedSection className="px-6 pb-10">
+            <div className="flex flex-col items-center">
+          <span
+              className="mb-6"
+              style={{
+                  fontFamily: theme.uiFont,
+                  fontSize: 10,
+                  fontWeight: 400,
+                  letterSpacing: 4,
+                  textTransform: "uppercase" as const,
+                  color: theme.textSecondary,
+              }}
+          >
+            Confirme sua presença
+          </span>
+            </div>
+
+            <div className="flex flex-col items-center">
+                {/* Confirmar Presença */}
+                <motion.button
+                    onClick={() => setRsvpOpen(true)}
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
+                    style={{
+                        fontFamily: theme.uiFont,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        letterSpacing: 1,
+                        background: theme.ctaPrimaryBg,
+                        color: theme.ctaPrimaryText,
+                        borderRadius: theme.ctaRadius,
+                    }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                >
+                    <Heart size={17} strokeWidth={1.5} />
+                    Confirmar Presença
+                </motion.button>
+            </div>
+
+        </AnimatedSection>
 
       {/* ================================================================= */}
       {/* 8. Footer — monogram with decorative ring                         */}

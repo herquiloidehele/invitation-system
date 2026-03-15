@@ -21,6 +21,9 @@ export interface LocationInfo {
   address: string;
   googleMapsUrl: string;
   wazeUrl?: string;
+  latitude?: number;
+  longitude?: number;
+  imageUrl?: string;
 }
 
 export interface ScheduleEvent {

@@ -19,7 +19,9 @@
   "location": {
     "name": "Quinta da Serra Verde",
     "address": "Estrada da Serra, 45, Sintra",
-    "googleMapsUrl": "https://maps.google.com/?q=Sintra+Portugal"
+    "googleMapsUrl": "https://maps.google.com/?q=Sintra+Portugal",
+    "latitude": 38.7871,
+    "longitude": -9.3908
   },
   "rsvp": {
     "enabled": true,
