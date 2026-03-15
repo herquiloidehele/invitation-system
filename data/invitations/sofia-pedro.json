@@ -42,5 +42,27 @@
     "artist": "Ed Sheeran",
     "title": "Perfect"
   },
-  "heroImage": "https://images.unsplash.com/photo-1662959832799-c7203051862b?w=800&q=80"
+  "heroImage": "https://images.unsplash.com/photo-1662959832799-c7203051862b?w=800&q=80",
+  "faqs": [
+    {
+      "question": "O que significa 'casual elegante'?",
+      "answer": "Pensem em algo bonito mas descontraído — como o nosso casamento! Evitem jeans e ténis, mas não precisam de gravata. Sapatos confortáveis são uma boa ideia para o jardim."
+    },
+    {
+      "question": "As crianças podem vir?",
+      "answer": "Claro que sim! Teremos um espaço dedicado aos mais pequenos com atividades e supervisão para que os pais possam relaxar."
+    },
+    {
+      "question": "Como chego à Quinta da Serra Verde?",
+      "answer": "Recomendamos carro ou táxi. A estrada de acesso é de terra batida nos últimos 500m — faz parte do charme! Haverá sinalização desde a entrada."
+    },
+    {
+      "question": "Posso levar o meu animal de estimação?",
+      "answer": "Infelizmente não podemos receber animais na quinta. Mas prometemos mostrar-vos muitas fotos do nosso cão com o laço de padrinho!"
+    },
+    {
+      "question": "Haverá transporte de regresso?",
+      "answer": "Sim! Teremos shuttles de regresso a Sintra e Lisboa à 01:00 e às 03:00."
+    }
+  ]
 }

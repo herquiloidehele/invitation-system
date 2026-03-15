@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, type MutableRefObject } from "react";
-import { motion, type Variants } from "framer-motion";
-import { CalendarPlus, MapPin, Heart, Shirt, Gift } from "lucide-react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import {  MapPin, Heart, Shirt, Gift, ChevronDown, HelpCircle } from "lucide-react";
 
-import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { InvitationData, TemplateTheme, FAQItem } from "@/lib/types";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
@@ -90,6 +90,134 @@ function AnimatedSection({
 }
 
 // ---------------------------------------------------------------------------
+// FAQ Accordion Item
+// ---------------------------------------------------------------------------
+
+function FAQAccordionItem({
+  faq,
+  index,
+  isOpen,
+  onToggle,
+  theme,
+  isLast,
+}: {
+  faq: FAQItem;
+  index: number;
+  isOpen: boolean;
+  onToggle: () => void;
+  theme: TemplateTheme;
+  isLast: boolean;
+}) {
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        className="flex w-full cursor-pointer items-start gap-3 text-left transition-colors"
+        style={{
+          padding: "18px 20px",
+          paddingBottom: isOpen ? 0 : 18,
+          background: "transparent",
+          border: "none",
+        }}
+      >
+        {/* Question number accent dot */}
+        <span
+          className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center"
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: 0.5,
+            color: theme.accent,
+            border: `1.5px solid ${theme.accent}`,
+            borderRadius: "50%",
+            opacity: isOpen ? 1 : 0.5,
+            transition: "opacity 0.3s ease",
+          }}
+        >
+          {index + 1}
+        </span>
+
+        {/* Question text */}
+        <span
+          className="flex-1"
+          style={{
+            fontFamily: theme.bodyFont,
+            fontSize: 15,
+            fontWeight: 500,
+            lineHeight: 1.45,
+            color: isOpen ? theme.textPrimary : theme.textSecondary,
+            transition: "color 0.3s ease",
+          }}
+        >
+          {faq.question}
+        </span>
+
+        {/* Chevron */}
+        <motion.span
+          className="mt-0.5 flex-shrink-0"
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <ChevronDown
+            size={16}
+            color={theme.accent}
+            strokeWidth={2}
+            style={{ opacity: isOpen ? 1 : 0.4, transition: "opacity 0.3s ease" }}
+          />
+        </motion.span>
+      </button>
+
+      {/* Answer with AnimatePresence height animation */}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{
+              height: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+              opacity: { duration: 0.25, delay: 0.05 },
+            }}
+            style={{ overflow: "hidden" }}
+          >
+            <div
+              style={{
+                padding: "8px 20px 20px",
+                paddingLeft: 48, // align with question text (20px + 20px icon + 8px gap)
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: theme.bodyFont,
+                  fontSize: 14,
+                  lineHeight: 1.7,
+                  color: theme.textSecondary,
+                  margin: 0,
+                }}
+              >
+                {faq.answer}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Divider between items */}
+      {!isLast && (
+        <div
+          style={{
+            height: 1,
+            background: theme.cardBorder,
+            margin: "0 20px",
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -102,6 +230,7 @@ interface InvitationPageProps {
 
 export default function InvitationPage({ invitation, theme, audioRef }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 44;
 
@@ -605,77 +734,119 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
         </div>
       </AnimatedSection>
 
-      {/* ----------------------------------------------------------------- */}
-      {/* 6. CTA Section                                                    */}
-      {/* ----------------------------------------------------------------- */}
-      <AnimatedSection className="px-6 pb-8">
-        <div className="flex flex-col items-center">
-          {/* Label */}
-          <span
-            className="mb-5"
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 10,
-              letterSpacing: 3,
-              textTransform: "uppercase" as const,
-              color: theme.textSecondary,
-            }}
-          >
+        {/* ----------------------------------------------------------------- */}
+        {/* 6. CTA Section                                                    */}
+        {/* ----------------------------------------------------------------- */}
+        <AnimatedSection className="px-6 pb-8">
+            <div className="flex flex-col items-center">
+                {/* Label */}
+                <span
+                    className="mb-5"
+                    style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: 10,
+                        letterSpacing: 3,
+                        textTransform: "uppercase" as const,
+                        color: theme.textSecondary,
+                    }}
+                >
             Confirme sua presença
           </span>
 
-          {/* Buttons */}
-          <div className="flex w-full flex-col gap-3">
-            {/* Primary — Ver Localização */}
-            <a
-              href={invitation.location.googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                background: theme.ctaPrimaryBg,
-                color: theme.ctaPrimaryText,
-                borderRadius: theme.ctaRadius,
-              }}
-            >
-              <MapPin size={18} />
-              Ver Localização
-            </a>
+                {/* Buttons */}
+                <div className="flex w-full flex-col gap-3">
+                    {/* Primary — Ver Localização */}
+                    <a
+                        href={invitation.location.googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex w-full items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
+                        style={{
+                            fontFamily: "'Inter', sans-serif",
+                            background: theme.ctaPrimaryBg,
+                            color: theme.ctaPrimaryText,
+                            borderRadius: theme.ctaRadius,
+                        }}
+                    >
+                        <MapPin size={18} />
+                        Ver Localização
+                    </a>
 
-            {/* Secondary — Confirmar Presença */}
-            <button
-              onClick={() => setRsvpOpen(true)}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                background: "transparent",
-                border: `1.5px solid ${theme.ctaSecondaryBorder}`,
-                color: theme.ctaSecondaryText,
-                borderRadius: theme.ctaRadius,
-              }}
-            >
-              <Heart size={18} />
-              Confirmar Presença
-            </button>
+                    {/* Secondary — Confirmar Presença */}
+                    <button
+                        onClick={() => setRsvpOpen(true)}
+                        className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
+                        style={{
+                            fontFamily: "'Inter', sans-serif",
+                            background: "transparent",
+                            border: `1.5px solid ${theme.ctaSecondaryBorder}`,
+                            color: theme.ctaSecondaryText,
+                            borderRadius: theme.ctaRadius,
+                        }}
+                    >
+                        <Heart size={18} />
+                        Confirmar Presença
+                    </button>
+                </div>
+            </div>
+        </AnimatedSection>
 
-            {/* Outline — Adicionar ao Calendário */}
-            <button
-              className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
+      {/* ----------------------------------------------------------------- */}
+      {/* 5b. FAQs                                                          */}
+      {/* ----------------------------------------------------------------- */}
+      {invitation.faqs && invitation.faqs.length > 0 && (
+        <AnimatedSection className="px-6 pb-8">
+          <div className="flex flex-col items-center">
+            {/* Section label */}
+            <span
               style={{
                 fontFamily: "'Inter', sans-serif",
-                background: "transparent",
-                border: `1px solid ${theme.cardBorder}`,
+                fontSize: 10,
+                letterSpacing: 3,
+                textTransform: "uppercase" as const,
                 color: theme.textSecondary,
-                borderRadius: theme.ctaRadius,
               }}
             >
-              <CalendarPlus size={18} />
-              Adicionar ao Calendário
-            </button>
+              Perguntas Frequentes
+            </span>
+
+            {/* Small divider */}
+            <div
+              className="mt-3 mb-5"
+              style={{
+                width: 24,
+                height: 1,
+                background: theme.accent,
+                opacity: 0.3,
+              }}
+            />
           </div>
-        </div>
-      </AnimatedSection>
+
+          {/* FAQ card */}
+          <div
+            style={{
+              background: theme.cardBg,
+              border: `1px solid ${theme.cardBorder}`,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}
+          >
+            {invitation.faqs.map((faq, i) => (
+              <FAQAccordionItem
+                key={i}
+                faq={faq}
+                index={i}
+                isOpen={openFaqIndex === i}
+                onToggle={() => setOpenFaqIndex(openFaqIndex === i ? null : i)}
+                theme={theme}
+                isLast={i === (invitation.faqs?.length ?? 0) - 1}
+              />
+            ))}
+          </div>
+        </AnimatedSection>
+      )}
+
+
 
       {/* ----------------------------------------------------------------- */}
       {/* 7. Footer                                                         */}

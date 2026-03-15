@@ -43,5 +43,27 @@
     "title": "Perfect"
   },
   "heroImage": "https://images.unsplash.com/photo-1713766056165-666537a07103?w=800&q=80",
-  "videoUrl": "/videos/video2.mp4"
+  "videoUrl": "/videos/video2.mp4",
+  "faqs": [
+    {
+      "question": "Posso levar acompanhante?",
+      "answer": "O convite é pessoal. Se o seu acompanhante estiver incluído, o nome dele(a) constará no convite. Em caso de dúvida, entre em contacto connosco."
+    },
+    {
+      "question": "As crianças são bem-vindas?",
+      "answer": "Adoramos os vossos pequeninos! No entanto, para que todos possam desfrutar da festa, pedimos que esta seja uma celebração apenas para adultos."
+    },
+    {
+      "question": "Onde posso estacionar?",
+      "answer": "A Quinta do Amor Eterno dispõe de estacionamento privativo e gratuito para todos os convidados."
+    },
+    {
+      "question": "Haverá opções vegetarianas?",
+      "answer": "Sim! Teremos opções para todas as dietas. Por favor, indiquem as vossas restrições alimentares na confirmação de presença."
+    },
+    {
+      "question": "Até que horas dura a festa?",
+      "answer": "A celebração está planeada até às 02:00, mas quem sabe... o amor pode fazer a noite durar mais!"
+    }
+  ]
 }

@@ -42,6 +42,11 @@ export interface AudioConfig {
   title: string;
 }
 
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
 export interface InvitationData {
   slug: string;
   template: TemplateName;
@@ -59,6 +64,7 @@ export interface InvitationData {
   audio: AudioConfig;
   heroImage: string;
   videoUrl?: string;
+  faqs?: FAQItem[];
 }
 
 export interface TemplateTheme {

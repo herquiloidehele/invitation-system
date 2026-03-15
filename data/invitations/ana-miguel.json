@@ -43,5 +43,27 @@
     "title": "Perfect"
   },
   "heroImage": "https://images.unsplash.com/photo-1655045802235-889a17a9d3d4?w=800&q=80",
-  "videoUrl": "/videos/video1.mp4"
+  "videoUrl": "/videos/video1.mp4",
+  "faqs": [
+    {
+      "question": "Qual é o dress code?",
+      "answer": "Cocktail — elegante mas confortável. Evitem branco, creme e marfim, por favor. Estejam à vontade para trazer cores!"
+    },
+    {
+      "question": "Posso levar acompanhante?",
+      "answer": "O convite é nominal. Se o vosso acompanhante estiver incluído, o nome dele(a) constará no convite."
+    },
+    {
+      "question": "Há estacionamento no local?",
+      "answer": "Sim, o Palácio de Cristal tem estacionamento disponível nas imediações. Recomendamos chegar com alguma antecedência."
+    },
+    {
+      "question": "Posso tirar fotografias durante a cerimónia?",
+      "answer": "Pedimos uma cerimónia unplugged — sem telemóveis, por favor. O nosso fotógrafo irá captar cada momento. Depois da cerimónia, fotografem à vontade!"
+    },
+    {
+      "question": "E se chover?",
+      "answer": "Temos um plano B! A cerimónia será transferida para a Sala dos Espelhos, igualmente encantadora."
+    }
+  ]
 }

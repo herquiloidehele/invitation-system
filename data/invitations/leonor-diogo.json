@@ -43,5 +43,27 @@
     "title": "Perfect"
   },
   "heroImage": "https://images.unsplash.com/photo-1645856050970-fc1150f4f47d?w=800&q=80",
-  "videoUrl": "/videos/video3.mp4"
+  "videoUrl": "/videos/video3.mp4",
+  "faqs": [
+    {
+      "question": "O que é Black Tie?",
+      "answer": "Para os senhores: smoking ou fato escuro com gravata. Para as senhoras: vestido longo ou midi elegante. É uma noite para brilhar!"
+    },
+    {
+      "question": "A cerimónia é religiosa?",
+      "answer": "Sim, a cerimónia será celebrada na Capela Dourada do Palacete. Pedimos respeito pelo espaço sagrado durante a celebração."
+    },
+    {
+      "question": "Posso levar acompanhante?",
+      "answer": "O convite é pessoal e nominal. Se o vosso par estiver convidado, receberá o seu próprio convite."
+    },
+    {
+      "question": "Há estacionamento com manobrista?",
+      "answer": "Sim, teremos serviço de valet parking à chegada. Basta entregar as chaves na entrada do Palacete."
+    },
+    {
+      "question": "Posso pedir uma música ao DJ?",
+      "answer": "Claro! Teremos um formulário digital na mesa para pedidos musicais. A playlist é de todos — queremos ver-vos na pista!"
+    }
+  ]
 }
