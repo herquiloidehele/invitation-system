@@ -257,7 +257,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                 style={{
                   fontFamily: p.displayFont,
                   fontSize: 18,
-                  color: p.text,
+                  color: props.theme.accent,
                 }}
               >
                 Confirmar Presença
