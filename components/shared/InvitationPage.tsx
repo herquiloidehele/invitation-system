@@ -112,7 +112,7 @@ function FAQAccordionItem({
     <div>
       <button
         onClick={onToggle}
-        className="flex w-full cursor-pointer items-start gap-3 text-left transition-colors"
+        className="flex w-full cursor-pointer items-start gap-3 text-left transition-colors items-center"
         style={{
           padding: "18px 20px",
           paddingBottom: isOpen ? 0 : 18,
@@ -143,7 +143,7 @@ function FAQAccordionItem({
           className="flex-1"
           style={{
             fontFamily: theme.bodyFont,
-            fontSize: 15,
+            fontSize: 14,
             fontWeight: 500,
             lineHeight: 1.45,
             color: isOpen ? theme.textPrimary : theme.textSecondary,
