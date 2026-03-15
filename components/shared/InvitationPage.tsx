@@ -689,7 +689,7 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             <span
               style={{
                 fontFamily: theme.bodyFont,
-                fontSize: 15,
+                fontSize: 13,
                 fontWeight: 500,
                 color: theme.textPrimary,
               }}
@@ -723,7 +723,7 @@ export default function InvitationPage({ invitation, theme, audioRef }: Invitati
             <span
               style={{
                 fontFamily: theme.bodyFont,
-                fontSize: 15,
+                fontSize: 13,
                 fontWeight: 500,
                 color: theme.textPrimary,
               }}
