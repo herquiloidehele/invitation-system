@@ -1,16 +1,23 @@
-import { PrismaClient } from "../lib/generated/prisma/client";
+import dotenv from "dotenv";
+import { PrismaClient } from "@/lib/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
-const pool = new pg.Pool({
-  host: "localhost",
-  port: 5433,
-  user: process.env.USER || "hhele",
-  database: "invitations",
-  password: "",
-});
+dotenv.config();
+
+const pool = new pg.Pool(
+  process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+        host: "localhost",
+        port: 5433,
+        user: process.env.USER || "hhele",
+        database: "invitations",
+        password: "",
+      }
+);
 const adapter = new PrismaPg(pool as any);
 const prisma = new PrismaClient({ adapter });
 
