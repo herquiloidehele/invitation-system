@@ -805,7 +805,7 @@ export default function InvitationForm({
                       className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end"
                     >
                       <div className="space-y-1">
-                        <Label className="text-xs">Time</Label>
+                        <Label className="text-xs">Hora</Label>
                         <Input
                           value={item.time}
                           onChange={(e) =>
@@ -815,7 +815,7 @@ export default function InvitationForm({
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Label</Label>
+                        <Label className="text-xs">Descrição</Label>
                         <Input
                           value={item.label}
                           onChange={(e) =>
@@ -825,13 +825,13 @@ export default function InvitationForm({
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Venue</Label>
+                        <Label className="text-xs">Local</Label>
                         <Input
                           value={item.venue}
                           onChange={(e) =>
                             updateScheduleItem(i, "venue", e.target.value)
                           }
-                          placeholder="Chapel"
+                          placeholder="Capela"
                         />
                       </div>
                       <Button
@@ -849,7 +849,7 @@ export default function InvitationForm({
                     size="sm"
                     onClick={addScheduleItem}
                   >
-                    + Add Event
+                    + Adicionar Evento
                   </Button>
                 </AccordionContent>
               </AccordionItem>
@@ -857,14 +857,14 @@ export default function InvitationForm({
               {/* ── FAQs ── */}
               <AccordionItem value="faqs" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
-                  FAQs ({(form.faqs ?? []).length} items)
+                  Perguntas Frequentes ({(form.faqs ?? []).length} itens)
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   {(form.faqs ?? []).map((faq, i) => (
                     <div key={i} className="space-y-2 border-l-2 pl-3">
                       <div className="flex items-start gap-2">
                         <div className="flex-1 space-y-1">
-                          <Label className="text-xs">Question</Label>
+                          <Label className="text-xs">Pergunta</Label>
                           <Input
                             value={faq.question}
                             onChange={(e) =>
@@ -882,7 +882,7 @@ export default function InvitationForm({
                         </Button>
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Answer</Label>
+                        <Label className="text-xs">Resposta</Label>
                         <Textarea
                           value={faq.answer}
                           onChange={(e) =>
@@ -894,7 +894,7 @@ export default function InvitationForm({
                     </div>
                   ))}
                   <Button variant="outline" size="sm" onClick={addFaq}>
-                    + Add FAQ
+                    + Adicionar Pergunta
                   </Button>
                 </AccordionContent>
               </AccordionItem>
@@ -908,7 +908,7 @@ export default function InvitationForm({
         <div className="h-full flex flex-col">
           <div className="px-4 py-2 border-b bg-muted/50 flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">
-              Live Preview
+              Pré-visualização
             </span>
             <span className="text-xs text-muted-foreground">
               {themes[form.template]?.label ?? form.template}
@@ -927,7 +927,7 @@ export default function InvitationForm({
                 <InvitationPage invitation={form} theme={currentTheme} />
               ) : (
                 <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
-                  Enter couple names to see preview
+                  Insira os nomes do casal para ver a pré-visualização
                 </div>
               )}
             </div>

@@ -275,11 +275,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 sideOffset={4}
               >
                 <DropdownMenuItem>
-                  <Sparkles className="mr-2 size-4" />
-                  Atualizar para Pro
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
                   <Settings className="mr-2 size-4" />
                   Configurações
                 </DropdownMenuItem>
