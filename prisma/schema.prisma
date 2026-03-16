@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Invitation {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  template     String   // "pink-floral" | "modern-minimal" | "boho-chic" | "midnight-elegance"
+  couple       Json     // { bride, groom, monogram }
+  date         Json     // { iso, display, dayOfWeek, time, day, month, year }
+  quote        String
+  location     Json     // { name, address, googleMapsUrl, wazeUrl?, latitude?, longitude?, imageUrl? }
+  rsvp         Json     // { enabled, deadline? }
+  schedule     Json     // ScheduleEvent[]
+  dressCode    String
+  giftRegistry Json     // { enabled, text, link? }
+  audio        Json     // { enabled, src, artist, title }
+  heroImage    String
+  videoUrl     String?
+  faqs         Json?    // FAQItem[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  rsvpResponses RsvpResponse[]
+}
+
+model RsvpResponse {
+  id                  String   @id @default(cuid())
+  invitationSlug      String
+  guestName           String
+  email               String?
+  attending           Boolean
+  guestsCount         Int      @default(1)
+  dietaryRestrictions String?
+  message             String?
+  submittedAt         DateTime @default(now())
+
+  invitation Invitation @relation(fields: [invitationSlug], references: [slug], onDelete: Cascade)
+
+  @@index([invitationSlug])
+}
