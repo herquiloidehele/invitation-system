@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { ThemeSwitcher } from "@/components/admin/theme-switcher";
 
 export function AdminHeader() {
   const pathname = usePathname();
@@ -47,7 +46,7 @@ export function AdminHeader() {
       </div>
 
       <div className="ml-auto px-4">
-      {/*  Add theme switcher here*/}
+        <ThemeSwitcher />
       </div>
     </header>
   );
