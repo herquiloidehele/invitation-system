@@ -293,11 +293,11 @@ export default function InvitationForm({
   // Submit
   async function handleSubmit() {
     if (!form.slug) {
-      toast.error("Slug is required");
+      toast.error("O slug é obrigatório");
       return;
     }
     if (!form.couple.bride || !form.couple.groom) {
-      toast.error("Bride and groom names are required");
+      toast.error("Os nomes da noiva e do noivo são obrigatórios");
       return;
     }
 
@@ -317,19 +317,19 @@ export default function InvitationForm({
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? "Failed to save");
+        throw new Error(data.error ?? "Falha ao guardar");
       }
 
       toast.success(
         mode === "create"
-          ? "Invitation created!"
-          : "Invitation updated!",
+          ? "Convite criado!"
+          : "Convite atualizado!",
       );
       router.push("/admin");
       router.refresh();
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to save invitation",
+        err instanceof Error ? err.message : "Falha ao guardar convite",
       );
     } finally {
       setSaving(false);
@@ -345,14 +345,14 @@ export default function InvitationForm({
             {/* Page title */}
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-semibold tracking-tight">
-                {mode === "create" ? "New Invitation" : "Edit Invitation"}
+                {mode === "create" ? "Novo Convite" : "Editar Convite"}
               </h1>
               <Button onClick={handleSubmit} disabled={saving}>
                 {saving
-                  ? "Saving..."
+                  ? "A guardar..."
                   : mode === "create"
-                    ? "Create"
-                    : "Save Changes"}
+                    ? "Criar"
+                    : "Guardar Alterações"}
               </Button>
             </div>
 
@@ -369,12 +369,12 @@ export default function InvitationForm({
               {/* ── Couple ── */}
               <AccordionItem value="couple" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
-                  Couple
+                  Casal
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="bride">Bride</Label>
+                      <Label htmlFor="bride">Noiva</Label>
                       <Input
                         id="bride"
                         value={form.couple.bride}
@@ -385,7 +385,7 @@ export default function InvitationForm({
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="groom">Groom</Label>
+                      <Label htmlFor="groom">Noivo</Label>
                       <Input
                         id="groom"
                         value={form.couple.groom}
@@ -398,14 +398,14 @@ export default function InvitationForm({
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="monogram">Monogram</Label>
+                      <Label htmlFor="monogram">Monograma</Label>
                       <Input
                         id="monogram"
                         value={form.couple.monogram}
                         onChange={(e) =>
                           updateCouple("monogram", e.target.value)
                         }
-                        placeholder="Auto-derived (e.g. M&J)"
+                        placeholder="Derivado automaticamente (ex: M&J)"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -427,11 +427,11 @@ export default function InvitationForm({
                 className="border rounded-lg px-4"
               >
                 <AccordionTrigger className="text-sm font-medium">
-                  Template & Media
+                  Modelo & Mídia
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   <div className="space-y-1.5">
-                    <Label>Template</Label>
+                    <Label>Modelo</Label>
                     <Select
                       value={form.template}
                       onValueChange={(v) =>
@@ -451,7 +451,7 @@ export default function InvitationForm({
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="heroImage">Hero Image URL</Label>
+                    <Label htmlFor="heroImage">URL da Imagem Principal</Label>
                     <Input
                       id="heroImage"
                       value={form.heroImage}
@@ -460,7 +460,7 @@ export default function InvitationForm({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="videoUrl">Video URL (optional)</Label>
+                    <Label htmlFor="videoUrl">URL do Vídeo (opcional)</Label>
                     <Input
                       id="videoUrl"
                       value={form.videoUrl ?? ""}
@@ -471,13 +471,13 @@ export default function InvitationForm({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="quote">Quote</Label>
+                    <Label htmlFor="quote">Citação</Label>
                     <Textarea
                       id="quote"
                       value={form.quote}
                       onChange={(e) => update("quote", e.target.value)}
                       rows={2}
-                      placeholder="A romantic quote..."
+                      placeholder="Uma citação romântica..."
                     />
                   </div>
                 </AccordionContent>
@@ -486,13 +486,13 @@ export default function InvitationForm({
               {/* ── Date & Time ── */}
               <AccordionItem value="date" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
-                  Date & Time
+                  Data & Hora
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="dateIso">
-                        Date (ISO)
+                        Data (ISO)
                       </Label>
                       <Input
                         id="dateIso"
@@ -508,7 +508,7 @@ export default function InvitationForm({
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="time">Time</Label>
+                      <Label htmlFor="time">Hora</Label>
                       <Input
                         id="time"
                         value={form.date.time}
@@ -519,31 +519,31 @@ export default function InvitationForm({
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="display">Display Date</Label>
+                      <Label htmlFor="display">Data de Exibição</Label>
                       <Input
                         id="display"
                         value={form.date.display}
                         onChange={(e) =>
                           updateDate("display", e.target.value)
                         }
-                        placeholder="Auto-derived"
+                        placeholder="Derivado automaticamente"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="dayOfWeek">Day of Week</Label>
+                      <Label htmlFor="dayOfWeek">Dia da Semana</Label>
                       <Input
                         id="dayOfWeek"
                         value={form.date.dayOfWeek}
                         onChange={(e) =>
                           updateDate("dayOfWeek", e.target.value)
                         }
-                        placeholder="Auto-derived"
+                        placeholder="Derivado automaticamente"
                       />
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Display, day of week, day, month, and year are
-                    auto-derived when you pick a date.
+                    A data de exibição, dia da semana, dia, mês e ano são
+                    derivados automaticamente ao selecionar uma data.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -554,11 +554,11 @@ export default function InvitationForm({
                 className="border rounded-lg px-4"
               >
                 <AccordionTrigger className="text-sm font-medium">
-                  Location
+                  Localização
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="locName">Venue Name</Label>
+                    <Label htmlFor="locName">Nome do Local</Label>
                     <Input
                       id="locName"
                       value={form.location.name}
@@ -569,7 +569,7 @@ export default function InvitationForm({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="locAddress">Address</Label>
+                    <Label htmlFor="locAddress">Morada</Label>
                     <Input
                       id="locAddress"
                       value={form.location.address}
@@ -580,7 +580,7 @@ export default function InvitationForm({
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="gmaps">Google Maps URL</Label>
+                      <Label htmlFor="gmaps">URL Google Maps</Label>
                       <Input
                         id="gmaps"
                         value={form.location.googleMapsUrl}
@@ -590,7 +590,7 @@ export default function InvitationForm({
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="waze">Waze URL (optional)</Label>
+                      <Label htmlFor="waze">URL Waze (opcional)</Label>
                       <Input
                         id="waze"
                         value={form.location.wazeUrl ?? ""}
@@ -637,7 +637,7 @@ export default function InvitationForm({
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="locImage">Venue Image URL</Label>
+                    <Label htmlFor="locImage">URL da Imagem do Local</Label>
                     <Input
                       id="locImage"
                       value={form.location.imageUrl ?? ""}
@@ -655,12 +655,12 @@ export default function InvitationForm({
                 className="border rounded-lg px-4"
               >
                 <AccordionTrigger className="text-sm font-medium">
-                  Details & Options
+                  Detalhes & Opções
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-4">
                   {/* Dress Code */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="dressCode">Dress Code</Label>
+                    <Label htmlFor="dressCode">Código de Vestuário</Label>
                     <Input
                       id="dressCode"
                       value={form.dressCode}
@@ -674,7 +674,7 @@ export default function InvitationForm({
                   {/* RSVP */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label>RSVP Enabled</Label>
+                      <Label>Confirmação Ativada</Label>
                       <Switch
                         checked={form.rsvp.enabled}
                         onCheckedChange={(v) => updateRsvp("enabled", v)}
@@ -683,7 +683,7 @@ export default function InvitationForm({
                     {form.rsvp.enabled && (
                       <div className="space-y-1.5">
                         <Label htmlFor="rsvpDeadline">
-                          Deadline (optional)
+                          Prazo (opcional)
                         </Label>
                         <Input
                           id="rsvpDeadline"
@@ -702,7 +702,7 @@ export default function InvitationForm({
                   {/* Gift Registry */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label>Gift Registry Enabled</Label>
+                      <Label>Lista de Presentes Ativada</Label>
                       <Switch
                         checked={form.giftRegistry.enabled}
                         onCheckedChange={(v) =>
@@ -713,7 +713,7 @@ export default function InvitationForm({
                     {form.giftRegistry.enabled && (
                       <>
                         <div className="space-y-1.5">
-                          <Label htmlFor="giftText">Gift Registry Text</Label>
+                          <Label htmlFor="giftText">Texto da Lista de Presentes</Label>
                           <Textarea
                             id="giftText"
                             value={form.giftRegistry.text}
@@ -725,7 +725,7 @@ export default function InvitationForm({
                         </div>
                         <div className="space-y-1.5">
                           <Label htmlFor="giftLink">
-                            Gift Registry Link (optional)
+                            Link da Lista de Presentes (opcional)
                           </Label>
                           <Input
                             id="giftLink"
@@ -744,7 +744,7 @@ export default function InvitationForm({
                   {/* Audio */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label>Audio Enabled</Label>
+                      <Label>Áudio Ativado</Label>
                       <Switch
                         checked={form.audio.enabled}
                         onCheckedChange={(v) => updateAudio("enabled", v)}
@@ -753,7 +753,7 @@ export default function InvitationForm({
                     {form.audio.enabled && (
                       <div className="space-y-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="audioSrc">Audio Source URL</Label>
+                          <Label htmlFor="audioSrc">URL da Fonte de Áudio</Label>
                           <Input
                             id="audioSrc"
                             value={form.audio.src}
@@ -764,7 +764,7 @@ export default function InvitationForm({
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-1.5">
-                            <Label htmlFor="audioArtist">Artist</Label>
+                            <Label htmlFor="audioArtist">Artista</Label>
                             <Input
                               id="audioArtist"
                               value={form.audio.artist}
@@ -774,7 +774,7 @@ export default function InvitationForm({
                             />
                           </div>
                           <div className="space-y-1.5">
-                            <Label htmlFor="audioTitle">Title</Label>
+                            <Label htmlFor="audioTitle">Título</Label>
                             <Input
                               id="audioTitle"
                               value={form.audio.title}
@@ -796,7 +796,7 @@ export default function InvitationForm({
                 className="border rounded-lg px-4"
               >
                 <AccordionTrigger className="text-sm font-medium">
-                  Schedule ({form.schedule.length} events)
+                  Programa ({form.schedule.length} eventos)
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   {form.schedule.map((item, i) => (

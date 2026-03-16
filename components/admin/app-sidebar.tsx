@@ -59,32 +59,32 @@ import {
 
 const navMain = [
   {
-    title: "Dashboard",
+    title: "Painel",
     url: "/admin",
     icon: LayoutDashboard,
     isActive: true,
   },
   {
-    title: "Invitations",
+    title: "Convites",
     url: "/admin/invitations",
     icon: Heart,
     items: [
-      { title: "All Invitations", url: "/admin" },
-      { title: "Create New", url: "/admin/invitations/new" },
+      { title: "Todos os Convites", url: "/admin" },
+      { title: "Criar Novo", url: "/admin/invitations/new" },
     ],
   },
   {
-    title: "Analytics",
+    title: "Analíticas",
     url: "/admin/analytics",
     icon: BarChart3,
   },
   {
-    title: "Templates",
+    title: "Modelos",
     url: "/admin/templates",
     icon: FolderKanban,
   },
   {
-    title: "RSVPs",
+    title: "Confirmações",
     url: "/admin/rsvps",
     icon: Users,
   },
@@ -92,17 +92,17 @@ const navMain = [
 
 const navDocuments = [
   {
-    title: "Data Library",
+    title: "Biblioteca de Dados",
     url: "#",
     icon: Database,
   },
   {
-    title: "Reports",
+    title: "Relatórios",
     url: "#",
     icon: FileText,
   },
   {
-    title: "Design Assets",
+    title: "Recursos de Design",
     url: "#",
     icon: PenTool,
   },
@@ -130,7 +130,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Brindel Studio</span>
-                  <span className="truncate text-xs">Admin Panel</span>
+                  <span className="truncate text-xs">Painel Administrativo</span>
                 </div>
                 <ChevronsUpDown className="ml-auto" />
               </DropdownMenuTrigger>
@@ -150,7 +150,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <div className="flex size-6 items-center justify-center rounded-sm border">
                     <AudioWaveform className="size-4 shrink-0" />
                   </div>
-                  Staging
+                  Ambiente de Teste
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 p-2">
@@ -158,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <Plus className="size-4" />
                   </div>
                   <div className="font-medium text-muted-foreground">
-                    Add workspace
+                    Adicionar espaço de trabalho
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -170,7 +170,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {/* Main navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel>Home</SidebarGroupLabel>
+          <SidebarGroupLabel>Início</SidebarGroupLabel>
           <SidebarMenu>
             {navMain.map((item) =>
               item.items ? (
@@ -226,7 +226,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         {/* Documents section */}
         <SidebarGroup>
-          <SidebarGroupLabel>Documents</SidebarGroupLabel>
+          <SidebarGroupLabel>Documentos</SidebarGroupLabel>
           <SidebarMenu>
             {navDocuments.map((item) => (
               <SidebarMenuItem key={item.title}>
@@ -276,17 +276,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               >
                 <DropdownMenuItem>
                   <Sparkles className="mr-2 size-4" />
-                  Upgrade to Pro
+                  Atualizar para Pro
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Settings className="mr-2 size-4" />
-                  Settings
+                  Configurações
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <LogOut className="mr-2 size-4" />
-                  Log out
+                  Sair
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

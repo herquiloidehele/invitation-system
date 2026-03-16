@@ -52,7 +52,7 @@ export default async function AdminDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Invitations
+              Total de Convites
             </CardTitle>
             <div className="flex items-center gap-1 text-xs text-emerald-600">
               <TrendingUp className="size-3" />
@@ -63,10 +63,10 @@ export default async function AdminDashboardPage() {
             <div className="text-2xl font-bold">{totalInvitations}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <TrendingUp className="size-3 text-emerald-500" />
-              <span>Trending up this month</span>
+              <span>Em alta este mês</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Active invitations
+              Convites ativos
             </p>
           </CardContent>
         </Card>
@@ -74,7 +74,7 @@ export default async function AdminDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total RSVPs
+              Total de Confirmações
             </CardTitle>
             <div className="flex items-center gap-1 text-xs text-rose-600">
               <TrendingDown className="size-3" />
@@ -85,10 +85,10 @@ export default async function AdminDashboardPage() {
             <div className="text-2xl font-bold">{totalRsvps}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <TrendingDown className="size-3 text-rose-500" />
-              <span>Down 20% this period</span>
+              <span>Queda de 20% neste período</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Responses received
+              Respostas recebidas
             </p>
           </CardContent>
         </Card>
@@ -96,7 +96,7 @@ export default async function AdminDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Templates
+              Modelos Ativos
             </CardTitle>
             <div className="flex items-center gap-1 text-xs text-emerald-600">
               <TrendingUp className="size-3" />
@@ -107,10 +107,10 @@ export default async function AdminDashboardPage() {
             <div className="text-2xl font-bold">{activeTemplates}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <TrendingUp className="size-3 text-emerald-500" />
-              <span>Strong template usage</span>
+              <span>Forte utilização de modelos</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Templates in use
+              Modelos em uso
             </p>
           </CardContent>
         </Card>
@@ -118,7 +118,7 @@ export default async function AdminDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              RSVP Rate
+              Taxa de Confirmação
             </CardTitle>
             <div className="flex items-center gap-1 text-xs text-emerald-600">
               <TrendingUp className="size-3" />
@@ -129,10 +129,10 @@ export default async function AdminDashboardPage() {
             <div className="text-2xl font-bold">{avgRsvpRate}%</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <TrendingUp className="size-3 text-emerald-500" />
-              <span>Steady performance increase</span>
+              <span>Crescimento constante</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Meets growth projections
+              Dentro das projeções de crescimento
             </p>
           </CardContent>
         </Card>
@@ -143,25 +143,25 @@ export default async function AdminDashboardPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Recent Invitations</CardTitle>
+              <CardTitle>Convites Recentes</CardTitle>
               <CardDescription>
-                Manage all wedding invitations
+                Gerir todos os convites de casamento
               </CardDescription>
             </div>
             <Link
               href="/admin/invitations/new"
               className={cn(buttonVariants({ variant: "default", size: "sm" }))}
             >
-              + New Invitation
+              + Novo Convite
             </Link>
           </div>
         </CardHeader>
         <CardContent>
           {invitations.length === 0 ? (
             <div className="border rounded-lg p-12 text-center text-muted-foreground">
-              <p className="text-lg">No invitations yet</p>
+              <p className="text-lg">Nenhum convite ainda</p>
               <p className="text-sm mt-1">
-                Create your first invitation to get started.
+                Crie o seu primeiro convite para começar.
               </p>
             </div>
           ) : (
@@ -169,12 +169,12 @@ export default async function AdminDashboardPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Couple</TableHead>
+                    <TableHead>Casal</TableHead>
                     <TableHead>Slug</TableHead>
-                    <TableHead>Template</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-center">RSVPs</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Modelo</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead className="text-center">Confirmações</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -218,7 +218,7 @@ export default async function AdminDashboardPage() {
                                 })
                               )}
                             >
-                              View
+                              Ver
                             </Link>
                             <Link
                               href={`/admin/invitations/${inv.id}/edit`}
@@ -229,7 +229,7 @@ export default async function AdminDashboardPage() {
                                 })
                               )}
                             >
-                              Edit
+                              Editar
                             </Link>
                             <DeleteInvitationButton
                               id={inv.id}

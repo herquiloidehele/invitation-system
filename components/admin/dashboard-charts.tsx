@@ -28,11 +28,11 @@ const chartData = [
 
 const chartConfig = {
   visitors: {
-    label: "Visitors",
+    label: "Visitantes",
     color: "var(--chart-1)",
   },
   rsvps: {
-    label: "RSVPs",
+    label: "Confirmações",
     color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
@@ -44,8 +44,8 @@ export function DashboardCharts() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Total Visitors</CardTitle>
-          <CardDescription>Total for the last 3 months</CardDescription>
+          <CardTitle>Total de Visitantes</CardTitle>
+          <CardDescription>Total dos últimos 3 meses</CardDescription>
         </div>
         <div className="flex items-center gap-1 rounded-lg border bg-muted p-1">
           <button
@@ -56,7 +56,7 @@ export function DashboardCharts() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Last 3 months
+            Últimos 3 meses
           </button>
           <button
             onClick={() => setTimeRange("30d")}
@@ -66,7 +66,7 @@ export function DashboardCharts() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Last 30 days
+            Últimos 30 dias
           </button>
           <button
             onClick={() => setTimeRange("7d")}
@@ -76,7 +76,7 @@ export function DashboardCharts() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Last 7 days
+            Últimos 7 dias
           </button>
         </div>
       </CardHeader>

@@ -35,14 +35,14 @@ export default function DeleteInvitationButton({
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? "Failed to delete");
+        throw new Error(data.error ?? "Falha ao eliminar");
       }
 
-      toast.success(`Deleted invitation for ${coupleName}`);
+      toast.success(`Convite de ${coupleName} eliminado`);
       router.refresh();
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to delete invitation",
+        err instanceof Error ? err.message : "Falha ao eliminar convite",
       );
     } finally {
       setDeleting(false);
@@ -56,25 +56,25 @@ export default function DeleteInvitationButton({
           <Button variant="destructive" size="sm" disabled={deleting} />
         }
       >
-        Delete
+        Eliminar
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Invitation</AlertDialogTitle>
+          <AlertDialogTitle>Eliminar Convite</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete the invitation for{" "}
-            <strong>{coupleName}</strong>? This action cannot be undone and will
-            also delete all associated RSVP responses.
+            Tem a certeza que deseja eliminar o convite de{" "}
+            <strong>{coupleName}</strong>? Esta ação não pode ser revertida e
+            também eliminará todas as confirmações associadas.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             onClick={handleDelete}
             disabled={deleting}
           >
-            {deleting ? "Deleting..." : "Delete"}
+            {deleting ? "A eliminar..." : "Eliminar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
