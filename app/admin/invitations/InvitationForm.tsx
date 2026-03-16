@@ -339,7 +339,7 @@ export default function InvitationForm({
   return (
     <div className="flex gap-6 h-[calc(100vh-5rem)]">
       {/* ──────────── Left: Form (55%) ──────────── */}
-      <div className="w-[55%] min-w-0">
+      <div className="w-[55%] flex-1 min-w-0">
         <ScrollArea className="h-full pr-4">
           <div className="space-y-4 pb-6">
             {/* Page title */}
@@ -904,7 +904,7 @@ export default function InvitationForm({
       </div>
 
       {/* ──────────── Right: Live Preview (45%) ──────────── */}
-      <div className="w-[45%] min-w-0 border-l">
+      <div className="w-[45%] max-w-[400px] min-w-0 border-l">
         <div className="h-full flex flex-col">
           <div className="px-4 py-2 border-b bg-muted/50 flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">
@@ -914,14 +914,9 @@ export default function InvitationForm({
               {themes[form.template]?.label ?? form.template}
             </span>
           </div>
-          <div className="flex-1 overflow-auto bg-neutral-100">
+          <div className="flex-1 overflow-auto">
             <div
-              className="mx-auto origin-top"
-              style={{
-                width: 390,
-                transform: "scale(0.85)",
-                transformOrigin: "top center",
-              }}
+              className="w-full"
             >
               {form.couple.bride && form.couple.groom ? (
                 <InvitationPage invitation={form} theme={currentTheme} />
