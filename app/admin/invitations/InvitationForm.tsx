@@ -357,13 +357,7 @@ export default function InvitationForm({
             </div>
 
             <Accordion
-              defaultValue={[
-                "couple",
-                "template",
-                "date",
-                "location",
-                "details",
-              ]}
+              defaultValue={[]}
               className="space-y-2"
             >
               {/* ── Couple ── */}
