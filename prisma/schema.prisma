@@ -23,6 +23,7 @@ model Invitation {
   heroImage    String
   videoUrl     String?
   faqs         Json?    // FAQItem[]
+  ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

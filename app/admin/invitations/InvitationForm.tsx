@@ -29,6 +29,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import InvitationPage from "@/components/shared/InvitationPage";
 import MediaUpload from "@/components/admin/MediaUpload";
+import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -129,12 +130,14 @@ interface InvitationFormProps {
   initialData?: InvitationData & { id?: string };
   mode: "create" | "edit";
   invitationId?: string;
+  ownerUrl?: string;
 }
 
 export default function InvitationForm({
   initialData,
   mode,
   invitationId,
+  ownerUrl,
 }: InvitationFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -356,6 +359,11 @@ export default function InvitationForm({
                     : "Guardar Alterações"}
               </Button>
             </div>
+
+            {/* Owner link — only shown in edit mode */}
+            {mode === "edit" && ownerUrl && (
+              <OwnerLinkPanel ownerUrl={ownerUrl} />
+            )}
 
             <Accordion
               defaultValue={[]}

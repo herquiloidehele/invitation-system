@@ -221,6 +221,17 @@ export default async function AdminDashboardPage() {
                               Ver
                             </Link>
                             <Link
+                              href={`/admin/rsvps?invitation=${inv.slug}`}
+                              className={cn(
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "sm",
+                                })
+                              )}
+                            >
+                              Confirmações
+                            </Link>
+                            <Link
                               href={`/admin/invitations/${inv.id}/edit`}
                               className={cn(
                                 buttonVariants({

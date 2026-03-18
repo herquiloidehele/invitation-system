@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import type { InvitationData, TemplateName } from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
@@ -16,6 +17,12 @@ export default async function EditInvitationPage({
   if (!row) {
     notFound();
   }
+
+  // Build absolute owner URL
+  const headersList = await headers();
+  const host = headersList.get("host") ?? "localhost:3000";
+  const proto = headersList.get("x-forwarded-proto") ?? "http";
+  const ownerUrl = `${proto}://${host}/confirmacoes/${row.ownerToken}`;
 
   // Convert Prisma row to InvitationData shape for the form
   const initialData: InvitationData & { id: string } = {
@@ -41,6 +48,7 @@ export default async function EditInvitationPage({
       mode="edit"
       initialData={initialData}
       invitationId={row.id}
+      ownerUrl={ownerUrl}
     />
   );
 }

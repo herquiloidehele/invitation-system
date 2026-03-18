@@ -57,10 +57,9 @@ function getBreadcrumbs(pathname: string) {
   const crumbs: { label: string; href: string }[] = [];
 
   if (segments[0] === "admin") {
-    crumbs.push({ label: "Admin", href: "/admin" });
-
     if (segments[1] === "invitations") {
-      crumbs.push({ label: "Convites", href: "/admin" });
+      crumbs.push({ label: "Admin", href: "/admin" });
+      crumbs.push({ label: "Convites", href: "/admin/invitations" });
 
       if (segments[2] === "new") {
         crumbs.push({ label: "Criar Novo", href: "/admin/invitations/new" });
@@ -70,7 +69,7 @@ function getBreadcrumbs(pathname: string) {
           href: `/admin/invitations/${segments[2]}/edit`,
         });
       }
-    } else if (segments.length === 1) {
+    } else {
       crumbs.push({ label: "Painel", href: "/admin" });
     }
   }
