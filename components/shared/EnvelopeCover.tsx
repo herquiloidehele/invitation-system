@@ -113,7 +113,7 @@ export default function EnvelopeCover({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] cursor-pointer overflow-hidden"
+      className="absolute inset-0 z-[100] cursor-pointer overflow-hidden"
       style={{ backgroundColor: theme.envelope.base, perspective: "1200px" }}
       onClick={handleTap}
       /* Exit animation: fast fade-out so there's no gap before the invitation */

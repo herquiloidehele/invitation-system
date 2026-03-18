@@ -74,34 +74,42 @@ export default function InvitationView({
   }, []);
 
   return (
-    <div className="min-h-dvh" style={{ backgroundColor: theme.bg }}>
-      {/* Invitation content — rendered behind the cover, fades in immediately */}
-      <AnimatePresence>
-        {showContent && (
-          <motion.div
-            key="invitation-content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <InvitationPage invitation={invitation} theme={theme} audioRef={audioRef} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    /* Outer full-screen layer — visible on wide screens as the side gutters */
+    <div className="min-h-dvh flex justify-center" style={{ backgroundColor: theme.bg }}>
+      {/* Inner column — capped at 500 px, acts as the positioning context
+          for the envelope cover (absolute inset-0 inside it). */}
+      <div
+        className="relative min-h-dvh w-full"
+        style={{ maxWidth: "500px", backgroundColor: theme.bg }}
+      >
+        {/* Invitation content — rendered behind the cover, fades in immediately */}
+        <AnimatePresence>
+          {showContent && (
+            <motion.div
+              key="invitation-content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <InvitationPage invitation={invitation} theme={theme} audioRef={audioRef} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Envelope cover sits on top. Its final phase fades to the bg color,
-          then it's removed from the DOM revealing the content beneath. */}
-      <AnimatePresence>
-        {coverVisible && (
-          <EnvelopeCover
-            key="envelope-cover"
-            theme={theme}
-            onOpen={handleOpen}
-            onAnimationComplete={handleAnimationComplete}
-            monogram={invitation.couple.monogram}
-          />
-        )}
-      </AnimatePresence>
+        {/* Envelope cover sits on top. Its final phase fades to the bg color,
+            then it's removed from the DOM revealing the content beneath. */}
+        <AnimatePresence>
+          {coverVisible && (
+            <EnvelopeCover
+              key="envelope-cover"
+              theme={theme}
+              onOpen={handleOpen}
+              onAnimationComplete={handleAnimationComplete}
+              monogram={invitation.couple.monogram}
+            />
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
