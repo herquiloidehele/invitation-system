@@ -28,6 +28,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import InvitationPage from "@/components/shared/InvitationPage";
+import MediaUpload from "@/components/admin/MediaUpload";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -445,23 +446,23 @@ export default function InvitationForm({
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="heroImage">URL da Imagem Principal</Label>
-                    <Input
-                      id="heroImage"
-                      value={form.heroImage}
-                      onChange={(e) => update("heroImage", e.target.value)}
-                      placeholder="https://..."
+                    <Label>Imagem Principal</Label>
+                    <MediaUpload
+                      kind="image"
+                      maxSizeMB={5}
+                      value={form.heroImage || undefined}
+                      onUpload={(url) => update("heroImage", url)}
+                      onClear={() => update("heroImage", "")}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="videoUrl">URL do Vídeo (opcional)</Label>
-                    <Input
-                      id="videoUrl"
-                      value={form.videoUrl ?? ""}
-                      onChange={(e) =>
-                        update("videoUrl", e.target.value || undefined)
-                      }
-                      placeholder="https://..."
+                    <Label>Vídeo (opcional)</Label>
+                    <MediaUpload
+                      kind="video"
+                      maxSizeMB={100}
+                      value={form.videoUrl || undefined}
+                      onUpload={(url) => update("videoUrl", url)}
+                      onClear={() => update("videoUrl", undefined)}
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -631,13 +632,13 @@ export default function InvitationForm({
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="locImage">URL da Imagem do Local</Label>
-                    <Input
-                      id="locImage"
-                      value={form.location.imageUrl ?? ""}
-                      onChange={(e) =>
-                        updateLocation("imageUrl", e.target.value)
-                      }
+                    <Label>Imagem do Local</Label>
+                    <MediaUpload
+                      kind="image"
+                      maxSizeMB={5}
+                      value={form.location.imageUrl || undefined}
+                      onUpload={(url) => updateLocation("imageUrl", url)}
+                      onClear={() => updateLocation("imageUrl", "")}
                     />
                   </div>
                 </AccordionContent>
@@ -747,13 +748,13 @@ export default function InvitationForm({
                     {form.audio.enabled && (
                       <div className="space-y-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="audioSrc">URL da Fonte de Áudio</Label>
-                          <Input
-                            id="audioSrc"
-                            value={form.audio.src}
-                            onChange={(e) =>
-                              updateAudio("src", e.target.value)
-                            }
+                          <Label>Ficheiro de Áudio</Label>
+                          <MediaUpload
+                            kind="audio"
+                            maxSizeMB={20}
+                            value={form.audio.src || undefined}
+                            onUpload={(url) => updateAudio("src", url)}
+                            onClear={() => updateAudio("src", "")}
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
