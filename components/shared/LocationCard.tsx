@@ -1,14 +1,16 @@
 "use client";
 
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { MapPin, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 import type { LocationInfo, TemplateTheme } from "@/lib/types";
 
-// Lazy-load the map to avoid SSR issues with Leaflet (it requires `window`)
-const MinimalistMap = lazy(() => import("./MinimalistMap"));
+// Dynamically import the map with ssr: false to prevent Leaflet from being
+// evaluated on the server (Leaflet requires `window`, which doesn't exist in SSR)
+const MinimalistMap = dynamic(() => import("./MinimalistMap"), { ssr: false });
 
 // ---------------------------------------------------------------------------
 // Helpers
