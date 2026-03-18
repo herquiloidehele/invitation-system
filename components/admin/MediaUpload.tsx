@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import imageCompression from "browser-image-compression";
@@ -146,28 +147,14 @@ export default function MediaUpload({
         const { presignedUrl, publicUrl } = await presignRes.json();
 
         // Upload directly to S3 with progress tracking
-        await new Promise<void>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("PUT", presignedUrl, true);
-          xhr.setRequestHeader("Content-Type", fileToUpload.type || file.type);
-
-          xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) {
+        await axios.put(presignedUrl, fileToUpload, {
+          headers: { "Content-Type": fileToUpload.type || file.type },
+          onUploadProgress: (e) => {
+            if (e.total) {
               const progress = Math.round((e.loaded / e.total) * 100);
               setUploadState({ status: "uploading", progress });
             }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve();
-            } else {
-              reject(new Error(`Upload falhou com status ${xhr.status}`));
-            }
-          };
-
-          xhr.onerror = () => reject(new Error("Erro de rede durante o upload."));
-          xhr.send(fileToUpload);
+          },
         });
 
         setUploadState({ status: "done", url: publicUrl });
