@@ -69,7 +69,7 @@ const navMain = [
     url: "/admin/invitations",
     icon: Heart,
     items: [
-      { title: "Todos os Convites", url: "/admin" },
+      { title: "Todos os Convites", url: "/admin/invitations" },
       { title: "Criar Novo", url: "/admin/invitations/new" },
     ],
   },
