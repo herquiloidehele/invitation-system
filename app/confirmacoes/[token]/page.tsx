@@ -66,7 +66,7 @@ export default async function OwnerRsvpPage({ params }: Props) {
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         {/* Summary cards */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="bg-white rounded-xl border p-4 text-center">
             <div className="text-3xl font-bold text-stone-800">
               {responses.length}
