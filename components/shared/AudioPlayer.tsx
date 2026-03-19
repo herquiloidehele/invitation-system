@@ -40,12 +40,14 @@ interface DirectProps {
   /** Optional external audio ref — when provided the player uses this
    *  already-playing Audio element instead of creating its own. */
   externalAudioRef?: MutableRefObject<HTMLAudioElement | null>;
+  onPlay?: () => void;
 }
 
 interface IntegrationProps {
   audio: AudioConfig;
   theme: TemplateTheme;
   externalAudioRef?: MutableRefObject<HTMLAudioElement | null>;
+  onPlay?: () => void;
 }
 
 type AudioPlayerProps = DirectProps | IntegrationProps;
@@ -66,6 +68,7 @@ export default function AudioPlayer(props: AudioPlayerProps) {
     ? derivePlayerTheme(props.theme)
     : props.theme;
   const externalAudioRef = props.externalAudioRef;
+  const onPlay = props.onPlay;
 
   const internalAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -134,7 +137,10 @@ export default function AudioPlayer(props: AudioPlayerProps) {
     } else {
       audio
         .play()
-        .then(() => setIsPlaying(true))
+        .then(() => {
+          setIsPlaying(true);
+          onPlay?.();
+        })
         .catch(() => {
           // Browser may block autoplay; user interaction required
           setIsPlaying(false);

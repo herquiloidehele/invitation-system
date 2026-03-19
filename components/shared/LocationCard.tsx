@@ -48,9 +48,10 @@ function getExternalMapUrl(location: LocationInfo): string {
 interface LocationCardProps {
   location: LocationInfo;
   theme: TemplateTheme;
+  onMapsClick?: () => void;
 }
 
-export default function LocationCard({ location, theme }: LocationCardProps) {
+export default function LocationCard({ location, theme, onMapsClick }: LocationCardProps) {
   const hasCoordinates =
     location.latitude != null && location.longitude != null;
 
@@ -174,6 +175,7 @@ export default function LocationCard({ location, theme }: LocationCardProps) {
           href="#"
           onClick={(e) => {
             e.preventDefault();
+            onMapsClick?.();
             window.open(getExternalMapUrl(location), "_blank", "noopener,noreferrer");
           }}
           className="flex w-full items-center justify-center gap-2 px-4 py-3 transition-all"

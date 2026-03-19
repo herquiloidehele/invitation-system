@@ -13,6 +13,7 @@ interface CalendarButtonProps {
   couple: CoupleInfo;
   className?: string;
   children: ReactNode;
+  onCalendarClick?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -67,8 +68,10 @@ export default function CalendarButton({
   couple,
   className,
   children,
+  onCalendarClick,
 }: CalendarButtonProps) {
   const handleClick = () => {
+    onCalendarClick?.();
     const url = buildGoogleCalendarUrl(date, location, couple);
     window.open(url, "_blank", "noopener,noreferrer");
   };

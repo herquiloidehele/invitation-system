@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import InvitationPage from "@/components/shared/InvitationPage";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface InvitationViewProps {
   invitation: InvitationData;
@@ -21,8 +22,18 @@ export default function InvitationView({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  /** User tapped — start music and let the envelope animate. */
+  const { trackEvent } = useAnalytics(invitation.slug);
+
+  // Track page view on mount (deduplicated server-side per session)
+  useEffect(() => {
+    trackEvent("page_view");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** User tapped — start music, track envelope open, and let the envelope animate. */
   const handleOpen = useCallback(() => {
+    trackEvent("envelope_open");
+
     if (invitation.audio.enabled) {
       try {
         const audio = new Audio(invitation.audio.src);
@@ -43,7 +54,7 @@ export default function InvitationView({
         /* silent */
       }
     }
-  }, [invitation.audio]);
+  }, [invitation.audio, trackEvent]);
 
   /** Stop music and clean up when leaving the invitation page. */
   useEffect(() => {

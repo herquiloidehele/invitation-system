@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect, type MutableRefObject } from "react";
+import { useState, useEffect, useCallback, type MutableRefObject } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Heart, Shirt, Gift, ChevronDown } from "lucide-react";
+import { Heart, Shirt, Gift, ChevronDown, ExternalLink } from "lucide-react";
 
 import type { InvitationData, TemplateTheme, FAQItem } from "@/lib/types";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
+import CalendarButton from "./CalendarButton";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import {RSVP_SUBMITTED_SLUGS_KEY} from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
@@ -327,6 +329,13 @@ export default function InvitationPage({
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
+  const { trackEvent } = useAnalytics(invitation.slug);
+
+  const handleMapsClick = useCallback(() => trackEvent("maps_click"), [trackEvent]);
+  const handleGiftClick = useCallback(() => trackEvent("gift_click"), [trackEvent]);
+  const handleCalendarClick = useCallback(() => trackEvent("calendar_click"), [trackEvent]);
+  const handleAudioPlay = useCallback(() => trackEvent("audio_play"), [trackEvent]);
+
   // Check localStorage on mount (client-only)
   useEffect(() => {
     try {
@@ -550,6 +559,7 @@ export default function InvitationPage({
               artist={invitation.audio.artist}
               theme={toAudioTheme(theme)}
               externalAudioRef={audioRef}
+              onPlay={handleAudioPlay}
             />
           </div>
         )}
@@ -744,6 +754,29 @@ export default function InvitationPage({
           >
             {invitation.date.dayOfWeek} &middot; {invitation.date.time}
           </span>
+
+          {/* Add to calendar */}
+          <CalendarButton
+            date={invitation.date}
+            location={invitation.location}
+            couple={invitation.couple}
+            onCalendarClick={handleCalendarClick}
+            className="mt-5 flex items-center justify-center gap-2 px-5 py-2 transition-all"
+          >
+            <span
+              style={{
+                fontFamily: theme.uiFont,
+                fontSize: 10,
+                fontWeight: 500,
+                letterSpacing: 1.5,
+                textTransform: "uppercase" as const,
+                color: theme.accent,
+                opacity: 0.75,
+              }}
+            >
+              + Adicionar ao Calendário
+            </span>
+          </CalendarButton>
         </div>
       </AnimatedSection>
 
@@ -936,6 +969,28 @@ export default function InvitationPage({
             >
               {invitation.giftRegistry.text}
             </span>
+            {invitation.giftRegistry.link && (
+              <motion.a
+                href={invitation.giftRegistry.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleGiftClick}
+                className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
+                style={{
+                  fontFamily: theme.uiFont,
+                  fontSize: 10,
+                  fontWeight: 500,
+                  letterSpacing: 1.5,
+                  textTransform: "uppercase" as const,
+                  color: theme.accent,
+                  textDecoration: "none",
+                }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <ExternalLink size={10} strokeWidth={1.5} />
+                Ver lista
+              </motion.a>
+            )}
           </motion.div>
         </div>
       </AnimatedSection>
@@ -946,7 +1001,7 @@ export default function InvitationPage({
       {/* 5b. Location Card Section                                         */}
       {/* ================================================================= */}
       <AnimatedSection className="px-6 pb-10">
-        <LocationCard location={invitation.location} theme={theme} />
+        <LocationCard location={invitation.location} theme={theme} onMapsClick={handleMapsClick} />
       </AnimatedSection>
 
       {/* ================================================================= */}
