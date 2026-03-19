@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MutableRefObject } from "react";
+import { useState, useEffect, type MutableRefObject } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Heart, Shirt, Gift, ChevronDown } from "lucide-react";
 
@@ -9,6 +9,7 @@ import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
+import {RSVP_SUBMITTED_SLUGS_KEY} from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Animation variants — each section has its own entrance
@@ -323,7 +324,18 @@ export default function InvitationPage({
   audioRef,
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
+  const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  // Check localStorage on mount (client-only)
+  useEffect(() => {
+    try {
+      const slugs: string[] = JSON.parse(localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]");
+      setRsvpSubmitted(slugs.includes(invitation.slug));
+    } catch {
+      // ignore
+    }
+  }, [invitation.slug]);
 
   const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 46;
 
@@ -1037,15 +1049,16 @@ export default function InvitationPage({
                         fontSize: 13,
                         fontWeight: 500,
                         letterSpacing: 1,
-                        background: theme.ctaPrimaryBg,
-                        color: theme.ctaPrimaryText,
+                        background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
+                        color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
                         borderRadius: theme.ctaRadius,
+                        cursor: rsvpSubmitted ? "default" : "pointer",
                     }}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                 >
                     <Heart size={17} strokeWidth={1.5} />
-                    Confirmar Presença
+                    {rsvpSubmitted ? "Presença Confirmada" : "Confirmar Presença"}
                 </motion.button>
             </div>
 
@@ -1119,7 +1132,16 @@ export default function InvitationPage({
       {/* ================================================================= */}
       <RSVPModal
         open={rsvpOpen}
-        onClose={() => setRsvpOpen(false)}
+        onClose={() => {
+          setRsvpOpen(false);
+          // Refresh submitted state after modal closes
+          try {
+            const slugs: string[] = JSON.parse(localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]");
+            setRsvpSubmitted(slugs.includes(invitation.slug));
+          } catch {
+            // ignore
+          }
+        }}
         invitation={invitation}
         theme={theme}
       />

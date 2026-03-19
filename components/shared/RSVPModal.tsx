@@ -7,6 +7,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
+import {RSVP_SUBMITTED_SLUGS_KEY} from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -129,7 +130,29 @@ function isIntegration(p: RSVPModalProps): p is IntegrationProps {
 // Component
 // ---------------------------------------------------------------------------
 
-type SubmitState = "idle" | "loading" | "success" | "error";
+type SubmitState = "idle" | "loading" | "success" | "error" | "already_submitted";
+
+const RSVP_STORAGE_KEY = RSVP_SUBMITTED_SLUGS_KEY;
+
+function getRsvpSubmittedSlugs(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(RSVP_STORAGE_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function markRsvpSubmitted(slug: string) {
+  const slugs = getRsvpSubmittedSlugs();
+  if (!slugs.includes(slug)) {
+    localStorage.setItem(RSVP_STORAGE_KEY, JSON.stringify([...slugs, slug]));
+  }
+}
+
+function hasSubmittedRsvp(slug: string): boolean {
+  return getRsvpSubmittedSlugs().includes(slug);
+}
 
 export default function RSVPModal(props: RSVPModalProps) {
   const isOpen = isIntegration(props) ? props.open : props.isOpen;
@@ -141,6 +164,15 @@ export default function RSVPModal(props: RSVPModalProps) {
   const p = buildModalPalette(props.theme);
 
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
+
+  // Check localStorage when modal opens
+  useEffect(() => {
+    if (isOpen && hasSubmittedRsvp(slug)) {
+      setSubmitState("already_submitted");
+    } else if (!isOpen) {
+      setSubmitState("idle");
+    }
+  }, [isOpen, slug]);
 
   const {
     register,
@@ -179,9 +211,17 @@ export default function RSVPModal(props: RSVPModalProps) {
       const res = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, slug }),
+        body: JSON.stringify({
+          invitationSlug: slug,
+          guestName: data.name,
+          email: data.email || undefined,
+          attending: data.attending === "yes",
+          dietaryRestrictions: data.dietaryRestrictions || undefined,
+          message: data.message || undefined,
+        }),
       });
       if (!res.ok) throw new Error("Failed to submit");
+      markRsvpSubmitted(slug);
       setSubmitState("success");
       reset();
     } catch {
@@ -190,7 +230,9 @@ export default function RSVPModal(props: RSVPModalProps) {
   };
 
   const handleClose = () => {
-    setSubmitState("idle");
+    if (submitState !== "already_submitted") {
+      setSubmitState("idle");
+    }
     reset();
     onClose();
   };
@@ -271,6 +313,38 @@ export default function RSVPModal(props: RSVPModalProps) {
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto px-5 py-5">
+              {/* Already submitted state */}
+              {submitState === "already_submitted" && (
+                <motion.div
+                  className="flex flex-col items-center gap-3 py-10 text-center"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
+                  <CheckCircle size={48} color="#22c55e" strokeWidth={1.5} />
+                  <p
+                    className="text-lg font-medium"
+                    style={{ fontFamily: p.displayFont, color: p.text }}
+                  >
+                    Presença já confirmada!
+                  </p>
+                  <p className="text-sm" style={{ color: p.textSoft }}>
+                    Você já enviou sua confirmação para este evento.
+                  </p>
+                  <button
+                    onClick={handleClose}
+                    className="mt-4 px-6 py-2 text-sm font-medium"
+                    style={{
+                      fontFamily: uiFont,
+                      background: "#22c55e",
+                      color: "#fff",
+                      borderRadius: p.ctaRadius,
+                    }}
+                  >
+                    Fechar
+                  </button>
+                </motion.div>
+              )}
+
               {/* Success state */}
               {submitState === "success" && (
                 <motion.div
