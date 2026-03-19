@@ -86,7 +86,6 @@ async function main() {
             guestName: rsvp.guestName,
             email: rsvp.email ?? null,
             attending: rsvp.attending,
-            guestsCount: rsvp.guestsCount ?? 1,
             dietaryRestrictions: rsvp.dietaryRestrictions ?? null,
             message: rsvp.message ?? null,
             submittedAt: new Date(rsvp.submittedAt),

@@ -27,9 +27,6 @@ export default async function OwnerRsvpPage({ params }: Props) {
   const responses = invitation.rsvpResponses;
   const totalAttending = responses.filter((r) => r.attending).length;
   const totalDeclined = responses.filter((r) => !r.attending).length;
-  const totalGuests = responses
-    .filter((r) => r.attending)
-    .reduce((sum, r) => sum + r.guestsCount, 0);
 
   const formatDate = (date: Date) =>
     new Date(date).toLocaleDateString("pt-PT", {
@@ -88,15 +85,6 @@ export default async function OwnerRsvpPage({ params }: Props) {
             </div>
             <div className="text-xs text-stone-500 mt-1">Não vão</div>
           </div>
-          <div className="bg-white rounded-xl border p-4 text-center">
-            <div className="text-3xl font-bold text-stone-800">
-              {totalGuests}
-            </div>
-            <div className="text-xs text-stone-500 mt-1 flex items-center justify-center gap-1">
-              <Users className="size-3" />
-              Convidados
-            </div>
-          </div>
         </div>
 
         {/* Response list */}
@@ -137,12 +125,6 @@ export default async function OwnerRsvpPage({ params }: Props) {
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">
                             <XCircle className="size-3" />
                             Não vai comparecer
-                          </span>
-                        )}
-                        {r.attending && r.guestsCount > 1 && (
-                          <span className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">
-                            <Users className="size-3" />
-                            {r.guestsCount} pessoas
                           </span>
                         )}
                       </div>

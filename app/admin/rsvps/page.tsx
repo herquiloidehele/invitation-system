@@ -36,7 +36,7 @@ export default async function AdminRsvpsPage({
   return (
     <RsvpsClient
       invitations={invitations as InvitationSummary[]}
-      responses={responses as RsvpResponseWithInvitation[]}
+      responses={responses as unknown as RsvpResponseWithInvitation[]}
       selectedSlug={selectedSlug ?? null}
     />
   );
@@ -57,7 +57,6 @@ export type RsvpResponseWithInvitation = {
   guestName: string;
   email: string | null;
   attending: boolean;
-  guestsCount: number;
   dietaryRestrictions: string | null;
   message: string | null;
   submittedAt: Date | string;

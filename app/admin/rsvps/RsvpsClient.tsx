@@ -58,9 +58,6 @@ export function RsvpsClient({
 
   const totalAttending = responses.filter((r) => r.attending).length;
   const totalDeclined = responses.filter((r) => !r.attending).length;
-  const totalGuests = responses
-    .filter((r) => r.attending)
-    .reduce((sum, r) => sum + r.guestsCount, 0);
 
   const handleFilterChange = useCallback(
     (value: string | null) => {
@@ -147,21 +144,6 @@ export function RsvpsClient({
             </p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total de Convidados
-            </CardTitle>
-            <Users className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalGuests}</div>
-            <p className="text-xs text-muted-foreground">
-              Incluindo acompanhantes
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Table */}
@@ -214,7 +196,6 @@ export function RsvpsClient({
                     <TableHead>Convidado</TableHead>
                     <TableHead>Convite</TableHead>
                     <TableHead className="text-center">Resposta</TableHead>
-                    <TableHead className="text-center">Convidados</TableHead>
                     <TableHead>Restrições Alimentares</TableHead>
                     <TableHead>Mensagem</TableHead>
                     <TableHead>Data</TableHead>
@@ -258,15 +239,6 @@ export function RsvpsClient({
                             <XCircle className="size-3 mr-1" />
                             Não vai
                           </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {r.attending ? (
-                          <Badge variant="secondary">{r.guestsCount}</Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">
-                            —
-                          </span>
                         )}
                       </TableCell>
                       <TableCell className="max-w-[160px]">

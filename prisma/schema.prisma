@@ -36,7 +36,6 @@ model RsvpResponse {
   guestName           String
   email               String?
   attending           Boolean
-  guestsCount         Int      @default(1)
   dietaryRestrictions String?
   message             String?
   submittedAt         DateTime @default(now())

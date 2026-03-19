@@ -18,7 +18,6 @@ const rsvpSchema = z.object({
   attending: z.enum(["yes", "no"], {
     error: "Selecione uma opção",
   }),
-  guestsCount: z.number().min(0).max(20),
   dietaryRestrictions: z.string(),
   message: z.string(),
 });
@@ -155,7 +154,6 @@ export default function RSVPModal(props: RSVPModalProps) {
       name: "",
       email: "",
       attending: undefined,
-      guestsCount: 0,
       dietaryRestrictions: "",
       message: "",
     },
@@ -453,21 +451,6 @@ export default function RSVPModal(props: RSVPModalProps) {
                       </span>
                     )}
                   </div>
-
-                  {/* Guests count — only when attending */}
-                  {attending === "yes" && (
-                    <div className="flex flex-col gap-1.5">
-                      <label style={labelStyle}>Número de acompanhantes</label>
-                      <input
-                        {...register("guestsCount")}
-                        type="number"
-                        min={0}
-                        max={20}
-                        className={inputClass}
-                        style={inputStyle}
-                      />
-                    </div>
-                  )}
 
                   {/* Dietary restrictions */}
                   {attending === "yes" && (

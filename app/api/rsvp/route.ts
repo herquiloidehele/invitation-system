@@ -11,7 +11,6 @@ const rsvpSchema = z.object({
   guestName: z.string().min(1, "Nome é obrigatório"),
   email: z.email("Email inválido").optional(),
   attending: z.boolean({ error: "Confirmação de presença é obrigatória" }),
-  guestsCount: z.number().int().min(1).max(10).optional().default(1),
   dietaryRestrictions: z.string().optional(),
   message: z.string().optional(),
 });
@@ -63,7 +62,6 @@ export async function POST(request: NextRequest) {
         guestName: data.guestName,
         email: data.email ?? null,
         attending: data.attending,
-        guestsCount: data.guestsCount,
         dietaryRestrictions: data.dietaryRestrictions ?? null,
         message: data.message ?? null,
       },
