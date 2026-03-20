@@ -20,6 +20,7 @@ function toInvitationData(row: {
   heroImage: string;
   videoUrl: string | null;
   faqs: unknown;
+  envelope: unknown;
 }): InvitationData {
   return {
     slug: row.slug,
@@ -36,6 +37,7 @@ function toInvitationData(row: {
     heroImage: row.heroImage,
     videoUrl: row.videoUrl ?? undefined,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
+    envelope: row.envelope as InvitationData["envelope"],
   };
 }
 
