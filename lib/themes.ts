@@ -30,7 +30,8 @@ export const themes: Record<string, TemplateTheme> = {
     ctaRadius: "9999px",
     monogramColor: "rgba(255,255,255,0.8)",
     tapTextColor: "rgba(255,255,255,0.7)",
-    bgGradient: "radial-gradient(ellipse at 50% 30%, rgba(196,160,80,0.06) 0%, transparent 70%)",
+    bgGradient:
+      "radial-gradient(ellipse at 50% 30%, rgba(196,160,80,0.06) 0%, transparent 70%)",
     decorativeColor: "rgba(196,160,80,0.18)",
     ctaGlow: "rgba(196,160,80,0.25)",
   },
@@ -62,7 +63,8 @@ export const themes: Record<string, TemplateTheme> = {
     ctaRadius: "0px",
     monogramColor: "rgba(44,44,44,0.6)",
     tapTextColor: "rgba(44,44,44,0.5)",
-    bgGradient: "radial-gradient(ellipse at 50% 40%, rgba(212,175,55,0.04) 0%, transparent 60%)",
+    bgGradient:
+      "radial-gradient(ellipse at 50% 40%, rgba(212,175,55,0.04) 0%, transparent 60%)",
     decorativeColor: "rgba(212,175,55,0.2)",
     ctaGlow: "rgba(44,44,44,0.12)",
   },
@@ -95,7 +97,8 @@ export const themes: Record<string, TemplateTheme> = {
     ctaRadius: "9999px",
     monogramColor: "rgba(255,255,255,0.8)",
     tapTextColor: "rgba(255,255,255,0.65)",
-    bgGradient: "radial-gradient(ellipse at 50% 35%, rgba(139,154,122,0.06) 0%, transparent 65%)",
+    bgGradient:
+      "radial-gradient(ellipse at 50% 35%, rgba(139,154,122,0.06) 0%, transparent 65%)",
     decorativeColor: "rgba(139,154,122,0.22)",
     ctaGlow: "rgba(160,113,90,0.2)",
   },
@@ -127,7 +130,8 @@ export const themes: Record<string, TemplateTheme> = {
     ctaRadius: "0px",
     monogramColor: "rgba(255,215,0,0.6)",
     tapTextColor: "rgba(255,215,0,0.5)",
-    bgGradient: "radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.03) 0%, transparent 60%)",
+    bgGradient:
+      "radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.03) 0%, transparent 60%)",
     decorativeColor: "rgba(255,215,0,0.15)",
     ctaGlow: "rgba(255,215,0,0.18)",
   },

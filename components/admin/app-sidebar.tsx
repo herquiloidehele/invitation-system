@@ -51,11 +51,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navMain = [
   {
@@ -68,10 +64,6 @@ const navMain = [
     title: "Convites",
     url: "/admin/invitations",
     icon: Heart,
-    items: [
-      { title: "Todos os Convites", url: "/admin/invitations" },
-      { title: "Criar Novo", url: "/admin/invitations/new" },
-    ],
   },
   {
     title: "Analíticas",
@@ -95,16 +87,6 @@ const navDocuments = [
     title: "Biblioteca de Dados",
     url: "#",
     icon: Database,
-  },
-  {
-    title: "Relatórios",
-    url: "#",
-    icon: FileText,
-  },
-  {
-    title: "Recursos de Design",
-    url: "#",
-    icon: PenTool,
   },
 ];
 
@@ -130,7 +112,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Brindel Studio</span>
-                  <span className="truncate text-xs">Painel Administrativo</span>
+                  <span className="truncate text-xs">
+                    Painel Administrativo
+                  </span>
                 </div>
                 <ChevronsUpDown className="ml-auto" />
               </DropdownMenuTrigger>
@@ -172,55 +156,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel>Início</SidebarGroupLabel>
           <SidebarMenu>
-            {navMain.map((item) =>
-              item.items ? (
-                <Collapsible
-                  key={item.title}
-                  defaultOpen={
-                    pathname === item.url ||
-                    item.items?.some((sub) => pathname === sub.url)
-                  }
-                  className="group/collapsible"
+            {navMain.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  render={<Link href={item.url} />}
+                  tooltip={item.title}
+                  isActive={pathname === item.url}
                 >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger
-                      render={
-                        <SidebarMenuButton tooltip={item.title} />
-                      }
-                    >
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              render={<Link href={subItem.url} />}
-                              isActive={pathname === subItem.url}
-                            >
-                              <span>{subItem.title}</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              ) : (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    render={<Link href={item.url} />}
-                    tooltip={item.title}
-                    isActive={pathname === item.url}
-                  >
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )
-            )}
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarGroup>
 
@@ -256,10 +203,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 }
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    src="/images/avatar.png"
-                    alt="Admin"
-                  />
+                  <AvatarImage src="/images/avatar.png" alt="Admin" />
                   <AvatarFallback className="rounded-lg">BS</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

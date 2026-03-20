@@ -20,7 +20,14 @@ import {
 import { cn } from "@/lib/utils";
 import DeleteInvitationButton from "./DeleteInvitationButton";
 import { DashboardCharts } from "@/components/admin/dashboard-charts";
-import { TrendingUp, TrendingDown, Heart, Users, BarChart3, Percent } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Heart,
+  Users,
+  BarChart3,
+  Percent,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +44,7 @@ export default async function AdminDashboardPage() {
   const totalInvitations = invitations.length;
   const totalRsvps = invitations.reduce(
     (sum, inv) => sum + inv._count.rsvpResponses,
-    0
+    0,
   );
   const activeTemplates = new Set(invitations.map((inv) => inv.template)).size;
   const avgRsvpRate =
@@ -65,9 +72,7 @@ export default async function AdminDashboardPage() {
               <TrendingUp className="size-3 text-emerald-500" />
               <span>Em alta este mês</span>
             </p>
-            <p className="text-xs text-muted-foreground">
-              Convites ativos
-            </p>
+            <p className="text-xs text-muted-foreground">Convites ativos</p>
           </CardContent>
         </Card>
 
@@ -87,9 +92,7 @@ export default async function AdminDashboardPage() {
               <TrendingDown className="size-3 text-rose-500" />
               <span>Queda de 20% neste período</span>
             </p>
-            <p className="text-xs text-muted-foreground">
-              Respostas recebidas
-            </p>
+            <p className="text-xs text-muted-foreground">Respostas recebidas</p>
           </CardContent>
         </Card>
 
@@ -109,9 +112,7 @@ export default async function AdminDashboardPage() {
               <TrendingUp className="size-3 text-emerald-500" />
               <span>Forte utilização de modelos</span>
             </p>
-            <p className="text-xs text-muted-foreground">
-              Modelos em uso
-            </p>
+            <p className="text-xs text-muted-foreground">Modelos em uso</p>
           </CardContent>
         </Card>
 

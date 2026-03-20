@@ -27,7 +27,7 @@ export default function InvitationView({
   // Track page view on mount (deduplicated server-side per session)
   useEffect(() => {
     trackEvent("page_view");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /** User tapped — start music, track envelope open, and let the envelope animate. */
@@ -39,16 +39,19 @@ export default function InvitationView({
         const audio = new Audio(invitation.audio.src);
         audio.loop = true;
         audio.volume = 0.03;
-        audio.play().then(() => {
-          // Cinematic volume fade-in synced with the slow-motion opening
-          let vol = 0.03;
-          const fade = setInterval(() => {
-            vol = Math.min(vol + 0.02, 0.5);
-            audio.volume = vol;
-            if (vol >= 0.5) clearInterval(fade);
-          }, 200); // ~5s to reach full volume
-          fadeIntervalRef.current = fade;
-        }).catch(() => {});
+        audio
+          .play()
+          .then(() => {
+            // Cinematic volume fade-in synced with the slow-motion opening
+            let vol = 0.03;
+            const fade = setInterval(() => {
+              vol = Math.min(vol + 0.02, 0.5);
+              audio.volume = vol;
+              if (vol >= 0.5) clearInterval(fade);
+            }, 200); // ~5s to reach full volume
+            fadeIntervalRef.current = fade;
+          })
+          .catch(() => {});
         audioRef.current = audio;
       } catch {
         /* silent */
@@ -86,7 +89,10 @@ export default function InvitationView({
 
   return (
     /* Outer full-screen layer — visible on wide screens as the side gutters */
-    <div className="min-h-dvh flex justify-center" style={{ backgroundColor: theme.bg }}>
+    <div
+      className="min-h-dvh flex justify-center"
+      style={{ backgroundColor: theme.bg }}
+    >
       {/* Inner column — capped at 500 px, acts as the positioning context
           for the envelope cover (absolute inset-0 inside it). */}
       <div
@@ -102,7 +108,11 @@ export default function InvitationView({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <InvitationPage invitation={invitation} theme={theme} audioRef={audioRef} />
+              <InvitationPage
+                invitation={invitation}
+                theme={theme}
+                audioRef={audioRef}
+              />
             </motion.div>
           )}
         </AnimatePresence>

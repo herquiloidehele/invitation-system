@@ -18,13 +18,7 @@ function fontName(fontStack: string): string {
   return fontStack.replace(/['"]/g, "").split(",")[0].trim();
 }
 
-function Swatch({
-  color,
-  label,
-}: {
-  color: string;
-  label: string;
-}) {
+function Swatch({ color, label }: { color: string; label: string }) {
   return (
     <div className="flex items-center gap-2">
       <div
@@ -115,7 +109,7 @@ export default function ThemeViewClient({
             href="/admin/templates"
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
-              "gap-1.5 text-muted-foreground"
+              "gap-1.5 text-muted-foreground",
             )}
           >
             <ArrowLeft className="size-4" />
@@ -130,7 +124,10 @@ export default function ThemeViewClient({
 
         <Link
           href={`/admin/invitations/new?template=${theme.name}`}
-          className={cn(buttonVariants({ variant: "default", size: "sm" }), "gap-2")}
+          className={cn(
+            buttonVariants({ variant: "default", size: "sm" }),
+            "gap-2",
+          )}
         >
           <Sparkles className="size-3.5" />
           Usar este Modelo
@@ -255,7 +252,9 @@ export default function ThemeViewClient({
               </button>
               <p className="text-[10px] text-muted-foreground">
                 Raio:{" "}
-                {theme.ctaRadius === "0px" ? "Cantos retos" : "Pílula (arredondado)"}
+                {theme.ctaRadius === "0px"
+                  ? "Cantos retos"
+                  : "Pílula (arredondado)"}
               </p>
             </div>
           </section>
@@ -265,9 +264,7 @@ export default function ThemeViewClient({
             <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Envelope
             </h2>
-            <div
-              className="flex items-center justify-center rounded-xl border bg-card p-6"
-            >
+            <div className="flex items-center justify-center rounded-xl border bg-card p-6">
               <div
                 className="flex h-20 w-32 items-center justify-center rounded-md shadow-sm"
                 style={{ background: theme.envelope.base }}
@@ -291,7 +288,7 @@ export default function ThemeViewClient({
             href={`/admin/invitations/new?template=${theme.name}`}
             className={cn(
               buttonVariants({ variant: "default", size: "lg" }),
-              "w-full gap-2"
+              "w-full gap-2",
             )}
           >
             <Sparkles className="size-4" />

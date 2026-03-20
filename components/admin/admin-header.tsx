@@ -29,8 +29,12 @@ export function AdminHeader() {
           <BreadcrumbList>
             {breadcrumbs.map((crumb, index) => (
               <React.Fragment key={crumb.href}>
-                {index > 0 && <BreadcrumbSeparator className="hidden md:block" />}
-                <BreadcrumbItem className={index === 0 ? "hidden md:block" : ""}>
+                {index > 0 && (
+                  <BreadcrumbSeparator className="hidden md:block" />
+                )}
+                <BreadcrumbItem
+                  className={index === 0 ? "hidden md:block" : ""}
+                >
                   {index === breadcrumbs.length - 1 ? (
                     <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                   ) : (

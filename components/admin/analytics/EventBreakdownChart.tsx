@@ -61,11 +61,29 @@ export function EventBreakdownChart({ data }: EventBreakdownChartProps) {
         <CardDescription>Cliques por tipo de ação</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="aspect-auto h-[180px] w-full">
-          <BarChart data={chartData} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[180px] w-full"
+        >
+          <BarChart
+            data={chartData}
+            margin={{ top: 10, right: 12, left: -10, bottom: 0 }}
+          >
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} className="text-xs" />
-            <YAxis tickLine={false} axisLine={false} tickMargin={4} className="text-xs" allowDecimals={false} />
+            <XAxis
+              dataKey="label"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              className="text-xs"
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={4}
+              className="text-xs"
+              allowDecimals={false}
+            />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="count" fill="var(--chart-3)" radius={[4, 4, 0, 0]} />
           </BarChart>

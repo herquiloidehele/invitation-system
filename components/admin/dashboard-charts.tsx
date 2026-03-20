@@ -37,10 +37,14 @@ const chartConfig = {
 
 function getRangeMs(range: string) {
   switch (range) {
-    case "90d": return 90 * 24 * 60 * 60 * 1000;
-    case "30d": return 30 * 24 * 60 * 60 * 1000;
-    case "7d": return 7 * 24 * 60 * 60 * 1000;
-    default: return 7 * 24 * 60 * 60 * 1000;
+    case "90d":
+      return 90 * 24 * 60 * 60 * 1000;
+    case "30d":
+      return 30 * 24 * 60 * 60 * 1000;
+    case "7d":
+      return 7 * 24 * 60 * 60 * 1000;
+    default:
+      return 7 * 24 * 60 * 60 * 1000;
   }
 }
 
@@ -58,28 +62,32 @@ export function DashboardCharts() {
     setLoading(true);
     fetch(`/api/admin/analytics?range=${timeRange}`)
       .then((r) => r.json())
-      .then((invitations: Array<{
-        viewsOverTime: { date: string; views: number; rsvps: number }[];
-        recentRsvps: { submittedAt: string }[];
-      }>) => {
-        // Merge time series across all invitations
-        const map: Record<string, { visitors: number; rsvps: number }> = {};
-        for (const inv of invitations) {
-          for (const entry of inv.viewsOverTime) {
-            if (!map[entry.date]) map[entry.date] = { visitors: 0, rsvps: 0 };
-            map[entry.date].visitors += entry.views;
-            map[entry.date].rsvps += entry.rsvps;
+      .then(
+        (
+          invitations: Array<{
+            viewsOverTime: { date: string; views: number; rsvps: number }[];
+            recentRsvps: { submittedAt: string }[];
+          }>,
+        ) => {
+          // Merge time series across all invitations
+          const map: Record<string, { visitors: number; rsvps: number }> = {};
+          for (const inv of invitations) {
+            for (const entry of inv.viewsOverTime) {
+              if (!map[entry.date]) map[entry.date] = { visitors: 0, rsvps: 0 };
+              map[entry.date].visitors += entry.views;
+              map[entry.date].rsvps += entry.rsvps;
+            }
           }
-        }
-        const merged = Object.entries(map)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([date, v]) => ({
-            date: formatDate(date),
-            visitors: v.visitors,
-            rsvps: v.rsvps,
-          }));
-        setData(merged);
-      })
+          const merged = Object.entries(map)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, v]) => ({
+              date: formatDate(date),
+              visitors: v.visitors,
+              rsvps: v.rsvps,
+            }));
+          setData(merged);
+        },
+      )
       .catch(() => setData([]))
       .finally(() => setLoading(false));
   }, [timeRange]);
@@ -93,8 +101,8 @@ export function DashboardCharts() {
             {timeRange === "90d"
               ? "Últimos 3 meses"
               : timeRange === "30d"
-              ? "Últimos 30 dias"
-              : "Últimos 7 dias"}
+                ? "Últimos 30 dias"
+                : "Últimos 7 dias"}
           </CardDescription>
         </div>
         <div className="flex items-center gap-1 rounded-lg border bg-muted p-1">
@@ -150,12 +158,28 @@ export function DashboardCharts() {
             >
               <defs>
                 <linearGradient id="fillVisitors" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.1} />
+                  <stop
+                    offset="5%"
+                    stopColor="var(--chart-1)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--chart-1)"
+                    stopOpacity={0.1}
+                  />
                 </linearGradient>
                 <linearGradient id="fillRsvps" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.1} />
+                  <stop
+                    offset="5%"
+                    stopColor="var(--chart-2)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--chart-2)"
+                    stopOpacity={0.1}
+                  />
                 </linearGradient>
               </defs>
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
@@ -166,7 +190,12 @@ export function DashboardCharts() {
                 tickMargin={8}
                 className="text-xs"
               />
-              <YAxis tickLine={false} axisLine={false} tickMargin={4} className="text-xs" />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={4}
+                className="text-xs"
+              />
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent indicator="dot" />}

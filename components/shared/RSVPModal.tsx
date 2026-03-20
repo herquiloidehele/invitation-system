@@ -7,7 +7,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import {RSVP_SUBMITTED_SLUGS_KEY} from "@/lib/constants";
+import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -62,7 +62,9 @@ interface ModalPalette {
 
 /** Build a high-contrast light palette, pulling only branding colors from the
  *  invitation theme. This guarantees readability on every template. */
-function buildModalPalette(theme: TemplateTheme | RSVPThemeLegacy): ModalPalette {
+function buildModalPalette(
+  theme: TemplateTheme | RSVPThemeLegacy,
+): ModalPalette {
   // Detect if the source is a full TemplateTheme (has uiFont) or legacy RSVPTheme
   const isTemplate = "uiFont" in theme;
   return {
@@ -77,7 +79,9 @@ function buildModalPalette(theme: TemplateTheme | RSVPThemeLegacy): ModalPalette
     ctaText: theme.ctaPrimaryText,
     ctaRadius: theme.ctaRadius,
     iconColor: "#999999",
-    uiFont: isTemplate ? (theme as TemplateTheme).uiFont : "'Outfit', sans-serif",
+    uiFont: isTemplate
+      ? (theme as TemplateTheme).uiFont
+      : "'Outfit', sans-serif",
     displayFont: "'Inter', serif",
     bodyFont: theme.bodyFont,
   };
@@ -130,7 +134,12 @@ function isIntegration(p: RSVPModalProps): p is IntegrationProps {
 // Component
 // ---------------------------------------------------------------------------
 
-type SubmitState = "idle" | "loading" | "success" | "error" | "already_submitted";
+type SubmitState =
+  | "idle"
+  | "loading"
+  | "success"
+  | "error"
+  | "already_submitted";
 
 const RSVP_STORAGE_KEY = RSVP_SUBMITTED_SLUGS_KEY;
 
@@ -157,8 +166,12 @@ function hasSubmittedRsvp(slug: string): boolean {
 export default function RSVPModal(props: RSVPModalProps) {
   const isOpen = isIntegration(props) ? props.open : props.isOpen;
   const onClose = props.onClose;
-  const slug = isIntegration(props) ? props.invitation.slug : props.invitationSlug;
-  const deadline = isIntegration(props) ? props.invitation.rsvp.deadline : undefined;
+  const slug = isIntegration(props)
+    ? props.invitation.slug
+    : props.invitationSlug;
+  const deadline = isIntegration(props)
+    ? props.invitation.rsvp.deadline
+    : undefined;
 
   // Build a guaranteed high-contrast light palette
   const p = buildModalPalette(props.theme);
@@ -285,7 +298,12 @@ export default function RSVPModal(props: RSVPModalProps) {
             initial={{ y: "100%", opacity: 0.8 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
-            transition={{ type: "spring", damping: 32, stiffness: 340, mass: 0.8 }}
+            transition={{
+              type: "spring",
+              damping: 32,
+              stiffness: 340,
+              mass: 0.8,
+            }}
           >
             {/* Header */}
             <div
@@ -476,9 +494,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                         className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
                         style={{
                           borderColor:
-                            attending === "yes"
-                              ? p.accent
-                              : p.border,
+                            attending === "yes" ? p.accent : p.border,
                           backgroundColor:
                             attending === "yes"
                               ? p.accent + "15"
@@ -498,10 +514,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                       <label
                         className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
                         style={{
-                          borderColor:
-                            attending === "no"
-                              ? p.accent
-                              : p.border,
+                          borderColor: attending === "no" ? p.accent : p.border,
                           backgroundColor:
                             attending === "no"
                               ? p.accent + "15"

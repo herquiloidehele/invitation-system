@@ -39,9 +39,15 @@ export default function ScheduleItem(props: ScheduleItemProps) {
   const time = isIntegrationProps(props) ? props.event.time : props.time;
   const label = isIntegrationProps(props) ? props.event.label : props.label;
   const venue = isIntegrationProps(props) ? props.event.venue : props.venue;
-  const accentColor = isIntegrationProps(props) ? props.theme.accent : props.accentColor;
-  const textColor = isIntegrationProps(props) ? props.theme.textPrimary : props.textColor;
-  const venueColor = isIntegrationProps(props) ? props.theme.textSecondary : props.venueColor;
+  const accentColor = isIntegrationProps(props)
+    ? props.theme.accent
+    : props.accentColor;
+  const textColor = isIntegrationProps(props)
+    ? props.theme.textPrimary
+    : props.textColor;
+  const venueColor = isIntegrationProps(props)
+    ? props.theme.textSecondary
+    : props.venueColor;
   const uiFont = isIntegrationProps(props) ? props.theme.uiFont : props.uiFont;
   const index = isIntegrationProps(props) ? 0 : props.index;
 
@@ -66,10 +72,7 @@ export default function ScheduleItem(props: ScheduleItemProps) {
 
       {/* Vertical divider */}
       <div className="relative flex shrink-0 flex-col items-center self-stretch">
-        <div
-          className="h-full w-px"
-          style={{ backgroundColor: accentColor }}
-        />
+        <div className="h-full w-px" style={{ backgroundColor: accentColor }} />
         {/* Dot accent */}
         <div
           className="absolute top-1 h-2 w-2 rounded-full"

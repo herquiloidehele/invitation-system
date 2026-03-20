@@ -26,11 +26,11 @@ interface EnvelopeCoverProps {
 
 const T = {
   /** Top flap swings open (3D rotation) */
-  flapOpen:   { dur: 10,  del: 1  },
+  flapOpen: { dur: 10, del: 1 },
   /** Bottom flap drops */
-  bottomDrop: { dur: 10,  del: 2  },
+  bottomDrop: { dur: 10, del: 2 },
   /** Entire scene fades to transparent */
-  sceneFade:  { dur: 2,  del: 3  },
+  sceneFade: { dur: 2, del: 3 },
 } as const;
 
 /** Milliseconds from tap until onAnimationComplete fires */
@@ -58,16 +58,21 @@ function EnvelopeBody({ color }: { color: string }) {
 /*  Flap components                                                    */
 /* ------------------------------------------------------------------ */
 
-function TopFlap({ opening, image }: { opening: boolean; image: string  }) {
+function TopFlap({ opening, image }: { opening: boolean; image: string }) {
   return (
     <motion.div
       className="absolute top-0 left-0 w-full origin-bottom"
       style={{ zIndex: 10 }}
-      initial={{  filter: "drop-shadow(0 0 0 transparent)", transform: "scale(1) translateY(0)" }}
+      initial={{
+        filter: "drop-shadow(0 0 0 transparent)",
+        transform: "scale(1) translateY(0)",
+      }}
       animate={
-        opening
-          && { filter: "drop-shadow(0 50px 90px #7f7f7f)", y: "-100%", transform: "scale(1.15) translateY(-25%)" }
-
+        opening && {
+          filter: "drop-shadow(0 50px 90px #7f7f7f)",
+          y: "-100%",
+          transform: "scale(1.15) translateY(-25%)",
+        }
       }
       transition={{
         duration: T.flapOpen.dur,
@@ -75,17 +80,27 @@ function TopFlap({ opening, image }: { opening: boolean; image: string  }) {
         ease: EASE,
       }}
     >
-      <Image src={image} width={500} height={500} alt={"Top Envelop Flap"} className={"w-full h-auto"} />
+      <Image
+        src={image}
+        width={500}
+        height={500}
+        alt={"Top Envelop Flap"}
+        className={"w-full h-auto"}
+      />
     </motion.div>
   );
 }
 
-function BottomFlap({ image }: { opening: boolean, image: string }) {
+function BottomFlap({ image }: { opening: boolean; image: string }) {
   return (
-    <div
-      className="absolute bottom-0 left-0 w-full origin-top"
-    >
-      <Image src={image} width={500} height={500} alt={"Top Envelop Flap"} className={"w-full h-auto"} />
+    <div className="absolute bottom-0 left-0 w-full origin-top">
+      <Image
+        src={image}
+        width={500}
+        height={500}
+        alt={"Top Envelop Flap"}
+        className={"w-full h-auto"}
+      />
     </div>
   );
 }
@@ -167,12 +182,17 @@ export default function EnvelopeCover({
             backgroundSize: "200% 100%",
           }}
           animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
-          transition={{ duration: 3.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+          transition={{
+            duration: 3.5,
+            repeat: Infinity,
+            repeatDelay: 2,
+            ease: "easeInOut",
+          }}
         />
       )}
 
       <BottomFlap opening={opening} image={theme.envelope.bottomFlap} />
-      <TopFlap opening={opening} image={theme.envelope.topFlap}  />
+      <TopFlap opening={opening} image={theme.envelope.topFlap} />
 
       {/* Slow opacity fade covering the last phase of the animation.
           This is the actual "scene fade" — it makes the envelope gradually
@@ -183,10 +203,13 @@ export default function EnvelopeCover({
           style={{ backgroundColor: theme.bg }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: T.sceneFade.dur, delay: T.sceneFade.del, ease: "easeIn" }}
+          transition={{
+            duration: T.sceneFade.dur,
+            delay: T.sceneFade.del,
+            ease: "easeIn",
+          }}
         />
       )}
     </motion.div>
   );
 }
-

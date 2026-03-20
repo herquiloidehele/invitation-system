@@ -11,7 +11,7 @@ import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
 import CalendarButton from "./CalendarButton";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import {RSVP_SUBMITTED_SLUGS_KEY} from "@/lib/constants";
+import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Animation variants — each section has its own entrance
@@ -285,7 +285,7 @@ function FAQAccordionItem({
                   fontSize: 12,
                   lineHeight: 1.75,
                   color: theme.textSecondary,
-                    opacity: 0.8,
+                  opacity: 0.8,
                   margin: 0,
                 }}
               >
@@ -331,15 +331,29 @@ export default function InvitationPage({
 
   const { trackEvent } = useAnalytics(invitation.slug);
 
-  const handleMapsClick = useCallback(() => trackEvent("maps_click"), [trackEvent]);
-  const handleGiftClick = useCallback(() => trackEvent("gift_click"), [trackEvent]);
-  const handleCalendarClick = useCallback(() => trackEvent("calendar_click"), [trackEvent]);
-  const handleAudioPlay = useCallback(() => trackEvent("audio_play"), [trackEvent]);
+  const handleMapsClick = useCallback(
+    () => trackEvent("maps_click"),
+    [trackEvent],
+  );
+  const handleGiftClick = useCallback(
+    () => trackEvent("gift_click"),
+    [trackEvent],
+  );
+  const handleCalendarClick = useCallback(
+    () => trackEvent("calendar_click"),
+    [trackEvent],
+  );
+  const handleAudioPlay = useCallback(
+    () => trackEvent("audio_play"),
+    [trackEvent],
+  );
 
   // Check localStorage on mount (client-only)
   useEffect(() => {
     try {
-      const slugs: string[] = JSON.parse(localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]");
+      const slugs: string[] = JSON.parse(
+        localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+      );
       setRsvpSubmitted(slugs.includes(invitation.slug));
     } catch {
       // ignore
@@ -473,8 +487,7 @@ export default function InvitationPage({
               variants={heroTextItem}
               className="my-2"
               style={{
-                fontFamily:
-                  theme.scriptFont ?? "'Cormorant Garamond', serif",
+                fontFamily: theme.scriptFont ?? "'Cormorant Garamond', serif",
                 fontSize: 34,
                 fontStyle: "italic",
                 color: "rgba(255,255,255,0.75)",
@@ -1001,7 +1014,11 @@ export default function InvitationPage({
       {/* 5b. Location Card Section                                         */}
       {/* ================================================================= */}
       <AnimatedSection className="px-6 pb-10">
-        <LocationCard location={invitation.location} theme={theme} onMapsClick={handleMapsClick} />
+        <LocationCard
+          location={invitation.location}
+          theme={theme}
+          onMapsClick={handleMapsClick}
+        />
       </AnimatedSection>
 
       {/* ================================================================= */}
@@ -1072,52 +1089,51 @@ export default function InvitationPage({
         </>
       )}
 
-        <SectionDivider theme={theme} />
+      <SectionDivider theme={theme} />
 
-        {/* ================================================================= */}
-        {/* 6. CTA Section                                                    */}
-        {/* ================================================================= */}
-        <AnimatedSection className="px-6 pb-10">
-            <div className="flex flex-col items-center">
+      {/* ================================================================= */}
+      {/* 6. CTA Section                                                    */}
+      {/* ================================================================= */}
+      <AnimatedSection className="px-6 pb-10">
+        <div className="flex flex-col items-center">
           <span
-              className="mb-6"
-              style={{
-                  fontFamily: theme.uiFont,
-                  fontSize: 10,
-                  fontWeight: 400,
-                  letterSpacing: 4,
-                  textTransform: "uppercase" as const,
-                  color: theme.textSecondary,
-              }}
+            className="mb-6"
+            style={{
+              fontFamily: theme.uiFont,
+              fontSize: 10,
+              fontWeight: 400,
+              letterSpacing: 4,
+              textTransform: "uppercase" as const,
+              color: theme.textSecondary,
+            }}
           >
             Confirme sua presença
           </span>
-            </div>
+        </div>
 
-            <div className="flex flex-col items-center">
-                {/* Confirmar Presença */}
-                <motion.button
-                    onClick={() => setRsvpOpen(true)}
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
-                    style={{
-                        fontFamily: theme.uiFont,
-                        fontSize: 13,
-                        fontWeight: 500,
-                        letterSpacing: 1,
-                        background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
-                        color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
-                        borderRadius: theme.ctaRadius,
-                        cursor: rsvpSubmitted ? "default" : "pointer",
-                    }}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                >
-                    <Heart size={17} strokeWidth={1.5} />
-                    {rsvpSubmitted ? "Presença Confirmada" : "Confirmar Presença"}
-                </motion.button>
-            </div>
-
-        </AnimatedSection>
+        <div className="flex flex-col items-center">
+          {/* Confirmar Presença */}
+          <motion.button
+            onClick={() => setRsvpOpen(true)}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
+            style={{
+              fontFamily: theme.uiFont,
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: 1,
+              background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
+              color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
+              borderRadius: theme.ctaRadius,
+              cursor: rsvpSubmitted ? "default" : "pointer",
+            }}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Heart size={17} strokeWidth={1.5} />
+            {rsvpSubmitted ? "Presença Confirmada" : "Confirmar Presença"}
+          </motion.button>
+        </div>
+      </AnimatedSection>
 
       {/* ================================================================= */}
       {/* 8. Footer — monogram with decorative ring                         */}
@@ -1191,7 +1207,9 @@ export default function InvitationPage({
           setRsvpOpen(false);
           // Refresh submitted state after modal closes
           try {
-            const slugs: string[] = JSON.parse(localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]");
+            const slugs: string[] = JSON.parse(
+              localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+            );
             setRsvpSubmitted(slugs.includes(invitation.slug));
           } catch {
             // ignore

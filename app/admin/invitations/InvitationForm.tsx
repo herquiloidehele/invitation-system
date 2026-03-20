@@ -57,12 +57,27 @@ function deriveDateFields(iso: string) {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return {};
     const months = [
-      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
     ];
     const days = [
-      "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira",
-      "Quinta-feira", "Sexta-feira", "Sábado",
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado",
     ];
     return {
       day: String(d.getDate()).padStart(2, "0"),
@@ -195,7 +210,10 @@ export default function InvitationForm({
   );
 
   const updateLocation = useCallback(
-    (field: keyof InvitationData["location"], value: string | number | undefined) => {
+    (
+      field: keyof InvitationData["location"],
+      value: string | number | undefined,
+    ) => {
       setForm((prev) => ({
         ...prev,
         location: { ...prev.location, [field]: value },
@@ -325,9 +343,7 @@ export default function InvitationForm({
       }
 
       toast.success(
-        mode === "create"
-          ? "Convite criado!"
-          : "Convite atualizado!",
+        mode === "create" ? "Convite criado!" : "Convite atualizado!",
       );
       router.push("/admin");
       router.refresh();
@@ -365,10 +381,7 @@ export default function InvitationForm({
               <OwnerLinkPanel ownerUrl={ownerUrl} />
             )}
 
-            <Accordion
-              defaultValue={[]}
-              className="space-y-2"
-            >
+            <Accordion defaultValue={[]} className="space-y-2">
               {/* ── Couple ── */}
               <AccordionItem value="couple" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
@@ -381,9 +394,7 @@ export default function InvitationForm({
                       <Input
                         id="bride"
                         value={form.couple.bride}
-                        onChange={(e) =>
-                          updateCouple("bride", e.target.value)
-                        }
+                        onChange={(e) => updateCouple("bride", e.target.value)}
                         placeholder="e.g. Maria"
                       />
                     </div>
@@ -392,9 +403,7 @@ export default function InvitationForm({
                       <Input
                         id="groom"
                         value={form.couple.groom}
-                        onChange={(e) =>
-                          updateCouple("groom", e.target.value)
-                        }
+                        onChange={(e) => updateCouple("groom", e.target.value)}
                         placeholder="e.g. João"
                       />
                     </div>
@@ -494,19 +503,14 @@ export default function InvitationForm({
                 <AccordionContent className="space-y-3 pb-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="dateIso">
-                        Data (ISO)
-                      </Label>
+                      <Label htmlFor="dateIso">Data (ISO)</Label>
                       <Input
                         id="dateIso"
                         type="date"
                         value={form.date.iso ? form.date.iso.split("T")[0] : ""}
                         onChange={(e) => {
                           const val = e.target.value;
-                          updateDate(
-                            "iso",
-                            val ? `${val}T00:00:00.000Z` : "",
-                          );
+                          updateDate("iso", val ? `${val}T00:00:00.000Z` : "");
                         }}
                       />
                     </div>
@@ -526,9 +530,7 @@ export default function InvitationForm({
                       <Input
                         id="display"
                         value={form.date.display}
-                        onChange={(e) =>
-                          updateDate("display", e.target.value)
-                        }
+                        onChange={(e) => updateDate("display", e.target.value)}
                         placeholder="Derivado automaticamente"
                       />
                     </div>
@@ -565,9 +567,7 @@ export default function InvitationForm({
                     <Input
                       id="locName"
                       value={form.location.name}
-                      onChange={(e) =>
-                        updateLocation("name", e.target.value)
-                      }
+                      onChange={(e) => updateLocation("name", e.target.value)}
                       placeholder="e.g. Quinta da Serra"
                     />
                   </div>
@@ -653,10 +653,7 @@ export default function InvitationForm({
               </AccordionItem>
 
               {/* ── Details ── */}
-              <AccordionItem
-                value="details"
-                className="border rounded-lg px-4"
-              >
+              <AccordionItem value="details" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
                   Detalhes & Opções
                 </AccordionTrigger>
@@ -685,9 +682,7 @@ export default function InvitationForm({
                     </div>
                     {form.rsvp.enabled && (
                       <div className="space-y-1.5">
-                        <Label htmlFor="rsvpDeadline">
-                          Prazo (opcional)
-                        </Label>
+                        <Label htmlFor="rsvpDeadline">Prazo (opcional)</Label>
                         <Input
                           id="rsvpDeadline"
                           value={form.rsvp.deadline ?? ""}
@@ -716,7 +711,9 @@ export default function InvitationForm({
                     {form.giftRegistry.enabled && (
                       <>
                         <div className="space-y-1.5">
-                          <Label htmlFor="giftText">Texto da Lista de Presentes</Label>
+                          <Label htmlFor="giftText">
+                            Texto da Lista de Presentes
+                          </Label>
                           <Textarea
                             id="giftText"
                             value={form.giftRegistry.text}
@@ -847,11 +844,7 @@ export default function InvitationForm({
                       </Button>
                     </div>
                   ))}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={addScheduleItem}
-                  >
+                  <Button variant="outline" size="sm" onClick={addScheduleItem}>
                     + Adicionar Evento
                   </Button>
                 </AccordionContent>
@@ -918,9 +911,7 @@ export default function InvitationForm({
             </span>
           </div>
           <div className="flex-1 overflow-auto bg-neutral-100">
-            <div
-              className="mx-auto origin-top w-full"
-            >
+            <div className="mx-auto origin-top w-full">
               {form.couple.bride && form.couple.groom ? (
                 <InvitationPage invitation={form} theme={currentTheme} />
               ) : (

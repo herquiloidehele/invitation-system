@@ -1,6 +1,13 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { CheckCircle2, XCircle, Users, Heart, Calendar, MapPin } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  Users,
+  Heart,
+  Calendar,
+  MapPin,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

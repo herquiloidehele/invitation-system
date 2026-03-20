@@ -21,9 +21,19 @@ export interface InvitationAnalytics {
   rsvpCount: number;
   conversionRate: string;
   eventBreakdown: Record<string, number>;
-  deviceBreakdown: { mobile: number; tablet: number; desktop: number; unknown: number };
+  deviceBreakdown: {
+    mobile: number;
+    tablet: number;
+    desktop: number;
+    unknown: number;
+  };
   viewsOverTime: { date: string; views: number; rsvps: number }[];
-  recentRsvps: { id: string; guestName: string; attending: boolean; submittedAt: string }[];
+  recentRsvps: {
+    id: string;
+    guestName: string;
+    attending: boolean;
+    submittedAt: string;
+  }[];
 }
 
 const RANGES = [
@@ -39,7 +49,11 @@ interface AnalyticsClientProps {
   selectedSlug: string;
 }
 
-export default function AnalyticsClient({ data, range, selectedSlug }: AnalyticsClientProps) {
+export default function AnalyticsClient({
+  data,
+  range,
+  selectedSlug,
+}: AnalyticsClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -52,9 +66,10 @@ export default function AnalyticsClient({ data, range, selectedSlug }: Analytics
     });
   }
 
-  const current = selectedSlug === "all"
-    ? null
-    : data.find((d) => d.slug === selectedSlug) ?? data[0] ?? null;
+  const current =
+    selectedSlug === "all"
+      ? null
+      : (data.find((d) => d.slug === selectedSlug) ?? data[0] ?? null);
 
   // Aggregate stats when "all" is selected
   const aggregate = {
@@ -88,7 +103,11 @@ export default function AnalyticsClient({ data, range, selectedSlug }: Analytics
     ? current.recentRsvps
     : data
         .flatMap((d) => d.recentRsvps)
-        .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+        .sort(
+          (a, b) =>
+            new Date(b.submittedAt).getTime() -
+            new Date(a.submittedAt).getTime(),
+        )
         .slice(0, 10);
 
   return (
@@ -150,7 +169,9 @@ export default function AnalyticsClient({ data, range, selectedSlug }: Analytics
       {data.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-20 text-center text-muted-foreground">
           <p className="text-lg font-medium">Nenhum convite encontrado</p>
-          <p className="text-sm">Crie um convite para começar a ver as analíticas.</p>
+          <p className="text-sm">
+            Crie um convite para começar a ver as analíticas.
+          </p>
         </div>
       ) : (
         <>
@@ -203,7 +224,9 @@ function mergeTimeSeries(
     .map(([date, v]) => ({ date, ...v }));
 }
 
-function mergeEventBreakdown(breakdowns: Record<string, number>[]): Record<string, number> {
+function mergeEventBreakdown(
+  breakdowns: Record<string, number>[],
+): Record<string, number> {
   const result: Record<string, number> = {};
   for (const bd of breakdowns) {
     for (const [k, v] of Object.entries(bd)) {
@@ -214,7 +237,12 @@ function mergeEventBreakdown(breakdowns: Record<string, number>[]): Record<strin
 }
 
 function mergeDeviceBreakdown(
-  breakdowns: { mobile: number; tablet: number; desktop: number; unknown: number }[],
+  breakdowns: {
+    mobile: number;
+    tablet: number;
+    desktop: number;
+    unknown: number;
+  }[],
 ) {
   return breakdowns.reduce(
     (acc, d) => ({

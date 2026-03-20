@@ -17,7 +17,9 @@ function Swatch({ color, label }: { color: string; label: string }) {
         style={{ background: color }}
         title={label}
       />
-      <span className="text-[9px] text-muted-foreground leading-none">{label}</span>
+      <span className="text-[9px] text-muted-foreground leading-none">
+        {label}
+      </span>
     </div>
   );
 }
@@ -93,7 +95,9 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
         {/* Title */}
         <div>
           <h3 className="font-semibold text-sm leading-tight">{theme.label}</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">{theme.description}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {theme.description}
+          </p>
         </div>
 
         {/* Palette swatches */}
@@ -102,18 +106,27 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
           <Swatch color={theme.secondary} label="Secundária" />
           <Swatch color={theme.accent} label="Destaque" />
           <Swatch color={theme.bg} label="Fundo" />
-          <Swatch color={theme.cardBg.startsWith("rgba") ? theme.accent : theme.cardBg} label="Cartão" />
+          <Swatch
+            color={
+              theme.cardBg.startsWith("rgba") ? theme.accent : theme.cardBg
+            }
+            label="Cartão"
+          />
         </div>
 
         {/* Typography */}
         <div className="space-y-1 text-xs text-muted-foreground">
           <p>
             <span className="font-medium text-foreground">Título:</span>{" "}
-            <span style={{ fontFamily: theme.displayFont }}>{fontName(theme.displayFont)}</span>
+            <span style={{ fontFamily: theme.displayFont }}>
+              {fontName(theme.displayFont)}
+            </span>
           </p>
           <p>
             <span className="font-medium text-foreground">Corpo:</span>{" "}
-            <span style={{ fontFamily: theme.bodyFont }}>{fontName(theme.bodyFont)}</span>
+            <span style={{ fontFamily: theme.bodyFont }}>
+              {fontName(theme.bodyFont)}
+            </span>
           </p>
           <p>
             <span className="font-medium text-foreground">Botões:</span>{" "}
@@ -137,7 +150,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             href={`/admin/templates/${theme.name}`}
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
-              "flex-1 gap-1.5"
+              "flex-1 gap-1.5",
             )}
           >
             <Eye className="size-3.5" />
@@ -147,7 +160,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             href={`/admin/invitations/new?template=${theme.name}`}
             className={cn(
               buttonVariants({ variant: "default", size: "sm" }),
-              "flex-1 gap-1.5"
+              "flex-1 gap-1.5",
             )}
           >
             <Sparkles className="size-3.5" />
@@ -172,7 +185,8 @@ export default function TemplatesPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Modelos</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Escolha um dos {themeList.length} modelos disponíveis para criar o seu convite de casamento.
+          Escolha um dos {themeList.length} modelos disponíveis para criar o seu
+          convite de casamento.
         </p>
       </div>
 

@@ -60,17 +60,34 @@ export function DeviceChart({ data }: DeviceChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>Dispositivos</CardTitle>
-        <CardDescription>Distribuição das visitas por dispositivo</CardDescription>
+        <CardDescription>
+          Distribuição das visitas por dispositivo
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[180px]">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[180px]"
+        >
           <PieChart>
-            <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
-            <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
+            <ChartTooltip
+              content={<ChartTooltipContent nameKey="name" hideLabel />}
+            />
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={70}
+            >
               {chartData.map((entry) => (
                 <Cell
                   key={entry.name}
-                  fill={COLORS[entry.name as keyof typeof COLORS] ?? "var(--chart-4)"}
+                  fill={
+                    COLORS[entry.name as keyof typeof COLORS] ??
+                    "var(--chart-4)"
+                  }
                 />
               ))}
             </Pie>

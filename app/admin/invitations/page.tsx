@@ -29,5 +29,9 @@ export default async function AdminInvitationsPage() {
     },
   });
 
-  return <InvitationsClient invitations={invitations as unknown as InvitationRow[]} />;
+  return (
+    <InvitationsClient
+      invitations={invitations as unknown as InvitationRow[]}
+    />
+  );
 }

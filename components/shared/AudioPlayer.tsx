@@ -1,6 +1,12 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback, type MutableRefObject } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  type MutableRefObject,
+} from "react";
 import { motion } from "framer-motion";
 import { Play, Pause } from "lucide-react";
 import type { AudioConfig, TemplateTheme } from "@/lib/types";
@@ -185,13 +191,19 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       <div className="flex min-w-0 flex-col pr-1">
         <span
           className="truncate text-sm font-medium leading-tight"
-          style={{ color: playerTheme.titleColor, fontFamily: "var(--font-outfit), 'Outfit', sans-serif" }}
+          style={{
+            color: playerTheme.titleColor,
+            fontFamily: "var(--font-outfit), 'Outfit', sans-serif",
+          }}
         >
           {title}
         </span>
         <span
           className="truncate text-xs leading-tight"
-          style={{ color: playerTheme.artistColor, fontFamily: "var(--font-outfit), 'Outfit', sans-serif" }}
+          style={{
+            color: playerTheme.artistColor,
+            fontFamily: "var(--font-outfit), 'Outfit', sans-serif",
+          }}
         >
           {artist}
         </span>
@@ -200,7 +212,11 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       {/* Animated equalizer bars — visible when playing */}
       <div
         className="flex items-end gap-[3px] pl-1"
-        style={{ height: 18, opacity: isPlaying ? 1 : 0.3, transition: "opacity 0.3s ease" }}
+        style={{
+          height: 18,
+          opacity: isPlaying ? 1 : 0.3,
+          transition: "opacity 0.3s ease",
+        }}
         aria-hidden
       >
         {[1, 2, 3, 4].map((n) => (
@@ -210,7 +226,9 @@ export default function AudioPlayer(props: AudioPlayerProps) {
             style={{
               backgroundColor: playerTheme.playBtnColor,
               height: isPlaying ? "100%" : 4,
-              animation: isPlaying ? `eq-bar-${n} 0.8s ease-in-out infinite` : "none",
+              animation: isPlaying
+                ? `eq-bar-${n} 0.8s ease-in-out infinite`
+                : "none",
               transition: "height 0.3s ease",
             }}
           />

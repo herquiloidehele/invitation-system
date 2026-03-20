@@ -66,7 +66,9 @@ export async function GET(request: NextRequest) {
     const uniqueVisitors = new Set(
       events.filter((e) => e.type === "page_view").map((e) => e.visitorId),
     ).size;
-    const envelopeOpens = events.filter((e) => e.type === "envelope_open").length;
+    const envelopeOpens = events.filter(
+      (e) => e.type === "envelope_open",
+    ).length;
     const openRate =
       totalViews > 0 ? ((envelopeOpens / totalViews) * 100).toFixed(1) : "0";
     const rsvpCount = inv.rsvpResponses.length;
@@ -109,7 +111,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Build a sorted time series spanning the range
-    const allDays = new Set([...Object.keys(viewsByDay), ...Object.keys(rsvpsByDay)]);
+    const allDays = new Set([
+      ...Object.keys(viewsByDay),
+      ...Object.keys(rsvpsByDay),
+    ]);
     const viewsOverTime = Array.from(allDays)
       .sort()
       .map((date) => ({

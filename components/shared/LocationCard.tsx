@@ -51,7 +51,11 @@ interface LocationCardProps {
   onMapsClick?: () => void;
 }
 
-export default function LocationCard({ location, theme, onMapsClick }: LocationCardProps) {
+export default function LocationCard({
+  location,
+  theme,
+  onMapsClick,
+}: LocationCardProps) {
   const hasCoordinates =
     location.latitude != null && location.longitude != null;
 
@@ -67,15 +71,12 @@ export default function LocationCard({ location, theme, onMapsClick }: LocationC
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         borderRadius: 16,
-        boxShadow:
-          "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+        boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
         border: `1px solid ${theme.cardBorder}`,
       }}
     >
       {/* Header — icon + title */}
-      <div
-        className="flex items-center gap-3 px-5 pt-5 pb-4"
-      >
+      <div className="flex items-center gap-3 px-5 pt-5 pb-4">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
           style={{ background: `${theme.accent}12` }}
@@ -151,11 +152,7 @@ export default function LocationCard({ location, theme, onMapsClick }: LocationC
                   className="flex h-full w-full items-center justify-center"
                   style={{ background: theme.cardBg }}
                 >
-                  <MapPin
-                    size={24}
-                    color={theme.textMuted}
-                    strokeWidth={1.5}
-                  />
+                  <MapPin size={24} color={theme.textMuted} strokeWidth={1.5} />
                 </div>
               }
             >
@@ -176,7 +173,11 @@ export default function LocationCard({ location, theme, onMapsClick }: LocationC
           onClick={(e) => {
             e.preventDefault();
             onMapsClick?.();
-            window.open(getExternalMapUrl(location), "_blank", "noopener,noreferrer");
+            window.open(
+              getExternalMapUrl(location),
+              "_blank",
+              "noopener,noreferrer",
+            );
           }}
           className="flex w-full items-center justify-center gap-2 px-4 py-3 transition-all"
           style={{

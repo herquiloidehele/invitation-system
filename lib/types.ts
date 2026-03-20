@@ -1,4 +1,8 @@
-export type TemplateName = "pink-floral" | "modern-minimal" | "boho-chic" | "midnight-elegance";
+export type TemplateName =
+  | "pink-floral"
+  | "modern-minimal"
+  | "boho-chic"
+  | "midnight-elegance";
 
 export interface CoupleInfo {
   bride: string;

@@ -28,9 +28,9 @@ const ALLOWED_TYPES: Record<string, "images" | "videos" | "audio"> = {
 
 // Max file sizes in bytes
 const MAX_SIZES: Record<"images" | "videos" | "audio", number> = {
-  images: 5 * 1024 * 1024,   //   5 MB
+  images: 5 * 1024 * 1024, //   5 MB
   videos: 100 * 1024 * 1024, // 100 MB
-  audio: 20 * 1024 * 1024,   //  20 MB
+  audio: 20 * 1024 * 1024, //  20 MB
 };
 
 export async function POST(req: NextRequest) {
@@ -43,7 +43,10 @@ export async function POST(req: NextRequest) {
       !process.env.S3_BUCKET_NAME
     ) {
       return NextResponse.json(
-        { error: "S3 storage is not configured. Set AWS_* environment variables." },
+        {
+          error:
+            "S3 storage is not configured. Set AWS_* environment variables.",
+        },
         { status: 503 },
       );
     }

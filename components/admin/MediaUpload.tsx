@@ -92,7 +92,9 @@ export default function MediaUpload({
   label,
   className,
 }: MediaUploadProps) {
-  const [uploadState, setUploadState] = useState<UploadState>({ status: "idle" });
+  const [uploadState, setUploadState] = useState<UploadState>({
+    status: "idle",
+  });
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlInputValue, setUrlInputValue] = useState("");
 
@@ -180,7 +182,9 @@ export default function MediaUpload({
         message: err?.message ?? "Ficheiro rejeitado.",
       });
     },
-    disabled: uploadState.status === "compressing" || uploadState.status === "uploading",
+    disabled:
+      uploadState.status === "compressing" ||
+      uploadState.status === "uploading",
     noClick: !!value,
     noDrag: !!value,
   });
@@ -257,16 +261,22 @@ export default function MediaUpload({
   }
 
   // ── Render: uploading / compressing ──
-  if (uploadState.status === "compressing" || uploadState.status === "uploading") {
+  if (
+    uploadState.status === "compressing" ||
+    uploadState.status === "uploading"
+  ) {
     const isCompressing = uploadState.status === "compressing";
-    const progress = uploadState.status === "uploading" ? uploadState.progress : 0;
+    const progress =
+      uploadState.status === "uploading" ? uploadState.progress : 0;
 
     return (
       <div className={cn("rounded-lg border bg-muted/30 p-6", className)}>
         <div className="flex flex-col items-center gap-3">
           <Loader2Icon className="h-8 w-8 text-primary animate-spin" />
           <p className="text-sm font-medium">
-            {isCompressing ? "A comprimir imagem..." : `A carregar... ${progress}%`}
+            {isCompressing
+              ? "A comprimir imagem..."
+              : `A carregar... ${progress}%`}
           </p>
           {!isCompressing && (
             <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
@@ -315,7 +325,8 @@ export default function MediaUpload({
               isDragActive
                 ? "border-primary bg-primary/5"
                 : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30",
-              uploadState.status === "error" && "border-destructive/50 bg-destructive/5",
+              uploadState.status === "error" &&
+                "border-destructive/50 bg-destructive/5",
             )}
           >
             <input {...getInputProps()} />

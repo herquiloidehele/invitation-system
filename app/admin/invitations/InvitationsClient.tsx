@@ -122,7 +122,9 @@ export function InvitationsClient({
         router.refresh();
       } catch (err) {
         toast.error(
-          err instanceof Error ? err.message : "Erro ao eliminar convite. Tente novamente.",
+          err instanceof Error
+            ? err.message
+            : "Erro ao eliminar convite. Tente novamente.",
         );
       } finally {
         setDeletingId(null);
@@ -179,9 +181,7 @@ export function InvitationsClient({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalRsvps}</div>
-            <p className="text-xs text-muted-foreground">
-              Respostas recebidas
-            </p>
+            <p className="text-xs text-muted-foreground">Respostas recebidas</p>
           </CardContent>
         </Card>
 
@@ -194,9 +194,7 @@ export function InvitationsClient({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{confirmationRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              Média por convite
-            </p>
+            <p className="text-xs text-muted-foreground">Média por convite</p>
           </CardContent>
         </Card>
       </div>
@@ -231,7 +229,10 @@ export function InvitationsClient({
                 className="pl-9"
               />
             </div>
-            <Select value={templateFilter} onValueChange={(v) => setTemplateFilter(v ?? "all")}>
+            <Select
+              value={templateFilter}
+              onValueChange={(v) => setTemplateFilter(v ?? "all")}
+            >
               <SelectTrigger className="w-full sm:w-52">
                 <SelectValue placeholder="Todos os modelos" />
               </SelectTrigger>
@@ -350,7 +351,10 @@ export function InvitationsClient({
                               href={`/${inv.slug}`}
                               target="_blank"
                               className={cn(
-                                buttonVariants({ variant: "ghost", size: "icon" }),
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "icon",
+                                }),
                                 "size-8 text-muted-foreground",
                               )}
                               title="Ver convite"
@@ -362,7 +366,10 @@ export function InvitationsClient({
                             <Link
                               href={`/admin/rsvps?invitation=${inv.slug}`}
                               className={cn(
-                                buttonVariants({ variant: "ghost", size: "icon" }),
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "icon",
+                                }),
                                 "size-8 text-muted-foreground",
                               )}
                               title="Ver confirmações"
@@ -374,7 +381,10 @@ export function InvitationsClient({
                             <Link
                               href={`/admin/invitations/${inv.id}/edit`}
                               className={cn(
-                                buttonVariants({ variant: "ghost", size: "icon" }),
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "icon",
+                                }),
                                 "size-8 text-muted-foreground",
                               )}
                               title="Editar convite"
@@ -410,7 +420,9 @@ export function InvitationsClient({
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogCancel>
+                                    Cancelar
+                                  </AlertDialogCancel>
                                   <AlertDialogAction
                                     variant="destructive"
                                     onClick={() =>

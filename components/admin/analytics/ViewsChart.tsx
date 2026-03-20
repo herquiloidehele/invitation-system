@@ -67,25 +67,70 @@ export function ViewsChart({ data }: ViewsChartProps) {
         <CardDescription>Visualizações e confirmações diárias</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="aspect-auto h-[220px] w-full">
-          <AreaChart data={formatted} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[220px] w-full"
+        >
+          <AreaChart
+            data={formatted}
+            margin={{ top: 10, right: 12, left: -10, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="fillViews" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.7} />
-                <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.05} />
+                <stop
+                  offset="5%"
+                  stopColor="var(--chart-1)"
+                  stopOpacity={0.7}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--chart-1)"
+                  stopOpacity={0.05}
+                />
               </linearGradient>
               <linearGradient id="fillRsvps" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.7} />
-                <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.05} />
+                <stop
+                  offset="5%"
+                  stopColor="var(--chart-2)"
+                  stopOpacity={0.7}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--chart-2)"
+                  stopOpacity={0.05}
+                />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} className="text-xs" />
-            <YAxis tickLine={false} axisLine={false} tickMargin={4} className="text-xs" />
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              className="text-xs"
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={4}
+              className="text-xs"
+            />
             <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Area dataKey="views" type="natural" fill="url(#fillViews)" stroke="var(--chart-1)" strokeWidth={2} />
-            <Area dataKey="rsvps" type="natural" fill="url(#fillRsvps)" stroke="var(--chart-2)" strokeWidth={2} />
+            <Area
+              dataKey="views"
+              type="natural"
+              fill="url(#fillViews)"
+              stroke="var(--chart-1)"
+              strokeWidth={2}
+            />
+            <Area
+              dataKey="rsvps"
+              type="natural"
+              fill="url(#fillRsvps)"
+              stroke="var(--chart-2)"
+              strokeWidth={2}
+            />
           </AreaChart>
         </ChartContainer>
       </CardContent>

@@ -10,10 +10,14 @@ interface PageProps {
 function getRangeStart(range: string): Date | null {
   const now = new Date();
   switch (range) {
-    case "7d": return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    case "30d": return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    case "90d": return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-    default: return null;
+    case "7d":
+      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    case "30d":
+      return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    case "90d":
+      return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    default:
+      return null;
   }
 }
 
@@ -62,12 +66,23 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
     const uniqueVisitors = new Set(
       events.filter((e) => e.type === "page_view").map((e) => e.visitorId),
     ).size;
-    const envelopeOpens = events.filter((e) => e.type === "envelope_open").length;
-    const openRate = totalViews > 0 ? ((envelopeOpens / totalViews) * 100).toFixed(1) : "0";
+    const envelopeOpens = events.filter(
+      (e) => e.type === "envelope_open",
+    ).length;
+    const openRate =
+      totalViews > 0 ? ((envelopeOpens / totalViews) * 100).toFixed(1) : "0";
     const rsvpCount = inv.rsvpResponses.length;
-    const conversionRate = totalViews > 0 ? ((rsvpCount / totalViews) * 100).toFixed(1) : "0";
+    const conversionRate =
+      totalViews > 0 ? ((rsvpCount / totalViews) * 100).toFixed(1) : "0";
 
-    const interactionTypes = ["maps_click", "waze_click", "gift_click", "audio_play", "calendar_click", "rsvp_submit"];
+    const interactionTypes = [
+      "maps_click",
+      "waze_click",
+      "gift_click",
+      "audio_play",
+      "calendar_click",
+      "rsvp_submit",
+    ];
     const eventBreakdown: Record<string, number> = {};
     for (const t of interactionTypes) {
       eventBreakdown[t] = events.filter((e) => e.type === t).length;
@@ -90,10 +105,17 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
       const day = toDateStr(new Date(r.submittedAt));
       rsvpsByDay[day] = (rsvpsByDay[day] ?? 0) + 1;
     }
-    const allDays = new Set([...Object.keys(viewsByDay), ...Object.keys(rsvpsByDay)]);
+    const allDays = new Set([
+      ...Object.keys(viewsByDay),
+      ...Object.keys(rsvpsByDay),
+    ]);
     const viewsOverTime = Array.from(allDays)
       .sort()
-      .map((date) => ({ date, views: viewsByDay[date] ?? 0, rsvps: rsvpsByDay[date] ?? 0 }));
+      .map((date) => ({
+        date,
+        views: viewsByDay[date] ?? 0,
+        rsvps: rsvpsByDay[date] ?? 0,
+      }));
 
     return {
       slug: inv.slug,

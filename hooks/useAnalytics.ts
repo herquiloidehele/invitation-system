@@ -12,7 +12,11 @@ export type AnalyticsEventType =
   | "calendar_click"
   | "rsvp_submit";
 
-function getOrCreate(storage: Storage, key: string, factory: () => string): string {
+function getOrCreate(
+  storage: Storage,
+  key: string,
+  factory: () => string,
+): string {
   try {
     const existing = storage.getItem(key);
     if (existing) return existing;
@@ -50,8 +54,16 @@ export function useAnalytics(slug: string) {
   const sessionIdRef = useRef<string>("");
 
   useEffect(() => {
-    visitorIdRef.current = getOrCreate(localStorage, "analytics_vid", generateId);
-    sessionIdRef.current = getOrCreate(sessionStorage, "analytics_sid", generateId);
+    visitorIdRef.current = getOrCreate(
+      localStorage,
+      "analytics_vid",
+      generateId,
+    );
+    sessionIdRef.current = getOrCreate(
+      sessionStorage,
+      "analytics_sid",
+      generateId,
+    );
   }, []);
 
   const trackEvent = useCallback(
@@ -64,11 +76,17 @@ export function useAnalytics(slug: string) {
           visitorId: visitorIdRef.current || generateId(),
           sessionId: sessionIdRef.current || generateId(),
           device: detectDevice(),
-          referrer: typeof document !== "undefined" ? document.referrer.slice(0, 200) : "",
+          referrer:
+            typeof document !== "undefined"
+              ? document.referrer.slice(0, 200)
+              : "",
         });
         // Use sendBeacon when available (survives page unload), fallback to fetch
         if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-          navigator.sendBeacon("/api/events", new Blob([body], { type: "application/json" }));
+          navigator.sendBeacon(
+            "/api/events",
+            new Blob([body], { type: "application/json" }),
+          );
         } else {
           fetch("/api/events", {
             method: "POST",

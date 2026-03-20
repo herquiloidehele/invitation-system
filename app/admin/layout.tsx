@@ -2,10 +2,7 @@ import { cookies } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppSidebar } from "@/components/admin/app-sidebar";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { ThemeProvider } from "@/components/admin/theme-provider";
 

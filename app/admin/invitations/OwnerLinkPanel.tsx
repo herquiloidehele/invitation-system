@@ -30,7 +30,8 @@ export function OwnerLinkPanel({ ownerUrl }: OwnerLinkPanelProps) {
         <div>
           <p className="text-sm font-medium">Link do casal</p>
           <p className="text-xs text-muted-foreground">
-            Partilhe este link com o casal para ver as confirmações — sem login necessário.
+            Partilhe este link com o casal para ver as confirmações — sem login
+            necessário.
           </p>
         </div>
         <a

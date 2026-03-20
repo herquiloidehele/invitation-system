@@ -169,7 +169,8 @@ export function RsvpsClient({
                   <SelectItem value="all">Todos os convites</SelectItem>
                   {invitations.map((inv) => (
                     <SelectItem key={inv.slug} value={inv.slug}>
-                      {inv.couple.bride} &amp; {inv.couple.groom} ({inv._count.rsvpResponses})
+                      {inv.couple.bride} &amp; {inv.couple.groom} (
+                      {inv._count.rsvpResponses})
                     </SelectItem>
                   ))}
                 </SelectContent>

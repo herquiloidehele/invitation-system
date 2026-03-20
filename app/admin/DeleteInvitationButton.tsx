@@ -52,9 +52,7 @@ export default function DeleteInvitationButton({
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        render={
-          <Button variant="destructive" size="sm" disabled={deleting} />
-        }
+        render={<Button variant="destructive" size="sm" disabled={deleting} />}
       >
         Eliminar
       </AlertDialogTrigger>

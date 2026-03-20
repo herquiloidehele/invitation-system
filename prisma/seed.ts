@@ -66,7 +66,9 @@ async function main() {
       },
     });
 
-    console.log(`  ✓ ${data.slug} (${data.couple.bride} & ${data.couple.groom})`);
+    console.log(
+      `  ✓ ${data.slug} (${data.couple.bride} & ${data.couple.groom})`,
+    );
   }
 
   // Migrate existing RSVPs if they exist
