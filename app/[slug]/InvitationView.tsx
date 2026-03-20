@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
@@ -23,6 +23,20 @@ export default function InvitationView({
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { trackEvent } = useAnalytics(invitation.slug);
+
+  // Merge per-invitation envelope overrides on top of the theme defaults
+  const mergedTheme = useMemo<TemplateTheme>(() => {
+    const overrides = invitation.envelope;
+    if (!overrides) return theme;
+    return {
+      ...theme,
+      envelope: {
+        base: overrides.base || theme.envelope.base,
+        topFlap: overrides.topFlap || theme.envelope.topFlap,
+        bottomFlap: overrides.bottomFlap || theme.envelope.bottomFlap,
+      },
+    };
+  }, [theme, invitation.envelope]);
 
   // Track page view on mount (deduplicated server-side per session)
   useEffect(() => {
@@ -123,7 +137,7 @@ export default function InvitationView({
           {coverVisible && (
             <EnvelopeCover
               key="envelope-cover"
-              theme={theme}
+              theme={mergedTheme}
               onOpen={handleOpen}
               onAnimationComplete={handleAnimationComplete}
               monogram={invitation.couple.monogram}

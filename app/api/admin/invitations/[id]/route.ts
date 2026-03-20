@@ -95,6 +95,7 @@ export async function PUT(
         ...(body.heroImage !== undefined && { heroImage: body.heroImage }),
         ...(body.videoUrl !== undefined && { videoUrl: body.videoUrl }),
         ...(body.faqs !== undefined && { faqs: body.faqs }),
+        ...(body.envelope !== undefined && { envelope: body.envelope }),
       },
     });
 

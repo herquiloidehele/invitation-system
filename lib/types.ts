@@ -54,6 +54,15 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface EnvelopeConfig {
+  /** Override the envelope body fill color (hex). Falls back to theme default if empty. */
+  base?: string;
+  /** Override the top flap image URL. Falls back to theme default if empty. */
+  topFlap?: string;
+  /** Override the bottom flap image URL. Falls back to theme default if empty. */
+  bottomFlap?: string;
+}
+
 export interface InvitationData {
   slug: string;
   template: TemplateName;
@@ -72,6 +81,8 @@ export interface InvitationData {
   heroImage: string;
   videoUrl?: string;
   faqs?: FAQItem[];
+  /** Per-invitation envelope appearance overrides. Missing fields fall back to theme defaults. */
+  envelope?: EnvelopeConfig;
 }
 
 export interface TemplateTheme {

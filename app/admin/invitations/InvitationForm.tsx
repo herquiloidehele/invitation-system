@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import type { InvitationData, TemplateName } from "@/lib/types";
+import type { InvitationData, TemplateName, EnvelopeConfig } from "@/lib/types";
 import { themes } from "@/lib/themes";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,9 @@ import {
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
+import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
@@ -134,6 +136,7 @@ function getDefaultFormState(): InvitationData {
     heroImage: "",
     videoUrl: "",
     faqs: [],
+    envelope: {},
   };
 }
 
@@ -306,11 +309,30 @@ export default function InvitationForm({
     }));
   }, []);
 
-  // Current theme for preview
-  const currentTheme = useMemo(
-    () => themes[form.template] ?? themes["pink-floral"],
-    [form.template],
+  // Envelope overrides
+  const updateEnvelope = useCallback(
+    (field: keyof EnvelopeConfig, value: string) => {
+      setForm((prev) => ({
+        ...prev,
+        envelope: { ...prev.envelope, [field]: value },
+      }));
+    },
+    [],
   );
+
+  // Current theme for preview — merge per-invitation envelope overrides
+  const currentTheme = useMemo(() => {
+    const base = themes[form.template] ?? themes["pink-floral"];
+    const overrides = form.envelope ?? {};
+    return {
+      ...base,
+      envelope: {
+        base: overrides.base || base.envelope.base,
+        topFlap: overrides.topFlap || base.envelope.topFlap,
+        bottomFlap: overrides.bottomFlap || base.envelope.bottomFlap,
+      },
+    };
+  }, [form.template, form.envelope]);
 
   // Submit
   async function handleSubmit() {
@@ -429,6 +451,95 @@ export default function InvitationForm({
                         placeholder="maria-joao"
                       />
                     </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ── Envelope ── */}
+              <AccordionItem
+                value="envelope"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Envelope
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  {/* Base color */}
+                  <div className="space-y-1.5">
+                    <Label>Cor de fundo</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Deixe em branco para usar a cor padrão do modelo (
+                      {
+                        (themes[form.template] ?? themes["pink-floral"])
+                          .envelope.base
+                      }
+                      )
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={
+                          form.envelope?.base ||
+                          (themes[form.template] ?? themes["pink-floral"])
+                            .envelope.base
+                        }
+                        onChange={(e) => updateEnvelope("base", e.target.value)}
+                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                        title="Escolher cor"
+                      />
+                      <Input
+                        value={form.envelope?.base ?? ""}
+                        onChange={(e) => updateEnvelope("base", e.target.value)}
+                        placeholder={`Padrão: ${(themes[form.template] ?? themes["pink-floral"]).envelope.base}`}
+                        className="font-mono text-sm"
+                      />
+                      {form.envelope?.base && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() => updateEnvelope("base", "")}
+                        >
+                          Repor
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Top flap image */}
+                  <div className="space-y-1.5">
+                    <Label>Imagem da aba superior</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Imagem triangular que cobre a parte superior do envelope.
+                      Deixe em branco para usar a imagem padrão.
+                    </p>
+                    <MediaUpload
+                      value={form.envelope?.topFlap ?? ""}
+                      onUpload={(url) => updateEnvelope("topFlap", url)}
+                      onClear={() => updateEnvelope("topFlap", "")}
+                      kind="image"
+                      maxSizeMB={5}
+                    />
+                  </div>
+
+                  <Separator />
+
+                  {/* Bottom flap image */}
+                  <div className="space-y-1.5">
+                    <Label>Imagem da aba inferior</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Imagem que cobre a parte inferior do envelope. Deixe em
+                      branco para usar a imagem padrão.
+                    </p>
+                    <MediaUpload
+                      value={form.envelope?.bottomFlap ?? ""}
+                      onUpload={(url) => updateEnvelope("bottomFlap", url)}
+                      onClear={() => updateEnvelope("bottomFlap", "")}
+                      kind="image"
+                      maxSizeMB={5}
+                    />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -899,19 +1010,47 @@ export default function InvitationForm({
         </ScrollArea>
       </div>
 
-      {/* ──────────── Right: Live Preview (45%) ──────────── */}
-      <div className="w-[35%] min-w-[350px] border-l">
-        <div className="h-full flex flex-col">
-          <div className="px-4 py-2 border-b bg-muted/50 flex items-center justify-between">
-            <span className="text-sm font-medium text-muted-foreground">
-              Pré-visualização
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {themes[form.template]?.label ?? form.template}
+      {/* ──────────── Right: Live Preview (35%) ──────────── */}
+      <div className="w-[35%] min-w-[350px] border-l flex flex-col h-full">
+        <Tabs defaultValue="invite" className="flex flex-col h-full">
+          {/* Tab bar */}
+          <div className="px-4 pt-3 pb-0 border-b bg-muted/50 flex items-center justify-between gap-2 shrink-0">
+            <TabsList className="h-8">
+              <TabsTrigger value="envelope" className="text-xs px-3 h-7">
+                Envelope
+              </TabsTrigger>
+              <TabsTrigger value="invite" className="text-xs px-3 h-7">
+                Convite
+              </TabsTrigger>
+            </TabsList>
+            <span className="text-xs text-muted-foreground shrink-0">
+              {currentTheme.label}
             </span>
           </div>
-          <div className="flex-1 overflow-auto bg-neutral-100">
-            <div className="mx-auto origin-top w-full">
+
+          {/* ── Tab: Envelope preview ── */}
+          <TabsContent value="envelope" className="flex-1 overflow-hidden m-0">
+            <div className="h-full relative overflow-hidden bg-neutral-200 max-h-165">
+              {form.couple.bride && form.couple.groom ? (
+                <EnvelopeCover
+                  theme={currentTheme}
+                  onOpen={() => {}}
+                  monogram={form.couple.monogram}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
+                  Insira os nomes do casal para ver a pré-visualização
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* ── Tab: Invitation page preview ── */}
+          <TabsContent
+            value="invite"
+            className="flex-1 overflow-auto m-0 bg-neutral-100"
+          >
+            <div className="mx-auto origin-top w-full max-h-165 relative">
               {form.couple.bride && form.couple.groom ? (
                 <InvitationPage invitation={form} theme={currentTheme} />
               ) : (
@@ -920,8 +1059,8 @@ export default function InvitationForm({
                 </div>
               )}
             </div>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

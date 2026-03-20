@@ -137,41 +137,6 @@ export default function EnvelopeCover({
     >
       <EnvelopeBody color={theme.envelope.base} />
 
-      {/* Monogram + tap prompt — centered on the envelope face */}
-      {!opening && (
-        <motion.div
-          className="absolute inset-0 z-[5] flex flex-col items-center justify-center gap-3 pointer-events-none"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-        >
-          {monogram && (
-            <span
-              className="text-4xl font-light tracking-widest"
-              style={{
-                fontFamily: theme.displayFont,
-                color: theme.monogramColor,
-                textShadow: "0 2px 12px rgba(0,0,0,0.08)",
-              }}
-            >
-              {monogram}
-            </span>
-          )}
-          <motion.span
-            className="text-xs font-medium uppercase tracking-[0.2em]"
-            style={{
-              fontFamily: theme.uiFont,
-              color: theme.tapTextColor,
-              opacity: 0.7,
-            }}
-            animate={{ opacity: [0.5, 0.9, 0.5] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            Toque para abrir
-          </motion.span>
-        </motion.div>
-      )}
-
       {/* Shimmer highlight — diagonal sweep across envelope */}
       {!opening && (
         <motion.div
