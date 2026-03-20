@@ -364,10 +364,14 @@ export default function InvitationForm({
         throw new Error(data.error ?? "Falha ao guardar");
       }
 
+      const data = await res.json();
+
       toast.success(
         mode === "create" ? "Convite criado!" : "Convite atualizado!",
       );
-      router.push("/admin");
+      if (mode === "create") {
+        router.push(`/admin/invitations/${data.id}/edit`);
+      }
       router.refresh();
     } catch (err) {
       toast.error(
