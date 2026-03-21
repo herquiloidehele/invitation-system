@@ -374,6 +374,7 @@ export default function InvitationPage({
 
   const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 46;
 
+  console.log({ invitation });
   return (
     <div
       style={{
@@ -682,7 +683,7 @@ export default function InvitationPage({
       {/* 3. Date Card — Save the Date (style varies per invitation)        */}
       {/* ================================================================= */}
       <AnimatedSection
-        className="px-6 pb-10"
+        className={`px-6 pb-10 ${invitation.videoUrl ? "pt-16" : ""}`}
         variants={scaleIn}
         isPreview={isPreview}
       >
