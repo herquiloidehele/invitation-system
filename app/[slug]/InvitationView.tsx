@@ -110,7 +110,7 @@ export default function InvitationView({
       {/* Inner column — capped at 500 px, acts as the positioning context
           for the envelope cover (absolute inset-0 inside it). */}
       <div
-        className="relative min-h-dvh w-full"
+        className="relative min-h-dvh w-full overflow-hidden"
         style={{ maxWidth: "500px", backgroundColor: theme.bg }}
       >
         {/* Invitation content — rendered behind the cover, fades in immediately */}
