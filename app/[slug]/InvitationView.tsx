@@ -73,6 +73,28 @@ export default function InvitationView({
     }
   }, [invitation.audio, trackEvent]);
 
+  /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
+  useEffect(() => {
+    let wasPlayingBeforeHide = false;
+
+    const handleVisibilityChange = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (document.hidden) {
+        wasPlayingBeforeHide = !audio.paused;
+        if (wasPlayingBeforeHide) audio.pause();
+      } else {
+        if (wasPlayingBeforeHide) audio.play().catch(() => {});
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
   /** Stop music and clean up when leaving the invitation page. */
   useEffect(() => {
     return () => {
