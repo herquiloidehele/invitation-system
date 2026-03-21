@@ -4,6 +4,14 @@ export type TemplateName =
   | "boho-chic"
   | "midnight-elegance";
 
+/** Visual style for the Save the Date section in the invitation page */
+export type SaveDateStyle =
+  | "classic"
+  | "countdown"
+  | "quad-cards"
+  | "cinematic"
+  | "minimal-line";
+
 export interface CoupleInfo {
   bride: string;
   groom: string;
@@ -103,6 +111,8 @@ export interface InvitationData {
   guestGuide?: GuestGuide;
   /** Per-invitation envelope appearance overrides. Missing fields fall back to theme defaults. */
   envelope?: EnvelopeConfig;
+  /** Visual style for the Save the Date section. Defaults to "classic". */
+  saveDateStyle?: SaveDateStyle;
 }
 
 export interface TemplateTheme {

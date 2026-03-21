@@ -1,5 +1,5 @@
 import { prisma } from "./db";
-import type { InvitationData, TemplateName } from "./types";
+import type { InvitationData, TemplateName, SaveDateStyle } from "./types";
 
 /**
  * Convert a Prisma Invitation row (with Json fields) into the
@@ -22,6 +22,7 @@ function toInvitationData(row: {
   faqs: unknown;
   guestGuide: unknown;
   envelope: unknown;
+  saveDateStyle: string | null;
 }): InvitationData {
   return {
     slug: row.slug,
@@ -40,6 +41,7 @@ function toInvitationData(row: {
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
     guestGuide: (row.guestGuide as InvitationData["guestGuide"]) ?? undefined,
     envelope: row.envelope as InvitationData["envelope"],
+    saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
   };
 }
 

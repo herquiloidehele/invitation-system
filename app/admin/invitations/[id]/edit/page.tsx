@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
-import type { InvitationData, TemplateName } from "@/lib/types";
+import type { InvitationData, TemplateName, SaveDateStyle } from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +45,7 @@ export default async function EditInvitationPage({
       (row.envelope as unknown as InvitationData["envelope"]) ?? undefined,
     guestGuide:
       (row.guestGuide as unknown as InvitationData["guestGuide"]) ?? undefined,
+    saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
   };
 
   return (

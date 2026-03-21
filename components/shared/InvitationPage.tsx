@@ -11,6 +11,7 @@ import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
 import CalendarButton from "./CalendarButton";
 import GuestGuideSection from "./GuestGuideSection";
+import SaveTheDateSection from "./SaveTheDateSection";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
@@ -678,134 +679,19 @@ export default function InvitationPage({
       )}
 
       {/* ================================================================= */}
-      {/* 3. Date Card — oversized, glassmorphism                           */}
+      {/* 3. Date Card — Save the Date (style varies per invitation)        */}
       {/* ================================================================= */}
       <AnimatedSection
         className="px-6 pb-10"
         variants={scaleIn}
         isPreview={isPreview}
       >
-        <div
-          className="relative flex flex-col items-center text-center"
-          style={{
-            background: theme.cardBg,
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderRadius: 20,
-            padding: "36px 28px",
-            boxShadow:
-              "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-            border: `1px solid ${theme.cardBorder}`,
-          }}
-        >
-          {/* Save the date label */}
-          <span
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 10,
-              fontWeight: 400,
-              letterSpacing: 5,
-              textTransform: "uppercase" as const,
-              color: theme.accent,
-            }}
-          >
-            Save the Date
-          </span>
-
-          {/* Day — oversized */}
-          <span
-            className="mt-3"
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 96,
-              fontWeight: 300,
-              lineHeight: 1,
-              color: theme.textPrimary,
-              letterSpacing: -2,
-            }}
-          >
-            {invitation.date.day}
-          </span>
-
-          {/* Month */}
-          <span
-            className="mt-1"
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 13,
-              fontWeight: 500,
-              letterSpacing: 8,
-              textTransform: "uppercase" as const,
-              color: theme.textSecondary,
-            }}
-          >
-            {invitation.date.month}
-          </span>
-
-          {/* Year */}
-          <span
-            className="mt-1"
-            style={{
-              fontFamily: theme.bodyFont,
-              fontSize: 20,
-              fontWeight: 300,
-              color: theme.textMuted,
-            }}
-          >
-            {invitation.date.year}
-          </span>
-
-          {/* Animated accent line */}
-          <motion.div
-            className="my-5"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.3, ease: EASE }}
-            style={{
-              width: 80,
-              height: 1,
-              background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
-              opacity: 0.35,
-            }}
-          />
-
-          {/* Day of week + time */}
-          <span
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 13,
-              fontWeight: 300,
-              letterSpacing: 1,
-              color: theme.textSecondary,
-            }}
-          >
-            {invitation.date.dayOfWeek} &middot; {invitation.date.time}
-          </span>
-
-          {/* Add to calendar */}
-          <CalendarButton
-            date={invitation.date}
-            location={invitation.location}
-            couple={invitation.couple}
-            onCalendarClick={handleCalendarClick}
-            className="mt-5 flex items-center justify-center gap-2 px-5 py-2 transition-all"
-          >
-            <span
-              style={{
-                fontFamily: theme.uiFont,
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: 1.5,
-                textTransform: "uppercase" as const,
-                color: theme.accent,
-                opacity: 0.75,
-              }}
-            >
-              + Adicionar ao Calendário
-            </span>
-          </CalendarButton>
-        </div>
+        <SaveTheDateSection
+          invitation={invitation}
+          theme={theme}
+          onCalendarClick={handleCalendarClick}
+          isPreview={isPreview}
+        />
       </AnimatedSection>
 
       <SectionDivider theme={theme} />

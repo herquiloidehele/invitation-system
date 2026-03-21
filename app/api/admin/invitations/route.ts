@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
         faqs: body.faqs ?? null,
         guestGuide: body.guestGuide ?? null,
         envelope: body.envelope ?? null,
+        saveDateStyle: body.saveDateStyle ?? null,
       },
     });
 

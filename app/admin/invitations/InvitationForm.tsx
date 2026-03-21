@@ -8,8 +8,8 @@ import type {
   InvitationData,
   TemplateName,
   EnvelopeConfig,
-  GuestGuide,
   GuestGuideItem,
+  SaveDateStyle,
 } from "@/lib/types";
 import { themes } from "@/lib/themes";
 
@@ -111,6 +111,165 @@ const TEMPLATE_OPTIONS: TemplateName[] = [
   "midnight-elegance",
 ];
 
+const SAVE_DATE_STYLE_OPTIONS: {
+  value: SaveDateStyle;
+  label: string;
+  description: string;
+  preview: React.ReactNode;
+}[] = [
+  {
+    value: "classic",
+    label: "Clássico",
+    description: "Cartão único com a data em destaque",
+    preview: (
+      <div className="flex flex-col items-center gap-0.5 py-1">
+        <div className="text-[9px] tracking-widest opacity-60 uppercase">
+          Save the Date
+        </div>
+        <div
+          className="text-2xl font-light leading-none"
+          style={{ fontFamily: "'Cormorant Garamond', serif" }}
+        >
+          20
+        </div>
+        <div className="text-[8px] tracking-[0.2em] uppercase opacity-70">
+          Setembro
+        </div>
+        <div className="text-xs opacity-50">2025</div>
+      </div>
+    ),
+  },
+  {
+    value: "countdown",
+    label: "Contagem Regressiva",
+    description: "Contador ao vivo em tempo real",
+    preview: (
+      <div className="flex flex-col items-center gap-1 py-1">
+        <div className="text-[9px] tracking-widest opacity-60 uppercase">
+          Save the Date
+        </div>
+        <div className="flex items-center gap-1 mt-0.5">
+          {["32", "14", "07", "42"].map((n, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <div
+                className="bg-black/5 rounded px-1 py-0.5 text-sm font-light leading-none"
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              >
+                {n}
+              </div>
+              <div className="text-[6px] uppercase tracking-wider opacity-50 mt-0.5">
+                {["D", "H", "M", "S"][i]}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    value: "quad-cards",
+    label: "4 Cartões",
+    description: "Grade 2×2 com dia, mês, ano e dia da semana",
+    preview: (
+      <div className="flex flex-col items-center gap-1 py-1">
+        <div className="text-[9px] tracking-widest opacity-60 uppercase">
+          Save the Date
+        </div>
+        <div className="grid grid-cols-2 gap-1 mt-0.5">
+          {[
+            ["20", "Dia"],
+            ["Set", "Mês"],
+            ["2025", "Ano"],
+            ["Sáb", "Semana"],
+          ].map(([v, l], i) => (
+            <div
+              key={i}
+              className="bg-black/5 rounded flex flex-col items-center px-2 py-1"
+            >
+              <span
+                className="text-xs font-light leading-none"
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              >
+                {v}
+              </span>
+              <span className="text-[6px] uppercase tracking-wider opacity-50 mt-0.5">
+                {l}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    value: "cinematic",
+    label: "Cinemático",
+    description: "Monograma em script com faixa horizontal",
+    preview: (
+      <div className="flex flex-col w-full overflow-hidden rounded py-1">
+        <div className="flex flex-col items-center bg-black/5 px-2 py-1.5">
+          <div className="text-[9px] tracking-widest opacity-60 uppercase">
+            Save the Date
+          </div>
+          <div
+            className="text-base leading-none opacity-80 mt-0.5"
+            style={{ fontFamily: "'Great Vibes', cursive" }}
+          >
+            Sofia &amp; Miguel
+          </div>
+        </div>
+        <div className="flex items-center justify-center gap-2 bg-black/[0.03] px-2 py-1 border-t border-black/5">
+          <span
+            className="text-sm font-light"
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          >
+            20
+          </span>
+          <span className="opacity-20 text-xs">|</span>
+          <div className="flex flex-col items-center">
+            <span className="text-[7px] uppercase tracking-wider">
+              Setembro
+            </span>
+            <span className="text-[6px] opacity-50">2025</span>
+          </div>
+          <span className="opacity-20 text-xs">|</span>
+          <span className="text-[7px] opacity-70">Sábado · 17:00</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    value: "minimal-line",
+    label: "Linha Minimalista",
+    description: "Todos os dados numa linha elegante sem fundo",
+    preview: (
+      <div className="flex flex-col items-center gap-1.5 py-2">
+        <div className="text-[9px] tracking-widest opacity-60 uppercase">
+          Save the Date
+        </div>
+        <div className="flex items-baseline gap-1.5">
+          <span
+            className="text-xl font-light leading-none"
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          >
+            20
+          </span>
+          <span className="opacity-30 text-sm">·</span>
+          <span className="text-[8px] uppercase tracking-[0.15em] opacity-70">
+            Set
+          </span>
+          <span className="opacity-30 text-sm">·</span>
+          <span className="text-[10px] font-light opacity-50">2025</span>
+        </div>
+        <div className="h-px w-12 bg-current opacity-20" />
+        <span className="text-[7px] uppercase tracking-[0.2em] opacity-50">
+          Sábado · 17:00
+        </span>
+      </div>
+    ),
+  },
+];
+
 function getDefaultFormState(): InvitationData {
   return {
     slug: "",
@@ -145,6 +304,7 @@ function getDefaultFormState(): InvitationData {
     faqs: [],
     guestGuide: { enabled: false, items: [] },
     envelope: {},
+    saveDateStyle: "classic",
   };
 }
 
@@ -737,6 +897,75 @@ export default function InvitationForm({
                     A data de exibição, dia da semana, dia, mês e ano são
                     derivados automaticamente ao selecionar uma data.
                   </p>
+
+                  {/* ── Save the Date style picker ── */}
+                  <div className="space-y-2 pt-1">
+                    <Label className="text-sm font-medium">
+                      Estilo do Save the Date
+                    </Label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {SAVE_DATE_STYLE_OPTIONS.map((opt) => {
+                        const isSelected =
+                          (form.saveDateStyle ?? "classic") === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => update("saveDateStyle", opt.value)}
+                            className="w-full text-left rounded-lg border transition-all duration-150 overflow-hidden"
+                            style={{
+                              borderColor: isSelected
+                                ? "hsl(var(--primary))"
+                                : "hsl(var(--border))",
+                              boxShadow: isSelected
+                                ? "0 0 0 2px hsl(var(--primary) / 0.15)"
+                                : "none",
+                              background: isSelected
+                                ? "hsl(var(--primary) / 0.04)"
+                                : "transparent",
+                            }}
+                          >
+                            <div className="flex items-stretch gap-0">
+                              {/* Mini preview pane */}
+                              <div
+                                className="flex items-center justify-center shrink-0 border-r"
+                                style={{
+                                  width: 120,
+                                  minHeight: 72,
+                                  borderColor: isSelected
+                                    ? "hsl(var(--primary) / 0.2)"
+                                    : "hsl(var(--border))",
+                                  background: isSelected
+                                    ? "hsl(var(--primary) / 0.06)"
+                                    : "hsl(var(--muted) / 0.5)",
+                                  color: "hsl(var(--foreground))",
+                                  fontSize: 12,
+                                }}
+                              >
+                                {opt.preview}
+                              </div>
+                              {/* Text info */}
+                              <div className="flex flex-col justify-center px-3 py-2 gap-0.5 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium leading-none">
+                                    {opt.label}
+                                  </span>
+                                  {isSelected && (
+                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary leading-none">
+                                      Selecionado
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-xs text-muted-foreground mt-1">
+                                  {opt.description}
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
 

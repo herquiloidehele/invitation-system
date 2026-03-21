@@ -97,6 +97,9 @@ export async function PUT(
         ...(body.faqs !== undefined && { faqs: body.faqs }),
         ...(body.guestGuide !== undefined && { guestGuide: body.guestGuide }),
         ...(body.envelope !== undefined && { envelope: body.envelope }),
+        ...(body.saveDateStyle !== undefined && {
+          saveDateStyle: body.saveDateStyle,
+        }),
       },
     });
 

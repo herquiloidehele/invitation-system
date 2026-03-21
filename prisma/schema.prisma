@@ -25,6 +25,7 @@ model Invitation {
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
   envelope     Json?    // EnvelopeConfig { base?, topFlap?, bottomFlap? }
+  saveDateStyle String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line"
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
