@@ -25,7 +25,8 @@ model Invitation {
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
   envelope     Json?    // EnvelopeConfig { base?, topFlap?, bottomFlap? }
-  saveDateStyle String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line"
+  saveDateStyle  String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line"
+  cinematicImageUrl String? // background image for the cinematic Save the Date style
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

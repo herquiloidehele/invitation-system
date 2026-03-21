@@ -101,7 +101,7 @@ function deriveDateFields(iso: string) {
 }
 
 // ---------------------------------------------------------------------------
-// Default form state
+// Constants
 // ---------------------------------------------------------------------------
 
 const TEMPLATE_OPTIONS: TemplateName[] = [
@@ -204,7 +204,7 @@ const SAVE_DATE_STYLE_OPTIONS: {
   {
     value: "cinematic",
     label: "Cinemático",
-    description: "Monograma em script com faixa horizontal",
+    description: "Fotografia em destaque com faixa de data em baixo",
     preview: (
       <div className="flex flex-col w-full overflow-hidden rounded py-1">
         <div className="flex flex-col items-center bg-black/5 px-2 py-1.5">
@@ -270,6 +270,10 @@ const SAVE_DATE_STYLE_OPTIONS: {
   },
 ];
 
+// ---------------------------------------------------------------------------
+// Default form state
+// ---------------------------------------------------------------------------
+
 function getDefaultFormState(): InvitationData {
   return {
     slug: "",
@@ -305,6 +309,7 @@ function getDefaultFormState(): InvitationData {
     guestGuide: { enabled: false, items: [] },
     envelope: {},
     saveDateStyle: "classic",
+    cinematicImageUrl: "",
   };
 }
 
@@ -966,6 +971,27 @@ export default function InvitationForm({
                       })}
                     </div>
                   </div>
+
+                  {/* ── Cinematic image upload — shown only when cinematic is selected ── */}
+                  {(form.saveDateStyle ?? "classic") === "cinematic" && (
+                    <div className="space-y-2 pt-1 rounded-lg border border-dashed border-border p-3">
+                      <Label className="text-sm font-medium">
+                        Imagem de Fundo (Cinemático)
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Fotografia para o topo do cartão cinemático. Se não
+                        carregar uma imagem, será usada uma foto de casamento
+                        padrão.
+                      </p>
+                      <MediaUpload
+                        kind="image"
+                        maxSizeMB={8}
+                        value={form.cinematicImageUrl || undefined}
+                        onUpload={(url) => update("cinematicImageUrl", url)}
+                        onClear={() => update("cinematicImageUrl", "")}
+                      />
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
 
@@ -1326,7 +1352,7 @@ export default function InvitationForm({
       </div>
 
       {/* ──────────── Right: Live Preview (35%) ──────────── */}
-      <div className="w-[35%] min-w-[350px] border-l flex flex-col h-full">
+      <div className="w-[35%] min-w-[380px] border-l flex flex-col h-full">
         <Tabs defaultValue="invite" className="flex flex-col h-full">
           {/* Tab bar */}
           <div className="px-4 pt-3 pb-0 border-b bg-muted/50 flex items-center justify-between gap-2 shrink-0">

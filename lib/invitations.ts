@@ -23,6 +23,7 @@ function toInvitationData(row: {
   guestGuide: unknown;
   envelope: unknown;
   saveDateStyle: string | null;
+  cinematicImageUrl: string | null;
 }): InvitationData {
   return {
     slug: row.slug,
@@ -42,6 +43,7 @@ function toInvitationData(row: {
     guestGuide: (row.guestGuide as InvitationData["guestGuide"]) ?? undefined,
     envelope: row.envelope as InvitationData["envelope"],
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
+    cinematicImageUrl: row.cinematicImageUrl ?? undefined,
   };
 }
 

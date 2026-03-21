@@ -113,6 +113,8 @@ export interface InvitationData {
   envelope?: EnvelopeConfig;
   /** Visual style for the Save the Date section. Defaults to "classic". */
   saveDateStyle?: SaveDateStyle;
+  /** Background image for the "cinematic" Save the Date style. Falls back to a default Unsplash photo if empty. */
+  cinematicImageUrl?: string;
 }
 
 export interface TemplateTheme {

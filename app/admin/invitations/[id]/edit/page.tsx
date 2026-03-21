@@ -46,6 +46,7 @@ export default async function EditInvitationPage({
     guestGuide:
       (row.guestGuide as unknown as InvitationData["guestGuide"]) ?? undefined,
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
+    cinematicImageUrl: row.cinematicImageUrl ?? undefined,
   };
 
   return (

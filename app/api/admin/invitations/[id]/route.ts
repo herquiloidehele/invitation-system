@@ -100,6 +100,9 @@ export async function PUT(
         ...(body.saveDateStyle !== undefined && {
           saveDateStyle: body.saveDateStyle,
         }),
+        ...(body.cinematicImageUrl !== undefined && {
+          cinematicImageUrl: body.cinematicImageUrl,
+        }),
       },
     });
 

@@ -163,4 +163,5 @@ export const MOCK_INVITATION: InvitationData = {
   },
 
   saveDateStyle: "classic",
+  cinematicImageUrl: undefined,
 };

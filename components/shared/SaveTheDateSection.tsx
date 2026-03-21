@@ -619,8 +619,11 @@ function SaveTheDateQuadCards({
 }
 
 // ---------------------------------------------------------------------------
-// 4. Cinematic Banner — full-width frosted strip with script monogram
+// 4. Cinematic Banner — full-bleed image top half + frosted date ribbon
 // ---------------------------------------------------------------------------
+
+const CINEMATIC_DEFAULT_IMAGE =
+  "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&fit=crop";
 
 function SaveTheDateCinematic({
   invitation,
@@ -628,6 +631,8 @@ function SaveTheDateCinematic({
   onCalendarClick,
 }: SaveTheDateProps) {
   const scriptFont = theme.scriptFont ?? theme.displayFont;
+  const bgImage =
+    invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
 
   return (
     <div
@@ -635,21 +640,40 @@ function SaveTheDateCinematic({
       style={{
         borderRadius: 20,
         border: `1px solid ${theme.cardBorder}`,
-        boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06)",
+        boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.08)",
       }}
     >
-      {/* Top half — monogram on gradient background */}
+      {/* Top half — full-bleed photo with overlay */}
       <div
-        className="w-full flex flex-col items-center justify-center"
-        style={{
-          background: `linear-gradient(160deg, ${theme.primary}22 0%, ${theme.accent}18 50%, ${theme.secondary}22 100%)`,
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          padding: "36px 24px 28px",
-          position: "relative",
-        }}
+        className="relative w-full flex flex-col items-center justify-end overflow-hidden"
+        style={{ minHeight: 220 }}
       >
-        {/* Decorative top bar */}
+        {/* Background image */}
+        <motion.div
+          initial={{ scale: 1.06, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.4, ease: EASE }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+
+        {/* Dark gradient overlay — heavier at bottom for text legibility */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.72) 100%)",
+          }}
+        />
+
+        {/* Thin accent bar at the very top */}
         <motion.div
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
@@ -662,64 +686,83 @@ function SaveTheDateCinematic({
             right: 0,
             height: 2,
             background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
-            opacity: 0.5,
+            opacity: 0.7,
           }}
         />
 
-        <SaveLabel theme={theme} />
-
-        {/* Script monogram */}
-        <motion.span
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.2, ease: EASE }}
-          className="mt-4"
-          style={{
-            fontFamily: scriptFont,
-            fontSize: 64,
-            fontWeight: 400,
-            lineHeight: 1.1,
-            color: theme.textPrimary,
-            letterSpacing: 2,
-          }}
+        {/* Content sits above the overlay */}
+        <div
+          className="relative z-10 flex flex-col items-center w-full"
+          style={{ padding: "28px 24px 28px" }}
         >
-          {invitation.couple.bride} &amp; {invitation.couple.groom}
-        </motion.span>
+          {/* "Save the Date" label — white on dark image */}
+          <span
+            style={{
+              fontFamily: theme.uiFont,
+              fontSize: 10,
+              fontWeight: 400,
+              letterSpacing: 5,
+              textTransform: "uppercase" as const,
+              color: "rgba(255,255,255,0.75)",
+            }}
+          >
+            Save the Date
+          </span>
 
-        {/* Decorative bottom line */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.4, ease: EASE }}
-          className="mt-5"
-          style={{
-            width: 120,
-            height: 1,
-            background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
-            opacity: 0.4,
-          }}
-        />
+          {/* Script couple names */}
+          <motion.span
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.25, ease: EASE }}
+            className="mt-3 text-center"
+            style={{
+              fontFamily: scriptFont,
+              fontSize: 52,
+              fontWeight: 400,
+              lineHeight: 1.15,
+              color: "rgba(255,255,255,0.95)",
+              textShadow: "0 2px 24px rgba(0,0,0,0.4)",
+              letterSpacing: 1,
+            }}
+          >
+            {invitation.couple.bride} &amp; {invitation.couple.groom}
+          </motion.span>
+
+          {/* Thin accent line */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.45, ease: EASE }}
+            className="mt-4"
+            style={{
+              width: 80,
+              height: 1,
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)",
+            }}
+          />
+        </div>
       </div>
 
-      {/* Bottom ribbon — horizontal date bar */}
+      {/* Bottom ribbon — frosted glass date bar */}
       <div
         className="w-full"
         style={{
           background: theme.cardBg,
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
           borderTop: `1px solid ${theme.cardBorder}`,
           padding: "20px 24px",
         }}
       >
         {/* Horizontal date ribbon */}
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-4">
           <span
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 36,
+              fontSize: 40,
               fontWeight: 300,
               lineHeight: 1,
               color: theme.textPrimary,
@@ -728,15 +771,17 @@ function SaveTheDateCinematic({
           >
             {invitation.date.day}
           </span>
+
           <div
             style={{
               width: 1,
-              height: 32,
+              height: 36,
               background: theme.accent,
-              opacity: 0.3,
+              opacity: 0.25,
             }}
           />
-          <div className="flex flex-col items-center">
+
+          <div className="flex flex-col items-center gap-0.5">
             <span
               style={{
                 fontFamily: theme.uiFont,
@@ -761,15 +806,17 @@ function SaveTheDateCinematic({
               {invitation.date.year}
             </span>
           </div>
+
           <div
             style={{
               width: 1,
-              height: 32,
+              height: 36,
               background: theme.accent,
-              opacity: 0.3,
+              opacity: 0.25,
             }}
           />
-          <div className="flex flex-col items-center">
+
+          <div className="flex flex-col items-center gap-0.5">
             <span
               style={{
                 fontFamily: theme.uiFont,
