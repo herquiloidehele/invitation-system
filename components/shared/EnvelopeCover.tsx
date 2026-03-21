@@ -64,15 +64,22 @@ function TopFlap({ opening, image }: { opening: boolean; image: string }) {
       className="absolute top-0 left-0 w-full origin-bottom"
       style={{ zIndex: 10 }}
       initial={{
-        filter: "drop-shadow(0 0 0 transparent)",
-        transform: "scale(1) translateY(0)",
+        filter: "drop-shadow(0 0px 0px rgba(0,0,0,0))",
+        scale: 1,
+        y: 0,
       }}
       animate={
-        opening && {
-          filter: "drop-shadow(0 50px 90px #7f7f7f)",
-          y: "-100%",
-          transform: "scale(1.15) translateY(-25%)",
-        }
+        opening
+          ? {
+              filter: "drop-shadow(0 50px 90px rgba(127,127,127,0.8))",
+              scale: 1.15,
+              y: "-25%",
+            }
+          : {
+              filter: "drop-shadow(0 0px 0px rgba(0,0,0,0))",
+              scale: 1,
+              y: 0,
+            }
       }
       transition={{
         duration: T.flapOpen.dur,
@@ -156,8 +163,8 @@ export default function EnvelopeCover({
         />
       )}
 
-      <BottomFlap opening={opening} image={theme.envelope.bottomFlap} />
       <TopFlap opening={opening} image={theme.envelope.topFlap} />
+      <BottomFlap opening={opening} image={theme.envelope.bottomFlap} />
 
       {/* Slow opacity fade covering the last phase of the animation.
           This is the actual "scene fade" — it makes the envelope gradually
