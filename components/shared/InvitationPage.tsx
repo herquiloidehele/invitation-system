@@ -419,10 +419,11 @@ export default function InvitationPage({
         {invitation.videoUrl ? (
           <video
             src={invitation.videoUrl}
-            autoPlay
             muted
             loop
             playsInline
+            autoPlay
+            data-invitation-video
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (

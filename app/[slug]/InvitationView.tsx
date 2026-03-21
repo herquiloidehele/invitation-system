@@ -98,7 +98,9 @@ export default function InvitationView({
     setShowContent(true);
     // Remove the cover from the DOM on the next frame
     // (after content is already rendering underneath)
-    requestAnimationFrame(() => setCoverVisible(false));
+    requestAnimationFrame(() => {
+      setCoverVisible(false);
+    });
   }, []);
 
   return (
