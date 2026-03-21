@@ -491,11 +491,12 @@ export default function InvitationForm({
                         className="h-9 w-9 rounded border cursor-pointer shrink-0"
                         title="Escolher cor"
                       />
-                      <Input
+                      <input
+                        type="text"
                         value={form.envelope?.base ?? ""}
                         onChange={(e) => updateEnvelope("base", e.target.value)}
                         placeholder={`Padrão: ${(themes[form.template] ?? themes["pink-floral"]).envelope.base}`}
-                        className="font-mono text-sm"
+                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
                       />
                       {form.envelope?.base && (
                         <Button

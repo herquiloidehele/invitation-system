@@ -41,6 +41,8 @@ export default async function EditInvitationPage({
     heroImage: row.heroImage,
     videoUrl: row.videoUrl ?? undefined,
     faqs: (row.faqs as unknown as InvitationData["faqs"]) ?? undefined,
+    envelope:
+      (row.envelope as unknown as InvitationData["envelope"]) ?? undefined,
   };
 
   return (
