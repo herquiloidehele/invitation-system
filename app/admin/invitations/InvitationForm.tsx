@@ -4,7 +4,13 @@ import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import type { InvitationData, TemplateName, EnvelopeConfig } from "@/lib/types";
+import type {
+  InvitationData,
+  TemplateName,
+  EnvelopeConfig,
+  GuestGuide,
+  GuestGuideItem,
+} from "@/lib/types";
 import { themes } from "@/lib/themes";
 
 import { Button } from "@/components/ui/button";
@@ -31,6 +37,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
+import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
 // ---------------------------------------------------------------------------
@@ -136,6 +143,7 @@ function getDefaultFormState(): InvitationData {
     heroImage: "",
     videoUrl: "",
     faqs: [],
+    guestGuide: { enabled: false, items: [] },
     envelope: {},
   };
 }
@@ -306,6 +314,69 @@ export default function InvitationForm({
     setForm((prev) => ({
       ...prev,
       faqs: (prev.faqs ?? []).filter((_, i) => i !== index),
+    }));
+  }, []);
+
+  // Guest Guide management
+  const updateGuestGuideEnabled = useCallback((enabled: boolean) => {
+    setForm((prev) => ({
+      ...prev,
+      guestGuide: { ...(prev.guestGuide ?? { items: [] }), enabled },
+    }));
+  }, []);
+
+  const togglePredefinedItem = useCallback((item: GuestGuideItem) => {
+    setForm((prev) => {
+      const current = prev.guestGuide?.items ?? [];
+      const exists = current.some((i) => i.id === item.id);
+      const items = exists
+        ? current.filter((i) => i.id !== item.id)
+        : [...current, item];
+      return {
+        ...prev,
+        guestGuide: { enabled: prev.guestGuide?.enabled ?? true, items },
+      };
+    });
+  }, []);
+
+  const addCustomGuideItem = useCallback(() => {
+    const newItem: GuestGuideItem = {
+      id: `custom-${Date.now()}`,
+      label: "",
+      iconType: "lucide",
+      iconName: "Star",
+    };
+    setForm((prev) => ({
+      ...prev,
+      guestGuide: {
+        enabled: prev.guestGuide?.enabled ?? true,
+        items: [...(prev.guestGuide?.items ?? []), newItem],
+      },
+    }));
+  }, []);
+
+  const updateCustomGuideItem = useCallback(
+    (id: string, patch: Partial<GuestGuideItem>) => {
+      setForm((prev) => ({
+        ...prev,
+        guestGuide: {
+          enabled: prev.guestGuide?.enabled ?? true,
+          items: (prev.guestGuide?.items ?? []).map((item) =>
+            item.id === id ? { ...item, ...patch } : item,
+          ),
+        },
+      }));
+    },
+    [],
+  );
+
+  const removeGuideItem = useCallback((id: string) => {
+    setForm((prev) => ({
+      ...prev,
+      guestGuide: {
+        enabled: prev.guestGuide?.enabled ?? true,
+        items: (prev.guestGuide?.items ?? []).filter((item) => item.id !== id),
+      },
     }));
   }, []);
 
@@ -1010,6 +1081,16 @@ export default function InvitationForm({
                   </Button>
                 </AccordionContent>
               </AccordionItem>
+
+              {/* ── Manual do Bom Convidado ── */}
+              <GuestGuideFormSection
+                guestGuide={form.guestGuide ?? { enabled: false, items: [] }}
+                onEnabledChange={updateGuestGuideEnabled}
+                onTogglePredefined={togglePredefinedItem}
+                onAddCustom={addCustomGuideItem}
+                onUpdateCustom={updateCustomGuideItem}
+                onRemoveItem={removeGuideItem}
+              />
             </Accordion>
           </div>
         </ScrollArea>
@@ -1057,7 +1138,11 @@ export default function InvitationForm({
           >
             <div className="mx-auto origin-top w-full max-h-165 relative">
               {form.couple.bride && form.couple.groom ? (
-                <InvitationPage invitation={form} theme={currentTheme} />
+                <InvitationPage
+                  invitation={form}
+                  theme={currentTheme}
+                  isPreview
+                />
               ) : (
                 <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
                   Insira os nomes do casal para ver a pré-visualização

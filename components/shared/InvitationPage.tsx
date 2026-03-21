@@ -10,6 +10,7 @@ import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
 import CalendarButton from "./CalendarButton";
+import GuestGuideSection from "./GuestGuideSection";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
@@ -177,17 +178,23 @@ function AnimatedSection({
   children,
   className = "",
   variants: customVariants,
+  isPreview = false,
 }: {
   children: React.ReactNode;
   className?: string;
   variants?: Variants;
+  isPreview?: boolean;
 }) {
   return (
     <motion.section
       variants={customVariants ?? fadeInUp}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-60px" }}
+      {...(isPreview
+        ? { animate: "visible" }
+        : {
+            whileInView: "visible",
+            viewport: { once: true, margin: "-60px" },
+          })}
       className={className}
     >
       {children}
@@ -318,12 +325,16 @@ interface InvitationPageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
+  /** Pass true in the admin live preview so all animations are always visible
+   *  and respond to React state changes rather than scroll position. */
+  isPreview?: boolean;
 }
 
 export default function InvitationPage({
   invitation,
   theme,
   audioRef,
+  isPreview = false,
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
@@ -582,7 +593,7 @@ export default function InvitationPage({
       {/* 2. Names (no-video fallback)                                      */}
       {/* ================================================================= */}
       {!invitation.videoUrl && (
-        <AnimatedSection>
+        <AnimatedSection isPreview={isPreview}>
           <div
             className="flex flex-col items-center text-center"
             style={{ padding: "36px 40px" }}
@@ -669,7 +680,11 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 3. Date Card — oversized, glassmorphism                           */}
       {/* ================================================================= */}
-      <AnimatedSection className="px-6 pb-10" variants={scaleIn}>
+      <AnimatedSection
+        className="px-6 pb-10"
+        variants={scaleIn}
+        isPreview={isPreview}
+      >
         <div
           className="relative flex flex-col items-center text-center"
           style={{
@@ -800,7 +815,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {invitation.schedule.length > 0 && (
         <>
-          <AnimatedSection className="px-6 pb-2">
+          <AnimatedSection className="px-6 pb-2" isPreview={isPreview}>
             <div className="flex flex-col items-center">
               <span
                 style={{
@@ -882,7 +897,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 5. Info Cards — glassmorphism, opposing slide-ins                  */}
       {/* ================================================================= */}
-      <AnimatedSection className="px-6 pb-10">
+      <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <div className="grid grid-cols-2 gap-3">
           {/* Dress Code — slides from left */}
           <motion.div
@@ -1013,7 +1028,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 5b. Location Card Section                                         */}
       {/* ================================================================= */}
-      <AnimatedSection className="px-6 pb-10">
+      <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <LocationCard
           location={invitation.location}
           theme={theme}
@@ -1022,13 +1037,31 @@ export default function InvitationPage({
       </AnimatedSection>
 
       {/* ================================================================= */}
+      {/* 6. Manual do Bom Convidado                                        */}
+      {/* ================================================================= */}
+      {invitation.guestGuide?.enabled &&
+        invitation.guestGuide.items.length > 0 && (
+          <>
+            <SectionDivider theme={theme} />
+
+            <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+              <GuestGuideSection
+                guestGuide={invitation.guestGuide}
+                theme={theme}
+                isPreview={isPreview}
+              />
+            </AnimatedSection>
+          </>
+        )}
+
+      {/* ================================================================= */}
       {/* 7. FAQs                                                           */}
       {/* ================================================================= */}
       {invitation.faqs && invitation.faqs.length > 0 && (
         <>
           <SectionDivider theme={theme} />
 
-          <AnimatedSection className="px-6 pb-10">
+          <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
             <div className="flex flex-col items-center">
               <span
                 style={{
@@ -1094,7 +1127,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 6. CTA Section                                                    */}
       {/* ================================================================= */}
-      <AnimatedSection className="px-6 pb-10">
+      <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
           <span
             className="mb-6"
@@ -1138,7 +1171,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 8. Footer — monogram with decorative ring                         */}
       {/* ================================================================= */}
-      <AnimatedSection variants={ambientFade}>
+      <AnimatedSection variants={ambientFade} isPreview={isPreview}>
         <footer className="flex flex-col items-center pb-12 pt-6">
           {/* Decorative accent line */}
           <motion.div

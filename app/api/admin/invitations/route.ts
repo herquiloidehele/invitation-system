@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
         heroImage: body.heroImage ?? "",
         videoUrl: body.videoUrl ?? null,
         faqs: body.faqs ?? null,
+        guestGuide: body.guestGuide ?? null,
         envelope: body.envelope ?? null,
       },
     });

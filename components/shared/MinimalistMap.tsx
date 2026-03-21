@@ -51,7 +51,7 @@ function isDarkTheme(theme: TemplateTheme): boolean {
 function getMapFilter(theme: TemplateTheme): string {
   if (isDarkTheme(theme)) {
     // Dark theme: slightly brighten, desaturate a bit
-    return "saturate(0.3) brightness(0.85) contrast(1.1)";
+    return "saturate(2.5) brightness(2.5) contrast(0.8)";
   }
   // Light themes: heavily desaturate for a clean, muted look
   return "saturate(0.15) brightness(1.05) contrast(0.95)";

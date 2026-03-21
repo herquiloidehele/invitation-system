@@ -54,6 +54,24 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface GuestGuideItem {
+  /** Stable identifier: slug for predefined items, uuid for custom */
+  id: string;
+  /** Display label shown below the icon */
+  label: string;
+  /** "lucide" uses a named Lucide icon; "image" uses a user-uploaded image URL */
+  iconType: "lucide" | "image";
+  /** Lucide icon component name (e.g. "CheckCircle2"). Used when iconType === "lucide". */
+  iconName?: string;
+  /** S3 / public image URL. Used when iconType === "image". */
+  iconUrl?: string;
+}
+
+export interface GuestGuide {
+  enabled: boolean;
+  items: GuestGuideItem[];
+}
+
 export interface EnvelopeConfig {
   /** Override the envelope body fill color (hex). Falls back to theme default if empty. */
   base?: string;
@@ -81,6 +99,8 @@ export interface InvitationData {
   heroImage: string;
   videoUrl?: string;
   faqs?: FAQItem[];
+  /** "Manual do bom convidado" section — optional list of icon + label tips for guests. */
+  guestGuide?: GuestGuide;
   /** Per-invitation envelope appearance overrides. Missing fields fall back to theme defaults. */
   envelope?: EnvelopeConfig;
 }

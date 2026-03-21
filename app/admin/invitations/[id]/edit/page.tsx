@@ -43,6 +43,8 @@ export default async function EditInvitationPage({
     faqs: (row.faqs as unknown as InvitationData["faqs"]) ?? undefined,
     envelope:
       (row.envelope as unknown as InvitationData["envelope"]) ?? undefined,
+    guestGuide:
+      (row.guestGuide as unknown as InvitationData["guestGuide"]) ?? undefined,
   };
 
   return (
