@@ -1,13 +1,15 @@
 import { prisma } from "./db";
-import type { InvitationData, TemplateName, SaveDateStyle } from "./types";
+import type { InvitationData, SaveDateStyle } from "./types";
 
-/**
- * Convert a Prisma Invitation row (with Json fields) into the
- * app-level InvitationData shape expected by all components.
- */
-function toInvitationData(row: {
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+type InvitationWithTheme = {
+  id: string;
   slug: string;
-  template: string;
+  themeId: string;
+  theme: { name: string };
   couple: unknown;
   date: unknown;
   quote: string;
@@ -24,10 +26,13 @@ function toInvitationData(row: {
   envelope: unknown;
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
-}): InvitationData {
+};
+
+function toInvitationData(row: InvitationWithTheme): InvitationData {
   return {
     slug: row.slug,
-    template: row.template as TemplateName,
+    themeId: row.themeId,
+    template: row.theme.name,
     couple: row.couple as InvitationData["couple"],
     date: row.date as InvitationData["date"],
     quote: row.quote,
@@ -47,10 +52,19 @@ function toInvitationData(row: {
   };
 }
 
+const includeTheme = { theme: { select: { name: true } } } as const;
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
 export async function getInvitation(
   slug: string,
 ): Promise<InvitationData | null> {
-  const row = await prisma.invitation.findUnique({ where: { slug } });
+  const row = await prisma.invitation.findUnique({
+    where: { slug },
+    include: includeTheme,
+  });
   if (!row) return null;
   return toInvitationData(row);
 }
@@ -58,6 +72,7 @@ export async function getInvitation(
 export async function getAllInvitations(): Promise<InvitationData[]> {
   const rows = await prisma.invitation.findMany({
     orderBy: { createdAt: "desc" },
+    include: includeTheme,
   });
   return rows.map(toInvitationData);
 }
@@ -68,9 +83,13 @@ export async function getAllInvitations(): Promise<InvitationData[]> {
 export async function getAllInvitationRows() {
   return prisma.invitation.findMany({
     orderBy: { createdAt: "desc" },
+    include: includeTheme,
   });
 }
 
 export async function getInvitationById(id: string) {
-  return prisma.invitation.findUnique({ where: { id } });
+  return prisma.invitation.findUnique({
+    where: { id },
+    include: includeTheme,
+  });
 }

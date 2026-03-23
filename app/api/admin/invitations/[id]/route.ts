@@ -15,6 +15,7 @@ export async function GET(
     const invitation = await prisma.invitation.findUnique({
       where: { id },
       include: {
+        theme: { select: { id: true, name: true, label: true } },
         rsvpResponses: {
           orderBy: { submittedAt: "desc" },
         },
@@ -76,11 +77,20 @@ export async function PUT(
       }
     }
 
+    // Resolve themeId — accept either themeId (new) or template slug (legacy)
+    let themeId: string | undefined = body.themeId;
+    if (!themeId && body.template) {
+      const theme = await prisma.theme.findUnique({
+        where: { name: body.template },
+      });
+      if (theme) themeId = theme.id;
+    }
+
     const invitation = await prisma.invitation.update({
       where: { id },
       data: {
         ...(body.slug !== undefined && { slug: body.slug }),
-        ...(body.template !== undefined && { template: body.template }),
+        ...(themeId !== undefined && { themeId }),
         ...(body.couple !== undefined && { couple: body.couple }),
         ...(body.date !== undefined && { date: body.date }),
         ...(body.quote !== undefined && { quote: body.quote }),
@@ -103,6 +113,9 @@ export async function PUT(
         ...(body.cinematicImageUrl !== undefined && {
           cinematicImageUrl: body.cinematicImageUrl,
         }),
+      },
+      include: {
+        theme: { select: { id: true, name: true, label: true } },
       },
     });
 

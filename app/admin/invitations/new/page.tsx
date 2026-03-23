@@ -1,59 +1,61 @@
+import { getThemes } from "@/lib/themes";
 import InvitationForm from "../InvitationForm";
-import { themes } from "@/lib/themes";
-import type { InvitationData, TemplateName } from "@/lib/types";
+import type { InvitationData } from "@/lib/types";
 
 interface PageProps {
   searchParams: Promise<{ template?: string }>;
 }
 
-/** Mirror of InvitationForm's getDefaultFormState so we can pre-fill template. */
-function buildDefaultWithTemplate(template: TemplateName): InvitationData {
-  return {
-    slug: "",
-    template,
-    couple: { bride: "", groom: "", monogram: "" },
-    date: {
-      iso: "",
-      display: "",
-      dayOfWeek: "",
-      time: "",
-      day: "",
-      month: "",
-      year: "",
-    },
-    quote: "",
-    location: {
-      name: "",
-      address: "",
-      googleMapsUrl: "",
-      wazeUrl: "",
-      latitude: undefined,
-      longitude: undefined,
-      imageUrl: "",
-    },
-    rsvp: { enabled: true, deadline: "" },
-    schedule: [],
-    dressCode: "",
-    giftRegistry: { enabled: false, text: "", link: "" },
-    audio: { enabled: false, src: "", artist: "", title: "" },
-    heroImage: "",
-    videoUrl: "",
-    faqs: [],
-  };
-}
+export const dynamic = "force-dynamic";
 
 export default async function NewInvitationPage({ searchParams }: PageProps) {
-  const { template } = await searchParams;
+  const [{ template }, themes] = await Promise.all([searchParams, getThemes()]);
 
-  // Validate that the query param matches a known theme.
-  const validTemplate =
-    template && themes[template as TemplateName]
-      ? (template as TemplateName)
-      : null;
-
-  const initialData = validTemplate
-    ? buildDefaultWithTemplate(validTemplate)
+  // If a template name was provided via query param, find the matching theme
+  const matchedTheme = template
+    ? themes.find((t) => t.name === template)
     : undefined;
 
-  return <InvitationForm mode="create" initialData={initialData} />;
+  // Pre-build initial data when a specific template was requested
+  const initialData: InvitationData | undefined = matchedTheme
+    ? {
+        slug: "",
+        themeId: matchedTheme.id,
+        template: matchedTheme.name,
+        couple: { bride: "", groom: "", monogram: "" },
+        date: {
+          iso: "",
+          display: "",
+          dayOfWeek: "",
+          time: "",
+          day: "",
+          month: "",
+          year: "",
+        },
+        quote: "",
+        location: {
+          name: "",
+          address: "",
+          googleMapsUrl: "",
+          wazeUrl: "",
+          latitude: undefined,
+          longitude: undefined,
+          imageUrl: "",
+        },
+        rsvp: { enabled: true, deadline: "" },
+        schedule: [],
+        dressCode: "",
+        giftRegistry: { enabled: false, text: "", link: "" },
+        audio: { enabled: false, src: "", artist: "", title: "" },
+        heroImage: "",
+        videoUrl: "",
+        faqs: [],
+        saveDateStyle: "classic",
+        cinematicImageUrl: "",
+      }
+    : undefined;
+
+  return (
+    <InvitationForm mode="create" initialData={initialData} themes={themes} />
+  );
 }

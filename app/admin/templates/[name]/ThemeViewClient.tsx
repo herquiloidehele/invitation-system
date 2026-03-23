@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Sparkles, Monitor, Smartphone } from "lucide-react";
+import { ArrowLeft, Sparkles, Smartphone, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import InvitationPage from "@/components/shared/InvitationPage";
@@ -100,6 +101,38 @@ export default function ThemeViewClient({
   invitation,
   theme,
 }: ThemeViewClientProps) {
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (
+      !confirm(
+        `Tem a certeza que quer eliminar o modelo "${theme.label}"? Esta acção não pode ser desfeita.`,
+      )
+    )
+      return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/themes/${theme.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Falha ao eliminar");
+      }
+      toast.success(`Modelo "${theme.label}" eliminado.`);
+      router.push("/admin/templates");
+      router.refresh();
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Falha ao eliminar modelo",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="flex h-full flex-col gap-0">
       {/* ── Top bar ──────────────────────────────────────────────────── */}
@@ -122,16 +155,39 @@ export default function ThemeViewClient({
           </span>
         </div>
 
-        <Link
-          href={`/admin/invitations/new?template=${theme.name}`}
-          className={cn(
-            buttonVariants({ variant: "default", size: "sm" }),
-            "gap-2",
-          )}
-        >
-          <Sparkles className="size-3.5" />
-          Usar este Modelo
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/admin/templates/${theme.name}/edit`}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "gap-1.5",
+            )}
+          >
+            <Pencil className="size-3.5" />
+            Editar
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10",
+            )}
+          >
+            <Trash2 className="size-3.5" />
+            {deleting ? "A eliminar..." : "Eliminar"}
+          </button>
+          <Link
+            href={`/admin/invitations/new?template=${theme.name}`}
+            className={cn(
+              buttonVariants({ variant: "default", size: "sm" }),
+              "gap-2",
+            )}
+          >
+            <Sparkles className="size-3.5" />
+            Usar este Modelo
+          </Link>
+        </div>
       </div>
 
       {/* ── Main two-column layout ────────────────────────────────────── */}

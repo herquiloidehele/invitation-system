@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getInvitation } from "@/lib/invitations";
-import { themes } from "@/lib/themes";
+import { getTheme } from "@/lib/themes";
 import InvitationView from "./InvitationView";
 
 // ---------------------------------------------------------------------------
-// Force dynamic rendering (data comes from the database now)
+// Force dynamic rendering (data comes from the database)
 // ---------------------------------------------------------------------------
 
 export const dynamic = "force-dynamic";
@@ -56,7 +56,7 @@ export default async function InvitationSlugPage({
     notFound();
   }
 
-  const theme = themes[invitation.template];
+  const theme = await getTheme(invitation.template);
 
   if (!theme) {
     notFound();

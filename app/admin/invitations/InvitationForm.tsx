@@ -6,12 +6,11 @@ import { toast } from "sonner";
 
 import type {
   InvitationData,
-  TemplateName,
+  TemplateTheme,
   EnvelopeConfig,
   GuestGuideItem,
   SaveDateStyle,
 } from "@/lib/types";
-import { themes } from "@/lib/themes";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,13 +102,6 @@ function deriveDateFields(iso: string) {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-const TEMPLATE_OPTIONS: TemplateName[] = [
-  "pink-floral",
-  "modern-minimal",
-  "boho-chic",
-  "midnight-elegance",
-];
 
 const SAVE_DATE_STYLE_OPTIONS: {
   value: SaveDateStyle;
@@ -274,10 +266,11 @@ const SAVE_DATE_STYLE_OPTIONS: {
 // Default form state
 // ---------------------------------------------------------------------------
 
-function getDefaultFormState(): InvitationData {
+function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
   return {
     slug: "",
-    template: "pink-floral",
+    themeId: firstTheme?.id ?? "theme_pink_floral",
+    template: firstTheme?.name ?? "pink-floral",
     couple: { bride: "", groom: "", monogram: "" },
     date: {
       iso: "",
@@ -322,6 +315,8 @@ interface InvitationFormProps {
   mode: "create" | "edit";
   invitationId?: string;
   ownerUrl?: string;
+  /** All available themes (fetched by the server parent and passed down). */
+  themes: TemplateTheme[];
 }
 
 export default function InvitationForm({
@@ -329,11 +324,12 @@ export default function InvitationForm({
   mode,
   invitationId,
   ownerUrl,
+  themes,
 }: InvitationFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<InvitationData>(
-    initialData ?? getDefaultFormState(),
+    initialData ?? getDefaultFormState(themes[0]),
   );
 
   // Generic updater
@@ -558,17 +554,20 @@ export default function InvitationForm({
 
   // Current theme for preview — merge per-invitation envelope overrides
   const currentTheme = useMemo(() => {
-    const base = themes[form.template] ?? themes["pink-floral"];
+    const base =
+      themes.find((t) => t.name === form.template) ??
+      themes.find((t) => t.name === "pink-floral") ??
+      themes[0];
     const overrides = form.envelope ?? {};
     return {
       ...base,
       envelope: {
-        base: overrides.base || base.envelope.base,
-        topFlap: overrides.topFlap || base.envelope.topFlap,
-        bottomFlap: overrides.bottomFlap || base.envelope.bottomFlap,
+        base: overrides.base || base?.envelope.base || "",
+        topFlap: overrides.topFlap || base?.envelope.topFlap || "",
+        bottomFlap: overrides.bottomFlap || base?.envelope.bottomFlap || "",
       },
     };
-  }, [form.template, form.envelope]);
+  }, [themes, form.template, form.envelope]);
 
   // Submit
   async function handleSubmit() {
@@ -709,19 +708,15 @@ export default function InvitationForm({
                     <Label>Cor de fundo</Label>
                     <p className="text-xs text-muted-foreground">
                       Deixe em branco para usar a cor padrão do modelo (
-                      {
-                        (themes[form.template] ?? themes["pink-floral"])
-                          .envelope.base
-                      }
-                      )
+                      {currentTheme?.envelope.base ?? ""})
                     </p>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
                         value={
                           form.envelope?.base ||
-                          (themes[form.template] ?? themes["pink-floral"])
-                            .envelope.base
+                          currentTheme?.envelope.base ||
+                          "#ffffff"
                         }
                         onChange={(e) => updateEnvelope("base", e.target.value)}
                         className="h-9 w-9 rounded border cursor-pointer shrink-0"
@@ -731,7 +726,7 @@ export default function InvitationForm({
                         type="text"
                         value={form.envelope?.base ?? ""}
                         onChange={(e) => updateEnvelope("base", e.target.value)}
-                        placeholder={`Padrão: ${(themes[form.template] ?? themes["pink-floral"]).envelope.base}`}
+                        placeholder={`Padrão: ${currentTheme?.envelope.base ?? ""}`}
                         className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
                       />
                       {form.envelope?.base && (
@@ -798,17 +793,23 @@ export default function InvitationForm({
                     <Label>Modelo</Label>
                     <Select
                       value={form.template}
-                      onValueChange={(v) =>
-                        update("template", v as TemplateName)
-                      }
+                      onValueChange={(v) => {
+                        if (!v) return;
+                        const selected = themes.find((t) => t.name === v);
+                        setForm((prev) => ({
+                          ...prev,
+                          template: v,
+                          themeId: selected?.id ?? v,
+                        }));
+                      }}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {TEMPLATE_OPTIONS.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {themes[t]?.label ?? t}
+                        {themes.map((t) => (
+                          <SelectItem key={t.name} value={t.name}>
+                            {t.label}
                           </SelectItem>
                         ))}
                       </SelectContent>

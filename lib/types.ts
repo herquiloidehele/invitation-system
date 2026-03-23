@@ -1,8 +1,5 @@
-export type TemplateName =
-  | "pink-floral"
-  | "modern-minimal"
-  | "boho-chic"
-  | "midnight-elegance";
+/** Theme name / slug identifier (e.g. "pink-floral"). Open-ended — themes are stored in the database. */
+export type TemplateName = string;
 
 /** Visual style for the Save the Date section in the invitation page */
 export type SaveDateStyle =
@@ -91,6 +88,9 @@ export interface EnvelopeConfig {
 
 export interface InvitationData {
   slug: string;
+  /** The theme's database id — used when saving/updating invitations. */
+  themeId: string;
+  /** The theme's slug name (e.g. "pink-floral") — derived from the Theme relation. */
   template: TemplateName;
   couple: CoupleInfo;
   date: DateInfo;
@@ -118,6 +118,8 @@ export interface InvitationData {
 }
 
 export interface TemplateTheme {
+  /** The database id (cuid) of the theme record. */
+  id: string;
   name: TemplateName;
   label: string;
   description: string;

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
-import type { InvitationData, TemplateName, SaveDateStyle } from "@/lib/types";
+import { getThemes } from "@/lib/themes";
+import type { InvitationData, SaveDateStyle } from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +13,13 @@ export default async function EditInvitationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const row = await prisma.invitation.findUnique({ where: { id } });
+  const [row, themes] = await Promise.all([
+    prisma.invitation.findUnique({
+      where: { id },
+      include: { theme: true },
+    }),
+    getThemes(),
+  ]);
 
   if (!row) {
     notFound();
@@ -28,7 +35,8 @@ export default async function EditInvitationPage({
   const initialData: InvitationData & { id: string } = {
     id: row.id,
     slug: row.slug,
-    template: row.template as TemplateName,
+    themeId: row.themeId,
+    template: row.theme.name,
     couple: row.couple as unknown as InvitationData["couple"],
     date: row.date as unknown as InvitationData["date"],
     quote: row.quote,
@@ -55,6 +63,7 @@ export default async function EditInvitationPage({
       initialData={initialData}
       invitationId={row.id}
       ownerUrl={ownerUrl}
+      themes={themes}
     />
   );
 }

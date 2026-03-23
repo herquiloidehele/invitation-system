@@ -17,7 +17,7 @@ export default async function AdminRsvpsPage({
       id: true,
       slug: true,
       couple: true,
-      template: true,
+      theme: { select: { name: true } },
       _count: { select: { rsvpResponses: true } },
     },
   });
@@ -28,15 +28,34 @@ export default async function AdminRsvpsPage({
     orderBy: { submittedAt: "desc" },
     include: {
       invitation: {
-        select: { id: true, slug: true, couple: true, template: true },
+        select: {
+          id: true,
+          slug: true,
+          couple: true,
+          theme: { select: { name: true } },
+        },
       },
     },
   });
 
+  // Flatten theme.name → template for client consumption
+  const invitationRows = invitations.map((inv) => ({
+    ...inv,
+    template: inv.theme.name,
+  }));
+
+  const responseRows = responses.map((r) => ({
+    ...r,
+    invitation: {
+      ...r.invitation,
+      template: r.invitation.theme.name,
+    },
+  }));
+
   return (
     <RsvpsClient
-      invitations={invitations as InvitationSummary[]}
-      responses={responses as unknown as RsvpResponseWithInvitation[]}
+      invitations={invitationRows as unknown as InvitationSummary[]}
+      responses={responseRows as unknown as RsvpResponseWithInvitation[]}
       selectedSlug={selectedSlug ?? null}
     />
   );

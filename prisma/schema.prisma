@@ -7,10 +7,63 @@ datasource db {
   provider = "postgresql"
 }
 
+model Theme {
+  id          String   @id @default(cuid())
+  name        String   @unique // slug identifier, e.g. "pink-floral"
+  label       String
+  description String
+
+  // Envelope appearance stored as JSON { base, topFlap, bottomFlap }
+  envelope Json
+
+  // Page background & card styling
+  bg         String
+  cardBg     String
+  cardBorder String
+
+  // Color palette
+  primary   String
+  secondary String
+  accent    String
+
+  // Text colors
+  textPrimary   String
+  textSecondary String
+  textMuted     String
+
+  // Typography
+  displayFont String
+  bodyFont    String
+  scriptFont  String?
+  uiFont      String
+
+  // CTA button styling
+  ctaPrimaryBg       String
+  ctaPrimaryText     String
+  ctaSecondaryBorder String
+  ctaSecondaryText   String
+  ctaRadius          String
+
+  // Cover text colors
+  monogramColor String
+  tapTextColor  String
+
+  // Atmospheric / decorative
+  bgGradient      String?
+  decorativeColor String
+  ctaGlow         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invitations Invitation[]
+}
+
 model Invitation {
   id           String   @id @default(cuid())
   slug         String   @unique
-  template     String   // "pink-floral" | "modern-minimal" | "boho-chic" | "midnight-elegance"
+  themeId      String
+  theme        Theme    @relation(fields: [themeId], references: [id])
   couple       Json     // { bride, groom, monogram }
   date         Json     // { iso, display, dayOfWeek, time, day, month, year }
   quote        String

@@ -34,6 +34,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
     where: slug !== "all" ? { slug } : undefined,
     orderBy: { createdAt: "desc" },
     include: {
+      theme: { select: { name: true } },
       rsvpResponses: {
         where: rangeStart ? { submittedAt: { gte: rangeStart } } : undefined,
         select: {
@@ -120,7 +121,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
     return {
       slug: inv.slug,
       coupleName: `${couple.bride} & ${couple.groom}`,
-      template: inv.template,
+      template: inv.theme.name,
       createdAt: inv.createdAt.toISOString(),
       totalViews,
       uniqueVisitors,

@@ -46,7 +46,7 @@ export default async function AdminDashboardPage() {
     (sum, inv) => sum + inv._count.rsvpResponses,
     0,
   );
-  const activeTemplates = new Set(invitations.map((inv) => inv.template)).size;
+  const activeTemplates = new Set(invitations.map((inv) => inv.themeId)).size;
   const avgRsvpRate =
     totalInvitations > 0
       ? ((totalRsvps / Math.max(totalInvitations, 1)) * 100).toFixed(1)

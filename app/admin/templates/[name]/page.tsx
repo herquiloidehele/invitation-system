@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { themes } from "@/lib/themes";
+import { getTheme } from "@/lib/themes";
 import { MOCK_INVITATION } from "@/lib/mock-invitation";
-import type { TemplateName } from "@/lib/types";
 import ThemeViewClient from "./ThemeViewClient";
+
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ name: string }>;
@@ -11,17 +12,16 @@ interface PageProps {
 export default async function ThemeViewPage({ params }: PageProps) {
   const { name } = await params;
 
-  const theme = themes[name as TemplateName];
+  const theme = await getTheme(name);
   if (!theme) notFound();
 
   // Build the mock invitation with the correct template field so that
   // any template-specific behaviour inside InvitationPage is exercised.
-  const invitation = { ...MOCK_INVITATION, template: theme.name };
+  const invitation = {
+    ...MOCK_INVITATION,
+    themeId: theme.id,
+    template: theme.name,
+  };
 
   return <ThemeViewClient invitation={invitation} theme={theme} />;
-}
-
-// Pre-render all 4 known theme pages at build time
-export function generateStaticParams() {
-  return Object.keys(themes).map((name) => ({ name }));
 }

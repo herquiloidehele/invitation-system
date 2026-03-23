@@ -1,138 +1,72 @@
-import { TemplateTheme } from "./types";
+import { prisma } from "./db";
+import type { TemplateTheme } from "./types";
+import type { Theme } from "./generated/prisma/client";
 
-export const themes: Record<string, TemplateTheme> = {
-  "pink-floral": {
-    name: "pink-floral",
-    label: "Pink Floral",
-    description: "Romântico & Elegante",
+// ---------------------------------------------------------------------------
+// Helpers — convert Prisma Theme row → TemplateTheme
+// ---------------------------------------------------------------------------
+
+function toTemplateTheme(row: Theme): TemplateTheme {
+  const envelope = row.envelope as {
+    base: string;
+    topFlap: string;
+    bottomFlap: string;
+  };
+
+  return {
+    id: row.id,
+    name: row.name,
+    label: row.label,
+    description: row.description,
     envelope: {
-      base: "#f4f1e9",
-      topFlap: "/images/top.png",
-      bottomFlap: "/images/bottom.png",
+      base: envelope.base,
+      topFlap: envelope.topFlap,
+      bottomFlap: envelope.bottomFlap,
     },
-    bg: "#FEF7F2",
-    cardBg: "rgba(255,255,255,0.65)",
-    cardBorder: "rgba(201,169,98,0.08)",
-    primary: "#8B1A4A",
-    secondary: "#8B5E6B",
-    accent: "#C4A050",
-    textPrimary: "#8B1A4A",
-    textSecondary: "#8B5E6B",
-    textMuted: "rgba(139,94,107,0.45)",
-    displayFont: "'Great Vibes', cursive",
-    bodyFont: "'Cormorant Garamond', serif",
-    scriptFont: "'Great Vibes', cursive",
-    uiFont: "'Outfit', sans-serif",
-    ctaPrimaryBg: "#C4A050",
-    ctaPrimaryText: "#FFFFFF",
-    ctaSecondaryBorder: "#8B1A4A",
-    ctaSecondaryText: "#8B1A4A",
-    ctaRadius: "9999px",
-    monogramColor: "rgba(255,255,255,0.8)",
-    tapTextColor: "rgba(255,255,255,0.7)",
-    bgGradient:
-      "radial-gradient(ellipse at 50% 30%, rgba(196,160,80,0.06) 0%, transparent 70%)",
-    decorativeColor: "rgba(196,160,80,0.18)",
-    ctaGlow: "rgba(196,160,80,0.25)",
-  },
-  "modern-minimal": {
-    name: "modern-minimal",
-    label: "Modern Minimal",
-    description: "Limpo & Sofisticado",
-    envelope: {
-      base: "#F7F0E8",
-      topFlap: "/images/top.png",
-      bottomFlap: "/images/bottom.png",
-    },
-    bg: "#FAFAF7",
-    cardBg: "rgba(255,255,255,0.5)",
-    cardBorder: "rgba(44,44,44,0.06)",
-    primary: "#2C2C2C",
-    secondary: "#666666",
-    accent: "#D4AF37",
-    textPrimary: "#2C2C2C",
-    textSecondary: "#888888",
-    textMuted: "rgba(136,136,136,0.5)",
-    displayFont: "'Playfair Display', serif",
-    bodyFont: "'Cormorant Garamond', serif",
-    uiFont: "'Outfit', sans-serif",
-    ctaPrimaryBg: "#2C2C2C",
-    ctaPrimaryText: "#FAFAF7",
-    ctaSecondaryBorder: "#D4AF37",
-    ctaSecondaryText: "#D4AF37",
-    ctaRadius: "0px",
-    monogramColor: "rgba(44,44,44,0.6)",
-    tapTextColor: "rgba(44,44,44,0.5)",
-    bgGradient:
-      "radial-gradient(ellipse at 50% 40%, rgba(212,175,55,0.04) 0%, transparent 60%)",
-    decorativeColor: "rgba(212,175,55,0.2)",
-    ctaGlow: "rgba(44,44,44,0.12)",
-  },
-  "boho-chic": {
-    name: "boho-chic",
-    label: "Boho Chic",
-    description: "Rústico & Natural",
-    envelope: {
-      base: "#F7F0E8",
-      topFlap: "/images/top.png",
-      bottomFlap: "/images/bottom.png",
-    },
-    bg: "#F3EBE1",
-    cardBg: "rgba(255,255,255,0.42)",
-    cardBorder: "rgba(160,113,90,0.08)",
-    primary: "#A0715A",
-    secondary: "#8B7355",
-    accent: "#8B9A7A",
-    textPrimary: "#A0715A",
-    textSecondary: "#8B7355",
-    textMuted: "rgba(139,115,85,0.35)",
-    displayFont: "'Homemade Apple', cursive",
-    bodyFont: "'Libre Baskerville', serif",
-    scriptFont: "'Homemade Apple', cursive",
-    uiFont: "'Outfit', sans-serif",
-    ctaPrimaryBg: "#A0715A",
-    ctaPrimaryText: "#FFFFFF",
-    ctaSecondaryBorder: "#A0715A",
-    ctaSecondaryText: "#A0715A",
-    ctaRadius: "9999px",
-    monogramColor: "rgba(255,255,255,0.8)",
-    tapTextColor: "rgba(255,255,255,0.65)",
-    bgGradient:
-      "radial-gradient(ellipse at 50% 35%, rgba(139,154,122,0.06) 0%, transparent 65%)",
-    decorativeColor: "rgba(139,154,122,0.22)",
-    ctaGlow: "rgba(160,113,90,0.2)",
-  },
-  "midnight-elegance": {
-    name: "midnight-elegance",
-    label: "Midnight Elegance",
-    description: "Luxuoso & Dramático",
-    envelope: {
-      base: "#F7F0E8",
-      topFlap: "/images/top.png",
-      bottomFlap: "/images/bottom.png",
-    },
-    bg: "#080C16",
-    cardBg: "rgba(255,255,255,0.025)",
-    cardBorder: "rgba(255,215,0,0.08)",
-    primary: "#FFFFFF",
-    secondary: "rgba(255,215,0,0.38)",
-    accent: "#FFD700",
-    textPrimary: "#FFFFFF",
-    textSecondary: "rgba(255,255,255,0.42)",
-    textMuted: "rgba(255,255,255,0.19)",
-    displayFont: "'Cinzel', serif",
-    bodyFont: "'Lora', serif",
-    uiFont: "'Outfit', sans-serif",
-    ctaPrimaryBg: "#FFD700",
-    ctaPrimaryText: "#080C16",
-    ctaSecondaryBorder: "#FFD700",
-    ctaSecondaryText: "#FFD700",
-    ctaRadius: "0px",
-    monogramColor: "rgba(255,215,0,0.6)",
-    tapTextColor: "rgba(255,215,0,0.5)",
-    bgGradient:
-      "radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.03) 0%, transparent 60%)",
-    decorativeColor: "rgba(255,215,0,0.15)",
-    ctaGlow: "rgba(255,215,0,0.18)",
-  },
-};
+    bg: row.bg,
+    cardBg: row.cardBg,
+    cardBorder: row.cardBorder,
+    primary: row.primary,
+    secondary: row.secondary,
+    accent: row.accent,
+    textPrimary: row.textPrimary,
+    textSecondary: row.textSecondary,
+    textMuted: row.textMuted,
+    displayFont: row.displayFont,
+    bodyFont: row.bodyFont,
+    scriptFont: row.scriptFont ?? undefined,
+    uiFont: row.uiFont,
+    ctaPrimaryBg: row.ctaPrimaryBg,
+    ctaPrimaryText: row.ctaPrimaryText,
+    ctaSecondaryBorder: row.ctaSecondaryBorder,
+    ctaSecondaryText: row.ctaSecondaryText,
+    ctaRadius: row.ctaRadius,
+    monogramColor: row.monogramColor,
+    tapTextColor: row.tapTextColor,
+    bgGradient: row.bgGradient ?? undefined,
+    decorativeColor: row.decorativeColor,
+    ctaGlow: row.ctaGlow ?? undefined,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+/** Fetch all themes from the database, ordered by creation date. */
+export async function getThemes(): Promise<TemplateTheme[]> {
+  const rows = await prisma.theme.findMany({ orderBy: { createdAt: "asc" } });
+  return rows.map(toTemplateTheme);
+}
+
+/** Fetch a single theme by its slug name (e.g. "pink-floral"). Returns null if not found. */
+export async function getTheme(name: string): Promise<TemplateTheme | null> {
+  const row = await prisma.theme.findUnique({ where: { name } });
+  return row ? toTemplateTheme(row) : null;
+}
+
+/** Fetch a single theme by its database id. Returns null if not found. */
+export async function getThemeById(id: string): Promise<TemplateTheme | null> {
+  const row = await prisma.theme.findUnique({ where: { id } });
+  return row ? toTemplateTheme(row) : null;
+}

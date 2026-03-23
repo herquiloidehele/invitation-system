@@ -10,6 +10,7 @@ export async function GET() {
     const invitations = await prisma.invitation.findMany({
       orderBy: { createdAt: "desc" },
       include: {
+        theme: { select: { id: true, name: true, label: true } },
         _count: {
           select: { rsvpResponses: true },
         },
@@ -34,10 +35,26 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Basic validation
-    if (!body.slug || !body.template || !body.couple || !body.date) {
+    // Basic validation — accept either themeId (new) or template slug (legacy)
+    if (!body.slug || !body.couple || !body.date) {
       return NextResponse.json(
-        { error: "Missing required fields: slug, template, couple, date" },
+        { error: "Missing required fields: slug, couple, date" },
+        { status: 400 },
+      );
+    }
+
+    // Resolve themeId
+    let themeId: string | undefined = body.themeId;
+    if (!themeId && body.template) {
+      // Legacy: look up by slug name
+      const theme = await prisma.theme.findUnique({
+        where: { name: body.template },
+      });
+      if (theme) themeId = theme.id;
+    }
+    if (!themeId) {
+      return NextResponse.json(
+        { error: "Missing required field: themeId (or template)" },
         { status: 400 },
       );
     }
@@ -57,7 +74,7 @@ export async function POST(request: NextRequest) {
     const invitation = await prisma.invitation.create({
       data: {
         slug: body.slug,
-        template: body.template,
+        themeId,
         couple: body.couple,
         date: body.date,
         quote: body.quote ?? "",
@@ -74,6 +91,9 @@ export async function POST(request: NextRequest) {
         envelope: body.envelope ?? null,
         saveDateStyle: body.saveDateStyle ?? null,
         cinematicImageUrl: body.cinematicImageUrl ?? null,
+      },
+      include: {
+        theme: { select: { id: true, name: true, label: true } },
       },
     });
 

@@ -6,6 +6,7 @@ import type { InvitationData } from "./types";
  */
 export const MOCK_INVITATION: InvitationData = {
   slug: "preview",
+  themeId: "theme_pink_floral",
   template: "pink-floral",
 
   couple: {

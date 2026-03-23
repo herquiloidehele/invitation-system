@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { themes } from "@/lib/themes";
+import { getThemes } from "@/lib/themes";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
-import { Eye, Sparkles } from "lucide-react";
+import { Eye, Sparkles, Pencil, Trash2, Plus } from "lucide-react";
 import type { TemplateTheme } from "@/lib/types";
+import DeleteThemeButton from "./DeleteThemeButton";
+
+export const dynamic = "force-dynamic";
 
 // ---------------------------------------------------------------------------
 // Colour swatch chip
@@ -37,8 +40,6 @@ function fontName(fontStack: string): string {
 // ---------------------------------------------------------------------------
 
 function ThemeCard({ theme }: { theme: TemplateTheme }) {
-  const isLight = theme.bg === "#080C16" ? false : true;
-
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md">
       {/* ── Colour band (envelope preview strip) ─────────────────────── */}
@@ -145,7 +146,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
         </div>
 
         {/* Action buttons */}
-        <div className="mt-auto flex gap-2 pt-2">
+        <div className="mt-auto flex gap-2 pt-2 flex-wrap">
           <Link
             href={`/admin/templates/${theme.name}`}
             className={cn(
@@ -154,7 +155,17 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             )}
           >
             <Eye className="size-3.5" />
-            Ver Prévia
+            Ver
+          </Link>
+          <Link
+            href={`/admin/templates/${theme.name}/edit`}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "flex-1 gap-1.5",
+            )}
+          >
+            <Pencil className="size-3.5" />
+            Editar
           </Link>
           <Link
             href={`/admin/invitations/new?template=${theme.name}`}
@@ -167,6 +178,11 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             Usar
           </Link>
         </div>
+
+        {/* Delete (separate row so it's visually distinct) */}
+        <div className="pt-0">
+          <DeleteThemeButton themeId={theme.id} themeName={theme.label} />
+        </div>
       </div>
     </div>
   );
@@ -176,18 +192,27 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
 // Page
 // ---------------------------------------------------------------------------
 
-export default function TemplatesPage() {
-  const themeList = Object.values(themes);
+export default async function TemplatesPage() {
+  const themeList = await getThemes();
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Modelos</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Escolha um dos {themeList.length} modelos disponíveis para criar o seu
-          convite de casamento.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Modelos</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {themeList.length} modelo{themeList.length !== 1 ? "s" : ""}{" "}
+            disponível{themeList.length !== 1 ? "is" : ""}.
+          </p>
+        </div>
+        <Link
+          href="/admin/templates/new"
+          className={cn(buttonVariants({ variant: "default" }), "gap-2")}
+        >
+          <Plus className="size-4" />
+          Novo Modelo
+        </Link>
       </div>
 
       {/* 2×2 grid */}
