@@ -217,7 +217,12 @@ export default function ThemeForm({
                 <Input
                   id="name"
                   value={form.name}
-                  onChange={(e) => set("name", e.target.value)}
+                  onChange={(e) =>
+                    set(
+                      "name",
+                      e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+                    )
+                  }
                   placeholder="pink-floral"
                   disabled={mode === "edit"}
                   className="font-mono text-xs"
