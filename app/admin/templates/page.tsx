@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getThemes } from "@/lib/themes";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
-import { Eye, Sparkles, Pencil, Trash2, Plus } from "lucide-react";
+import { Eye, Sparkles, Pencil, Trash2, Plus, Copy } from "lucide-react";
 import type { TemplateTheme } from "@/lib/types";
 import DeleteThemeButton from "./DeleteThemeButton";
 
@@ -168,14 +168,14 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             Editar
           </Link>
           <Link
-            href={`/admin/invitations/new?template=${theme.name}`}
+            href={`/admin/templates/new?from=${theme.name}`}
             className={cn(
-              buttonVariants({ variant: "default", size: "sm" }),
+              buttonVariants({ variant: "outline", size: "sm" }),
               "flex-1 gap-1.5",
             )}
           >
-            <Sparkles className="size-3.5" />
-            Usar
+            <Copy className="size-3.5" />
+            Duplicar
           </Link>
         </div>
 

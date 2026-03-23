@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Sparkles, Smartphone, Pencil, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Sparkles,
+  Smartphone,
+  Pencil,
+  Trash2,
+  Copy,
+} from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -165,6 +172,16 @@ export default function ThemeViewClient({
           >
             <Pencil className="size-3.5" />
             Editar
+          </Link>
+          <Link
+            href={`/admin/templates/new?from=${theme.name}`}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "gap-1.5",
+            )}
+          >
+            <Copy className="size-3.5" />
+            Duplicar
           </Link>
           <button
             onClick={handleDelete}
