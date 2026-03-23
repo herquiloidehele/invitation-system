@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -169,6 +169,205 @@ function ColorField({
           className="font-mono text-xs h-8"
         />
       </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Font field — dropdown picker with live font preview
+// ---------------------------------------------------------------------------
+
+/** Every Google Font loaded via next/font/google in app/layout.tsx */
+const AVAILABLE_FONTS: { label: string; stack: string; variable: string }[] = [
+  {
+    label: "Cormorant Garamond",
+    stack: "'Cormorant Garamond', serif",
+    variable: "var(--font-cormorant-garamond)",
+  },
+  {
+    label: "Playfair Display",
+    stack: "'Playfair Display', serif",
+    variable: "var(--font-playfair-display)",
+  },
+  {
+    label: "Libre Baskerville",
+    stack: "'Libre Baskerville', serif",
+    variable: "var(--font-libre-baskerville)",
+  },
+  {
+    label: "Cinzel",
+    stack: "'Cinzel', serif",
+    variable: "var(--font-cinzel)",
+  },
+  {
+    label: "Lora",
+    stack: "'Lora', serif",
+    variable: "var(--font-lora)",
+  },
+  {
+    label: "DM Serif Display",
+    stack: "'DM Serif Display', serif",
+    variable: "var(--font-dm-serif-display)",
+  },
+  {
+    label: "Great Vibes",
+    stack: "'Great Vibes', cursive",
+    variable: "var(--font-great-vibes)",
+  },
+  {
+    label: "Homemade Apple",
+    stack: "'Homemade Apple', cursive",
+    variable: "var(--font-homemade-apple)",
+  },
+  {
+    label: "Outfit",
+    stack: "'Outfit', sans-serif",
+    variable: "var(--font-outfit)",
+  },
+];
+
+const SAMPLE_TEXT: Record<string, string> = {
+  "'Great Vibes', cursive": "Save the Date",
+  "'Homemade Apple', cursive": "Save the Date",
+  "'Outfit', sans-serif": "Confirmar Presença",
+  default: "Sofia & Miguel",
+};
+
+function getSample(stack: string) {
+  return SAMPLE_TEXT[stack] ?? SAMPLE_TEXT.default;
+}
+
+function FontField({
+  label,
+  value,
+  onChange,
+  optional,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  optional?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const matched = AVAILABLE_FONTS.find((f) => f.stack === value);
+  const displayName = matched?.label ?? (value ? value : "Selecionar fonte…");
+  const displayVariable = matched?.variable;
+
+  return (
+    <div className="space-y-1.5" ref={ref}>
+      <Label className="text-xs">
+        {label}
+        {optional && (
+          <span className="ml-1 text-muted-foreground">(opcional)</span>
+        )}
+      </Label>
+
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      >
+        <span
+          style={
+            displayVariable
+              ? { fontFamily: displayVariable, fontSize: 15 }
+              : { color: "var(--muted-foreground)", fontSize: 13 }
+          }
+        >
+          {displayName}
+        </span>
+        <svg
+          className={`ml-2 size-4 flex-shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute z-50 mt-1 w-72 overflow-hidden rounded-md border bg-popover shadow-lg">
+          {/* Clear option for optional fields */}
+          {optional && (
+            <button
+              type="button"
+              onClick={() => {
+                onChange("");
+                setOpen(false);
+              }}
+              className="flex w-full items-center gap-3 px-3 py-2 text-xs text-muted-foreground hover:bg-accent"
+            >
+              <span className="italic">Nenhuma (desativada)</span>
+            </button>
+          )}
+          {AVAILABLE_FONTS.map((font) => {
+            const isSelected = value === font.stack;
+            return (
+              <button
+                key={font.stack}
+                type="button"
+                onClick={() => {
+                  onChange(font.stack);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-accent ${isSelected ? "bg-accent" : ""}`}
+              >
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-muted-foreground">
+                    {font.label}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: font.variable,
+                      fontSize: 17,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {getSample(font.stack)}
+                  </span>
+                </div>
+                {isSelected && (
+                  <svg
+                    className="size-4 flex-shrink-0 text-primary"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -446,49 +645,28 @@ export default function ThemeForm({
               Tipografia
             </AccordionTrigger>
             <AccordionContent className="space-y-3 pb-4">
-              <p className="text-[11px] text-muted-foreground">
-                Use stacks CSS completas, ex:{" "}
-                <code>&apos;Cormorant Garamond&apos;, serif</code>
-              </p>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">
-                    Fonte de Títulos (displayFont)
-                  </Label>
-                  <Input
-                    value={form.displayFont}
-                    onChange={(e) => set("displayFont", e.target.value)}
-                    placeholder="'Cormorant Garamond', serif"
-                    className="font-mono text-xs"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Fonte de Corpo (bodyFont)</Label>
-                  <Input
-                    value={form.bodyFont}
-                    onChange={(e) => set("bodyFont", e.target.value)}
-                    placeholder="'Lato', sans-serif"
-                    className="font-mono text-xs"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Fonte Script (opcional)</Label>
-                  <Input
-                    value={form.scriptFont}
-                    onChange={(e) => set("scriptFont", e.target.value)}
-                    placeholder="'Great Vibes', cursive"
-                    className="font-mono text-xs"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Fonte UI (uiFont)</Label>
-                  <Input
-                    value={form.uiFont}
-                    onChange={(e) => set("uiFont", e.target.value)}
-                    placeholder="'Montserrat', sans-serif"
-                    className="font-mono text-xs"
-                  />
-                </div>
+                <FontField
+                  label="Fonte de Títulos"
+                  value={form.displayFont}
+                  onChange={(v) => set("displayFont", v)}
+                />
+                <FontField
+                  label="Fonte de Corpo"
+                  value={form.bodyFont}
+                  onChange={(v) => set("bodyFont", v)}
+                />
+                <FontField
+                  label="Fonte Script"
+                  value={form.scriptFont}
+                  onChange={(v) => set("scriptFont", v)}
+                  optional
+                />
+                <FontField
+                  label="Fonte UI"
+                  value={form.uiFont}
+                  onChange={(v) => set("uiFont", v)}
+                />
               </div>
             </AccordionContent>
           </AccordionItem>
