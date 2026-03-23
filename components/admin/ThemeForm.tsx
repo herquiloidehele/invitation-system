@@ -87,8 +87,27 @@ function PhonePreview({ form }: { form: ThemeFormData }) {
 }
 
 // ---------------------------------------------------------------------------
-// Color field — input[type=color] + text input together
+// Color field — clickable swatch that opens native color picker + text input
 // ---------------------------------------------------------------------------
+
+/**
+ * Extract the first #rrggbb / #rgb hex found in a CSS value string.
+ * Works for plain hex, rgba(), and simple gradients.
+ * Returns "" if nothing parseable is found.
+ */
+function extractHex(value: string): string {
+  const m = value.match(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b/);
+  if (m) return m[0];
+  // Try to parse rgb()/rgba() into hex
+  const rgba = value.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (rgba) {
+    const r = parseInt(rgba[1]).toString(16).padStart(2, "0");
+    const g = parseInt(rgba[2]).toString(16).padStart(2, "0");
+    const b = parseInt(rgba[3]).toString(16).padStart(2, "0");
+    return `#${r}${g}${b}`;
+  }
+  return "";
+}
 
 function ColorField({
   label,
@@ -103,22 +122,46 @@ function ColorField({
   placeholder?: string;
   hint?: string;
 }) {
-  // Only show the colour picker if value looks like a plain hex
-  const isHex = /^#([0-9a-fA-F]{3,8})$/.test(value);
+  const hex = extractHex(value);
 
   return (
     <div className="space-y-1.5">
       <Label className="text-xs">{label}</Label>
       {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
       <div className="flex items-center gap-2">
-        {isHex && (
+        {/* Swatch button — always visible, opens native picker */}
+        <label
+          className="relative h-8 w-8 flex-shrink-0 cursor-pointer overflow-hidden rounded-md border border-input shadow-sm transition-opacity hover:opacity-80"
+          title="Escolher cor"
+          style={{
+            // checkerboard background for transparency / non-hex values
+            backgroundImage:
+              "linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)",
+            backgroundSize: "8px 8px",
+            backgroundPosition: "0 0, 0 4px, 4px -4px, -4px 0px",
+          }}
+        >
+          {/* Colour fill on top of the checkerboard */}
+          <span
+            className="absolute inset-0"
+            style={{ background: value || "transparent" }}
+          />
           <input
             type="color"
-            value={value.slice(0, 7)}
-            onChange={(e) => onChange(e.target.value)}
-            className="h-8 w-8 rounded border cursor-pointer shrink-0"
+            value={hex || "#ffffff"}
+            onChange={(e) => {
+              // If value is rgba/gradient, replace only the first hex segment
+              if (hex && value !== hex) {
+                onChange(value.replace(hex, e.target.value));
+              } else {
+                onChange(e.target.value);
+              }
+            }}
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
           />
-        )}
+        </label>
+
+        {/* Raw text input for rgba / gradient / advanced values */}
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
