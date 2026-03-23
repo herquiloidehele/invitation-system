@@ -80,6 +80,47 @@ export function themeToFormData(theme: TemplateTheme): ThemeFormData {
   };
 }
 
+/**
+ * Convert form state back to a TemplateTheme for live preview.
+ * Uses a placeholder id/name so the preview works before the theme is saved.
+ */
+export function formDataToTheme(form: ThemeFormData): TemplateTheme {
+  return {
+    id: "__preview__",
+    name: form.name || "__preview__",
+    label: form.label || "Pré-visualização",
+    description: form.description,
+    envelope: {
+      base: form.envelopeBase,
+      topFlap: form.envelopeTopFlap,
+      bottomFlap: form.envelopeBottomFlap,
+    },
+    bg: form.bg,
+    cardBg: form.cardBg,
+    cardBorder: form.cardBorder,
+    primary: form.primary,
+    secondary: form.secondary,
+    accent: form.accent,
+    textPrimary: form.textPrimary,
+    textSecondary: form.textSecondary,
+    textMuted: form.textMuted,
+    displayFont: form.displayFont,
+    bodyFont: form.bodyFont,
+    scriptFont: form.scriptFont || undefined,
+    uiFont: form.uiFont,
+    ctaPrimaryBg: form.ctaPrimaryBg,
+    ctaPrimaryText: form.ctaPrimaryText,
+    ctaSecondaryBorder: form.ctaSecondaryBorder,
+    ctaSecondaryText: form.ctaSecondaryText,
+    ctaRadius: form.ctaRadius,
+    monogramColor: form.monogramColor,
+    tapTextColor: form.tapTextColor,
+    bgGradient: form.bgGradient || undefined,
+    decorativeColor: form.decorativeColor,
+    ctaGlow: form.ctaGlow || undefined,
+  };
+}
+
 export const EMPTY_FORM_DATA: ThemeFormData = {
   name: "",
   label: "",
