@@ -10,6 +10,7 @@ import type {
   EnvelopeConfig,
   GuestGuideItem,
   SaveDateStyle,
+  SectionImages,
 } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -303,6 +304,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     envelope: {},
     saveDateStyle: "classic",
     cinematicImageUrl: "",
+    sectionImages: {},
   };
 }
 
@@ -547,6 +549,17 @@ export default function InvitationForm({
       setForm((prev) => ({
         ...prev,
         envelope: { ...prev.envelope, [field]: value },
+      }));
+    },
+    [],
+  );
+
+  // Section image overrides
+  const updateSectionImage = useCallback(
+    (field: keyof SectionImages, value: string | undefined) => {
+      setForm((prev) => ({
+        ...prev,
+        sectionImages: { ...prev.sectionImages, [field]: value },
       }));
     },
     [],
@@ -835,6 +848,69 @@ export default function InvitationForm({
                       onClear={() => update("videoUrl", undefined)}
                     />
                   </div>
+
+                  {/* ── Section Images ── */}
+                  <div className="space-y-1.5">
+                    <Label>
+                      Imagem de Seção 1{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (após capa)
+                      </span>
+                    </Label>
+                    <MediaUpload
+                      kind="image"
+                      maxSizeMB={5}
+                      value={form.sectionImages?.image1 || undefined}
+                      onUpload={(url) => updateSectionImage("image1", url)}
+                      onClear={() => updateSectionImage("image1", undefined)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>
+                      Imagem de Seção 2{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (após programação)
+                      </span>
+                    </Label>
+                    <MediaUpload
+                      kind="image"
+                      maxSizeMB={5}
+                      value={form.sectionImages?.image2 || undefined}
+                      onUpload={(url) => updateSectionImage("image2", url)}
+                      onClear={() => updateSectionImage("image2", undefined)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>
+                      Imagem de Seção 3{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (após localização)
+                      </span>
+                    </Label>
+                    <MediaUpload
+                      kind="image"
+                      maxSizeMB={5}
+                      value={form.sectionImages?.image3 || undefined}
+                      onUpload={(url) => updateSectionImage("image3", url)}
+                      onClear={() => updateSectionImage("image3", undefined)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>
+                      Imagem de Rodapé{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (imagem 4)
+                      </span>
+                    </Label>
+                    <MediaUpload
+                      kind="image"
+                      maxSizeMB={5}
+                      value={form.sectionImages?.image4 || undefined}
+                      onUpload={(url) => updateSectionImage("image4", url)}
+                      onClear={() => updateSectionImage("image4", undefined)}
+                    />
+                  </div>
+
                   <div className="space-y-1.5">
                     <Label htmlFor="quote">Citação</Label>
                     <Textarea

@@ -77,6 +77,17 @@ export interface GuestGuide {
   items: GuestGuideItem[];
 }
 
+export interface SectionImages {
+  /** Full-bleed image shown between the hero/names section and the date card. */
+  image1?: string;
+  /** Full-bleed image shown between the schedule section and the info cards. */
+  image2?: string;
+  /** Full-bleed image shown between the location card and the guest guide / FAQs. */
+  image3?: string;
+  /** Decorative image shown inside the footer area. */
+  image4?: string;
+}
+
 export interface EnvelopeConfig {
   /** Override the envelope body fill color (hex). Falls back to theme default if empty. */
   base?: string;
@@ -115,6 +126,8 @@ export interface InvitationData {
   saveDateStyle?: SaveDateStyle;
   /** Background image for the "cinematic" Save the Date style. Falls back to a default Unsplash photo if empty. */
   cinematicImageUrl?: string;
+  /** Optional decorative images placed between sections and in the footer. Each falls back to a default Unsplash photo if not provided. */
+  sectionImages?: SectionImages;
 }
 
 export interface TemplateTheme {

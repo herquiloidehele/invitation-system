@@ -172,6 +172,67 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
 }
 
 // ---------------------------------------------------------------------------
+// Full-bleed section image with gradient fades blending into the theme bg
+// ---------------------------------------------------------------------------
+
+function SectionImage({
+  src,
+  theme,
+  height = 280,
+}: {
+  src: string;
+  theme: TemplateTheme;
+  height?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+      style={{
+        position: "relative",
+        width: "100%",
+        height,
+        overflow: "hidden",
+      }}
+    >
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        }}
+      />
+      {/* Top gradient — fades from theme.bg down into transparent */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `linear-gradient(to bottom, ${theme.bg} 0%, transparent 40%)`,
+          pointerEvents: "none",
+        }}
+      />
+      {/* Bottom gradient — fades from transparent up into theme.bg */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `linear-gradient(to top, ${theme.bg} 0%, transparent 40%)`,
+          pointerEvents: "none",
+        }}
+      />
+    </motion.div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Animated section wrappers
 // ---------------------------------------------------------------------------
 
@@ -696,6 +757,13 @@ export default function InvitationPage({
         />
       </AnimatedSection>
 
+      {/* ================================================================= */}
+      {/* IMAGE 1 — after Save the Date info                                */}
+      {/* ================================================================= */}
+      {invitation.sectionImages?.image1 && (
+        <SectionImage src={invitation.sectionImages.image1} theme={theme} />
+      )}
+
       <SectionDivider theme={theme} />
 
       {/* ================================================================= */}
@@ -780,6 +848,13 @@ export default function InvitationPage({
 
           <SectionDivider theme={theme} />
         </>
+      )}
+
+      {/* ================================================================= */}
+      {/* IMAGE 2 — between schedule and info cards                         */}
+      {/* ================================================================= */}
+      {invitation.sectionImages?.image2 && (
+        <SectionImage src={invitation.sectionImages.image2} theme={theme} />
       )}
 
       {/* ================================================================= */}
@@ -923,6 +998,13 @@ export default function InvitationPage({
           onMapsClick={handleMapsClick}
         />
       </AnimatedSection>
+
+      {/* ================================================================= */}
+      {/* IMAGE 3 — between location and guest guide / FAQs                 */}
+      {/* ================================================================= */}
+      {invitation.sectionImages?.image3 && (
+        <SectionImage src={invitation.sectionImages.image3} theme={theme} />
+      )}
 
       {/* ================================================================= */}
       {/* 6. Manual do Bom Convidado                                        */}
@@ -1118,6 +1200,17 @@ export default function InvitationPage({
           </span>
         </footer>
       </AnimatedSection>
+
+      {/* ================================================================= */}
+      {/* IMAGE 4 — bottom of page                                          */}
+      {/* ================================================================= */}
+      {invitation.sectionImages?.image4 && (
+        <SectionImage
+          src={invitation.sectionImages.image4}
+          theme={theme}
+          height={220}
+        />
+      )}
 
       {/* ================================================================= */}
       {/* RSVP Modal                                                        */}
