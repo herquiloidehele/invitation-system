@@ -80,6 +80,7 @@ model Invitation {
   envelope     Json?    // EnvelopeConfig { base?, topFlap?, bottomFlap? }
   saveDateStyle  String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line"
   cinematicImageUrl String? // background image for the cinematic Save the Date style
+  sectionImages  Json?   // SectionImages { image1?, image2?, image3?, image4? }
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

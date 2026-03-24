@@ -113,6 +113,9 @@ export async function PUT(
         ...(body.cinematicImageUrl !== undefined && {
           cinematicImageUrl: body.cinematicImageUrl,
         }),
+        ...(body.sectionImages !== undefined && {
+          sectionImages: body.sectionImages,
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },
