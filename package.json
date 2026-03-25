@@ -7,9 +7,11 @@
     "build": "prisma generate && npm run db:migrate && next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "tsx prisma/seed.ts",
     "db:seed:dev": "tsx --env-file=.env prisma/seed.ts",
+    "db:seed:prod": "tsx --env-file=.prod prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:dev": "cross-env ENV=dev prisma migrate dev",
+    "db:migrate:prod": "cross-env ENV=prod prisma migrate dev",
     "db:studio": "prisma studio"
   },
   "prisma": {
@@ -52,6 +54,7 @@
     "@types/pg": "^8.18.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
