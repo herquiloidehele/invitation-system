@@ -2,7 +2,12 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getThemes } from "@/lib/themes";
-import type { InvitationData, SaveDateStyle, SectionImages } from "@/lib/types";
+import type {
+  InvitationData,
+  ParentsInfo,
+  SaveDateStyle,
+  SectionImages,
+} from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
 
 export const dynamic = "force-dynamic";
@@ -57,6 +62,7 @@ export default async function EditInvitationPage({
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages:
       (row.sectionImages as unknown as SectionImages | null) ?? undefined,
+    parents: (row.parents as unknown as ParentsInfo | null) ?? undefined,
   };
 
   return (

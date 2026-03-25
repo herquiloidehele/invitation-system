@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
         saveDateStyle: body.saveDateStyle ?? null,
         cinematicImageUrl: body.cinematicImageUrl ?? null,
         sectionImages: body.sectionImages ?? null,
+        parents: body.parents ?? null,
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

@@ -116,6 +116,9 @@ export async function PUT(
         ...(body.sectionImages !== undefined && {
           sectionImages: body.sectionImages,
         }),
+        ...(body.parents !== undefined && {
+          parents: body.parents,
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

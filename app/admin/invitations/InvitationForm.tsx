@@ -11,6 +11,7 @@ import type {
   GuestGuideItem,
   SaveDateStyle,
   SectionImages,
+  ParentsInfo,
 } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -305,6 +306,15 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     saveDateStyle: "classic",
     cinematicImageUrl: "",
     sectionImages: {},
+    parents: {
+      enabled: false,
+      blessingMessage: "Com a bênção dos Pais",
+      inviteMessage: "Convidam para celebração do seu casamento",
+      bridesFather: "",
+      bridesMother: "",
+      groomsFather: "",
+      groomsMother: "",
+    },
   };
 }
 
@@ -565,6 +575,27 @@ export default function InvitationForm({
     [],
   );
 
+  // Parents info
+  const updateParents = useCallback(
+    (field: keyof ParentsInfo, value: string | boolean) => {
+      setForm((prev) => ({
+        ...prev,
+        parents: {
+          enabled: false,
+          blessingMessage: "Com a bênção dos Pais",
+          inviteMessage: "Convidam para celebração do seu casamento",
+          bridesFather: "",
+          bridesMother: "",
+          groomsFather: "",
+          groomsMother: "",
+          ...prev.parents,
+          [field]: value,
+        },
+      }));
+    },
+    [],
+  );
+
   // Current theme for preview — merge per-invitation envelope overrides
   const currentTheme = useMemo(() => {
     const base =
@@ -703,6 +734,102 @@ export default function InvitationForm({
                         placeholder="maria-joao"
                       />
                     </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Parents mode */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-medium">Modo Pais</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Exibe os nomes dos pais e mensagens de bênção no hero
+                          do convite
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.parents?.enabled ?? false}
+                        onCheckedChange={(v) => updateParents("enabled", v)}
+                      />
+                    </div>
+
+                    {form.parents?.enabled && (
+                      <div className="space-y-3 rounded-lg border p-3 bg-muted/30">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="blessingMessage">
+                            Mensagem de bênção
+                          </Label>
+                          <Input
+                            id="blessingMessage"
+                            value={form.parents?.blessingMessage ?? ""}
+                            onChange={(e) =>
+                              updateParents("blessingMessage", e.target.value)
+                            }
+                            placeholder="Com a bênção dos Pais"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground uppercase tracking-wide">
+                            Pais da Noiva
+                          </Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              value={form.parents?.bridesFather ?? ""}
+                              onChange={(e) =>
+                                updateParents("bridesFather", e.target.value)
+                              }
+                              placeholder="Pai da noiva"
+                            />
+                            <Input
+                              value={form.parents?.bridesMother ?? ""}
+                              onChange={(e) =>
+                                updateParents("bridesMother", e.target.value)
+                              }
+                              placeholder="Mãe da noiva"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground uppercase tracking-wide">
+                            Pais do Noivo
+                          </Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              value={form.parents?.groomsFather ?? ""}
+                              onChange={(e) =>
+                                updateParents("groomsFather", e.target.value)
+                              }
+                              placeholder="Pai do noivo"
+                            />
+                            <Input
+                              value={form.parents?.groomsMother ?? ""}
+                              onChange={(e) =>
+                                updateParents("groomsMother", e.target.value)
+                              }
+                              placeholder="Mãe do noivo"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="inviteMessage">
+                            Mensagem de convite
+                          </Label>
+                          <Textarea
+                            id="inviteMessage"
+                            value={form.parents?.inviteMessage ?? ""}
+                            onChange={(e) =>
+                              updateParents("inviteMessage", e.target.value)
+                            }
+                            placeholder="Convidam para celebração do seu casamento"
+                            rows={2}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </AccordionContent>
               </AccordionItem>

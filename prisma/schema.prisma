@@ -81,6 +81,7 @@ model Invitation {
   saveDateStyle  String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line"
   cinematicImageUrl String? // background image for the cinematic Save the Date style
   sectionImages  Json?   // SectionImages { image1?, image2?, image3?, image4? }
+  parents        Json?   // ParentsInfo { enabled, blessingMessage, inviteMessage, bridesFather, bridesMother, groomsFather, groomsMother }
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

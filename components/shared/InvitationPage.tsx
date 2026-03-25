@@ -527,114 +527,262 @@ export default function InvitationPage({
               zIndex: 10,
             }}
           >
-            {/* Label */}
-            <motion.span
-              variants={heroTextItem}
-              style={{
-                fontFamily: theme.uiFont,
-                fontSize: 10,
-                fontWeight: 300,
-                letterSpacing: 5,
-                textTransform: "uppercase" as const,
-                color: "rgba(255,255,255,0.65)",
-              }}
-            >
-              Convidam para o casamento de
-            </motion.span>
+            {invitation.parents?.enabled ? (
+              /* ── Parents Mode (video) ── */
+              <>
+                {/* Couple names */}
+                <motion.h1
+                  variants={heroTextItem}
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize + 10,
+                    lineHeight: 1.05,
+                    color: "#ffffff",
+                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  {invitation.couple.bride}
+                </motion.h1>
 
-            {/* Bride */}
-            <motion.h1
-              variants={heroTextItem}
-              className="mt-5"
-              style={{
-                fontFamily: theme.displayFont,
-                fontSize: nameFontSize + 10,
-                lineHeight: 1.05,
-                color: "#ffffff",
-                textShadow: "0 2px 40px rgba(0,0,0,0.5)",
-              }}
-            >
-              {invitation.couple.bride}
-            </motion.h1>
+                <motion.span
+                  variants={heroTextItem}
+                  className="my-2"
+                  style={{
+                    fontFamily:
+                      theme.scriptFont ?? "'Cormorant Garamond', serif",
+                    fontSize: 34,
+                    fontStyle: "italic",
+                    color: "rgba(255,255,255,0.75)",
+                    textShadow: "0 2px 20px rgba(0,0,0,0.35)",
+                  }}
+                >
+                  &amp;
+                </motion.span>
 
-            {/* Ampersand */}
-            <motion.span
-              variants={heroTextItem}
-              className="my-2"
-              style={{
-                fontFamily: theme.scriptFont ?? "'Cormorant Garamond', serif",
-                fontSize: 34,
-                fontStyle: "italic",
-                color: "rgba(255,255,255,0.75)",
-                textShadow: "0 2px 20px rgba(0,0,0,0.35)",
-              }}
-            >
-              &amp;
-            </motion.span>
+                <motion.h1
+                  variants={heroTextItem}
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize + 10,
+                    lineHeight: 1.05,
+                    color: "#ffffff",
+                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  {invitation.couple.groom}
+                </motion.h1>
 
-            {/* Groom */}
-            <motion.h1
-              variants={heroTextItem}
-              style={{
-                fontFamily: theme.displayFont,
-                fontSize: nameFontSize + 10,
-                lineHeight: 1.05,
-                color: "#ffffff",
-                textShadow: "0 2px 40px rgba(0,0,0,0.5)",
-              }}
-            >
-              {invitation.couple.groom}
-            </motion.h1>
+                {/* Blessing message */}
+                <motion.span
+                  variants={heroTextItem}
+                  className="mt-5"
+                  style={{
+                    fontFamily: theme.bodyFont,
+                    fontSize: 13,
+                    fontStyle: "italic",
+                    color: "rgba(255,255,255,0.65)",
+                    letterSpacing: 1,
+                  }}
+                >
+                  {invitation.parents.blessingMessage}
+                </motion.span>
 
-            {/* Date pill */}
-            <motion.div
-              variants={heroTextItem}
-              className="mt-7 flex items-center gap-4"
-              style={{
-                fontFamily: theme.uiFont,
-                fontSize: 10,
-                fontWeight: 300,
-                letterSpacing: 6,
-                textTransform: "uppercase" as const,
-                color: "rgba(255,255,255,0.6)",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 28,
-                  height: 1,
-                  background: "rgba(255,255,255,0.3)",
-                }}
-              />
-              {invitation.date.day}&nbsp;&middot;&nbsp;
-              {invitation.date.month}&nbsp;&middot;&nbsp;
-              {invitation.date.year}
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 28,
-                  height: 1,
-                  background: "rgba(255,255,255,0.3)",
-                }}
-              />
-            </motion.div>
+                {/* Parents names — two columns */}
+                <motion.div
+                  variants={heroTextItem}
+                  className="mt-5 flex w-full max-w-sm justify-between gap-6"
+                >
+                  <div
+                    className="flex flex-col items-start gap-0.5"
+                    style={{ textAlign: "left" }}
+                  >
+                    {invitation.parents.bridesFather && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 12,
+                          color: "rgba(255,255,255,0.8)",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {invitation.parents.bridesFather}
+                      </span>
+                    )}
+                    {invitation.parents.bridesMother && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 12,
+                          color: "rgba(255,255,255,0.8)",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {invitation.parents.bridesMother}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className="flex flex-col items-end gap-0.5"
+                    style={{ textAlign: "right" }}
+                  >
+                    {invitation.parents.groomsFather && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 12,
+                          color: "rgba(255,255,255,0.8)",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {invitation.parents.groomsFather}
+                      </span>
+                    )}
+                    {invitation.parents.groomsMother && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 12,
+                          color: "rgba(255,255,255,0.8)",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {invitation.parents.groomsMother}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
 
-            {/* Quote */}
-            <motion.p
-              variants={heroTextItem}
-              className="mt-5"
-              style={{
-                fontFamily: theme.bodyFont,
-                fontSize: 14,
-                fontStyle: "italic" as const,
-                lineHeight: 1.65,
-                color: "rgba(255,255,255,0.5)",
-                maxWidth: 280,
-              }}
-            >
-              {invitation.quote}
-            </motion.p>
+                {/* Invite message */}
+                <motion.p
+                  variants={heroTextItem}
+                  className="mt-5"
+                  style={{
+                    fontFamily: theme.bodyFont,
+                    fontSize: 13,
+                    fontStyle: "italic",
+                    lineHeight: 1.65,
+                    color: "rgba(255,255,255,0.55)",
+                    maxWidth: 300,
+                    textAlign: "center",
+                  }}
+                >
+                  {invitation.parents.inviteMessage}
+                </motion.p>
+              </>
+            ) : (
+              /* ── Standard Mode (video) ── */
+              <>
+                {/* Label */}
+                <motion.span
+                  variants={heroTextItem}
+                  style={{
+                    fontFamily: theme.uiFont,
+                    fontSize: 10,
+                    fontWeight: 300,
+                    letterSpacing: 5,
+                    textTransform: "uppercase" as const,
+                    color: "rgba(255,255,255,0.65)",
+                  }}
+                >
+                  Convidam para o casamento de
+                </motion.span>
+
+                {/* Bride */}
+                <motion.h1
+                  variants={heroTextItem}
+                  className="mt-5"
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize + 10,
+                    lineHeight: 1.05,
+                    color: "#ffffff",
+                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  {invitation.couple.bride}
+                </motion.h1>
+
+                {/* Ampersand */}
+                <motion.span
+                  variants={heroTextItem}
+                  className="my-2"
+                  style={{
+                    fontFamily:
+                      theme.scriptFont ?? "'Cormorant Garamond', serif",
+                    fontSize: 34,
+                    fontStyle: "italic",
+                    color: "rgba(255,255,255,0.75)",
+                    textShadow: "0 2px 20px rgba(0,0,0,0.35)",
+                  }}
+                >
+                  &amp;
+                </motion.span>
+
+                {/* Groom */}
+                <motion.h1
+                  variants={heroTextItem}
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize + 10,
+                    lineHeight: 1.05,
+                    color: "#ffffff",
+                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  {invitation.couple.groom}
+                </motion.h1>
+
+                {/* Date pill */}
+                <motion.div
+                  variants={heroTextItem}
+                  className="mt-7 flex items-center gap-4"
+                  style={{
+                    fontFamily: theme.uiFont,
+                    fontSize: 10,
+                    fontWeight: 300,
+                    letterSpacing: 6,
+                    textTransform: "uppercase" as const,
+                    color: "rgba(255,255,255,0.6)",
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 28,
+                      height: 1,
+                      background: "rgba(255,255,255,0.3)",
+                    }}
+                  />
+                  {invitation.date.day}&nbsp;&middot;&nbsp;
+                  {invitation.date.month}&nbsp;&middot;&nbsp;
+                  {invitation.date.year}
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 28,
+                      height: 1,
+                      background: "rgba(255,255,255,0.3)",
+                    }}
+                  />
+                </motion.div>
+
+                {/* Quote */}
+                <motion.p
+                  variants={heroTextItem}
+                  className="mt-5"
+                  style={{
+                    fontFamily: theme.bodyFont,
+                    fontSize: 14,
+                    fontStyle: "italic" as const,
+                    lineHeight: 1.65,
+                    color: "rgba(255,255,255,0.5)",
+                    maxWidth: 280,
+                  }}
+                >
+                  {invitation.quote}
+                </motion.p>
+              </>
+            )}
           </motion.div>
         )}
 
@@ -662,81 +810,242 @@ export default function InvitationPage({
             className="flex flex-col items-center text-center"
             style={{ padding: "36px 40px" }}
           >
-            <span
-              style={{
-                fontFamily: theme.uiFont,
-                fontSize: 10,
-                fontWeight: 300,
-                letterSpacing: 4,
-                textTransform: "uppercase" as const,
-                color: theme.textSecondary,
-              }}
-            >
-              Convidam para o casamento de
-            </span>
+            {invitation.parents?.enabled ? (
+              /* ── Parents Mode (image hero) ── */
+              <>
+                {/* Couple names */}
+                <h1
+                  className="mt-2"
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize,
+                    lineHeight: 1.1,
+                    color: theme.textPrimary,
+                  }}
+                >
+                  {invitation.couple.bride}
+                </h1>
 
-            <h1
-              className="mt-5"
-              style={{
-                fontFamily: theme.displayFont,
-                fontSize: nameFontSize,
-                lineHeight: 1.1,
-                color: theme.textPrimary,
-              }}
-            >
-              {invitation.couple.bride}
-            </h1>
+                <span
+                  className="my-2"
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: 26,
+                    fontStyle: "italic",
+                    color: theme.accent,
+                  }}
+                >
+                  &amp;
+                </span>
 
-            <span
-              className="my-2"
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 26,
-                fontStyle: "italic",
-                color: theme.accent,
-              }}
-            >
-              &amp;
-            </span>
+                <h1
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize,
+                    lineHeight: 1.1,
+                    color: theme.textPrimary,
+                  }}
+                >
+                  {invitation.couple.groom}
+                </h1>
 
-            <h1
-              style={{
-                fontFamily: theme.displayFont,
-                fontSize: nameFontSize,
-                lineHeight: 1.1,
-                color: theme.textPrimary,
-              }}
-            >
-              {invitation.couple.groom}
-            </h1>
+                {/* Decorative accent line */}
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
+                  className="mt-6 mb-5"
+                  style={{
+                    width: 48,
+                    height: 1,
+                    background: theme.accent,
+                    opacity: 0.3,
+                  }}
+                />
 
-            {/* Decorative accent line */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-              className="mt-7 mb-5"
-              style={{
-                width: 48,
-                height: 1,
-                background: theme.accent,
-                opacity: 0.3,
-              }}
-            />
+                {/* Blessing message */}
+                <p
+                  style={{
+                    fontFamily: theme.bodyFont,
+                    fontSize: 13,
+                    fontStyle: "italic",
+                    color: theme.textSecondary,
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {invitation.parents.blessingMessage}
+                </p>
 
-            <p
-              style={{
-                fontFamily: theme.bodyFont,
-                fontSize: 16,
-                fontStyle: "italic" as const,
-                lineHeight: 1.65,
-                color: theme.textSecondary,
-                maxWidth: 300,
-              }}
-            >
-              {invitation.quote}
-            </p>
+                {/* Parents names — two columns */}
+                <div className="mt-5 flex w-full max-w-xs justify-between gap-4">
+                  <div className="flex flex-col items-start gap-0.5">
+                    {invitation.parents.bridesFather && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 13,
+                          color: theme.textPrimary,
+                          lineHeight: 1.6,
+                          textAlign: "left",
+                        }}
+                      >
+                        {invitation.parents.bridesFather}
+                      </span>
+                    )}
+                    {invitation.parents.bridesMother && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 13,
+                          color: theme.textPrimary,
+                          lineHeight: 1.6,
+                          textAlign: "left",
+                        }}
+                      >
+                        {invitation.parents.bridesMother}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end gap-0.5">
+                    {invitation.parents.groomsFather && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 13,
+                          color: theme.textPrimary,
+                          lineHeight: 1.6,
+                          textAlign: "right",
+                        }}
+                      >
+                        {invitation.parents.groomsFather}
+                      </span>
+                    )}
+                    {invitation.parents.groomsMother && (
+                      <span
+                        style={{
+                          fontFamily: theme.bodyFont,
+                          fontSize: 13,
+                          color: theme.textPrimary,
+                          lineHeight: 1.6,
+                          textAlign: "right",
+                        }}
+                      >
+                        {invitation.parents.groomsMother}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Decorative accent line */}
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
+                  className="mt-6 mb-5"
+                  style={{
+                    width: 48,
+                    height: 1,
+                    background: theme.accent,
+                    opacity: 0.3,
+                  }}
+                />
+
+                {/* Invite message */}
+                <p
+                  style={{
+                    fontFamily: theme.bodyFont,
+                    fontSize: 14,
+                    fontStyle: "italic",
+                    lineHeight: 1.65,
+                    color: theme.textSecondary,
+                    maxWidth: 300,
+                  }}
+                >
+                  {invitation.parents.inviteMessage}
+                </p>
+              </>
+            ) : (
+              /* ── Standard Mode (image hero) ── */
+              <>
+                <span
+                  style={{
+                    fontFamily: theme.uiFont,
+                    fontSize: 10,
+                    fontWeight: 300,
+                    letterSpacing: 4,
+                    textTransform: "uppercase" as const,
+                    color: theme.textSecondary,
+                  }}
+                >
+                  Convidam para o casamento de
+                </span>
+
+                <h1
+                  className="mt-5"
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize,
+                    lineHeight: 1.1,
+                    color: theme.textPrimary,
+                  }}
+                >
+                  {invitation.couple.bride}
+                </h1>
+
+                <span
+                  className="my-2"
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: 26,
+                    fontStyle: "italic",
+                    color: theme.accent,
+                  }}
+                >
+                  &amp;
+                </span>
+
+                <h1
+                  style={{
+                    fontFamily: theme.displayFont,
+                    fontSize: nameFontSize,
+                    lineHeight: 1.1,
+                    color: theme.textPrimary,
+                  }}
+                >
+                  {invitation.couple.groom}
+                </h1>
+
+                {/* Decorative accent line */}
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
+                  className="mt-7 mb-5"
+                  style={{
+                    width: 48,
+                    height: 1,
+                    background: theme.accent,
+                    opacity: 0.3,
+                  }}
+                />
+
+                <p
+                  style={{
+                    fontFamily: theme.bodyFont,
+                    fontSize: 16,
+                    fontStyle: "italic" as const,
+                    lineHeight: 1.65,
+                    color: theme.textSecondary,
+                    maxWidth: 300,
+                  }}
+                >
+                  {invitation.quote}
+                </p>
+              </>
+            )}
           </div>
         </AnimatedSection>
       )}

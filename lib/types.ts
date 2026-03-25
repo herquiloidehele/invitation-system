@@ -97,6 +97,19 @@ export interface EnvelopeConfig {
   bottomFlap?: string;
 }
 
+export interface ParentsInfo {
+  /** Whether to show the parents mode in the hero section. */
+  enabled: boolean;
+  /** E.g. "Com a bênção dos Pais" */
+  blessingMessage: string;
+  /** E.g. "Convidam para celebração do seu casamento" */
+  inviteMessage: string;
+  bridesFather: string;
+  bridesMother: string;
+  groomsFather: string;
+  groomsMother: string;
+}
+
 export interface InvitationData {
   slug: string;
   /** The theme's database id — used when saving/updating invitations. */
@@ -128,6 +141,8 @@ export interface InvitationData {
   cinematicImageUrl?: string;
   /** Optional decorative images placed between sections and in the footer. Each falls back to a default Unsplash photo if not provided. */
   sectionImages?: SectionImages;
+  /** Optional parents info for the "parents mode" hero section. */
+  parents?: ParentsInfo;
 }
 
 export interface TemplateTheme {

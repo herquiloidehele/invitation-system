@@ -1,5 +1,10 @@
 import { prisma } from "./db";
-import type { InvitationData, SaveDateStyle, SectionImages } from "./types";
+import type {
+  InvitationData,
+  ParentsInfo,
+  SaveDateStyle,
+  SectionImages,
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -27,6 +32,7 @@ type InvitationWithTheme = {
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
   sectionImages: unknown;
+  parents: unknown;
 };
 
 function toInvitationData(row: InvitationWithTheme): InvitationData {
@@ -51,6 +57,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
+    parents: (row.parents as ParentsInfo | null) ?? undefined,
   };
 }
 
