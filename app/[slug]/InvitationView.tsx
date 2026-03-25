@@ -6,7 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import InvitationPage from "@/components/shared/InvitationPage";
-import ExternalVideoPage from "@/components/shared/ExternalVideoPage";
+import ExternalVideoPage, {
+  type ExternalVideoPageHandle,
+} from "@/components/shared/ExternalVideoPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface InvitationViewProps {
@@ -20,8 +22,13 @@ export default function InvitationView({
 }: InvitationViewProps) {
   const [coverVisible, setCoverVisible] = useState(true);
   const [showContent, setShowContent] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const videoRef = useRef<ExternalVideoPageHandle | null>(null);
+
+  const isExternalVideo =
+    (invitation.invitationType ?? "standard") === "external_video";
 
   const { trackEvent } = useAnalytics(invitation.slug);
 
@@ -127,9 +134,16 @@ export default function InvitationView({
       return;
     }
 
+    // For external video: play imperatively (within the gesture context) and
+    // reveal the video. The <video> element is already mounted and preloading.
+    if (type === "external_video") {
+      videoRef.current?.play();
+      setVideoVisible(true);
+      requestAnimationFrame(() => setCoverVisible(false));
+      return;
+    }
+
     setShowContent(true);
-    // Remove the cover from the DOM on the next frame
-    // (after content is already rendering underneath)
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
@@ -138,10 +152,6 @@ export default function InvitationView({
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
     const type = invitation.invitationType ?? "standard";
-
-    if (type === "external_video") {
-      return <ExternalVideoPage videoUrl={invitation.videoUrl ?? ""} />;
-    }
 
     if (type === "external_link") {
       // Redirect is handled in handleAnimationComplete; render nothing here
@@ -170,6 +180,15 @@ export default function InvitationView({
         className="relative min-h-dvh w-full overflow-hidden"
         style={{ maxWidth: "500px", backgroundColor: theme.bg }}
       >
+        {/* External video — mounted immediately for preloading, revealed after animation */}
+        {isExternalVideo && (
+          <ExternalVideoPage
+            ref={videoRef}
+            videoUrl={invitation.videoUrl ?? ""}
+            visible={videoVisible}
+          />
+        )}
+
         {/* Invitation content — rendered behind the cover, fades in immediately */}
         <AnimatePresence>
           {showContent && (
