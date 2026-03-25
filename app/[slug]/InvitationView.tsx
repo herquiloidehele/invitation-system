@@ -186,6 +186,8 @@ export default function InvitationView({
             ref={videoRef}
             videoUrl={invitation.videoUrl ?? ""}
             visible={videoVisible}
+            invitation={invitation}
+            theme={mergedTheme}
           />
         )}
 
