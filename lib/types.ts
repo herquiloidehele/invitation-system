@@ -1,6 +1,9 @@
 /** Theme name / slug identifier (e.g. "pink-floral"). Open-ended — themes are stored in the database. */
 export type TemplateName = string;
 
+/** Invitation type — determines what is shown after the envelope cover opens. */
+export type InvitationType = "standard" | "external_video" | "external_link";
+
 /** Visual style for the Save the Date section in the invitation page */
 export type SaveDateStyle =
   | "classic"
@@ -143,6 +146,10 @@ export interface InvitationData {
   sectionImages?: SectionImages;
   /** Optional parents info for the "parents mode" hero section. */
   parents?: ParentsInfo;
+  /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
+  invitationType: InvitationType;
+  /** External URL for the iframe page (external_link type). */
+  externalLink?: string;
 }
 
 export interface TemplateTheme {

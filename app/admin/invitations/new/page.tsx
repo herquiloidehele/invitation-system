@@ -52,6 +52,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         faqs: [],
         saveDateStyle: "classic",
         cinematicImageUrl: "",
+        invitationType: "standard",
       }
     : undefined;
 

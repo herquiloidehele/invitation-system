@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import type {
   InvitationData,
+  InvitationType,
   ParentsInfo,
   SaveDateStyle,
   SectionImages,
@@ -33,6 +34,8 @@ type InvitationWithTheme = {
   cinematicImageUrl: string | null;
   sectionImages: unknown;
   parents: unknown;
+  invitationType: string;
+  externalLink: string | null;
 };
 
 function toInvitationData(row: InvitationWithTheme): InvitationData {
@@ -58,6 +61,8 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
+    invitationType: (row.invitationType as InvitationType) ?? "standard",
+    externalLink: row.externalLink ?? undefined,
   };
 }
 
@@ -75,7 +80,7 @@ export async function getInvitation(
     include: includeTheme,
   });
   if (!row) return null;
-  return toInvitationData(row);
+  return toInvitationData(row as unknown as InvitationWithTheme);
 }
 
 export async function getAllInvitations(): Promise<InvitationData[]> {
@@ -83,7 +88,7 @@ export async function getAllInvitations(): Promise<InvitationData[]> {
     orderBy: { createdAt: "desc" },
     include: includeTheme,
   });
-  return rows.map(toInvitationData);
+  return (rows as unknown as InvitationWithTheme[]).map(toInvitationData);
 }
 
 /**

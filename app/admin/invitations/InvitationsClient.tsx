@@ -30,6 +30,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -49,6 +55,9 @@ import {
   Trash2,
   Search,
   Plus,
+  ChevronDown,
+  Scroll,
+  Link2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -209,13 +218,41 @@ export function InvitationsClient({
                 Gerir, editar e acompanhar todos os convites de casamento
               </CardDescription>
             </div>
-            <Link
-              href="/admin/invitations/new"
-              className={cn(buttonVariants({ variant: "default", size: "sm" }))}
-            >
-              <Plus className="size-4 mr-1.5" />
-              Criar Convite
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button size="sm">
+                    <Plus className="size-4 mr-1.5" />
+                    Criar Convite
+                    <ChevronDown className="size-3.5 ml-1.5 opacity-70" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem
+                  onClick={() => router.push("/admin/invitations/new")}
+                >
+                  <Scroll className="size-4 mr-2 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium text-sm">Interno</p>
+                    <p className="text-xs text-muted-foreground">
+                      Convite completo com todas as secções
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => router.push("/admin/invitations/new-external")}
+                >
+                  <Link2 className="size-4 mr-2 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium text-sm">Externo</p>
+                    <p className="text-xs text-muted-foreground">
+                      Capa + vídeo ou link externo
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Filters */}

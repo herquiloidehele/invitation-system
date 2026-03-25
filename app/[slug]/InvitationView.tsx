@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import InvitationPage from "@/components/shared/InvitationPage";
+import ExternalVideoPage from "@/components/shared/ExternalVideoPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface InvitationViewProps {
@@ -44,11 +45,12 @@ export default function InvitationView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** User tapped — start music, track envelope open, and let the envelope animate. */
+  /** User tapped — start music (only for standard invites), track envelope open. */
   const handleOpen = useCallback(() => {
     trackEvent("envelope_open");
 
-    if (invitation.audio.enabled) {
+    // External invites don't have background audio
+    if (invitation.invitationType === "standard" && invitation.audio.enabled) {
       try {
         const audio = new Audio(invitation.audio.src);
         audio.loop = true;
@@ -71,7 +73,7 @@ export default function InvitationView({
         /* silent */
       }
     }
-  }, [invitation.audio, trackEvent]);
+  }, [invitation.audio, invitation.invitationType, trackEvent]);
 
   /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
   useEffect(() => {
@@ -117,13 +119,44 @@ export default function InvitationView({
    * is seamless.
    */
   const handleAnimationComplete = useCallback(() => {
+    const type = invitation.invitationType ?? "standard";
+
+    // For external links, redirect the browser after the envelope animation
+    if (type === "external_link" && invitation.externalLink) {
+      window.location.href = invitation.externalLink;
+      return;
+    }
+
     setShowContent(true);
     // Remove the cover from the DOM on the next frame
     // (after content is already rendering underneath)
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
-  }, []);
+  }, [invitation.invitationType, invitation.externalLink]);
+
+  /** Render the appropriate content based on invitation type. */
+  function renderContent() {
+    const type = invitation.invitationType ?? "standard";
+
+    if (type === "external_video") {
+      return <ExternalVideoPage videoUrl={invitation.videoUrl ?? ""} />;
+    }
+
+    if (type === "external_link") {
+      // Redirect is handled in handleAnimationComplete; render nothing here
+      return null;
+    }
+
+    // Default: standard full invitation page
+    return (
+      <InvitationPage
+        invitation={invitation}
+        theme={theme}
+        audioRef={audioRef}
+      />
+    );
+  }
 
   return (
     /* Outer full-screen layer — visible on wide screens as the side gutters */
@@ -146,11 +179,7 @@ export default function InvitationView({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <InvitationPage
-                invitation={invitation}
-                theme={theme}
-                audioRef={audioRef}
-              />
+              {renderContent()}
             </motion.div>
           )}
         </AnimatePresence>

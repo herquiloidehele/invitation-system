@@ -4,11 +4,13 @@ import { prisma } from "@/lib/db";
 import { getThemes } from "@/lib/themes";
 import type {
   InvitationData,
+  InvitationType,
   ParentsInfo,
   SaveDateStyle,
   SectionImages,
 } from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
+import ExternalInvitationForm from "../../ExternalInvitationForm";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +65,25 @@ export default async function EditInvitationPage({
     sectionImages:
       (row.sectionImages as unknown as SectionImages | null) ?? undefined,
     parents: (row.parents as unknown as ParentsInfo | null) ?? undefined,
+    invitationType: (row.invitationType as InvitationType) ?? "standard",
+    externalLink: row.externalLink ?? undefined,
   };
+
+  const isExternal =
+    initialData.invitationType === "external_video" ||
+    initialData.invitationType === "external_link";
+
+  if (isExternal) {
+    return (
+      <ExternalInvitationForm
+        mode="edit"
+        initialData={initialData}
+        invitationId={row.id}
+        ownerUrl={ownerUrl}
+        themes={themes}
+      />
+    );
+  }
 
   return (
     <InvitationForm

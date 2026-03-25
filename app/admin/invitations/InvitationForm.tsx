@@ -315,6 +315,8 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       groomsFather: "",
       groomsMother: "",
     },
+    invitationType: "standard",
+    externalLink: "",
   };
 }
 

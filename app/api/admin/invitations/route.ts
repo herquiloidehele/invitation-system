@@ -93,6 +93,8 @@ export async function POST(request: NextRequest) {
         cinematicImageUrl: body.cinematicImageUrl ?? null,
         sectionImages: body.sectionImages ?? null,
         parents: body.parents ?? null,
+        invitationType: body.invitationType ?? "standard",
+        externalLink: body.externalLink ?? null,
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

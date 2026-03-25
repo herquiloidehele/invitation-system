@@ -119,6 +119,12 @@ export async function PUT(
         ...(body.parents !== undefined && {
           parents: body.parents,
         }),
+        ...(body.invitationType !== undefined && {
+          invitationType: body.invitationType,
+        }),
+        ...(body.externalLink !== undefined && {
+          externalLink: body.externalLink,
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },
