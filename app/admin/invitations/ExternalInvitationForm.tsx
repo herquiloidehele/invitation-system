@@ -9,6 +9,7 @@ import type {
   InvitationData,
   InvitationType,
   TemplateTheme,
+  EnvelopeConfig,
 } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,12 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
@@ -82,6 +89,7 @@ function getDefaultState(
     invitationType: invType,
     externalLink: "",
     saveDateStyle: "classic",
+    envelope: {},
   };
 }
 
@@ -149,6 +157,17 @@ export default function ExternalInvitationForm({
     [mode],
   );
 
+  // Envelope overrides
+  const updateEnvelope = useCallback(
+    (field: keyof EnvelopeConfig, value: string) => {
+      setForm((prev) => ({
+        ...prev,
+        envelope: { ...prev.envelope, [field]: value },
+      }));
+    },
+    [],
+  );
+
   // Switch sub-type
   const switchSubType = useCallback((t: ExternalSubType) => {
     setForm((prev) => ({
@@ -161,12 +180,20 @@ export default function ExternalInvitationForm({
 
   // Current theme for cover preview
   const currentTheme = useMemo(() => {
-    return (
+    const base =
       themes.find((t) => t.id === form.themeId) ??
       themes.find((t) => t.name === form.template) ??
-      themes[0]
-    );
-  }, [themes, form.themeId, form.template]);
+      themes[0];
+    const overrides = form.envelope ?? {};
+    return {
+      ...base,
+      envelope: {
+        base: overrides.base || base?.envelope.base || "",
+        topFlap: overrides.topFlap || base?.envelope.topFlap || "",
+        bottomFlap: overrides.bottomFlap || base?.envelope.bottomFlap || "",
+      },
+    };
+  }, [themes, form.themeId, form.template, form.envelope]);
 
   // Submit
   async function handleSubmit() {
@@ -417,6 +444,96 @@ export default function ExternalInvitationForm({
                 </SelectContent>
               </Select>
             </div>
+
+            <Separator />
+
+            {/* ── Envelope editor ── */}
+            <Accordion defaultValue={[]} className="w-full">
+              <AccordionItem
+                value="envelope"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Personalizar capa
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  {/* Base color */}
+                  <div className="space-y-1.5">
+                    <Label>Cor de fundo</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Deixe em branco para usar a cor padrão do modelo (
+                      {currentTheme?.envelope.base ?? ""})
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={
+                          form.envelope?.base ||
+                          currentTheme?.envelope.base ||
+                          "#ffffff"
+                        }
+                        onChange={(e) => updateEnvelope("base", e.target.value)}
+                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                        title="Escolher cor"
+                      />
+                      <input
+                        type="text"
+                        value={form.envelope?.base ?? ""}
+                        onChange={(e) => updateEnvelope("base", e.target.value)}
+                        placeholder={`Padrão: ${currentTheme?.envelope.base ?? ""}`}
+                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                      />
+                      {form.envelope?.base && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() => updateEnvelope("base", "")}
+                        >
+                          Repor
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Top flap image */}
+                  <div className="space-y-1.5">
+                    <Label>Imagem da aba superior</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Imagem triangular que cobre a parte superior do envelope.
+                      Deixe em branco para usar a imagem padrão.
+                    </p>
+                    <MediaUpload
+                      value={form.envelope?.topFlap ?? ""}
+                      onUpload={(url) => updateEnvelope("topFlap", url)}
+                      onClear={() => updateEnvelope("topFlap", "")}
+                      kind="image"
+                      maxSizeMB={5}
+                    />
+                  </div>
+
+                  <Separator />
+
+                  {/* Bottom flap image */}
+                  <div className="space-y-1.5">
+                    <Label>Imagem da aba inferior</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Imagem que cobre a parte inferior do envelope. Deixe em
+                      branco para usar a imagem padrão.
+                    </p>
+                    <MediaUpload
+                      value={form.envelope?.bottomFlap ?? ""}
+                      onUpload={(url) => updateEnvelope("bottomFlap", url)}
+                      onClear={() => updateEnvelope("bottomFlap", "")}
+                      kind="image"
+                      maxSizeMB={5}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
             <Separator />
 
