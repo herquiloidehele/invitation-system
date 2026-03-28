@@ -12,7 +12,10 @@ import {
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
 import { PREDEFINED_GUIDE_ITEMS, isPredefinedItem } from "@/lib/guest-guide";
+import { LUCIDE_ICON_INPUT_OPTIONS } from "@/lib/lucide-icons";
 import type { GuestGuide, GuestGuideItem } from "@/lib/types";
+
+const LUCIDE_ICON_DATALIST_ID = "guest-guide-lucide-icons";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -147,6 +150,7 @@ function CustomItemRow({ item, onUpdate, onRemove }: CustomItemRowProps) {
           <Input
             value={item.iconName ?? ""}
             onChange={(e) => onUpdate({ iconName: e.target.value })}
+            list={LUCIDE_ICON_DATALIST_ID}
             placeholder="ex: Star, Heart, Music..."
             className="font-mono text-xs"
           />
@@ -212,6 +216,12 @@ export default function GuestGuideFormSection({
 
         {guestGuide.enabled && (
           <>
+            <datalist id={LUCIDE_ICON_DATALIST_ID}>
+              {LUCIDE_ICON_INPUT_OPTIONS.map((iconName) => (
+                <option key={iconName} value={iconName} />
+              ))}
+            </datalist>
+
             <PredefinedGrid
               selectedIds={selectedIds}
               onToggle={onTogglePredefined}

@@ -1,34 +1,13 @@
 "use client";
 
+import { createElement } from "react";
 import { motion } from "framer-motion";
-import {
-  BellOff,
-  Cake,
-  Camera,
-  Car,
-  CheckCircle2,
-  Church,
-  Clock,
-  Coffee,
-  Flower,
-  Heart,
-  HeartHandshake,
-  MapPin,
-  MessageCircleOff,
-  Moon,
-  Music,
-  PartyPopper,
-  Phone,
-  Smile,
-  Sparkles,
-  Star,
-  Sun,
-  UserX,
-  Utensils,
-  Wine,
-  type LucideProps,
-} from "lucide-react";
+import { Heart, Star } from "lucide-react";
 
+import {
+  getLucideIconComponent,
+  resolveLucideIconName,
+} from "@/lib/lucide-icons";
 import type { GuestGuide, GuestGuideItem, TemplateTheme } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -45,40 +24,6 @@ const fadeInUp = {
 const staggerContainer = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.07 } },
-};
-
-// ---------------------------------------------------------------------------
-// Icon map — all icons available for guest-guide items
-// ---------------------------------------------------------------------------
-
-type LucideComponent = React.ComponentType<LucideProps>;
-
-const ICON_MAP: Record<string, LucideComponent> = {
-  BellOff,
-  Cake,
-  Camera,
-  Car,
-  CheckCircle2,
-  Church,
-  Clock,
-  Coffee,
-  Flower,
-  FlowerOff: Flower, // backwards-compat alias
-  Heart,
-  HeartHandshake,
-  MapPin,
-  MessageCircleOff,
-  Moon,
-  Music,
-  PartyPopper,
-  Phone,
-  Smile,
-  Sparkles,
-  Star,
-  Sun,
-  UserX,
-  Utensils,
-  Wine,
 };
 
 // ---------------------------------------------------------------------------
@@ -103,9 +48,16 @@ function GuideIcon({ item, size, color }: GuideIconProps) {
     );
   }
 
-  const IconComp = item.iconName ? ICON_MAP[item.iconName] : undefined;
+  const resolvedIconName = resolveLucideIconName(item.iconName);
+  const IconComp = resolvedIconName
+    ? getLucideIconComponent(resolvedIconName)
+    : undefined;
   if (IconComp) {
-    return <IconComp size={size} color={color} strokeWidth={1.5} />;
+    return createElement(IconComp, {
+      size,
+      color,
+      strokeWidth: 1.5,
+    });
   }
 
   return <Star size={size} color={color} strokeWidth={1.5} />;
