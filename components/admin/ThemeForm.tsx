@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -17,13 +17,12 @@ import {
 import { Smartphone } from "lucide-react";
 import InvitationPage from "@/components/shared/InvitationPage";
 import { MOCK_INVITATION } from "@/lib/mock-invitation";
+import type { ThemeFormData } from "@/lib/theme-form-data";
+import { EMPTY_FORM_DATA, formDataToTheme } from "@/lib/theme-form-data";
 // ThemeFormData, themeToFormData, formDataToTheme and EMPTY_FORM_DATA live in a plain .ts file
 // so that server components can import them without hitting the "use client" boundary.
 export type { ThemeFormData } from "@/lib/theme-form-data";
 export { EMPTY_FORM_DATA } from "@/lib/theme-form-data";
-
-import type { ThemeFormData } from "@/lib/theme-form-data";
-import { EMPTY_FORM_DATA, formDataToTheme } from "@/lib/theme-form-data";
 
 // ---------------------------------------------------------------------------
 // Phone frame preview (same shell used in ThemeViewClient)
@@ -109,6 +108,39 @@ function extractHex(value: string): string {
   return "";
 }
 
+/** Convert a hex color (#rrggbb) to its r, g, b decimal components. */
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = hex.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);
+  if (!m) return null;
+  return {
+    r: parseInt(m[1], 16),
+    g: parseInt(m[2], 16),
+    b: parseInt(m[3], 16),
+  };
+}
+
+/**
+ * Replace the colour portion of a CSS value with a new hex colour.
+ * Handles plain hex values, rgb(), and rgba() — preserving the alpha channel.
+ */
+function replaceColorInValue(original: string, newHex: string): string {
+  // If the original contains a literal hex, swap it directly
+  if (/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b/.test(original)) {
+    return original.replace(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b/, newHex);
+  }
+  // If it's an rgba()/rgb() value, replace the r,g,b components keeping alpha
+  const rgbaMatch = original.match(/rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+(.*)\)/);
+  if (rgbaMatch) {
+    const rgb = hexToRgb(newHex);
+    if (rgb) {
+      const tail = rgbaMatch[1]; // e.g. ",0.65" or ""
+      return `rgba(${rgb.r},${rgb.g},${rgb.b}${tail})`;
+    }
+  }
+  // Fallback: just return the new hex
+  return newHex;
+}
+
 function ColorField({
   label,
   value,
@@ -150,9 +182,9 @@ function ColorField({
             type="color"
             value={hex || "#ffffff"}
             onChange={(e) => {
-              // If value is rgba/gradient, replace only the first hex segment
+              // If value is rgba/gradient, replace the colour while keeping structure
               if (hex && value !== hex) {
-                onChange(value.replace(hex, e.target.value));
+                onChange(replaceColorInValue(value, e.target.value));
               } else {
                 onChange(e.target.value);
               }
@@ -584,7 +616,6 @@ export default function ThemeForm({
                   label="Fundo do Cartão (cardBg)"
                   value={form.cardBg}
                   onChange={(v) => set("cardBg", v)}
-                  hint="Pode ser rgba(...)"
                 />
               </div>
               <ColorField
