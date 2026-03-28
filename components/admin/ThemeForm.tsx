@@ -252,6 +252,11 @@ const AVAILABLE_FONTS: { label: string; stack: string; variable: string }[] = [
     variable: "var(--font-homemade-apple)",
   },
   {
+    label: "Pinyon Script",
+    stack: "'Pinyon Script', cursive",
+    variable: "var(--font-pinyon-script)",
+  },
+  {
     label: "Outfit",
     stack: "'Outfit', sans-serif",
     variable: "var(--font-outfit)",
@@ -261,6 +266,7 @@ const AVAILABLE_FONTS: { label: string; stack: string; variable: string }[] = [
 const SAMPLE_TEXT: Record<string, string> = {
   "'Great Vibes', cursive": "Save the Date",
   "'Homemade Apple', cursive": "Save the Date",
+  "'Pinyon Script', cursive": "Save the Date",
   "'Outfit', sans-serif": "Confirmar Presença",
   default: "Sofia & Miguel",
 };

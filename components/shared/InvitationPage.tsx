@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback, type MutableRefObject } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Heart, Shirt, Gift, ChevronDown, ExternalLink } from "lucide-react";
+import { type MutableRefObject, useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
-import type { InvitationData, TemplateTheme, FAQItem } from "@/lib/types";
+import type { FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
-import CalendarButton from "./CalendarButton";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -103,6 +102,7 @@ function isScriptFont(displayFont: string): boolean {
   return (
     lower.includes("great vibes") ||
     lower.includes("homemade apple") ||
+    lower.includes("pinyon script") ||
     lower.includes("cursive")
   );
 }

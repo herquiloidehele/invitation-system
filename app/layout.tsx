@@ -9,6 +9,7 @@ import {
   Lora,
   Outfit,
   DM_Serif_Display,
+  Pinyon_Script,
   Geist,
 } from "next/font/google";
 import "./globals.css";
@@ -74,6 +75,12 @@ const dmSerifDisplay = DM_Serif_Display({
   variable: "--font-dm-serif-display",
 });
 
+const pinyonScript = Pinyon_Script({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-pinyon-script",
+});
+
 export const metadata: Metadata = {
   title: "Brindel Studio — Convites Digitais",
   description: "Convites de casamento interativos e memoráveis",
@@ -91,7 +98,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} antialiased`}
+        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} ${pinyonScript.variable} antialiased`}
       >
         {children}
       </body>
