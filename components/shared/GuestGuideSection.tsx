@@ -1,6 +1,7 @@
 "use client";
 
 import { createElement } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Star } from "lucide-react";
 
@@ -8,6 +9,7 @@ import {
   getLucideIconComponent,
   resolveLucideIconName,
 } from "@/lib/lucide-icons";
+import { sanitizeAndNormalizeSvg } from "@/lib/svg-icons";
 import type { GuestGuide, GuestGuideItem, TemplateTheme } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -36,7 +38,65 @@ interface GuideIconProps {
   color: string;
 }
 
+function InlineSvgIcon({
+  url,
+  size,
+  color,
+}: {
+  url: string;
+  size: number;
+  color: string;
+}) {
+  const [markup, setMarkup] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSvg() {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Failed to fetch SVG icon");
+        }
+
+        const svgText = await response.text();
+        const sanitized = sanitizeAndNormalizeSvg(svgText);
+
+        if (!cancelled) {
+          setMarkup(sanitized);
+        }
+      } catch {
+        if (!cancelled) {
+          setMarkup(null);
+        }
+      }
+    }
+
+    setMarkup(null);
+    void loadSvg();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  if (!markup) {
+    return <Star size={size} color={color} strokeWidth={1.5} />;
+  }
+
+  return (
+    <span
+      style={{ width: size, height: size, color, display: "inline-flex" }}
+      dangerouslySetInnerHTML={{ __html: markup }}
+    />
+  );
+}
+
 function GuideIcon({ item, size, color }: GuideIconProps) {
+  if (item.iconType === "svg" && item.iconUrl) {
+    return <InlineSvgIcon url={item.iconUrl} size={size} color={color} />;
+  }
+
   if (item.iconType === "image" && item.iconUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element

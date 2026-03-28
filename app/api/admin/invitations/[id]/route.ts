@@ -1,5 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
+
+/**
+ * Reject empty strings for JSON columns — they cause `JSON.parse("")`
+ * failures in the pg adapter. For non-nullable JSON columns the fallback
+ * is the existing DB value; for nullable columns pass `null`.
+ */
+function sanitizeJsonField(
+  value: unknown,
+  fallback: Prisma.InputJsonValue | null,
+): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+  if (value === "" || (typeof value === "string" && value.trim() === "")) {
+    return fallback === null
+      ? Prisma.JsonNull
+      : (fallback as Prisma.InputJsonValue);
+  }
+  return value as Prisma.InputJsonValue;
+}
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations/[id] — Get a single invitation
@@ -91,22 +109,45 @@ export async function PUT(
       data: {
         ...(body.slug !== undefined && { slug: body.slug }),
         ...(themeId !== undefined && { themeId }),
-        ...(body.couple !== undefined && { couple: body.couple }),
-        ...(body.date !== undefined && { date: body.date }),
-        ...(body.quote !== undefined && { quote: body.quote }),
-        ...(body.location !== undefined && { location: body.location }),
-        ...(body.rsvp !== undefined && { rsvp: body.rsvp }),
-        ...(body.schedule !== undefined && { schedule: body.schedule }),
-        ...(body.dressCode !== undefined && { dressCode: body.dressCode }),
-        ...(body.giftRegistry !== undefined && {
-          giftRegistry: body.giftRegistry,
+        ...(body.couple !== undefined && {
+          couple: sanitizeJsonField(body.couple, existing.couple),
         }),
-        ...(body.audio !== undefined && { audio: body.audio }),
+        ...(body.date !== undefined && {
+          date: sanitizeJsonField(body.date, existing.date),
+        }),
+        ...(body.quote !== undefined && { quote: body.quote }),
+        ...(body.location !== undefined && {
+          location: sanitizeJsonField(body.location, existing.location),
+        }),
+        ...(body.rsvp !== undefined && {
+          rsvp: sanitizeJsonField(body.rsvp, existing.rsvp),
+        }),
+        ...(body.schedule !== undefined && {
+          schedule: sanitizeJsonField(body.schedule, existing.schedule),
+        }),
+        ...(body.dressCode !== undefined && {
+          dressCode: sanitizeJsonField(body.dressCode, existing.dressCode),
+        }),
+        ...(body.giftRegistry !== undefined && {
+          giftRegistry: sanitizeJsonField(
+            body.giftRegistry,
+            existing.giftRegistry,
+          ),
+        }),
+        ...(body.audio !== undefined && {
+          audio: sanitizeJsonField(body.audio, existing.audio),
+        }),
         ...(body.heroImage !== undefined && { heroImage: body.heroImage }),
         ...(body.videoUrl !== undefined && { videoUrl: body.videoUrl }),
-        ...(body.faqs !== undefined && { faqs: body.faqs }),
-        ...(body.guestGuide !== undefined && { guestGuide: body.guestGuide }),
-        ...(body.envelope !== undefined && { envelope: body.envelope }),
+        ...(body.faqs !== undefined && {
+          faqs: sanitizeJsonField(body.faqs, null),
+        }),
+        ...(body.guestGuide !== undefined && {
+          guestGuide: sanitizeJsonField(body.guestGuide, null),
+        }),
+        ...(body.envelope !== undefined && {
+          envelope: sanitizeJsonField(body.envelope, null),
+        }),
         ...(body.saveDateStyle !== undefined && {
           saveDateStyle: body.saveDateStyle,
         }),
@@ -114,10 +155,13 @@ export async function PUT(
           cinematicImageUrl: body.cinematicImageUrl,
         }),
         ...(body.sectionImages !== undefined && {
-          sectionImages: body.sectionImages,
+          sectionImages: sanitizeJsonField(body.sectionImages, null),
         }),
         ...(body.parents !== undefined && {
-          parents: body.parents,
+          parents: sanitizeJsonField(body.parents, null),
+        }),
+        ...(body.ourStory !== undefined && {
+          ourStory: sanitizeJsonField(body.ourStory, null),
         }),
         ...(body.invitationType !== undefined && {
           invitationType: body.invitationType,

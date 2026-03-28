@@ -81,7 +81,7 @@ function getDefaultState(
     location: { name: "", address: "", googleMapsUrl: "" },
     rsvp: { enabled: false },
     schedule: [],
-    dressCode: "",
+    dressCode: { enabled: false, text: "" },
     giftRegistry: { enabled: false, text: "" },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",

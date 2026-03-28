@@ -50,7 +50,7 @@ export default async function EditInvitationPage({
     location: row.location as unknown as InvitationData["location"],
     rsvp: row.rsvp as unknown as InvitationData["rsvp"],
     schedule: row.schedule as unknown as InvitationData["schedule"],
-    dressCode: row.dressCode,
+    dressCode: row.dressCode as unknown as InvitationData["dressCode"],
     giftRegistry: row.giftRegistry as unknown as InvitationData["giftRegistry"],
     audio: row.audio as unknown as InvitationData["audio"],
     heroImage: row.heroImage,

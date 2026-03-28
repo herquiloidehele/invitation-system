@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 // Types
 // ---------------------------------------------------------------------------
 
-type MediaKind = "image" | "video" | "audio";
+type MediaKind = "image" | "svg" | "video" | "audio";
 
 interface MediaUploadProps {
   /** Current value (an S3 URL or existing URL) */
@@ -53,31 +53,24 @@ type UploadState =
 
 const ACCEPT_MAP: Record<MediaKind, Record<string, string[]>> = {
   image: { "image/*": [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"] },
+  svg: { "image/svg+xml": [".svg"] },
   video: { "video/*": [".mp4", ".webm", ".ogg", ".mov", ".avi"] },
   audio: { "audio/*": [".mp3", ".ogg", ".wav", ".aac", ".flac", ".webm"] },
 };
 
 const KIND_LABEL: Record<MediaKind, string> = {
   image: "imagem",
+  svg: "SVG",
   video: "vídeo",
   audio: "áudio",
 };
 
 const KIND_ICON: Record<MediaKind, React.ElementType> = {
   image: ImageIcon,
+  svg: ImageIcon,
   video: VideoIcon,
   audio: MusicIcon,
 };
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function isS3Url(url: string): boolean {
-  return url.includes(".amazonaws.com/") || url.startsWith("https://");
-}
 
 // ---------------------------------------------------------------------------
 // Component
@@ -100,6 +93,7 @@ export default function MediaUpload({
 
   const KindIcon = KIND_ICON[kind];
   const kindLabel = KIND_LABEL[kind];
+  const dropzoneLabel = label ?? `Arraste um ficheiro de ${kindLabel}`;
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -118,7 +112,7 @@ export default function MediaUpload({
         let fileToUpload = file;
 
         // Compress images client-side before uploading
-        if (kind === "image") {
+        if (kind === "image" && file.type !== "image/svg+xml") {
           setUploadState({ status: "compressing" });
           fileToUpload = await imageCompression(file, {
             maxSizeMB: Math.min(maxSizeMB, 2),
@@ -210,7 +204,7 @@ export default function MediaUpload({
       <div className={cn("space-y-2", className)}>
         <div className="relative rounded-lg border bg-muted/30 overflow-hidden">
           {/* Preview */}
-          {kind === "image" && (
+          {(kind === "image" || kind === "svg") && (
             <div className="relative w-full h-40 bg-muted">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -340,9 +334,7 @@ export default function MediaUpload({
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  {isDragActive
-                    ? `Solte o ficheiro aqui`
-                    : `Arraste um ficheiro de ${kindLabel}`}
+                  {isDragActive ? `Solte o ficheiro aqui` : dropzoneLabel}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   ou{" "}
@@ -352,7 +344,8 @@ export default function MediaUpload({
                 </p>
               </div>
               <p className="text-xs text-muted-foreground">
-                {kind === "image" && "JPG, PNG, WebP, AVIF"}
+                {kind === "image" && "JPG, PNG, WebP, GIF, AVIF"}
+                {kind === "svg" && "SVG vetorial monocromático"}
                 {kind === "video" && "MP4, WebM, MOV"}
                 {kind === "audio" && "MP3, WAV, OGG, AAC"}
                 {" · "}Máx. {maxSizeMB} MB

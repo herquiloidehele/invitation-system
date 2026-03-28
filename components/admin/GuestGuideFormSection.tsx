@@ -114,6 +114,17 @@ function CustomItemRow({ item, onUpdate, onRemove }: CustomItemRowProps) {
           </button>
           <button
             type="button"
+            onClick={() => onUpdate({ iconType: "svg", iconName: undefined })}
+            className={`px-2 py-1 text-xs transition-colors ${
+              item.iconType === "svg"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            SVG
+          </button>
+          <button
+            type="button"
             onClick={() => onUpdate({ iconType: "image", iconName: undefined })}
             className={`px-2 py-1 text-xs transition-colors ${
               item.iconType === "image"
@@ -165,6 +176,20 @@ function CustomItemRow({ item, onUpdate, onRemove }: CustomItemRowProps) {
               lucide.dev/icons
             </a>{" "}
             para os nomes disponíveis.
+          </p>
+        </div>
+      ) : item.iconType === "svg" ? (
+        <div className="space-y-1">
+          <Label className="text-xs">SVG do ícone</Label>
+          <MediaUpload
+            kind="svg"
+            maxSizeMB={1}
+            value={item.iconUrl || undefined}
+            onUpload={(url) => onUpdate({ iconUrl: url })}
+            onClear={() => onUpdate({ iconUrl: "" })}
+          />
+          <p className="text-xs text-muted-foreground">
+            Use SVGs simples para que a cor acompanhe o tema automaticamente.
           </p>
         </div>
       ) : (

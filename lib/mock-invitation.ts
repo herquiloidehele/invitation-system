@@ -49,7 +49,7 @@ export const MOCK_INVITATION: InvitationData = {
     { time: "00:00", label: "Festa", venue: "Terraço com Vista" },
   ],
 
-  dressCode: "Traje Formal",
+  dressCode: { enabled: true, text: "Traje Formal" },
 
   giftRegistry: {
     enabled: true,
@@ -165,5 +165,11 @@ export const MOCK_INVITATION: InvitationData = {
 
   saveDateStyle: "classic",
   cinematicImageUrl: undefined,
+  ourStory: {
+    enabled: true,
+    title: "Nossa História",
+    description:
+      "Conhecemo-nos num café em Lisboa, numa tarde chuvosa de Novembro. O que começou com um sorriso tímido transformou-se numa conversa que nunca mais acabou. Desde esse dia, partilhamos sonhos, aventuras e um amor que cresce a cada dia. Agora, queremos celebrar este novo capítulo convosco.",
+  },
   invitationType: "standard",
 };

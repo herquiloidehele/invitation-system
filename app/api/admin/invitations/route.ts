@@ -1,5 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
+
+/**
+ * Reject empty strings for JSON columns — they cause `JSON.parse("")`
+ * failures in the pg adapter. Returns `Prisma.JsonNull` for nullable
+ * columns when the fallback is null, which satisfies Prisma's type system.
+ */
+function sanitizeJsonField(
+  value: unknown,
+  fallback: object | unknown[] | null,
+): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (typeof value === "string" && value.trim() === "")
+  ) {
+    return fallback === null
+      ? Prisma.JsonNull
+      : (fallback as Prisma.InputJsonValue);
+  }
+  return value as Prisma.InputJsonValue;
+}
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations — List all invitations
@@ -78,21 +101,33 @@ export async function POST(request: NextRequest) {
         couple: body.couple,
         date: body.date,
         quote: body.quote ?? "",
-        location: body.location ?? {},
-        rsvp: body.rsvp ?? { enabled: true },
-        schedule: body.schedule ?? [],
-        dressCode: body.dressCode ?? "",
-        giftRegistry: body.giftRegistry ?? { enabled: false, text: "" },
-        audio: body.audio ?? { enabled: false, src: "", artist: "", title: "" },
+        location: sanitizeJsonField(body.location, {}),
+        rsvp: sanitizeJsonField(body.rsvp, { enabled: true }),
+        schedule: sanitizeJsonField(body.schedule, []),
+        dressCode: sanitizeJsonField(body.dressCode, {
+          enabled: false,
+          text: "",
+        }),
+        giftRegistry: sanitizeJsonField(body.giftRegistry, {
+          enabled: false,
+          text: "",
+        }),
+        audio: sanitizeJsonField(body.audio, {
+          enabled: false,
+          src: "",
+          artist: "",
+          title: "",
+        }),
         heroImage: body.heroImage ?? "",
         videoUrl: body.videoUrl ?? null,
-        faqs: body.faqs ?? null,
-        guestGuide: body.guestGuide ?? null,
-        envelope: body.envelope ?? null,
+        faqs: sanitizeJsonField(body.faqs, null),
+        guestGuide: sanitizeJsonField(body.guestGuide, null),
+        envelope: sanitizeJsonField(body.envelope, null),
         saveDateStyle: body.saveDateStyle ?? null,
         cinematicImageUrl: body.cinematicImageUrl ?? null,
-        sectionImages: body.sectionImages ?? null,
-        parents: body.parents ?? null,
+        sectionImages: sanitizeJsonField(body.sectionImages, null),
+        parents: sanitizeJsonField(body.parents, null),
+        ourStory: sanitizeJsonField(body.ourStory, null),
         invitationType: body.invitationType ?? "standard",
         externalLink: body.externalLink ?? null,
       },

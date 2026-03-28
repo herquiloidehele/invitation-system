@@ -1,33 +1,7 @@
-import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { buttonVariants } from "@/components/ui/button-variants";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import DeleteInvitationButton from "./DeleteInvitationButton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCharts } from "@/components/admin/dashboard-charts";
-import {
-  TrendingUp,
-  TrendingDown,
-  Heart,
-  Users,
-  BarChart3,
-  Percent,
-} from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

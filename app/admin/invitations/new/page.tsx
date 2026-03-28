@@ -44,7 +44,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         },
         rsvp: { enabled: true, deadline: "" },
         schedule: [],
-        dressCode: "",
+        dressCode: { enabled: false, text: "" },
         giftRegistry: { enabled: false, text: "", link: "" },
         audio: { enabled: false, src: "", artist: "", title: "" },
         heroImage: "",

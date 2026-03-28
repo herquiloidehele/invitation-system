@@ -2,6 +2,7 @@ import { prisma } from "./db";
 import type {
   InvitationData,
   InvitationType,
+  OurStory,
   ParentsInfo,
   SaveDateStyle,
   SectionImages,
@@ -22,7 +23,7 @@ type InvitationWithTheme = {
   location: unknown;
   rsvp: unknown;
   schedule: unknown;
-  dressCode: string;
+  dressCode: unknown;
   giftRegistry: unknown;
   audio: unknown;
   heroImage: string;
@@ -34,6 +35,7 @@ type InvitationWithTheme = {
   cinematicImageUrl: string | null;
   sectionImages: unknown;
   parents: unknown;
+  ourStory: unknown;
   invitationType: string;
   externalLink: string | null;
 };
@@ -49,7 +51,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     location: row.location as InvitationData["location"],
     rsvp: row.rsvp as InvitationData["rsvp"],
     schedule: row.schedule as InvitationData["schedule"],
-    dressCode: row.dressCode,
+    dressCode: row.dressCode as InvitationData["dressCode"],
     giftRegistry: row.giftRegistry as InvitationData["giftRegistry"],
     audio: row.audio as InvitationData["audio"],
     heroImage: row.heroImage,
@@ -61,6 +63,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
+    ourStory: (row.ourStory as OurStory | null) ?? undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
   };

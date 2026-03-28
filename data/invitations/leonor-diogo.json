@@ -33,7 +33,7 @@
     { "time": "20:00", "label": "Jantar", "venue": "Grande Sala de Banquetes" },
     { "time": "23:00", "label": "Festa", "venue": "Terraço sob as Estrelas" }
   ],
-  "dressCode": "Black Tie",
+  "dressCode": { "enabled": true, "text": "Black Tie" },
   "giftRegistry": {
     "enabled": true,
     "text": "A vossa presença é o melhor presente que nos podem dar"

@@ -70,7 +70,7 @@ model Invitation {
   location     Json     // { name, address, googleMapsUrl, wazeUrl?, latitude?, longitude?, imageUrl? }
   rsvp         Json     // { enabled, deadline? }
   schedule     Json     // ScheduleEvent[]
-  dressCode    String
+  dressCode    Json     // { enabled, text }
   giftRegistry Json     // { enabled, text, link? }
   audio        Json     // { enabled, src, artist, title }
   heroImage    String
@@ -82,6 +82,7 @@ model Invitation {
   cinematicImageUrl String? // background image for the cinematic Save the Date style
   sectionImages  Json?   // SectionImages { image1?, image2?, image3?, image4? }
   parents        Json?   // ParentsInfo { enabled, blessingMessage, inviteMessage, bridesFather, bridesMother, groomsFather, groomsMother }
+  ourStory       Json?   // OurStory { enabled, title, description }
   invitationType String  @default("standard") // "standard" | "external_video" | "external_link"
   externalLink   String? // URL for the external link / iframe (external_link type)
   ownerToken   String   @unique @default(cuid())

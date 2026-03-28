@@ -12,6 +12,7 @@ import type {
   SaveDateStyle,
   SectionImages,
   ParentsInfo,
+  OurStory,
 } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -295,7 +296,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     },
     rsvp: { enabled: true, deadline: "" },
     schedule: [],
-    dressCode: "",
+    dressCode: { enabled: false, text: "" },
     giftRegistry: { enabled: false, text: "", link: "" },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
@@ -314,6 +315,11 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       bridesMother: "",
       groomsFather: "",
       groomsMother: "",
+    },
+    ourStory: {
+      enabled: false,
+      title: "Nossa História",
+      description: "",
     },
     invitationType: "standard",
     externalLink: "",
@@ -413,6 +419,16 @@ export default function InvitationForm({
       setForm((prev) => ({
         ...prev,
         rsvp: { ...prev.rsvp, [field]: value },
+      }));
+    },
+    [],
+  );
+
+  const updateDressCode = useCallback(
+    (field: keyof InvitationData["dressCode"], value: boolean | string) => {
+      setForm((prev) => ({
+        ...prev,
+        dressCode: { ...prev.dressCode, [field]: value },
       }));
     },
     [],
@@ -1307,14 +1323,27 @@ export default function InvitationForm({
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-4">
                   {/* Dress Code */}
-                  <div className="space-y-1.5">
-                    <Label htmlFor="dressCode">Código de Vestuário</Label>
-                    <Input
-                      id="dressCode"
-                      value={form.dressCode}
-                      onChange={(e) => update("dressCode", e.target.value)}
-                      placeholder="e.g. Traje Formal"
-                    />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label>Dress Code Ativado</Label>
+                      <Switch
+                        checked={form.dressCode.enabled}
+                        onCheckedChange={(v) => updateDressCode("enabled", v)}
+                      />
+                    </div>
+                    {form.dressCode.enabled && (
+                      <div className="space-y-1.5">
+                        <Label htmlFor="dressCode">Código de Vestuário</Label>
+                        <Input
+                          id="dressCode"
+                          value={form.dressCode.text}
+                          onChange={(e) =>
+                            updateDressCode("text", e.target.value)
+                          }
+                          placeholder="e.g. Traje Formal"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <Separator />
@@ -1435,6 +1464,87 @@ export default function InvitationForm({
                       </div>
                     )}
                   </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ── Nossa História ── */}
+              <AccordionItem
+                value="ourStory"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Nossa História{" "}
+                  {form.ourStory?.enabled ? "(ativo)" : "(desativado)"}
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      checked={form.ourStory?.enabled ?? false}
+                      onCheckedChange={(checked) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          ourStory: {
+                            ...(prev.ourStory ?? {
+                              enabled: false,
+                              title: "Nossa História",
+                              description: "",
+                            }),
+                            enabled: checked,
+                          },
+                        }))
+                      }
+                    />
+                    <Label className="text-xs text-muted-foreground">
+                      Mostrar secção &quot;Nossa História&quot;
+                    </Label>
+                  </div>
+
+                  {form.ourStory?.enabled && (
+                    <>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Título</Label>
+                        <Input
+                          value={form.ourStory?.title ?? "Nossa História"}
+                          onChange={(e) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              ourStory: {
+                                ...(prev.ourStory ?? {
+                                  enabled: true,
+                                  title: "Nossa História",
+                                  description: "",
+                                }),
+                                title: e.target.value,
+                              },
+                            }))
+                          }
+                          placeholder="Nossa História"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs">Descrição</Label>
+                        <Textarea
+                          value={form.ourStory?.description ?? ""}
+                          onChange={(e) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              ourStory: {
+                                ...(prev.ourStory ?? {
+                                  enabled: true,
+                                  title: "Nossa História",
+                                  description: "",
+                                }),
+                                description: e.target.value,
+                              },
+                            }))
+                          }
+                          placeholder="Conte a história do casal..."
+                          rows={5}
+                        />
+                      </div>
+                    </>
+                  )}
                 </AccordionContent>
               </AccordionItem>
 

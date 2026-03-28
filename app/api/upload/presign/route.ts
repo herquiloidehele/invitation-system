@@ -10,6 +10,7 @@ const ALLOWED_TYPES: Record<string, "images" | "videos" | "audio"> = {
   "image/webp": "images",
   "image/gif": "images",
   "image/avif": "images",
+  "image/svg+xml": "images",
   // Videos
   "video/mp4": "videos",
   "video/webm": "videos",

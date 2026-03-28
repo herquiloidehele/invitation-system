@@ -44,6 +44,11 @@ export interface ScheduleEvent {
   venue: string;
 }
 
+export interface DressCode {
+  enabled: boolean;
+  text: string;
+}
+
 export interface GiftRegistry {
   enabled: boolean;
   text: string;
@@ -67,11 +72,11 @@ export interface GuestGuideItem {
   id: string;
   /** Display label shown below the icon */
   label: string;
-  /** "lucide" uses a named Lucide icon; "image" uses a user-uploaded image URL */
-  iconType: "lucide" | "image";
+  /** "lucide" uses a named Lucide icon; "svg" uses a recolorable uploaded SVG; "image" uses a raster image URL */
+  iconType: "lucide" | "svg" | "image";
   /** Lucide icon component name (e.g. "CheckCircle2"). Used when iconType === "lucide". */
   iconName?: string;
-  /** S3 / public image URL. Used when iconType === "image". */
+  /** S3 / public asset URL. Used when iconType === "svg" or "image". */
   iconUrl?: string;
 }
 
@@ -98,6 +103,15 @@ export interface EnvelopeConfig {
   topFlap?: string;
   /** Override the bottom flap image URL. Falls back to theme default if empty. */
   bottomFlap?: string;
+}
+
+export interface OurStory {
+  /** Whether to show the "Nossa História" section. */
+  enabled: boolean;
+  /** Section title — defaults to "Nossa História". */
+  title: string;
+  /** The couple's story narrative. */
+  description: string;
 }
 
 export interface ParentsInfo {
@@ -128,7 +142,7 @@ export interface InvitationData {
     deadline?: string;
   };
   schedule: ScheduleEvent[];
-  dressCode: string;
+  dressCode: DressCode;
   giftRegistry: GiftRegistry;
   audio: AudioConfig;
   heroImage: string;
@@ -146,6 +160,8 @@ export interface InvitationData {
   sectionImages?: SectionImages;
   /** Optional parents info for the "parents mode" hero section. */
   parents?: ParentsInfo;
+  /** Optional "Nossa História" section — the couple's story. */
+  ourStory?: OurStory;
   /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
   invitationType: InvitationType;
   /** External URL for the iframe page (external_link type). */

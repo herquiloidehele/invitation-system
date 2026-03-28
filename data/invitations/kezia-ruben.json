@@ -33,7 +33,7 @@
     { "time": "19:00", "label": "Jantar", "venue": "Salão Principal" },
     { "time": "22:00", "label": "Festa", "venue": "Pista de Dança" }
   ],
-  "dressCode": "Cocktail Attire",
+  "dressCode": { "enabled": true, "text": "Cocktail Attire" },
   "giftRegistry": {
     "enabled": true,
     "text": "A vossa presença é o melhor presente"
