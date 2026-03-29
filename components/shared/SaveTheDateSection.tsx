@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import type { InvitationData, TemplateTheme, SaveDateStyle } from "@/lib/types";
+import type { InvitationData, SaveDateStyle, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import CalendarButton from "./CalendarButton";
 
