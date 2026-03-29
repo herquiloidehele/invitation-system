@@ -1784,6 +1784,8 @@ export default function InvitationForm({
                         ["calendarCta", "Adicionar ao Calendário"],
                         ["countdownValue", "Contagem — Número"],
                         ["countdownLabel", "Contagem — Etiqueta"],
+                        ["countdownDate", "Contagem — Data"],
+                        ["countdownWeekday", "Contagem — Dia/Hora"],
                       ] as const
                     ).map(([element, label]) => {
                       const el = form.textStyles?.elements?.[element];

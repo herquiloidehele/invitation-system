@@ -297,26 +297,13 @@ function SaveTheDateCountdown({
       <SaveLabel ts={ts} />
 
       {/* Date context */}
-      <span
-        className="mt-3"
-        style={{
-          fontFamily: ts.scriptFont,
-          fontSize: 22,
-          fontWeight: 300,
-          color: ts.textPrimary,
-          letterSpacing: 1,
-        }}
-      >
+      <span className="mt-3" style={ts.countdownDate}>
         {invitation.date.day} · {invitation.date.month} · {invitation.date.year}
       </span>
 
       <span
         style={{
-          fontFamily: ts.uiFont,
-          fontSize: 12,
-          fontWeight: 300,
-          letterSpacing: 1,
-          color: ts.textMuted,
+          ...ts.countdownWeekday,
           marginTop: 2,
         }}
       >

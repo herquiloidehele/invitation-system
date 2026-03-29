@@ -223,6 +223,8 @@ export interface TextStyleOverrides {
     calendarCta?: TextStyle;
     countdownValue?: TextStyle;
     countdownLabel?: TextStyle;
+    countdownDate?: TextStyle;
+    countdownWeekday?: TextStyle;
   };
 }
 

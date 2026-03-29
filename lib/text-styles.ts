@@ -78,6 +78,10 @@ export interface ResolvedTextStyles {
   countdownValue: CSSProperties;
   /** Countdown unit label ("Dias", "Horas", etc.) */
   countdownLabel: CSSProperties;
+  /** Countdown date context ("day · month · year") */
+  countdownDate: CSSProperties;
+  /** Countdown weekday & time ("Segunda-feira · 16:00") */
+  countdownWeekday: CSSProperties;
 
   // -- Resolved role-level values for sub-components that need individual props --
   /** Resolved display font (for sub-components) */
@@ -547,6 +551,28 @@ export function resolveTextStyles(
     el?.countdownLabel,
   );
 
+  const countdownDate = applyOverride(
+    {
+      fontFamily: scriptFont,
+      fontSize: 22,
+      fontWeight: 300,
+      color: textPrimary,
+      letterSpacing: 1,
+    },
+    el?.countdownDate,
+  );
+
+  const countdownWeekday = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 12,
+      fontWeight: 300,
+      letterSpacing: 1,
+      color: textMuted,
+    },
+    el?.countdownWeekday,
+  );
+
   return {
     coupleNames,
     coupleNamesVideo,
@@ -584,6 +610,8 @@ export function resolveTextStyles(
     calendarCta,
     countdownValue,
     countdownLabel,
+    countdownDate,
+    countdownWeekday,
     // Role-level resolved values
     displayFont,
     bodyFont,
