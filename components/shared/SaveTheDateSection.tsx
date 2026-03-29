@@ -51,20 +51,7 @@ function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
 }
 
 function SaveLabel({ ts }: { ts: ResolvedTextStyles }) {
-  return (
-    <span
-      style={{
-        fontFamily: ts.uiFont,
-        fontSize: 10,
-        fontWeight: 400,
-        letterSpacing: 5,
-        textTransform: "uppercase" as const,
-        color: ts.accent,
-      }}
-    >
-      Save the Date
-    </span>
-  );
+  return <span style={ts.saveLabel}>Save the Date</span>;
 }
 
 function CalendarCTA({
@@ -84,19 +71,7 @@ function CalendarCTA({
       onCalendarClick={onCalendarClick}
       className="mt-5 flex items-center justify-center gap-2 px-5 py-2 transition-all"
     >
-      <span
-        style={{
-          fontFamily: ts.uiFont,
-          fontSize: 10,
-          fontWeight: 500,
-          letterSpacing: 1.5,
-          textTransform: "uppercase" as const,
-          color: ts.accent,
-          opacity: 0.75,
-        }}
-      >
-        + Adicionar ao Calendário
-      </span>
+      <span style={ts.calendarCta}>+ Adicionar ao Calendário</span>
     </CalendarButton>
   );
 }

@@ -1780,6 +1780,8 @@ export default function InvitationForm({
                         ["locationAddress", "Morada do Local"],
                         ["guideItemLabel", "Etiqueta do Guia"],
                         ["guideScriptTitle", "Título do Guia"],
+                        ["saveLabel", "Save the Date — Título"],
+                        ["calendarCta", "Adicionar ao Calendário"],
                       ] as const
                     ).map(([element, label]) => {
                       const el = form.textStyles?.elements?.[element];

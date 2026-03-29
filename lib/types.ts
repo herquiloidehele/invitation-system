@@ -219,6 +219,8 @@ export interface TextStyleOverrides {
     locationAddress?: TextStyle;
     guideItemLabel?: TextStyle;
     guideScriptTitle?: TextStyle;
+    saveLabel?: TextStyle;
+    calendarCta?: TextStyle;
   };
 }
 

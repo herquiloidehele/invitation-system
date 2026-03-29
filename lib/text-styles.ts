@@ -70,6 +70,10 @@ export interface ResolvedTextStyles {
   guideItemLabel: CSSProperties;
   /** Guest guide script title ("Bom Convidado") */
   guideScriptTitle: CSSProperties;
+  /** "Save the Date" label text */
+  saveLabel: CSSProperties;
+  /** "+ Adicionar ao Calendário" button text */
+  calendarCta: CSSProperties;
 
   // -- Resolved role-level values for sub-components that need individual props --
   /** Resolved display font (for sub-components) */
@@ -491,6 +495,31 @@ export function resolveTextStyles(
     el?.guideScriptTitle,
   );
 
+  const saveLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 10,
+      fontWeight: 400,
+      letterSpacing: 5,
+      textTransform: "uppercase" as const,
+      color: accent,
+    },
+    el?.saveLabel,
+  );
+
+  const calendarCta = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 10,
+      fontWeight: 500,
+      letterSpacing: 1.5,
+      textTransform: "uppercase" as const,
+      color: accent,
+      opacity: 0.75,
+    },
+    el?.calendarCta,
+  );
+
   return {
     coupleNames,
     coupleNamesVideo,
@@ -524,6 +553,8 @@ export function resolveTextStyles(
     locationAddress,
     guideItemLabel,
     guideScriptTitle,
+    saveLabel,
+    calendarCta,
     // Role-level resolved values
     displayFont,
     bodyFont,
