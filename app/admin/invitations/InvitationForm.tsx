@@ -573,7 +573,7 @@ export default function InvitationForm({
 
   // Envelope overrides
   const updateEnvelope = useCallback(
-    (field: keyof EnvelopeConfig, value: string) => {
+    (field: keyof EnvelopeConfig, value: string | boolean) => {
       setForm((prev) => ({
         ...prev,
         envelope: { ...prev.envelope, [field]: value },
@@ -933,6 +933,22 @@ export default function InvitationForm({
                       onClear={() => updateEnvelope("bottomFlap", "")}
                       kind="image"
                       maxSizeMB={5}
+                    />
+                  </div>
+
+                  <Separator />
+
+                  {/* Shimmer toggle */}
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label>Efeito shimmer</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Animação diagonal de brilho sobre a capa do envelope.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.envelope?.shimmer !== false}
+                      onCheckedChange={(v) => updateEnvelope("shimmer", v)}
                     />
                   </div>
                 </AccordionContent>
@@ -1693,6 +1709,7 @@ export default function InvitationForm({
                   theme={currentTheme}
                   onOpen={() => {}}
                   monogram={form.couple.monogram}
+                  shimmer={form.envelope?.shimmer !== false}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">

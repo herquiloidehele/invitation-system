@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useState } from "react";
+import { motion } from "framer-motion";
 import type { TemplateTheme } from "@/lib/types";
 import Image from "next/image";
 
@@ -14,7 +14,9 @@ interface EnvelopeCoverProps {
   onOpen: () => void;
   /** Called when the full opening animation has finished playing. */
   onAnimationComplete?: () => void;
-  /** Couple monogram to display on the envelope face (e.g. "A&M") */
+  /** Enable the diagonal shimmer highlight animation. Defaults to true. */
+  shimmer?: boolean;
+  /** Monogram text displayed on the envelope (passed through but unused in this component). */
   monogram?: string;
 }
 
@@ -120,7 +122,7 @@ export default function EnvelopeCover({
   theme,
   onOpen,
   onAnimationComplete,
-  monogram,
+  shimmer = true,
 }: EnvelopeCoverProps) {
   const [opening, setOpening] = useState(false);
 
@@ -145,7 +147,7 @@ export default function EnvelopeCover({
       <EnvelopeBody color={theme.envelope.base} />
 
       {/* Shimmer highlight — diagonal sweep across envelope */}
-      {!opening && (
+      {shimmer && !opening && (
         <motion.div
           className="absolute inset-0 z-[6] pointer-events-none"
           style={{

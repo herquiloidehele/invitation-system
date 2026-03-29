@@ -244,6 +244,7 @@ export default function InvitationView({
               onOpen={handleOpen}
               onAnimationComplete={handleAnimationComplete}
               monogram={invitation.couple.monogram}
+              shimmer={invitation.envelope?.shimmer !== false}
             />
           )}
         </AnimatePresence>

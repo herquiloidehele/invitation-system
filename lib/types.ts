@@ -103,6 +103,8 @@ export interface EnvelopeConfig {
   topFlap?: string;
   /** Override the bottom flap image URL. Falls back to theme default if empty. */
   bottomFlap?: string;
+  /** Enable/disable the diagonal shimmer highlight animation on the envelope cover. Defaults to true. */
+  shimmer?: boolean;
 }
 
 export interface OurStory {

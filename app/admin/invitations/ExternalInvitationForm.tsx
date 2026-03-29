@@ -15,6 +15,7 @@ import type {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectTrigger,
@@ -159,7 +160,7 @@ export default function ExternalInvitationForm({
 
   // Envelope overrides
   const updateEnvelope = useCallback(
-    (field: keyof EnvelopeConfig, value: string) => {
+    (field: keyof EnvelopeConfig, value: string | boolean) => {
       setForm((prev) => ({
         ...prev,
         envelope: { ...prev.envelope, [field]: value },
@@ -531,6 +532,22 @@ export default function ExternalInvitationForm({
                       maxSizeMB={5}
                     />
                   </div>
+
+                  <Separator />
+
+                  {/* Shimmer toggle */}
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label>Efeito shimmer</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Animação diagonal de brilho sobre a capa do envelope.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.envelope?.shimmer !== false}
+                      onCheckedChange={(v) => updateEnvelope("shimmer", v)}
+                    />
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -591,6 +608,7 @@ export default function ExternalInvitationForm({
               theme={currentTheme}
               onOpen={() => {}}
               monogram={form.couple.monogram || "A&B"}
+              shimmer={form.envelope?.shimmer !== false}
             />
           )}
         </div>
