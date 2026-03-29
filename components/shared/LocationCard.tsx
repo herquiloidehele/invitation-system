@@ -7,6 +7,7 @@ import { MapPin, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 import type { LocationInfo, TemplateTheme } from "@/lib/types";
+import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 // Dynamically import the map with ssr: false to prevent Leaflet from being
@@ -49,12 +50,15 @@ function getExternalMapUrl(location: LocationInfo): string {
 interface LocationCardProps {
   location: LocationInfo;
   theme: TemplateTheme;
+  /** Resolved text styles — when provided, text elements use these instead of raw theme values */
+  ts?: ResolvedTextStyles;
   onMapsClick?: () => void;
 }
 
 export default function LocationCard({
   location,
   theme,
+  ts,
   onMapsClick,
 }: LocationCardProps) {
   const hasCoordinates =
@@ -86,12 +90,13 @@ export default function LocationCard({
         </div>
         <span
           style={{
-            fontFamily: theme.uiFont,
+            fontFamily: ts?.uiFont ?? theme.uiFont,
             fontSize: 9,
             fontWeight: 500,
             letterSpacing: 3,
             textTransform: "uppercase" as const,
-            color: theme.textMuted,
+            color: ts?.textMuted ?? theme.textMuted,
+            ...(ts?.labels ?? {}),
           }}
         >
           Localização
@@ -115,21 +120,23 @@ export default function LocationCard({
       <div className="flex flex-col gap-1 px-5 pb-3">
         <span
           style={{
-            fontFamily: theme.bodyFont,
+            fontFamily: ts?.bodyFont ?? theme.bodyFont,
             fontSize: 16,
             fontWeight: 600,
-            color: theme.textPrimary,
+            color: ts?.textPrimary ?? theme.textPrimary,
+            ...(ts?.locationName ?? {}),
           }}
         >
           {location.name}
         </span>
         <span
           style={{
-            fontFamily: theme.uiFont,
+            fontFamily: ts?.uiFont ?? theme.uiFont,
             fontSize: 14,
             fontWeight: 400,
-            color: theme.textSecondary,
+            color: ts?.textSecondary ?? theme.textSecondary,
             lineHeight: 1.5,
+            ...(ts?.locationAddress ?? {}),
           }}
         >
           {location.address}
@@ -156,9 +163,9 @@ export default function LocationCard({
                   <MapPin size={24} color={theme.textMuted} strokeWidth={1.5} />
                   <span
                     style={{
-                      fontFamily: theme.uiFont,
+                      fontFamily: ts?.uiFont ?? theme.uiFont,
                       fontSize: 12,
-                      color: theme.textMuted,
+                      color: ts?.textMuted ?? theme.textMuted,
                     }}
                   >
                     Mapa indisponível offline
@@ -206,7 +213,7 @@ export default function LocationCard({
           }}
           className="flex w-full items-center justify-center gap-2 px-4 py-3 transition-all"
           style={{
-            fontFamily: theme.uiFont,
+            fontFamily: ts?.uiFont ?? theme.uiFont,
             fontSize: 12,
             fontWeight: 500,
             letterSpacing: 0.8,

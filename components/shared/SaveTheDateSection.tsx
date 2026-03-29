@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { InvitationData, TemplateTheme, SaveDateStyle } from "@/lib/types";
+import type { ResolvedTextStyles } from "@/lib/text-styles";
 import CalendarButton from "./CalendarButton";
 
 // ---------------------------------------------------------------------------
@@ -15,9 +16,10 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 // Shared props for all variants
 // ---------------------------------------------------------------------------
 
-interface SaveTheDateProps {
+export interface SaveTheDateProps {
   invitation: InvitationData;
   theme: TemplateTheme;
+  ts: ResolvedTextStyles;
   onCalendarClick?: () => void;
   isPreview?: boolean;
 }
@@ -26,7 +28,7 @@ interface SaveTheDateProps {
 // Shared sub-components
 // ---------------------------------------------------------------------------
 
-function AccentLine({ theme }: { theme: TemplateTheme }) {
+function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
   return (
     <motion.div
       className="my-5"
@@ -37,23 +39,23 @@ function AccentLine({ theme }: { theme: TemplateTheme }) {
       style={{
         width: 80,
         height: 1,
-        background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
+        background: `linear-gradient(90deg, transparent, ${ts.accent}, transparent)`,
         opacity: 0.35,
       }}
     />
   );
 }
 
-function SaveLabel({ theme }: { theme: TemplateTheme }) {
+function SaveLabel({ ts }: { ts: ResolvedTextStyles }) {
   return (
     <span
       style={{
-        fontFamily: theme.uiFont,
+        fontFamily: ts.uiFont,
         fontSize: 10,
         fontWeight: 400,
         letterSpacing: 5,
         textTransform: "uppercase" as const,
-        color: theme.accent,
+        color: ts.accent,
       }}
     >
       Save the Date
@@ -63,11 +65,11 @@ function SaveLabel({ theme }: { theme: TemplateTheme }) {
 
 function CalendarCTA({
   invitation,
-  theme,
+  ts,
   onCalendarClick,
 }: {
   invitation: InvitationData;
-  theme: TemplateTheme;
+  ts: ResolvedTextStyles;
   onCalendarClick?: () => void;
 }) {
   return (
@@ -80,12 +82,12 @@ function CalendarCTA({
     >
       <span
         style={{
-          fontFamily: theme.uiFont,
+          fontFamily: ts.uiFont,
           fontSize: 10,
           fontWeight: 500,
           letterSpacing: 1.5,
           textTransform: "uppercase" as const,
-          color: theme.accent,
+          color: ts.accent,
           opacity: 0.75,
         }}
       >
@@ -102,6 +104,7 @@ function CalendarCTA({
 function SaveTheDateClassic({
   invitation,
   theme,
+  ts,
   onCalendarClick,
 }: SaveTheDateProps) {
   return (
@@ -117,69 +120,33 @@ function SaveTheDateClassic({
         border: `1px solid ${theme.cardBorder}`,
       }}
     >
-      <SaveLabel theme={theme} />
+      <SaveLabel ts={ts} />
 
       {/* Day — oversized */}
-      <span
-        className="mt-3"
-        style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: 96,
-          fontWeight: 300,
-          lineHeight: 1,
-          color: theme.textPrimary,
-          letterSpacing: -2,
-        }}
-      >
+      <span className="mt-3" style={ts.dateDay}>
         {invitation.date.day}
       </span>
 
       {/* Month */}
-      <span
-        className="mt-1"
-        style={{
-          fontFamily: theme.uiFont,
-          fontSize: 13,
-          fontWeight: 500,
-          letterSpacing: 8,
-          textTransform: "uppercase" as const,
-          color: theme.textSecondary,
-        }}
-      >
+      <span className="mt-1" style={ts.dateMonth}>
         {invitation.date.month}
       </span>
 
       {/* Year */}
-      <span
-        className="mt-1"
-        style={{
-          fontFamily: theme.bodyFont,
-          fontSize: 20,
-          fontWeight: 300,
-          color: theme.textMuted,
-        }}
-      >
+      <span className="mt-1" style={ts.dateYear}>
         {invitation.date.year}
       </span>
 
-      <AccentLine theme={theme} />
+      <AccentLine ts={ts} />
 
       {/* Day of week + time */}
-      <span
-        style={{
-          fontFamily: theme.uiFont,
-          fontSize: 13,
-          fontWeight: 300,
-          letterSpacing: 1,
-          color: theme.textSecondary,
-        }}
-      >
+      <span style={ts.dateTime}>
         {invitation.date.dayOfWeek} &middot; {invitation.date.time}
       </span>
 
       <CalendarCTA
         invitation={invitation}
-        theme={theme}
+        ts={ts}
         onCalendarClick={onCalendarClick}
       />
     </div>
@@ -276,10 +243,12 @@ function CountdownUnit({
   value,
   label,
   theme,
+  ts,
 }: {
   value: number;
   label: string;
   theme: TemplateTheme;
+  ts: ResolvedTextStyles;
 }) {
   return (
     <div className="flex flex-col items-center gap-1">
@@ -300,7 +269,7 @@ function CountdownUnit({
             fontSize: 25,
             fontWeight: 300,
             lineHeight: 1,
-            color: theme.textPrimary,
+            color: ts.textPrimary,
             letterSpacing: -1,
             display: "block",
             textAlign: "center",
@@ -311,12 +280,12 @@ function CountdownUnit({
       </div>
       <span
         style={{
-          fontFamily: theme.uiFont,
+          fontFamily: ts.uiFont,
           fontSize: 9,
           fontWeight: 500,
           letterSpacing: 2.5,
           textTransform: "uppercase" as const,
-          color: theme.textMuted,
+          color: ts.textMuted,
         }}
       >
         {label}
@@ -328,6 +297,7 @@ function CountdownUnit({
 function SaveTheDateCountdown({
   invitation,
   theme,
+  ts,
   onCalendarClick,
 }: SaveTheDateProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
@@ -360,16 +330,16 @@ function SaveTheDateCountdown({
         border: `1px solid ${theme.cardBorder}`,
       }}
     >
-      <SaveLabel theme={theme} />
+      <SaveLabel ts={ts} />
 
       {/* Date context */}
       <span
         className="mt-3"
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: ts.scriptFont,
           fontSize: 22,
           fontWeight: 300,
-          color: theme.textPrimary,
+          color: ts.textPrimary,
           letterSpacing: 1,
         }}
       >
@@ -378,36 +348,36 @@ function SaveTheDateCountdown({
 
       <span
         style={{
-          fontFamily: theme.uiFont,
+          fontFamily: ts.uiFont,
           fontSize: 12,
           fontWeight: 300,
           letterSpacing: 1,
-          color: theme.textMuted,
+          color: ts.textMuted,
           marginTop: 2,
         }}
       >
         {invitation.date.dayOfWeek} &middot; {invitation.date.time}
       </span>
 
-      <AccentLine theme={theme} />
+      <AccentLine ts={ts} />
 
       {/* Countdown tiles */}
       {isCelebration ? (
         <div className="flex flex-col items-center gap-2 py-3">
           <span
             style={{
-              fontFamily: theme.scriptFont ?? theme.displayFont,
+              fontFamily: ts.scriptFont,
               fontSize: 28,
-              color: theme.accent,
+              color: ts.accent,
             }}
           >
             Hoje é o grande dia!
           </span>
           <span
             style={{
-              fontFamily: theme.uiFont,
+              fontFamily: ts.uiFont,
               fontSize: 12,
-              color: theme.textSecondary,
+              color: ts.textSecondary,
               letterSpacing: 1,
             }}
           >
@@ -416,12 +386,17 @@ function SaveTheDateCountdown({
         </div>
       ) : (
         <div className="flex items-start justify-center gap-1">
-          <CountdownUnit value={timeLeft.days} label="Dias" theme={theme} />
+          <CountdownUnit
+            value={timeLeft.days}
+            label="Dias"
+            theme={theme}
+            ts={ts}
+          />
           <span
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: ts.scriptFont,
               fontSize: 36,
-              color: theme.accent,
+              color: ts.accent,
               lineHeight: 1,
               marginTop: 10,
               opacity: 0.5,
@@ -429,12 +404,17 @@ function SaveTheDateCountdown({
           >
             :
           </span>
-          <CountdownUnit value={timeLeft.hours} label="Horas" theme={theme} />
+          <CountdownUnit
+            value={timeLeft.hours}
+            label="Horas"
+            theme={theme}
+            ts={ts}
+          />
           <span
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: ts.scriptFont,
               fontSize: 36,
-              color: theme.accent,
+              color: ts.accent,
               lineHeight: 1,
               marginTop: 10,
               opacity: 0.5,
@@ -446,12 +426,13 @@ function SaveTheDateCountdown({
             value={timeLeft.minutes}
             label="Minutos"
             theme={theme}
+            ts={ts}
           />
           <span
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: ts.scriptFont,
               fontSize: 36,
-              color: theme.accent,
+              color: ts.accent,
               lineHeight: 1,
               marginTop: 10,
               opacity: 0.5,
@@ -463,13 +444,14 @@ function SaveTheDateCountdown({
             value={timeLeft.seconds}
             label="Segundos"
             theme={theme}
+            ts={ts}
           />
         </div>
       )}
 
       <CalendarCTA
         invitation={invitation}
-        theme={theme}
+        ts={ts}
         onCalendarClick={onCalendarClick}
       />
     </div>
@@ -485,12 +467,14 @@ function QuadCard({
   value,
   valueFontSize = 48,
   theme,
+  ts,
   delay = 0,
 }: {
   label: string;
   value: string;
   valueFontSize?: number;
   theme: TemplateTheme;
+  ts: ResolvedTextStyles;
   delay?: number;
 }) {
   return (
@@ -513,11 +497,10 @@ function QuadCard({
     >
       <span
         style={{
-          // fontFamily: "'Cormorant Garamond', serif",
           fontSize: valueFontSize,
           fontWeight: 300,
           lineHeight: 1,
-          color: theme.textPrimary,
+          color: ts.textPrimary,
           letterSpacing: valueFontSize > 40 ? -1 : 0,
         }}
       >
@@ -525,12 +508,12 @@ function QuadCard({
       </span>
       <span
         style={{
-          fontFamily: theme.uiFont,
+          fontFamily: ts.uiFont,
           fontSize: 9,
           fontWeight: 500,
           letterSpacing: 2.5,
           textTransform: "uppercase" as const,
-          color: theme.accent,
+          color: ts.accent,
           marginTop: 8,
         }}
       >
@@ -543,6 +526,7 @@ function QuadCard({
 function SaveTheDateQuadCards({
   invitation,
   theme,
+  ts,
   onCalendarClick,
 }: SaveTheDateProps) {
   return (
@@ -554,7 +538,7 @@ function SaveTheDateQuadCards({
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        <SaveLabel theme={theme} />
+        <SaveLabel ts={ts} />
       </motion.div>
 
       {/* 2×2 grid */}
@@ -564,6 +548,7 @@ function SaveTheDateQuadCards({
           value={invitation.date.day}
           valueFontSize={24}
           theme={theme}
+          ts={ts}
           delay={0.05}
         />
         <QuadCard
@@ -571,6 +556,7 @@ function SaveTheDateQuadCards({
           value={invitation.date.month}
           valueFontSize={24}
           theme={theme}
+          ts={ts}
           delay={0.1}
         />
         <QuadCard
@@ -578,6 +564,7 @@ function SaveTheDateQuadCards({
           value={invitation.date.year}
           valueFontSize={24}
           theme={theme}
+          ts={ts}
           delay={0.15}
         />
         <QuadCard
@@ -585,6 +572,7 @@ function SaveTheDateQuadCards({
           value={invitation.date.dayOfWeek}
           valueFontSize={24}
           theme={theme}
+          ts={ts}
           delay={0.2}
         />
       </div>
@@ -599,18 +587,18 @@ function SaveTheDateQuadCards({
       >
         <span
           style={{
-            fontFamily: theme.uiFont,
+            fontFamily: ts.uiFont,
             fontSize: 12,
             fontWeight: 300,
             letterSpacing: 2,
-            color: theme.textMuted,
+            color: ts.textMuted,
           }}
         >
           {invitation.date.time}
         </span>
         <CalendarCTA
           invitation={invitation}
-          theme={theme}
+          ts={ts}
           onCalendarClick={onCalendarClick}
         />
       </motion.div>
@@ -628,9 +616,9 @@ const CINEMATIC_DEFAULT_IMAGE =
 function SaveTheDateCinematic({
   invitation,
   theme,
+  ts,
   onCalendarClick,
 }: SaveTheDateProps) {
-  const scriptFont = theme.scriptFont ?? theme.displayFont;
   const bgImage =
     invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
 
@@ -685,7 +673,7 @@ function SaveTheDateCinematic({
             left: 0,
             right: 0,
             height: 2,
-            background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
+            background: `linear-gradient(90deg, transparent, ${ts.accent}, transparent)`,
             opacity: 0.7,
           }}
         />
@@ -698,7 +686,7 @@ function SaveTheDateCinematic({
           {/* "Save the Date" label — white on dark image */}
           <span
             style={{
-              fontFamily: theme.uiFont,
+              fontFamily: ts.uiFont,
               fontSize: 10,
               fontWeight: 400,
               letterSpacing: 5,
@@ -717,7 +705,7 @@ function SaveTheDateCinematic({
             transition={{ duration: 1, delay: 0.25, ease: EASE }}
             className="mt-3 text-center"
             style={{
-              fontFamily: scriptFont,
+              fontFamily: ts.scriptFont,
               fontSize: 52,
               fontWeight: 400,
               lineHeight: 1.15,
@@ -761,11 +749,11 @@ function SaveTheDateCinematic({
         <div className="flex items-center justify-center gap-4">
           <span
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: ts.scriptFont,
               fontSize: 40,
               fontWeight: 300,
               lineHeight: 1,
-              color: theme.textPrimary,
+              color: ts.textPrimary,
               letterSpacing: -1,
             }}
           >
@@ -776,7 +764,7 @@ function SaveTheDateCinematic({
             style={{
               width: 1,
               height: 36,
-              background: theme.accent,
+              background: ts.accent,
               opacity: 0.25,
             }}
           />
@@ -784,22 +772,22 @@ function SaveTheDateCinematic({
           <div className="flex flex-col items-center gap-0.5">
             <span
               style={{
-                fontFamily: theme.uiFont,
+                fontFamily: ts.uiFont,
                 fontSize: 11,
                 fontWeight: 600,
                 letterSpacing: 4,
                 textTransform: "uppercase" as const,
-                color: theme.textSecondary,
+                color: ts.textSecondary,
               }}
             >
               {invitation.date.month}
             </span>
             <span
               style={{
-                fontFamily: theme.bodyFont,
+                fontFamily: ts.bodyFont,
                 fontSize: 12,
                 fontWeight: 300,
-                color: theme.textMuted,
+                color: ts.textMuted,
                 letterSpacing: 1,
               }}
             >
@@ -811,7 +799,7 @@ function SaveTheDateCinematic({
             style={{
               width: 1,
               height: 36,
-              background: theme.accent,
+              background: ts.accent,
               opacity: 0.25,
             }}
           />
@@ -819,21 +807,21 @@ function SaveTheDateCinematic({
           <div className="flex flex-col items-center gap-0.5">
             <span
               style={{
-                fontFamily: theme.uiFont,
+                fontFamily: ts.uiFont,
                 fontSize: 11,
                 fontWeight: 400,
                 letterSpacing: 2,
-                color: theme.textSecondary,
+                color: ts.textSecondary,
               }}
             >
               {invitation.date.dayOfWeek}
             </span>
             <span
               style={{
-                fontFamily: theme.uiFont,
+                fontFamily: ts.uiFont,
                 fontSize: 12,
                 fontWeight: 300,
-                color: theme.textMuted,
+                color: ts.textMuted,
               }}
             >
               {invitation.date.time}
@@ -844,7 +832,7 @@ function SaveTheDateCinematic({
         <div className="flex justify-center mt-4">
           <CalendarCTA
             invitation={invitation}
-            theme={theme}
+            ts={ts}
             onCalendarClick={onCalendarClick}
           />
         </div>
@@ -859,7 +847,7 @@ function SaveTheDateCinematic({
 
 function SaveTheDateMinimalLine({
   invitation,
-  theme,
+  ts,
   onCalendarClick,
 }: SaveTheDateProps) {
   return (
@@ -871,7 +859,7 @@ function SaveTheDateMinimalLine({
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        <SaveLabel theme={theme} />
+        <SaveLabel ts={ts} />
       </motion.div>
 
       {/* Main date line — large, spaced */}
@@ -884,11 +872,11 @@ function SaveTheDateMinimalLine({
       >
         <span
           style={{
-            fontFamily: theme.bodyFont,
+            fontFamily: ts.bodyFont,
             fontSize: 30,
             fontWeight: 300,
             lineHeight: 1,
-            color: theme.textPrimary,
+            color: ts.textPrimary,
             letterSpacing: -1,
           }}
         >
@@ -896,7 +884,7 @@ function SaveTheDateMinimalLine({
         </span>
         <span
           style={{
-            color: theme.accent,
+            color: ts.accent,
             opacity: 0.4,
             fontSize: 28,
             fontWeight: 200,
@@ -906,19 +894,19 @@ function SaveTheDateMinimalLine({
         </span>
         <span
           style={{
-            fontFamily: theme.bodyFont,
+            fontFamily: ts.bodyFont,
             fontSize: 14,
             fontWeight: 500,
             letterSpacing: 5,
             textTransform: "uppercase" as const,
-            color: theme.textSecondary,
+            color: ts.textSecondary,
           }}
         >
           {invitation.date.month}
         </span>
         <span
           style={{
-            color: theme.accent,
+            color: ts.accent,
             opacity: 0.4,
             fontSize: 28,
             fontWeight: 200,
@@ -928,10 +916,10 @@ function SaveTheDateMinimalLine({
         </span>
         <span
           style={{
-            fontFamily: theme.bodyFont,
+            fontFamily: ts.bodyFont,
             fontSize: 24,
             fontWeight: 300,
-            color: theme.textMuted,
+            color: ts.textMuted,
           }}
         >
           {invitation.date.year}
@@ -947,7 +935,7 @@ function SaveTheDateMinimalLine({
         style={{
           width: 120,
           height: 1,
-          background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${ts.accent}, transparent)`,
           opacity: 0.3,
         }}
       />
@@ -962,26 +950,24 @@ function SaveTheDateMinimalLine({
       >
         <span
           style={{
-            fontFamily: theme.uiFont,
+            fontFamily: ts.uiFont,
             fontSize: 12,
             fontWeight: 300,
             letterSpacing: 3,
-            color: theme.textSecondary,
+            color: ts.textSecondary,
             textTransform: "uppercase" as const,
           }}
         >
           {invitation.date.dayOfWeek}
         </span>
-        <span style={{ color: theme.accent, opacity: 0.4, fontSize: 16 }}>
-          ·
-        </span>
+        <span style={{ color: ts.accent, opacity: 0.4, fontSize: 16 }}>·</span>
         <span
           style={{
-            fontFamily: theme.uiFont,
+            fontFamily: ts.uiFont,
             fontSize: 12,
             fontWeight: 300,
             letterSpacing: 2,
-            color: theme.textMuted,
+            color: ts.textMuted,
           }}
         >
           {invitation.date.time}
@@ -990,7 +976,7 @@ function SaveTheDateMinimalLine({
 
       <CalendarCTA
         invitation={invitation}
-        theme={theme}
+        ts={ts}
         onCalendarClick={onCalendarClick}
       />
     </div>
@@ -1004,6 +990,7 @@ function SaveTheDateMinimalLine({
 export default function SaveTheDateSection({
   invitation,
   theme,
+  ts,
   onCalendarClick,
   isPreview,
 }: SaveTheDateProps) {
@@ -1015,6 +1002,7 @@ export default function SaveTheDateSection({
         <SaveTheDateCountdown
           invitation={invitation}
           theme={theme}
+          ts={ts}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />
@@ -1024,6 +1012,7 @@ export default function SaveTheDateSection({
         <SaveTheDateQuadCards
           invitation={invitation}
           theme={theme}
+          ts={ts}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />
@@ -1033,6 +1022,7 @@ export default function SaveTheDateSection({
         <SaveTheDateCinematic
           invitation={invitation}
           theme={theme}
+          ts={ts}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />
@@ -1042,6 +1032,7 @@ export default function SaveTheDateSection({
         <SaveTheDateMinimalLine
           invitation={invitation}
           theme={theme}
+          ts={ts}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />
@@ -1052,6 +1043,7 @@ export default function SaveTheDateSection({
         <SaveTheDateClassic
           invitation={invitation}
           theme={theme}
+          ts={ts}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />

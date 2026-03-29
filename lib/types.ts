@@ -129,6 +129,57 @@ export interface ParentsInfo {
   groomsMother: string;
 }
 
+// ---------------------------------------------------------------------------
+// Per-invitation text style overrides
+// ---------------------------------------------------------------------------
+
+/** Style overrides for a single text element (all fields optional). */
+export interface TextStyle {
+  fontFamily?: string;
+  fontSize?: number;
+  color?: string;
+  fontWeight?: string | number;
+  letterSpacing?: number;
+}
+
+/** Two-tier text styling overrides stored on each invitation.
+ *
+ * Tier 1 — role-based overrides: broadly replace the theme's font-family
+ * and color slots for every element that uses that role.
+ *
+ * Tier 2 — element-specific overrides: fine-tune individual text elements
+ * (highest specificity, wins over both theme defaults and role overrides).
+ */
+export interface TextStyleOverrides {
+  /** Override the theme's four font-family roles. */
+  fonts?: {
+    display?: string;
+    body?: string;
+    script?: string;
+    ui?: string;
+  };
+  /** Override the theme's text-color roles. */
+  colors?: {
+    textPrimary?: string;
+    textSecondary?: string;
+    textMuted?: string;
+    accent?: string;
+  };
+  /** Per-element overrides (highest specificity). */
+  elements?: {
+    coupleNames?: TextStyle;
+    ampersand?: TextStyle;
+    quote?: TextStyle;
+    sectionTitles?: TextStyle;
+    bodyText?: TextStyle;
+    labels?: TextStyle;
+    dateDay?: TextStyle;
+    dateMonth?: TextStyle;
+    dateYear?: TextStyle;
+    dateTime?: TextStyle;
+  };
+}
+
 export interface InvitationData {
   slug: string;
   /** The theme's database id — used when saving/updating invitations. */
@@ -164,6 +215,8 @@ export interface InvitationData {
   parents?: ParentsInfo;
   /** Optional "Nossa História" section — the couple's story. */
   ourStory?: OurStory;
+  /** Per-invitation text style overrides (fonts, colors, sizes). Missing fields fall back to theme defaults. */
+  textStyles?: TextStyleOverrides;
   /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
   invitationType: InvitationType;
   /** External URL for the iframe page (external_link type). */

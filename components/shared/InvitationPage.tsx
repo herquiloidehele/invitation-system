@@ -11,12 +11,14 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
 import type { FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
+import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
+import SectionImage from "./SectionImage";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -105,16 +107,6 @@ const staggerContainer: Variants = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function isScriptFont(displayFont: string): boolean {
-  const lower = displayFont.toLowerCase();
-  return (
-    lower.includes("great vibes") ||
-    lower.includes("homemade apple") ||
-    lower.includes("pinyon script") ||
-    lower.includes("cursive")
-  );
-}
-
 function toAudioTheme(theme: TemplateTheme) {
   return {
     bgColor: theme.cardBg,
@@ -180,71 +172,6 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
 }
 
 // ---------------------------------------------------------------------------
-// Full-bleed section image with gradient fades blending into the theme bg
-// ---------------------------------------------------------------------------
-
-function SectionImage({
-  src,
-  theme,
-  height = 300,
-  hiddeBottom,
-}: {
-  src: string;
-  theme: TemplateTheme;
-  height?: number;
-  hiddeBottom?: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 1.2, ease: "easeOut" }}
-      style={{
-        position: "relative",
-        width: "100%",
-        height,
-        overflow: "hidden",
-      }}
-    >
-      <img
-        src={src}
-        alt=""
-        aria-hidden="true"
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          display: "block",
-        }}
-      />
-      {/* Top gradient — fades from theme.bg down into transparent */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: `linear-gradient(to bottom, ${theme.bg} 0%, transparent 40%)`,
-          pointerEvents: "none",
-        }}
-      />
-      {/* Bottom gradient — fades from transparent up into theme.bg */}
-      {!hiddeBottom && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: `linear-gradient(to top, ${theme.bg} 0%, transparent 40%)`,
-            pointerEvents: "none",
-          }}
-        />
-      )}
-    </motion.div>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Animated section wrappers
 // ---------------------------------------------------------------------------
 
@@ -285,6 +212,7 @@ function FAQAccordionItem({
   isOpen,
   onToggle,
   theme,
+  ts,
   isLast,
 }: {
   faq: FAQItem;
@@ -292,14 +220,13 @@ function FAQAccordionItem({
   isOpen: boolean;
   onToggle: () => void;
   theme: TemplateTheme;
+  ts: ResolvedTextStyles;
   isLast: boolean;
 }) {
   return (
     <div
       style={{
-        borderLeft: isOpen
-          ? `2px solid ${theme.accent}`
-          : "2px solid transparent",
+        borderLeft: isOpen ? `2px solid ${ts.accent}` : "2px solid transparent",
         transition: "border-color 0.35s ease",
       }}
     >
@@ -317,11 +244,8 @@ function FAQAccordionItem({
         <span
           className="flex-1"
           style={{
-            fontFamily: theme.bodyFont,
-            fontSize: 14,
-            fontWeight: 500,
-            lineHeight: 1.5,
-            color: isOpen ? theme.textPrimary : theme.textSecondary,
+            ...ts.faqQuestion,
+            color: isOpen ? ts.textPrimary : ts.textSecondary,
             transition: "color 0.3s ease",
           }}
         >
@@ -336,7 +260,7 @@ function FAQAccordionItem({
         >
           <ChevronDown
             size={16}
-            color={theme.accent}
+            color={ts.accent}
             strokeWidth={1.5}
             style={{
               opacity: isOpen ? 1 : 0.4,
@@ -362,11 +286,7 @@ function FAQAccordionItem({
             <div style={{ padding: "4px 22px 22px" }}>
               <p
                 style={{
-                  fontFamily: theme.bodyFont,
-                  fontSize: 12,
-                  lineHeight: 1.75,
-                  color: theme.textSecondary,
-                  opacity: 0.8,
+                  ...ts.faqAnswer,
                   margin: 0,
                 }}
               >
@@ -450,7 +370,7 @@ export default function InvitationPage({
     }
   }, [invitation.slug]);
 
-  const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 46;
+  const ts = resolveTextStyles(theme, invitation.textStyles);
 
   return (
     <div
@@ -555,44 +475,19 @@ export default function InvitationPage({
               /* ── Parents Mode (video) ── */
               <>
                 {/* Couple names */}
-                <motion.h1
-                  variants={heroTextItem}
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize + 10,
-                    lineHeight: 1.05,
-                    color: "#ffffff",
-                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
-                  }}
-                >
+                <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
                   {invitation.couple.bride}
                 </motion.h1>
 
                 <motion.span
                   variants={heroTextItem}
                   className="my-2"
-                  style={{
-                    fontFamily:
-                      theme.scriptFont ?? "'Cormorant Garamond', serif",
-                    fontSize: 34,
-                    fontStyle: "italic",
-                    color: "rgba(255,255,255,0.75)",
-                    textShadow: "0 2px 20px rgba(0,0,0,0.35)",
-                  }}
+                  style={ts.ampersandVideo}
                 >
                   &amp;
                 </motion.span>
 
-                <motion.h1
-                  variants={heroTextItem}
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize + 10,
-                    lineHeight: 1.05,
-                    color: "#ffffff",
-                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
-                  }}
-                >
+                <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
                   {invitation.couple.groom}
                 </motion.h1>
 
@@ -600,13 +495,7 @@ export default function InvitationPage({
                 <motion.span
                   variants={heroTextItem}
                   className="mt-5"
-                  style={{
-                    fontFamily: theme.bodyFont,
-                    fontSize: 13,
-                    fontStyle: "italic",
-                    color: "rgba(255,255,255,0.65)",
-                    letterSpacing: 1,
-                  }}
+                  style={ts.blessingMessageVideo}
                 >
                   {invitation.parents.blessingMessage}
                 </motion.span>
@@ -621,26 +510,12 @@ export default function InvitationPage({
                     style={{ textAlign: "left" }}
                   >
                     {invitation.parents.bridesFather && (
-                      <span
-                        style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 12,
-                          color: "rgba(255,255,255,0.8)",
-                          lineHeight: 1.6,
-                        }}
-                      >
+                      <span style={ts.parentsNamesVideo}>
                         {invitation.parents.bridesFather}
                       </span>
                     )}
                     {invitation.parents.bridesMother && (
-                      <span
-                        style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 12,
-                          color: "rgba(255,255,255,0.8)",
-                          lineHeight: 1.6,
-                        }}
-                      >
+                      <span style={ts.parentsNamesVideo}>
                         {invitation.parents.bridesMother}
                       </span>
                     )}
@@ -650,26 +525,12 @@ export default function InvitationPage({
                     style={{ textAlign: "right" }}
                   >
                     {invitation.parents.groomsFather && (
-                      <span
-                        style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 12,
-                          color: "rgba(255,255,255,0.8)",
-                          lineHeight: 1.6,
-                        }}
-                      >
+                      <span style={ts.parentsNamesVideo}>
                         {invitation.parents.groomsFather}
                       </span>
                     )}
                     {invitation.parents.groomsMother && (
-                      <span
-                        style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 12,
-                          color: "rgba(255,255,255,0.8)",
-                          lineHeight: 1.6,
-                        }}
-                      >
+                      <span style={ts.parentsNamesVideo}>
                         {invitation.parents.groomsMother}
                       </span>
                     )}
@@ -681,11 +542,7 @@ export default function InvitationPage({
                   variants={heroTextItem}
                   className="mt-5"
                   style={{
-                    fontFamily: theme.bodyFont,
-                    fontSize: 13,
-                    fontStyle: "italic",
-                    lineHeight: 1.65,
-                    color: "rgba(255,255,255,0.55)",
+                    ...ts.inviteMessageVideo,
                     maxWidth: 300,
                     textAlign: "center",
                   }}
@@ -699,14 +556,7 @@ export default function InvitationPage({
                 {/* Label */}
                 <motion.span
                   variants={heroTextItem}
-                  style={{
-                    fontFamily: theme.uiFont,
-                    fontSize: 10,
-                    fontWeight: 300,
-                    letterSpacing: 5,
-                    textTransform: "uppercase" as const,
-                    color: "rgba(255,255,255,0.65)",
-                  }}
+                  style={ts.inviteLabelVideo}
                 >
                   Convidam para o casamento de
                 </motion.span>
@@ -715,13 +565,7 @@ export default function InvitationPage({
                 <motion.h1
                   variants={heroTextItem}
                   className="mt-5"
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize + 10,
-                    lineHeight: 1.05,
-                    color: "#ffffff",
-                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
-                  }}
+                  style={ts.coupleNamesVideo}
                 >
                   {invitation.couple.bride}
                 </motion.h1>
@@ -730,29 +574,13 @@ export default function InvitationPage({
                 <motion.span
                   variants={heroTextItem}
                   className="my-2"
-                  style={{
-                    fontFamily:
-                      theme.scriptFont ?? "'Cormorant Garamond', serif",
-                    fontSize: 34,
-                    fontStyle: "italic",
-                    color: "rgba(255,255,255,0.75)",
-                    textShadow: "0 2px 20px rgba(0,0,0,0.35)",
-                  }}
+                  style={ts.ampersandVideo}
                 >
                   &amp;
                 </motion.span>
 
                 {/* Groom */}
-                <motion.h1
-                  variants={heroTextItem}
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize + 10,
-                    lineHeight: 1.05,
-                    color: "#ffffff",
-                    textShadow: "0 2px 40px rgba(0,0,0,0.5)",
-                  }}
-                >
+                <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
                   {invitation.couple.groom}
                 </motion.h1>
 
@@ -760,14 +588,7 @@ export default function InvitationPage({
                 <motion.div
                   variants={heroTextItem}
                   className="mt-7 flex items-center gap-4"
-                  style={{
-                    fontFamily: theme.uiFont,
-                    fontSize: 10,
-                    fontWeight: 300,
-                    letterSpacing: 6,
-                    textTransform: "uppercase" as const,
-                    color: "rgba(255,255,255,0.6)",
-                  }}
+                  style={ts.datePillVideo}
                 >
                   <span
                     style={{
@@ -795,11 +616,7 @@ export default function InvitationPage({
                   variants={heroTextItem}
                   className="mt-5"
                   style={{
-                    fontFamily: theme.bodyFont,
-                    fontSize: 14,
-                    fontStyle: "italic" as const,
-                    lineHeight: 1.65,
-                    color: "rgba(255,255,255,0.5)",
+                    ...ts.quoteVideo,
                     maxWidth: 280,
                   }}
                 >
@@ -838,40 +655,15 @@ export default function InvitationPage({
               /* ── Parents Mode (image hero) ── */
               <>
                 {/* Couple names */}
-                <h1
-                  className="mt-2"
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize,
-                    lineHeight: 1.1,
-                    color: theme.textPrimary,
-                  }}
-                >
+                <h1 className="mt-2" style={ts.coupleNames}>
                   {invitation.couple.bride}
                 </h1>
 
-                <span
-                  className="my-2"
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 26,
-                    fontStyle: "italic",
-                    color: theme.accent,
-                  }}
-                >
+                <span className="my-2" style={ts.ampersand}>
                   &amp;
                 </span>
 
-                <h1
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize,
-                    lineHeight: 1.1,
-                    color: theme.textPrimary,
-                  }}
-                >
-                  {invitation.couple.groom}
-                </h1>
+                <h1 style={ts.coupleNames}>{invitation.couple.groom}</h1>
 
                 {/* Decorative accent line */}
                 <motion.div
@@ -883,21 +675,13 @@ export default function InvitationPage({
                   style={{
                     width: 48,
                     height: 1,
-                    background: theme.accent,
+                    background: ts.accent,
                     opacity: 0.3,
                   }}
                 />
 
                 {/* Blessing message */}
-                <p
-                  style={{
-                    fontFamily: theme.bodyFont,
-                    fontSize: 13,
-                    fontStyle: "italic",
-                    color: theme.textSecondary,
-                    letterSpacing: 0.5,
-                  }}
-                >
+                <p style={ts.blessingMessage}>
                   {invitation.parents.blessingMessage}
                 </p>
 
@@ -907,10 +691,7 @@ export default function InvitationPage({
                     {invitation.parents.bridesFather && (
                       <span
                         style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 13,
-                          color: theme.textPrimary,
-                          lineHeight: 1.6,
+                          ...ts.parentsNames,
                           textAlign: "left",
                         }}
                       >
@@ -920,10 +701,7 @@ export default function InvitationPage({
                     {invitation.parents.bridesMother && (
                       <span
                         style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 13,
-                          color: theme.textPrimary,
-                          lineHeight: 1.6,
+                          ...ts.parentsNames,
                           textAlign: "left",
                         }}
                       >
@@ -935,10 +713,7 @@ export default function InvitationPage({
                     {invitation.parents.groomsFather && (
                       <span
                         style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 13,
-                          color: theme.textPrimary,
-                          lineHeight: 1.6,
+                          ...ts.parentsNames,
                           textAlign: "right",
                         }}
                       >
@@ -948,10 +723,7 @@ export default function InvitationPage({
                     {invitation.parents.groomsMother && (
                       <span
                         style={{
-                          fontFamily: theme.bodyFont,
-                          fontSize: 13,
-                          color: theme.textPrimary,
-                          lineHeight: 1.6,
+                          ...ts.parentsNames,
                           textAlign: "right",
                         }}
                       >
@@ -971,7 +743,7 @@ export default function InvitationPage({
                   style={{
                     width: 48,
                     height: 1,
-                    background: theme.accent,
+                    background: ts.accent,
                     opacity: 0.3,
                   }}
                 />
@@ -979,11 +751,7 @@ export default function InvitationPage({
                 {/* Invite message */}
                 <p
                   style={{
-                    fontFamily: theme.bodyFont,
-                    fontSize: 14,
-                    fontStyle: "italic",
-                    lineHeight: 1.65,
-                    color: theme.textSecondary,
+                    ...ts.inviteMessage,
                     maxWidth: 300,
                   }}
                 >
@@ -993,53 +761,17 @@ export default function InvitationPage({
             ) : (
               /* ── Standard Mode (image hero) ── */
               <>
-                <span
-                  style={{
-                    fontFamily: theme.uiFont,
-                    fontSize: 10,
-                    fontWeight: 300,
-                    letterSpacing: 4,
-                    textTransform: "uppercase" as const,
-                    color: theme.textSecondary,
-                  }}
-                >
-                  Convidam para o casamento de
-                </span>
+                <span style={ts.inviteLabel}>Convidam para o casamento de</span>
 
-                <h1
-                  className="mt-5"
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize,
-                    lineHeight: 1.1,
-                    color: theme.textPrimary,
-                  }}
-                >
+                <h1 className="mt-5" style={ts.coupleNames}>
                   {invitation.couple.bride}
                 </h1>
 
-                <span
-                  className="my-2"
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 26,
-                    fontStyle: "italic",
-                    color: theme.accent,
-                  }}
-                >
+                <span className="my-2" style={ts.ampersand}>
                   &amp;
                 </span>
 
-                <h1
-                  style={{
-                    fontFamily: theme.displayFont,
-                    fontSize: nameFontSize,
-                    lineHeight: 1.1,
-                    color: theme.textPrimary,
-                  }}
-                >
-                  {invitation.couple.groom}
-                </h1>
+                <h1 style={ts.coupleNames}>{invitation.couple.groom}</h1>
 
                 {/* Decorative accent line */}
                 <motion.div
@@ -1051,18 +783,14 @@ export default function InvitationPage({
                   style={{
                     width: 48,
                     height: 1,
-                    background: theme.accent,
+                    background: ts.accent,
                     opacity: 0.3,
                   }}
                 />
 
                 <p
                   style={{
-                    fontFamily: theme.bodyFont,
-                    fontSize: 16,
-                    fontStyle: "italic" as const,
-                    lineHeight: 1.65,
-                    color: theme.textSecondary,
+                    ...ts.quote,
                     maxWidth: 300,
                   }}
                 >
@@ -1085,6 +813,7 @@ export default function InvitationPage({
         <SaveTheDateSection
           invitation={invitation}
           theme={theme}
+          ts={ts}
           onCalendarClick={handleCalendarClick}
           isPreview={isPreview}
         />
@@ -1106,16 +835,7 @@ export default function InvitationPage({
         <>
           <AnimatedSection className="px-6 pb-2" isPreview={isPreview}>
             <div className="flex flex-col items-center">
-              <span
-                style={{
-                  fontFamily: theme.uiFont,
-                  fontSize: 10,
-                  fontWeight: 400,
-                  letterSpacing: 4,
-                  textTransform: "uppercase" as const,
-                  color: theme.textSecondary,
-                }}
-              >
+              <span style={ts.sectionTitles}>
                 {invitation.ourStory.title || "Nossa História"}
               </span>
 
@@ -1128,7 +848,7 @@ export default function InvitationPage({
                 style={{
                   width: 28,
                   height: 1,
-                  background: theme.accent,
+                  background: ts.accent,
                   opacity: 0.25,
                 }}
               />
@@ -1153,18 +873,15 @@ export default function InvitationPage({
                 {/* Decorative heart icon */}
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
-                  style={{ background: `${theme.accent}12` }}
+                  style={{ background: `${ts.accent}12` }}
                 >
-                  <Heart size={20} color={theme.accent} strokeWidth={1.5} />
+                  <Heart size={20} color={ts.accent} strokeWidth={1.5} />
                 </div>
 
                 {/* Story text */}
                 <p
                   style={{
-                    fontFamily: theme.bodyFont,
-                    fontSize: 14,
-                    lineHeight: 1.8,
-                    color: theme.textSecondary,
+                    ...ts.bodyText,
                     textAlign: "center",
                     margin: 0,
                     whiteSpace: "pre-line",
@@ -1187,18 +904,7 @@ export default function InvitationPage({
         <>
           <AnimatedSection className="px-6 pb-2" isPreview={isPreview}>
             <div className="flex flex-col items-center">
-              <span
-                style={{
-                  fontFamily: theme.uiFont,
-                  fontSize: 10,
-                  fontWeight: 400,
-                  letterSpacing: 4,
-                  textTransform: "uppercase" as const,
-                  color: theme.textSecondary,
-                }}
-              >
-                Programação
-              </span>
+              <span style={ts.sectionTitles}>Programação</span>
 
               <motion.div
                 className="mt-3 mb-6"
@@ -1209,7 +915,7 @@ export default function InvitationPage({
                 style={{
                   width: 28,
                   height: 1,
-                  background: theme.accent,
+                  background: ts.accent,
                   opacity: 0.25,
                 }}
               />
@@ -1249,10 +955,11 @@ export default function InvitationPage({
                     time={event.time}
                     label={event.label}
                     venue={event.venue}
-                    accentColor={theme.accent}
-                    textColor={theme.textPrimary}
-                    venueColor={theme.textSecondary}
-                    uiFont={theme.uiFont}
+                    accentColor={ts.accent}
+                    textColor={ts.textPrimary}
+                    venueColor={ts.textSecondary}
+                    uiFont={ts.uiFont}
+                    scriptFont={ts.scriptFont}
                     index={i}
                   />
                 </div>
@@ -1301,29 +1008,18 @@ export default function InvitationPage({
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
                   style={{
-                    background: `${theme.accent}12`,
+                    background: `${ts.accent}12`,
                   }}
                 >
-                  <Shirt size={20} color={theme.accent} strokeWidth={1.5} />
+                  <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
                 </div>
+                <span style={ts.labels}>Dress Code</span>
                 <span
                   style={{
-                    fontFamily: theme.uiFont,
-                    fontSize: 9,
-                    fontWeight: 500,
-                    letterSpacing: 3,
-                    textTransform: "uppercase" as const,
-                    color: theme.textMuted,
-                  }}
-                >
-                  Dress Code
-                </span>
-                <span
-                  style={{
-                    fontFamily: theme.bodyFont,
+                    fontFamily: ts.bodyFont,
                     fontSize: 13,
                     fontWeight: 500,
-                    color: theme.textPrimary,
+                    color: ts.textPrimary,
                   }}
                 >
                   {invitation.dressCode.text}
@@ -1353,29 +1049,18 @@ export default function InvitationPage({
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
                   style={{
-                    background: `${theme.accent}12`,
+                    background: `${ts.accent}12`,
                   }}
                 >
-                  <Gift size={20} color={theme.accent} strokeWidth={1.5} />
+                  <Gift size={20} color={ts.accent} strokeWidth={1.5} />
                 </div>
+                <span style={ts.labels}>Presentes</span>
                 <span
                   style={{
-                    fontFamily: theme.uiFont,
-                    fontSize: 9,
-                    fontWeight: 500,
-                    letterSpacing: 3,
-                    textTransform: "uppercase" as const,
-                    color: theme.textMuted,
-                  }}
-                >
-                  Presentes
-                </span>
-                <span
-                  style={{
-                    fontFamily: theme.bodyFont,
+                    fontFamily: ts.bodyFont,
                     fontSize: 13,
                     fontWeight: 500,
-                    color: theme.textPrimary,
+                    color: ts.textPrimary,
                   }}
                 >
                   {invitation.giftRegistry.text}
@@ -1387,15 +1072,7 @@ export default function InvitationPage({
                     rel="noopener noreferrer"
                     onClick={handleGiftClick}
                     className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
-                    style={{
-                      fontFamily: theme.uiFont,
-                      fontSize: 10,
-                      fontWeight: 500,
-                      letterSpacing: 1.5,
-                      textTransform: "uppercase" as const,
-                      color: theme.accent,
-                      textDecoration: "none",
-                    }}
+                    style={ts.giftLink}
                     whileHover={{ scale: 1.02 }}
                   >
                     <ExternalLink size={10} strokeWidth={1.5} />
@@ -1417,6 +1094,7 @@ export default function InvitationPage({
         <LocationCard
           location={invitation.location}
           theme={theme}
+          ts={ts}
           onMapsClick={handleMapsClick}
         />
       </AnimatedSection>
@@ -1440,6 +1118,7 @@ export default function InvitationPage({
               <GuestGuideSection
                 guestGuide={invitation.guestGuide}
                 theme={theme}
+                ts={ts}
                 isPreview={isPreview}
               />
             </AnimatedSection>
@@ -1455,18 +1134,7 @@ export default function InvitationPage({
 
           <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
             <div className="flex flex-col items-center">
-              <span
-                style={{
-                  fontFamily: theme.uiFont,
-                  fontSize: 10,
-                  fontWeight: 400,
-                  letterSpacing: 4,
-                  textTransform: "uppercase" as const,
-                  color: theme.textSecondary,
-                }}
-              >
-                Perguntas Frequentes
-              </span>
+              <span style={ts.sectionTitles}>Perguntas Frequentes</span>
 
               <motion.div
                 className="mt-3 mb-6"
@@ -1477,7 +1145,7 @@ export default function InvitationPage({
                 style={{
                   width: 28,
                   height: 1,
-                  background: theme.accent,
+                  background: ts.accent,
                   opacity: 0.25,
                 }}
               />
@@ -1506,6 +1174,7 @@ export default function InvitationPage({
                     setOpenFaqIndex(openFaqIndex === i ? null : i)
                   }
                   theme={theme}
+                  ts={ts}
                   isLast={i === (invitation.faqs?.length ?? 0) - 1}
                 />
               ))}
@@ -1521,17 +1190,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
-          <span
-            className="mb-6"
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 10,
-              fontWeight: 400,
-              letterSpacing: 4,
-              textTransform: "uppercase" as const,
-              color: theme.textSecondary,
-            }}
-          >
+          <span className="mb-6" style={ts.ctaLabel}>
             Confirme sua presença
           </span>
         </div>
@@ -1594,29 +1253,11 @@ export default function InvitationPage({
                 opacity: 0.5,
               }}
             />
-            <span
-              style={{
-                fontFamily: theme.displayFont,
-                fontSize: 22,
-                color: theme.textMuted,
-                letterSpacing: 2,
-              }}
-            >
-              {invitation.couple.monogram}
-            </span>
+            <span style={ts.footerMonogram}>{invitation.couple.monogram}</span>
           </div>
 
           {/* Date */}
-          <span
-            className="mt-4"
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 10,
-              fontWeight: 300,
-              letterSpacing: 3,
-              color: theme.textMuted,
-            }}
-          >
+          <span className="mt-4" style={ts.footerDate}>
             {invitation.date.day} &middot; {invitation.date.month} &middot;{" "}
             {invitation.date.year}
           </span>
@@ -1630,7 +1271,7 @@ export default function InvitationPage({
         <SectionImage
           src={invitation.sectionImages.image4}
           theme={theme}
-          height={220}
+          height={300}
           hiddeBottom
         />
       )}

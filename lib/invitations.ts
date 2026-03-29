@@ -6,6 +6,7 @@ import type {
   ParentsInfo,
   SaveDateStyle,
   SectionImages,
+  TextStyleOverrides,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -38,6 +39,7 @@ type InvitationWithTheme = {
   ourStory: unknown;
   invitationType: string;
   externalLink: string | null;
+  textStyles: unknown;
 };
 
 function toInvitationData(row: InvitationWithTheme): InvitationData {
@@ -66,6 +68,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
+    textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
   };
 }
 

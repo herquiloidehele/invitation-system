@@ -11,6 +11,7 @@ import {
 } from "@/lib/lucide-icons";
 import { sanitizeAndNormalizeSvg } from "@/lib/svg-icons";
 import type { GuestGuide, GuestGuideItem, TemplateTheme } from "@/lib/types";
+import type { ResolvedTextStyles } from "@/lib/text-styles";
 
 // ---------------------------------------------------------------------------
 // Animation constants — kept local, only what this section needs
@@ -130,10 +131,16 @@ function GuideIcon({ item, size, color }: GuideIconProps) {
 interface GuideItemCardProps {
   item: GuestGuideItem;
   theme: TemplateTheme;
+  ts?: ResolvedTextStyles;
   isPreview?: boolean;
 }
 
-function GuideItemCard({ item, theme, isPreview = false }: GuideItemCardProps) {
+function GuideItemCard({
+  item,
+  theme,
+  ts,
+  isPreview = false,
+}: GuideItemCardProps) {
   return (
     <motion.div
       {...(isPreview
@@ -159,11 +166,12 @@ function GuideItemCard({ item, theme, isPreview = false }: GuideItemCardProps) {
 
       <span
         style={{
-          fontFamily: theme.bodyFont,
+          fontFamily: ts?.bodyFont ?? theme.bodyFont,
           fontSize: 12,
           fontWeight: 500,
-          color: theme.textPrimary,
+          color: ts?.textPrimary ?? theme.textPrimary,
           lineHeight: 1.4,
+          ...(ts?.guideItemLabel ?? {}),
         }}
       >
         {item.label}
@@ -179,6 +187,8 @@ function GuideItemCard({ item, theme, isPreview = false }: GuideItemCardProps) {
 interface GuestGuideSectionProps {
   guestGuide: GuestGuide;
   theme: TemplateTheme;
+  /** Resolved text styles — when provided, text elements use these instead of raw theme values */
+  ts?: ResolvedTextStyles;
   /** When true, all animations use `animate` instead of `whileInView` so
    *  the section is always fully visible (no scroll-trigger dependency).
    *  Use this in the admin live preview. */
@@ -188,6 +198,7 @@ interface GuestGuideSectionProps {
 export default function GuestGuideSection({
   guestGuide,
   theme,
+  ts,
   isPreview = false,
 }: GuestGuideSectionProps) {
   return (
@@ -196,23 +207,25 @@ export default function GuestGuideSection({
       <div className="flex flex-col items-center mb-6">
         <span
           style={{
-            fontFamily: theme.uiFont,
+            fontFamily: ts?.uiFont ?? theme.uiFont,
             fontSize: 10,
             fontWeight: 400,
             letterSpacing: 4,
             textTransform: "uppercase",
-            color: theme.textSecondary,
+            color: ts?.textSecondary ?? theme.textSecondary,
+            ...(ts?.labels ?? {}),
           }}
         >
           Manual do
         </span>
         <span
           style={{
-            fontFamily: theme.scriptFont ?? theme.displayFont,
+            fontFamily: ts?.scriptFont ?? theme.scriptFont ?? theme.displayFont,
             fontSize: 28,
-            color: theme.primary,
+            color: ts?.accent ?? theme.primary,
             lineHeight: 1.2,
             marginTop: 2,
+            ...(ts?.guideScriptTitle ?? {}),
           }}
         >
           Bom Convidado
@@ -261,6 +274,7 @@ export default function GuestGuideSection({
             key={item.id}
             item={item}
             theme={theme}
+            ts={ts}
             isPreview={isPreview}
           />
         ))}

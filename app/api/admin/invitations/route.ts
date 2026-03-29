@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
         ourStory: sanitizeJsonField(body.ourStory, null),
         invitationType: body.invitationType ?? "standard",
         externalLink: body.externalLink ?? null,
+        textStyles: sanitizeJsonField(body.textStyles, null),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

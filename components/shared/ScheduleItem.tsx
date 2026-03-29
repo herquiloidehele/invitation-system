@@ -16,6 +16,8 @@ interface DirectProps {
   venueColor: string;
   /** UI font for labels (replaces hardcoded Inter) */
   uiFont: string;
+  /** Script font for the time column (replaces hardcoded Cormorant Garamond) */
+  scriptFont?: string;
   /** Index in the schedule list — drives staggered entrance delay */
   index: number;
 }
@@ -49,6 +51,9 @@ export default function ScheduleItem(props: ScheduleItemProps) {
     ? props.theme.textSecondary
     : props.venueColor;
   const uiFont = isIntegrationProps(props) ? props.theme.uiFont : props.uiFont;
+  const scriptFont = isIntegrationProps(props)
+    ? (props.theme.scriptFont ?? "'Cormorant Garamond', serif")
+    : (props.scriptFont ?? "'Cormorant Garamond', serif");
   const index = isIntegrationProps(props) ? 0 : props.index;
 
   return (
@@ -63,7 +68,7 @@ export default function ScheduleItem(props: ScheduleItemProps) {
       <div
         className="w-[60px] shrink-0 text-center"
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: scriptFont,
           color: textColor,
         }}
       >

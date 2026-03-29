@@ -169,6 +169,9 @@ export async function PUT(
         ...(body.externalLink !== undefined && {
           externalLink: body.externalLink,
         }),
+        ...(body.textStyles !== undefined && {
+          textStyles: sanitizeJsonField(body.textStyles, null),
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },
