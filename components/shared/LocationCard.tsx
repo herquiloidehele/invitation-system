@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { MapPin, ExternalLink } from "lucide-react";
+import { ExternalLink, MapPin } from "lucide-react";
 import Image from "next/image";
 
 import type { LocationInfo, TemplateTheme } from "@/lib/types";
@@ -78,7 +78,7 @@ export default function LocationCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.8, ease: EASE }}
-      className="flex flex-col overflow-hidden"
+      className="flex flex-col overflow-hidden pt-5"
       style={{
         background: effectiveCardBg,
         backdropFilter: "blur(12px)",
@@ -88,29 +88,6 @@ export default function LocationCard({
         border: `1px solid ${effectiveCardBorder}`,
       }}
     >
-      {/* Header — icon + title */}
-      <div className="flex items-center gap-3 px-5 pt-5 pb-4">
-        <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-          style={{ background: `${theme.accent}12` }}
-        >
-          <MapPin size={20} color={theme.accent} strokeWidth={1.5} />
-        </div>
-        <span
-          style={{
-            fontFamily: ts?.uiFont ?? theme.uiFont,
-            fontSize: 9,
-            fontWeight: 500,
-            letterSpacing: 3,
-            textTransform: "uppercase" as const,
-            color: ts?.textMuted ?? theme.textMuted,
-            ...(ts?.labels ?? {}),
-          }}
-        >
-          Localização
-        </span>
-      </div>
-
       {/* Venue image — shown only if imageUrl is provided */}
       {location.imageUrl && (
         <div className="relative w-full" style={{ height: 180 }}>

@@ -983,8 +983,6 @@ export default function InvitationPage({
               ))}
             </div>
           </motion.div>
-
-          <SectionDivider theme={theme} />
         </>
       )}
 
@@ -1000,6 +998,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {(invitation.dressCode.enabled || invitation.giftRegistry.enabled) && (
         <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+          <SectionDivider theme={theme} />
           <div
             className={`grid ${invitation.dressCode.enabled && invitation.giftRegistry.enabled ? "grid-cols-2" : "grid-cols-1"} gap-3`}
           >
@@ -1108,6 +1107,24 @@ export default function InvitationPage({
       {/* 5b. Location Card Section                                         */}
       {/* ================================================================= */}
       <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+        <div className="flex flex-col items-center">
+          <span style={ts.sectionTitles}>Localização</span>
+
+          <motion.div
+            className="mt-3 mb-6"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: EASE }}
+            style={{
+              width: 28,
+              height: 1,
+              background: ts.accent,
+              opacity: 0.25,
+            }}
+          />
+        </div>
+
         <LocationCard
           location={invitation.location}
           theme={theme}
