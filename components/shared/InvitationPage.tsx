@@ -11,6 +11,7 @@ import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
+import DynamicFontLoader from "./DynamicFontLoader";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
@@ -445,6 +446,9 @@ export default function InvitationPage({
         position: "relative",
       }}
     >
+      {/* Load any non-builtin Google Fonts used by this theme */}
+      <DynamicFontLoader theme={theme} />
+
       {/* ================================================================= */}
       {/* Atmospheric grain overlay                                         */}
       {/* ================================================================= */}

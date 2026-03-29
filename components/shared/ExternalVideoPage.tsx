@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import RSVPModal from "@/components/shared/RSVPModal";
+import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
 export interface ExternalVideoPageHandle {
@@ -75,6 +76,7 @@ const ExternalVideoPage = forwardRef<
 
   return (
     <>
+      <DynamicFontLoader theme={theme} />
       <div
         style={{
           position: "fixed",
