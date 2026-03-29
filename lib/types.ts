@@ -173,10 +173,24 @@ export interface TextStyleOverrides {
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
     labels?: TextStyle;
+    inviteLabel?: TextStyle;
+    faqQuestion?: TextStyle;
+    faqAnswer?: TextStyle;
     dateDay?: TextStyle;
     dateMonth?: TextStyle;
     dateYear?: TextStyle;
     dateTime?: TextStyle;
+    blessingMessage?: TextStyle;
+    parentsNames?: TextStyle;
+    inviteMessage?: TextStyle;
+    footerMonogram?: TextStyle;
+    footerDate?: TextStyle;
+    ctaLabel?: TextStyle;
+    giftLink?: TextStyle;
+    locationName?: TextStyle;
+    locationAddress?: TextStyle;
+    guideItemLabel?: TextStyle;
+    guideScriptTitle?: TextStyle;
   };
 }
 

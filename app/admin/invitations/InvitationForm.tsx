@@ -617,39 +617,7 @@ export default function InvitationForm({
     [],
   );
 
-  // Text style overrides — tier 1 (role-based)
-  const updateTextStyleFont = useCallback(
-    (role: keyof NonNullable<TextStyleOverrides["fonts"]>, value: string) => {
-      setForm((prev) => {
-        const ts = prev.textStyles ?? {};
-        const fonts = { ...ts.fonts, [role]: value || undefined };
-        // If all font values are empty, remove the fonts key entirely
-        const hasAny = Object.values(fonts).some(Boolean);
-        return {
-          ...prev,
-          textStyles: { ...ts, fonts: hasAny ? fonts : undefined },
-        };
-      });
-    },
-    [],
-  );
-
-  const updateTextStyleColor = useCallback(
-    (role: keyof NonNullable<TextStyleOverrides["colors"]>, value: string) => {
-      setForm((prev) => {
-        const ts = prev.textStyles ?? {};
-        const colors = { ...ts.colors, [role]: value || undefined };
-        const hasAny = Object.values(colors).some(Boolean);
-        return {
-          ...prev,
-          textStyles: { ...ts, colors: hasAny ? colors : undefined },
-        };
-      });
-    },
-    [],
-  );
-
-  // Text style overrides — tier 2 (element-specific)
+  // Text style overrides — element-specific
   const updateTextStyleElement = useCallback(
     (
       element: keyof NonNullable<TextStyleOverrides["elements"]>,
@@ -1749,275 +1717,176 @@ export default function InvitationForm({
                 <AccordionTrigger className="text-sm font-medium">
                   Personalização de Texto
                 </AccordionTrigger>
-                <AccordionContent className="space-y-5 pb-4">
+                <AccordionContent className="space-y-4 pb-4">
                   {/* Info */}
                   <p className="text-xs text-muted-foreground">
-                    Sobrescrever fontes, cores e tamanhos para este convite.
-                    Campos vazios usam os padrões do modelo.
+                    Ajustes finos por elemento de texto. Campos vazios usam os
+                    padrões do modelo.
                   </p>
 
-                  {/* ── Tier 1: Font family overrides ── */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Fontes
-                    </h4>
-                    <FontPicker
-                      label="Display (títulos)"
-                      value={form.textStyles?.fonts?.display ?? ""}
-                      onChange={(v) => updateTextStyleFont("display", v)}
-                      optional
-                    />
-                    <FontPicker
-                      label="Body (corpo)"
-                      value={form.textStyles?.fonts?.body ?? ""}
-                      onChange={(v) => updateTextStyleFont("body", v)}
-                      optional
-                    />
-                    <FontPicker
-                      label="Script (manuscrita)"
-                      value={form.textStyles?.fonts?.script ?? ""}
-                      onChange={(v) => updateTextStyleFont("script", v)}
-                      optional
-                    />
-                    <FontPicker
-                      label="UI (interface)"
-                      value={form.textStyles?.fonts?.ui ?? ""}
-                      onChange={(v) => updateTextStyleFont("ui", v)}
-                      optional
-                    />
-                  </div>
-
-                  <Separator />
-
-                  {/* ── Tier 1: Color overrides ── */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Cores do Texto
-                    </h4>
+                  {/* ── Element-specific overrides ── */}
+                  <Accordion className="space-y-1">
                     {(
                       [
-                        ["textPrimary", "Primária", currentTheme.textPrimary],
-                        [
-                          "textSecondary",
-                          "Secundária",
-                          currentTheme.textSecondary,
-                        ],
-                        ["textMuted", "Subtil", currentTheme.textMuted],
-                        ["accent", "Destaque", currentTheme.accent],
+                        ["coupleNames", "Nomes do Casal"],
+                        ["ampersand", "& (e comercial)"],
+                        ["quote", "Citação"],
+                        ["sectionTitles", "Títulos de Secção"],
+                        ["bodyText", "Texto do Corpo"],
+                        ["labels", "Etiquetas"],
+                        ["inviteLabel", "Etiqueta do Convite"],
+                        ["dateDay", "Data — Dia"],
+                        ["dateMonth", "Data — Mês"],
+                        ["dateYear", "Data — Ano"],
+                        ["dateTime", "Data — Hora"],
+                        ["faqQuestion", "Pergunta FAQ"],
+                        ["faqAnswer", "Resposta FAQ"],
+                        ["blessingMessage", "Mensagem de Bênção"],
+                        ["parentsNames", "Nomes dos Pais"],
+                        ["inviteMessage", "Mensagem do Convite"],
+                        ["footerMonogram", "Monograma do Rodapé"],
+                        ["footerDate", "Data do Rodapé"],
+                        ["ctaLabel", "Etiqueta CTA"],
+                        ["giftLink", "Link de Presentes"],
+                        ["locationName", "Nome do Local"],
+                        ["locationAddress", "Morada do Local"],
+                        ["guideItemLabel", "Etiqueta do Guia"],
+                        ["guideScriptTitle", "Título do Guia"],
                       ] as const
-                    ).map(([role, label, themeDefault]) => (
-                      <div key={role} className="space-y-1">
-                        <Label className="text-xs">{label}</Label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="color"
-                            value={
-                              form.textStyles?.colors?.[role] ||
-                              themeDefault ||
-                              "#000000"
-                            }
-                            onChange={(e) =>
-                              updateTextStyleColor(role, e.target.value)
-                            }
-                            className="h-9 w-9 rounded border cursor-pointer shrink-0"
-                          />
-                          <input
-                            type="text"
-                            value={form.textStyles?.colors?.[role] ?? ""}
-                            onChange={(e) =>
-                              updateTextStyleColor(role, e.target.value)
-                            }
-                            placeholder={`Padrão: ${themeDefault}`}
-                            className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
-                          />
-                          {form.textStyles?.colors?.[role] && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="shrink-0 text-muted-foreground"
-                              onClick={() => updateTextStyleColor(role, "")}
-                            >
-                              Repor
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Separator />
-
-                  {/* ── Tier 2: Element-specific overrides ── */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Elementos Específicos
-                    </h4>
-                    <p className="text-xs text-muted-foreground">
-                      Ajustes finos por elemento. Sobrepõem as fontes e cores
-                      acima.
-                    </p>
-
-                    <Accordion multiple className="space-y-1">
-                      {(
-                        [
-                          ["coupleNames", "Nomes do Casal"],
-                          ["ampersand", "& (e comercial)"],
-                          ["quote", "Citação"],
-                          ["sectionTitles", "Títulos de Secção"],
-                          ["bodyText", "Texto do Corpo"],
-                          ["labels", "Etiquetas"],
-                          ["dateDay", "Data — Dia"],
-                          ["dateMonth", "Data — Mês"],
-                          ["dateYear", "Data — Ano"],
-                          ["dateTime", "Data — Hora"],
-                        ] as const
-                      ).map(([element, label]) => {
-                        const el = form.textStyles?.elements?.[element];
-                        const hasOverride =
-                          el && Object.values(el).some((v) => v !== undefined);
-                        return (
-                          <AccordionItem
-                            key={element}
-                            value={`el-${element}`}
-                            className="border rounded px-3"
-                          >
-                            <AccordionTrigger className="text-xs py-2">
-                              <span className="flex items-center gap-2">
-                                {label}
-                                {hasOverride && (
-                                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
-                                )}
-                              </span>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-2 pb-3">
-                              <FontPicker
-                                label="Fonte"
-                                value={el?.fontFamily ?? ""}
-                                onChange={(v) =>
-                                  updateTextStyleElement(
-                                    element,
-                                    "fontFamily",
-                                    v,
-                                  )
-                                }
-                                optional
-                              />
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                  <Label className="text-xs">
-                                    Tamanho (px)
-                                  </Label>
-                                  <Input
-                                    type="number"
-                                    min={8}
-                                    max={200}
-                                    value={el?.fontSize ?? ""}
+                    ).map(([element, label]) => {
+                      const el = form.textStyles?.elements?.[element];
+                      const hasOverride =
+                        el && Object.values(el).some((v) => v !== undefined);
+                      return (
+                        <AccordionItem
+                          key={element}
+                          value={`el-${element}`}
+                          className="border rounded px-3"
+                        >
+                          <AccordionTrigger className="text-xs py-2">
+                            <span className="flex items-center gap-2">
+                              {label}
+                              {hasOverride && (
+                                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
+                              )}
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent className="space-y-2 pb-3">
+                            <FontPicker
+                              label="Fonte"
+                              value={el?.fontFamily ?? ""}
+                              onChange={(v) =>
+                                updateTextStyleElement(element, "fontFamily", v)
+                              }
+                              optional
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-xs">Tamanho (px)</Label>
+                                <Input
+                                  type="number"
+                                  min={8}
+                                  max={200}
+                                  value={el?.fontSize ?? ""}
+                                  onChange={(e) =>
+                                    updateTextStyleElement(
+                                      element,
+                                      "fontSize",
+                                      e.target.value
+                                        ? Number(e.target.value)
+                                        : undefined,
+                                    )
+                                  }
+                                  placeholder="Auto"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">Peso</Label>
+                                <Select
+                                  value={
+                                    el?.fontWeight != null
+                                      ? String(el.fontWeight)
+                                      : ""
+                                  }
+                                  onValueChange={(v) =>
+                                    updateTextStyleElement(
+                                      element,
+                                      "fontWeight",
+                                      v || undefined,
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger className="h-8 text-xs">
+                                    <SelectValue placeholder="Auto" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="300">Light</SelectItem>
+                                    <SelectItem value="400">Regular</SelectItem>
+                                    <SelectItem value="500">Medium</SelectItem>
+                                    <SelectItem value="600">
+                                      Semibold
+                                    </SelectItem>
+                                    <SelectItem value="700">Bold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-xs">Cor</Label>
+                                <div className="flex items-center gap-1.5">
+                                  <input
+                                    type="color"
+                                    value={el?.color || "#000000"}
                                     onChange={(e) =>
                                       updateTextStyleElement(
                                         element,
-                                        "fontSize",
-                                        e.target.value
-                                          ? Number(e.target.value)
-                                          : undefined,
+                                        "color",
+                                        e.target.value,
                                       )
                                     }
-                                    placeholder="Auto"
+                                    className="h-8 w-8 rounded border cursor-pointer shrink-0"
                                   />
-                                </div>
-                                <div className="space-y-1">
-                                  <Label className="text-xs">Peso</Label>
-                                  <Select
-                                    value={
-                                      el?.fontWeight != null
-                                        ? String(el.fontWeight)
-                                        : ""
-                                    }
-                                    onValueChange={(v) =>
-                                      updateTextStyleElement(
-                                        element,
-                                        "fontWeight",
-                                        v || undefined,
-                                      )
-                                    }
-                                  >
-                                    <SelectTrigger className="h-8 text-xs">
-                                      <SelectValue placeholder="Auto" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="300">Light</SelectItem>
-                                      <SelectItem value="400">
-                                        Regular
-                                      </SelectItem>
-                                      <SelectItem value="500">
-                                        Medium
-                                      </SelectItem>
-                                      <SelectItem value="600">
-                                        Semibold
-                                      </SelectItem>
-                                      <SelectItem value="700">Bold</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                  <Label className="text-xs">Cor</Label>
-                                  <div className="flex items-center gap-1.5">
-                                    <input
-                                      type="color"
-                                      value={el?.color || "#000000"}
-                                      onChange={(e) =>
-                                        updateTextStyleElement(
-                                          element,
-                                          "color",
-                                          e.target.value,
-                                        )
-                                      }
-                                      className="h-8 w-8 rounded border cursor-pointer shrink-0"
-                                    />
-                                    <input
-                                      type="text"
-                                      value={el?.color ?? ""}
-                                      onChange={(e) =>
-                                        updateTextStyleElement(
-                                          element,
-                                          "color",
-                                          e.target.value,
-                                        )
-                                      }
-                                      placeholder="Auto"
-                                      className="font-mono text-xs h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="space-y-1">
-                                  <Label className="text-xs">Espaçamento</Label>
-                                  <Input
-                                    type="number"
-                                    step={0.1}
-                                    value={el?.letterSpacing ?? ""}
+                                  <input
+                                    type="text"
+                                    value={el?.color ?? ""}
                                     onChange={(e) =>
                                       updateTextStyleElement(
                                         element,
-                                        "letterSpacing",
-                                        e.target.value
-                                          ? Number(e.target.value)
-                                          : undefined,
+                                        "color",
+                                        e.target.value,
                                       )
                                     }
                                     placeholder="Auto"
-                                    className="h-8 text-xs"
+                                    className="font-mono text-xs h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
                                   />
                                 </div>
                               </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        );
-                      })}
-                    </Accordion>
-                  </div>
-
-                  <Separator />
+                              <div className="space-y-1">
+                                <Label className="text-xs">Espaçamento</Label>
+                                <Input
+                                  type="number"
+                                  step={0.1}
+                                  value={el?.letterSpacing ?? ""}
+                                  onChange={(e) =>
+                                    updateTextStyleElement(
+                                      element,
+                                      "letterSpacing",
+                                      e.target.value
+                                        ? Number(e.target.value)
+                                        : undefined,
+                                    )
+                                  }
+                                  placeholder="Auto"
+                                  className="h-8 text-xs"
+                                />
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
 
                   {/* Reset all overrides */}
                   {form.textStyles &&

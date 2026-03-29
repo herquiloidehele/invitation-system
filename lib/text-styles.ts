@@ -260,7 +260,7 @@ export function resolveTextStyles(
       textTransform: "uppercase" as const,
       color: textSecondary,
     },
-    el?.sectionTitles,
+    el?.inviteLabel ?? el?.sectionTitles,
   );
 
   const inviteLabelVideo = applyOverride(
@@ -272,12 +272,12 @@ export function resolveTextStyles(
       textTransform: "uppercase" as const,
       color: "rgba(255,255,255,0.65)",
     },
-    el?.sectionTitles,
+    el?.inviteLabel ?? el?.sectionTitles,
   );
 
   const faqQuestion = applyOverride(
     { fontFamily: bodyFont, fontSize: 14, fontWeight: 500, lineHeight: 1.5 },
-    el?.bodyText,
+    el?.faqQuestion ?? el?.bodyText,
   );
 
   const faqAnswer = applyOverride(
@@ -288,7 +288,7 @@ export function resolveTextStyles(
       color: textSecondary,
       opacity: 0.8,
     },
-    el?.bodyText,
+    el?.faqAnswer ?? el?.bodyText,
   );
 
   const dateDay = applyOverride(
@@ -343,66 +343,90 @@ export function resolveTextStyles(
     el?.dateTime,
   );
 
-  const blessingMessage: CSSProperties = {
-    fontFamily: bodyFont,
-    fontSize: 13,
-    fontStyle: "italic",
-    color: textSecondary,
-    letterSpacing: 0.5,
-  };
+  const blessingMessage = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      fontStyle: "italic" as const,
+      color: textSecondary,
+      letterSpacing: 0.5,
+    },
+    el?.blessingMessage,
+  );
 
-  const blessingMessageVideo: CSSProperties = {
-    fontFamily: bodyFont,
-    fontSize: 13,
-    fontStyle: "italic",
-    color: "rgba(255,255,255,0.65)",
-    letterSpacing: 1,
-  };
+  const blessingMessageVideo = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      fontStyle: "italic" as const,
+      color: "rgba(255,255,255,0.65)",
+      letterSpacing: 1,
+    },
+    el?.blessingMessage,
+  );
 
-  const parentsNames: CSSProperties = {
-    fontFamily: bodyFont,
-    fontSize: 13,
-    color: textPrimary,
-    lineHeight: 1.6,
-  };
+  const parentsNames = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      color: textPrimary,
+      lineHeight: 1.6,
+    },
+    el?.parentsNames,
+  );
 
-  const parentsNamesVideo: CSSProperties = {
-    fontFamily: bodyFont,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.8)",
-    lineHeight: 1.6,
-  };
+  const parentsNamesVideo = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 12,
+      color: "rgba(255,255,255,0.8)",
+      lineHeight: 1.6,
+    },
+    el?.parentsNames,
+  );
 
-  const inviteMessage: CSSProperties = {
-    fontFamily: bodyFont,
-    fontSize: 14,
-    fontStyle: "italic",
-    lineHeight: 1.65,
-    color: textSecondary,
-  };
+  const inviteMessage = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 14,
+      fontStyle: "italic" as const,
+      lineHeight: 1.65,
+      color: textSecondary,
+    },
+    el?.inviteMessage,
+  );
 
-  const inviteMessageVideo: CSSProperties = {
-    fontFamily: bodyFont,
-    fontSize: 13,
-    fontStyle: "italic",
-    lineHeight: 1.65,
-    color: "rgba(255,255,255,0.55)",
-  };
+  const inviteMessageVideo = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      fontStyle: "italic" as const,
+      lineHeight: 1.65,
+      color: "rgba(255,255,255,0.55)",
+    },
+    el?.inviteMessage,
+  );
 
-  const footerMonogram: CSSProperties = {
-    fontFamily: displayFont,
-    fontSize: 22,
-    color: textMuted,
-    letterSpacing: 2,
-  };
+  const footerMonogram = applyOverride(
+    {
+      fontFamily: displayFont,
+      fontSize: 22,
+      color: textMuted,
+      letterSpacing: 2,
+    },
+    el?.footerMonogram,
+  );
 
-  const footerDate: CSSProperties = {
-    fontFamily: uiFont,
-    fontSize: 10,
-    fontWeight: 300,
-    letterSpacing: 3,
-    color: textMuted,
-  };
+  const footerDate = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 10,
+      fontWeight: 300,
+      letterSpacing: 3,
+      color: textMuted,
+    },
+    el?.footerDate,
+  );
 
   const ctaLabel = applyOverride(
     {
@@ -413,31 +437,37 @@ export function resolveTextStyles(
       textTransform: "uppercase" as const,
       color: textSecondary,
     },
-    el?.sectionTitles,
+    el?.ctaLabel ?? el?.sectionTitles,
   );
 
-  const giftLink: CSSProperties = {
-    fontFamily: uiFont,
-    fontSize: 10,
-    fontWeight: 500,
-    letterSpacing: 1.5,
-    textTransform: "uppercase" as const,
-    color: accent,
-    textDecoration: "none",
-  };
+  const giftLink = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 10,
+      fontWeight: 500,
+      letterSpacing: 1.5,
+      textTransform: "uppercase" as const,
+      color: accent,
+      textDecoration: "none",
+    },
+    el?.giftLink,
+  );
 
   const locationName = applyOverride(
     { fontFamily: bodyFont, fontSize: 16, fontWeight: 600, color: textPrimary },
-    el?.bodyText,
+    el?.locationName ?? el?.bodyText,
   );
 
-  const locationAddress: CSSProperties = {
-    fontFamily: uiFont,
-    fontSize: 14,
-    fontWeight: 400,
-    color: textSecondary,
-    lineHeight: 1.5,
-  };
+  const locationAddress = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 14,
+      fontWeight: 400,
+      color: textSecondary,
+      lineHeight: 1.5,
+    },
+    el?.locationAddress,
+  );
 
   const guideItemLabel = applyOverride(
     {
@@ -447,16 +477,19 @@ export function resolveTextStyles(
       color: textPrimary,
       lineHeight: 1.4,
     },
-    el?.labels,
+    el?.guideItemLabel ?? el?.labels,
   );
 
-  const guideScriptTitle: CSSProperties = {
-    fontFamily: scriptFont ?? displayFont,
-    fontSize: 28,
-    color: theme.primary,
-    lineHeight: 1.2,
-    marginTop: 2,
-  };
+  const guideScriptTitle = applyOverride(
+    {
+      fontFamily: scriptFont ?? displayFont,
+      fontSize: 28,
+      color: theme.primary,
+      lineHeight: 1.2,
+      marginTop: 2,
+    },
+    el?.guideScriptTitle,
+  );
 
   return {
     coupleNames,
