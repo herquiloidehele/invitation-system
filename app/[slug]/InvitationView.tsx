@@ -26,9 +26,16 @@ export default function InvitationView({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<ExternalVideoPageHandle | null>(null);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const isExternalVideo =
     (invitation.invitationType ?? "standard") === "external_video";
+
+  // Standard invitations with a hero video need the bytes pre-buffered
+  // before the invite is opened, so the video plays instantly.
+  const isStandardWithVideo =
+    (invitation.invitationType ?? "standard") === "standard" &&
+    !!invitation.videoUrl;
 
   const { trackEvent } = useAnalytics(invitation.slug);
 
@@ -164,6 +171,7 @@ export default function InvitationView({
         invitation={invitation}
         theme={theme}
         audioRef={audioRef}
+        prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
       />
     );
   }
@@ -188,6 +196,27 @@ export default function InvitationView({
             visible={videoVisible}
             invitation={invitation}
             theme={mergedTheme}
+          />
+        )}
+
+        {/* Persistent prefetch video — mounted once and reused by InvitationPage
+            via ref so the browser never re-downloads the video. */}
+        {isStandardWithVideo && (
+          <video
+            ref={heroVideoRef}
+            src={invitation.videoUrl!}
+            preload="auto"
+            muted
+            loop
+            playsInline
+            aria-hidden
+            style={{
+              position: "absolute",
+              width: 0,
+              height: 0,
+              opacity: 0,
+              pointerEvents: "none",
+            }}
           />
         )}
 

@@ -86,6 +86,14 @@ export const metadata: Metadata = {
   description: "Convites de casamento interativos e memoráveis",
 };
 
+// Build the S3 origin at startup for DNS preconnect (e.g. "https://bucket.s3.region.amazonaws.com")
+const s3Bucket = process.env.S3_BUCKET_NAME;
+const s3Region = process.env.AWS_REGION;
+const s3Origin =
+  s3Bucket && s3Region
+    ? `https://${s3Bucket}.s3.${s3Region}.amazonaws.com`
+    : null;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -97,6 +105,15 @@ export default function RootLayout({
       className={cn("font-sans", geist.variable)}
       suppressHydrationWarning
     >
+      <head>
+        {/* Early DNS + TLS handshake to the S3 bucket so media loads faster */}
+        {s3Origin && (
+          <>
+            <link rel="preconnect" href={s3Origin} />
+            <link rel="dns-prefetch" href={s3Origin} />
+          </>
+        )}
+      </head>
       <body
         className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} ${pinyonScript.variable} antialiased`}
       >

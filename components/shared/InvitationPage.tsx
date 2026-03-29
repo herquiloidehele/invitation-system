@@ -1,6 +1,13 @@
 "use client";
 
-import { type MutableRefObject, useCallback, useEffect, useState } from "react";
+import {
+  type MutableRefObject,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
@@ -12,6 +19,7 @@ import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
 import DynamicFontLoader from "./DynamicFontLoader";
+import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
@@ -388,6 +396,10 @@ interface InvitationPageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
+  /** When provided, InvitationPage will adopt this existing <video> element
+   *  into the hero section instead of creating a new one, avoiding duplicate
+   *  network requests. */
+  prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
   /** Pass true in the admin live preview so all animations are always visible
    *  and respond to React state changes rather than scroll position. */
   isPreview?: boolean;
@@ -397,6 +409,7 @@ export default function InvitationPage({
   invitation,
   theme,
   audioRef,
+  prefetchedVideoRef,
   isPreview = false,
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
@@ -436,7 +449,6 @@ export default function InvitationPage({
 
   const nameFontSize = isScriptFont(theme.displayFont) ? 52 : 46;
 
-  console.log({ invitation });
   return (
     <div
       style={{
@@ -482,15 +494,20 @@ export default function InvitationPage({
       >
         {/* Background media */}
         {invitation.videoUrl ? (
-          <video
-            src={invitation.videoUrl}
-            muted
-            loop
-            playsInline
-            autoPlay
-            data-invitation-video
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+          prefetchedVideoRef ? (
+            <PrefetchedVideoSlot videoRef={prefetchedVideoRef} />
+          ) : (
+            <video
+              src={invitation.videoUrl}
+              muted
+              loop
+              playsInline
+              autoPlay
+              preload="auto"
+              data-invitation-video
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )
         ) : (
           <img
             src={invitation.heroImage}
