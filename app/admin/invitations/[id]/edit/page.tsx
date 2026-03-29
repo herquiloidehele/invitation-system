@@ -8,6 +8,9 @@ import type {
   ParentsInfo,
   SaveDateStyle,
   SectionImages,
+  OurStory,
+  TextStyleOverrides,
+  CardStyleOverrides,
 } from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
 import ExternalInvitationForm from "../../ExternalInvitationForm";
@@ -65,6 +68,11 @@ export default async function EditInvitationPage({
     sectionImages:
       (row.sectionImages as unknown as SectionImages | null) ?? undefined,
     parents: (row.parents as unknown as ParentsInfo | null) ?? undefined,
+    ourStory: (row.ourStory as unknown as OurStory | null) ?? undefined,
+    textStyles:
+      (row.textStyles as unknown as TextStyleOverrides | null) ?? undefined,
+    cardStyles:
+      (row.cardStyles as unknown as CardStyleOverrides | null) ?? undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
   };

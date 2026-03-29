@@ -1782,6 +1782,8 @@ export default function InvitationForm({
                         ["guideScriptTitle", "Título do Guia"],
                         ["saveLabel", "Save the Date — Título"],
                         ["calendarCta", "Adicionar ao Calendário"],
+                        ["countdownValue", "Contagem — Número"],
+                        ["countdownLabel", "Contagem — Etiqueta"],
                       ] as const
                     ).map(([element, label]) => {
                       const el = form.textStyles?.elements?.[element];

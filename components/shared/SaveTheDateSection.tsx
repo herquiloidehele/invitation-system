@@ -245,11 +245,7 @@ function CountdownUnit({
       >
         <span
           style={{
-            fontSize: 25,
-            fontWeight: 300,
-            lineHeight: 1,
-            color: ts.textPrimary,
-            letterSpacing: -1,
+            ...ts.countdownValue,
             display: "block",
             textAlign: "center",
           }}
@@ -257,18 +253,7 @@ function CountdownUnit({
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span
-        style={{
-          fontFamily: ts.uiFont,
-          fontSize: 9,
-          fontWeight: 500,
-          letterSpacing: 2.5,
-          textTransform: "uppercase" as const,
-          color: ts.textMuted,
-        }}
-      >
-        {label}
-      </span>
+      <span style={ts.countdownLabel}>{label}</span>
     </div>
   );
 }

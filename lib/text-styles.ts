@@ -74,6 +74,10 @@ export interface ResolvedTextStyles {
   saveLabel: CSSProperties;
   /** "+ Adicionar ao Calendário" button text */
   calendarCta: CSSProperties;
+  /** Countdown number value (days, hours, minutes, seconds) */
+  countdownValue: CSSProperties;
+  /** Countdown unit label ("Dias", "Horas", etc.) */
+  countdownLabel: CSSProperties;
 
   // -- Resolved role-level values for sub-components that need individual props --
   /** Resolved display font (for sub-components) */
@@ -520,6 +524,29 @@ export function resolveTextStyles(
     el?.calendarCta,
   );
 
+  const countdownValue = applyOverride(
+    {
+      fontSize: 25,
+      fontWeight: 300,
+      lineHeight: 1,
+      color: textPrimary,
+      letterSpacing: -1,
+    },
+    el?.countdownValue,
+  );
+
+  const countdownLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 9,
+      fontWeight: 500,
+      letterSpacing: 2.5,
+      textTransform: "uppercase" as const,
+      color: textMuted,
+    },
+    el?.countdownLabel,
+  );
+
   return {
     coupleNames,
     coupleNamesVideo,
@@ -555,6 +582,8 @@ export function resolveTextStyles(
     guideScriptTitle,
     saveLabel,
     calendarCta,
+    countdownValue,
+    countdownLabel,
     // Role-level resolved values
     displayFont,
     bodyFont,

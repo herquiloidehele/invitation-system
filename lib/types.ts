@@ -221,6 +221,8 @@ export interface TextStyleOverrides {
     guideScriptTitle?: TextStyle;
     saveLabel?: TextStyle;
     calendarCta?: TextStyle;
+    countdownValue?: TextStyle;
+    countdownLabel?: TextStyle;
   };
 }
 
