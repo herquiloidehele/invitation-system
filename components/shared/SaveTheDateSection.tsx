@@ -33,6 +33,8 @@ export interface SaveTheDateProps {
 // ---------------------------------------------------------------------------
 
 function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
+  const color = (ts.accentLine.color as string) ?? ts.accent;
+  const opacity = ts.accentLine.opacity ?? 0.35;
   return (
     <motion.div
       className="my-5"
@@ -43,8 +45,8 @@ function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
       style={{
         width: 80,
         height: 1,
-        background: `linear-gradient(90deg, transparent, ${ts.accent}, transparent)`,
-        opacity: 0.35,
+        background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+        opacity,
       }}
     />
   );

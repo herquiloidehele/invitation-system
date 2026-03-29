@@ -82,6 +82,8 @@ export interface ResolvedTextStyles {
   countdownDate: CSSProperties;
   /** Countdown weekday & time ("Segunda-feira · 16:00") */
   countdownWeekday: CSSProperties;
+  /** Decorative accent line between sections (color controls the gradient) */
+  accentLine: CSSProperties;
 
   // -- Resolved role-level values for sub-components that need individual props --
   /** Resolved display font (for sub-components) */
@@ -573,6 +575,14 @@ export function resolveTextStyles(
     el?.countdownWeekday,
   );
 
+  const accentLine = applyOverride(
+    {
+      color: accent,
+      opacity: 0.35,
+    },
+    el?.accentLine,
+  );
+
   return {
     coupleNames,
     coupleNamesVideo,
@@ -612,6 +622,7 @@ export function resolveTextStyles(
     countdownLabel,
     countdownDate,
     countdownWeekday,
+    accentLine,
     // Role-level resolved values
     displayFont,
     bodyFont,

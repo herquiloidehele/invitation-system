@@ -225,6 +225,7 @@ export interface TextStyleOverrides {
     countdownLabel?: TextStyle;
     countdownDate?: TextStyle;
     countdownWeekday?: TextStyle;
+    accentLine?: TextStyle;
   };
 }
 
