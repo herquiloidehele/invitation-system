@@ -5,7 +5,6 @@ import {
   type RefObject,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
@@ -187,11 +186,13 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
 function SectionImage({
   src,
   theme,
-  height = 280,
+  height = 300,
+  hiddeBottom,
 }: {
   src: string;
   theme: TemplateTheme;
   height?: number;
+  hiddeBottom?: boolean;
 }) {
   return (
     <motion.div
@@ -228,15 +229,17 @@ function SectionImage({
         }}
       />
       {/* Bottom gradient — fades from transparent up into theme.bg */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: `linear-gradient(to top, ${theme.bg} 0%, transparent 40%)`,
-          pointerEvents: "none",
-        }}
-      />
+      {!hiddeBottom && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: `linear-gradient(to top, ${theme.bg} 0%, transparent 40%)`,
+            pointerEvents: "none",
+          }}
+        />
+      )}
     </motion.div>
   );
 }
@@ -1628,6 +1631,7 @@ export default function InvitationPage({
           src={invitation.sectionImages.image4}
           theme={theme}
           height={220}
+          hiddeBottom
         />
       )}
 
