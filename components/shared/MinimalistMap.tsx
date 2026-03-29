@@ -16,7 +16,7 @@ const TILES_DARK =
   "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
 // ---------------------------------------------------------------------------
-// Build an SVG marker that uses the theme accent color
+// Build an SVG marker that uses the theme primary color
 // ---------------------------------------------------------------------------
 
 function createPinIcon(accentColor: string): L.DivIcon {
@@ -100,8 +100,8 @@ export default function MinimalistMap({
       subdomains: "abcd",
     }).addTo(map);
 
-    // Custom pin marker
-    const icon = createPinIcon(theme.accent);
+    // Custom pin marker using theme primary color
+    const icon = createPinIcon(theme.primary);
     L.marker([latitude, longitude], { icon, interactive: false }).addTo(map);
 
     mapRef.current = map;
@@ -123,15 +123,36 @@ export default function MinimalistMap({
         }
       `}</style>
       <div
-        ref={containerRef}
         className={className}
         style={{
+          position: "relative",
           width: "100%",
           height: "100%",
-          filter: getMapFilter(theme),
-          transition: "filter 0.5s ease",
+          overflow: "hidden",
         }}
-      />
+      >
+        {/* Map tiles */}
+        <div
+          ref={containerRef}
+          style={{
+            width: "100%",
+            height: "100%",
+            filter: getMapFilter(theme),
+            transition: "filter 0.5s ease",
+          }}
+        />
+        {/* Primary-color tint overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: theme.primary,
+            opacity: isDarkTheme(theme) ? 0.25 : 0.35,
+            mixBlendMode: "color",
+            pointerEvents: "none",
+          }}
+        />
+      </div>
     </>
   );
 }
