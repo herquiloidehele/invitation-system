@@ -42,6 +42,25 @@ const TOTAL_MS = (T.flapOpen.dur - 5) * 1000;
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 /* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Derive a shadow colour from the envelope base colour so it blends
+ * naturally with any envelope hue instead of using a fixed gray.
+ */
+function shadowColorFromBase(hex: string, opacity = 0.65): string {
+  const raw = hex.replace("#", "");
+  const r = parseInt(raw.slice(0, 2), 16);
+  const g = parseInt(raw.slice(2, 4), 16);
+  const b = parseInt(raw.slice(4, 6), 16);
+
+  // Darken each channel to ~25 % of the original
+  const factor = 0.25;
+  return `rgba(${Math.round(r * factor)},${Math.round(g * factor)},${Math.round(b * factor)},${opacity})`;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Envelope body (the back panel visible behind the flaps)            */
 /* ------------------------------------------------------------------ */
 
@@ -60,7 +79,17 @@ function EnvelopeBody({ color }: { color: string }) {
 /*  Flap components                                                    */
 /* ------------------------------------------------------------------ */
 
-function TopFlap({ opening, image }: { opening: boolean; image: string }) {
+function TopFlap({
+  opening,
+  image,
+  baseColor,
+}: {
+  opening: boolean;
+  image: string;
+  baseColor: string;
+}) {
+  const shadow = shadowColorFromBase(baseColor);
+
   return (
     <motion.div
       className="absolute top-0 left-0 w-full origin-bottom"
@@ -73,7 +102,7 @@ function TopFlap({ opening, image }: { opening: boolean; image: string }) {
       animate={
         opening
           ? {
-              filter: "drop-shadow(0 50px 90px rgba(127,127,127,0.8))",
+              filter: `drop-shadow(0 50px 90px ${shadow})`,
               scale: 1.15,
               y: "-25%",
             }
@@ -165,7 +194,11 @@ export default function EnvelopeCover({
         />
       )}
 
-      <TopFlap opening={opening} image={theme.envelope.topFlap} />
+      <TopFlap
+        opening={opening}
+        image={theme.envelope.topFlap}
+        baseColor={theme.envelope.base}
+      />
       <BottomFlap opening={opening} image={theme.envelope.bottomFlap} />
 
       {/* Slow opacity fade covering the last phase of the animation.
