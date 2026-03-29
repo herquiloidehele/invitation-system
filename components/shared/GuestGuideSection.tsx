@@ -132,6 +132,8 @@ interface GuideItemCardProps {
   item: GuestGuideItem;
   theme: TemplateTheme;
   ts?: ResolvedTextStyles;
+  cardBg?: string;
+  cardBorder?: string;
   isPreview?: boolean;
 }
 
@@ -139,7 +141,9 @@ function GuideItemCard({
   item,
   theme,
   ts,
-  isPreview = false,
+  cardBg,
+  cardBorder,
+  isPreview,
 }: GuideItemCardProps) {
   return (
     <motion.div
@@ -148,12 +152,12 @@ function GuideItemCard({
         : { variants: fadeInUp })}
       className="flex flex-col items-center gap-2 text-center"
       style={{
-        background: theme.cardBg,
+        background: cardBg || theme.cardBg,
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         borderRadius: 14,
         padding: "18px 12px",
-        border: `1px solid ${theme.cardBorder}`,
+        border: `1px solid ${cardBorder || theme.cardBorder}`,
         boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 4px 16px rgba(0,0,0,0.03)",
       }}
     >
@@ -184,11 +188,15 @@ function GuideItemCard({
 // GuestGuideSection — the full invitation-page section
 // ---------------------------------------------------------------------------
 
-interface GuestGuideSectionProps {
+export interface GuestGuideSectionProps {
   guestGuide: GuestGuide;
   theme: TemplateTheme;
   /** Resolved text styles — when provided, text elements use these instead of raw theme values */
   ts?: ResolvedTextStyles;
+  /** Per-section card background override. Falls back to theme.cardBg. */
+  cardBg?: string;
+  /** Per-section card border override. Falls back to theme.cardBorder. */
+  cardBorder?: string;
   /** When true, all animations use `animate` instead of `whileInView` so
    *  the section is always fully visible (no scroll-trigger dependency).
    *  Use this in the admin live preview. */
@@ -199,8 +207,12 @@ export default function GuestGuideSection({
   guestGuide,
   theme,
   ts,
+  cardBg,
+  cardBorder,
   isPreview = false,
 }: GuestGuideSectionProps) {
+  const effectiveCardBg = cardBg || theme.cardBg;
+  const effectiveCardBorder = cardBorder || theme.cardBorder;
   return (
     <>
       {/* Section header */}
@@ -275,6 +287,8 @@ export default function GuestGuideSection({
             item={item}
             theme={theme}
             ts={ts}
+            cardBg={effectiveCardBg}
+            cardBorder={effectiveCardBorder}
             isPreview={isPreview}
           />
         ))}

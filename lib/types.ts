@@ -130,6 +130,34 @@ export interface ParentsInfo {
 }
 
 // ---------------------------------------------------------------------------
+// Per-invitation card style overrides
+// ---------------------------------------------------------------------------
+
+/** Style overrides for a single card/section (all fields optional). */
+export interface CardStyle {
+  /** Background color (e.g. "rgba(255,255,255,0.65)" or "#FFF"). Falls back to theme.cardBg. */
+  cardBg?: string;
+  /** Border color (e.g. "rgba(201,169,98,0.08)"). Falls back to theme.cardBorder. */
+  cardBorder?: string;
+}
+
+/** Identifiers for each card section whose background can be individually overridden. */
+export type CardSectionKey =
+  | "saveTheDate"
+  | "ourStory"
+  | "schedule"
+  | "dressCode"
+  | "giftRegistry"
+  | "location"
+  | "guestGuide"
+  | "faqs";
+
+/** Per-section card styling overrides stored on each invitation.
+ *  Missing keys or undefined fields fall back to theme defaults.
+ */
+export type CardStyleOverrides = Partial<Record<CardSectionKey, CardStyle>>;
+
+// ---------------------------------------------------------------------------
 // Per-invitation text style overrides
 // ---------------------------------------------------------------------------
 
@@ -231,6 +259,8 @@ export interface InvitationData {
   ourStory?: OurStory;
   /** Per-invitation text style overrides (fonts, colors, sizes). Missing fields fall back to theme defaults. */
   textStyles?: TextStyleOverrides;
+  /** Per-section card background/border overrides. Missing keys fall back to theme.cardBg / theme.cardBorder. */
+  cardStyles?: CardStyleOverrides;
   /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
   invitationType: InvitationType;
   /** External URL for the iframe page (external_link type). */

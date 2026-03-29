@@ -108,7 +108,7 @@ export async function PUT(
       where: { id },
       data: {
         ...(body.slug !== undefined && { slug: body.slug }),
-        ...(themeId !== undefined && { themeId }),
+        ...(themeId !== undefined && { theme: { connect: { id: themeId } } }),
         ...(body.couple !== undefined && {
           couple: sanitizeJsonField(body.couple, existing.couple),
         }),
@@ -171,6 +171,9 @@ export async function PUT(
         }),
         ...(body.textStyles !== undefined && {
           textStyles: sanitizeJsonField(body.textStyles, null),
+        }),
+        ...(body.cardStyles !== undefined && {
+          cardStyles: sanitizeJsonField(body.cardStyles, null),
         }),
       },
       include: {

@@ -15,6 +15,8 @@ import type {
   OurStory,
   TextStyleOverrides,
   TextStyle,
+  CardSectionKey,
+  CardStyle,
 } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -642,6 +644,32 @@ export default function InvitationForm({
 
   const clearTextStyles = useCallback(() => {
     setForm((prev) => ({ ...prev, textStyles: undefined }));
+  }, []);
+
+  // Card style overrides per section
+  const updateCardStyle = useCallback(
+    (
+      section: CardSectionKey,
+      field: keyof CardStyle,
+      value: string | undefined,
+    ) => {
+      setForm((prev) => {
+        const cs = { ...prev.cardStyles };
+        const sec = { ...cs[section], [field]: value || undefined };
+        const secHasAny = Object.values(sec).some((v) => v !== undefined);
+        cs[section] = secHasAny ? sec : undefined;
+        const hasAny = Object.values(cs).some(Boolean);
+        return {
+          ...prev,
+          cardStyles: hasAny ? cs : undefined,
+        };
+      });
+    },
+    [],
+  );
+
+  const clearCardStyles = useCallback(() => {
+    setForm((prev) => ({ ...prev, cardStyles: undefined }));
   }, []);
 
   // Current theme for preview — merge per-invitation envelope overrides
@@ -1898,6 +1926,142 @@ export default function InvitationForm({
                         onClick={clearTextStyles}
                       >
                         Repor Todas as Personalizações de Texto
+                      </Button>
+                    )}
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ── Card Styles per section ── */}
+              <AccordionItem
+                value="card-styles"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Cores dos Cartões
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <p className="text-xs text-muted-foreground">
+                    Personalize o fundo e a borda de cada secção
+                    individualmente. Campos vazios usam os padrões do modelo.
+                  </p>
+
+                  <Accordion className="space-y-1">
+                    {(
+                      [
+                        ["saveTheDate", "Save the Date"],
+                        ["ourStory", "Nossa História"],
+                        ["schedule", "Programa"],
+                        ["dressCode", "Dress Code"],
+                        ["giftRegistry", "Presentes"],
+                        ["location", "Localização"],
+                        ["guestGuide", "Manual do Convidado"],
+                        ["faqs", "Perguntas Frequentes"],
+                      ] as const
+                    ).map(([section, label]) => {
+                      const sec = form.cardStyles?.[section];
+                      const hasOverride =
+                        sec && Object.values(sec).some((v) => v !== undefined);
+                      return (
+                        <AccordionItem
+                          key={section}
+                          value={`cs-${section}`}
+                          className="border rounded px-3"
+                        >
+                          <AccordionTrigger className="text-xs py-2">
+                            <span className="flex items-center gap-2">
+                              {label}
+                              {hasOverride && (
+                                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
+                              )}
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent className="space-y-2 pb-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Fundo</Label>
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="color"
+                                  value={
+                                    sec?.cardBg ||
+                                    currentTheme.cardBg ||
+                                    "#ffffff"
+                                  }
+                                  onChange={(e) =>
+                                    updateCardStyle(
+                                      section,
+                                      "cardBg",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="h-8 w-8 rounded border cursor-pointer shrink-0"
+                                />
+                                <input
+                                  type="text"
+                                  value={sec?.cardBg ?? ""}
+                                  onChange={(e) =>
+                                    updateCardStyle(
+                                      section,
+                                      "cardBg",
+                                      e.target.value,
+                                    )
+                                  }
+                                  placeholder={currentTheme.cardBg || "Auto"}
+                                  className="font-mono text-xs h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Borda</Label>
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="color"
+                                  value={
+                                    sec?.cardBorder ||
+                                    currentTheme.cardBorder ||
+                                    "#cccccc"
+                                  }
+                                  onChange={(e) =>
+                                    updateCardStyle(
+                                      section,
+                                      "cardBorder",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="h-8 w-8 rounded border cursor-pointer shrink-0"
+                                />
+                                <input
+                                  type="text"
+                                  value={sec?.cardBorder ?? ""}
+                                  onChange={(e) =>
+                                    updateCardStyle(
+                                      section,
+                                      "cardBorder",
+                                      e.target.value,
+                                    )
+                                  }
+                                  placeholder={
+                                    currentTheme.cardBorder || "Auto"
+                                  }
+                                  className="font-mono text-xs h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                                />
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
+
+                  {/* Reset all card style overrides */}
+                  {form.cardStyles &&
+                    Object.keys(form.cardStyles).length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive"
+                        onClick={clearCardStyles}
+                      >
+                        Repor Todas as Cores dos Cartões
                       </Button>
                     )}
                 </AccordionContent>

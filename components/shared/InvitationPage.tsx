@@ -10,7 +10,12 @@ import {
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
-import type { FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CardSectionKey,
+  FAQItem,
+  InvitationData,
+  TemplateTheme,
+} from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
@@ -371,6 +376,13 @@ export default function InvitationPage({
   }, [invitation.slug]);
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
+
+  /** Resolve card bg/border for a given section, falling back to theme defaults. */
+  const cs = (section: CardSectionKey) => ({
+    cardBg: invitation.cardStyles?.[section]?.cardBg || theme.cardBg,
+    cardBorder:
+      invitation.cardStyles?.[section]?.cardBorder || theme.cardBorder,
+  });
 
   return (
     <div
@@ -814,6 +826,8 @@ export default function InvitationPage({
           invitation={invitation}
           theme={theme}
           ts={ts}
+          cardBg={cs("saveTheDate").cardBg}
+          cardBorder={cs("saveTheDate").cardBorder}
           onCalendarClick={handleCalendarClick}
           isPreview={isPreview}
         />
@@ -858,7 +872,7 @@ export default function InvitationPage({
           <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
             <div
               style={{
-                background: theme.cardBg,
+                background: cs("ourStory").cardBg,
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
                 borderRadius: 20,
@@ -866,7 +880,7 @@ export default function InvitationPage({
                 padding: "28px 24px",
                 boxShadow:
                   "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                border: `1px solid ${theme.cardBorder}`,
+                border: `1px solid ${cs("ourStory").cardBorder}`,
               }}
             >
               <div className="flex flex-col items-center gap-4">
@@ -932,7 +946,7 @@ export default function InvitationPage({
           >
             <div
               style={{
-                background: theme.cardBg,
+                background: cs("schedule").cardBg,
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
                 borderRadius: 20,
@@ -940,7 +954,7 @@ export default function InvitationPage({
                 padding: "8px 0",
                 boxShadow:
                   "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                border: `1px solid ${theme.cardBorder}`,
+                border: `1px solid ${cs("schedule").cardBorder}`,
               }}
             >
               {invitation.schedule.map((event, i) => (
@@ -948,7 +962,10 @@ export default function InvitationPage({
                   {i > 0 && (
                     <div
                       className="mx-6"
-                      style={{ height: 1, background: theme.cardBorder }}
+                      style={{
+                        height: 1,
+                        background: cs("schedule").cardBorder,
+                      }}
                     />
                   )}
                   <ScheduleItem
@@ -995,14 +1012,14 @@ export default function InvitationPage({
                 viewport={{ once: true, margin: "-40px" }}
                 className="flex flex-col items-center gap-3 text-center"
                 style={{
-                  background: theme.cardBg,
+                  background: cs("dressCode").cardBg,
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
                   borderRadius: 16,
                   padding: "24px 14px",
                   boxShadow:
                     "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                  border: `1px solid ${theme.cardBorder}`,
+                  border: `1px solid ${cs("dressCode").cardBorder}`,
                 }}
               >
                 <div
@@ -1036,14 +1053,14 @@ export default function InvitationPage({
                 viewport={{ once: true, margin: "-40px" }}
                 className="flex flex-col items-center gap-3 text-center"
                 style={{
-                  background: theme.cardBg,
+                  background: cs("giftRegistry").cardBg,
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
                   borderRadius: 16,
                   padding: "24px 14px",
                   boxShadow:
                     "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                  border: `1px solid ${theme.cardBorder}`,
+                  border: `1px solid ${cs("giftRegistry").cardBorder}`,
                 }}
               >
                 <div
@@ -1095,6 +1112,8 @@ export default function InvitationPage({
           location={invitation.location}
           theme={theme}
           ts={ts}
+          cardBg={cs("location").cardBg}
+          cardBorder={cs("location").cardBorder}
           onMapsClick={handleMapsClick}
         />
       </AnimatedSection>
@@ -1119,6 +1138,8 @@ export default function InvitationPage({
                 guestGuide={invitation.guestGuide}
                 theme={theme}
                 ts={ts}
+                cardBg={cs("guestGuide").cardBg}
+                cardBorder={cs("guestGuide").cardBorder}
                 isPreview={isPreview}
               />
             </AnimatedSection>
@@ -1154,14 +1175,14 @@ export default function InvitationPage({
             {/* FAQ card */}
             <div
               style={{
-                background: theme.cardBg,
+                background: cs("faqs").cardBg,
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
                 borderRadius: 20,
                 overflow: "hidden",
                 boxShadow:
                   "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                border: `1px solid ${theme.cardBorder}`,
+                border: `1px solid ${cs("faqs").cardBorder}`,
               }}
             >
               {invitation.faqs.map((faq, i) => (

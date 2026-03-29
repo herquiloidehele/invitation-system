@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     const invitation = await prisma.invitation.create({
       data: {
         slug: body.slug,
-        themeId,
+        theme: { connect: { id: themeId } },
         couple: body.couple,
         date: body.date,
         quote: body.quote ?? "",
@@ -131,6 +131,7 @@ export async function POST(request: NextRequest) {
         invitationType: body.invitationType ?? "standard",
         externalLink: body.externalLink ?? null,
         textStyles: sanitizeJsonField(body.textStyles, null),
+        cardStyles: sanitizeJsonField(body.cardStyles, null),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

@@ -84,6 +84,7 @@ model Invitation {
   parents        Json?   // ParentsInfo { enabled, blessingMessage, inviteMessage, bridesFather, bridesMother, groomsFather, groomsMother }
   ourStory       Json?   // OurStory { enabled, title, description }
   textStyles     Json?   // TextStyleOverrides — per-invitation text styling overrides (fonts, colors, sizes)
+  cardStyles     Json?   // CardStyleOverrides — per-section card background/border overrides
   invitationType String  @default("standard") // "standard" | "external_video" | "external_link"
   externalLink   String? // URL for the external link / iframe (external_link type)
   ownerToken   String   @unique @default(cuid())

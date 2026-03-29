@@ -20,6 +20,10 @@ export interface SaveTheDateProps {
   invitation: InvitationData;
   theme: TemplateTheme;
   ts: ResolvedTextStyles;
+  /** Per-section card background override. Falls back to theme.cardBg. */
+  cardBg?: string;
+  /** Per-section card border override. Falls back to theme.cardBorder. */
+  cardBorder?: string;
   onCalendarClick?: () => void;
   isPreview?: boolean;
 }
@@ -989,11 +993,19 @@ function SaveTheDateMinimalLine({
 
 export default function SaveTheDateSection({
   invitation,
-  theme,
+  theme: rawTheme,
   ts,
+  cardBg,
+  cardBorder,
   onCalendarClick,
   isPreview,
 }: SaveTheDateProps) {
+  // Merge per-section card overrides into theme so all variants pick them up
+  const theme = {
+    ...rawTheme,
+    cardBg: cardBg || rawTheme.cardBg,
+    cardBorder: cardBorder || rawTheme.cardBorder,
+  };
   const style: SaveDateStyle = invitation.saveDateStyle ?? "classic";
 
   switch (style) {

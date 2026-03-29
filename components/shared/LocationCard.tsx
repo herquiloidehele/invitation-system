@@ -47,11 +47,15 @@ function getExternalMapUrl(location: LocationInfo): string {
 // Component
 // ---------------------------------------------------------------------------
 
-interface LocationCardProps {
+export interface LocationCardProps {
   location: LocationInfo;
   theme: TemplateTheme;
   /** Resolved text styles — when provided, text elements use these instead of raw theme values */
   ts?: ResolvedTextStyles;
+  /** Per-section card background override. Falls back to theme.cardBg. */
+  cardBg?: string;
+  /** Per-section card border override. Falls back to theme.cardBorder. */
+  cardBorder?: string;
   onMapsClick?: () => void;
 }
 
@@ -59,8 +63,12 @@ export default function LocationCard({
   location,
   theme,
   ts,
+  cardBg,
+  cardBorder,
   onMapsClick,
 }: LocationCardProps) {
+  const effectiveCardBg = cardBg || theme.cardBg;
+  const effectiveCardBorder = cardBorder || theme.cardBorder;
   const hasCoordinates =
     location.latitude != null && location.longitude != null;
 
@@ -72,12 +80,12 @@ export default function LocationCard({
       transition={{ duration: 0.8, ease: EASE }}
       className="flex flex-col overflow-hidden"
       style={{
-        background: theme.cardBg,
+        background: effectiveCardBg,
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         borderRadius: 16,
         boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-        border: `1px solid ${theme.cardBorder}`,
+        border: `1px solid ${effectiveCardBorder}`,
       }}
     >
       {/* Header — icon + title */}
@@ -151,14 +159,14 @@ export default function LocationCard({
             style={{
               height: 180,
               borderRadius: 12,
-              border: `1px solid ${theme.cardBorder}`,
+              border: `1px solid ${effectiveCardBorder}`,
             }}
           >
             <ErrorBoundary
               fallback={
                 <div
                   className="flex h-full w-full flex-col items-center justify-center gap-2"
-                  style={{ background: theme.cardBg }}
+                  style={{ background: effectiveCardBg }}
                 >
                   <MapPin size={24} color={theme.textMuted} strokeWidth={1.5} />
                   <span
@@ -177,7 +185,7 @@ export default function LocationCard({
                 fallback={
                   <div
                     className="flex h-full w-full items-center justify-center"
-                    style={{ background: theme.cardBg }}
+                    style={{ background: effectiveCardBg }}
                   >
                     <MapPin
                       size={24}
