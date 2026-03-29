@@ -7,6 +7,7 @@ import { MapPin, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 import type { LocationInfo, TemplateTheme } from "@/lib/types";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 // Dynamically import the map with ssr: false to prevent Leaflet from being
 // evaluated on the server (Leaflet requires `window`, which doesn't exist in SSR)
@@ -146,22 +147,46 @@ export default function LocationCard({
               border: `1px solid ${theme.cardBorder}`,
             }}
           >
-            <Suspense
+            <ErrorBoundary
               fallback={
                 <div
-                  className="flex h-full w-full items-center justify-center"
+                  className="flex h-full w-full flex-col items-center justify-center gap-2"
                   style={{ background: theme.cardBg }}
                 >
                   <MapPin size={24} color={theme.textMuted} strokeWidth={1.5} />
+                  <span
+                    style={{
+                      fontFamily: theme.uiFont,
+                      fontSize: 12,
+                      color: theme.textMuted,
+                    }}
+                  >
+                    Mapa indisponível offline
+                  </span>
                 </div>
               }
             >
-              <MinimalistMap
-                latitude={location.latitude!}
-                longitude={location.longitude!}
-                theme={theme}
-              />
-            </Suspense>
+              <Suspense
+                fallback={
+                  <div
+                    className="flex h-full w-full items-center justify-center"
+                    style={{ background: theme.cardBg }}
+                  >
+                    <MapPin
+                      size={24}
+                      color={theme.textMuted}
+                      strokeWidth={1.5}
+                    />
+                  </div>
+                }
+              >
+                <MinimalistMap
+                  latitude={location.latitude!}
+                  longitude={location.longitude!}
+                  theme={theme}
+                />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         </div>
       )}
