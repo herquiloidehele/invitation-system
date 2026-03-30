@@ -37,6 +37,13 @@ export default function InvitationView({
     (invitation.invitationType ?? "standard") === "standard" &&
     !!invitation.videoUrl;
 
+  // Likewise, pre-buffer the background audio so it plays immediately
+  // when the user taps the envelope instead of waiting for a download.
+  const isStandardWithAudio =
+    (invitation.invitationType ?? "standard") === "standard" &&
+    invitation.audio.enabled &&
+    !!invitation.audio.src;
+
   const { trackEvent } = useAnalytics(invitation.slug);
 
   // Merge per-invitation envelope overrides on top of the theme defaults
@@ -63,10 +70,11 @@ export default function InvitationView({
   const handleOpen = useCallback(() => {
     trackEvent("envelope_open");
 
-    // External invites don't have background audio
-    if (invitation.invitationType === "standard" && invitation.audio.enabled) {
+    // Use the pre-buffered <audio> element so playback starts instantly
+    if (isStandardWithAudio) {
       try {
-        const audio = new Audio(invitation.audio.src);
+        const audio = audioRef.current;
+        if (!audio) return;
         audio.loop = true;
         audio.volume = 0.03;
         audio
@@ -82,12 +90,11 @@ export default function InvitationView({
             fadeIntervalRef.current = fade;
           })
           .catch(() => {});
-        audioRef.current = audio;
       } catch {
         /* silent */
       }
     }
-  }, [invitation.audio, invitation.invitationType, trackEvent]);
+  }, [isStandardWithAudio, trackEvent]);
 
   /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
   useEffect(() => {
@@ -209,6 +216,25 @@ export default function InvitationView({
             muted
             loop
             playsInline
+            aria-hidden
+            style={{
+              position: "absolute",
+              width: 0,
+              height: 0,
+              opacity: 0,
+              pointerEvents: "none",
+            }}
+          />
+        )}
+
+        {/* Persistent prefetch audio — mounted once so the browser downloads
+            the audio file while the envelope animation is visible. Reused by
+            handleOpen to start playback instantly without waiting for a fetch. */}
+        {isStandardWithAudio && (
+          <audio
+            ref={audioRef}
+            src={invitation.audio.src}
+            preload="auto"
             aria-hidden
             style={{
               position: "absolute",
