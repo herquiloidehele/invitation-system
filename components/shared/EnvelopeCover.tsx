@@ -93,7 +93,7 @@ function TopFlap({
   return (
     <motion.div
       className="absolute top-0 left-0 w-full origin-bottom"
-      style={{ zIndex: 10 }}
+      style={{ zIndex: 10, height: "calc(50% + 10vh)" }}
       initial={{
         filter: "drop-shadow(0 0px 0px rgba(0,0,0,0))",
         scale: 1,
@@ -123,7 +123,7 @@ function TopFlap({
         width={500}
         height={500}
         alt={"Top Envelop Flap"}
-        className={"w-full h-auto"}
+        className={"w-full h-full object-cover object-bottom"}
       />
     </motion.div>
   );
@@ -131,13 +131,16 @@ function TopFlap({
 
 function BottomFlap({ image }: { opening: boolean; image: string }) {
   return (
-    <div className="absolute bottom-0 left-0 w-full origin-top">
+    <div
+      className="absolute bottom-0 left-0 w-full origin-top"
+      style={{ height: "calc(50% + 10vh)" }}
+    >
       <Image
         src={image}
         width={500}
         height={500}
         alt={"Top Envelop Flap"}
-        className={"w-full h-auto"}
+        className={"w-full h-full object-cover object-top"}
       />
     </div>
   );
