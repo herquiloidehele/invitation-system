@@ -1873,6 +1873,9 @@ export default function InvitationForm({
                         ["countdownDate", "Contagem — Data"],
                         ["countdownWeekday", "Contagem — Dia/Hora"],
                         ["accentLine", "Linha Decorativa"],
+                        ["scheduleTime", "Programa — Hora"],
+                        ["scheduleLabel", "Programa — Descrição"],
+                        ["scheduleVenue", "Programa — Local"],
                       ] as const
                     ).map(([element, label]) => {
                       const el = form.textStyles?.elements?.[element];
