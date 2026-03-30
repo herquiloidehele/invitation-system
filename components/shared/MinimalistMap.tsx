@@ -101,7 +101,7 @@ export default function MinimalistMap({
     }).addTo(map);
 
     // Custom pin marker using theme primary color
-    const icon = createPinIcon(theme.primary);
+    const icon = createPinIcon(theme.secondary);
     L.marker([latitude, longitude], { icon, interactive: false }).addTo(map);
 
     mapRef.current = map;
@@ -146,7 +146,7 @@ export default function MinimalistMap({
           style={{
             position: "absolute",
             inset: 0,
-            backgroundColor: theme.primary,
+            backgroundColor: theme.secondary,
             opacity: isDarkTheme(theme) ? 0.25 : 0.35,
             mixBlendMode: "color",
             pointerEvents: "none",

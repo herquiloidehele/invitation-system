@@ -27,6 +27,9 @@ export interface ThemeFormData {
   bodyFont: string;
   scriptFont: string;
   uiFont: string;
+  sectionTitleFont: string;
+  sectionTitleFontSize: string;
+  sectionTitleFontWeight: string;
   // CTA
   ctaPrimaryBg: string;
   ctaPrimaryText: string;
@@ -67,6 +70,12 @@ export function themeToFormData(theme: TemplateTheme): ThemeFormData {
     bodyFont: theme.bodyFont,
     scriptFont: theme.scriptFont ?? "",
     uiFont: theme.uiFont,
+    sectionTitleFont: theme.sectionTitleFont ?? "",
+    sectionTitleFontSize:
+      theme.sectionTitleFontSize != null
+        ? String(theme.sectionTitleFontSize)
+        : "",
+    sectionTitleFontWeight: theme.sectionTitleFontWeight ?? "",
     ctaPrimaryBg: theme.ctaPrimaryBg,
     ctaPrimaryText: theme.ctaPrimaryText,
     ctaSecondaryBorder: theme.ctaSecondaryBorder,
@@ -108,6 +117,11 @@ export function formDataToTheme(form: ThemeFormData): TemplateTheme {
     bodyFont: form.bodyFont,
     scriptFont: form.scriptFont || undefined,
     uiFont: form.uiFont,
+    sectionTitleFont: form.sectionTitleFont || undefined,
+    sectionTitleFontSize: form.sectionTitleFontSize
+      ? Number(form.sectionTitleFontSize)
+      : undefined,
+    sectionTitleFontWeight: form.sectionTitleFontWeight || undefined,
     ctaPrimaryBg: form.ctaPrimaryBg,
     ctaPrimaryText: form.ctaPrimaryText,
     ctaSecondaryBorder: form.ctaSecondaryBorder,
@@ -141,6 +155,9 @@ export const EMPTY_FORM_DATA: ThemeFormData = {
   bodyFont: "'Cormorant Garamond', serif",
   scriptFont: "",
   uiFont: "'Outfit', sans-serif",
+  sectionTitleFont: "",
+  sectionTitleFontSize: "",
+  sectionTitleFontWeight: "",
   ctaPrimaryBg: "#d4a0a0",
   ctaPrimaryText: "#ffffff",
   ctaSecondaryBorder: "#d4a0a0",

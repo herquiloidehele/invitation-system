@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ScheduleEvent, TemplateTheme } from "@/lib/types";
 
@@ -12,12 +13,12 @@ interface DirectProps {
   label: string;
   venue: string;
   accentColor: string;
-  textColor: string;
-  venueColor: string;
-  /** UI font for labels (replaces hardcoded Inter) */
-  uiFont: string;
-  /** Script font for the time column (replaces hardcoded Cormorant Garamond) */
-  scriptFont?: string;
+  /** Resolved CSSProperties for the time column (font, color, size, weight …) */
+  timeStyle: CSSProperties;
+  /** Resolved CSSProperties for the event label */
+  labelStyle: CSSProperties;
+  /** Resolved CSSProperties for the venue name */
+  venueStyle: CSSProperties;
   /** Index in the schedule list — drives staggered entrance delay */
   index: number;
 }
@@ -41,19 +42,41 @@ export default function ScheduleItem(props: ScheduleItemProps) {
   const time = isIntegrationProps(props) ? props.event.time : props.time;
   const label = isIntegrationProps(props) ? props.event.label : props.label;
   const venue = isIntegrationProps(props) ? props.event.venue : props.venue;
+
+  // Accent color for decorative divider + dot
   const accentColor = isIntegrationProps(props)
     ? props.theme.accent
     : props.accentColor;
-  const textColor = isIntegrationProps(props)
-    ? props.theme.textPrimary
-    : props.textColor;
-  const venueColor = isIntegrationProps(props)
-    ? props.theme.textSecondary
-    : props.venueColor;
-  const uiFont = isIntegrationProps(props) ? props.theme.uiFont : props.uiFont;
-  const scriptFont = isIntegrationProps(props)
-    ? (props.theme.scriptFont ?? "'Cormorant Garamond', serif")
-    : (props.scriptFont ?? "'Cormorant Garamond', serif");
+
+  // Per-element resolved styles (integration mode uses simple theme fallbacks)
+  const timeStyle: CSSProperties = isIntegrationProps(props)
+    ? {
+        fontFamily: props.theme.scriptFont ?? "'Cormorant Garamond', serif",
+        fontSize: 18,
+        fontWeight: 600,
+        lineHeight: 1.15,
+        color: props.theme.textPrimary,
+      }
+    : props.timeStyle;
+
+  const labelStyle: CSSProperties = isIntegrationProps(props)
+    ? {
+        fontFamily: props.theme.uiFont,
+        fontSize: 14,
+        fontWeight: 600,
+        letterSpacing: 0.5,
+        color: props.theme.textPrimary,
+      }
+    : props.labelStyle;
+
+  const venueStyle: CSSProperties = isIntegrationProps(props)
+    ? {
+        fontFamily: props.theme.uiFont,
+        fontSize: 14,
+        color: props.theme.textSecondary,
+      }
+    : props.venueStyle;
+
   const index = isIntegrationProps(props) ? 0 : props.index;
 
   return (
@@ -65,14 +88,8 @@ export default function ScheduleItem(props: ScheduleItemProps) {
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
     >
       {/* Time column */}
-      <div
-        className="w-[60px] shrink-0 text-center"
-        style={{
-          fontFamily: scriptFont,
-          color: textColor,
-        }}
-      >
-        <span className="text-lg font-semibold leading-tight">{time}</span>
+      <div className="w-[60px] shrink-0 text-center" style={timeStyle}>
+        <span className="leading-tight">{time}</span>
       </div>
 
       {/* Vertical divider */}
@@ -88,24 +105,15 @@ export default function ScheduleItem(props: ScheduleItemProps) {
       {/* Event info */}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span
-          className="text-sm font-semibold uppercase tracking-wide"
+          className="uppercase tracking-wide"
           style={{
-            fontFamily: uiFont,
+            ...labelStyle,
             fontVariantCaps: "all-small-caps",
-            color: textColor,
           }}
         >
           {label}
         </span>
-        <span
-          className="text-sm"
-          style={{
-            fontFamily: uiFont,
-            color: venueColor,
-          }}
-        >
-          {venue}
-        </span>
+        <span style={venueStyle}>{venue}</span>
       </div>
     </motion.div>
   );

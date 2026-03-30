@@ -1,9 +1,8 @@
 "use client";
 
-import { createElement } from "react";
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 import {
   getLucideIconComponent,
@@ -215,60 +214,6 @@ export default function GuestGuideSection({
   const effectiveCardBorder = cardBorder || theme.cardBorder;
   return (
     <>
-      {/* Section header */}
-      <div className="flex flex-col items-center mb-6">
-        <span
-          style={{
-            fontFamily: ts?.uiFont ?? theme.uiFont,
-            fontSize: 10,
-            fontWeight: 400,
-            letterSpacing: 4,
-            textTransform: "uppercase",
-            color: ts?.textSecondary ?? theme.textSecondary,
-            ...(ts?.labels ?? {}),
-          }}
-        >
-          Manual do
-        </span>
-        <span
-          style={{
-            fontFamily: ts?.scriptFont ?? theme.scriptFont ?? theme.displayFont,
-            fontSize: 28,
-            color: ts?.accent ?? theme.primary,
-            lineHeight: 1.2,
-            marginTop: 2,
-            ...(ts?.guideScriptTitle ?? {}),
-          }}
-        >
-          Bom Convidado
-        </span>
-
-        <motion.div
-          className="flex items-center gap-2 mt-3"
-          initial={{ opacity: 0, scaleX: 0 }}
-          {...(isPreview
-            ? { animate: { opacity: 1, scaleX: 1 } }
-            : {
-                whileInView: { opacity: 1, scaleX: 1 },
-                viewport: { once: true },
-              })}
-          transition={{ duration: 0.7, ease: EASE }}
-        >
-          <div
-            style={{ width: 28, height: 1, background: theme.decorativeColor }}
-          />
-          <Heart
-            size={10}
-            color={theme.accent}
-            fill={theme.accent}
-            strokeWidth={0}
-          />
-          <div
-            style={{ width: 28, height: 1, background: theme.decorativeColor }}
-          />
-        </motion.div>
-      </div>
-
       {/* 2-column grid of items */}
       <motion.div
         className="grid grid-cols-2 gap-3"

@@ -179,13 +179,17 @@ export interface TextStyle {
  * (highest specificity, wins over both theme defaults and role overrides).
  */
 export interface TextStyleOverrides {
-  /** Override the theme's four font-family roles. */
+  /** Override the theme's font-family roles. */
   fonts?: {
     display?: string;
     body?: string;
     script?: string;
     ui?: string;
+    sectionTitle?: string;
   };
+  /** Override the theme's section-title sizing. */
+  sectionTitleFontSize?: number;
+  sectionTitleFontWeight?: string | number;
   /** Override the theme's text-color roles. */
   colors?: {
     textPrimary?: string;
@@ -226,6 +230,12 @@ export interface TextStyleOverrides {
     countdownDate?: TextStyle;
     countdownWeekday?: TextStyle;
     accentLine?: TextStyle;
+    /** Schedule item — time column (e.g. "16:00") */
+    scheduleTime?: TextStyle;
+    /** Schedule item — event label (e.g. "CERIMÔNIA") */
+    scheduleLabel?: TextStyle;
+    /** Schedule item — venue name (e.g. "Igreja Matriz") */
+    scheduleVenue?: TextStyle;
   };
 }
 
@@ -302,6 +312,12 @@ export interface TemplateTheme {
   scriptFont?: string;
   /** UI font for labels, buttons, small text (replaces hardcoded Inter) */
   uiFont: string;
+  /** Dedicated font for section titles (e.g. "Programação", "Nossa História"). Falls back to uiFont. */
+  sectionTitleFont?: string;
+  /** Default font size for section titles (px). Falls back to 10. */
+  sectionTitleFontSize?: number;
+  /** Default font weight for section titles. Falls back to 400. */
+  sectionTitleFontWeight?: string;
   // CTA styling
   ctaPrimaryBg: string;
   ctaPrimaryText: string;

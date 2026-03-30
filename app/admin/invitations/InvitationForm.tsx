@@ -646,6 +646,22 @@ export default function InvitationForm({
     setForm((prev) => ({ ...prev, textStyles: undefined }));
   }, []);
 
+  // Text style overrides — font role (sectionTitle font)
+  const updateTextStyleFont = useCallback(
+    (role: keyof NonNullable<TextStyleOverrides["fonts"]>, value: string) => {
+      setForm((prev) => {
+        const ts = prev.textStyles ?? {};
+        const fonts = { ...ts.fonts, [role]: value || undefined };
+        const hasAny = Object.values(fonts).some((v) => v !== undefined);
+        return {
+          ...prev,
+          textStyles: { ...ts, fonts: hasAny ? fonts : undefined },
+        };
+      });
+    },
+    [],
+  );
+
   // Card style overrides per section
   const updateCardStyle = useCallback(
     (
@@ -1751,6 +1767,76 @@ export default function InvitationForm({
                     Ajustes finos por elemento de texto. Campos vazios usam os
                     padrões do modelo.
                   </p>
+
+                  {/* ── Section title font role override ── */}
+                  <FontPicker
+                    label="Fonte de Títulos de Secção"
+                    value={form.textStyles?.fonts?.sectionTitle ?? ""}
+                    onChange={(v) => updateTextStyleFont("sectionTitle", v)}
+                    optional
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">
+                        Tamanho Títulos de Secção (px)
+                      </Label>
+                      <Input
+                        type="number"
+                        min={6}
+                        max={100}
+                        value={form.textStyles?.sectionTitleFontSize ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value
+                            ? Number(e.target.value)
+                            : undefined;
+                          setForm((prev) => {
+                            const ts = { ...prev.textStyles };
+                            return {
+                              ...prev,
+                              textStyles: {
+                                ...ts,
+                                sectionTitleFontSize: val,
+                              },
+                            };
+                          });
+                        }}
+                        placeholder="Auto"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Peso Títulos de Secção</Label>
+                      <Select
+                        value={
+                          form.textStyles?.sectionTitleFontWeight != null
+                            ? String(form.textStyles.sectionTitleFontWeight)
+                            : ""
+                        }
+                        onValueChange={(v) => {
+                          setForm((prev) => {
+                            const ts = { ...prev.textStyles };
+                            return {
+                              ...prev,
+                              textStyles: {
+                                ...ts,
+                                sectionTitleFontWeight: v || undefined,
+                              },
+                            };
+                          });
+                        }}
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="Auto" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="300">Light</SelectItem>
+                          <SelectItem value="400">Regular</SelectItem>
+                          <SelectItem value="500">Medium</SelectItem>
+                          <SelectItem value="600">Semibold</SelectItem>
+                          <SelectItem value="700">Bold</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
 
                   {/* ── Element-specific overrides ── */}
                   <Accordion className="space-y-1">

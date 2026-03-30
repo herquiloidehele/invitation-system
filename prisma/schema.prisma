@@ -32,10 +32,13 @@ model Theme {
   textMuted     String
 
   // Typography
-  displayFont String
-  bodyFont    String
-  scriptFont  String?
-  uiFont      String
+  displayFont      String
+  bodyFont         String
+  scriptFont       String?
+  uiFont           String
+  sectionTitleFont     String?
+  sectionTitleFontSize  Float?
+  sectionTitleFontWeight String?
 
   // CTA button styling
   ctaPrimaryBg       String

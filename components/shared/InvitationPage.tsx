@@ -973,10 +973,9 @@ export default function InvitationPage({
                     label={event.label}
                     venue={event.venue}
                     accentColor={ts.accent}
-                    textColor={ts.textPrimary}
-                    venueColor={ts.textSecondary}
-                    uiFont={ts.uiFont}
-                    scriptFont={ts.scriptFont}
+                    timeStyle={ts.scheduleTime}
+                    labelStyle={ts.scheduleLabel}
+                    venueStyle={ts.scheduleVenue}
                     index={i}
                   />
                 </div>
@@ -1142,13 +1141,33 @@ export default function InvitationPage({
         <SectionImage src={invitation.sectionImages.image3} theme={theme} />
       )}
 
+      <SectionDivider theme={theme} />
       {/* ================================================================= */}
       {/* 6. Manual do Bom Convidado                                        */}
       {/* ================================================================= */}
       {invitation.guestGuide?.enabled &&
         invitation.guestGuide.items.length > 0 && (
           <>
-            <SectionDivider theme={theme} />
+            <div className="flex flex-col items-center">
+              <span style={ts.sectionTitles} className={"text-center"}>
+                Manual do <br />
+                Bom Convidado
+              </span>
+
+              <motion.div
+                className="mt-3 mb-6"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, ease: EASE }}
+                style={{
+                  width: 28,
+                  height: 1,
+                  background: ts.accent,
+                  opacity: 0.25,
+                }}
+              />
+            </div>
 
             <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
               <GuestGuideSection

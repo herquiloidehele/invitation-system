@@ -79,6 +79,18 @@ export async function PUT(
             ? (body.scriptFont ?? null)
             : existing.scriptFont,
         uiFont: body.uiFont ?? existing.uiFont,
+        sectionTitleFont:
+          "sectionTitleFont" in body
+            ? (body.sectionTitleFont ?? null)
+            : existing.sectionTitleFont,
+        sectionTitleFontSize:
+          "sectionTitleFontSize" in body
+            ? (body.sectionTitleFontSize ?? null)
+            : existing.sectionTitleFontSize,
+        sectionTitleFontWeight:
+          "sectionTitleFontWeight" in body
+            ? (body.sectionTitleFontWeight ?? null)
+            : existing.sectionTitleFontWeight,
         ctaPrimaryBg: body.ctaPrimaryBg ?? existing.ctaPrimaryBg,
         ctaPrimaryText: body.ctaPrimaryText ?? existing.ctaPrimaryText,
         ctaSecondaryBorder:

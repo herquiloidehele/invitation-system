@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:prod": "cross-env ENV=prod next dev",
     "build": "prisma generate && npm run db:migrate && next build",
     "start": "next start",
     "lint": "eslint",

@@ -84,6 +84,12 @@ export interface ResolvedTextStyles {
   countdownWeekday: CSSProperties;
   /** Decorative accent line between sections (color controls the gradient) */
   accentLine: CSSProperties;
+  /** Schedule item — time column (e.g. "16:00") */
+  scheduleTime: CSSProperties;
+  /** Schedule item — event label (e.g. "CERIMÔNIA") */
+  scheduleLabel: CSSProperties;
+  /** Schedule item — venue name (e.g. "Igreja Matriz") */
+  scheduleVenue: CSSProperties;
 
   // -- Resolved role-level values for sub-components that need individual props --
   /** Resolved display font (for sub-components) */
@@ -94,6 +100,12 @@ export interface ResolvedTextStyles {
   scriptFont: string;
   /** Resolved UI font */
   uiFont: string;
+  /** Resolved section title font */
+  sectionTitleFont: string;
+  /** Resolved section title font size */
+  sectionTitleFontSize: number;
+  /** Resolved section title font weight */
+  sectionTitleFontWeight: string | number;
   /** Resolved text colors */
   textPrimary: string;
   textSecondary: string;
@@ -156,6 +168,12 @@ export function resolveTextStyles(
     theme.scriptFont ??
     "'Cormorant Garamond', serif";
   const uiFont = overrides?.fonts?.ui ?? theme.uiFont;
+  const sectionTitleFont =
+    overrides?.fonts?.sectionTitle ?? theme.sectionTitleFont ?? uiFont;
+  const sectionTitleFontSize =
+    overrides?.sectionTitleFontSize ?? theme.sectionTitleFontSize ?? 10;
+  const sectionTitleFontWeight =
+    overrides?.sectionTitleFontWeight ?? theme.sectionTitleFontWeight ?? 400;
 
   const textPrimary = overrides?.colors?.textPrimary ?? theme.textPrimary;
   const textSecondary = overrides?.colors?.textSecondary ?? theme.textSecondary;
@@ -233,9 +251,9 @@ export function resolveTextStyles(
 
   const sectionTitles = applyOverride(
     {
-      fontFamily: uiFont,
-      fontSize: 10,
-      fontWeight: 400,
+      fontFamily: sectionTitleFont,
+      fontSize: sectionTitleFontSize,
+      fontWeight: sectionTitleFontWeight,
       letterSpacing: 4,
       textTransform: "uppercase" as const,
       color: textSecondary,
@@ -583,6 +601,37 @@ export function resolveTextStyles(
     el?.accentLine,
   );
 
+  const scheduleTime = applyOverride(
+    {
+      fontFamily: scriptFont,
+      fontSize: 18,
+      fontWeight: 600,
+      lineHeight: 1.15,
+      color: textPrimary,
+    },
+    el?.scheduleTime,
+  );
+
+  const scheduleLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 14,
+      fontWeight: 600,
+      letterSpacing: 0.5,
+      color: textPrimary,
+    },
+    el?.scheduleLabel,
+  );
+
+  const scheduleVenue = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 14,
+      color: textSecondary,
+    },
+    el?.scheduleVenue,
+  );
+
   return {
     coupleNames,
     coupleNamesVideo,
@@ -623,11 +672,17 @@ export function resolveTextStyles(
     countdownDate,
     countdownWeekday,
     accentLine,
+    scheduleTime,
+    scheduleLabel,
+    scheduleVenue,
     // Role-level resolved values
     displayFont,
     bodyFont,
     scriptFont,
     uiFont,
+    sectionTitleFont,
+    sectionTitleFontSize,
+    sectionTitleFontWeight,
     textPrimary,
     textSecondary,
     textMuted,

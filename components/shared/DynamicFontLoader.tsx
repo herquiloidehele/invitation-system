@@ -19,6 +19,7 @@ export default function DynamicFontLoader({ theme }: { theme: TemplateTheme }) {
     theme.bodyFont,
     theme.scriptFont,
     theme.uiFont,
+    theme.sectionTitleFont,
   ]);
 
   return null;

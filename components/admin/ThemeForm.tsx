@@ -500,6 +500,46 @@ export default function ThemeForm({
                   value={form.uiFont}
                   onChange={(v) => set("uiFont", v)}
                 />
+                <FontPicker
+                  label="Fonte de Títulos de Secção"
+                  value={form.sectionTitleFont}
+                  onChange={(v) => set("sectionTitleFont", v)}
+                  optional
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">
+                    Tamanho Títulos de Secção (px)
+                  </Label>
+                  <Input
+                    type="number"
+                    min={6}
+                    max={100}
+                    value={form.sectionTitleFontSize}
+                    onChange={(e) =>
+                      set("sectionTitleFontSize", e.target.value)
+                    }
+                    placeholder="10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Peso Títulos de Secção</Label>
+                  <select
+                    value={form.sectionTitleFontWeight}
+                    onChange={(e) =>
+                      set("sectionTitleFontWeight", e.target.value)
+                    }
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    <option value="">Auto (400)</option>
+                    <option value="300">Light (300)</option>
+                    <option value="400">Regular (400)</option>
+                    <option value="500">Medium (500)</option>
+                    <option value="600">Semibold (600)</option>
+                    <option value="700">Bold (700)</option>
+                  </select>
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>
