@@ -249,6 +249,8 @@ export interface InvitationData {
   date: DateInfo;
   quote: string;
   location: LocationInfo;
+  /** Optional second venue (e.g. ceremony vs. reception). Uses the same LocationInfo shape. */
+  location2?: LocationInfo;
   rsvp: {
     enabled: boolean;
     deadline?: string;

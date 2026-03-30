@@ -419,6 +419,41 @@ export default function InvitationForm({
     [],
   );
 
+  const updateLocation2 = useCallback(
+    (
+      field: keyof InvitationData["location"],
+      value: string | number | undefined,
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        location2: { ...prev.location2!, [field]: value },
+      }));
+    },
+    [],
+  );
+
+  const addLocation2 = useCallback(() => {
+    setForm((prev) => ({
+      ...prev,
+      location2: {
+        name: "",
+        address: "",
+        googleMapsUrl: "",
+        wazeUrl: "",
+        latitude: undefined,
+        longitude: undefined,
+        imageUrl: "",
+      },
+    }));
+  }, []);
+
+  const removeLocation2 = useCallback(() => {
+    setForm((prev) => ({
+      ...prev,
+      location2: undefined,
+    }));
+  }, []);
+
   const updateRsvp = useCallback(
     (field: keyof InvitationData["rsvp"], value: boolean | string) => {
       setForm((prev) => ({
@@ -1403,6 +1438,126 @@ export default function InvitationForm({
                       onClear={() => updateLocation("imageUrl", "")}
                     />
                   </div>
+
+                  {/* ── Second Location (optional) ── */}
+                  <Separator className="my-4" />
+                  {!form.location2 ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={addLocation2}
+                    >
+                      + Adicionar Segundo Local
+                    </Button>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-semibold">
+                          Segundo Local
+                        </Label>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={removeLocation2}
+                        >
+                          Remover
+                        </Button>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="loc2Name">Nome do Local</Label>
+                        <Input
+                          id="loc2Name"
+                          value={form.location2.name}
+                          onChange={(e) =>
+                            updateLocation2("name", e.target.value)
+                          }
+                          placeholder="e.g. Quinta da Serra"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="loc2Address">Morada</Label>
+                        <Input
+                          id="loc2Address"
+                          value={form.location2.address}
+                          onChange={(e) =>
+                            updateLocation2("address", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gmaps2">URL Google Maps</Label>
+                          <Input
+                            id="gmaps2"
+                            value={form.location2.googleMapsUrl}
+                            onChange={(e) =>
+                              updateLocation2("googleMapsUrl", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="waze2">URL Waze (opcional)</Label>
+                          <Input
+                            id="waze2"
+                            value={form.location2.wazeUrl ?? ""}
+                            onChange={(e) =>
+                              updateLocation2("wazeUrl", e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="lat2">Latitude</Label>
+                          <Input
+                            id="lat2"
+                            type="number"
+                            step="any"
+                            value={form.location2.latitude ?? ""}
+                            onChange={(e) =>
+                              updateLocation2(
+                                "latitude",
+                                e.target.value
+                                  ? parseFloat(e.target.value)
+                                  : undefined,
+                              )
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="lng2">Longitude</Label>
+                          <Input
+                            id="lng2"
+                            type="number"
+                            step="any"
+                            value={form.location2.longitude ?? ""}
+                            onChange={(e) =>
+                              updateLocation2(
+                                "longitude",
+                                e.target.value
+                                  ? parseFloat(e.target.value)
+                                  : undefined,
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>Imagem do Local</Label>
+                        <MediaUpload
+                          kind="image"
+                          maxSizeMB={5}
+                          value={form.location2.imageUrl || undefined}
+                          onUpload={(url) => updateLocation2("imageUrl", url)}
+                          onClear={() => updateLocation2("imageUrl", "")}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
 

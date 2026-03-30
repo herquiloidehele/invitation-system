@@ -102,6 +102,7 @@ export async function POST(request: NextRequest) {
         date: body.date,
         quote: body.quote ?? "",
         location: sanitizeJsonField(body.location, {}),
+        location2: sanitizeJsonField(body.location2, null),
         rsvp: sanitizeJsonField(body.rsvp, { enabled: true }),
         schedule: sanitizeJsonField(body.schedule, []),
         dressCode: sanitizeJsonField(body.dressCode, {

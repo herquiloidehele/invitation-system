@@ -119,6 +119,9 @@ export async function PUT(
         ...(body.location !== undefined && {
           location: sanitizeJsonField(body.location, existing.location),
         }),
+        ...(body.location2 !== undefined && {
+          location2: sanitizeJsonField(body.location2, null),
+        }),
         ...(body.rsvp !== undefined && {
           rsvp: sanitizeJsonField(body.rsvp, existing.rsvp),
         }),

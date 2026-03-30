@@ -71,6 +71,7 @@ model Invitation {
   date         Json     // { iso, display, dayOfWeek, time, day, month, year }
   quote        String
   location     Json     // { name, address, googleMapsUrl, wazeUrl?, latitude?, longitude?, imageUrl? }
+  location2    Json?    // Optional second location — same shape as location
   rsvp         Json     // { enabled, deadline? }
   schedule     Json     // ScheduleEvent[]
   dressCode    Json     // { enabled, text }

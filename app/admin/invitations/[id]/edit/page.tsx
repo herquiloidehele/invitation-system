@@ -51,6 +51,8 @@ export default async function EditInvitationPage({
     date: row.date as unknown as InvitationData["date"],
     quote: row.quote,
     location: row.location as unknown as InvitationData["location"],
+    location2:
+      (row.location2 as unknown as InvitationData["location2"]) ?? undefined,
     rsvp: row.rsvp as unknown as InvitationData["rsvp"],
     schedule: row.schedule as unknown as InvitationData["schedule"],
     dressCode: row.dressCode as unknown as InvitationData["dressCode"],

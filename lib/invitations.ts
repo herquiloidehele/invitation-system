@@ -3,6 +3,7 @@ import type {
   CardStyleOverrides,
   InvitationData,
   InvitationType,
+  LocationInfo,
   OurStory,
   ParentsInfo,
   SaveDateStyle,
@@ -23,6 +24,7 @@ type InvitationWithTheme = {
   date: unknown;
   quote: string;
   location: unknown;
+  location2: unknown;
   rsvp: unknown;
   schedule: unknown;
   dressCode: unknown;
@@ -53,6 +55,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     date: row.date as InvitationData["date"],
     quote: row.quote,
     location: row.location as InvitationData["location"],
+    location2: (row.location2 as LocationInfo | null) ?? undefined,
     rsvp: row.rsvp as InvitationData["rsvp"],
     schedule: row.schedule as InvitationData["schedule"],
     dressCode: row.dressCode as InvitationData["dressCode"],

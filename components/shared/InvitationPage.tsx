@@ -1132,6 +1132,20 @@ export default function InvitationPage({
           cardBorder={cs("location").cardBorder}
           onMapsClick={handleMapsClick}
         />
+
+        {/* Second location card (optional) */}
+        {invitation.location2 && (
+          <div className="mt-4">
+            <LocationCard
+              location={invitation.location2}
+              theme={theme}
+              ts={ts}
+              cardBg={cs("location").cardBg}
+              cardBorder={cs("location").cardBorder}
+              onMapsClick={handleMapsClick}
+            />
+          </div>
+        )}
       </AnimatedSection>
 
       {/* ================================================================= */}
