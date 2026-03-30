@@ -992,6 +992,61 @@ export default function InvitationPage({
         <SectionImage src={invitation.sectionImages.image2} theme={theme} />
       )}
 
+      <SectionDivider theme={theme} />
+
+      {/* ================================================================= */}
+      {/* 5b. Location Card Section                                         */}
+      {/* ================================================================= */}
+      <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+        <div className="flex flex-col items-center">
+          <span style={ts.sectionTitles}>Localização</span>
+
+          <motion.div
+            className="mt-3 mb-6"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: EASE }}
+            style={{
+              width: 28,
+              height: 1,
+              background: ts.accent,
+              opacity: 0.25,
+            }}
+          />
+        </div>
+
+        <LocationCard
+          location={invitation.location}
+          theme={theme}
+          ts={ts}
+          cardBg={cs("location").cardBg}
+          cardBorder={cs("location").cardBorder}
+          onMapsClick={handleMapsClick}
+        />
+
+        {/* Second location card (optional) */}
+        {invitation.location2 && (
+          <div className="mt-4">
+            <LocationCard
+              location={invitation.location2}
+              theme={theme}
+              ts={ts}
+              cardBg={cs("location").cardBg}
+              cardBorder={cs("location").cardBorder}
+              onMapsClick={handleMapsClick}
+            />
+          </div>
+        )}
+      </AnimatedSection>
+
+      {/* ================================================================= */}
+      {/* IMAGE 3 — between location and guest guide / FAQs                 */}
+      {/* ================================================================= */}
+      {invitation.sectionImages?.image3 && (
+        <SectionImage src={invitation.sectionImages.image3} theme={theme} />
+      )}
+
       {/* ================================================================= */}
       {/* 5. Info Cards — glassmorphism, opposing slide-ins                  */}
       {/* ================================================================= */}
@@ -1100,68 +1155,13 @@ export default function InvitationPage({
         </AnimatedSection>
       )}
 
-      <SectionDivider theme={theme} />
-
-      {/* ================================================================= */}
-      {/* 5b. Location Card Section                                         */}
-      {/* ================================================================= */}
-      <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
-        <div className="flex flex-col items-center">
-          <span style={ts.sectionTitles}>Localização</span>
-
-          <motion.div
-            className="mt-3 mb-6"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: EASE }}
-            style={{
-              width: 28,
-              height: 1,
-              background: ts.accent,
-              opacity: 0.25,
-            }}
-          />
-        </div>
-
-        <LocationCard
-          location={invitation.location}
-          theme={theme}
-          ts={ts}
-          cardBg={cs("location").cardBg}
-          cardBorder={cs("location").cardBorder}
-          onMapsClick={handleMapsClick}
-        />
-
-        {/* Second location card (optional) */}
-        {invitation.location2 && (
-          <div className="mt-4">
-            <LocationCard
-              location={invitation.location2}
-              theme={theme}
-              ts={ts}
-              cardBg={cs("location").cardBg}
-              cardBorder={cs("location").cardBorder}
-              onMapsClick={handleMapsClick}
-            />
-          </div>
-        )}
-      </AnimatedSection>
-
-      {/* ================================================================= */}
-      {/* IMAGE 3 — between location and guest guide / FAQs                 */}
-      {/* ================================================================= */}
-      {invitation.sectionImages?.image3 && (
-        <SectionImage src={invitation.sectionImages.image3} theme={theme} />
-      )}
-
-      <SectionDivider theme={theme} />
       {/* ================================================================= */}
       {/* 6. Manual do Bom Convidado                                        */}
       {/* ================================================================= */}
       {invitation.guestGuide?.enabled &&
         invitation.guestGuide.items.length > 0 && (
           <>
+            <SectionDivider theme={theme} />
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles} className={"text-center"}>
                 Manual do <br />
