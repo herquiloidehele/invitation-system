@@ -1,6 +1,8 @@
 import { prisma } from "./db";
 import type {
   CardStyleOverrides,
+  GiftCategoryData,
+  GiftItemData,
   InvitationData,
   InvitationType,
   OurStory,
@@ -42,7 +44,49 @@ type InvitationWithTheme = {
   externalLink: string | null;
   textStyles: unknown;
   cardStyles: unknown;
+  giftCategories?: Array<{
+    id: string;
+    name: string;
+    icon: string | null;
+    order: number;
+    items: Array<{
+      id: string;
+      categoryId: string;
+      name: string;
+      imageUrl: string | null;
+      price: number | null;
+      link: string | null;
+      order: number;
+    }>;
+  }>;
 };
+
+function toGiftCategories(
+  rows?: InvitationWithTheme["giftCategories"],
+): GiftCategoryData[] | undefined {
+  if (!rows || rows.length === 0) return undefined;
+  return rows
+    .sort((a, b) => a.order - b.order)
+    .map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      icon: cat.icon ?? undefined,
+      order: cat.order,
+      items: cat.items
+        .sort((a, b) => a.order - b.order)
+        .map(
+          (item): GiftItemData => ({
+            id: item.id,
+            categoryId: item.categoryId,
+            name: item.name,
+            imageUrl: item.imageUrl ?? undefined,
+            price: item.price ?? undefined,
+            link: item.link ?? undefined,
+            order: item.order,
+          }),
+        ),
+    }));
+}
 
 function toInvitationData(row: InvitationWithTheme): InvitationData {
   return {
@@ -72,10 +116,21 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     externalLink: row.externalLink ?? undefined,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
+    giftCategories: toGiftCategories(row.giftCategories),
   };
 }
 
 const includeTheme = { theme: { select: { name: true } } } as const;
+
+const includeThemeAndGifts = {
+  theme: { select: { name: true } },
+  giftCategories: {
+    orderBy: { order: "asc" as const },
+    include: {
+      items: { orderBy: { order: "asc" as const } },
+    },
+  },
+} as const;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -86,7 +141,7 @@ export async function getInvitation(
 ): Promise<InvitationData | null> {
   const row = await prisma.invitation.findUnique({
     where: { slug },
-    include: includeTheme,
+    include: includeThemeAndGifts,
   });
   if (!row) return null;
   return toInvitationData(row as unknown as InvitationWithTheme);
@@ -113,6 +168,6 @@ export async function getAllInvitationRows() {
 export async function getInvitationById(id: string) {
   return prisma.invitation.findUnique({
     where: { id },
-    include: includeTheme,
+    include: includeThemeAndGifts,
   });
 }

@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
+import { ChevronDown, Heart, Shirt } from "lucide-react";
 
 import type {
   CardSectionKey,
@@ -22,6 +22,7 @@ import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
 import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
+import GiftRegistrySection from "./GiftRegistrySection";
 import SaveTheDateSection from "./SaveTheDateSection";
 import SectionImage from "./SectionImage";
 import DynamicFontLoader from "./DynamicFontLoader";
@@ -993,110 +994,65 @@ export default function InvitationPage({
       )}
 
       {/* ================================================================= */}
-      {/* 5. Info Cards — glassmorphism, opposing slide-ins                  */}
+      {/* 5. Info Cards — Dress Code (standalone) + Gift Registry Section   */}
       {/* ================================================================= */}
-      {(invitation.dressCode.enabled || invitation.giftRegistry.enabled) && (
+
+      {/* Dress Code Card — standalone */}
+      {invitation.dressCode.enabled && (
+        <AnimatedSection className="px-6 pb-4" isPreview={isPreview}>
+          <SectionDivider theme={theme} />
+          <motion.div
+            variants={slideFromLeft}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="mx-auto flex max-w-xs flex-col items-center gap-3 text-center"
+            style={{
+              background: cs("dressCode").cardBg,
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              borderRadius: 16,
+              padding: "24px 14px",
+              boxShadow:
+                "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+              border: `1px solid ${cs("dressCode").cardBorder}`,
+            }}
+          >
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-full"
+              style={{
+                background: `${ts.accent}12`,
+              }}
+            >
+              <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
+            </div>
+            <span style={ts.labels}>Dress Code</span>
+            <span
+              style={{
+                fontFamily: ts.bodyFont,
+                fontSize: 13,
+                fontWeight: 500,
+                color: ts.textPrimary,
+              }}
+            >
+              {invitation.dressCode.text}
+            </span>
+          </motion.div>
+        </AnimatedSection>
+      )}
+
+      {/* Gift Registry Section — dedicated section with categories + items grid */}
+      {invitation.giftRegistry.enabled && (
         <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
           <SectionDivider theme={theme} />
-          <div
-            className={`grid ${invitation.dressCode.enabled && invitation.giftRegistry.enabled ? "grid-cols-2" : "grid-cols-1"} gap-3`}
-          >
-            {/* Dress Code — slides from left */}
-            {invitation.dressCode.enabled && (
-              <motion.div
-                variants={slideFromLeft}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-40px" }}
-                className="flex flex-col items-center gap-3 text-center"
-                style={{
-                  background: cs("dressCode").cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: 16,
-                  padding: "24px 14px",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                  border: `1px solid ${cs("dressCode").cardBorder}`,
-                }}
-              >
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full"
-                  style={{
-                    background: `${ts.accent}12`,
-                  }}
-                >
-                  <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
-                </div>
-                <span style={ts.labels}>Dress Code</span>
-                <span
-                  style={{
-                    fontFamily: ts.bodyFont,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: ts.textPrimary,
-                  }}
-                >
-                  {invitation.dressCode.text}
-                </span>
-              </motion.div>
-            )}
-
-            {/* Gift Registry — slides from right */}
-            {invitation.giftRegistry.enabled && (
-              <motion.div
-                variants={slideFromRight}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-40px" }}
-                className="flex flex-col items-center gap-3 text-center"
-                style={{
-                  background: cs("giftRegistry").cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: 16,
-                  padding: "24px 14px",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                  border: `1px solid ${cs("giftRegistry").cardBorder}`,
-                }}
-              >
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full"
-                  style={{
-                    background: `${ts.accent}12`,
-                  }}
-                >
-                  <Gift size={20} color={ts.accent} strokeWidth={1.5} />
-                </div>
-                <span style={ts.labels}>Presentes</span>
-                <span
-                  style={{
-                    fontFamily: ts.bodyFont,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: ts.textPrimary,
-                  }}
-                >
-                  {invitation.giftRegistry.text}
-                </span>
-                {invitation.giftRegistry.link && (
-                  <motion.a
-                    href={invitation.giftRegistry.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={handleGiftClick}
-                    className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
-                    style={ts.giftLink}
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <ExternalLink size={10} strokeWidth={1.5} />
-                    Ver lista
-                  </motion.a>
-                )}
-              </motion.div>
-            )}
-          </div>
+          <GiftRegistrySection
+            invitation={invitation}
+            theme={theme}
+            ts={ts}
+            cs={cs}
+            isPreview={isPreview}
+            onGiftClick={handleGiftClick}
+          />
         </AnimatedSection>
       )}
 

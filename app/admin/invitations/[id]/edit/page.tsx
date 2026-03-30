@@ -11,6 +11,8 @@ import type {
   OurStory,
   TextStyleOverrides,
   CardStyleOverrides,
+  GiftCategoryData,
+  GiftItemData,
 } from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
 import ExternalInvitationForm from "../../ExternalInvitationForm";
@@ -26,7 +28,13 @@ export default async function EditInvitationPage({
   const [row, themes] = await Promise.all([
     prisma.invitation.findUnique({
       where: { id },
-      include: { theme: true },
+      include: {
+        theme: true,
+        giftCategories: {
+          orderBy: { order: "asc" },
+          include: { items: { orderBy: { order: "asc" } } },
+        },
+      },
     }),
     getThemes(),
   ]);
@@ -40,6 +48,25 @@ export default async function EditInvitationPage({
   const host = headersList.get("host") ?? "localhost:3000";
   const proto = headersList.get("x-forwarded-proto") ?? "http";
   const ownerUrl = `${proto}://${host}/confirmacoes/${row.ownerToken}`;
+
+  // Convert gift categories from DB rows to serialisable data
+  const giftCategories: GiftCategoryData[] = row.giftCategories.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    icon: cat.icon ?? undefined,
+    order: cat.order,
+    items: cat.items.map(
+      (item): GiftItemData => ({
+        id: item.id,
+        categoryId: item.categoryId,
+        name: item.name,
+        imageUrl: item.imageUrl ?? undefined,
+        price: item.price ?? undefined,
+        link: item.link ?? undefined,
+        order: item.order,
+      }),
+    ),
+  }));
 
   // Convert Prisma row to InvitationData shape for the form
   const initialData: InvitationData & { id: string } = {
@@ -100,6 +127,7 @@ export default async function EditInvitationPage({
       invitationId={row.id}
       ownerUrl={ownerUrl}
       themes={themes}
+      initialGiftCategories={giftCategories}
     />
   );
 }

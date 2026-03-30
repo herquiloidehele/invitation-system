@@ -305,7 +305,109 @@ async function main() {
     );
   }
 
-  // ── 3. Migrate existing RSVPs if they exist ───────────────────────────────
+  // ── 3. Seed sample gift categories & items for the first invitation ─────
+  console.log("\nSeeding gift categories & items...");
+
+  // Find the first standard invitation to attach gift data to
+  const firstInvitation = await prisma.invitation.findFirst({
+    where: { slug: "kezia-ruben" },
+  });
+
+  if (firstInvitation) {
+    // Clean existing gift data for idempotency
+    await prisma.giftItem.deleteMany({
+      where: { category: { invitationId: firstInvitation.id } },
+    });
+    await prisma.giftCategory.deleteMany({
+      where: { invitationId: firstInvitation.id },
+    });
+
+    const categories = [
+      {
+        name: "Casa",
+        icon: "Home",
+        order: 0,
+        items: [
+          {
+            name: "Jogo de Toalhas",
+            price: 189.9,
+            link: "https://example.com/toalhas",
+            order: 0,
+          },
+          { name: "Jogo de Cama King", price: 349.9, order: 1 },
+          { name: "Cortinas Blackout", price: 259.9, order: 2 },
+        ],
+      },
+      {
+        name: "Cozinha",
+        icon: "UtensilsCrossed",
+        order: 1,
+        items: [
+          {
+            name: "Panela de Pressão Elétrica",
+            price: 449.9,
+            link: "https://example.com/panela",
+            order: 0,
+          },
+          { name: "Jogo de Facas Profissional", price: 299.9, order: 1 },
+          { name: "Liquidificador", price: 179.9, order: 2 },
+        ],
+      },
+      {
+        name: "Lua de Mel",
+        icon: "Plane",
+        order: 2,
+        items: [
+          { name: "Passeio de Barco", price: 850.0, order: 0 },
+          {
+            name: "Jantar Romântico",
+            price: 520.0,
+            link: "https://example.com/jantar",
+            order: 1,
+          },
+        ],
+      },
+    ];
+
+    for (const cat of categories) {
+      const created = await prisma.giftCategory.create({
+        data: {
+          invitationId: firstInvitation.id,
+          name: cat.name,
+          icon: cat.icon,
+          order: cat.order,
+        },
+      });
+      for (const item of cat.items) {
+        await prisma.giftItem.create({
+          data: {
+            categoryId: created.id,
+            name: item.name,
+            price: item.price,
+            link: (item as { link?: string }).link ?? null,
+            order: item.order,
+          },
+        });
+      }
+      console.log(`  ✓ category: ${cat.name} (${cat.items.length} items)`);
+    }
+
+    // Update the invitation's giftRegistry to enabled
+    await prisma.invitation.update({
+      where: { id: firstInvitation.id },
+      data: {
+        giftRegistry: {
+          enabled: true,
+          text: "A vossa presença é o melhor presente. Se desejarem contribuir, temos uma lista simbólica.",
+          title: "Lista de Presentes",
+        },
+      },
+    });
+  } else {
+    console.log("  ⚠ No invitation found for gift data seeding");
+  }
+
+  // ── 4. Migrate existing RSVPs if they exist ───────────────────────────────
   const rsvpFile = join(process.cwd(), "data", "rsvps.json");
   if (existsSync(rsvpFile)) {
     const rsvpRaw = readFileSync(rsvpFile, "utf-8");

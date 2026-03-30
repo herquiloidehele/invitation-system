@@ -94,8 +94,36 @@ model Invitation {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  rsvpResponses RsvpResponse[]
-  events        InvitationEvent[]
+  rsvpResponses  RsvpResponse[]
+  events         InvitationEvent[]
+  giftCategories GiftCategory[]
+}
+
+model GiftCategory {
+  id           String     @id @default(cuid())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name         String
+  icon         String?    // Lucide icon name (e.g. "Home", "UtensilsCrossed")
+  order        Int        @default(0)
+  items        GiftItem[]
+  createdAt    DateTime   @default(now())
+
+  @@index([invitationId])
+}
+
+model GiftItem {
+  id         String       @id @default(cuid())
+  categoryId String
+  category   GiftCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name       String
+  imageUrl   String?
+  price      Float?
+  link       String?      // External product URL
+  order      Int          @default(0)
+  createdAt  DateTime     @default(now())
+
+  @@index([categoryId])
 }
 
 model InvitationEvent {

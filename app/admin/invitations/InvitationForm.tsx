@@ -17,6 +17,7 @@ import type {
   TextStyle,
   CardSectionKey,
   CardStyle,
+  GiftCategoryData,
 } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ import InvitationPage from "@/components/shared/InvitationPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
+import GiftCatalogFormSection from "@/components/admin/GiftCatalogFormSection";
 import FontPicker from "@/components/admin/FontPicker";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
@@ -342,6 +344,8 @@ interface InvitationFormProps {
   ownerUrl?: string;
   /** All available themes (fetched by the server parent and passed down). */
   themes: TemplateTheme[];
+  /** Initial gift categories + items loaded from DB (edit mode). */
+  initialGiftCategories?: GiftCategoryData[];
 }
 
 export default function InvitationForm({
@@ -350,11 +354,15 @@ export default function InvitationForm({
   invitationId,
   ownerUrl,
   themes,
+  initialGiftCategories,
 }: InvitationFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<InvitationData>(
     initialData ?? getDefaultFormState(themes[0]),
+  );
+  const [giftCategories, setGiftCategories] = useState<GiftCategoryData[]>(
+    initialGiftCategories ?? [],
   );
 
   // Generic updater
@@ -704,6 +712,12 @@ export default function InvitationForm({
       },
     };
   }, [themes, form.template, form.envelope]);
+
+  // Merge gift categories into the form data for the live preview
+  const previewInvitation = useMemo<InvitationData>(
+    () => ({ ...form, giftCategories }),
+    [form, giftCategories],
+  );
 
   // Submit
   async function handleSubmit() {
@@ -1478,6 +1492,19 @@ export default function InvitationForm({
                     {form.giftRegistry.enabled && (
                       <>
                         <div className="space-y-1.5">
+                          <Label htmlFor="giftTitle">
+                            Título da Secção (opcional)
+                          </Label>
+                          <Input
+                            id="giftTitle"
+                            placeholder="Lista de Presentes"
+                            value={form.giftRegistry.title ?? ""}
+                            onChange={(e) =>
+                              updateGiftRegistry("title", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1.5">
                           <Label htmlFor="giftText">
                             Texto da Lista de Presentes
                           </Label>
@@ -1502,6 +1529,14 @@ export default function InvitationForm({
                             }
                           />
                         </div>
+
+                        <Separator />
+
+                        <GiftCatalogFormSection
+                          invitationId={invitationId}
+                          categories={giftCategories}
+                          onCategoriesChange={setGiftCategories}
+                        />
                       </>
                     )}
                   </div>
@@ -1862,6 +1897,8 @@ export default function InvitationForm({
                         ["footerDate", "Data do Rodapé"],
                         ["ctaLabel", "Etiqueta CTA"],
                         ["giftLink", "Link de Presentes"],
+                        ["giftItemName", "Nome do Item (Presentes)"],
+                        ["giftItemPrice", "Preço do Item (Presentes)"],
                         ["locationName", "Nome do Local"],
                         ["locationAddress", "Morada do Local"],
                         ["guideItemLabel", "Etiqueta do Guia"],
@@ -2049,6 +2086,7 @@ export default function InvitationForm({
                         ["schedule", "Programa"],
                         ["dressCode", "Dress Code"],
                         ["giftRegistry", "Presentes"],
+                        ["giftItems", "Itens de Presentes"],
                         ["location", "Localização"],
                         ["guestGuide", "Manual do Convidado"],
                         ["faqs", "Perguntas Frequentes"],
@@ -2211,7 +2249,7 @@ export default function InvitationForm({
             <div className="mx-auto origin-top w-full max-h-165 relative">
               {form.couple.bride && form.couple.groom ? (
                 <InvitationPage
-                  invitation={form}
+                  invitation={previewInvitation}
                   theme={currentTheme}
                   isPreview
                 />

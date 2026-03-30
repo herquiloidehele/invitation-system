@@ -62,6 +62,10 @@ export interface ResolvedTextStyles {
   ctaLabel: CSSProperties;
   /** Gift link text */
   giftLink: CSSProperties;
+  /** Gift item name in the catalog grid */
+  giftItemName: CSSProperties;
+  /** Gift item price in the catalog grid */
+  giftItemPrice: CSSProperties;
   /** Location venue name */
   locationName: CSSProperties;
   /** Location address */
@@ -485,6 +489,27 @@ export function resolveTextStyles(
     el?.giftLink,
   );
 
+  const giftItemName = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      fontWeight: 500,
+      lineHeight: 1.3,
+      color: textPrimary,
+    },
+    el?.giftItemName,
+  );
+
+  const giftItemPrice = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 11,
+      fontWeight: 400,
+      color: textMuted,
+    },
+    el?.giftItemPrice,
+  );
+
   const locationName = applyOverride(
     { fontFamily: bodyFont, fontSize: 16, fontWeight: 600, color: textPrimary },
     el?.locationName ?? el?.bodyText,
@@ -661,6 +686,8 @@ export function resolveTextStyles(
     footerDate,
     ctaLabel,
     giftLink,
+    giftItemName,
+    giftItemPrice,
     locationName,
     locationAddress,
     guideItemLabel,

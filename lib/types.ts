@@ -53,6 +53,26 @@ export interface GiftRegistry {
   enabled: boolean;
   text: string;
   link?: string;
+  /** Custom section title — defaults to "Lista de Presentes". */
+  title?: string;
+}
+
+export interface GiftItemData {
+  id: string;
+  categoryId: string;
+  name: string;
+  imageUrl?: string;
+  price?: number;
+  link?: string;
+  order: number;
+}
+
+export interface GiftCategoryData {
+  id: string;
+  name: string;
+  icon?: string;
+  order: number;
+  items: GiftItemData[];
 }
 
 export interface AudioConfig {
@@ -148,6 +168,7 @@ export type CardSectionKey =
   | "schedule"
   | "dressCode"
   | "giftRegistry"
+  | "giftItems"
   | "location"
   | "guestGuide"
   | "faqs";
@@ -219,6 +240,10 @@ export interface TextStyleOverrides {
     footerDate?: TextStyle;
     ctaLabel?: TextStyle;
     giftLink?: TextStyle;
+    /** Gift item name in the catalog grid */
+    giftItemName?: TextStyle;
+    /** Gift item price in the catalog grid */
+    giftItemPrice?: TextStyle;
     locationName?: TextStyle;
     locationAddress?: TextStyle;
     guideItemLabel?: TextStyle;
@@ -256,6 +281,8 @@ export interface InvitationData {
   schedule: ScheduleEvent[];
   dressCode: DressCode;
   giftRegistry: GiftRegistry;
+  /** Gift categories with items — loaded from the GiftCategory/GiftItem DB relations. */
+  giftCategories?: GiftCategoryData[];
   audio: AudioConfig;
   heroImage: string;
   videoUrl?: string;

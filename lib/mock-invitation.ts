@@ -55,7 +55,87 @@ export const MOCK_INVITATION: InvitationData = {
     enabled: true,
     text: "A vossa presença é o melhor presente. Se desejarem contribuir, temos uma lista simbólica.",
     link: "https://example.com",
+    title: "Lista de Presentes",
   },
+
+  giftCategories: [
+    {
+      id: "cat-casa",
+      name: "Casa",
+      icon: "Home",
+      order: 0,
+      items: [
+        {
+          id: "item-1",
+          categoryId: "cat-casa",
+          name: "Jogo de Toalhas",
+          price: 189.9,
+          link: "https://example.com/toalhas",
+          order: 0,
+        },
+        {
+          id: "item-2",
+          categoryId: "cat-casa",
+          name: "Jogo de Cama King",
+          price: 349.9,
+          order: 1,
+        },
+        {
+          id: "item-3",
+          categoryId: "cat-casa",
+          name: "Cortinas Blackout",
+          price: 259.9,
+          order: 2,
+        },
+      ],
+    },
+    {
+      id: "cat-cozinha",
+      name: "Cozinha",
+      icon: "UtensilsCrossed",
+      order: 1,
+      items: [
+        {
+          id: "item-4",
+          categoryId: "cat-cozinha",
+          name: "Panela de Pressão Elétrica",
+          price: 449.9,
+          link: "https://example.com/panela",
+          order: 0,
+        },
+        {
+          id: "item-5",
+          categoryId: "cat-cozinha",
+          name: "Jogo de Facas Profissional",
+          price: 299.9,
+          order: 1,
+        },
+      ],
+    },
+    {
+      id: "cat-viagem",
+      name: "Lua de Mel",
+      icon: "Plane",
+      order: 2,
+      items: [
+        {
+          id: "item-6",
+          categoryId: "cat-viagem",
+          name: "Passeio de Barco",
+          price: 850.0,
+          order: 0,
+        },
+        {
+          id: "item-7",
+          categoryId: "cat-viagem",
+          name: "Jantar Romântico",
+          price: 520.0,
+          link: "https://example.com/jantar",
+          order: 1,
+        },
+      ],
+    },
+  ],
 
   audio: {
     enabled: false,
