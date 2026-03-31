@@ -1,23 +1,25 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type {
-  InvitationData,
-  TemplateTheme,
-  EnvelopeConfig,
-  GuestGuideItem,
-  SaveDateStyle,
-  SectionImages,
-  ParentsInfo,
-  OurStory,
-  TextStyleOverrides,
-  TextStyle,
   CardSectionKey,
   CardStyle,
+  EnvelopeConfig,
+  GuestGuideItem,
+  InvitationData,
+  LocationInfo,
+  ParentsInfo,
+  SaveDateStyle,
+  SectionImages,
+  TemplateTheme,
+  TextStyle,
+  TextStyleOverrides,
 } from "@/lib/types";
+
+import { Loader2, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,10 +28,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
   Accordion,
@@ -355,6 +357,69 @@ export default function InvitationForm({
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<InvitationData>(
     initialData ?? getDefaultFormState(themes[0]),
+  );
+
+  // Google Maps link auto-fill state
+  const [mapsLink1, setMapsLink1] = useState("");
+  const [mapsLink2, setMapsLink2] = useState("");
+  const [resolvingLoc1, setResolvingLoc1] = useState(false);
+  const [resolvingLoc2, setResolvingLoc2] = useState(false);
+
+  /**
+   * Resolve a Google Maps link and auto-fill location fields.
+   * @param link - The Google Maps link (short or full)
+   * @param target - Which location to fill ("location" or "location2")
+   */
+  const resolveLocationFromLink = useCallback(
+    async (link: string, target: "location" | "location2") => {
+      const trimmed = link.trim();
+      if (!trimmed) {
+        toast.error("Cole um link do Google Maps primeiro.");
+        return;
+      }
+
+      const setResolving =
+        target === "location" ? setResolvingLoc1 : setResolvingLoc2;
+      setResolving(true);
+
+      try {
+        const res = await fetch("/api/admin/resolve-location", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: trimmed }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          toast.error(data.error || "Erro ao resolver o link.");
+          return;
+        }
+
+        // Auto-fill location fields (preserve imageUrl since it's uploaded separately)
+        setForm((prev) => {
+          const existing =
+            target === "location" ? prev.location : prev.location2;
+          const updated: LocationInfo = {
+            name: data.name || existing?.name || "",
+            address: data.address || existing?.address || "",
+            googleMapsUrl: data.googleMapsUrl || existing?.googleMapsUrl || "",
+            wazeUrl: data.wazeUrl || existing?.wazeUrl || "",
+            latitude: data.latitude ?? existing?.latitude,
+            longitude: data.longitude ?? existing?.longitude,
+            imageUrl: existing?.imageUrl || "",
+          };
+          return { ...prev, [target]: updated };
+        });
+
+        toast.success("Localização preenchida com sucesso!");
+      } catch {
+        toast.error("Erro de rede ao resolver o link. Tente novamente.");
+      } finally {
+        setResolving(false);
+      }
+    },
+    [],
   );
 
   // Generic updater
@@ -1351,6 +1416,48 @@ export default function InvitationForm({
                   Localização
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
+                  {/* ── Auto-fill from Google Maps link ── */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">
+                      Preencher automaticamente via Google Maps
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={mapsLink1}
+                        onChange={(e) => setMapsLink1(e.target.value)}
+                        placeholder="Cole o link do Google Maps aqui..."
+                        className="flex-1 text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            resolveLocationFromLink(mapsLink1, "location");
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={resolvingLoc1 || !mapsLink1.trim()}
+                        onClick={() =>
+                          resolveLocationFromLink(mapsLink1, "location")
+                        }
+                        className="shrink-0"
+                      >
+                        {resolvingLoc1 ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <MapPin className="h-4 w-4" />
+                        )}
+                        <span className="ml-1.5">
+                          {resolvingLoc1 ? "A buscar..." : "Buscar"}
+                        </span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   <div className="space-y-1.5">
                     <Label htmlFor="locName">Nome do Local</Label>
                     <Input
@@ -1467,6 +1574,49 @@ export default function InvitationForm({
                           Remover
                         </Button>
                       </div>
+
+                      {/* ── Auto-fill from Google Maps link (Location 2) ── */}
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">
+                          Preencher automaticamente via Google Maps
+                        </Label>
+                        <div className="flex gap-2">
+                          <Input
+                            value={mapsLink2}
+                            onChange={(e) => setMapsLink2(e.target.value)}
+                            placeholder="Cole o link do Google Maps aqui..."
+                            className="flex-1 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                resolveLocationFromLink(mapsLink2, "location2");
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            disabled={resolvingLoc2 || !mapsLink2.trim()}
+                            onClick={() =>
+                              resolveLocationFromLink(mapsLink2, "location2")
+                            }
+                            className="shrink-0"
+                          >
+                            {resolvingLoc2 ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <MapPin className="h-4 w-4" />
+                            )}
+                            <span className="ml-1.5">
+                              {resolvingLoc2 ? "A buscar..." : "Buscar"}
+                            </span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      <Separator />
+
                       <div className="space-y-1.5">
                         <Label htmlFor="loc2Name">Nome do Local</Label>
                         <Input
