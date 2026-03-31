@@ -609,6 +609,7 @@ export default function ExternalInvitationForm({
               onOpen={() => {}}
               monogram={form.couple.monogram || "A&B"}
               shimmer={form.envelope?.shimmer !== false}
+              imageSettings={form.imageSettings}
             />
           )}
         </div>

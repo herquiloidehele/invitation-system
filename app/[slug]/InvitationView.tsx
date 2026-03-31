@@ -271,6 +271,7 @@ export default function InvitationView({
               onAnimationComplete={handleAnimationComplete}
               monogram={invitation.couple.monogram}
               shimmer={invitation.envelope?.shimmer !== false}
+              imageSettings={invitation.imageSettings}
             />
           )}
         </AnimatePresence>

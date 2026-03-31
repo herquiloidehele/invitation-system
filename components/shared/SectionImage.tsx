@@ -1,7 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { TemplateTheme } from "@/lib/types";
+import type {
+  ImageSettingsKey,
+  ImageSettingsMap,
+  TemplateTheme,
+} from "@/lib/types";
+import { getImageStyle } from "@/lib/image-settings";
 
 // ---------------------------------------------------------------------------
 // Full-bleed section image with gradient fades blending into the theme bg
@@ -12,12 +17,18 @@ export default function SectionImage({
   theme,
   height = 300,
   hiddeBottom,
+  imageSettings,
+  imageKey,
 }: {
   src: string;
   theme: TemplateTheme;
   height?: number;
   hiddeBottom?: boolean;
+  imageSettings?: ImageSettingsMap;
+  imageKey?: ImageSettingsKey;
 }) {
+  const imgStyle = imageKey ? getImageStyle(imageSettings, imageKey) : {};
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -41,6 +52,7 @@ export default function SectionImage({
           objectFit: "cover",
           display: "block",
           opacity: 0.85,
+          ...imgStyle,
         }}
       />
       {/* Top gradient — strong fade into bg */}

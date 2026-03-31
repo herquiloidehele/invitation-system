@@ -6,9 +6,15 @@ import { motion } from "framer-motion";
 import { ExternalLink, MapPin } from "lucide-react";
 import Image from "next/image";
 
-import type { LocationInfo, TemplateTheme } from "@/lib/types";
+import type {
+  ImageSettingsKey,
+  ImageSettingsMap,
+  LocationInfo,
+  TemplateTheme,
+} from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { getImageStyle } from "@/lib/image-settings";
 
 // Dynamically import the map with ssr: false to prevent Leaflet from being
 // evaluated on the server (Leaflet requires `window`, which doesn't exist in SSR)
@@ -57,6 +63,10 @@ export interface LocationCardProps {
   /** Per-section card border override. Falls back to theme.cardBorder. */
   cardBorder?: string;
   onMapsClick?: () => void;
+  /** Per-image position & zoom overrides map. */
+  imageSettings?: ImageSettingsMap;
+  /** Which image key to use for this location. */
+  imageKey?: ImageSettingsKey;
 }
 
 export default function LocationCard({
@@ -66,6 +76,8 @@ export default function LocationCard({
   cardBg,
   cardBorder,
   onMapsClick,
+  imageSettings,
+  imageKey,
 }: LocationCardProps) {
   const effectiveCardBg = cardBg || theme.cardBg;
   const effectiveCardBorder = cardBorder || theme.cardBorder;
@@ -90,13 +102,19 @@ export default function LocationCard({
     >
       {/* Venue image — shown only if imageUrl is provided */}
       {location.imageUrl && (
-        <div className="relative w-full" style={{ height: 180 }}>
+        <div
+          className="relative w-full overflow-hidden"
+          style={{ height: 180 }}
+        >
           <Image
             src={location.imageUrl}
             alt={location.name}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 480px"
+            style={
+              imageKey ? getImageStyle(imageSettings, imageKey) : undefined
+            }
           />
         </div>
       )}

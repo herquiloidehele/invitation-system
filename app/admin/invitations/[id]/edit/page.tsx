@@ -5,6 +5,7 @@ import { getThemes } from "@/lib/themes";
 import type {
   InvitationData,
   InvitationType,
+  ImageSettingsMap,
   ParentsInfo,
   SaveDateStyle,
   SectionImages,
@@ -75,6 +76,8 @@ export default async function EditInvitationPage({
       (row.textStyles as unknown as TextStyleOverrides | null) ?? undefined,
     cardStyles:
       (row.cardStyles as unknown as CardStyleOverrides | null) ?? undefined,
+    imageSettings:
+      (row.imageSettings as unknown as ImageSettingsMap | null) ?? undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
   };

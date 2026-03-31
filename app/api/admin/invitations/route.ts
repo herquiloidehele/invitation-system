@@ -133,6 +133,7 @@ export async function POST(request: NextRequest) {
         externalLink: body.externalLink ?? null,
         textStyles: sanitizeJsonField(body.textStyles, null),
         cardStyles: sanitizeJsonField(body.cardStyles, null),
+        imageSettings: sanitizeJsonField(body.imageSettings, null),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

@@ -2,7 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import type { TemplateTheme } from "@/lib/types";
+import type { ImageSettingsMap, TemplateTheme } from "@/lib/types";
+import { getImageStyle } from "@/lib/image-settings";
 import Image from "next/image";
 
 /* ------------------------------------------------------------------ */
@@ -18,6 +19,8 @@ interface EnvelopeCoverProps {
   shimmer?: boolean;
   /** Monogram text displayed on the envelope (passed through but unused in this component). */
   monogram?: string;
+  /** Per-image position & zoom overrides map. */
+  imageSettings?: ImageSettingsMap;
 }
 
 /* ------------------------------------------------------------------ */
@@ -83,10 +86,12 @@ function TopFlap({
   opening,
   image,
   baseColor,
+  imgStyle,
 }: {
   opening: boolean;
   image: string;
   baseColor: string;
+  imgStyle?: React.CSSProperties;
 }) {
   const shadow = shadowColorFromBase(baseColor);
 
@@ -124,12 +129,20 @@ function TopFlap({
         height={500}
         alt={"Top Envelop Flap"}
         className={"w-full h-full object-cover object-bottom"}
+        style={imgStyle}
       />
     </motion.div>
   );
 }
 
-function BottomFlap({ image }: { opening: boolean; image: string }) {
+function BottomFlap({
+  image,
+  imgStyle,
+}: {
+  opening: boolean;
+  image: string;
+  imgStyle?: React.CSSProperties;
+}) {
   return (
     <div
       className="absolute bottom-0 left-0 w-full origin-top"
@@ -141,6 +154,7 @@ function BottomFlap({ image }: { opening: boolean; image: string }) {
         height={500}
         alt={"Top Envelop Flap"}
         className={"w-full h-full object-cover object-top"}
+        style={imgStyle}
       />
     </div>
   );
@@ -155,6 +169,7 @@ export default function EnvelopeCover({
   onOpen,
   onAnimationComplete,
   shimmer = true,
+  imageSettings,
 }: EnvelopeCoverProps) {
   const [opening, setOpening] = useState(false);
 
@@ -166,6 +181,9 @@ export default function EnvelopeCover({
       setTimeout(onAnimationComplete, TOTAL_MS);
     }
   }, [opening, onOpen, onAnimationComplete]);
+
+  const topFlapStyle = getImageStyle(imageSettings, "envelopeTopFlap");
+  const bottomFlapStyle = getImageStyle(imageSettings, "envelopeBottomFlap");
 
   return (
     <motion.div
@@ -201,8 +219,13 @@ export default function EnvelopeCover({
         opening={opening}
         image={theme.envelope.topFlap}
         baseColor={theme.envelope.base}
+        imgStyle={topFlapStyle}
       />
-      <BottomFlap opening={opening} image={theme.envelope.bottomFlap} />
+      <BottomFlap
+        opening={opening}
+        image={theme.envelope.bottomFlap}
+        imgStyle={bottomFlapStyle}
+      />
 
       {/* Slow opacity fade covering the last phase of the animation.
           This is the actual "scene fade" — it makes the envelope gradually

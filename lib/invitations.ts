@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import type {
   CardStyleOverrides,
+  ImageSettingsMap,
   InvitationData,
   InvitationType,
   LocationInfo,
@@ -44,6 +45,7 @@ type InvitationWithTheme = {
   externalLink: string | null;
   textStyles: unknown;
   cardStyles: unknown;
+  imageSettings: unknown;
 };
 
 function toInvitationData(row: InvitationWithTheme): InvitationData {
@@ -75,6 +77,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     externalLink: row.externalLink ?? undefined,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
+    imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
   };
 }
 

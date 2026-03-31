@@ -178,6 +178,9 @@ export async function PUT(
         ...(body.cardStyles !== undefined && {
           cardStyles: sanitizeJsonField(body.cardStyles, null),
         }),
+        ...(body.imageSettings !== undefined && {
+          imageSettings: sanitizeJsonField(body.imageSettings, null),
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

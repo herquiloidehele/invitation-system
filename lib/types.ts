@@ -96,6 +96,43 @@ export interface SectionImages {
   image4?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Image position & zoom settings
+// ---------------------------------------------------------------------------
+
+/** Position and zoom settings for a single image. */
+export interface ImageSettings {
+  /** Horizontal focal-point position as a percentage (0–100). 50 = centred. */
+  positionX: number;
+  /** Vertical focal-point position as a percentage (0–100). 50 = centred. */
+  positionY: number;
+  /** Zoom / scale factor. 1 = no zoom (default), up to 2.5. */
+  zoom: number;
+}
+
+/** Default settings used when no override is stored. */
+export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
+  positionX: 50,
+  positionY: 50,
+  zoom: 1,
+};
+
+/** Identifiers for every image slot that supports position/zoom. */
+export type ImageSettingsKey =
+  | "heroImage"
+  | "sectionImage1"
+  | "sectionImage2"
+  | "sectionImage3"
+  | "sectionImage4"
+  | "cinematicImage"
+  | "locationImage1"
+  | "locationImage2"
+  | "envelopeTopFlap"
+  | "envelopeBottomFlap";
+
+/** Map of image-slot key → position/zoom settings. */
+export type ImageSettingsMap = Partial<Record<ImageSettingsKey, ImageSettings>>;
+
 export interface EnvelopeConfig {
   /** Override the envelope body fill color (hex). Falls back to theme default if empty. */
   base?: string;
@@ -284,6 +321,8 @@ export interface InvitationData {
   invitationType: InvitationType;
   /** External URL for the iframe page (external_link type). */
   externalLink?: string;
+  /** Per-image position & zoom overrides. Missing keys use the default (centred, zoom 1). */
+  imageSettings?: ImageSettingsMap;
 }
 
 export interface TemplateTheme {

@@ -9,6 +9,8 @@ import type {
   CardStyle,
   EnvelopeConfig,
   GuestGuideItem,
+  ImageSettings,
+  ImageSettingsKey,
   InvitationData,
   LocationInfo,
   ParentsInfo,
@@ -18,6 +20,7 @@ import type {
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
+import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 
 import { ExternalLink, Loader2, MapPin } from "lucide-react";
 
@@ -51,6 +54,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
+import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import FontPicker from "@/components/admin/FontPicker";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
@@ -336,6 +340,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     },
     invitationType: "standard",
     externalLink: "",
+    imageSettings: {},
   };
 }
 
@@ -702,6 +707,24 @@ export default function InvitationForm({
       }));
     },
     [],
+  );
+
+  // Image position/zoom settings
+  const updateImageSettings = useCallback(
+    (key: ImageSettingsKey, settings: ImageSettings) => {
+      setForm((prev) => ({
+        ...prev,
+        imageSettings: { ...prev.imageSettings, [key]: settings },
+      }));
+    },
+    [],
+  );
+
+  /** Read the current settings for a given image key, falling back to defaults. */
+  const imgSettings = useCallback(
+    (key: ImageSettingsKey): ImageSettings =>
+      form.imageSettings?.[key] ?? DEFAULT_IMAGE_SETTINGS,
+    [form.imageSettings],
   );
 
   // Parents info
@@ -1096,6 +1119,15 @@ export default function InvitationForm({
                       kind="image"
                       maxSizeMB={5}
                     />
+                    {(form.envelope?.topFlap ?? "") && (
+                      <ImagePositionEditor
+                        src={form.envelope!.topFlap!}
+                        settings={imgSettings("envelopeTopFlap")}
+                        onChange={(s) =>
+                          updateImageSettings("envelopeTopFlap", s)
+                        }
+                      />
+                    )}
                   </div>
 
                   <Separator />
@@ -1114,6 +1146,15 @@ export default function InvitationForm({
                       kind="image"
                       maxSizeMB={5}
                     />
+                    {(form.envelope?.bottomFlap ?? "") && (
+                      <ImagePositionEditor
+                        src={form.envelope!.bottomFlap!}
+                        settings={imgSettings("envelopeBottomFlap")}
+                        onChange={(s) =>
+                          updateImageSettings("envelopeBottomFlap", s)
+                        }
+                      />
+                    )}
                   </div>
 
                   <Separator />
@@ -1178,6 +1219,13 @@ export default function InvitationForm({
                       onUpload={(url) => update("heroImage", url)}
                       onClear={() => update("heroImage", "")}
                     />
+                    {form.heroImage && (
+                      <ImagePositionEditor
+                        src={form.heroImage}
+                        settings={imgSettings("heroImage")}
+                        onChange={(s) => updateImageSettings("heroImage", s)}
+                      />
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label>Vídeo (opcional)</Label>
@@ -1205,6 +1253,15 @@ export default function InvitationForm({
                       onUpload={(url) => updateSectionImage("image1", url)}
                       onClear={() => updateSectionImage("image1", undefined)}
                     />
+                    {form.sectionImages?.image1 && (
+                      <ImagePositionEditor
+                        src={form.sectionImages.image1}
+                        settings={imgSettings("sectionImage1")}
+                        onChange={(s) =>
+                          updateImageSettings("sectionImage1", s)
+                        }
+                      />
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label>
@@ -1220,6 +1277,15 @@ export default function InvitationForm({
                       onUpload={(url) => updateSectionImage("image2", url)}
                       onClear={() => updateSectionImage("image2", undefined)}
                     />
+                    {form.sectionImages?.image2 && (
+                      <ImagePositionEditor
+                        src={form.sectionImages.image2}
+                        settings={imgSettings("sectionImage2")}
+                        onChange={(s) =>
+                          updateImageSettings("sectionImage2", s)
+                        }
+                      />
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label>
@@ -1235,6 +1301,15 @@ export default function InvitationForm({
                       onUpload={(url) => updateSectionImage("image3", url)}
                       onClear={() => updateSectionImage("image3", undefined)}
                     />
+                    {form.sectionImages?.image3 && (
+                      <ImagePositionEditor
+                        src={form.sectionImages.image3}
+                        settings={imgSettings("sectionImage3")}
+                        onChange={(s) =>
+                          updateImageSettings("sectionImage3", s)
+                        }
+                      />
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label>
@@ -1250,6 +1325,15 @@ export default function InvitationForm({
                       onUpload={(url) => updateSectionImage("image4", url)}
                       onClear={() => updateSectionImage("image4", undefined)}
                     />
+                    {form.sectionImages?.image4 && (
+                      <ImagePositionEditor
+                        src={form.sectionImages.image4}
+                        settings={imgSettings("sectionImage4")}
+                        onChange={(s) =>
+                          updateImageSettings("sectionImage4", s)
+                        }
+                      />
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -1408,6 +1492,15 @@ export default function InvitationForm({
                         onUpload={(url) => update("cinematicImageUrl", url)}
                         onClear={() => update("cinematicImageUrl", "")}
                       />
+                      {form.cinematicImageUrl && (
+                        <ImagePositionEditor
+                          src={form.cinematicImageUrl}
+                          settings={imgSettings("cinematicImage")}
+                          onChange={(s) =>
+                            updateImageSettings("cinematicImage", s)
+                          }
+                        />
+                      )}
                     </div>
                   )}
                 </AccordionContent>
@@ -1550,6 +1643,15 @@ export default function InvitationForm({
                       onUpload={(url) => updateLocation("imageUrl", url)}
                       onClear={() => updateLocation("imageUrl", "")}
                     />
+                    {form.location.imageUrl && (
+                      <ImagePositionEditor
+                        src={form.location.imageUrl}
+                        settings={imgSettings("locationImage1")}
+                        onChange={(s) =>
+                          updateImageSettings("locationImage1", s)
+                        }
+                      />
+                    )}
                   </div>
 
                   {/* ── Second Location (optional) ── */}
@@ -1711,6 +1813,15 @@ export default function InvitationForm({
                           onUpload={(url) => updateLocation2("imageUrl", url)}
                           onClear={() => updateLocation2("imageUrl", "")}
                         />
+                        {form.location2.imageUrl && (
+                          <ImagePositionEditor
+                            src={form.location2.imageUrl}
+                            settings={imgSettings("locationImage2")}
+                            onChange={(s) =>
+                              updateImageSettings("locationImage2", s)
+                            }
+                          />
+                        )}
                       </div>
                     </div>
                   )}
@@ -2525,6 +2636,7 @@ export default function InvitationForm({
                   onOpen={() => {}}
                   monogram={form.couple.monogram}
                   shimmer={form.envelope?.shimmer !== false}
+                  imageSettings={form.imageSettings}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">

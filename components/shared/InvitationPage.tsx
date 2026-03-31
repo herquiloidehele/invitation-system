@@ -17,6 +17,7 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
+import { getImageStyle } from "@/lib/image-settings";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
@@ -448,6 +449,7 @@ export default function InvitationPage({
             src={invitation.heroImage}
             alt="Hero"
             className="h-full w-full object-cover"
+            style={getImageStyle(invitation.imageSettings, "heroImage")}
           />
         )}
 
@@ -830,6 +832,7 @@ export default function InvitationPage({
           cardBorder={cs("saveTheDate").cardBorder}
           onCalendarClick={handleCalendarClick}
           isPreview={isPreview}
+          imageSettings={invitation.imageSettings}
         />
       </AnimatedSection>
 
@@ -837,7 +840,12 @@ export default function InvitationPage({
       {/* IMAGE 1 — after Save the Date info                                */}
       {/* ================================================================= */}
       {invitation.sectionImages?.image1 && (
-        <SectionImage src={invitation.sectionImages.image1} theme={theme} />
+        <SectionImage
+          src={invitation.sectionImages.image1}
+          theme={theme}
+          imageSettings={invitation.imageSettings}
+          imageKey="sectionImage1"
+        />
       )}
 
       <SectionDivider theme={theme} />
@@ -989,7 +997,12 @@ export default function InvitationPage({
       {/* IMAGE 2 — between schedule and info cards                         */}
       {/* ================================================================= */}
       {invitation.sectionImages?.image2 && (
-        <SectionImage src={invitation.sectionImages.image2} theme={theme} />
+        <SectionImage
+          src={invitation.sectionImages.image2}
+          theme={theme}
+          imageSettings={invitation.imageSettings}
+          imageKey="sectionImage2"
+        />
       )}
 
       <SectionDivider theme={theme} />
@@ -1023,6 +1036,8 @@ export default function InvitationPage({
           cardBg={cs("location").cardBg}
           cardBorder={cs("location").cardBorder}
           onMapsClick={handleMapsClick}
+          imageSettings={invitation.imageSettings}
+          imageKey="locationImage1"
         />
 
         {/* Second location card (optional) */}
@@ -1035,6 +1050,8 @@ export default function InvitationPage({
               cardBg={cs("location").cardBg}
               cardBorder={cs("location").cardBorder}
               onMapsClick={handleMapsClick}
+              imageSettings={invitation.imageSettings}
+              imageKey="locationImage2"
             />
           </div>
         )}
@@ -1044,7 +1061,12 @@ export default function InvitationPage({
       {/* IMAGE 3 — between location and guest guide / FAQs                 */}
       {/* ================================================================= */}
       {invitation.sectionImages?.image3 && (
-        <SectionImage src={invitation.sectionImages.image3} theme={theme} />
+        <SectionImage
+          src={invitation.sectionImages.image3}
+          theme={theme}
+          imageSettings={invitation.imageSettings}
+          imageKey="sectionImage3"
+        />
       )}
 
       {/* ================================================================= */}
@@ -1345,6 +1367,8 @@ export default function InvitationPage({
           theme={theme}
           height={300}
           hiddeBottom
+          imageSettings={invitation.imageSettings}
+          imageKey="sectionImage4"
         />
       )}
 

@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import type { InvitationData, SaveDateStyle, TemplateTheme } from "@/lib/types";
+import type {
+  ImageSettingsMap,
+  InvitationData,
+  SaveDateStyle,
+  TemplateTheme,
+} from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
+import { getImageStyle } from "@/lib/image-settings";
 import CalendarButton from "./CalendarButton";
 
 // ---------------------------------------------------------------------------
@@ -26,6 +32,8 @@ export interface SaveTheDateProps {
   cardBorder?: string;
   onCalendarClick?: () => void;
   isPreview?: boolean;
+  /** Per-image position & zoom overrides map. */
+  imageSettings?: ImageSettingsMap;
 }
 
 // ---------------------------------------------------------------------------
@@ -571,9 +579,11 @@ function SaveTheDateCinematic({
   theme,
   ts,
   onCalendarClick,
+  imageSettings,
 }: SaveTheDateProps) {
   const bgImage =
     invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
+  const cinematicImgStyle = getImageStyle(imageSettings, "cinematicImage");
 
   return (
     <div
@@ -601,6 +611,18 @@ function SaveTheDateCinematic({
             backgroundImage: `url(${bgImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
+            ...(cinematicImgStyle.objectPosition
+              ? {
+                  backgroundPosition: cinematicImgStyle.objectPosition,
+                  ...(cinematicImgStyle.transform
+                    ? {
+                        transform: cinematicImgStyle.transform,
+                        transformOrigin:
+                          cinematicImgStyle.transformOrigin as string,
+                      }
+                    : {}),
+                }
+              : {}),
           }}
         />
 
@@ -948,6 +970,7 @@ export default function SaveTheDateSection({
   cardBorder,
   onCalendarClick,
   isPreview,
+  imageSettings,
 }: SaveTheDateProps) {
   // Merge per-section card overrides into theme so all variants pick them up
   const theme = {
@@ -986,6 +1009,7 @@ export default function SaveTheDateSection({
           ts={ts}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
+          imageSettings={imageSettings}
         />
       );
     case "minimal-line":
