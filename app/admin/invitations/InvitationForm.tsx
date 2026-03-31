@@ -19,7 +19,7 @@ import type {
   TextStyleOverrides,
 } from "@/lib/types";
 
-import { Loader2, MapPin } from "lucide-react";
+import { ExternalLink, Loader2, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
@@ -2486,7 +2492,27 @@ export default function InvitationForm({
               </TabsTrigger>
             </TabsList>
             <span className="text-xs text-muted-foreground shrink-0">
-              {currentTheme.label}
+              {form.slug ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <a
+                          href={`/${form.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors"
+                        />
+                      }
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>Ver convite público</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <ExternalLink className="h-4 w-4 opacity-40" />
+              )}
             </span>
           </div>
 
