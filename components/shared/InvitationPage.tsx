@@ -1131,6 +1131,7 @@ export default function InvitationPage({
                     fontSize: 13,
                     fontWeight: 500,
                     color: ts.textPrimary,
+                    whiteSpace: "pre-line",
                   }}
                 >
                   {invitation.giftRegistry.text}
