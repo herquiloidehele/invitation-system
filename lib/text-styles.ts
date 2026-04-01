@@ -60,6 +60,8 @@ export interface ResolvedTextStyles {
   footerDate: CSSProperties;
   /** CTA section label ("Confirme sua presença") */
   ctaLabel: CSSProperties;
+  /** Gift registry body text */
+  giftText: CSSProperties;
   /** Gift link text */
   giftLink: CSSProperties;
   /** Location venue name */
@@ -472,6 +474,16 @@ export function resolveTextStyles(
     el?.ctaLabel ?? el?.sectionTitles,
   );
 
+  const giftText = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      fontWeight: 500,
+      color: textPrimary,
+    },
+    el?.giftText ?? el?.bodyText,
+  );
+
   const giftLink = applyOverride(
     {
       fontFamily: uiFont,
@@ -660,6 +672,7 @@ export function resolveTextStyles(
     footerMonogram,
     footerDate,
     ctaLabel,
+    giftText,
     giftLink,
     locationName,
     locationAddress,

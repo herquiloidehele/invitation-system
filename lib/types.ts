@@ -256,6 +256,7 @@ export interface TextStyleOverrides {
     footerDate?: TextStyle;
     ctaLabel?: TextStyle;
     giftLink?: TextStyle;
+    giftText?: TextStyle;
     locationName?: TextStyle;
     locationAddress?: TextStyle;
     guideItemLabel?: TextStyle;

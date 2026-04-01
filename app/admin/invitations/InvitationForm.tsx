@@ -2284,6 +2284,7 @@ export default function InvitationForm({
                         ["footerDate", "Data do Rodapé"],
                         ["ctaLabel", "Etiqueta CTA"],
                         ["giftLink", "Link de Presentes"],
+                        ["giftText", "Texto de Presentes"],
                         ["locationName", "Nome do Local"],
                         ["locationAddress", "Morada do Local"],
                         ["guideItemLabel", "Etiqueta do Guia"],

@@ -775,7 +775,14 @@ export default function InvitationPage({
             ) : (
               /* ── Standard Mode (image hero) ── */
               <>
-                <span style={ts.inviteLabel}>Convidam para o casamento de</span>
+                <p
+                  style={{
+                    ...ts.quote,
+                    maxWidth: 300,
+                  }}
+                >
+                  {invitation.quote}
+                </p>
 
                 <h1 className="mt-5" style={ts.coupleNames}>
                   {invitation.couple.bride}
@@ -802,14 +809,9 @@ export default function InvitationPage({
                   }}
                 />
 
-                <p
-                  style={{
-                    ...ts.quote,
-                    maxWidth: 300,
-                  }}
-                >
-                  {invitation.quote}
-                </p>
+                <span style={ts.inviteLabel}>
+                  Convidam para o seu casamento
+                </span>
               </>
             )}
           </div>
@@ -1149,10 +1151,7 @@ export default function InvitationPage({
                 <span style={ts.labels}>Presentes</span>
                 <span
                   style={{
-                    fontFamily: ts.bodyFont,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: ts.textPrimary,
+                    ...ts.giftText,
                     whiteSpace: "pre-line",
                   }}
                 >
