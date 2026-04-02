@@ -11,48 +11,6 @@ import {
 import type { TextStyle, TextStyleOverrides } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
-// Labels for each text element key (Portuguese)
-// ---------------------------------------------------------------------------
-
-export const TEXT_ELEMENT_LABELS: Record<string, string> = {
-  coupleNames: "Nomes do Casal",
-  ampersand: "& (e comercial)",
-  quote: "Citação",
-  sectionTitles: "Títulos de Secção",
-  bodyText: "Texto do Corpo",
-  labels: "Etiquetas",
-  inviteLabel: "Etiqueta do Convite",
-  dateDay: "Data — Dia",
-  dateMonth: "Data — Mês",
-  dateYear: "Data — Ano",
-  dateTime: "Data — Hora",
-  faqQuestion: "Pergunta FAQ",
-  faqAnswer: "Resposta FAQ",
-  blessingMessage: "Mensagem de Bênção",
-  parentsNames: "Nomes dos Pais",
-  inviteMessage: "Mensagem do Convite",
-  footerMonogram: "Monograma do Rodapé",
-  footerDate: "Data do Rodapé",
-  ctaLabel: "Etiqueta CTA",
-  giftLink: "Link de Presentes",
-  giftText: "Texto de Presentes",
-  locationName: "Nome do Local",
-  locationAddress: "Morada do Local",
-  guideItemLabel: "Etiqueta do Guia",
-  guideScriptTitle: "Título do Guia",
-  saveLabel: "Save the Date — Título",
-  calendarCta: "Adicionar ao Calendário",
-  countdownValue: "Contagem — Número",
-  countdownLabel: "Contagem — Etiqueta",
-  countdownDate: "Contagem — Data",
-  countdownWeekday: "Contagem — Dia/Hora",
-  accentLine: "Linha Decorativa",
-  scheduleTime: "Programa — Hora",
-  scheduleLabel: "Programa — Descrição",
-  scheduleVenue: "Programa — Local",
-};
-
-// ---------------------------------------------------------------------------
 // Context
 // ---------------------------------------------------------------------------
 

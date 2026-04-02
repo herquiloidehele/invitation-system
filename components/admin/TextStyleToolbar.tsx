@@ -7,10 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  TEXT_ELEMENT_LABELS,
-  useInlineTextEdit,
-} from "@/components/shared/EditableText";
+import { useInlineTextEdit } from "@/components/shared/EditableText";
 import FontPicker from "@/components/admin/FontPicker";
 import { extractFamilyName } from "@/lib/google-fonts";
 import { useDynamicFont } from "@/hooks/useDynamicFont";
@@ -141,7 +138,6 @@ export default function TextStyleToolbar() {
 
   const elementKey = ctx.selectedElement as ElementKey;
   const overrides: TextStyle = ctx.getOverrides(elementKey) ?? {};
-  const label = TEXT_ELEMENT_LABELS[elementKey] ?? elementKey;
 
   // ---- Handlers ---------------------------------------------------------
   const set = (field: keyof TextStyle, value: string | number | undefined) => {
@@ -161,11 +157,6 @@ export default function TextStyleToolbar() {
       }}
       className="flex items-center gap-1.5 rounded-lg border bg-popover px-2 py-1.5 shadow-xl"
     >
-      {/* Element label */}
-      <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap pr-1 border-r mr-0.5">
-        {label}
-      </span>
-
       {/* Font picker — compact trigger */}
       <ToolbarFontPicker
         value={overrides.fontFamily ?? ""}
