@@ -15,6 +15,7 @@ import type {
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { getImageStyle } from "@/lib/image-settings";
+import { EditableText } from "./EditableText";
 
 // Dynamically import the map with ssr: false to prevent Leaflet from being
 // evaluated on the server (Leaflet requires `window`, which doesn't exist in SSR)
@@ -121,29 +122,33 @@ export default function LocationCard({
 
       {/* Venue name + address */}
       <div className="flex flex-col gap-1 px-5 pb-3">
-        <span
-          style={{
-            fontFamily: ts?.bodyFont ?? theme.bodyFont,
-            fontSize: 16,
-            fontWeight: 600,
-            color: ts?.textPrimary ?? theme.textPrimary,
-            ...(ts?.locationName ?? {}),
-          }}
-        >
-          {location.name}
-        </span>
-        <span
-          style={{
-            fontFamily: ts?.uiFont ?? theme.uiFont,
-            fontSize: 14,
-            fontWeight: 400,
-            color: ts?.textSecondary ?? theme.textSecondary,
-            lineHeight: 1.5,
-            ...(ts?.locationAddress ?? {}),
-          }}
-        >
-          {location.address}
-        </span>
+        <EditableText elementKey="locationName">
+          <span
+            style={{
+              fontFamily: ts?.bodyFont ?? theme.bodyFont,
+              fontSize: 16,
+              fontWeight: 600,
+              color: ts?.textPrimary ?? theme.textPrimary,
+              ...(ts?.locationName ?? {}),
+            }}
+          >
+            {location.name}
+          </span>
+        </EditableText>
+        <EditableText elementKey="locationAddress">
+          <span
+            style={{
+              fontFamily: ts?.uiFont ?? theme.uiFont,
+              fontSize: 14,
+              fontWeight: 400,
+              color: ts?.textSecondary ?? theme.textSecondary,
+              lineHeight: 1.5,
+              ...(ts?.locationAddress ?? {}),
+            }}
+          >
+            {location.address}
+          </span>
+        </EditableText>
       </div>
 
       {/* Map preview */}

@@ -11,6 +11,7 @@ import type {
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import CalendarButton from "./CalendarButton";
+import { EditableText } from "./EditableText";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -61,7 +62,11 @@ function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
 }
 
 function SaveLabel({ ts }: { ts: ResolvedTextStyles }) {
-  return <span style={ts.saveLabel}>Save the Date</span>;
+  return (
+    <span style={ts.saveLabel}>
+      <EditableText elementKey="saveLabel">Save the Date</EditableText>
+    </span>
+  );
 }
 
 function CalendarCTA({
@@ -81,7 +86,11 @@ function CalendarCTA({
       onCalendarClick={onCalendarClick}
       className="mt-5 flex items-center justify-center gap-2 px-5 py-2 transition-all"
     >
-      <span style={ts.calendarCta}>+ Adicionar ao Calendário</span>
+      <span style={ts.calendarCta}>
+        <EditableText elementKey="calendarCta">
+          + Adicionar ao Calendário
+        </EditableText>
+      </span>
     </CalendarButton>
   );
 }
@@ -113,24 +122,30 @@ function SaveTheDateClassic({
 
       {/* Day — oversized */}
       <span className="mt-3" style={ts.dateDay}>
-        {invitation.date.day}
+        <EditableText elementKey="dateDay">{invitation.date.day}</EditableText>
       </span>
 
       {/* Month */}
       <span className="mt-1" style={ts.dateMonth}>
-        {invitation.date.month}
+        <EditableText elementKey="dateMonth">
+          {invitation.date.month}
+        </EditableText>
       </span>
 
       {/* Year */}
       <span className="mt-1" style={ts.dateYear}>
-        {invitation.date.year}
+        <EditableText elementKey="dateYear">
+          {invitation.date.year}
+        </EditableText>
       </span>
 
       <AccentLine ts={ts} />
 
       {/* Day of week + time */}
       <span style={ts.dateTime}>
-        {invitation.date.dayOfWeek} &middot; {invitation.date.time}
+        <EditableText elementKey="dateTime">
+          {invitation.date.dayOfWeek} &middot; {invitation.date.time}
+        </EditableText>
       </span>
 
       <CalendarCTA
@@ -260,10 +275,14 @@ function CountdownUnit({
             textAlign: "center",
           }}
         >
-          {String(value).padStart(2, "0")}
+          <EditableText elementKey="countdownValue">
+            {String(value).padStart(2, "0")}
+          </EditableText>
         </span>
       </div>
-      <span style={ts.countdownLabel}>{label}</span>
+      <span style={ts.countdownLabel}>
+        <EditableText elementKey="countdownLabel">{label}</EditableText>
+      </span>
     </div>
   );
 }
@@ -308,7 +327,10 @@ function SaveTheDateCountdown({
 
       {/* Date context */}
       <span className="mt-3" style={ts.countdownDate}>
-        {invitation.date.day} · {invitation.date.month} · {invitation.date.year}
+        <EditableText elementKey="countdownDate">
+          {invitation.date.day} · {invitation.date.month} ·{" "}
+          {invitation.date.year}
+        </EditableText>
       </span>
 
       <span
@@ -317,7 +339,9 @@ function SaveTheDateCountdown({
           marginTop: 2,
         }}
       >
-        {invitation.date.dayOfWeek} &middot; {invitation.date.time}
+        <EditableText elementKey="countdownWeekday">
+          {invitation.date.dayOfWeek} &middot; {invitation.date.time}
+        </EditableText>
       </span>
 
       <AccentLine ts={ts} />

@@ -22,7 +22,7 @@ import type {
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 
-import { ExternalLink, Loader2, MapPin } from "lucide-react";
+import { ExternalLink, Loader2, MapPin, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +57,8 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import FontPicker from "@/components/admin/FontPicker";
+import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
+import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
 // ---------------------------------------------------------------------------
@@ -2175,281 +2177,6 @@ export default function InvitationForm({
                 onRemoveItem={removeGuideItem}
               />
 
-              {/* ── Personalização de Texto ── */}
-              <AccordionItem
-                value="text-styles"
-                className="border rounded-lg px-4"
-              >
-                <AccordionTrigger className="text-sm font-medium">
-                  Personalização de Texto
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 pb-4">
-                  {/* Info */}
-                  <p className="text-xs text-muted-foreground">
-                    Ajustes finos por elemento de texto. Campos vazios usam os
-                    padrões do modelo.
-                  </p>
-
-                  {/* ── Section title font role override ── */}
-                  <FontPicker
-                    label="Fonte de Títulos de Secção"
-                    value={form.textStyles?.fonts?.sectionTitle ?? ""}
-                    onChange={(v) => updateTextStyleFont("sectionTitle", v)}
-                    optional
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1">
-                      <Label className="text-xs">
-                        Tamanho Títulos de Secção (px)
-                      </Label>
-                      <Input
-                        type="number"
-                        min={6}
-                        max={100}
-                        value={form.textStyles?.sectionTitleFontSize ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value
-                            ? Number(e.target.value)
-                            : undefined;
-                          setForm((prev) => {
-                            const ts = { ...prev.textStyles };
-                            return {
-                              ...prev,
-                              textStyles: {
-                                ...ts,
-                                sectionTitleFontSize: val,
-                              },
-                            };
-                          });
-                        }}
-                        placeholder="Auto"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Peso Títulos de Secção</Label>
-                      <Select
-                        value={
-                          form.textStyles?.sectionTitleFontWeight != null
-                            ? String(form.textStyles.sectionTitleFontWeight)
-                            : ""
-                        }
-                        onValueChange={(v) => {
-                          setForm((prev) => {
-                            const ts = { ...prev.textStyles };
-                            return {
-                              ...prev,
-                              textStyles: {
-                                ...ts,
-                                sectionTitleFontWeight: v || undefined,
-                              },
-                            };
-                          });
-                        }}
-                      >
-                        <SelectTrigger className="h-8 text-xs">
-                          <SelectValue placeholder="Auto" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="300">Light</SelectItem>
-                          <SelectItem value="400">Regular</SelectItem>
-                          <SelectItem value="500">Medium</SelectItem>
-                          <SelectItem value="600">Semibold</SelectItem>
-                          <SelectItem value="700">Bold</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {/* ── Element-specific overrides ── */}
-                  <Accordion className="space-y-1">
-                    {(
-                      [
-                        ["coupleNames", "Nomes do Casal"],
-                        ["ampersand", "& (e comercial)"],
-                        ["quote", "Citação"],
-                        ["sectionTitles", "Títulos de Secção"],
-                        ["bodyText", "Texto do Corpo"],
-                        ["labels", "Etiquetas"],
-                        ["inviteLabel", "Etiqueta do Convite"],
-                        ["dateDay", "Data — Dia"],
-                        ["dateMonth", "Data — Mês"],
-                        ["dateYear", "Data — Ano"],
-                        ["dateTime", "Data — Hora"],
-                        ["faqQuestion", "Pergunta FAQ"],
-                        ["faqAnswer", "Resposta FAQ"],
-                        ["blessingMessage", "Mensagem de Bênção"],
-                        ["parentsNames", "Nomes dos Pais"],
-                        ["inviteMessage", "Mensagem do Convite"],
-                        ["footerMonogram", "Monograma do Rodapé"],
-                        ["footerDate", "Data do Rodapé"],
-                        ["ctaLabel", "Etiqueta CTA"],
-                        ["giftLink", "Link de Presentes"],
-                        ["giftText", "Texto de Presentes"],
-                        ["locationName", "Nome do Local"],
-                        ["locationAddress", "Morada do Local"],
-                        ["guideItemLabel", "Etiqueta do Guia"],
-                        ["guideScriptTitle", "Título do Guia"],
-                        ["saveLabel", "Save the Date — Título"],
-                        ["calendarCta", "Adicionar ao Calendário"],
-                        ["countdownValue", "Contagem — Número"],
-                        ["countdownLabel", "Contagem — Etiqueta"],
-                        ["countdownDate", "Contagem — Data"],
-                        ["countdownWeekday", "Contagem — Dia/Hora"],
-                        ["accentLine", "Linha Decorativa"],
-                        ["scheduleTime", "Programa — Hora"],
-                        ["scheduleLabel", "Programa — Descrição"],
-                        ["scheduleVenue", "Programa — Local"],
-                      ] as const
-                    ).map(([element, label]) => {
-                      const el = form.textStyles?.elements?.[element];
-                      const hasOverride =
-                        el && Object.values(el).some((v) => v !== undefined);
-                      return (
-                        <AccordionItem
-                          key={element}
-                          value={`el-${element}`}
-                          className="border rounded px-3"
-                        >
-                          <AccordionTrigger className="text-xs py-2">
-                            <span className="flex items-center gap-2">
-                              {label}
-                              {hasOverride && (
-                                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
-                              )}
-                            </span>
-                          </AccordionTrigger>
-                          <AccordionContent className="space-y-2 pb-3">
-                            <FontPicker
-                              label="Fonte"
-                              value={el?.fontFamily ?? ""}
-                              onChange={(v) =>
-                                updateTextStyleElement(element, "fontFamily", v)
-                              }
-                              optional
-                            />
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="space-y-1">
-                                <Label className="text-xs">Tamanho (px)</Label>
-                                <Input
-                                  type="number"
-                                  min={8}
-                                  max={200}
-                                  value={el?.fontSize ?? ""}
-                                  onChange={(e) =>
-                                    updateTextStyleElement(
-                                      element,
-                                      "fontSize",
-                                      e.target.value
-                                        ? Number(e.target.value)
-                                        : undefined,
-                                    )
-                                  }
-                                  placeholder="Auto"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <Label className="text-xs">Peso</Label>
-                                <Select
-                                  value={
-                                    el?.fontWeight != null
-                                      ? String(el.fontWeight)
-                                      : ""
-                                  }
-                                  onValueChange={(v) =>
-                                    updateTextStyleElement(
-                                      element,
-                                      "fontWeight",
-                                      v || undefined,
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger className="h-8 text-xs">
-                                    <SelectValue placeholder="Auto" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="300">Light</SelectItem>
-                                    <SelectItem value="400">Regular</SelectItem>
-                                    <SelectItem value="500">Medium</SelectItem>
-                                    <SelectItem value="600">
-                                      Semibold
-                                    </SelectItem>
-                                    <SelectItem value="700">Bold</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="space-y-1">
-                                <Label className="text-xs">Cor</Label>
-                                <div className="flex items-center gap-1.5">
-                                  <input
-                                    type="color"
-                                    value={el?.color || "#000000"}
-                                    onChange={(e) =>
-                                      updateTextStyleElement(
-                                        element,
-                                        "color",
-                                        e.target.value,
-                                      )
-                                    }
-                                    className="h-8 w-8 rounded border cursor-pointer shrink-0"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={el?.color ?? ""}
-                                    onChange={(e) =>
-                                      updateTextStyleElement(
-                                        element,
-                                        "color",
-                                        e.target.value,
-                                      )
-                                    }
-                                    placeholder="Auto"
-                                    className="font-mono text-xs h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <Label className="text-xs">Espaçamento</Label>
-                                <Input
-                                  type="number"
-                                  step={0.1}
-                                  value={el?.letterSpacing ?? ""}
-                                  onChange={(e) =>
-                                    updateTextStyleElement(
-                                      element,
-                                      "letterSpacing",
-                                      e.target.value
-                                        ? Number(e.target.value)
-                                        : undefined,
-                                    )
-                                  }
-                                  placeholder="Auto"
-                                  className="h-8 text-xs"
-                                />
-                              </div>
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      );
-                    })}
-                  </Accordion>
-
-                  {/* Reset all overrides */}
-                  {form.textStyles &&
-                    Object.keys(form.textStyles).length > 0 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-destructive"
-                        onClick={clearTextStyles}
-                      >
-                        Repor Todas as Personalizações de Texto
-                      </Button>
-                    )}
-                </AccordionContent>
-              </AccordionItem>
-
               {/* ── Card Styles per section ── */}
               <AccordionItem
                 value="card-styles"
@@ -2603,29 +2330,49 @@ export default function InvitationForm({
                 Convite
               </TabsTrigger>
             </TabsList>
-            <span className="text-xs text-muted-foreground shrink-0">
-              {form.slug ? (
+            <div className="flex items-center gap-1">
+              {form.textStyles && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger
                       render={
-                        <a
-                          href={`/${form.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors"
+                        <button
+                          type="button"
+                          onClick={clearTextStyles}
+                          className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                         />
                       }
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <RotateCcw className="h-3.5 w-3.5" />
                     </TooltipTrigger>
-                    <TooltipContent>Ver convite público</TooltipContent>
+                    <TooltipContent>Resetar estilos de texto</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              ) : (
-                <ExternalLink className="h-4 w-4 opacity-40" />
               )}
-            </span>
+              <span className="text-xs text-muted-foreground shrink-0">
+                {form.slug ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <a
+                            href={`/${form.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors"
+                          />
+                        }
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </TooltipTrigger>
+                      <TooltipContent>Ver convite público</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <ExternalLink className="h-4 w-4 opacity-40" />
+                )}
+              </span>
+            </div>
           </div>
 
           {/* ── Tab: Envelope preview ── */}
@@ -2652,19 +2399,25 @@ export default function InvitationForm({
             value="invite"
             className="flex-1 overflow-auto m-0 bg-neutral-100"
           >
-            <div className="mx-auto origin-top w-full max-h-165 relative">
-              {form.couple.bride && form.couple.groom ? (
-                <InvitationPage
-                  invitation={form}
-                  theme={currentTheme}
-                  isPreview
-                />
-              ) : (
-                <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
-                  Insira os nomes do casal para ver a pré-visualização
-                </div>
-              )}
-            </div>
+            <InlineTextEditProvider
+              updateTextStyleElement={updateTextStyleElement}
+              textStyles={form.textStyles}
+            >
+              <TextStyleToolbar />
+              <div className="mx-auto origin-top w-full max-h-165 relative">
+                {form.couple.bride && form.couple.groom ? (
+                  <InvitationPage
+                    invitation={form}
+                    theme={currentTheme}
+                    isPreview
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
+                    Insira os nomes do casal para ver a pré-visualização
+                  </div>
+                )}
+              </div>
+            </InlineTextEditProvider>
           </TabsContent>
         </Tabs>
       </div>

@@ -11,6 +11,7 @@ import {
 import { sanitizeAndNormalizeSvg } from "@/lib/svg-icons";
 import type { GuestGuide, GuestGuideItem, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
+import { EditableText } from "./EditableText";
 
 // ---------------------------------------------------------------------------
 // Animation constants — kept local, only what this section needs
@@ -167,18 +168,20 @@ function GuideItemCard({
         <GuideIcon item={item} size={22} color={theme.accent} />
       </div>
 
-      <span
-        style={{
-          fontFamily: ts?.bodyFont ?? theme.bodyFont,
-          fontSize: 12,
-          fontWeight: 500,
-          color: ts?.textPrimary ?? theme.textPrimary,
-          lineHeight: 1.4,
-          ...(ts?.guideItemLabel ?? {}),
-        }}
-      >
-        {item.label}
-      </span>
+      <EditableText elementKey="guideItemLabel">
+        <span
+          style={{
+            fontFamily: ts?.bodyFont ?? theme.bodyFont,
+            fontSize: 12,
+            fontWeight: 500,
+            color: ts?.textPrimary ?? theme.textPrimary,
+            lineHeight: 1.4,
+            ...(ts?.guideItemLabel ?? {}),
+          }}
+        >
+          {item.label}
+        </span>
+      </EditableText>
     </motion.div>
   );
 }

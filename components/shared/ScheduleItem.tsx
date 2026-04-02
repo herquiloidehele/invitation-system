@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ScheduleEvent, TemplateTheme } from "@/lib/types";
+import { EditableText } from "./EditableText";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -89,7 +90,9 @@ export default function ScheduleItem(props: ScheduleItemProps) {
     >
       {/* Time column */}
       <div className="w-[60px] shrink-0 text-center" style={timeStyle}>
-        <span className="leading-tight">{time}</span>
+        <EditableText elementKey="scheduleTime">
+          <span className="leading-tight">{time}</span>
+        </EditableText>
       </div>
 
       {/* Vertical divider */}
@@ -104,16 +107,20 @@ export default function ScheduleItem(props: ScheduleItemProps) {
 
       {/* Event info */}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span
-          className="uppercase tracking-wide"
-          style={{
-            ...labelStyle,
-            fontVariantCaps: "all-small-caps",
-          }}
-        >
-          {label}
-        </span>
-        <span style={venueStyle}>{venue}</span>
+        <EditableText elementKey="scheduleLabel">
+          <span
+            className="uppercase tracking-wide"
+            style={{
+              ...labelStyle,
+              fontVariantCaps: "all-small-caps",
+            }}
+          >
+            {label}
+          </span>
+        </EditableText>
+        <EditableText elementKey="scheduleVenue">
+          <span style={venueStyle}>{venue}</span>
+        </EditableText>
       </div>
     </motion.div>
   );

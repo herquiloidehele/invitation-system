@@ -27,6 +27,7 @@ import SaveTheDateSection from "./SaveTheDateSection";
 import SectionImage from "./SectionImage";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
+import { EditableText } from "./EditableText";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
@@ -255,7 +256,7 @@ function FAQAccordionItem({
             transition: "color 0.3s ease",
           }}
         >
-          {faq.question}
+          <EditableText elementKey="faqQuestion">{faq.question}</EditableText>
         </span>
 
         {/* Chevron */}
@@ -296,7 +297,7 @@ function FAQAccordionItem({
                   margin: 0,
                 }}
               >
-                {faq.answer}
+                <EditableText elementKey="faqAnswer">{faq.answer}</EditableText>
               </p>
             </div>
           </motion.div>
@@ -395,7 +396,7 @@ export default function InvitationPage({
       }}
     >
       {/* Load any non-builtin Google Fonts used by this theme */}
-      <DynamicFontLoader theme={theme} />
+      <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
 
       {/* ================================================================= */}
       {/* Atmospheric grain overlay                                         */}
@@ -490,7 +491,9 @@ export default function InvitationPage({
               <>
                 {/* Couple names */}
                 <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
-                  {invitation.couple.bride}
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.bride}
+                  </EditableText>
                 </motion.h1>
 
                 <motion.span
@@ -498,11 +501,13 @@ export default function InvitationPage({
                   className="my-2"
                   style={ts.ampersandVideo}
                 >
-                  &amp;
+                  <EditableText elementKey="ampersand">&amp;</EditableText>
                 </motion.span>
 
                 <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
-                  {invitation.couple.groom}
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.groom}
+                  </EditableText>
                 </motion.h1>
 
                 {/* Blessing message */}
@@ -511,7 +516,9 @@ export default function InvitationPage({
                   className="mt-5"
                   style={ts.blessingMessageVideo}
                 >
-                  {invitation.parents.blessingMessage}
+                  <EditableText elementKey="blessingMessage">
+                    {invitation.parents.blessingMessage}
+                  </EditableText>
                 </motion.span>
 
                 {/* Parents names — two columns */}
@@ -525,12 +532,16 @@ export default function InvitationPage({
                   >
                     {invitation.parents.bridesFather && (
                       <span style={ts.parentsNamesVideo}>
-                        {invitation.parents.bridesFather}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.bridesFather}
+                        </EditableText>
                       </span>
                     )}
                     {invitation.parents.bridesMother && (
                       <span style={ts.parentsNamesVideo}>
-                        {invitation.parents.bridesMother}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.bridesMother}
+                        </EditableText>
                       </span>
                     )}
                   </div>
@@ -540,12 +551,16 @@ export default function InvitationPage({
                   >
                     {invitation.parents.groomsFather && (
                       <span style={ts.parentsNamesVideo}>
-                        {invitation.parents.groomsFather}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.groomsFather}
+                        </EditableText>
                       </span>
                     )}
                     {invitation.parents.groomsMother && (
                       <span style={ts.parentsNamesVideo}>
-                        {invitation.parents.groomsMother}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.groomsMother}
+                        </EditableText>
                       </span>
                     )}
                   </div>
@@ -561,7 +576,9 @@ export default function InvitationPage({
                     textAlign: "center",
                   }}
                 >
-                  {invitation.parents.inviteMessage}
+                  <EditableText elementKey="inviteMessage">
+                    {invitation.parents.inviteMessage}
+                  </EditableText>
                 </motion.p>
               </>
             ) : (
@@ -572,7 +589,9 @@ export default function InvitationPage({
                   variants={heroTextItem}
                   style={ts.inviteLabelVideo}
                 >
-                  Convidam para o casamento de
+                  <EditableText elementKey="inviteLabel">
+                    Convidam para o casamento de
+                  </EditableText>
                 </motion.span>
 
                 {/* Bride */}
@@ -581,7 +600,9 @@ export default function InvitationPage({
                   className="mt-5"
                   style={ts.coupleNamesVideo}
                 >
-                  {invitation.couple.bride}
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.bride}
+                  </EditableText>
                 </motion.h1>
 
                 {/* Ampersand */}
@@ -590,12 +611,14 @@ export default function InvitationPage({
                   className="my-2"
                   style={ts.ampersandVideo}
                 >
-                  &amp;
+                  <EditableText elementKey="ampersand">&amp;</EditableText>
                 </motion.span>
 
                 {/* Groom */}
                 <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
-                  {invitation.couple.groom}
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.groom}
+                  </EditableText>
                 </motion.h1>
 
                 {/* Date pill */}
@@ -634,7 +657,9 @@ export default function InvitationPage({
                     maxWidth: 280,
                   }}
                 >
-                  {invitation.quote}
+                  <EditableText elementKey="quote">
+                    {invitation.quote}
+                  </EditableText>
                 </motion.p>
               </>
             )}
@@ -670,14 +695,20 @@ export default function InvitationPage({
               <>
                 {/* Couple names */}
                 <h1 className="mt-2" style={ts.coupleNames}>
-                  {invitation.couple.bride}
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.bride}
+                  </EditableText>
                 </h1>
 
                 <span className="my-2" style={ts.ampersand}>
-                  &amp;
+                  <EditableText elementKey="ampersand">&amp;</EditableText>
                 </span>
 
-                <h1 style={ts.coupleNames}>{invitation.couple.groom}</h1>
+                <h1 style={ts.coupleNames}>
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.groom}
+                  </EditableText>
+                </h1>
 
                 {/* Decorative accent line */}
                 <motion.div
@@ -696,7 +727,9 @@ export default function InvitationPage({
 
                 {/* Blessing message */}
                 <p style={ts.blessingMessage}>
-                  {invitation.parents.blessingMessage}
+                  <EditableText elementKey="blessingMessage">
+                    {invitation.parents.blessingMessage}
+                  </EditableText>
                 </p>
 
                 {/* Parents names — two columns */}
@@ -709,7 +742,9 @@ export default function InvitationPage({
                           textAlign: "left",
                         }}
                       >
-                        {invitation.parents.bridesFather}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.bridesFather}
+                        </EditableText>
                       </span>
                     )}
                     {invitation.parents.bridesMother && (
@@ -719,7 +754,9 @@ export default function InvitationPage({
                           textAlign: "left",
                         }}
                       >
-                        {invitation.parents.bridesMother}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.bridesMother}
+                        </EditableText>
                       </span>
                     )}
                   </div>
@@ -731,7 +768,9 @@ export default function InvitationPage({
                           textAlign: "right",
                         }}
                       >
-                        {invitation.parents.groomsFather}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.groomsFather}
+                        </EditableText>
                       </span>
                     )}
                     {invitation.parents.groomsMother && (
@@ -741,7 +780,9 @@ export default function InvitationPage({
                           textAlign: "right",
                         }}
                       >
-                        {invitation.parents.groomsMother}
+                        <EditableText elementKey="parentsNames">
+                          {invitation.parents.groomsMother}
+                        </EditableText>
                       </span>
                     )}
                   </div>
@@ -769,7 +810,9 @@ export default function InvitationPage({
                     maxWidth: 300,
                   }}
                 >
-                  {invitation.parents.inviteMessage}
+                  <EditableText elementKey="inviteMessage">
+                    {invitation.parents.inviteMessage}
+                  </EditableText>
                 </p>
               </>
             ) : (
@@ -781,18 +824,26 @@ export default function InvitationPage({
                     maxWidth: 300,
                   }}
                 >
-                  {invitation.quote}
+                  <EditableText elementKey="quote">
+                    {invitation.quote}
+                  </EditableText>
                 </p>
 
                 <h1 className="mt-5" style={ts.coupleNames}>
-                  {invitation.couple.bride}
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.bride}
+                  </EditableText>
                 </h1>
 
                 <span className="my-2" style={ts.ampersand}>
-                  &amp;
+                  <EditableText elementKey="ampersand">&amp;</EditableText>
                 </span>
 
-                <h1 style={ts.coupleNames}>{invitation.couple.groom}</h1>
+                <h1 style={ts.coupleNames}>
+                  <EditableText elementKey="coupleNames">
+                    {invitation.couple.groom}
+                  </EditableText>
+                </h1>
 
                 {/* Decorative accent line */}
                 <motion.div
@@ -810,7 +861,9 @@ export default function InvitationPage({
                 />
 
                 <span style={ts.inviteLabel}>
-                  Convidam para o seu casamento
+                  <EditableText elementKey="inviteLabel">
+                    Convidam para o seu casamento
+                  </EditableText>
                 </span>
               </>
             )}
@@ -860,7 +913,9 @@ export default function InvitationPage({
           <AnimatedSection className="px-6 pb-2" isPreview={isPreview}>
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
-                {invitation.ourStory.title || "Nossa História"}
+                <EditableText elementKey="sectionTitles">
+                  {invitation.ourStory.title || "Nossa História"}
+                </EditableText>
               </span>
 
               <motion.div
@@ -911,7 +966,9 @@ export default function InvitationPage({
                     whiteSpace: "pre-line",
                   }}
                 >
-                  {invitation.ourStory.description}
+                  <EditableText elementKey="bodyText">
+                    {invitation.ourStory.description}
+                  </EditableText>
                 </p>
               </div>
             </div>
@@ -928,7 +985,11 @@ export default function InvitationPage({
         <>
           <AnimatedSection className="px-6 pb-2" isPreview={isPreview}>
             <div className="flex flex-col items-center">
-              <span style={ts.sectionTitles}>Programação</span>
+              <span style={ts.sectionTitles}>
+                <EditableText elementKey="sectionTitles">
+                  Programação
+                </EditableText>
+              </span>
 
               <motion.div
                 className="mt-3 mb-6"
@@ -1014,7 +1075,9 @@ export default function InvitationPage({
       {/* ================================================================= */}
       <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
-          <span style={ts.sectionTitles}>Localização</span>
+          <span style={ts.sectionTitles}>
+            <EditableText elementKey="sectionTitles">Localização</EditableText>
+          </span>
 
           <motion.div
             className="mt-3 mb-6"
@@ -1107,7 +1170,9 @@ export default function InvitationPage({
                 >
                   <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
                 </div>
-                <span style={ts.labels}>Dress Code</span>
+                <span style={ts.labels}>
+                  <EditableText elementKey="labels">Dress Code</EditableText>
+                </span>
                 <span
                   style={{
                     fontFamily: ts.bodyFont,
@@ -1116,7 +1181,9 @@ export default function InvitationPage({
                     color: ts.textPrimary,
                   }}
                 >
-                  {invitation.dressCode.text}
+                  <EditableText elementKey="bodyText">
+                    {invitation.dressCode.text}
+                  </EditableText>
                 </span>
               </motion.div>
             )}
@@ -1148,14 +1215,18 @@ export default function InvitationPage({
                 >
                   <Gift size={20} color={ts.accent} strokeWidth={1.5} />
                 </div>
-                <span style={ts.labels}>Presentes</span>
+                <span style={ts.labels}>
+                  <EditableText elementKey="labels">Presentes</EditableText>
+                </span>
                 <span
                   style={{
                     ...ts.giftText,
                     whiteSpace: "pre-line",
                   }}
                 >
-                  {invitation.giftRegistry.text}
+                  <EditableText elementKey="giftText">
+                    {invitation.giftRegistry.text}
+                  </EditableText>
                 </span>
                 {invitation.giftRegistry.link && (
                   <motion.a
@@ -1168,7 +1239,7 @@ export default function InvitationPage({
                     whileHover={{ scale: 1.02 }}
                   >
                     <ExternalLink size={10} strokeWidth={1.5} />
-                    Ver lista
+                    <EditableText elementKey="giftLink">Ver lista</EditableText>
                   </motion.a>
                 )}
               </motion.div>
@@ -1186,8 +1257,10 @@ export default function InvitationPage({
             <SectionDivider theme={theme} />
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles} className={"text-center"}>
-                Manual do <br />
-                Bom Convidado
+                <EditableText elementKey="sectionTitles">
+                  Manual do <br />
+                  Bom Convidado
+                </EditableText>
               </span>
 
               <motion.div
@@ -1227,7 +1300,11 @@ export default function InvitationPage({
 
           <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
             <div className="flex flex-col items-center">
-              <span style={ts.sectionTitles}>Perguntas Frequentes</span>
+              <span style={ts.sectionTitles}>
+                <EditableText elementKey="sectionTitles">
+                  Perguntas Frequentes
+                </EditableText>
+              </span>
 
               <motion.div
                 className="mt-3 mb-6"
@@ -1284,7 +1361,9 @@ export default function InvitationPage({
       <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
           <span className="mb-6" style={ts.ctaLabel}>
-            Confirme sua presença
+            <EditableText elementKey="ctaLabel">
+              Confirme sua presença
+            </EditableText>
           </span>
         </div>
 
@@ -1346,13 +1425,19 @@ export default function InvitationPage({
                 opacity: 0.5,
               }}
             />
-            <span style={ts.footerMonogram}>{invitation.couple.monogram}</span>
+            <span style={ts.footerMonogram}>
+              <EditableText elementKey="footerMonogram">
+                {invitation.couple.monogram}
+              </EditableText>
+            </span>
           </div>
 
           {/* Date */}
           <span className="mt-4" style={ts.footerDate}>
-            {invitation.date.day} &middot; {invitation.date.month} &middot;{" "}
-            {invitation.date.year}
+            <EditableText elementKey="footerDate">
+              {invitation.date.day} &middot; {invitation.date.month} &middot;{" "}
+              {invitation.date.year}
+            </EditableText>
           </span>
         </footer>
       </AnimatedSection>
