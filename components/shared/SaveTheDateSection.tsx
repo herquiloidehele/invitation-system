@@ -31,6 +31,8 @@ export interface SaveTheDateProps {
   cardBg?: string;
   /** Per-section card border override. Falls back to theme.cardBorder. */
   cardBorder?: string;
+  /** Per-section card border-radius override. Falls back to per-variant default. */
+  cardBorderRadius?: number;
   onCalendarClick?: () => void;
   isPreview?: boolean;
   /** Per-image position & zoom overrides map. */
@@ -103,6 +105,7 @@ function SaveTheDateClassic({
   invitation,
   theme,
   ts,
+  cardBorderRadius,
   onCalendarClick,
 }: SaveTheDateProps) {
   return (
@@ -112,7 +115,7 @@ function SaveTheDateClassic({
         background: theme.cardBg,
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        borderRadius: 20,
+        borderRadius: cardBorderRadius ?? 20,
         padding: "36px 28px",
         boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
         border: `1px solid ${theme.cardBorder}`,
@@ -291,6 +294,7 @@ function SaveTheDateCountdown({
   invitation,
   theme,
   ts,
+  cardBorderRadius,
   onCalendarClick,
 }: SaveTheDateProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
@@ -317,7 +321,7 @@ function SaveTheDateCountdown({
         background: theme.cardBg,
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        borderRadius: 20,
+        borderRadius: cardBorderRadius ?? 20,
         padding: "32px 24px",
         boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
         border: `1px solid ${theme.cardBorder}`,
@@ -512,6 +516,7 @@ function SaveTheDateQuadCards({
   invitation,
   theme,
   ts,
+  cardBorderRadius,
   onCalendarClick,
 }: SaveTheDateProps) {
   return (
@@ -602,6 +607,7 @@ function SaveTheDateCinematic({
   invitation,
   theme,
   ts,
+  cardBorderRadius,
   onCalendarClick,
   imageSettings,
 }: SaveTheDateProps) {
@@ -613,7 +619,7 @@ function SaveTheDateCinematic({
     <div
       className="relative flex flex-col items-center overflow-hidden"
       style={{
-        borderRadius: 20,
+        borderRadius: cardBorderRadius ?? 20,
         border: `1px solid ${theme.cardBorder}`,
         boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.08)",
       }}
@@ -847,6 +853,7 @@ function SaveTheDateCinematic({
 function SaveTheDateMinimalLine({
   invitation,
   ts,
+  cardBorderRadius: _cardBorderRadius,
   onCalendarClick,
 }: SaveTheDateProps) {
   return (
@@ -992,6 +999,7 @@ export default function SaveTheDateSection({
   ts,
   cardBg,
   cardBorder,
+  cardBorderRadius,
   onCalendarClick,
   isPreview,
   imageSettings,
@@ -1011,6 +1019,7 @@ export default function SaveTheDateSection({
           invitation={invitation}
           theme={theme}
           ts={ts}
+          cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />
@@ -1021,6 +1030,7 @@ export default function SaveTheDateSection({
           invitation={invitation}
           theme={theme}
           ts={ts}
+          cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />
@@ -1031,6 +1041,7 @@ export default function SaveTheDateSection({
           invitation={invitation}
           theme={theme}
           ts={ts}
+          cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
           imageSettings={imageSettings}
@@ -1042,6 +1053,7 @@ export default function SaveTheDateSection({
           invitation={invitation}
           theme={theme}
           ts={ts}
+          cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />
@@ -1053,6 +1065,7 @@ export default function SaveTheDateSection({
           invitation={invitation}
           theme={theme}
           ts={ts}
+          cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
         />

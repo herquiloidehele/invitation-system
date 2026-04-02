@@ -176,6 +176,8 @@ export interface CardStyle {
   cardBg?: string;
   /** Border color (e.g. "rgba(201,169,98,0.08)"). Falls back to theme.cardBorder. */
   cardBorder?: string;
+  /** Border radius in px (e.g. 20). Falls back to per-component default. */
+  borderRadius?: number;
 }
 
 /** Identifiers for each card section whose background can be individually overridden. */

@@ -63,6 +63,8 @@ export interface LocationCardProps {
   cardBg?: string;
   /** Per-section card border override. Falls back to theme.cardBorder. */
   cardBorder?: string;
+  /** Per-section card border-radius override. Falls back to 16. */
+  cardBorderRadius?: number;
   onMapsClick?: () => void;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
@@ -76,6 +78,7 @@ export default function LocationCard({
   ts,
   cardBg,
   cardBorder,
+  cardBorderRadius,
   onMapsClick,
   imageSettings,
   imageKey,
@@ -96,7 +99,7 @@ export default function LocationCard({
         background: effectiveCardBg,
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
-        borderRadius: 16,
+        borderRadius: cardBorderRadius ?? 16,
         boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
         border: `1px solid ${effectiveCardBorder}`,
       }}

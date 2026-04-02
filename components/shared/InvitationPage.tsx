@@ -28,6 +28,7 @@ import SectionImage from "./SectionImage";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
 import { EditableText } from "./EditableText";
+import { EditableCard } from "./EditableCard";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
@@ -379,11 +380,13 @@ export default function InvitationPage({
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
 
-  /** Resolve card bg/border for a given section, falling back to theme defaults. */
-  const cs = (section: CardSectionKey) => ({
+  /** Resolve card bg/border/borderRadius for a given section, falling back to theme defaults. */
+  const cs = (section: CardSectionKey, defaultRadius: number) => ({
     cardBg: invitation.cardStyles?.[section]?.cardBg || theme.cardBg,
     cardBorder:
       invitation.cardStyles?.[section]?.cardBorder || theme.cardBorder,
+    borderRadius:
+      invitation.cardStyles?.[section]?.borderRadius ?? defaultRadius,
   });
 
   return (
@@ -881,16 +884,19 @@ export default function InvitationPage({
         variants={scaleIn}
         isPreview={isPreview}
       >
-        <SaveTheDateSection
-          invitation={invitation}
-          theme={theme}
-          ts={ts}
-          cardBg={cs("saveTheDate").cardBg}
-          cardBorder={cs("saveTheDate").cardBorder}
-          onCalendarClick={handleCalendarClick}
-          isPreview={isPreview}
-          imageSettings={invitation.imageSettings}
-        />
+        <EditableCard sectionKey="saveTheDate">
+          <SaveTheDateSection
+            invitation={invitation}
+            theme={theme}
+            ts={ts}
+            cardBg={cs("saveTheDate", 20).cardBg}
+            cardBorder={cs("saveTheDate", 20).cardBorder}
+            cardBorderRadius={cs("saveTheDate", 20).borderRadius}
+            onCalendarClick={handleCalendarClick}
+            isPreview={isPreview}
+            imageSettings={invitation.imageSettings}
+          />
+        </EditableCard>
       </AnimatedSection>
 
       {/* ================================================================= */}
@@ -937,43 +943,45 @@ export default function InvitationPage({
           </AnimatedSection>
 
           <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
-            <div
-              style={{
-                background: cs("ourStory").cardBg,
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                borderRadius: 20,
-                overflow: "hidden",
-                padding: "28px 24px",
-                boxShadow:
-                  "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                border: `1px solid ${cs("ourStory").cardBorder}`,
-              }}
-            >
-              <div className="flex flex-col items-center gap-4">
-                {/* Decorative heart icon */}
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full"
-                  style={{ background: `${ts.accent}12` }}
-                >
-                  <Heart size={20} color={ts.accent} strokeWidth={1.5} />
-                </div>
+            <EditableCard sectionKey="ourStory">
+              <div
+                style={{
+                  background: cs("ourStory", 20).cardBg,
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  borderRadius: cs("ourStory", 20).borderRadius,
+                  overflow: "hidden",
+                  padding: "28px 24px",
+                  boxShadow:
+                    "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+                  border: `1px solid ${cs("ourStory", 20).cardBorder}`,
+                }}
+              >
+                <div className="flex flex-col items-center gap-4">
+                  {/* Decorative heart icon */}
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-full"
+                    style={{ background: `${ts.accent}12` }}
+                  >
+                    <Heart size={20} color={ts.accent} strokeWidth={1.5} />
+                  </div>
 
-                {/* Story text */}
-                <p
-                  style={{
-                    ...ts.bodyText,
-                    textAlign: "center",
-                    margin: 0,
-                    whiteSpace: "pre-line",
-                  }}
-                >
-                  <EditableText elementKey="bodyText">
-                    {invitation.ourStory.description}
-                  </EditableText>
-                </p>
+                  {/* Story text */}
+                  <p
+                    style={{
+                      ...ts.bodyText,
+                      textAlign: "center",
+                      margin: 0,
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    <EditableText elementKey="bodyText">
+                      {invitation.ourStory.description}
+                    </EditableText>
+                  </p>
+                </div>
               </div>
-            </div>
+            </EditableCard>
           </AnimatedSection>
 
           <SectionDivider theme={theme} />
@@ -1017,43 +1025,45 @@ export default function InvitationPage({
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
           >
-            <div
-              style={{
-                background: cs("schedule").cardBg,
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                borderRadius: 20,
-                overflow: "hidden",
-                padding: "8px 0",
-                boxShadow:
-                  "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                border: `1px solid ${cs("schedule").cardBorder}`,
-              }}
-            >
-              {invitation.schedule.map((event, i) => (
-                <div key={i}>
-                  {i > 0 && (
-                    <div
-                      className="mx-6"
-                      style={{
-                        height: 1,
-                        background: cs("schedule").cardBorder,
-                      }}
+            <EditableCard sectionKey="schedule">
+              <div
+                style={{
+                  background: cs("schedule", 20).cardBg,
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  borderRadius: cs("schedule", 20).borderRadius,
+                  overflow: "hidden",
+                  padding: "8px 0",
+                  boxShadow:
+                    "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+                  border: `1px solid ${cs("schedule", 20).cardBorder}`,
+                }}
+              >
+                {invitation.schedule.map((event, i) => (
+                  <div key={i}>
+                    {i > 0 && (
+                      <div
+                        className="mx-6"
+                        style={{
+                          height: 1,
+                          background: cs("schedule", 20).cardBorder,
+                        }}
+                      />
+                    )}
+                    <ScheduleItem
+                      time={event.time}
+                      label={event.label}
+                      venue={event.venue}
+                      accentColor={ts.accent}
+                      timeStyle={ts.scheduleTime}
+                      labelStyle={ts.scheduleLabel}
+                      venueStyle={ts.scheduleVenue}
+                      index={i}
                     />
-                  )}
-                  <ScheduleItem
-                    time={event.time}
-                    label={event.label}
-                    venue={event.venue}
-                    accentColor={ts.accent}
-                    timeStyle={ts.scheduleTime}
-                    labelStyle={ts.scheduleLabel}
-                    venueStyle={ts.scheduleVenue}
-                    index={i}
-                  />
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            </EditableCard>
           </motion.div>
         </>
       )}
@@ -1096,30 +1106,36 @@ export default function InvitationPage({
           />
         </div>
 
-        <LocationCard
-          location={invitation.location}
-          theme={theme}
-          ts={ts}
-          cardBg={cs("location").cardBg}
-          cardBorder={cs("location").cardBorder}
-          onMapsClick={handleMapsClick}
-          imageSettings={invitation.imageSettings}
-          imageKey="locationImage1"
-        />
+        <EditableCard sectionKey="location">
+          <LocationCard
+            location={invitation.location}
+            theme={theme}
+            ts={ts}
+            cardBg={cs("location", 16).cardBg}
+            cardBorder={cs("location", 16).cardBorder}
+            cardBorderRadius={cs("location", 16).borderRadius}
+            onMapsClick={handleMapsClick}
+            imageSettings={invitation.imageSettings}
+            imageKey="locationImage1"
+          />
+        </EditableCard>
 
         {/* Second location card (optional) */}
         {invitation.location2 && (
           <div className="mt-4">
-            <LocationCard
-              location={invitation.location2}
-              theme={theme}
-              ts={ts}
-              cardBg={cs("location").cardBg}
-              cardBorder={cs("location").cardBorder}
-              onMapsClick={handleMapsClick}
-              imageSettings={invitation.imageSettings}
-              imageKey="locationImage2"
-            />
+            <EditableCard sectionKey="location">
+              <LocationCard
+                location={invitation.location2}
+                theme={theme}
+                ts={ts}
+                cardBg={cs("location", 16).cardBg}
+                cardBorder={cs("location", 16).cardBorder}
+                cardBorderRadius={cs("location", 16).borderRadius}
+                onMapsClick={handleMapsClick}
+                imageSettings={invitation.imageSettings}
+                imageKey="locationImage2"
+              />
+            </EditableCard>
           </div>
         )}
       </AnimatedSection>
@@ -1147,104 +1163,110 @@ export default function InvitationPage({
           >
             {/* Dress Code — slides from left */}
             {invitation.dressCode.enabled && (
-              <motion.div
-                variants={slideFromLeft}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-40px" }}
-                className="flex flex-col items-center gap-3 text-center"
-                style={{
-                  background: cs("dressCode").cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: 16,
-                  padding: "24px 14px",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                  border: `1px solid ${cs("dressCode").cardBorder}`,
-                }}
-              >
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full"
+              <EditableCard sectionKey="dressCode">
+                <motion.div
+                  variants={slideFromLeft}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-40px" }}
+                  className="flex flex-col items-center gap-3 text-center"
                   style={{
-                    background: `${ts.accent}12`,
+                    background: cs("dressCode", 16).cardBg,
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    borderRadius: cs("dressCode", 16).borderRadius,
+                    padding: "24px 14px",
+                    boxShadow:
+                      "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                    border: `1px solid ${cs("dressCode", 16).cardBorder}`,
                   }}
                 >
-                  <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
-                </div>
-                <span style={ts.labels}>
-                  <EditableText elementKey="labels">Dress Code</EditableText>
-                </span>
-                <span
-                  style={{
-                    fontFamily: ts.bodyFont,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: ts.textPrimary,
-                  }}
-                >
-                  <EditableText elementKey="bodyText">
-                    {invitation.dressCode.text}
-                  </EditableText>
-                </span>
-              </motion.div>
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-full"
+                    style={{
+                      background: `${ts.accent}12`,
+                    }}
+                  >
+                    <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
+                  </div>
+                  <span style={ts.labels}>
+                    <EditableText elementKey="labels">Dress Code</EditableText>
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: ts.bodyFont,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: ts.textPrimary,
+                    }}
+                  >
+                    <EditableText elementKey="bodyText">
+                      {invitation.dressCode.text}
+                    </EditableText>
+                  </span>
+                </motion.div>
+              </EditableCard>
             )}
 
             {/* Gift Registry — slides from right */}
             {invitation.giftRegistry.enabled && (
-              <motion.div
-                variants={slideFromRight}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-40px" }}
-                className="flex flex-col items-center gap-3 text-center"
-                style={{
-                  background: cs("giftRegistry").cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: 16,
-                  padding: "24px 14px",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                  border: `1px solid ${cs("giftRegistry").cardBorder}`,
-                }}
-              >
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full"
+              <EditableCard sectionKey="giftRegistry">
+                <motion.div
+                  variants={slideFromRight}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-40px" }}
+                  className="flex flex-col items-center gap-3 text-center"
                   style={{
-                    background: `${ts.accent}12`,
+                    background: cs("giftRegistry", 16).cardBg,
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    borderRadius: cs("giftRegistry", 16).borderRadius,
+                    padding: "24px 14px",
+                    boxShadow:
+                      "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                    border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
                   }}
                 >
-                  <Gift size={20} color={ts.accent} strokeWidth={1.5} />
-                </div>
-                <span style={ts.labels}>
-                  <EditableText elementKey="labels">Presentes</EditableText>
-                </span>
-                <span
-                  style={{
-                    ...ts.giftText,
-                    whiteSpace: "pre-line",
-                  }}
-                >
-                  <EditableText elementKey="giftText">
-                    {invitation.giftRegistry.text}
-                  </EditableText>
-                </span>
-                {invitation.giftRegistry.link && (
-                  <motion.a
-                    href={invitation.giftRegistry.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={handleGiftClick}
-                    className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
-                    style={ts.giftLink}
-                    whileHover={{ scale: 1.02 }}
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-full"
+                    style={{
+                      background: `${ts.accent}12`,
+                    }}
                   >
-                    <ExternalLink size={10} strokeWidth={1.5} />
-                    <EditableText elementKey="giftLink">Ver lista</EditableText>
-                  </motion.a>
-                )}
-              </motion.div>
+                    <Gift size={20} color={ts.accent} strokeWidth={1.5} />
+                  </div>
+                  <span style={ts.labels}>
+                    <EditableText elementKey="labels">Presentes</EditableText>
+                  </span>
+                  <span
+                    style={{
+                      ...ts.giftText,
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    <EditableText elementKey="giftText">
+                      {invitation.giftRegistry.text}
+                    </EditableText>
+                  </span>
+                  {invitation.giftRegistry.link && (
+                    <motion.a
+                      href={invitation.giftRegistry.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={handleGiftClick}
+                      className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
+                      style={ts.giftLink}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <ExternalLink size={10} strokeWidth={1.5} />
+                      <EditableText elementKey="giftLink">
+                        Ver lista
+                      </EditableText>
+                    </motion.a>
+                  )}
+                </motion.div>
+              </EditableCard>
             )}
           </div>
         </AnimatedSection>
@@ -1281,14 +1303,17 @@ export default function InvitationPage({
             </div>
 
             <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
-              <GuestGuideSection
-                guestGuide={invitation.guestGuide}
-                theme={theme}
-                ts={ts}
-                cardBg={cs("guestGuide").cardBg}
-                cardBorder={cs("guestGuide").cardBorder}
-                isPreview={isPreview}
-              />
+              <EditableCard sectionKey="guestGuide">
+                <GuestGuideSection
+                  guestGuide={invitation.guestGuide}
+                  theme={theme}
+                  ts={ts}
+                  cardBg={cs("guestGuide", 14).cardBg}
+                  cardBorder={cs("guestGuide", 14).cardBorder}
+                  cardBorderRadius={cs("guestGuide", 14).borderRadius}
+                  isPreview={isPreview}
+                />
+              </EditableCard>
             </AnimatedSection>
           </>
         )}
@@ -1324,33 +1349,35 @@ export default function InvitationPage({
             </div>
 
             {/* FAQ card */}
-            <div
-              style={{
-                background: cs("faqs").cardBg,
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                borderRadius: 20,
-                overflow: "hidden",
-                boxShadow:
-                  "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                border: `1px solid ${cs("faqs").cardBorder}`,
-              }}
-            >
-              {invitation.faqs.map((faq, i) => (
-                <FAQAccordionItem
-                  key={i}
-                  faq={faq}
-                  index={i}
-                  isOpen={openFaqIndex === i}
-                  onToggle={() =>
-                    setOpenFaqIndex(openFaqIndex === i ? null : i)
-                  }
-                  theme={theme}
-                  ts={ts}
-                  isLast={i === (invitation.faqs?.length ?? 0) - 1}
-                />
-              ))}
-            </div>
+            <EditableCard sectionKey="faqs">
+              <div
+                style={{
+                  background: cs("faqs", 20).cardBg,
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  borderRadius: cs("faqs", 20).borderRadius,
+                  overflow: "hidden",
+                  boxShadow:
+                    "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+                  border: `1px solid ${cs("faqs", 20).cardBorder}`,
+                }}
+              >
+                {invitation.faqs.map((faq, i) => (
+                  <FAQAccordionItem
+                    key={i}
+                    faq={faq}
+                    index={i}
+                    isOpen={openFaqIndex === i}
+                    onToggle={() =>
+                      setOpenFaqIndex(openFaqIndex === i ? null : i)
+                    }
+                    theme={theme}
+                    ts={ts}
+                    isLast={i === (invitation.faqs?.length ?? 0) - 1}
+                  />
+                ))}
+              </div>
+            </EditableCard>
           </AnimatedSection>
         </>
       )}

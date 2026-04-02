@@ -134,6 +134,7 @@ interface GuideItemCardProps {
   ts?: ResolvedTextStyles;
   cardBg?: string;
   cardBorder?: string;
+  cardBorderRadius?: number;
   isPreview?: boolean;
 }
 
@@ -143,6 +144,7 @@ function GuideItemCard({
   ts,
   cardBg,
   cardBorder,
+  cardBorderRadius,
   isPreview,
 }: GuideItemCardProps) {
   return (
@@ -155,7 +157,7 @@ function GuideItemCard({
         background: cardBg || theme.cardBg,
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
-        borderRadius: 14,
+        borderRadius: cardBorderRadius ?? 14,
         padding: "18px 12px",
         border: `1px solid ${cardBorder || theme.cardBorder}`,
         boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 4px 16px rgba(0,0,0,0.03)",
@@ -199,6 +201,8 @@ export interface GuestGuideSectionProps {
   cardBg?: string;
   /** Per-section card border override. Falls back to theme.cardBorder. */
   cardBorder?: string;
+  /** Per-section card border-radius override. Falls back to 14. */
+  cardBorderRadius?: number;
   /** When true, all animations use `animate` instead of `whileInView` so
    *  the section is always fully visible (no scroll-trigger dependency).
    *  Use this in the admin live preview. */
@@ -211,6 +215,7 @@ export default function GuestGuideSection({
   ts,
   cardBg,
   cardBorder,
+  cardBorderRadius,
   isPreview = false,
 }: GuestGuideSectionProps) {
   const effectiveCardBg = cardBg || theme.cardBg;
@@ -237,6 +242,7 @@ export default function GuestGuideSection({
             ts={ts}
             cardBg={effectiveCardBg}
             cardBorder={effectiveCardBorder}
+            cardBorderRadius={cardBorderRadius}
             isPreview={isPreview}
           />
         ))}
