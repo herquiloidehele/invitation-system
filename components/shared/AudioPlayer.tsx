@@ -5,11 +5,13 @@ import {
   useState,
   useEffect,
   useCallback,
+  type CSSProperties,
   type MutableRefObject,
 } from "react";
 import { motion } from "framer-motion";
 import { Play, Pause } from "lucide-react";
 import type { AudioConfig, TemplateTheme } from "@/lib/types";
+import { EditableText } from "./EditableText";
 
 // ---------------------------------------------------------------------------
 // Theme helpers
@@ -43,6 +45,10 @@ interface DirectProps {
   title: string;
   artist: string;
   theme: AudioPlayerTheme;
+  /** Resolved CSSProperties for the song title */
+  titleStyle?: CSSProperties;
+  /** Resolved CSSProperties for the artist name */
+  artistStyle?: CSSProperties;
   /** Optional external audio ref — when provided the player uses this
    *  already-playing Audio element instead of creating its own. */
   externalAudioRef?: MutableRefObject<HTMLAudioElement | null>;
@@ -73,6 +79,8 @@ export default function AudioPlayer(props: AudioPlayerProps) {
   const playerTheme = isIntegrationProps(props)
     ? derivePlayerTheme(props.theme)
     : props.theme;
+  const titleStyle = isIntegrationProps(props) ? undefined : props.titleStyle;
+  const artistStyle = isIntegrationProps(props) ? undefined : props.artistStyle;
   const externalAudioRef = props.externalAudioRef;
   const onPlay = props.onPlay;
 
@@ -154,6 +162,16 @@ export default function AudioPlayer(props: AudioPlayerProps) {
     }
   }, [isPlaying, getAudio]);
 
+  // Fallback styles when no resolved text styles are provided
+  const defaultTitleStyle: CSSProperties = {
+    color: playerTheme.titleColor,
+    fontFamily: "var(--font-outfit), 'Outfit', sans-serif",
+  };
+  const defaultArtistStyle: CSSProperties = {
+    color: playerTheme.artistColor,
+    fontFamily: "var(--font-outfit), 'Outfit', sans-serif",
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -189,24 +207,22 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       </button>
 
       <div className="flex min-w-0 flex-col pr-1">
-        <span
-          className="truncate text-sm font-medium leading-tight"
-          style={{
-            color: playerTheme.titleColor,
-            fontFamily: "var(--font-outfit), 'Outfit', sans-serif",
-          }}
-        >
-          {title}
-        </span>
-        <span
-          className="truncate text-xs leading-tight"
-          style={{
-            color: playerTheme.artistColor,
-            fontFamily: "var(--font-outfit), 'Outfit', sans-serif",
-          }}
-        >
-          {artist}
-        </span>
+        <EditableText elementKey="audioTitle">
+          <span
+            className="truncate text-sm font-medium leading-tight"
+            style={titleStyle ?? defaultTitleStyle}
+          >
+            {title}
+          </span>
+        </EditableText>
+        <EditableText elementKey="audioArtist">
+          <span
+            className="truncate text-xs leading-tight"
+            style={artistStyle ?? defaultArtistStyle}
+          >
+            {artist}
+          </span>
+        </EditableText>
       </div>
 
       {/* Animated equalizer bars — visible when playing */}

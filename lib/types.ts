@@ -274,6 +274,10 @@ export interface TextStyleOverrides {
     scheduleLabel?: TextStyle;
     /** Schedule item — venue name (e.g. "Igreja Matriz") */
     scheduleVenue?: TextStyle;
+    /** Audio player — song title */
+    audioTitle?: TextStyle;
+    /** Audio player — artist name */
+    audioArtist?: TextStyle;
   };
 }
 

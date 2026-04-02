@@ -674,6 +674,8 @@ export default function InvitationPage({
               title={invitation.audio.title}
               artist={invitation.audio.artist}
               theme={toAudioTheme(theme)}
+              titleStyle={ts.audioTitle}
+              artistStyle={ts.audioArtist}
               externalAudioRef={audioRef}
               onPlay={handleAudioPlay}
             />

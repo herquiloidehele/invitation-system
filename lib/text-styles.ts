@@ -92,6 +92,10 @@ export interface ResolvedTextStyles {
   scheduleLabel: CSSProperties;
   /** Schedule item — venue name (e.g. "Igreja Matriz") */
   scheduleVenue: CSSProperties;
+  /** Audio player — song title */
+  audioTitle: CSSProperties;
+  /** Audio player — artist name */
+  audioArtist: CSSProperties;
 
   // -- Resolved role-level values for sub-components that need individual props --
   /** Resolved display font (for sub-components) */
@@ -644,6 +648,25 @@ export function resolveTextStyles(
     el?.scheduleVenue,
   );
 
+  const audioTitle = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 14,
+      fontWeight: 500,
+      color: textPrimary,
+    },
+    el?.audioTitle,
+  );
+
+  const audioArtist = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 12,
+      color: textSecondary,
+    },
+    el?.audioArtist,
+  );
+
   return {
     coupleNames,
     coupleNamesVideo,
@@ -688,6 +711,8 @@ export function resolveTextStyles(
     scheduleTime,
     scheduleLabel,
     scheduleVenue,
+    audioTitle,
+    audioArtist,
     // Role-level resolved values
     displayFont,
     bodyFont,
