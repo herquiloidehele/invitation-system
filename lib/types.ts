@@ -280,6 +280,30 @@ export interface TextStyleOverrides {
     audioTitle?: TextStyle;
     /** Audio player — artist name */
     audioArtist?: TextStyle;
+    // -- Quad Cards variant --
+    quadDayValue?: TextStyle;
+    quadDayLabel?: TextStyle;
+    quadMonthValue?: TextStyle;
+    quadMonthLabel?: TextStyle;
+    quadYearValue?: TextStyle;
+    quadYearLabel?: TextStyle;
+    quadDayOfWeekValue?: TextStyle;
+    quadDayOfWeekLabel?: TextStyle;
+    quadTime?: TextStyle;
+    // -- Cinematic variant --
+    cinematicSaveLabel?: TextStyle;
+    cinematicCouple?: TextStyle;
+    cinematicDay?: TextStyle;
+    cinematicMonth?: TextStyle;
+    cinematicYear?: TextStyle;
+    cinematicDayOfWeek?: TextStyle;
+    cinematicTime?: TextStyle;
+    // -- Minimal Line variant --
+    minimalDay?: TextStyle;
+    minimalMonth?: TextStyle;
+    minimalYear?: TextStyle;
+    minimalDayOfWeek?: TextStyle;
+    minimalTime?: TextStyle;
   };
 }
 

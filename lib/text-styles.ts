@@ -97,6 +97,48 @@ export interface ResolvedTextStyles {
   /** Audio player — artist name */
   audioArtist: CSSProperties;
 
+  // -- Quad Cards variant --
+  /** Quad card value (number/text) */
+  quadDayValue: CSSProperties;
+  /** Quad card label (e.g. "Dia") */
+  quadDayLabel: CSSProperties;
+  quadMonthValue: CSSProperties;
+  quadMonthLabel: CSSProperties;
+  quadYearValue: CSSProperties;
+  quadYearLabel: CSSProperties;
+  quadDayOfWeekValue: CSSProperties;
+  quadDayOfWeekLabel: CSSProperties;
+  /** Quad cards time display */
+  quadTime: CSSProperties;
+
+  // -- Cinematic variant --
+  /** "Save the Date" label on cinematic image overlay */
+  cinematicSaveLabel: CSSProperties;
+  /** Couple names on cinematic image */
+  cinematicCouple: CSSProperties;
+  /** Day number in cinematic ribbon */
+  cinematicDay: CSSProperties;
+  /** Month in cinematic ribbon */
+  cinematicMonth: CSSProperties;
+  /** Year in cinematic ribbon */
+  cinematicYear: CSSProperties;
+  /** Day of week in cinematic ribbon */
+  cinematicDayOfWeek: CSSProperties;
+  /** Time in cinematic ribbon */
+  cinematicTime: CSSProperties;
+
+  // -- Minimal Line variant --
+  /** Day number in minimal-line layout */
+  minimalDay: CSSProperties;
+  /** Month in minimal-line layout */
+  minimalMonth: CSSProperties;
+  /** Year in minimal-line layout */
+  minimalYear: CSSProperties;
+  /** Day of week in minimal-line layout */
+  minimalDayOfWeek: CSSProperties;
+  /** Time in minimal-line layout */
+  minimalTime: CSSProperties;
+
   // -- Resolved role-level values for sub-components that need individual props --
   /** Resolved display font (for sub-components) */
   displayFont: string;
@@ -667,6 +709,232 @@ export function resolveTextStyles(
     el?.audioArtist,
   );
 
+  // -- Quad Cards variant --
+  const quadDayValue = applyOverride(
+    {
+      fontSize: 24,
+      fontWeight: 300,
+      lineHeight: 1,
+      color: textPrimary,
+    },
+    el?.quadDayValue,
+  );
+  const quadDayLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 9,
+      fontWeight: 500,
+      letterSpacing: 2.5,
+      textTransform: "uppercase" as const,
+      color: accent,
+      marginTop: 8,
+    },
+    el?.quadDayLabel,
+  );
+  const quadMonthValue = applyOverride(
+    {
+      fontSize: 24,
+      fontWeight: 300,
+      lineHeight: 1,
+      color: textPrimary,
+    },
+    el?.quadMonthValue,
+  );
+  const quadMonthLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 9,
+      fontWeight: 500,
+      letterSpacing: 2.5,
+      textTransform: "uppercase" as const,
+      color: accent,
+      marginTop: 8,
+    },
+    el?.quadMonthLabel,
+  );
+  const quadYearValue = applyOverride(
+    {
+      fontSize: 24,
+      fontWeight: 300,
+      lineHeight: 1,
+      color: textPrimary,
+    },
+    el?.quadYearValue,
+  );
+  const quadYearLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 9,
+      fontWeight: 500,
+      letterSpacing: 2.5,
+      textTransform: "uppercase" as const,
+      color: accent,
+      marginTop: 8,
+    },
+    el?.quadYearLabel,
+  );
+  const quadDayOfWeekValue = applyOverride(
+    {
+      fontSize: 24,
+      fontWeight: 300,
+      lineHeight: 1,
+      color: textPrimary,
+    },
+    el?.quadDayOfWeekValue,
+  );
+  const quadDayOfWeekLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 9,
+      fontWeight: 500,
+      letterSpacing: 2.5,
+      textTransform: "uppercase" as const,
+      color: accent,
+      marginTop: 8,
+    },
+    el?.quadDayOfWeekLabel,
+  );
+  const quadTime = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 12,
+      fontWeight: 300,
+      letterSpacing: 2,
+      color: textMuted,
+    },
+    el?.quadTime,
+  );
+
+  // -- Cinematic variant --
+  const cinematicSaveLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 10,
+      fontWeight: 400,
+      letterSpacing: 5,
+      textTransform: "uppercase" as const,
+      color: "rgba(255,255,255,0.75)",
+    },
+    el?.cinematicSaveLabel,
+  );
+  const cinematicCouple = applyOverride(
+    {
+      fontFamily: scriptFont,
+      fontSize: 52,
+      fontWeight: 400,
+      lineHeight: 1.15,
+      color: "rgba(255,255,255,0.95)",
+      textShadow: "0 2px 24px rgba(0,0,0,0.4)",
+      letterSpacing: 1,
+    },
+    el?.cinematicCouple,
+  );
+  const cinematicDay = applyOverride(
+    {
+      fontFamily: scriptFont,
+      fontSize: 40,
+      fontWeight: 300,
+      lineHeight: 1,
+      color: textPrimary,
+      letterSpacing: -1,
+    },
+    el?.cinematicDay,
+  );
+  const cinematicMonth = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 11,
+      fontWeight: 600,
+      letterSpacing: 4,
+      textTransform: "uppercase" as const,
+      color: textSecondary,
+    },
+    el?.cinematicMonth,
+  );
+  const cinematicYear = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 12,
+      fontWeight: 300,
+      color: textMuted,
+      letterSpacing: 1,
+    },
+    el?.cinematicYear,
+  );
+  const cinematicDayOfWeek = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 11,
+      fontWeight: 400,
+      letterSpacing: 2,
+      color: textSecondary,
+    },
+    el?.cinematicDayOfWeek,
+  );
+  const cinematicTime = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 12,
+      fontWeight: 300,
+      color: textMuted,
+    },
+    el?.cinematicTime,
+  );
+
+  // -- Minimal Line variant --
+  const minimalDay = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 30,
+      fontWeight: 300,
+      lineHeight: 1,
+      color: textPrimary,
+      letterSpacing: -1,
+    },
+    el?.minimalDay,
+  );
+  const minimalMonth = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 14,
+      fontWeight: 500,
+      letterSpacing: 5,
+      textTransform: "uppercase" as const,
+      color: textSecondary,
+    },
+    el?.minimalMonth,
+  );
+  const minimalYear = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 24,
+      fontWeight: 300,
+      color: textMuted,
+    },
+    el?.minimalYear,
+  );
+  const minimalDayOfWeek = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 12,
+      fontWeight: 300,
+      letterSpacing: 3,
+      color: textSecondary,
+      textTransform: "uppercase" as const,
+    },
+    el?.minimalDayOfWeek,
+  );
+  const minimalTime = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 12,
+      fontWeight: 300,
+      letterSpacing: 2,
+      color: textMuted,
+    },
+    el?.minimalTime,
+  );
+
   return {
     coupleNames,
     coupleNamesVideo,
@@ -713,6 +981,30 @@ export function resolveTextStyles(
     scheduleVenue,
     audioTitle,
     audioArtist,
+    // Quad Cards
+    quadDayValue,
+    quadDayLabel,
+    quadMonthValue,
+    quadMonthLabel,
+    quadYearValue,
+    quadYearLabel,
+    quadDayOfWeekValue,
+    quadDayOfWeekLabel,
+    quadTime,
+    // Cinematic
+    cinematicSaveLabel,
+    cinematicCouple,
+    cinematicDay,
+    cinematicMonth,
+    cinematicYear,
+    cinematicDayOfWeek,
+    cinematicTime,
+    // Minimal Line
+    minimalDay,
+    minimalMonth,
+    minimalYear,
+    minimalDayOfWeek,
+    minimalTime,
     // Role-level resolved values
     displayFont,
     bodyFont,

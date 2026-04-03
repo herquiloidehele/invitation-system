@@ -454,17 +454,21 @@ function SaveTheDateCountdown({
 function QuadCard({
   label,
   value,
-  valueFontSize = 48,
   theme,
   ts,
   delay = 0,
+  elementKey,
+  valueStyle,
+  labelStyle,
 }: {
   label: string;
   value: string;
-  valueFontSize?: number;
   theme: TemplateTheme;
   ts: ResolvedTextStyles;
   delay?: number;
+  elementKey: string;
+  valueStyle: React.CSSProperties;
+  labelStyle: React.CSSProperties;
 }) {
   return (
     <motion.div
@@ -484,29 +488,11 @@ function QuadCard({
         minHeight: 100,
       }}
     >
-      <span
-        style={{
-          fontSize: valueFontSize,
-          fontWeight: 300,
-          lineHeight: 1,
-          color: ts.textPrimary,
-          letterSpacing: valueFontSize > 40 ? -1 : 0,
-        }}
-      >
-        {value}
+      <span style={valueStyle}>
+        <EditableText elementKey={`${elementKey}Value`}>{value}</EditableText>
       </span>
-      <span
-        style={{
-          fontFamily: ts.uiFont,
-          fontSize: 9,
-          fontWeight: 500,
-          letterSpacing: 2.5,
-          textTransform: "uppercase" as const,
-          color: ts.accent,
-          marginTop: 8,
-        }}
-      >
-        {label}
+      <span style={labelStyle}>
+        <EditableText elementKey={`${elementKey}Label`}>{label}</EditableText>
       </span>
     </motion.div>
   );
@@ -536,34 +522,42 @@ function SaveTheDateQuadCards({
         <QuadCard
           label="Dia"
           value={invitation.date.day}
-          valueFontSize={24}
           theme={theme}
           ts={ts}
           delay={0.05}
+          elementKey="quadDay"
+          valueStyle={ts.quadDayValue}
+          labelStyle={ts.quadDayLabel}
         />
         <QuadCard
           label="Mês"
           value={invitation.date.month}
-          valueFontSize={24}
           theme={theme}
           ts={ts}
           delay={0.1}
+          elementKey="quadMonth"
+          valueStyle={ts.quadMonthValue}
+          labelStyle={ts.quadMonthLabel}
         />
         <QuadCard
           label="Ano"
           value={invitation.date.year}
-          valueFontSize={24}
           theme={theme}
           ts={ts}
           delay={0.15}
+          elementKey="quadYear"
+          valueStyle={ts.quadYearValue}
+          labelStyle={ts.quadYearLabel}
         />
         <QuadCard
           label="Dia da Semana"
           value={invitation.date.dayOfWeek}
-          valueFontSize={24}
           theme={theme}
           ts={ts}
           delay={0.2}
+          elementKey="quadDayOfWeek"
+          valueStyle={ts.quadDayOfWeekValue}
+          labelStyle={ts.quadDayOfWeekLabel}
         />
       </div>
 
@@ -575,16 +569,10 @@ function SaveTheDateQuadCards({
         transition={{ duration: 0.6, delay: 0.25, ease: EASE }}
         className="flex flex-col items-center gap-1"
       >
-        <span
-          style={{
-            fontFamily: ts.uiFont,
-            fontSize: 12,
-            fontWeight: 300,
-            letterSpacing: 2,
-            color: ts.textMuted,
-          }}
-        >
-          {invitation.date.time}
+        <span style={ts.quadTime}>
+          <EditableText elementKey="quadTime">
+            {invitation.date.time}
+          </EditableText>
         </span>
         <CalendarCTA
           invitation={invitation}
@@ -689,17 +677,10 @@ function SaveTheDateCinematic({
           style={{ padding: "28px 24px 28px" }}
         >
           {/* "Save the Date" label — white on dark image */}
-          <span
-            style={{
-              fontFamily: ts.uiFont,
-              fontSize: 10,
-              fontWeight: 400,
-              letterSpacing: 5,
-              textTransform: "uppercase" as const,
-              color: "rgba(255,255,255,0.75)",
-            }}
-          >
-            Save the Date
+          <span style={ts.cinematicSaveLabel}>
+            <EditableText elementKey="cinematicSaveLabel">
+              Save the Date
+            </EditableText>
           </span>
 
           {/* Script couple names */}
@@ -709,17 +690,11 @@ function SaveTheDateCinematic({
             viewport={{ once: true }}
             transition={{ duration: 1, delay: 0.25, ease: EASE }}
             className="mt-3 text-center"
-            style={{
-              fontFamily: ts.scriptFont,
-              fontSize: 52,
-              fontWeight: 400,
-              lineHeight: 1.15,
-              color: "rgba(255,255,255,0.95)",
-              textShadow: "0 2px 24px rgba(0,0,0,0.4)",
-              letterSpacing: 1,
-            }}
+            style={ts.cinematicCouple}
           >
-            {invitation.couple.bride} &amp; {invitation.couple.groom}
+            <EditableText elementKey="cinematicCouple">
+              {invitation.couple.bride} &amp; {invitation.couple.groom}
+            </EditableText>
           </motion.span>
 
           {/* Thin accent line */}
@@ -752,17 +727,10 @@ function SaveTheDateCinematic({
       >
         {/* Horizontal date ribbon */}
         <div className="flex items-center justify-center gap-4">
-          <span
-            style={{
-              fontFamily: ts.scriptFont,
-              fontSize: 40,
-              fontWeight: 300,
-              lineHeight: 1,
-              color: ts.textPrimary,
-              letterSpacing: -1,
-            }}
-          >
-            {invitation.date.day}
+          <span style={ts.cinematicDay}>
+            <EditableText elementKey="cinematicDay">
+              {invitation.date.day}
+            </EditableText>
           </span>
 
           <div
@@ -775,28 +743,15 @@ function SaveTheDateCinematic({
           />
 
           <div className="flex flex-col items-center gap-0.5">
-            <span
-              style={{
-                fontFamily: ts.uiFont,
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: 4,
-                textTransform: "uppercase" as const,
-                color: ts.textSecondary,
-              }}
-            >
-              {invitation.date.month}
+            <span style={ts.cinematicMonth}>
+              <EditableText elementKey="cinematicMonth">
+                {invitation.date.month}
+              </EditableText>
             </span>
-            <span
-              style={{
-                fontFamily: ts.bodyFont,
-                fontSize: 12,
-                fontWeight: 300,
-                color: ts.textMuted,
-                letterSpacing: 1,
-              }}
-            >
-              {invitation.date.year}
+            <span style={ts.cinematicYear}>
+              <EditableText elementKey="cinematicYear">
+                {invitation.date.year}
+              </EditableText>
             </span>
           </div>
 
@@ -810,26 +765,15 @@ function SaveTheDateCinematic({
           />
 
           <div className="flex flex-col items-center gap-0.5">
-            <span
-              style={{
-                fontFamily: ts.uiFont,
-                fontSize: 11,
-                fontWeight: 400,
-                letterSpacing: 2,
-                color: ts.textSecondary,
-              }}
-            >
-              {invitation.date.dayOfWeek}
+            <span style={ts.cinematicDayOfWeek}>
+              <EditableText elementKey="cinematicDayOfWeek">
+                {invitation.date.dayOfWeek}
+              </EditableText>
             </span>
-            <span
-              style={{
-                fontFamily: ts.uiFont,
-                fontSize: 12,
-                fontWeight: 300,
-                color: ts.textMuted,
-              }}
-            >
-              {invitation.date.time}
+            <span style={ts.cinematicTime}>
+              <EditableText elementKey="cinematicTime">
+                {invitation.date.time}
+              </EditableText>
             </span>
           </div>
         </div>
@@ -876,17 +820,10 @@ function SaveTheDateMinimalLine({
         transition={{ duration: 0.9, delay: 0.1, ease: EASE }}
         className="flex items-center justify-center flex-wrap gap-x-4 gap-y-1"
       >
-        <span
-          style={{
-            fontFamily: ts.bodyFont,
-            fontSize: 30,
-            fontWeight: 300,
-            lineHeight: 1,
-            color: ts.textPrimary,
-            letterSpacing: -1,
-          }}
-        >
-          {invitation.date.day}
+        <span style={ts.minimalDay}>
+          <EditableText elementKey="minimalDay">
+            {invitation.date.day}
+          </EditableText>
         </span>
         <span
           style={{
@@ -898,17 +835,10 @@ function SaveTheDateMinimalLine({
         >
           ·
         </span>
-        <span
-          style={{
-            fontFamily: ts.bodyFont,
-            fontSize: 14,
-            fontWeight: 500,
-            letterSpacing: 5,
-            textTransform: "uppercase" as const,
-            color: ts.textSecondary,
-          }}
-        >
-          {invitation.date.month}
+        <span style={ts.minimalMonth}>
+          <EditableText elementKey="minimalMonth">
+            {invitation.date.month}
+          </EditableText>
         </span>
         <span
           style={{
@@ -920,15 +850,10 @@ function SaveTheDateMinimalLine({
         >
           ·
         </span>
-        <span
-          style={{
-            fontFamily: ts.bodyFont,
-            fontSize: 24,
-            fontWeight: 300,
-            color: ts.textMuted,
-          }}
-        >
-          {invitation.date.year}
+        <span style={ts.minimalYear}>
+          <EditableText elementKey="minimalYear">
+            {invitation.date.year}
+          </EditableText>
         </span>
       </motion.div>
 
@@ -954,29 +879,16 @@ function SaveTheDateMinimalLine({
         transition={{ duration: 0.6, delay: 0.3, ease: EASE }}
         className="flex items-center gap-3"
       >
-        <span
-          style={{
-            fontFamily: ts.uiFont,
-            fontSize: 12,
-            fontWeight: 300,
-            letterSpacing: 3,
-            color: ts.textSecondary,
-            textTransform: "uppercase" as const,
-          }}
-        >
-          {invitation.date.dayOfWeek}
+        <span style={ts.minimalDayOfWeek}>
+          <EditableText elementKey="minimalDayOfWeek">
+            {invitation.date.dayOfWeek}
+          </EditableText>
         </span>
         <span style={{ color: ts.accent, opacity: 0.4, fontSize: 16 }}>·</span>
-        <span
-          style={{
-            fontFamily: ts.uiFont,
-            fontSize: 12,
-            fontWeight: 300,
-            letterSpacing: 2,
-            color: ts.textMuted,
-          }}
-        >
-          {invitation.date.time}
+        <span style={ts.minimalTime}>
+          <EditableText elementKey="minimalTime">
+            {invitation.date.time}
+          </EditableText>
         </span>
       </motion.div>
 
