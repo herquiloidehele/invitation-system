@@ -625,33 +625,6 @@ export default function InvitationPage({
                   </EditableText>
                 </motion.span>
 
-                {/* Date pill */}
-                <motion.div
-                  variants={heroTextItem}
-                  className="mt-7 flex items-center gap-4"
-                  style={ts.datePillVideo}
-                >
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 28,
-                      height: 1,
-                      background: "rgba(255,255,255,0.3)",
-                    }}
-                  />
-                  {invitation.date.day}&nbsp;&middot;&nbsp;
-                  {invitation.date.month}&nbsp;&middot;&nbsp;
-                  {invitation.date.year}
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 28,
-                      height: 1,
-                      background: "rgba(255,255,255,0.3)",
-                    }}
-                  />
-                </motion.div>
-
                 {/* Quote */}
                 <motion.p
                   variants={heroTextItem}
