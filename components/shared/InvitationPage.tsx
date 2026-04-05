@@ -587,16 +587,6 @@ export default function InvitationPage({
             ) : (
               /* ── Standard Mode (video) ── */
               <>
-                {/* Label */}
-                <motion.span
-                  variants={heroTextItem}
-                  style={ts.inviteLabelVideo}
-                >
-                  <EditableText elementKey="inviteLabel">
-                    Convidam para o casamento de
-                  </EditableText>
-                </motion.span>
-
                 {/* Bride */}
                 <motion.h1
                   variants={heroTextItem}
@@ -623,6 +613,17 @@ export default function InvitationPage({
                     {invitation.couple.groom}
                   </EditableText>
                 </motion.h1>
+
+                {/* Label */}
+                <motion.span
+                  variants={heroTextItem}
+                  style={ts.inviteLabelVideo}
+                  className="mt-7"
+                >
+                  <EditableText elementKey="inviteLabel">
+                    Convidam para o seu casamento
+                  </EditableText>
+                </motion.span>
 
                 {/* Date pill */}
                 <motion.div
