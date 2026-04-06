@@ -470,7 +470,7 @@ export default function InvitationPage({
             variants={heroTextContainer}
             initial="hidden"
             animate="visible"
-            className="absolute inset-x-0 flex flex-col items-center text-center"
+            className="absolute inset-x-0 flex flex-col items-center text-center mt-16"
             style={{
               top: "50%",
               transform: "translateY(-58%)",
