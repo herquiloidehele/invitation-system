@@ -353,24 +353,15 @@ function SaveTheDateCountdown({
       {/* Countdown tiles */}
       {isCelebration ? (
         <div className="flex flex-col items-center gap-2 py-3">
-          <span
-            style={{
-              fontFamily: ts.scriptFont,
-              fontSize: 28,
-              color: ts.accent,
-            }}
-          >
-            Hoje é o grande dia!
+          <span style={ts.celebrationTitle}>
+            <EditableText elementKey="celebrationTitle">
+              Hoje é o grande dia!
+            </EditableText>
           </span>
-          <span
-            style={{
-              fontFamily: ts.uiFont,
-              fontSize: 12,
-              color: ts.textSecondary,
-              letterSpacing: 1,
-            }}
-          >
-            {invitation.couple.bride} &amp; {invitation.couple.groom}
+          <span style={ts.celebrationCouple}>
+            <EditableText elementKey="celebrationCouple">
+              {invitation.couple.bride} &amp; {invitation.couple.groom}
+            </EditableText>
           </span>
         </div>
       ) : (

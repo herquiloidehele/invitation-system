@@ -84,6 +84,10 @@ export interface ResolvedTextStyles {
   countdownDate: CSSProperties;
   /** Countdown weekday & time ("Segunda-feira · 16:00") */
   countdownWeekday: CSSProperties;
+  /** Celebration title ("Hoje é o grande dia!") — shown when countdown reaches zero */
+  celebrationTitle: CSSProperties;
+  /** Celebration couple names — shown when countdown reaches zero */
+  celebrationCouple: CSSProperties;
   /** Decorative accent line between sections (color controls the gradient) */
   accentLine: CSSProperties;
   /** Schedule item — time column (e.g. "16:00") */
@@ -651,6 +655,25 @@ export function resolveTextStyles(
     el?.countdownWeekday,
   );
 
+  const celebrationTitle = applyOverride(
+    {
+      fontFamily: scriptFont,
+      fontSize: 28,
+      color: accent,
+    },
+    el?.celebrationTitle,
+  );
+
+  const celebrationCouple = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 12,
+      color: textSecondary,
+      letterSpacing: 1,
+    },
+    el?.celebrationCouple,
+  );
+
   const accentLine = applyOverride(
     {
       color: accent,
@@ -975,6 +998,8 @@ export function resolveTextStyles(
     countdownLabel,
     countdownDate,
     countdownWeekday,
+    celebrationTitle,
+    celebrationCouple,
     accentLine,
     scheduleTime,
     scheduleLabel,

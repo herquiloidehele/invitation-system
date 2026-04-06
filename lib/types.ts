@@ -269,6 +269,10 @@ export interface TextStyleOverrides {
     countdownLabel?: TextStyle;
     countdownDate?: TextStyle;
     countdownWeekday?: TextStyle;
+    /** Celebration title — shown when countdown reaches zero */
+    celebrationTitle?: TextStyle;
+    /** Celebration couple names — shown when countdown reaches zero */
+    celebrationCouple?: TextStyle;
     accentLine?: TextStyle;
     /** Schedule item — time column (e.g. "16:00") */
     scheduleTime?: TextStyle;
