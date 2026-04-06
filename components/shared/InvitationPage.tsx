@@ -1,10 +1,21 @@
 "use client";
 
-import { type MutableRefObject, type RefObject, useCallback, useEffect, useState } from "react";
+import {
+  type MutableRefObject,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
-import type { CardSectionKey, FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CardSectionKey,
+  FAQItem,
+  InvitationData,
+  TemplateTheme,
+} from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import AudioPlayer from "./AudioPlayer";
@@ -621,7 +632,7 @@ export default function InvitationPage({
                   style={{
                     ...ts.quoteVideo,
                     maxWidth: 280,
-                    whiteSpace: "pre-line"
+                    whiteSpace: "pre-line",
                   }}
                 >
                   <EditableText elementKey="quote">
@@ -1167,6 +1178,22 @@ export default function InvitationPage({
                       {invitation.dressCode.text}
                     </EditableText>
                   </span>
+                  {(invitation.dressCode.colors?.length ?? 0) > 0 && (
+                    <div className="mt-1 flex items-center justify-center gap-2.5">
+                      {invitation.dressCode.colors!.map((color, i) => (
+                        <span
+                          key={i}
+                          className="inline-block rounded-full"
+                          style={{
+                            backgroundColor: color,
+                            width: 28,
+                            height: 28,
+                            border: "1px solid rgba(0,0,0,0.1)",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               </EditableCard>
             )}

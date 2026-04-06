@@ -47,6 +47,7 @@ export interface ScheduleEvent {
 export interface DressCode {
   enabled: boolean;
   text: string;
+  colors?: string[]; // 1-6 hex color values, e.g. ["#000000", "#FFFFFF"]
 }
 
 export interface GiftRegistry {

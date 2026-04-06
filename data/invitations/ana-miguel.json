@@ -33,7 +33,11 @@
     { "time": "18:30", "label": "Jantar", "venue": "Sala dos Espelhos" },
     { "time": "22:00", "label": "Festa", "venue": "Galeria Principal" }
   ],
-  "dressCode": { "enabled": true, "text": "Cocktail" },
+  "dressCode": {
+    "enabled": true,
+    "text": "Cocktail",
+    "colors": ["#2c3e50", "#c0392b", "#f1c40f", "#ecf0f1"]
+  },
   "giftRegistry": {
     "enabled": true,
     "text": "A vossa presença é a nossa maior alegria"

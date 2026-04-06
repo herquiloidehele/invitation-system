@@ -22,7 +22,14 @@ import type {
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 
-import { ExternalLink, Loader2, MapPin, RotateCcw } from "lucide-react";
+import {
+  ExternalLink,
+  Loader2,
+  MapPin,
+  Plus,
+  RotateCcw,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -546,7 +553,10 @@ export default function InvitationForm({
   );
 
   const updateDressCode = useCallback(
-    (field: keyof InvitationData["dressCode"], value: boolean | string) => {
+    (
+      field: keyof InvitationData["dressCode"],
+      value: boolean | string | string[],
+    ) => {
       setForm((prev) => ({
         ...prev,
         dressCode: { ...prev.dressCode, [field]: value },
@@ -1859,6 +1869,67 @@ export default function InvitationForm({
                           }
                           placeholder="e.g. Traje Formal"
                         />
+                      </div>
+                    )}
+                    {form.dressCode.enabled && (
+                      <div className="space-y-1.5">
+                        <Label>Paleta de Cores</Label>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {(form.dressCode.colors ?? []).map((color, idx) => (
+                            <div key={idx} className="group relative">
+                              <label
+                                className="block h-8 w-8 cursor-pointer rounded-full border border-border shadow-sm transition-shadow hover:shadow-md"
+                                style={{ backgroundColor: color }}
+                              >
+                                <input
+                                  type="color"
+                                  value={color}
+                                  onChange={(e) => {
+                                    const updated = [
+                                      ...(form.dressCode.colors ?? []),
+                                    ];
+                                    updated[idx] = e.target.value;
+                                    updateDressCode("colors", updated);
+                                  }}
+                                  className="sr-only"
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = (
+                                    form.dressCode.colors ?? []
+                                  ).filter((_, i) => i !== idx);
+                                  updateDressCode(
+                                    "colors",
+                                    updated.length > 0 ? updated : [],
+                                  );
+                                }}
+                                className="absolute -top-1.5 -right-1.5 hidden h-4 w-4 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-sm group-hover:flex"
+                              >
+                                <X size={10} />
+                              </button>
+                            </div>
+                          ))}
+                          {(form.dressCode.colors ?? []).length < 6 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = form.dressCode.colors ?? [];
+                                updateDressCode("colors", [
+                                  ...current,
+                                  "#000000",
+                                ]);
+                              }}
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-border text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          Adicione até 6 cores para exibir no convite.
+                        </p>
                       </div>
                     )}
                   </div>

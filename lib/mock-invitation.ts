@@ -49,7 +49,11 @@ export const MOCK_INVITATION: InvitationData = {
     { time: "00:00", label: "Festa", venue: "Terraço com Vista" },
   ],
 
-  dressCode: { enabled: true, text: "Traje Formal" },
+  dressCode: {
+    enabled: true,
+    text: "Traje Formal",
+    colors: ["#000000", "#1a1a2e", "#d4af37"],
+  },
 
   giftRegistry: {
     enabled: true,

@@ -33,7 +33,11 @@
     { "time": "19:30", "label": "Jantar", "venue": "Celeiro Rústico" },
     { "time": "22:30", "label": "Festa", "venue": "Jardim das Luzes" }
   ],
-  "dressCode": { "enabled": true, "text": "Traje Casual Elegante" },
+  "dressCode": {
+    "enabled": true,
+    "text": "Traje Casual Elegante",
+    "colors": ["#f5e6d3", "#8b7355", "#2f4f4f"]
+  },
   "giftRegistry": {
     "enabled": true,
     "text": "O vosso carinho vale mais que qualquer presente"
