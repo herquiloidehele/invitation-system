@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  type MutableRefObject,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { type MutableRefObject, type RefObject, useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
-import type {
-  CardSectionKey,
-  FAQItem,
-  InvitationData,
-  TemplateTheme,
-} from "@/lib/types";
+import type { CardSectionKey, FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import AudioPlayer from "./AudioPlayer";
@@ -1165,19 +1154,16 @@ export default function InvitationPage({
                   <span style={ts.labels}>
                     <EditableText elementKey="labels">Dress Code</EditableText>
                   </span>
-                  <span
-                    style={{
-                      fontFamily: ts.bodyFont,
-                      fontSize: 13,
-                      fontWeight: 500,
-                      color: ts.textPrimary,
-                      whiteSpace: "pre-line",
-                    }}
-                  >
-                    <EditableText elementKey="bodyText">
+                  <EditableText elementKey="dressCodeText">
+                    <span
+                      style={{
+                        ...ts.dressCodeText,
+                        whiteSpace: "pre-line",
+                      }}
+                    >
                       {invitation.dressCode.text}
-                    </EditableText>
-                  </span>
+                    </span>
+                  </EditableText>
                   {(invitation.dressCode.colors?.length ?? 0) > 0 && (
                     <div className="mt-1 flex items-center justify-center gap-2.5">
                       {invitation.dressCode.colors!.map((color, i) => (

@@ -244,6 +244,7 @@ export interface TextStyleOverrides {
     quote?: TextStyle;
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
+    dressCodeText?: TextStyle;
     labels?: TextStyle;
     inviteLabel?: TextStyle;
     faqQuestion?: TextStyle;

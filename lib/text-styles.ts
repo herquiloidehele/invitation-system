@@ -22,6 +22,8 @@ export interface ResolvedTextStyles {
   sectionTitles: CSSProperties;
   /** Body/description text (story text, FAQ answers, etc.) */
   bodyText: CSSProperties;
+  /** Dress code description text */
+  dressCodeText: CSSProperties;
   /** Small labels ("Dress Code", "Presentes", "Localização") */
   labels: CSSProperties;
   /** "Convidam para o casamento de" label — normal */
@@ -321,6 +323,17 @@ export function resolveTextStyles(
       color: textSecondary,
     },
     el?.bodyText,
+  );
+
+  const dressCodeText = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      fontWeight: 500,
+      color: textPrimary,
+      whiteSpace: "pre-line",
+    },
+    el?.dressCodeText ?? el?.bodyText,
   );
 
   const labels = applyOverride(
@@ -967,6 +980,7 @@ export function resolveTextStyles(
     quoteVideo,
     sectionTitles,
     bodyText,
+    dressCodeText,
     labels,
     inviteLabel,
     inviteLabelVideo,
