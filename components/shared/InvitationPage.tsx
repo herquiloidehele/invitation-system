@@ -621,6 +621,7 @@ export default function InvitationPage({
                   style={{
                     ...ts.quoteVideo,
                     maxWidth: 280,
+                    whiteSpace: "pre-line"
                   }}
                 >
                   <EditableText elementKey="quote">
