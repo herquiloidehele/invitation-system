@@ -4,15 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:prod": "cross-env ENV=prod next dev",
+    "dev:prod": "env-cmd -f .env.production next dev",
     "build": "prisma generate && npm run db:migrate && next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed:dev": "tsx --env-file=.env prisma/seed.ts",
-    "db:seed:prod": "tsx --env-file=.prod prisma/seed.ts",
+    "db:seed:dev": "tsx --env-file=.env.development prisma/seed.ts",
+    "db:seed:prod": "tsx --env-file=.env.production prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
-    "db:migrate:dev": "cross-env ENV=dev prisma migrate dev",
-    "db:migrate:prod": "cross-env ENV=prod prisma migrate dev",
+    "db:migrate:dev": "cross-env NODE_ENV=development prisma migrate dev",
+    "db:migrate:prod": "cross-env NODE_ENV=production prisma migrate dev",
     "db:studio": "prisma studio"
   },
   "prisma": {
@@ -57,6 +57,7 @@
     "@types/react-dom": "^19",
     "cross-env": "^10.1.0",
     "dotenv": "^17.3.1",
+    "env-cmd": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "prettier": "3.8.1",
