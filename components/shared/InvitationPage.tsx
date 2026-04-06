@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  type MutableRefObject,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { type MutableRefObject, type RefObject, useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
-import type {
-  CardSectionKey,
-  FAQItem,
-  InvitationData,
-  TemplateTheme,
-} from "@/lib/types";
+import type { CardSectionKey, FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import AudioPlayer from "./AudioPlayer";
@@ -1132,9 +1121,7 @@ export default function InvitationPage({
       {(invitation.dressCode.enabled || invitation.giftRegistry.enabled) && (
         <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
           <SectionDivider theme={theme} />
-          <div
-            className={`grid ${invitation.dressCode.enabled && invitation.giftRegistry.enabled ? "grid-cols-2" : "grid-cols-1"} gap-3`}
-          >
+          <div className={`flex flex-col gap-6`}>
             {/* Dress Code — slides from left */}
             {invitation.dressCode.enabled && (
               <EditableCard sectionKey="dressCode">
