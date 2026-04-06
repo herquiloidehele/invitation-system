@@ -1160,6 +1160,7 @@ export default function InvitationPage({
                       fontSize: 13,
                       fontWeight: 500,
                       color: ts.textPrimary,
+                      whiteSpace: "pre-line",
                     }}
                   >
                     <EditableText elementKey="bodyText">

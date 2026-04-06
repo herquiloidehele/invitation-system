@@ -56,7 +56,6 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
-import FontPicker from "@/components/admin/FontPicker";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
@@ -1852,7 +1851,7 @@ export default function InvitationForm({
                     {form.dressCode.enabled && (
                       <div className="space-y-1.5">
                         <Label htmlFor="dressCode">Código de Vestuário</Label>
-                        <Input
+                        <Textarea
                           id="dressCode"
                           value={form.dressCode.text}
                           onChange={(e) =>
