@@ -111,12 +111,14 @@ function deriveDateFields(iso: string) {
       "Sexta-feira",
       "Sábado",
     ];
+    // Use UTC getters since the ISO string is stored as UTC (T00:00:00.000Z)
+    // Using local-time getters causes off-by-one day errors due to timezone offset
     return {
-      day: String(d.getDate()).padStart(2, "0"),
-      month: months[d.getMonth()],
-      year: String(d.getFullYear()),
-      dayOfWeek: days[d.getDay()],
-      display: `${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`,
+      day: String(d.getUTCDate()).padStart(2, "0"),
+      month: months[d.getUTCMonth()],
+      year: String(d.getUTCFullYear()),
+      dayOfWeek: days[d.getUTCDay()],
+      display: `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`,
     };
   } catch {
     return {};

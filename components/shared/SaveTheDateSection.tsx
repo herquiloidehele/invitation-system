@@ -173,20 +173,20 @@ interface TimeLeft {
 }
 
 function computeTimeLeft(isoDate: string, timeStr: string): TimeLeft {
-  // Parse the wedding date in Europe/Lisbon timezone
-  // We combine the date part with the time field
+  // Parse the wedding date in Europe/Lisbon timezone.
+  // The ISO date is stored as "YYYY-MM-DDT00:00:00.000Z" and the separate
+  // time field holds the Lisbon wall-clock time (e.g. "16:00").
   const datePart = isoDate.split("T")[0]; // "YYYY-MM-DD"
   const time = timeStr || "00:00";
 
-  // Build a date string that we can parse
   const [hour, minute] = time.split(":").map(Number);
   const [year, month, day] = datePart.split("-").map(Number);
 
-  // Create the target in UTC by computing what midnight Lisbon corresponds to.
-  // Portugal is UTC+0 (WET) in winter, UTC+1 (WEST) in summer.
-  // We use Intl.DateTimeFormat to determine the offset for the target date.
-  const approxDate = new Date(year, month - 1, day, hour, minute, 0, 0);
-  // Get the UTC offset for that local time in Lisbon
+  // Use Date.UTC (NOT new Date(year,...)) to avoid the JS quirk where years
+  // 0-99 are mapped to 1900-1999 in the Date constructor.
+  // We create a UTC timestamp with the wall-clock values, format it in Lisbon
+  // to see what wall-clock Lisbon would show, then derive the offset.
+  const utcGuess = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
   const lisbonFormatter = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/Lisbon",
     year: "numeric",
@@ -198,30 +198,24 @@ function computeTimeLeft(isoDate: string, timeStr: string): TimeLeft {
     hour12: false,
   });
 
-  // Format the approx date in Lisbon time to get parts
-  const parts = lisbonFormatter.formatToParts(approxDate);
+  const parts = lisbonFormatter.formatToParts(new Date(utcGuess));
   const get = (type: string) =>
     parseInt(parts.find((p) => p.type === type)?.value ?? "0");
 
-  // Reconstruct what Lisbon time approxDate corresponds to
-  const lisbonHour = get("hour");
-  const lisbonMinute = get("minute");
+  // The Lisbon wall-clock when utcGuess is the real UTC time:
+  const lisbonFromUtc = Date.UTC(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour"),
+    get("minute"),
+    get("second"),
+  );
+  // offset = Lisbon_wall - UTC  (positive when Lisbon is ahead, i.e. summer)
+  const offsetMs = lisbonFromUtc - utcGuess;
 
-  // Offset in minutes from Lisbon to UTC for this date
-  // UTC = Lisbon_wall_clock - offset => offset = wall - UTC
-  const offsetMs =
-    Date.UTC(
-      get("year"),
-      get("month") - 1,
-      get("day"),
-      lisbonHour,
-      lisbonMinute,
-    ) - approxDate.getTime();
-  const offsetMinutes = Math.round(offsetMs / 60000);
-
-  // Build target UTC ms: Lisbon time minus offset
-  const targetMs =
-    Date.UTC(year, month - 1, day, hour, minute) - offsetMinutes * 60000;
+  // The target UTC ms is the desired Lisbon wall-clock minus the offset
+  const targetMs = utcGuess - offsetMs;
 
   const now = Date.now();
   const diff = targetMs - now;
