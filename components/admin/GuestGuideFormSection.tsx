@@ -14,6 +14,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import { PREDEFINED_GUIDE_ITEMS, isPredefinedItem } from "@/lib/guest-guide";
 import { LUCIDE_ICON_INPUT_OPTIONS } from "@/lib/lucide-icons";
 import type { GuestGuide, GuestGuideItem } from "@/lib/types";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 const LUCIDE_ICON_DATALIST_ID = "guest-guide-lucide-icons";
 
@@ -28,6 +29,7 @@ interface GuestGuideFormSectionProps {
   onAddCustom: () => void;
   onUpdateCustom: (id: string, patch: Partial<GuestGuideItem>) => void;
   onRemoveItem: (id: string) => void;
+  onReorderItem: (id: string, direction: "up" | "down") => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -209,6 +211,73 @@ function CustomItemRow({ item, onUpdate, onRemove }: CustomItemRowProps) {
 }
 
 // ---------------------------------------------------------------------------
+
+interface ReorderListProps {
+  items: GuestGuideItem[];
+  onReorder: (id: string, direction: "up" | "down") => void;
+}
+
+function ReorderList({ items, onReorder }: ReorderListProps) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs text-muted-foreground uppercase tracking-wide">
+        Ordenar itens
+      </Label>
+      <div className="space-y-1">
+        {items.map((item, index) => {
+          const isFirst = index === 0;
+          const isLast = index === items.length - 1;
+          const isPredefined = isPredefinedItem(item.id);
+          return (
+            <div
+              key={item.id}
+              className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2"
+            >
+              <span className="flex-1 text-xs leading-tight truncate">
+                {item.label || "(sem título)"}
+              </span>
+              {isPredefined ? (
+                <span className="shrink-0 text-[10px] text-muted-foreground bg-muted rounded px-1.5 py-0.5">
+                  predefinido
+                </span>
+              ) : (
+                <span className="shrink-0 text-[10px] text-primary bg-primary/10 rounded px-1.5 py-0.5">
+                  personalizado
+                </span>
+              )}
+              <div className="flex shrink-0">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  disabled={isFirst}
+                  onClick={() => onReorder(item.id, "up")}
+                  aria-label="Mover para cima"
+                >
+                  <ChevronUp size={14} />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  disabled={isLast}
+                  onClick={() => onReorder(item.id, "down")}
+                  aria-label="Mover para baixo"
+                >
+                  <ChevronDown size={14} />
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // GuestGuideFormSection — AccordionItem for the admin editor
 // ---------------------------------------------------------------------------
 
@@ -219,6 +288,7 @@ export default function GuestGuideFormSection({
   onAddCustom,
   onUpdateCustom,
   onRemoveItem,
+  onReorderItem,
 }: GuestGuideFormSectionProps) {
   const selectedIds = new Set(guestGuide.items.map((i) => i.id));
   const customItems = guestGuide.items.filter((i) => !isPredefinedItem(i.id));
@@ -273,6 +343,16 @@ export default function GuestGuideFormSection({
                 + Adicionar item personalizado
               </Button>
             </div>
+
+            {guestGuide.items.length >= 2 && (
+              <>
+                <Separator />
+                <ReorderList
+                  items={guestGuide.items}
+                  onReorder={onReorderItem}
+                />
+              </>
+            )}
           </>
         )}
       </AccordionContent>

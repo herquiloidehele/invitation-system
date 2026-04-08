@@ -704,6 +704,24 @@ export default function InvitationForm({
     }));
   }, []);
 
+  const reorderGuideItem = useCallback(
+    (id: string, direction: "up" | "down") => {
+      setForm((prev) => {
+        const items = [...(prev.guestGuide?.items ?? [])];
+        const index = items.findIndex((i) => i.id === id);
+        if (index < 0) return prev;
+        const swapIndex = direction === "up" ? index - 1 : index + 1;
+        if (swapIndex < 0 || swapIndex >= items.length) return prev;
+        [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
+        return {
+          ...prev,
+          guestGuide: { enabled: prev.guestGuide?.enabled ?? true, items },
+        };
+      });
+    },
+    [],
+  );
+
   // Envelope overrides
   const updateEnvelope = useCallback(
     (field: keyof EnvelopeConfig, value: string | boolean) => {
@@ -2272,6 +2290,7 @@ export default function InvitationForm({
                 onAddCustom={addCustomGuideItem}
                 onUpdateCustom={updateCustomGuideItem}
                 onRemoveItem={removeGuideItem}
+                onReorderItem={reorderGuideItem}
               />
 
               {/* ── Textos Personalizados ── */}
