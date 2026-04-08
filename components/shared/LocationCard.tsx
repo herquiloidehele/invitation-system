@@ -7,6 +7,7 @@ import { ExternalLink, MapPin } from "lucide-react";
 import Image from "next/image";
 
 import type {
+  CustomTexts,
   ImageSettingsKey,
   ImageSettingsMap,
   LocationInfo,
@@ -16,6 +17,7 @@ import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { getImageStyle } from "@/lib/image-settings";
 import { EditableText } from "./EditableText";
+import { t } from "@/lib/custom-texts";
 
 // Dynamically import the map with ssr: false to prevent Leaflet from being
 // evaluated on the server (Leaflet requires `window`, which doesn't exist in SSR)
@@ -70,6 +72,8 @@ export interface LocationCardProps {
   imageSettings?: ImageSettingsMap;
   /** Which image key to use for this location. */
   imageKey?: ImageSettingsKey;
+  /** Per-invitation UI text overrides. */
+  customTexts?: CustomTexts;
 }
 
 export default function LocationCard({
@@ -82,6 +86,7 @@ export default function LocationCard({
   onMapsClick,
   imageSettings,
   imageKey,
+  customTexts: ct,
 }: LocationCardProps) {
   const effectiveCardBg = cardBg || theme.cardBg;
   const effectiveCardBorder = cardBorder || theme.cardBorder;
@@ -179,7 +184,7 @@ export default function LocationCard({
                       color: ts?.textMuted ?? theme.textMuted,
                     }}
                   >
-                    Mapa indisponível offline
+                    {t(ct, "map_unavailableOffline")}
                   </span>
                 </div>
               }
@@ -237,7 +242,7 @@ export default function LocationCard({
           whileTap={{ scale: 0.98 }}
         >
           <ExternalLink size={15} strokeWidth={1.5} />
-          Abrir no Mapa
+          {t(ct, "cta_openMap")}
         </motion.a>
       </div>
     </motion.div>

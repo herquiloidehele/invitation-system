@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type {
   CardSectionKey,
   CardStyle,
+  CustomTexts,
   EnvelopeConfig,
   GuestGuideItem,
   ImageSettings,
@@ -21,6 +22,7 @@ import type {
   TextStyleOverrides,
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
+import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
 
 import {
   ExternalLink,
@@ -830,6 +832,27 @@ export default function InvitationForm({
 
   const clearCardStyles = useCallback(() => {
     setForm((prev) => ({ ...prev, cardStyles: undefined }));
+  }, []);
+
+  // -- Custom Texts --
+  const updateCustomText = useCallback(
+    (key: keyof CustomTexts, value: string) => {
+      setForm((prev) => {
+        const ct = { ...prev.customTexts };
+        if (value.trim()) {
+          ct[key] = value;
+        } else {
+          delete ct[key];
+        }
+        const hasAny = Object.keys(ct).length > 0;
+        return { ...prev, customTexts: hasAny ? ct : undefined };
+      });
+    },
+    [],
+  );
+
+  const clearCustomTexts = useCallback(() => {
+    setForm((prev) => ({ ...prev, customTexts: undefined }));
   }, []);
 
   // Current theme for preview — merge per-invitation envelope overrides
@@ -2250,6 +2273,60 @@ export default function InvitationForm({
                 onUpdateCustom={updateCustomGuideItem}
                 onRemoveItem={removeGuideItem}
               />
+
+              {/* ── Textos Personalizados ── */}
+              <AccordionItem
+                value="customTexts"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Textos Personalizados
+                </AccordionTrigger>
+                <AccordionContent className="space-y-5 pb-4">
+                  <p className="text-xs text-muted-foreground">
+                    Personalize os textos exibidos no convite. Deixe em branco
+                    para usar o texto padrão.
+                  </p>
+
+                  {CUSTOM_TEXT_GROUPS.map((group) => (
+                    <div key={group.id} className="space-y-3">
+                      <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {group.label}
+                      </h4>
+                      {group.fields.map((field) => (
+                        <div key={field.key} className="space-y-1">
+                          <Label
+                            htmlFor={`ct-${field.key}`}
+                            className="text-xs"
+                          >
+                            {field.label}
+                          </Label>
+                          <Input
+                            id={`ct-${field.key}`}
+                            value={form.customTexts?.[field.key] ?? ""}
+                            onChange={(e) =>
+                              updateCustomText(field.key, e.target.value)
+                            }
+                            placeholder={field.placeholder}
+                            className="text-sm"
+                          />
+                        </div>
+                      ))}
+                      <Separator />
+                    </div>
+                  ))}
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-muted-foreground"
+                    onClick={clearCustomTexts}
+                  >
+                    <RotateCcw size={12} className="mr-1" />
+                    Repor todos os textos padrão
+                  </Button>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </div>
         </ScrollArea>

@@ -313,6 +313,78 @@ export interface TextStyleOverrides {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Per-invitation customizable UI text overrides
+// ---------------------------------------------------------------------------
+
+/** Every guest-visible UI string that can be overridden per invitation.
+ *  All fields are optional — missing keys fall back to the built-in defaults
+ *  defined in `lib/custom-texts.ts`.
+ */
+export interface CustomTexts {
+  // -- Section Titles --
+  sectionTitle_ourStory?: string;
+  sectionTitle_schedule?: string;
+  sectionTitle_location?: string;
+  sectionTitle_dressCode?: string;
+  sectionTitle_giftRegistry?: string;
+  sectionTitle_guestGuide?: string;
+  sectionTitle_faqs?: string;
+
+  // -- CTA / Buttons --
+  cta_confirmLabel?: string;
+  cta_confirmButton?: string;
+  cta_confirmedButton?: string;
+  cta_giftLink?: string;
+  cta_openMap?: string;
+  cta_addToCalendar?: string;
+
+  // -- Save the Date --
+  saveDate_label?: string;
+  saveDate_celebrationTitle?: string;
+  saveDate_days?: string;
+  saveDate_hours?: string;
+  saveDate_minutes?: string;
+  saveDate_seconds?: string;
+  saveDate_dayLabel?: string;
+  saveDate_monthLabel?: string;
+  saveDate_yearLabel?: string;
+  saveDate_dayOfWeekLabel?: string;
+
+  // -- Hero --
+  hero_inviteLabel?: string;
+
+  // -- RSVP Modal: Form --
+  rsvp_modalTitle?: string;
+  rsvp_nameLabel?: string;
+  rsvp_namePlaceholder?: string;
+  rsvp_emailLabel?: string;
+  rsvp_emailPlaceholder?: string;
+  rsvp_attendingLabel?: string;
+  rsvp_attendingYes?: string;
+  rsvp_attendingNo?: string;
+  rsvp_dietaryLabel?: string;
+  rsvp_dietaryPlaceholder?: string;
+  rsvp_messageLabel?: string;
+  rsvp_messagePlaceholder?: string;
+
+  // -- RSVP Modal: States & Actions --
+  rsvp_deadlinePrefix?: string;
+  rsvp_submitButton?: string;
+  rsvp_submitting?: string;
+  rsvp_successTitle?: string;
+  rsvp_successMessage?: string;
+  rsvp_alreadyTitle?: string;
+  rsvp_alreadyMessage?: string;
+  rsvp_errorTitle?: string;
+  rsvp_errorMessage?: string;
+  rsvp_retryButton?: string;
+  rsvp_closeButton?: string;
+
+  // -- Misc --
+  map_unavailableOffline?: string;
+}
+
 export interface InvitationData {
   slug: string;
   /** The theme's database id — used when saving/updating invitations. */
@@ -360,6 +432,8 @@ export interface InvitationData {
   externalLink?: string;
   /** Per-image position & zoom overrides. Missing keys use the default (centred, zoom 1). */
   imageSettings?: ImageSettingsMap;
+  /** Per-invitation UI text overrides. Missing keys fall back to built-in Portuguese defaults. */
+  customTexts?: CustomTexts;
 }
 
 export interface TemplateTheme {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type {
+  CustomTexts,
   ImageSettingsMap,
   InvitationData,
   SaveDateStyle,
@@ -10,6 +11,7 @@ import type {
 } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
+import { t } from "@/lib/custom-texts";
 import CalendarButton from "./CalendarButton";
 import { EditableText } from "./EditableText";
 
@@ -37,6 +39,8 @@ export interface SaveTheDateProps {
   isPreview?: boolean;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
+  /** Per-invitation UI text overrides. */
+  customTexts?: CustomTexts;
 }
 
 // ---------------------------------------------------------------------------
@@ -63,10 +67,18 @@ function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
   );
 }
 
-function SaveLabel({ ts }: { ts: ResolvedTextStyles }) {
+function SaveLabel({
+  ts,
+  customTexts: ct,
+}: {
+  ts: ResolvedTextStyles;
+  customTexts?: CustomTexts;
+}) {
   return (
     <span style={ts.saveLabel}>
-      <EditableText elementKey="saveLabel">Save the Date</EditableText>
+      <EditableText elementKey="saveLabel">
+        {t(ct, "saveDate_label")}
+      </EditableText>
     </span>
   );
 }
@@ -75,10 +87,12 @@ function CalendarCTA({
   invitation,
   ts,
   onCalendarClick,
+  customTexts: ct,
 }: {
   invitation: InvitationData;
   ts: ResolvedTextStyles;
   onCalendarClick?: () => void;
+  customTexts?: CustomTexts;
 }) {
   return (
     <CalendarButton
@@ -90,7 +104,7 @@ function CalendarCTA({
     >
       <span style={ts.calendarCta}>
         <EditableText elementKey="calendarCta">
-          + Adicionar ao Calendário
+          {t(ct, "cta_addToCalendar")}
         </EditableText>
       </span>
     </CalendarButton>
@@ -107,6 +121,7 @@ function SaveTheDateClassic({
   ts,
   cardBorderRadius,
   onCalendarClick,
+  customTexts: ct,
 }: SaveTheDateProps) {
   return (
     <div
@@ -121,7 +136,7 @@ function SaveTheDateClassic({
         border: `1px solid ${theme.cardBorder}`,
       }}
     >
-      <SaveLabel ts={ts} />
+      <SaveLabel ts={ts} customTexts={ct} />
 
       {/* Day — oversized */}
       <span className="mt-3" style={ts.dateDay}>
@@ -155,6 +170,7 @@ function SaveTheDateClassic({
         invitation={invitation}
         ts={ts}
         onCalendarClick={onCalendarClick}
+        customTexts={ct}
       />
     </div>
   );
@@ -290,6 +306,7 @@ function SaveTheDateCountdown({
   ts,
   cardBorderRadius,
   onCalendarClick,
+  customTexts: ct,
 }: SaveTheDateProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
     computeTimeLeft(invitation.date.iso, invitation.date.time),
@@ -321,7 +338,7 @@ function SaveTheDateCountdown({
         border: `1px solid ${theme.cardBorder}`,
       }}
     >
-      <SaveLabel ts={ts} />
+      <SaveLabel ts={ts} customTexts={ct} />
 
       {/* Date context */}
       <span className="mt-3" style={ts.countdownDate}>
@@ -349,7 +366,7 @@ function SaveTheDateCountdown({
         <div className="flex flex-col items-center gap-2 py-3">
           <span style={ts.celebrationTitle}>
             <EditableText elementKey="celebrationTitle">
-              Hoje é o grande dia!
+              {t(ct, "saveDate_celebrationTitle")}
             </EditableText>
           </span>
           <span style={ts.celebrationCouple}>
@@ -362,7 +379,7 @@ function SaveTheDateCountdown({
         <div className="flex items-start justify-center gap-1">
           <CountdownUnit
             value={timeLeft.days}
-            label="Dias"
+            label={t(ct, "saveDate_days")}
             theme={theme}
             ts={ts}
           />
@@ -380,7 +397,7 @@ function SaveTheDateCountdown({
           </span>
           <CountdownUnit
             value={timeLeft.hours}
-            label="Horas"
+            label={t(ct, "saveDate_hours")}
             theme={theme}
             ts={ts}
           />
@@ -398,7 +415,7 @@ function SaveTheDateCountdown({
           </span>
           <CountdownUnit
             value={timeLeft.minutes}
-            label="Minutos"
+            label={t(ct, "saveDate_minutes")}
             theme={theme}
             ts={ts}
           />
@@ -416,7 +433,7 @@ function SaveTheDateCountdown({
           </span>
           <CountdownUnit
             value={timeLeft.seconds}
-            label="Segundos"
+            label={t(ct, "saveDate_seconds")}
             theme={theme}
             ts={ts}
           />
@@ -427,6 +444,7 @@ function SaveTheDateCountdown({
         invitation={invitation}
         ts={ts}
         onCalendarClick={onCalendarClick}
+        customTexts={ct}
       />
     </div>
   );
@@ -489,6 +507,7 @@ function SaveTheDateQuadCards({
   ts,
   cardBorderRadius,
   onCalendarClick,
+  customTexts: ct,
 }: SaveTheDateProps) {
   return (
     <div className="flex flex-col items-center gap-4">
@@ -499,13 +518,13 @@ function SaveTheDateQuadCards({
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        <SaveLabel ts={ts} />
+        <SaveLabel ts={ts} customTexts={ct} />
       </motion.div>
 
       {/* 2×2 grid */}
       <div className="grid grid-cols-2 gap-3 w-full">
         <QuadCard
-          label="Dia"
+          label={t(ct, "saveDate_dayLabel")}
           value={invitation.date.day}
           theme={theme}
           ts={ts}
@@ -515,7 +534,7 @@ function SaveTheDateQuadCards({
           labelStyle={ts.quadDayLabel}
         />
         <QuadCard
-          label="Mês"
+          label={t(ct, "saveDate_monthLabel")}
           value={invitation.date.month}
           theme={theme}
           ts={ts}
@@ -525,7 +544,7 @@ function SaveTheDateQuadCards({
           labelStyle={ts.quadMonthLabel}
         />
         <QuadCard
-          label="Ano"
+          label={t(ct, "saveDate_yearLabel")}
           value={invitation.date.year}
           theme={theme}
           ts={ts}
@@ -535,7 +554,7 @@ function SaveTheDateQuadCards({
           labelStyle={ts.quadYearLabel}
         />
         <QuadCard
-          label="Dia da Semana"
+          label={t(ct, "saveDate_dayOfWeekLabel")}
           value={invitation.date.dayOfWeek}
           theme={theme}
           ts={ts}
@@ -563,6 +582,7 @@ function SaveTheDateQuadCards({
           invitation={invitation}
           ts={ts}
           onCalendarClick={onCalendarClick}
+          customTexts={ct}
         />
       </motion.div>
     </div>
@@ -583,6 +603,7 @@ function SaveTheDateCinematic({
   cardBorderRadius,
   onCalendarClick,
   imageSettings,
+  customTexts: ct,
 }: SaveTheDateProps) {
   const bgImage =
     invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
@@ -664,7 +685,7 @@ function SaveTheDateCinematic({
           {/* "Save the Date" label — white on dark image */}
           <span style={ts.cinematicSaveLabel}>
             <EditableText elementKey="cinematicSaveLabel">
-              Save the Date
+              {t(ct, "saveDate_label")}
             </EditableText>
           </span>
 
@@ -768,6 +789,7 @@ function SaveTheDateCinematic({
             invitation={invitation}
             ts={ts}
             onCalendarClick={onCalendarClick}
+            customTexts={ct}
           />
         </div>
       </div>
@@ -784,6 +806,7 @@ function SaveTheDateMinimalLine({
   ts,
   cardBorderRadius: _cardBorderRadius,
   onCalendarClick,
+  customTexts: ct,
 }: SaveTheDateProps) {
   return (
     <div className="flex flex-col items-center gap-5">
@@ -794,7 +817,7 @@ function SaveTheDateMinimalLine({
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        <SaveLabel ts={ts} />
+        <SaveLabel ts={ts} customTexts={ct} />
       </motion.div>
 
       {/* Main date line — large, spaced */}
@@ -881,6 +904,7 @@ function SaveTheDateMinimalLine({
         invitation={invitation}
         ts={ts}
         onCalendarClick={onCalendarClick}
+        customTexts={ct}
       />
     </div>
   );
@@ -900,6 +924,7 @@ export default function SaveTheDateSection({
   onCalendarClick,
   isPreview,
   imageSettings,
+  customTexts,
 }: SaveTheDateProps) {
   // Merge per-section card overrides into theme so all variants pick them up
   const theme = {
@@ -919,6 +944,7 @@ export default function SaveTheDateSection({
           cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
+          customTexts={customTexts}
         />
       );
     case "quad-cards":
@@ -930,6 +956,7 @@ export default function SaveTheDateSection({
           cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
+          customTexts={customTexts}
         />
       );
     case "cinematic":
@@ -942,6 +969,7 @@ export default function SaveTheDateSection({
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
           imageSettings={imageSettings}
+          customTexts={customTexts}
         />
       );
     case "minimal-line":
@@ -953,6 +981,7 @@ export default function SaveTheDateSection({
           cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
+          customTexts={customTexts}
         />
       );
     case "classic":
@@ -965,6 +994,7 @@ export default function SaveTheDateSection({
           cardBorderRadius={cardBorderRadius}
           onCalendarClick={onCalendarClick}
           isPreview={isPreview}
+          customTexts={customTexts}
         />
       );
   }

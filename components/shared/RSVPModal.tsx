@@ -6,8 +6,9 @@ import { X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { t } from "@/lib/custom-texts";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -122,6 +123,7 @@ interface IntegrationProps {
   onClose: () => void;
   invitation: InvitationData;
   theme: TemplateTheme;
+  customTexts?: CustomTexts;
 }
 
 type RSVPModalProps = DirectProps | IntegrationProps;
@@ -172,6 +174,7 @@ export default function RSVPModal(props: RSVPModalProps) {
   const deadline = isIntegration(props)
     ? props.invitation.rsvp.deadline
     : undefined;
+  const ct = isIntegration(props) ? props.customTexts : undefined;
 
   // Build a guaranteed high-contrast light palette
   const p = buildModalPalette(props.theme);
@@ -318,11 +321,11 @@ export default function RSVPModal(props: RSVPModalProps) {
                   color: props.theme.accent,
                 }}
               >
-                Confirmar Presença
+                {t(ct, "rsvp_modalTitle")}
               </h2>
               <button
                 onClick={handleClose}
-                aria-label="Fechar"
+                aria-label={t(ct, "rsvp_closeButton")}
                 className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-black/5"
               >
                 <X size={18} color={p.iconColor} />
@@ -343,10 +346,10 @@ export default function RSVPModal(props: RSVPModalProps) {
                     className="text-lg font-medium"
                     style={{ fontFamily: p.displayFont, color: p.text }}
                   >
-                    Presença já confirmada!
+                    {t(ct, "rsvp_alreadyTitle")}
                   </p>
                   <p className="text-sm" style={{ color: p.textSoft }}>
-                    Você já enviou sua confirmação para este evento.
+                    {t(ct, "rsvp_alreadyMessage")}
                   </p>
                   <button
                     onClick={handleClose}
@@ -358,7 +361,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                       borderRadius: p.ctaRadius,
                     }}
                   >
-                    Fechar
+                    {t(ct, "rsvp_closeButton")}
                   </button>
                 </motion.div>
               )}
@@ -378,10 +381,10 @@ export default function RSVPModal(props: RSVPModalProps) {
                       color: p.text,
                     }}
                   >
-                    Obrigado!
+                    {t(ct, "rsvp_successTitle")}
                   </p>
                   <p className="text-sm" style={{ color: p.textSoft }}>
-                    Sua confirmação foi registrada com sucesso.
+                    {t(ct, "rsvp_successMessage")}
                   </p>
                   <button
                     onClick={handleClose}
@@ -393,7 +396,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                       borderRadius: p.ctaRadius,
                     }}
                   >
-                    Fechar
+                    {t(ct, "rsvp_closeButton")}
                   </button>
                 </motion.div>
               )}
@@ -413,10 +416,10 @@ export default function RSVPModal(props: RSVPModalProps) {
                       color: p.text,
                     }}
                   >
-                    Erro ao enviar
+                    {t(ct, "rsvp_errorTitle")}
                   </p>
                   <p className="text-sm" style={{ color: p.textSoft }}>
-                    Tente novamente em alguns instantes.
+                    {t(ct, "rsvp_errorMessage")}
                   </p>
                   <button
                     onClick={() => setSubmitState("idle")}
@@ -428,7 +431,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                       borderRadius: p.ctaRadius,
                     }}
                   >
-                    Tentar novamente
+                    {t(ct, "rsvp_retryButton")}
                   </button>
                 </motion.div>
               )}
@@ -449,16 +452,16 @@ export default function RSVPModal(props: RSVPModalProps) {
                         color: p.textMuted,
                       }}
                     >
-                      Confirme até {deadline}
+                      {t(ct, "rsvp_deadlinePrefix")} {deadline}
                     </p>
                   )}
 
                   {/* Name */}
                   <div className="flex flex-col gap-1.5">
-                    <label style={labelStyle}>Nome *</label>
+                    <label style={labelStyle}>{t(ct, "rsvp_nameLabel")}</label>
                     <input
                       {...register("name")}
-                      placeholder="Seu nome completo"
+                      placeholder={t(ct, "rsvp_namePlaceholder")}
                       className={inputClass}
                       style={inputStyle}
                     />
@@ -471,11 +474,11 @@ export default function RSVPModal(props: RSVPModalProps) {
 
                   {/* Email */}
                   <div className="flex flex-col gap-1.5">
-                    <label style={labelStyle}>Email</label>
+                    <label style={labelStyle}>{t(ct, "rsvp_emailLabel")}</label>
                     <input
                       {...register("email")}
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder={t(ct, "rsvp_emailPlaceholder")}
                       className={inputClass}
                       style={inputStyle}
                     />
@@ -488,7 +491,9 @@ export default function RSVPModal(props: RSVPModalProps) {
 
                   {/* Attending */}
                   <div className="flex flex-col gap-2">
-                    <label style={labelStyle}>Você irá comparecer? *</label>
+                    <label style={labelStyle}>
+                      {t(ct, "rsvp_attendingLabel")}
+                    </label>
                     <div className="flex gap-3">
                       <label
                         className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
@@ -509,7 +514,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                           value="yes"
                           className="sr-only"
                         />
-                        Sim, estarei lá!
+                        {t(ct, "rsvp_attendingYes")}
                       </label>
                       <label
                         className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
@@ -529,7 +534,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                           value="no"
                           className="sr-only"
                         />
-                        Não poderei ir
+                        {t(ct, "rsvp_attendingNo")}
                       </label>
                     </div>
                     {errors.attending && (
@@ -542,10 +547,12 @@ export default function RSVPModal(props: RSVPModalProps) {
                   {/* Dietary restrictions */}
                   {attending === "yes" && (
                     <div className="flex flex-col gap-1.5">
-                      <label style={labelStyle}>Restrições alimentares</label>
+                      <label style={labelStyle}>
+                        {t(ct, "rsvp_dietaryLabel")}
+                      </label>
                       <input
                         {...register("dietaryRestrictions")}
-                        placeholder="Vegetariano, sem glúten…"
+                        placeholder={t(ct, "rsvp_dietaryPlaceholder")}
                         className={inputClass}
                         style={inputStyle}
                       />
@@ -554,11 +561,13 @@ export default function RSVPModal(props: RSVPModalProps) {
 
                   {/* Message */}
                   <div className="flex flex-col gap-1.5">
-                    <label style={labelStyle}>Mensagem para os noivos</label>
+                    <label style={labelStyle}>
+                      {t(ct, "rsvp_messageLabel")}
+                    </label>
                     <textarea
                       {...register("message")}
                       rows={3}
-                      placeholder="Deixe uma mensagem especial…"
+                      placeholder={t(ct, "rsvp_messagePlaceholder")}
                       className={`${inputClass} resize-none`}
                       style={inputStyle}
                     />
@@ -579,10 +588,10 @@ export default function RSVPModal(props: RSVPModalProps) {
                     {submitState === "loading" ? (
                       <>
                         <Loader2 size={16} className="animate-spin" />
-                        Enviando…
+                        {t(ct, "rsvp_submitting")}
                       </>
                     ) : (
-                      "Confirmar"
+                      t(ct, "rsvp_submitButton")
                     )}
                   </button>
                 </form>

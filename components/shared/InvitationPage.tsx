@@ -7,6 +7,7 @@ import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 import type { CardSectionKey, FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
+import { t } from "@/lib/custom-texts";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
@@ -610,7 +611,7 @@ export default function InvitationPage({
                   className="mt-7"
                 >
                   <EditableText elementKey="inviteLabel">
-                    Convidam para o seu casamento
+                    {t(invitation.customTexts, "hero_inviteLabel")}
                   </EditableText>
                 </motion.span>
 
@@ -831,7 +832,7 @@ export default function InvitationPage({
 
                 <span style={ts.inviteLabel}>
                   <EditableText elementKey="inviteLabel">
-                    Convidam para o seu casamento
+                    {t(invitation.customTexts, "hero_inviteLabel")}
                   </EditableText>
                 </span>
               </>
@@ -859,6 +860,7 @@ export default function InvitationPage({
             onCalendarClick={handleCalendarClick}
             isPreview={isPreview}
             imageSettings={invitation.imageSettings}
+            customTexts={invitation.customTexts}
           />
         </EditableCard>
       </AnimatedSection>
@@ -886,7 +888,8 @@ export default function InvitationPage({
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
-                  {invitation.ourStory.title || "Nossa História"}
+                  {invitation.ourStory.title ||
+                    t(invitation.customTexts, "sectionTitle_ourStory")}
                 </EditableText>
               </span>
 
@@ -961,7 +964,7 @@ export default function InvitationPage({
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
-                  Programação
+                  {t(invitation.customTexts, "sectionTitle_schedule")}
                 </EditableText>
               </span>
 
@@ -1052,7 +1055,9 @@ export default function InvitationPage({
       <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
           <span style={ts.sectionTitles}>
-            <EditableText elementKey="sectionTitles">Localização</EditableText>
+            <EditableText elementKey="sectionTitles">
+              {t(invitation.customTexts, "sectionTitle_location")}
+            </EditableText>
           </span>
 
           <motion.div
@@ -1081,6 +1086,7 @@ export default function InvitationPage({
             onMapsClick={handleMapsClick}
             imageSettings={invitation.imageSettings}
             imageKey="locationImage1"
+            customTexts={invitation.customTexts}
           />
         </EditableCard>
 
@@ -1098,6 +1104,7 @@ export default function InvitationPage({
                 onMapsClick={handleMapsClick}
                 imageSettings={invitation.imageSettings}
                 imageKey="locationImage2"
+                customTexts={invitation.customTexts}
               />
             </EditableCard>
           </div>
@@ -1152,7 +1159,9 @@ export default function InvitationPage({
                     <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
                   </div>
                   <span style={ts.labels}>
-                    <EditableText elementKey="labels">Dress Code</EditableText>
+                    <EditableText elementKey="labels">
+                      {t(invitation.customTexts, "sectionTitle_dressCode")}
+                    </EditableText>
                   </span>
                   <EditableText elementKey="dressCodeText">
                     <span
@@ -1213,7 +1222,9 @@ export default function InvitationPage({
                     <Gift size={20} color={ts.accent} strokeWidth={1.5} />
                   </div>
                   <span style={ts.labels}>
-                    <EditableText elementKey="labels">Presentes</EditableText>
+                    <EditableText elementKey="labels">
+                      {t(invitation.customTexts, "sectionTitle_giftRegistry")}
+                    </EditableText>
                   </span>
                   <span
                     style={{
@@ -1237,7 +1248,7 @@ export default function InvitationPage({
                     >
                       <ExternalLink size={10} strokeWidth={1.5} />
                       <EditableText elementKey="giftLink">
-                        Ver lista
+                        {t(invitation.customTexts, "cta_giftLink")}
                       </EditableText>
                     </motion.a>
                   )}
@@ -1258,8 +1269,14 @@ export default function InvitationPage({
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles} className={"text-center"}>
                 <EditableText elementKey="sectionTitles">
-                  Manual do <br />
-                  Bom Convidado
+                  {t(invitation.customTexts, "sectionTitle_guestGuide")
+                    .split("\n")
+                    .map((line, i, arr) => (
+                      <span key={i}>
+                        {line}
+                        {i < arr.length - 1 && <br />}
+                      </span>
+                    ))}
                 </EditableText>
               </span>
 
@@ -1305,7 +1322,7 @@ export default function InvitationPage({
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
-                  Perguntas Frequentes
+                  {t(invitation.customTexts, "sectionTitle_faqs")}
                 </EditableText>
               </span>
 
@@ -1365,9 +1382,9 @@ export default function InvitationPage({
       {/* ================================================================= */}
       <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
-          <span className="mb-6" style={ts.ctaLabel}>
+          <span className="mb-6 text-center" style={ts.ctaLabel}>
             <EditableText elementKey="ctaLabel">
-              Confirme sua presença
+              {t(invitation.customTexts, "cta_confirmLabel")}
             </EditableText>
           </span>
         </div>
@@ -1391,7 +1408,9 @@ export default function InvitationPage({
             whileTap={{ scale: 0.98 }}
           >
             <Heart size={17} strokeWidth={1.5} />
-            {rsvpSubmitted ? "Presença Confirmada" : "Confirmar Presença"}
+            {rsvpSubmitted
+              ? t(invitation.customTexts, "cta_confirmedButton")
+              : t(invitation.customTexts, "cta_confirmButton")}
           </motion.button>
         </div>
       </AnimatedSection>
@@ -1480,6 +1499,7 @@ export default function InvitationPage({
         }}
         invitation={invitation}
         theme={theme}
+        customTexts={invitation.customTexts}
       />
     </div>
   );

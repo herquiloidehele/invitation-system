@@ -181,6 +181,9 @@ export async function PUT(
         ...(body.imageSettings !== undefined && {
           imageSettings: sanitizeJsonField(body.imageSettings, null),
         }),
+        ...(body.customTexts !== undefined && {
+          customTexts: sanitizeJsonField(body.customTexts, null),
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },
