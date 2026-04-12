@@ -192,11 +192,16 @@ function computeTimeLeft(isoDate: string, timeStr: string): TimeLeft {
   // Parse the wedding date in Europe/Lisbon timezone.
   // The ISO date is stored as "YYYY-MM-DDT00:00:00.000Z" and the separate
   // time field holds the Lisbon wall-clock time (e.g. "16:00").
-  const datePart = isoDate.split("T")[0]; // "YYYY-MM-DD"
+  const datePart = isoDate?.split("T")[0] ?? ""; // "YYYY-MM-DD"
   const time = timeStr || "00:00";
 
   const [hour, minute] = time.split(":").map(Number);
   const [year, month, day] = datePart.split("-").map(Number);
+
+  // Guard against missing or invalid date values (e.g. empty form fields)
+  if (!datePart || isNaN(year) || isNaN(month) || isNaN(day)) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, passed: false };
+  }
 
   // Use Date.UTC (NOT new Date(year,...)) to avoid the JS quirk where years
   // 0-99 are mapped to 1900-1999 in the Date constructor.
