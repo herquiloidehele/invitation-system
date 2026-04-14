@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { InvitationData } from "@/lib/types";
+import { getModelComponent } from "@/components/models";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
-import InvitationPage from "@/components/shared/InvitationPage";
 import ExternalVideoPage, {
   type ExternalVideoPageHandle,
 } from "@/components/shared/ExternalVideoPage";
@@ -13,13 +13,9 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface InvitationViewProps {
   invitation: InvitationData;
-  theme: TemplateTheme;
 }
 
-export default function InvitationView({
-  invitation,
-  theme,
-}: InvitationViewProps) {
+export default function InvitationView({ invitation }: InvitationViewProps) {
   const [coverVisible, setCoverVisible] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [videoVisible, setVideoVisible] = useState(false);
@@ -27,6 +23,8 @@ export default function InvitationView({
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<ExternalVideoPageHandle | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  const { styles } = invitation;
 
   const isExternalVideo =
     (invitation.invitationType ?? "standard") === "external_video";
@@ -45,20 +43,6 @@ export default function InvitationView({
     !!invitation.audio.src;
 
   const { trackEvent } = useAnalytics(invitation.slug);
-
-  // Merge per-invitation envelope overrides on top of the theme defaults
-  const mergedTheme = useMemo<TemplateTheme>(() => {
-    const overrides = invitation.envelope;
-    if (!overrides) return theme;
-    return {
-      ...theme,
-      envelope: {
-        base: overrides.base || theme.envelope.base,
-        topFlap: overrides.topFlap || theme.envelope.topFlap,
-        bottomFlap: overrides.bottomFlap || theme.envelope.bottomFlap,
-      },
-    };
-  }, [theme, invitation.envelope]);
 
   // Track page view on mount (deduplicated server-side per session)
   useEffect(() => {
@@ -172,11 +156,21 @@ export default function InvitationView({
       return null;
     }
 
-    // Default: standard full invitation page
+    // Resolve the model component dynamically
+    const ModelComponent = getModelComponent(invitation.modelComponent);
+    if (!ModelComponent) {
+      return (
+        <div className="flex items-center justify-center min-h-dvh p-8 text-center">
+          <p>Modelo &quot;{invitation.modelComponent}&quot; não encontrado.</p>
+        </div>
+      );
+    }
+
+    // Default: standard full invitation page via model component
     return (
-      <InvitationPage
+      <ModelComponent
         invitation={invitation}
-        theme={theme}
+        styles={styles}
         audioRef={audioRef}
         prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
       />
@@ -187,13 +181,13 @@ export default function InvitationView({
     /* Outer full-screen layer — visible on wide screens as the side gutters */
     <div
       className="min-h-dvh flex justify-center"
-      style={{ backgroundColor: theme.bg }}
+      style={{ backgroundColor: styles.bg }}
     >
       {/* Inner column — capped at 500 px, acts as the positioning context
           for the envelope cover (absolute inset-0 inside it). */}
       <div
         className="relative min-h-dvh w-full overflow-hidden"
-        style={{ maxWidth: "500px", backgroundColor: theme.bg }}
+        style={{ maxWidth: "500px", backgroundColor: styles.bg }}
       >
         {/* External video — mounted immediately for preloading, revealed after animation */}
         {isExternalVideo && (
@@ -202,11 +196,11 @@ export default function InvitationView({
             videoUrl={invitation.videoUrl ?? ""}
             visible={videoVisible}
             invitation={invitation}
-            theme={mergedTheme}
+            theme={styles}
           />
         )}
 
-        {/* Persistent prefetch video — mounted once and reused by InvitationPage
+        {/* Persistent prefetch video — mounted once and reused by model component
             via ref so the browser never re-downloads the video. */}
         {isStandardWithVideo && (
           <video
@@ -266,11 +260,11 @@ export default function InvitationView({
           {coverVisible && (
             <EnvelopeCover
               key="envelope-cover"
-              theme={mergedTheme}
+              theme={styles}
               onOpen={handleOpen}
               onAnimationComplete={handleAnimationComplete}
               monogram={invitation.couple.monogram}
-              shimmer={invitation.envelope?.shimmer !== false}
+              shimmer={styles.envelopeShimmer !== false}
               imageSettings={invitation.imageSettings}
             />
           )}

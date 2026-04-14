@@ -13,8 +13,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import type { InvitationData, TemplateTheme } from "@/lib/types";
-import InvitationPage from "@/components/shared/InvitationPage";
+import type { InvitationData, ModelRecord } from "@/lib/types";
+import ClassicFloral from "@/components/models/ClassicFloral/ClassicFloral";
+import { getDefaultStylesForComponent } from "@/components/models";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 
@@ -46,10 +47,10 @@ function Swatch({ color, label }: { color: string; label: string }) {
 // ---------------------------------------------------------------------------
 
 function PhoneFrame({
-  theme,
+  model,
   invitation,
 }: {
-  theme: TemplateTheme;
+  model: ModelRecord;
   invitation: InvitationData;
 }) {
   return (
@@ -81,7 +82,10 @@ function PhoneFrame({
         }}
       >
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-        <InvitationPage invitation={invitation} theme={theme} />
+        <ClassicFloral
+          invitation={invitation}
+          styles={getDefaultStylesForComponent(model.component)}
+        />
       </div>
 
       {/* Bottom home-indicator bar */}
@@ -101,34 +105,35 @@ function PhoneFrame({
 
 interface ThemeViewClientProps {
   invitation: InvitationData;
-  theme: TemplateTheme;
+  model: ModelRecord;
 }
 
 export default function ThemeViewClient({
   invitation,
-  theme,
+  model,
 }: ThemeViewClientProps) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
+  const s = getDefaultStylesForComponent(model.component);
 
   async function handleDelete() {
     if (
       !confirm(
-        `Tem a certeza que quer eliminar o modelo "${theme.label}"? Esta acção não pode ser desfeita.`,
+        `Tem a certeza que quer eliminar o modelo "${model.label}"? Esta acção não pode ser desfeita.`,
       )
     )
       return;
 
     setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/themes/${theme.id}`, {
+      const res = await fetch(`/api/admin/models/${model.id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error ?? "Falha ao eliminar");
       }
-      toast.success(`Modelo "${theme.label}" eliminado.`);
+      toast.success(`Modelo "${model.label}" eliminado.`);
       router.push("/admin/templates");
       router.refresh();
     } catch (err) {
@@ -156,15 +161,15 @@ export default function ThemeViewClient({
             Modelos
           </Link>
           <span className="text-muted-foreground">/</span>
-          <h1 className="text-sm font-semibold">{theme.label}</h1>
+          <h1 className="text-sm font-semibold">{model.label}</h1>
           <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-            {theme.description}
+            {model.description}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           <Link
-            href={`/admin/templates/${theme.name}/edit`}
+            href={`/admin/templates/${model.name}/edit`}
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
               "gap-1.5",
@@ -174,7 +179,7 @@ export default function ThemeViewClient({
             Editar
           </Link>
           <Link
-            href={`/admin/templates/new?from=${theme.name}`}
+            href={`/admin/templates/new?from=${model.name}`}
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
               "gap-1.5",
@@ -195,7 +200,7 @@ export default function ThemeViewClient({
             {deleting ? "A eliminar..." : "Eliminar"}
           </button>
           <Link
-            href={`/admin/invitations/new?template=${theme.name}`}
+            href={`/admin/invitations/new?template=${model.name}`}
             className={cn(
               buttonVariants({ variant: "default", size: "sm" }),
               "gap-2",
@@ -209,7 +214,7 @@ export default function ThemeViewClient({
 
       {/* ── Main two-column layout ────────────────────────────────────── */}
       <div className="flex flex-1 gap-8 overflow-hidden">
-        {/* ── Left panel: theme metadata ───────────────────────── */}
+        {/* ── Left panel: model metadata ───────────────────────── */}
         <div className="flex w-72 flex-shrink-0 flex-col gap-6 overflow-y-auto pb-6">
           {/* Colour palette */}
           <section className="space-y-3">
@@ -217,12 +222,12 @@ export default function ThemeViewClient({
               Paleta de Cores
             </h2>
             <div className="space-y-2 rounded-xl border bg-card p-4">
-              <Swatch color={theme.bg} label="Fundo" />
-              <Swatch color={theme.primary} label="Primária" />
-              <Swatch color={theme.secondary} label="Secundária" />
-              <Swatch color={theme.accent} label="Destaque" />
-              <Swatch color={theme.textPrimary} label="Texto principal" />
-              <Swatch color={theme.textSecondary} label="Texto secundário" />
+              <Swatch color={s.bg} label="Fundo" />
+              <Swatch color={s.primary} label="Primária" />
+              <Swatch color={s.secondary} label="Secundária" />
+              <Swatch color={s.accent} label="Destaque" />
+              <Swatch color={s.textPrimary} label="Texto principal" />
+              <Swatch color={s.textSecondary} label="Texto secundário" />
             </div>
           </section>
 
@@ -239,12 +244,12 @@ export default function ThemeViewClient({
                 </p>
                 <p
                   className="text-2xl leading-tight"
-                  style={{ fontFamily: theme.displayFont }}
+                  style={{ fontFamily: s.displayFont }}
                 >
                   Sofia &amp; Miguel
                 </p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">
-                  {fontName(theme.displayFont)}
+                  {fontName(s.displayFont)}
                 </p>
               </div>
 
@@ -257,17 +262,17 @@ export default function ThemeViewClient({
                 </p>
                 <p
                   className="text-sm leading-relaxed text-muted-foreground"
-                  style={{ fontFamily: theme.bodyFont }}
+                  style={{ fontFamily: s.bodyFont }}
                 >
                   Dois corações, uma história.
                 </p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">
-                  {fontName(theme.bodyFont)}
+                  {fontName(s.bodyFont)}
                 </p>
               </div>
 
               {/* Script font if available */}
-              {theme.scriptFont && (
+              {s.scriptFont && (
                 <>
                   <div className="h-px bg-border" />
                   <div>
@@ -276,12 +281,12 @@ export default function ThemeViewClient({
                     </p>
                     <p
                       className="text-xl leading-tight"
-                      style={{ fontFamily: theme.scriptFont }}
+                      style={{ fontFamily: s.scriptFont }}
                     >
                       Save the Date
                     </p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {fontName(theme.scriptFont)}
+                      {fontName(s.scriptFont)}
                     </p>
                   </div>
                 </>
@@ -298,10 +303,10 @@ export default function ThemeViewClient({
               <button
                 className="w-full py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
                 style={{
-                  background: theme.ctaPrimaryBg,
-                  color: theme.ctaPrimaryText,
-                  borderRadius: theme.ctaRadius === "0px" ? 4 : 9999,
-                  fontFamily: theme.uiFont,
+                  background: s.ctaPrimaryBg,
+                  color: s.ctaPrimaryText,
+                  borderRadius: s.ctaRadius === "0px" ? 4 : 9999,
+                  fontFamily: s.uiFont,
                   letterSpacing: 0.5,
                   border: "none",
                   cursor: "default",
@@ -313,10 +318,10 @@ export default function ThemeViewClient({
                 className="w-full py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
                 style={{
                   background: "transparent",
-                  color: theme.ctaSecondaryText,
-                  border: `1.5px solid ${theme.ctaSecondaryBorder}`,
-                  borderRadius: theme.ctaRadius === "0px" ? 4 : 9999,
-                  fontFamily: theme.uiFont,
+                  color: s.ctaSecondaryText,
+                  border: `1.5px solid ${s.ctaSecondaryBorder}`,
+                  borderRadius: s.ctaRadius === "0px" ? 4 : 9999,
+                  fontFamily: s.uiFont,
                   letterSpacing: 0.5,
                   cursor: "default",
                 }}
@@ -325,7 +330,7 @@ export default function ThemeViewClient({
               </button>
               <p className="text-[10px] text-muted-foreground">
                 Raio:{" "}
-                {theme.ctaRadius === "0px"
+                {s.ctaRadius === "0px"
                   ? "Cantos retos"
                   : "Pílula (arredondado)"}
               </p>
@@ -340,13 +345,13 @@ export default function ThemeViewClient({
             <div className="flex items-center justify-center rounded-xl border bg-card p-6">
               <div
                 className="flex h-20 w-32 items-center justify-center rounded-md shadow-sm"
-                style={{ background: theme.envelope.base }}
+                style={{ background: s.envelope.base }}
               >
                 <span
                   style={{
-                    fontFamily: theme.displayFont,
+                    fontFamily: s.displayFont,
                     fontSize: 22,
-                    color: theme.monogramColor,
+                    color: s.monogramColor,
                     letterSpacing: 2,
                   }}
                 >
@@ -358,7 +363,7 @@ export default function ThemeViewClient({
 
           {/* CTA */}
           <Link
-            href={`/admin/invitations/new?template=${theme.name}`}
+            href={`/admin/invitations/new?template=${model.name}`}
             className={cn(
               buttonVariants({ variant: "default", size: "lg" }),
               "w-full gap-2",
@@ -378,7 +383,7 @@ export default function ThemeViewClient({
               <span>Prévia — dados de exemplo</span>
             </div>
 
-            <PhoneFrame theme={theme} invitation={invitation} />
+            <PhoneFrame model={model} invitation={invitation} />
           </div>
         </div>
       </div>

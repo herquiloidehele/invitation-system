@@ -16,7 +16,7 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
-import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { InvitationData, InvitationStyles } from "@/lib/types";
 import RSVPModal from "@/components/shared/RSVPModal";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
@@ -31,7 +31,7 @@ interface ExternalVideoPageProps {
   /** When false the wrapper is invisible but still mounted (preloading). */
   visible?: boolean;
   invitation: InvitationData;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
 }
 
 const ExternalVideoPage = forwardRef<

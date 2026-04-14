@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { getTheme } from "@/lib/themes";
-import { themeToFormData } from "@/lib/theme-form-data";
+import { getModel } from "@/lib/models";
+import { modelToFormData } from "@/lib/theme-form-data";
 import ThemeForm from "@/components/admin/ThemeForm";
 import { prisma } from "@/lib/db";
 
@@ -13,11 +13,11 @@ interface PageProps {
 export default async function EditTemplatePage({ params }: PageProps) {
   const { name } = await params;
 
-  const theme = await getTheme(name);
-  if (!theme) notFound();
+  const model = await getModel(name);
+  if (!model) notFound();
 
   // Look up the DB id so we can pass it to the form for the PUT request
-  const row = await prisma.theme.findUnique({
+  const row = await prisma.model.findUnique({
     where: { name },
     select: { id: true },
   });
@@ -27,8 +27,8 @@ export default async function EditTemplatePage({ params }: PageProps) {
     <div className="space-y-4">
       <ThemeForm
         mode="edit"
-        themeId={row.id}
-        initialData={themeToFormData(theme)}
+        modelId={row.id}
+        initialData={modelToFormData(model)}
       />
     </div>
   );

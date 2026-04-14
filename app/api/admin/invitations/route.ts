@@ -33,7 +33,7 @@ export async function GET() {
     const invitations = await prisma.invitation.findMany({
       orderBy: { createdAt: "desc" },
       include: {
-        theme: { select: { id: true, name: true, label: true } },
+        model: { select: { id: true, name: true, label: true } },
         _count: {
           select: { rsvpResponses: true },
         },
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Basic validation — accept either themeId (new) or template slug (legacy)
+    // Basic validation
     if (!body.slug || !body.couple || !body.date) {
       return NextResponse.json(
         { error: "Missing required fields: slug, couple, date" },
@@ -66,18 +66,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Resolve themeId
-    let themeId: string | undefined = body.themeId;
-    if (!themeId && body.template) {
+    // Resolve modelId
+    let modelId: string | undefined = body.modelId;
+    if (!modelId && body.template) {
       // Legacy: look up by slug name
-      const theme = await prisma.theme.findUnique({
+      const model = await prisma.model.findUnique({
         where: { name: body.template },
       });
-      if (theme) themeId = theme.id;
+      if (model) modelId = model.id;
     }
-    if (!themeId) {
+    if (!modelId) {
       return NextResponse.json(
-        { error: "Missing required field: themeId (or template)" },
+        { error: "Missing required field: modelId (or template)" },
+        { status: 400 },
+      );
+    }
+
+    if (!body.styles) {
+      return NextResponse.json(
+        { error: "Missing required field: styles" },
         { status: 400 },
       );
     }
@@ -97,9 +104,10 @@ export async function POST(request: NextRequest) {
     const invitation = await prisma.invitation.create({
       data: {
         slug: body.slug,
-        theme: { connect: { id: themeId } },
+        model: { connect: { id: modelId } },
         couple: body.couple,
         date: body.date,
+        styles: body.styles,
         quote: body.quote ?? "",
         location: sanitizeJsonField(body.location, {}),
         location2: sanitizeJsonField(body.location2, null),
@@ -123,21 +131,17 @@ export async function POST(request: NextRequest) {
         videoUrl: body.videoUrl ?? null,
         faqs: sanitizeJsonField(body.faqs, null),
         guestGuide: sanitizeJsonField(body.guestGuide, null),
-        envelope: sanitizeJsonField(body.envelope, null),
-        saveDateStyle: body.saveDateStyle ?? null,
         cinematicImageUrl: body.cinematicImageUrl ?? null,
         sectionImages: sanitizeJsonField(body.sectionImages, null),
         parents: sanitizeJsonField(body.parents, null),
         ourStory: sanitizeJsonField(body.ourStory, null),
         invitationType: body.invitationType ?? "standard",
         externalLink: body.externalLink ?? null,
-        textStyles: sanitizeJsonField(body.textStyles, null),
-        cardStyles: sanitizeJsonField(body.cardStyles, null),
         imageSettings: sanitizeJsonField(body.imageSettings, null),
         customTexts: sanitizeJsonField(body.customTexts, null),
       },
       include: {
-        theme: { select: { id: true, name: true, label: true } },
+        model: { select: { id: true, name: true, label: true } },
       },
     });
 

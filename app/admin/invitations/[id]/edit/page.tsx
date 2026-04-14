@@ -1,17 +1,15 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
-import { getThemes } from "@/lib/themes";
+import { getModels } from "@/lib/models";
 import type {
   InvitationData,
   InvitationType,
   ImageSettingsMap,
   ParentsInfo,
-  SaveDateStyle,
   SectionImages,
   OurStory,
-  TextStyleOverrides,
-  CardStyleOverrides,
+  InvitationStyles,
 } from "@/lib/types";
 import InvitationForm from "../../InvitationForm";
 import ExternalInvitationForm from "../../ExternalInvitationForm";
@@ -24,12 +22,12 @@ export default async function EditInvitationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [row, themes] = await Promise.all([
+  const [row, models] = await Promise.all([
     prisma.invitation.findUnique({
       where: { id },
-      include: { theme: true },
+      include: { model: true },
     }),
-    getThemes(),
+    getModels(),
   ]);
 
   if (!row) {
@@ -46,8 +44,9 @@ export default async function EditInvitationPage({
   const initialData: InvitationData & { id: string } = {
     id: row.id,
     slug: row.slug,
-    themeId: row.themeId,
-    template: row.theme.name,
+    modelId: row.modelId,
+    modelComponent: row.model.component,
+    styles: row.styles as unknown as InvitationStyles,
     couple: row.couple as unknown as InvitationData["couple"],
     date: row.date as unknown as InvitationData["date"],
     quote: row.quote,
@@ -62,20 +61,13 @@ export default async function EditInvitationPage({
     heroImage: row.heroImage,
     videoUrl: row.videoUrl ?? undefined,
     faqs: (row.faqs as unknown as InvitationData["faqs"]) ?? undefined,
-    envelope:
-      (row.envelope as unknown as InvitationData["envelope"]) ?? undefined,
     guestGuide:
       (row.guestGuide as unknown as InvitationData["guestGuide"]) ?? undefined,
-    saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages:
       (row.sectionImages as unknown as SectionImages | null) ?? undefined,
     parents: (row.parents as unknown as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as unknown as OurStory | null) ?? undefined,
-    textStyles:
-      (row.textStyles as unknown as TextStyleOverrides | null) ?? undefined,
-    cardStyles:
-      (row.cardStyles as unknown as CardStyleOverrides | null) ?? undefined,
     imageSettings:
       (row.imageSettings as unknown as ImageSettingsMap | null) ?? undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
@@ -93,7 +85,7 @@ export default async function EditInvitationPage({
         initialData={initialData}
         invitationId={row.id}
         ownerUrl={ownerUrl}
-        themes={themes}
+        models={models}
       />
     );
   }
@@ -104,7 +96,7 @@ export default async function EditInvitationPage({
       initialData={initialData}
       invitationId={row.id}
       ownerUrl={ownerUrl}
-      themes={themes}
+      models={models}
     />
   );
 }

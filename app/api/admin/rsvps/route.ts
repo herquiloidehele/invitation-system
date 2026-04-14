@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
             id: true,
             slug: true,
             couple: true,
-            theme: { select: { name: true } },
+            model: { select: { name: true } },
           },
         },
       },

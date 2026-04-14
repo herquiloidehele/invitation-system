@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import type {
   ImageSettingsKey,
   ImageSettingsMap,
-  TemplateTheme,
+  InvitationStyles,
 } from "@/lib/types";
 import { getImageStyle } from "@/lib/image-settings";
 
@@ -21,7 +21,7 @@ export default function SectionImage({
   imageKey,
 }: {
   src: string;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   height?: number;
   hiddeBottom?: boolean;
   imageSettings?: ImageSettingsMap;

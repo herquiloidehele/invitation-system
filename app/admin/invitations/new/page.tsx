@@ -1,4 +1,5 @@
-import { getThemes } from "@/lib/themes";
+import { getModels } from "@/lib/models";
+import { getDefaultStylesForComponent } from "@/components/models";
 import InvitationForm from "../InvitationForm";
 import type { InvitationData } from "@/lib/types";
 
@@ -9,19 +10,20 @@ interface PageProps {
 export const dynamic = "force-dynamic";
 
 export default async function NewInvitationPage({ searchParams }: PageProps) {
-  const [{ template }, themes] = await Promise.all([searchParams, getThemes()]);
+  const [{ template }, models] = await Promise.all([searchParams, getModels()]);
 
-  // If a template name was provided via query param, find the matching theme
-  const matchedTheme = template
-    ? themes.find((t) => t.name === template)
+  // If a template name was provided via query param, find the matching model
+  const matchedModel = template
+    ? models.find((m) => m.name === template)
     : undefined;
 
   // Pre-build initial data when a specific template was requested
-  const initialData: InvitationData | undefined = matchedTheme
+  const initialData: InvitationData | undefined = matchedModel
     ? {
         slug: "",
-        themeId: matchedTheme.id,
-        template: matchedTheme.name,
+        modelId: matchedModel.id,
+        modelComponent: matchedModel.component,
+        styles: getDefaultStylesForComponent(matchedModel.component),
         couple: { bride: "", groom: "", monogram: "" },
         date: {
           iso: "",
@@ -50,7 +52,6 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         heroImage: "",
         videoUrl: "",
         faqs: [],
-        saveDateStyle: "classic",
         cinematicImageUrl: "",
         invitationType: "standard",
         imageSettings: {},
@@ -58,6 +59,6 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
     : undefined;
 
   return (
-    <InvitationForm mode="create" initialData={initialData} themes={themes} />
+    <InvitationForm mode="create" initialData={initialData} models={models} />
   );
 }

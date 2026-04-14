@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
-import type { ScheduleEvent, TemplateTheme } from "@/lib/types";
+import type { ScheduleEvent, InvitationStyles } from "@/lib/types";
 import { EditableText } from "./EditableText";
 
 // ---------------------------------------------------------------------------
@@ -26,7 +26,7 @@ interface DirectProps {
 
 interface IntegrationProps {
   event: ScheduleEvent;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
 }
 
 type ScheduleItemProps = DirectProps | IntegrationProps;

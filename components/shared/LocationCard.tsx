@@ -11,7 +11,7 @@ import type {
   ImageSettingsKey,
   ImageSettingsMap,
   LocationInfo,
-  TemplateTheme,
+  InvitationStyles,
 } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
@@ -58,7 +58,7 @@ function getExternalMapUrl(location: LocationInfo): string {
 
 export interface LocationCardProps {
   location: LocationInfo;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   /** Resolved text styles — when provided, text elements use these instead of raw theme values */
   ts?: ResolvedTextStyles;
   /** Per-section card background override. Falls back to theme.cardBg. */

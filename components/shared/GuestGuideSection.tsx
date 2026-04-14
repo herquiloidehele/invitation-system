@@ -9,7 +9,7 @@ import {
   resolveLucideIconName,
 } from "@/lib/lucide-icons";
 import { sanitizeAndNormalizeSvg } from "@/lib/svg-icons";
-import type { GuestGuide, GuestGuideItem, TemplateTheme } from "@/lib/types";
+import type { GuestGuide, GuestGuideItem, InvitationStyles } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { EditableText } from "./EditableText";
 
@@ -130,7 +130,7 @@ function GuideIcon({ item, size, color }: GuideIconProps) {
 
 interface GuideItemCardProps {
   item: GuestGuideItem;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   ts?: ResolvedTextStyles;
   cardBg?: string;
   cardBorder?: string;
@@ -194,7 +194,7 @@ function GuideItemCard({
 
 export interface GuestGuideSectionProps {
   guestGuide: GuestGuide;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   /** Resolved text styles — when provided, text elements use these instead of raw theme values */
   ts?: ResolvedTextStyles;
   /** Per-section card background override. Falls back to theme.cardBg. */

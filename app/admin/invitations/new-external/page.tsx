@@ -1,10 +1,10 @@
-import { getThemes } from "@/lib/themes";
+import { getModels } from "@/lib/models";
 import ExternalInvitationForm from "../ExternalInvitationForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewExternalInvitationPage() {
-  const themes = await getThemes();
+  const models = await getModels();
 
-  return <ExternalInvitationForm mode="create" themes={themes} />;
+  return <ExternalInvitationForm mode="create" models={models} />;
 }

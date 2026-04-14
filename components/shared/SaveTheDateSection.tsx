@@ -7,7 +7,7 @@ import type {
   ImageSettingsMap,
   InvitationData,
   SaveDateStyle,
-  TemplateTheme,
+  InvitationStyles,
 } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
@@ -27,7 +27,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export interface SaveTheDateProps {
   invitation: InvitationData;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   ts: ResolvedTextStyles;
   /** Per-section card background override. Falls back to theme.cardBg. */
   cardBg?: string;
@@ -269,7 +269,7 @@ function CountdownUnit({
 }: {
   value: number;
   label: string;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   ts: ResolvedTextStyles;
 }) {
   return (
@@ -471,7 +471,7 @@ function QuadCard({
 }: {
   label: string;
   value: string;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   ts: ResolvedTextStyles;
   delay?: number;
   elementKey: string;
@@ -937,7 +937,7 @@ export default function SaveTheDateSection({
     cardBg: cardBg || rawTheme.cardBg,
     cardBorder: cardBorder || rawTheme.cardBorder,
   };
-  const style: SaveDateStyle = invitation.saveDateStyle ?? "classic";
+  const style: SaveDateStyle = theme.saveDateStyle ?? "classic";
 
   switch (style) {
     case "countdown":

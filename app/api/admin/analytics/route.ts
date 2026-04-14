@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     where: slug ? { slug } : undefined,
     orderBy: { createdAt: "desc" },
     include: {
-      theme: { select: { name: true } },
+      model: { select: { name: true } },
       _count: { select: { rsvpResponses: true } },
       rsvpResponses: {
         where: rangeStart ? { submittedAt: { gte: rangeStart } } : undefined,
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
     return {
       slug: inv.slug,
       coupleName,
-      template: inv.theme.name,
+      template: inv.model.name,
       createdAt: inv.createdAt,
       totalViews,
       uniqueVisitors,

@@ -20,7 +20,7 @@ export default async function AdminInvitationsPage() {
     select: {
       id: true,
       slug: true,
-      theme: { select: { name: true } },
+      model: { select: { name: true } },
       couple: true,
       date: true,
       rsvp: true,
@@ -29,10 +29,10 @@ export default async function AdminInvitationsPage() {
     },
   });
 
-  // Flatten theme.name → template for the client component
+  // Flatten model.name → template for the client component
   const rows = invitations.map((inv) => ({
     ...inv,
-    template: inv.theme.name,
+    template: inv.model.name,
   }));
 
   return <InvitationsClient invitations={rows as unknown as InvitationRow[]} />;

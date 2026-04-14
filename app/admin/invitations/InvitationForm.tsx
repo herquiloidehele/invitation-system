@@ -13,11 +13,12 @@ import type {
   ImageSettings,
   ImageSettingsKey,
   InvitationData,
+  InvitationStyles,
   LocationInfo,
+  ModelRecord,
   ParentsInfo,
   SaveDateStyle,
   SectionImages,
-  TemplateTheme,
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
@@ -60,7 +61,9 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import InvitationPage from "@/components/shared/InvitationPage";
+import ClassicFloral from "@/components/models/ClassicFloral/ClassicFloral";
+import { getDefaultStylesForComponent } from "@/components/models";
+import StyleCustomizationSection from "@/components/admin/StyleCustomizationSection";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
@@ -300,11 +303,14 @@ const SAVE_DATE_STYLE_OPTIONS: {
 // Default form state
 // ---------------------------------------------------------------------------
 
-function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
+function getDefaultFormState(firstModel?: ModelRecord): InvitationData {
   return {
     slug: "",
-    themeId: firstTheme?.id ?? "theme_pink_floral",
-    template: firstTheme?.name ?? "pink-floral",
+    modelId: firstModel?.id ?? "",
+    modelComponent: firstModel?.component ?? "ClassicFloral",
+    styles: getDefaultStylesForComponent(
+      firstModel?.component ?? "ClassicFloral",
+    ),
     couple: { bride: "", groom: "", monogram: "" },
     date: {
       iso: "",
@@ -334,8 +340,6 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     videoUrl: "",
     faqs: [],
     guestGuide: { enabled: false, items: [] },
-    envelope: {},
-    saveDateStyle: "classic",
     cinematicImageUrl: "",
     sectionImages: {},
     parents: {
@@ -367,8 +371,8 @@ interface InvitationFormProps {
   mode: "create" | "edit";
   invitationId?: string;
   ownerUrl?: string;
-  /** All available themes (fetched by the server parent and passed down). */
-  themes: TemplateTheme[];
+  /** All available models (fetched by the server parent and passed down). */
+  models: ModelRecord[];
 }
 
 export default function InvitationForm({
@@ -376,12 +380,12 @@ export default function InvitationForm({
   mode,
   invitationId,
   ownerUrl,
-  themes,
+  models,
 }: InvitationFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<InvitationData>(
-    initialData ?? getDefaultFormState(themes[0]),
+    initialData ?? getDefaultFormState(models[0]),
   );
 
   // Google Maps link auto-fill state
@@ -722,12 +726,16 @@ export default function InvitationForm({
     [],
   );
 
-  // Envelope overrides
+  // Envelope overrides — stored inside form.styles.envelope
   const updateEnvelope = useCallback(
     (field: keyof EnvelopeConfig, value: string | boolean) => {
       setForm((prev) => ({
         ...prev,
-        envelope: { ...prev.envelope, [field]: value },
+        styles: {
+          ...prev.styles,
+          envelope: { ...prev.styles.envelope, [field]: value },
+          ...(field === "shimmer" ? { envelopeShimmer: value as boolean } : {}),
+        },
       }));
     },
     [],
@@ -783,7 +791,7 @@ export default function InvitationForm({
     [],
   );
 
-  // Text style overrides — element-specific
+  // Text style overrides — element-specific (stored in form.styles.textOverrides)
   const updateTextStyleElement = useCallback(
     (
       element: keyof NonNullable<TextStyleOverrides["elements"]>,
@@ -791,7 +799,7 @@ export default function InvitationForm({
       value: string | number | undefined,
     ) => {
       setForm((prev) => {
-        const ts = prev.textStyles ?? {};
+        const ts = prev.styles.textOverrides ?? {};
         const elements = { ...ts.elements };
         const el = { ...elements[element], [field]: value || undefined };
         const elHasAny = Object.values(el).some((v) => v !== undefined);
@@ -799,7 +807,10 @@ export default function InvitationForm({
         const hasAny = Object.values(elements).some(Boolean);
         return {
           ...prev,
-          textStyles: { ...ts, elements: hasAny ? elements : undefined },
+          styles: {
+            ...prev.styles,
+            textOverrides: { ...ts, elements: hasAny ? elements : undefined },
+          },
         };
       });
     },
@@ -807,26 +818,32 @@ export default function InvitationForm({
   );
 
   const clearTextStyles = useCallback(() => {
-    setForm((prev) => ({ ...prev, textStyles: undefined }));
+    setForm((prev) => ({
+      ...prev,
+      styles: { ...prev.styles, textOverrides: undefined },
+    }));
   }, []);
 
   // Text style overrides — font role (sectionTitle font)
   const updateTextStyleFont = useCallback(
     (role: keyof NonNullable<TextStyleOverrides["fonts"]>, value: string) => {
       setForm((prev) => {
-        const ts = prev.textStyles ?? {};
+        const ts = prev.styles.textOverrides ?? {};
         const fonts = { ...ts.fonts, [role]: value || undefined };
         const hasAny = Object.values(fonts).some((v) => v !== undefined);
         return {
           ...prev,
-          textStyles: { ...ts, fonts: hasAny ? fonts : undefined },
+          styles: {
+            ...prev.styles,
+            textOverrides: { ...ts, fonts: hasAny ? fonts : undefined },
+          },
         };
       });
     },
     [],
   );
 
-  // Card style overrides per section
+  // Card style overrides per section (stored in form.styles.cardOverrides)
   const updateCardStyle = useCallback(
     (
       section: CardSectionKey,
@@ -834,14 +851,17 @@ export default function InvitationForm({
       value: string | number | undefined,
     ) => {
       setForm((prev) => {
-        const cs = { ...prev.cardStyles };
+        const cs = { ...prev.styles.cardOverrides };
         const sec = { ...cs[section], [field]: value || undefined };
         const secHasAny = Object.values(sec).some((v) => v !== undefined);
         cs[section] = secHasAny ? sec : undefined;
         const hasAny = Object.values(cs).some(Boolean);
         return {
           ...prev,
-          cardStyles: hasAny ? cs : undefined,
+          styles: {
+            ...prev.styles,
+            cardOverrides: hasAny ? cs : undefined,
+          },
         };
       });
     },
@@ -849,7 +869,10 @@ export default function InvitationForm({
   );
 
   const clearCardStyles = useCallback(() => {
-    setForm((prev) => ({ ...prev, cardStyles: undefined }));
+    setForm((prev) => ({
+      ...prev,
+      styles: { ...prev.styles, cardOverrides: undefined },
+    }));
   }, []);
 
   // -- Custom Texts --
@@ -873,22 +896,21 @@ export default function InvitationForm({
     setForm((prev) => ({ ...prev, customTexts: undefined }));
   }, []);
 
-  // Current theme for preview — merge per-invitation envelope overrides
-  const currentTheme = useMemo(() => {
-    const base =
-      themes.find((t) => t.name === form.template) ??
-      themes.find((t) => t.name === "pink-floral") ??
-      themes[0];
-    const overrides = form.envelope ?? {};
-    return {
-      ...base,
-      envelope: {
-        base: overrides.base || base?.envelope.base || "",
-        topFlap: overrides.topFlap || base?.envelope.topFlap || "",
-        bottomFlap: overrides.bottomFlap || base?.envelope.bottomFlap || "",
-      },
-    };
-  }, [themes, form.template, form.envelope]);
+  // Style change callback for StyleCustomizationSection
+  const onStyleChange = useCallback(
+    <K extends keyof InvitationStyles>(key: K, value: InvitationStyles[K]) => {
+      setForm((prev) => ({
+        ...prev,
+        styles: { ...prev.styles, [key]: value },
+      }));
+    },
+    [],
+  );
+
+  // Current styles for preview — invitation owns all styles directly
+  const currentStyles: InvitationStyles = useMemo(() => {
+    return form.styles;
+  }, [form.styles]);
 
   // Submit
   async function handleSubmit() {
@@ -1125,14 +1147,14 @@ export default function InvitationForm({
                     <Label>Cor de fundo</Label>
                     <p className="text-xs text-muted-foreground">
                       Deixe em branco para usar a cor padrão do modelo (
-                      {currentTheme?.envelope.base ?? ""})
+                      {currentStyles?.envelope.base ?? ""})
                     </p>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
                         value={
-                          form.envelope?.base ||
-                          currentTheme?.envelope.base ||
+                          form.styles.envelope?.base ||
+                          currentStyles?.envelope.base ||
                           "#ffffff"
                         }
                         onChange={(e) => updateEnvelope("base", e.target.value)}
@@ -1141,12 +1163,12 @@ export default function InvitationForm({
                       />
                       <input
                         type="text"
-                        value={form.envelope?.base ?? ""}
+                        value={form.styles.envelope?.base ?? ""}
                         onChange={(e) => updateEnvelope("base", e.target.value)}
-                        placeholder={`Padrão: ${currentTheme?.envelope.base ?? ""}`}
+                        placeholder={`Padrão: ${currentStyles?.envelope.base ?? ""}`}
                         className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
                       />
-                      {form.envelope?.base && (
+                      {form.styles.envelope?.base && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1169,15 +1191,15 @@ export default function InvitationForm({
                       Deixe em branco para usar a imagem padrão.
                     </p>
                     <MediaUpload
-                      value={form.envelope?.topFlap ?? ""}
+                      value={form.styles.envelope?.topFlap ?? ""}
                       onUpload={(url) => updateEnvelope("topFlap", url)}
                       onClear={() => updateEnvelope("topFlap", "")}
                       kind="image"
                       maxSizeMB={5}
                     />
-                    {(form.envelope?.topFlap ?? "") && (
+                    {(form.styles.envelope?.topFlap ?? "") && (
                       <ImagePositionEditor
-                        src={form.envelope!.topFlap!}
+                        src={form.styles.envelope!.topFlap!}
                         settings={imgSettings("envelopeTopFlap")}
                         onChange={(s) =>
                           updateImageSettings("envelopeTopFlap", s)
@@ -1196,15 +1218,15 @@ export default function InvitationForm({
                       branco para usar a imagem padrão.
                     </p>
                     <MediaUpload
-                      value={form.envelope?.bottomFlap ?? ""}
+                      value={form.styles.envelope?.bottomFlap ?? ""}
                       onUpload={(url) => updateEnvelope("bottomFlap", url)}
                       onClear={() => updateEnvelope("bottomFlap", "")}
                       kind="image"
                       maxSizeMB={5}
                     />
-                    {(form.envelope?.bottomFlap ?? "") && (
+                    {(form.styles.envelope?.bottomFlap ?? "") && (
                       <ImagePositionEditor
-                        src={form.envelope!.bottomFlap!}
+                        src={form.styles.envelope!.bottomFlap!}
                         settings={imgSettings("envelopeBottomFlap")}
                         onChange={(s) =>
                           updateImageSettings("envelopeBottomFlap", s)
@@ -1224,10 +1246,23 @@ export default function InvitationForm({
                       </p>
                     </div>
                     <Switch
-                      checked={form.envelope?.shimmer !== false}
+                      checked={form.styles.envelopeShimmer !== false}
                       onCheckedChange={(v) => updateEnvelope("shimmer", v)}
                     />
                   </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ── Visual Customization ── */}
+              <AccordionItem value="styles" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-sm font-medium">
+                  Personalização Visual
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <StyleCustomizationSection
+                    styles={form.styles}
+                    onStyleChange={onStyleChange}
+                  />
                 </AccordionContent>
               </AccordionItem>
 
@@ -1243,24 +1278,34 @@ export default function InvitationForm({
                   <div className="space-y-1.5">
                     <Label>Modelo</Label>
                     <Select
-                      value={form.template}
+                      value={form.modelId}
                       onValueChange={(v) => {
                         if (!v) return;
-                        const selected = themes.find((t) => t.name === v);
-                        setForm((prev) => ({
-                          ...prev,
-                          template: v,
-                          themeId: selected?.id ?? v,
-                        }));
+                        const selected = models.find((m) => m.id === v);
+                        if (selected) {
+                          setForm((prev) => ({
+                            ...prev,
+                            modelId: selected.id,
+                            modelComponent: selected.component,
+                            styles: {
+                              ...getDefaultStylesForComponent(
+                                selected.component,
+                              ),
+                              // Preserve any per-invitation overrides
+                              textOverrides: prev.styles.textOverrides,
+                              cardOverrides: prev.styles.cardOverrides,
+                            },
+                          }));
+                        }
                       }}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {themes.map((t) => (
-                          <SelectItem key={t.name} value={t.name}>
-                            {t.label}
+                        {models.map((m) => (
+                          <SelectItem key={m.id} value={m.id}>
+                            {m.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -1469,12 +1514,21 @@ export default function InvitationForm({
                     <div className="grid grid-cols-1 gap-2">
                       {SAVE_DATE_STYLE_OPTIONS.map((opt) => {
                         const isSelected =
-                          (form.saveDateStyle ?? "classic") === opt.value;
+                          (form.styles.saveDateStyle ?? "classic") ===
+                          opt.value;
                         return (
                           <button
                             key={opt.value}
                             type="button"
-                            onClick={() => update("saveDateStyle", opt.value)}
+                            onClick={() =>
+                              setForm((prev) => ({
+                                ...prev,
+                                styles: {
+                                  ...prev.styles,
+                                  saveDateStyle: opt.value,
+                                },
+                              }))
+                            }
                             className="w-full text-left rounded-lg border transition-all duration-150 overflow-hidden"
                             style={{
                               borderColor: isSelected
@@ -1531,7 +1585,7 @@ export default function InvitationForm({
                   </div>
 
                   {/* ── Cinematic image upload — shown only when cinematic is selected ── */}
-                  {(form.saveDateStyle ?? "classic") === "cinematic" && (
+                  {(form.styles.saveDateStyle ?? "classic") === "cinematic" && (
                     <div className="space-y-2 pt-1 rounded-lg border border-dashed border-border p-3">
                       <Label className="text-sm font-medium">
                         Imagem de Fundo (Cinemático)
@@ -2365,7 +2419,7 @@ export default function InvitationForm({
               </TabsTrigger>
             </TabsList>
             <div className="flex items-center gap-1">
-              {form.textStyles && (
+              {form.styles.textOverrides && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger
@@ -2383,24 +2437,27 @@ export default function InvitationForm({
                   </Tooltip>
                 </TooltipProvider>
               )}
-              {form.cardStyles && Object.keys(form.cardStyles).length > 0 && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger
-                      render={
-                        <button
-                          type="button"
-                          onClick={clearCardStyles}
-                          className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                        />
-                      }
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                    </TooltipTrigger>
-                    <TooltipContent>Resetar estilos dos cartões</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+              {form.styles.cardOverrides &&
+                Object.keys(form.styles.cardOverrides).length > 0 && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <button
+                            type="button"
+                            onClick={clearCardStyles}
+                            className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                          />
+                        }
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Resetar estilos dos cartões
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               <span className="text-xs text-muted-foreground shrink-0">
                 {form.slug ? (
                   <TooltipProvider>
@@ -2432,10 +2489,10 @@ export default function InvitationForm({
             <div className="h-full relative overflow-hidden bg-neutral-200 max-h-165">
               {form.couple.bride && form.couple.groom ? (
                 <EnvelopeCover
-                  theme={currentTheme}
+                  theme={currentStyles}
                   onOpen={() => {}}
                   monogram={form.couple.monogram}
-                  shimmer={form.envelope?.shimmer !== false}
+                  shimmer={form.styles.envelopeShimmer !== false}
                   imageSettings={form.imageSettings}
                 />
               ) : (
@@ -2453,19 +2510,19 @@ export default function InvitationForm({
           >
             <InlineTextEditProvider
               updateTextStyleElement={updateTextStyleElement}
-              textStyles={form.textStyles}
+              textStyles={form.styles.textOverrides}
             >
               <InlineCardEditProvider
                 updateCardStyle={updateCardStyle}
-                cardStyles={form.cardStyles}
+                cardStyles={form.styles.cardOverrides}
               >
                 <TextStyleToolbar />
                 <CardStyleToolbar />
                 <div className="mx-auto origin-top w-full max-h-165 relative">
                   {form.couple.bride && form.couple.groom ? (
-                    <InvitationPage
+                    <ClassicFloral
                       invitation={form}
-                      theme={currentTheme}
+                      styles={currentStyles}
                       isPreview
                     />
                   ) : (

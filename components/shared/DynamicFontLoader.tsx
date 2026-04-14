@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
-import type { TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import type { InvitationStyles, TextStyleOverrides } from "@/lib/types";
 
 /**
  * Loads any non-builtin Google Fonts used by the current theme AND any
@@ -20,7 +20,7 @@ export default function DynamicFontLoader({
   theme,
   textStyles,
 }: {
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   textStyles?: TextStyleOverrides;
 }) {
   // Collect element-level fontFamily overrides (stable reference via useMemo)

@@ -1,24 +1,30 @@
 "use client";
 
-import { type MutableRefObject, type RefObject, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
-import type { CardSectionKey, FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CardSectionKey,
+  FAQItem,
+  InvitationData,
+  InvitationStyles,
+} from "@/lib/types";
+import type { ModelComponentProps } from "@/components/models/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { t } from "@/lib/custom-texts";
-import AudioPlayer from "./AudioPlayer";
-import ScheduleItem from "./ScheduleItem";
-import RSVPModal from "./RSVPModal";
-import LocationCard from "./LocationCard";
-import GuestGuideSection from "./GuestGuideSection";
-import SaveTheDateSection from "./SaveTheDateSection";
-import SectionImage from "./SectionImage";
-import DynamicFontLoader from "./DynamicFontLoader";
-import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
-import { EditableText } from "./EditableText";
-import { EditableCard } from "./EditableCard";
+import AudioPlayer from "../../shared/AudioPlayer";
+import ScheduleItem from "../../shared/ScheduleItem";
+import RSVPModal from "../../shared/RSVPModal";
+import LocationCard from "../../shared/LocationCard";
+import GuestGuideSection from "../../shared/GuestGuideSection";
+import SaveTheDateSection from "../../shared/SaveTheDateSection";
+import SectionImage from "../../shared/SectionImage";
+import DynamicFontLoader from "../../shared/DynamicFontLoader";
+import { PrefetchedVideoSlot } from "../../shared/PrefetchedVideoSlot";
+import { EditableText } from "../../shared/EditableText";
+import { EditableCard } from "../../shared/EditableCard";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
@@ -105,13 +111,13 @@ const staggerContainer: Variants = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function toAudioTheme(theme: TemplateTheme) {
+function toAudioTheme(styles: InvitationStyles) {
   return {
-    bgColor: theme.cardBg,
-    playBtnColor: theme.accent,
-    playIconColor: theme.ctaPrimaryText,
-    titleColor: theme.textPrimary,
-    artistColor: theme.textSecondary,
+    bgColor: styles.cardBg,
+    playBtnColor: styles.accent,
+    playIconColor: styles.ctaPrimaryText,
+    titleColor: styles.textPrimary,
+    artistColor: styles.textSecondary,
   };
 }
 
@@ -125,7 +131,7 @@ const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='h
 // Decorative section divider
 // ---------------------------------------------------------------------------
 
-function SectionDivider({ theme }: { theme: TemplateTheme }) {
+function SectionDivider({ styles }: { styles: InvitationStyles }) {
   return (
     <div className="flex items-center justify-center gap-3 py-6">
       <motion.div
@@ -136,7 +142,7 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
         style={{
           width: 36,
           height: 1,
-          background: theme.decorativeColor,
+          background: styles.decorativeColor,
           transformOrigin: "right center",
         }}
       />
@@ -149,7 +155,7 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
           width: 5,
           height: 5,
           borderRadius: "50%",
-          background: theme.accent,
+          background: styles.accent,
           opacity: 0.35,
         }}
       />
@@ -161,7 +167,7 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
         style={{
           width: 36,
           height: 1,
-          background: theme.decorativeColor,
+          background: styles.decorativeColor,
           transformOrigin: "left center",
         }}
       />
@@ -209,7 +215,7 @@ function FAQAccordionItem({
   faq,
   isOpen,
   onToggle,
-  theme,
+  styles,
   ts,
   isLast,
 }: {
@@ -217,7 +223,7 @@ function FAQAccordionItem({
   index: number;
   isOpen: boolean;
   onToggle: () => void;
-  theme: TemplateTheme;
+  styles: InvitationStyles;
   ts: ResolvedTextStyles;
   isLast: boolean;
 }) {
@@ -300,7 +306,7 @@ function FAQAccordionItem({
         <div
           style={{
             height: 1,
-            background: theme.cardBorder,
+            background: styles.cardBorder,
             margin: "0 22px",
           }}
         />
@@ -313,26 +319,13 @@ function FAQAccordionItem({
 // Main Component
 // ---------------------------------------------------------------------------
 
-interface InvitationPageProps {
-  invitation: InvitationData;
-  theme: TemplateTheme;
-  audioRef?: MutableRefObject<HTMLAudioElement | null>;
-  /** When provided, InvitationPage will adopt this existing <video> element
-   *  into the hero section instead of creating a new one, avoiding duplicate
-   *  network requests. */
-  prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
-  /** Pass true in the admin live preview so all animations are always visible
-   *  and respond to React state changes rather than scroll position. */
-  isPreview?: boolean;
-}
-
-export default function InvitationPage({
+export default function ClassicFloral({
   invitation,
-  theme,
+  styles,
   audioRef,
   prefetchedVideoRef,
   isPreview = false,
-}: InvitationPageProps) {
+}: ModelComponentProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -368,28 +361,28 @@ export default function InvitationPage({
     }
   }, [invitation.slug]);
 
-  const ts = resolveTextStyles(theme, invitation.textStyles);
+  const ts = resolveTextStyles(styles, styles.textOverrides);
 
-  /** Resolve card bg/border/borderRadius for a given section, falling back to theme defaults. */
+  /** Resolve card bg/border/borderRadius for a given section, falling back to style defaults. */
   const cs = (section: CardSectionKey, defaultRadius: number) => ({
-    cardBg: invitation.cardStyles?.[section]?.cardBg || theme.cardBg,
+    cardBg: styles.cardOverrides?.[section]?.cardBg || styles.cardBg,
     cardBorder:
-      invitation.cardStyles?.[section]?.cardBorder || theme.cardBorder,
+      styles.cardOverrides?.[section]?.cardBorder || styles.cardBorder,
     borderRadius:
-      invitation.cardStyles?.[section]?.borderRadius ?? defaultRadius,
+      styles.cardOverrides?.[section]?.borderRadius ?? defaultRadius,
   });
 
   return (
     <div
       style={{
-        background: theme.bg,
-        color: theme.textPrimary,
+        background: styles.bg,
+        color: styles.textPrimary,
         minHeight: "100dvh",
         position: "relative",
       }}
     >
-      {/* Load any non-builtin Google Fonts used by this theme */}
-      <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
+      {/* Load any non-builtin Google Fonts used by this model's styles */}
+      <DynamicFontLoader theme={styles} textStyles={styles.textOverrides} />
 
       {/* ================================================================= */}
       {/* Atmospheric grain overlay                                         */}
@@ -408,10 +401,10 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* Radial gradient wash                                              */}
       {/* ================================================================= */}
-      {theme.bgGradient && (
+      {styles.bgGradient && (
         <div
           className="pointer-events-none fixed inset-0"
-          style={{ background: theme.bgGradient }}
+          style={{ background: styles.bgGradient }}
         />
       )}
 
@@ -460,8 +453,8 @@ export default function InvitationPage({
           className="pointer-events-none absolute inset-0"
           style={{
             background: invitation.videoUrl
-              ? `linear-gradient(to bottom, transparent 40%, ${theme.bg} 100%)`
-              : `linear-gradient(to bottom, transparent 35%, ${theme.bg} 100%)`,
+              ? `linear-gradient(to bottom, transparent 40%, ${styles.bg} 100%)`
+              : `linear-gradient(to bottom, transparent 35%, ${styles.bg} 100%)`,
           }}
         />
 
@@ -641,7 +634,7 @@ export default function InvitationPage({
               src={invitation.audio.src}
               title={invitation.audio.title}
               artist={invitation.audio.artist}
-              theme={toAudioTheme(theme)}
+              theme={toAudioTheme(styles)}
               titleStyle={ts.audioTitle}
               artistStyle={ts.audioArtist}
               externalAudioRef={audioRef}
@@ -852,7 +845,7 @@ export default function InvitationPage({
         <EditableCard sectionKey="saveTheDate">
           <SaveTheDateSection
             invitation={invitation}
-            theme={theme}
+            theme={styles}
             ts={ts}
             cardBg={cs("saveTheDate", 20).cardBg}
             cardBorder={cs("saveTheDate", 20).cardBorder}
@@ -871,13 +864,13 @@ export default function InvitationPage({
       {invitation.sectionImages?.image1 && (
         <SectionImage
           src={invitation.sectionImages.image1}
-          theme={theme}
+          theme={styles}
           imageSettings={invitation.imageSettings}
           imageKey="sectionImage1"
         />
       )}
 
-      <SectionDivider theme={theme} />
+      <SectionDivider styles={styles} />
 
       {/* ================================================================= */}
       {/* 3b. Nossa História — couple's story                               */}
@@ -951,7 +944,7 @@ export default function InvitationPage({
             </EditableCard>
           </AnimatedSection>
 
-          <SectionDivider theme={theme} />
+          <SectionDivider styles={styles} />
         </>
       )}
 
@@ -1041,13 +1034,13 @@ export default function InvitationPage({
       {invitation.sectionImages?.image2 && (
         <SectionImage
           src={invitation.sectionImages.image2}
-          theme={theme}
+          theme={styles}
           imageSettings={invitation.imageSettings}
           imageKey="sectionImage2"
         />
       )}
 
-      <SectionDivider theme={theme} />
+      <SectionDivider styles={styles} />
 
       {/* ================================================================= */}
       {/* 5b. Location Card Section                                         */}
@@ -1078,7 +1071,7 @@ export default function InvitationPage({
         <EditableCard sectionKey="location">
           <LocationCard
             location={invitation.location}
-            theme={theme}
+            theme={styles}
             ts={ts}
             cardBg={cs("location", 16).cardBg}
             cardBorder={cs("location", 16).cardBorder}
@@ -1096,7 +1089,7 @@ export default function InvitationPage({
             <EditableCard sectionKey="location">
               <LocationCard
                 location={invitation.location2}
-                theme={theme}
+                theme={styles}
                 ts={ts}
                 cardBg={cs("location", 16).cardBg}
                 cardBorder={cs("location", 16).cardBorder}
@@ -1117,7 +1110,7 @@ export default function InvitationPage({
       {invitation.sectionImages?.image3 && (
         <SectionImage
           src={invitation.sectionImages.image3}
-          theme={theme}
+          theme={styles}
           imageSettings={invitation.imageSettings}
           imageKey="sectionImage3"
         />
@@ -1128,7 +1121,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {(invitation.dressCode.enabled || invitation.giftRegistry.enabled) && (
         <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
-          <SectionDivider theme={theme} />
+          <SectionDivider styles={styles} />
           <div className={`flex flex-col gap-6`}>
             {/* Dress Code — slides from left */}
             {invitation.dressCode.enabled && (
@@ -1265,7 +1258,7 @@ export default function InvitationPage({
       {invitation.guestGuide?.enabled &&
         invitation.guestGuide.items.length > 0 && (
           <>
-            <SectionDivider theme={theme} />
+            <SectionDivider styles={styles} />
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles} className={"text-center"}>
                 <EditableText elementKey="sectionTitles">
@@ -1299,7 +1292,7 @@ export default function InvitationPage({
               <EditableCard sectionKey="guestGuide">
                 <GuestGuideSection
                   guestGuide={invitation.guestGuide}
-                  theme={theme}
+                  theme={styles}
                   ts={ts}
                   cardBg={cs("guestGuide", 14).cardBg}
                   cardBorder={cs("guestGuide", 14).cardBorder}
@@ -1316,7 +1309,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {invitation.faqs && invitation.faqs.length > 0 && (
         <>
-          <SectionDivider theme={theme} />
+          <SectionDivider styles={styles} />
 
           <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
             <div className="flex flex-col items-center">
@@ -1364,7 +1357,7 @@ export default function InvitationPage({
                     onToggle={() =>
                       setOpenFaqIndex(openFaqIndex === i ? null : i)
                     }
-                    theme={theme}
+                    styles={styles}
                     ts={ts}
                     isLast={i === (invitation.faqs?.length ?? 0) - 1}
                   />
@@ -1375,7 +1368,7 @@ export default function InvitationPage({
         </>
       )}
 
-      <SectionDivider theme={theme} />
+      <SectionDivider styles={styles} />
 
       {/* ================================================================= */}
       {/* 6. CTA Section                                                    */}
@@ -1395,13 +1388,13 @@ export default function InvitationPage({
             onClick={() => setRsvpOpen(true)}
             className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
             style={{
-              fontFamily: theme.uiFont,
+              fontFamily: styles.uiFont,
               fontSize: 13,
               fontWeight: 500,
               letterSpacing: 1,
-              background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
-              color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
-              borderRadius: theme.ctaRadius,
+              background: rsvpSubmitted ? "#22c55e" : styles.ctaPrimaryBg,
+              color: rsvpSubmitted ? "#fff" : styles.ctaPrimaryText,
+              borderRadius: styles.ctaRadius,
               cursor: rsvpSubmitted ? "default" : "pointer",
             }}
             whileHover={{ scale: 1.01 }}
@@ -1430,7 +1423,7 @@ export default function InvitationPage({
             style={{
               width: 48,
               height: 1,
-              background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${styles.accent}, transparent)`,
               opacity: 0.2,
             }}
           />
@@ -1444,7 +1437,7 @@ export default function InvitationPage({
             <div
               className="absolute inset-0 rounded-full"
               style={{
-                border: `1px dashed ${theme.decorativeColor}`,
+                border: `1px dashed ${styles.decorativeColor}`,
                 animation: "slow-rotate 30s linear infinite",
                 opacity: 0.5,
               }}
@@ -1472,7 +1465,7 @@ export default function InvitationPage({
       {invitation.sectionImages?.image4 && (
         <SectionImage
           src={invitation.sectionImages.image4}
-          theme={theme}
+          theme={styles}
           height={300}
           hiddeBottom
           imageSettings={invitation.imageSettings}
@@ -1498,7 +1491,7 @@ export default function InvitationPage({
           }
         }}
         invitation={invitation}
-        theme={theme}
+        theme={styles}
         customTexts={invitation.customTexts}
       />
     </div>

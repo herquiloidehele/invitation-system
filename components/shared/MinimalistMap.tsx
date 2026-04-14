@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import type { TemplateTheme } from "@/lib/types";
+import type { InvitationStyles } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Tile layer URLs — free, no API key required
@@ -37,18 +37,28 @@ function createPinIcon(accentColor: string): L.DivIcon {
 }
 
 // ---------------------------------------------------------------------------
-// Determine if a theme is "dark"
+// Determine if a theme is "dark" (based on background luminance)
 // ---------------------------------------------------------------------------
 
-function isDarkTheme(theme: TemplateTheme): boolean {
-  return theme.name === "midnight-elegance";
+function isDarkTheme(theme: InvitationStyles): boolean {
+  // Quick hex-to-luminance check on the page background color
+  const hex = theme.bg.replace("#", "");
+  if (hex.length >= 6) {
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    // Relative luminance approximation
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance < 0.35;
+  }
+  return false;
 }
 
 // ---------------------------------------------------------------------------
 // CSS filter to make the map blend with the theme
 // ---------------------------------------------------------------------------
 
-function getMapFilter(theme: TemplateTheme): string {
+function getMapFilter(theme: InvitationStyles): string {
   if (isDarkTheme(theme)) {
     // Dark theme: slightly brighten, desaturate a bit
     return "saturate(2.5) brightness(2.5) contrast(0.8)";
@@ -64,7 +74,7 @@ function getMapFilter(theme: TemplateTheme): string {
 interface MinimalistMapProps {
   latitude: number;
   longitude: number;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   className?: string;
 }
 
@@ -111,7 +121,7 @@ export default function MinimalistMap({
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latitude, longitude, theme.name]);
+  }, [latitude, longitude, theme.bg]);
 
   return (
     <>

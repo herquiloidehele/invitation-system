@@ -33,7 +33,7 @@ export async function GET(
     const invitation = await prisma.invitation.findUnique({
       where: { id },
       include: {
-        theme: { select: { id: true, name: true, label: true } },
+        model: { select: { id: true, name: true, label: true } },
         rsvpResponses: {
           orderBy: { submittedAt: "desc" },
         },
@@ -95,25 +95,28 @@ export async function PUT(
       }
     }
 
-    // Resolve themeId — accept either themeId (new) or template slug (legacy)
-    let themeId: string | undefined = body.themeId;
-    if (!themeId && body.template) {
-      const theme = await prisma.theme.findUnique({
+    // Resolve modelId — accept either modelId (new) or template slug (legacy)
+    let modelId: string | undefined = body.modelId;
+    if (!modelId && body.template) {
+      const model = await prisma.model.findUnique({
         where: { name: body.template },
       });
-      if (theme) themeId = theme.id;
+      if (model) modelId = model.id;
     }
 
     const invitation = await prisma.invitation.update({
       where: { id },
       data: {
         ...(body.slug !== undefined && { slug: body.slug }),
-        ...(themeId !== undefined && { theme: { connect: { id: themeId } } }),
+        ...(modelId !== undefined && { model: { connect: { id: modelId } } }),
         ...(body.couple !== undefined && {
           couple: sanitizeJsonField(body.couple, existing.couple),
         }),
         ...(body.date !== undefined && {
           date: sanitizeJsonField(body.date, existing.date),
+        }),
+        ...(body.styles !== undefined && {
+          styles: body.styles,
         }),
         ...(body.quote !== undefined && { quote: body.quote }),
         ...(body.location !== undefined && {
@@ -148,12 +151,6 @@ export async function PUT(
         ...(body.guestGuide !== undefined && {
           guestGuide: sanitizeJsonField(body.guestGuide, null),
         }),
-        ...(body.envelope !== undefined && {
-          envelope: sanitizeJsonField(body.envelope, null),
-        }),
-        ...(body.saveDateStyle !== undefined && {
-          saveDateStyle: body.saveDateStyle,
-        }),
         ...(body.cinematicImageUrl !== undefined && {
           cinematicImageUrl: body.cinematicImageUrl,
         }),
@@ -172,12 +169,6 @@ export async function PUT(
         ...(body.externalLink !== undefined && {
           externalLink: body.externalLink,
         }),
-        ...(body.textStyles !== undefined && {
-          textStyles: sanitizeJsonField(body.textStyles, null),
-        }),
-        ...(body.cardStyles !== undefined && {
-          cardStyles: sanitizeJsonField(body.cardStyles, null),
-        }),
         ...(body.imageSettings !== undefined && {
           imageSettings: sanitizeJsonField(body.imageSettings, null),
         }),
@@ -186,7 +177,7 @@ export async function PUT(
         }),
       },
       include: {
-        theme: { select: { id: true, name: true, label: true } },
+        model: { select: { id: true, name: true, label: true } },
       },
     });
 

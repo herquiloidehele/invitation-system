@@ -1,27 +1,25 @@
 import { prisma } from "./db";
 import type {
-  CardStyleOverrides,
   CustomTexts,
   ImageSettingsMap,
   InvitationData,
+  InvitationStyles,
   InvitationType,
   LocationInfo,
   OurStory,
   ParentsInfo,
-  SaveDateStyle,
   SectionImages,
-  TextStyleOverrides,
 } from "./types";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-type InvitationWithTheme = {
+type InvitationWithModel = {
   id: string;
   slug: string;
-  themeId: string;
-  theme: { name: string };
+  modelId: string;
+  model: { component: string };
   couple: unknown;
   date: unknown;
   quote: string;
@@ -36,25 +34,23 @@ type InvitationWithTheme = {
   videoUrl: string | null;
   faqs: unknown;
   guestGuide: unknown;
-  envelope: unknown;
-  saveDateStyle: string | null;
   cinematicImageUrl: string | null;
   sectionImages: unknown;
   parents: unknown;
   ourStory: unknown;
+  styles: unknown;
   invitationType: string;
   externalLink: string | null;
-  textStyles: unknown;
-  cardStyles: unknown;
   imageSettings: unknown;
   customTexts: unknown;
 };
 
-function toInvitationData(row: InvitationWithTheme): InvitationData {
+function toInvitationData(row: InvitationWithModel): InvitationData {
   return {
     slug: row.slug,
-    themeId: row.themeId,
-    template: row.theme.name,
+    modelId: row.modelId,
+    modelComponent: row.model.component,
+    styles: row.styles as InvitationStyles,
     couple: row.couple as InvitationData["couple"],
     date: row.date as InvitationData["date"],
     quote: row.quote,
@@ -69,22 +65,18 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     videoUrl: row.videoUrl ?? undefined,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
     guestGuide: (row.guestGuide as InvitationData["guestGuide"]) ?? undefined,
-    envelope: row.envelope as InvitationData["envelope"],
-    saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
-    textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
-    cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     customTexts: (row.customTexts as CustomTexts | null) ?? undefined,
   };
 }
 
-const includeTheme = { theme: { select: { name: true } } } as const;
+const includeModel = { model: { select: { component: true } } } as const;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -95,18 +87,18 @@ export async function getInvitation(
 ): Promise<InvitationData | null> {
   const row = await prisma.invitation.findUnique({
     where: { slug },
-    include: includeTheme,
+    include: includeModel,
   });
   if (!row) return null;
-  return toInvitationData(row as unknown as InvitationWithTheme);
+  return toInvitationData(row as unknown as InvitationWithModel);
 }
 
 export async function getAllInvitations(): Promise<InvitationData[]> {
   const rows = await prisma.invitation.findMany({
     orderBy: { createdAt: "desc" },
-    include: includeTheme,
+    include: includeModel,
   });
-  return (rows as unknown as InvitationWithTheme[]).map(toInvitationData);
+  return (rows as unknown as InvitationWithModel[]).map(toInvitationData);
 }
 
 /**
@@ -115,13 +107,13 @@ export async function getAllInvitations(): Promise<InvitationData[]> {
 export async function getAllInvitationRows() {
   return prisma.invitation.findMany({
     orderBy: { createdAt: "desc" },
-    include: includeTheme,
+    include: includeModel,
   });
 }
 
 export async function getInvitationById(id: string) {
   return prisma.invitation.findUnique({
     where: { id },
-    include: includeTheme,
+    include: includeModel,
   });
 }

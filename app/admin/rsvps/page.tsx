@@ -17,7 +17,7 @@ export default async function AdminRsvpsPage({
       id: true,
       slug: true,
       couple: true,
-      theme: { select: { name: true } },
+      model: { select: { name: true } },
       _count: { select: { rsvpResponses: true } },
     },
   });
@@ -32,23 +32,23 @@ export default async function AdminRsvpsPage({
           id: true,
           slug: true,
           couple: true,
-          theme: { select: { name: true } },
+          model: { select: { name: true } },
         },
       },
     },
   });
 
-  // Flatten theme.name → template for client consumption
+  // Flatten model.name → template for client consumption
   const invitationRows = invitations.map((inv) => ({
     ...inv,
-    template: inv.theme.name,
+    template: inv.model.name,
   }));
 
   const responseRows = responses.map((r) => ({
     ...r,
     invitation: {
       ...r.invitation,
-      template: r.invitation.theme.name,
+      template: r.invitation.model.name,
     },
   }));
 

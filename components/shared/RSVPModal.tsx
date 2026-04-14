@@ -6,7 +6,11 @@ import { X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CustomTexts,
+  InvitationData,
+  InvitationStyles,
+} from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { t } from "@/lib/custom-texts";
 
@@ -64,9 +68,9 @@ interface ModalPalette {
 /** Build a high-contrast light palette, pulling only branding colors from the
  *  invitation theme. This guarantees readability on every template. */
 function buildModalPalette(
-  theme: TemplateTheme | RSVPThemeLegacy,
+  theme: InvitationStyles | RSVPThemeLegacy,
 ): ModalPalette {
-  // Detect if the source is a full TemplateTheme (has uiFont) or legacy RSVPTheme
+  // Detect if the source is a full InvitationStyles (has uiFont) or legacy RSVPTheme
   const isTemplate = "uiFont" in theme;
   return {
     cardBg: "#FFFFFF",
@@ -81,7 +85,7 @@ function buildModalPalette(
     ctaRadius: theme.ctaRadius,
     iconColor: "#999999",
     uiFont: isTemplate
-      ? (theme as TemplateTheme).uiFont
+      ? (theme as InvitationStyles).uiFont
       : "'Outfit', sans-serif",
     displayFont: "'Inter', serif",
     bodyFont: theme.bodyFont,
@@ -122,7 +126,7 @@ interface IntegrationProps {
   open: boolean;
   onClose: () => void;
   invitation: InvitationData;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   customTexts?: CustomTexts;
 }
 

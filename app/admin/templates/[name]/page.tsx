@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { getTheme } from "@/lib/themes";
+import { getModel } from "@/lib/models";
 import { MOCK_INVITATION } from "@/lib/mock-invitation";
+import { getDefaultStylesForComponent } from "@/components/models";
 import ThemeViewClient from "./ThemeViewClient";
 
 export const dynamic = "force-dynamic";
@@ -12,16 +13,17 @@ interface PageProps {
 export default async function ThemeViewPage({ params }: PageProps) {
   const { name } = await params;
 
-  const theme = await getTheme(name);
-  if (!theme) notFound();
+  const model = await getModel(name);
+  if (!model) notFound();
 
-  // Build the mock invitation with the correct template field so that
-  // any template-specific behaviour inside InvitationPage is exercised.
+  // Build the mock invitation with the correct model fields so that
+  // any model-specific behaviour inside the model component is exercised.
   const invitation = {
     ...MOCK_INVITATION,
-    themeId: theme.id,
-    template: theme.name,
+    modelId: model.id,
+    modelComponent: model.component,
+    styles: getDefaultStylesForComponent(model.component),
   };
 
-  return <ThemeViewClient invitation={invitation} theme={theme} />;
+  return <ThemeViewClient invitation={invitation} model={model} />;
 }

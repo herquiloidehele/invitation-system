@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { getThemes } from "@/lib/themes";
+import { getModels } from "@/lib/models";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 import { Eye, Sparkles, Pencil, Trash2, Plus, Copy } from "lucide-react";
-import type { TemplateTheme } from "@/lib/types";
+import type { ModelRecord, InvitationStyles } from "@/lib/types";
+import { getDefaultStylesForComponent } from "@/components/models";
 import DeleteThemeButton from "./DeleteThemeButton";
 
 export const dynamic = "force-dynamic";
@@ -39,19 +40,20 @@ function fontName(fontStack: string): string {
 // Single theme card
 // ---------------------------------------------------------------------------
 
-function ThemeCard({ theme }: { theme: TemplateTheme }) {
+function ThemeCard({ model }: { model: ModelRecord }) {
+  const s = getDefaultStylesForComponent(model.component);
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md">
       {/* ── Colour band (envelope preview strip) ─────────────────────── */}
       <div
         className="relative h-28 w-full overflow-hidden"
-        style={{ background: theme.bg }}
+        style={{ background: s.bg }}
       >
         {/* Subtle radial gradient wash */}
-        {theme.bgGradient && (
+        {s.bgGradient && (
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: theme.bgGradient }}
+            style={{ background: s.bgGradient }}
           />
         )}
 
@@ -60,9 +62,9 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
           <span
             className="select-none"
             style={{
-              fontFamily: theme.displayFont,
+              fontFamily: s.displayFont,
               fontSize: 36,
-              color: theme.textPrimary,
+              color: s.textPrimary,
               opacity: 0.85,
               letterSpacing: 2,
               lineHeight: 1,
@@ -72,11 +74,11 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
           </span>
           <span
             style={{
-              fontFamily: theme.uiFont,
+              fontFamily: s.uiFont,
               fontSize: 9,
               letterSpacing: 5,
               textTransform: "uppercase",
-              color: theme.textSecondary,
+              color: s.textSecondary,
               opacity: 0.65,
             }}
           >
@@ -87,7 +89,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
         {/* Accent bottom bar */}
         <div
           className="absolute bottom-0 inset-x-0 h-0.5"
-          style={{ background: theme.accent, opacity: 0.45 }}
+          style={{ background: s.accent, opacity: 0.45 }}
         />
       </div>
 
@@ -95,22 +97,20 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
       <div className="flex flex-1 flex-col gap-4 p-5">
         {/* Title */}
         <div>
-          <h3 className="font-semibold text-sm leading-tight">{theme.label}</h3>
+          <h3 className="font-semibold text-sm leading-tight">{model.label}</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {theme.description}
+            {model.description}
           </p>
         </div>
 
         {/* Palette swatches */}
         <div className="flex items-end gap-3">
-          <Swatch color={theme.primary} label="Primária" />
-          <Swatch color={theme.secondary} label="Secundária" />
-          <Swatch color={theme.accent} label="Destaque" />
-          <Swatch color={theme.bg} label="Fundo" />
+          <Swatch color={s.primary} label="Primária" />
+          <Swatch color={s.secondary} label="Secundária" />
+          <Swatch color={s.accent} label="Destaque" />
+          <Swatch color={s.bg} label="Fundo" />
           <Swatch
-            color={
-              theme.cardBg.startsWith("rgba") ? theme.accent : theme.cardBg
-            }
+            color={s.cardBg.startsWith("rgba") ? s.accent : s.cardBg}
             label="Cartão"
           />
         </div>
@@ -119,14 +119,14 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
         <div className="space-y-1 text-xs text-muted-foreground">
           <p>
             <span className="font-medium text-foreground">Título:</span>{" "}
-            <span style={{ fontFamily: theme.displayFont }}>
-              {fontName(theme.displayFont)}
+            <span style={{ fontFamily: s.displayFont }}>
+              {fontName(s.displayFont)}
             </span>
           </p>
           <p>
             <span className="font-medium text-foreground">Corpo:</span>{" "}
-            <span style={{ fontFamily: theme.bodyFont }}>
-              {fontName(theme.bodyFont)}
+            <span style={{ fontFamily: s.bodyFont }}>
+              {fontName(s.bodyFont)}
             </span>
           </p>
           <p>
@@ -134,10 +134,10 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             <span
               className="inline-block px-2 py-0.5 text-[10px] font-medium"
               style={{
-                background: theme.ctaPrimaryBg,
-                color: theme.ctaPrimaryText,
-                borderRadius: theme.ctaRadius === "0px" ? 2 : 9999,
-                fontFamily: theme.uiFont,
+                background: s.ctaPrimaryBg,
+                color: s.ctaPrimaryText,
+                borderRadius: s.ctaRadius === "0px" ? 2 : 9999,
+                fontFamily: s.uiFont,
               }}
             >
               Confirmar
@@ -148,7 +148,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
         {/* Action buttons */}
         <div className="mt-auto flex gap-2 pt-2 flex-wrap">
           <Link
-            href={`/admin/templates/${theme.name}`}
+            href={`/admin/templates/${model.name}`}
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
               "flex-1 gap-1.5",
@@ -158,7 +158,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             Ver
           </Link>
           <Link
-            href={`/admin/templates/${theme.name}/edit`}
+            href={`/admin/templates/${model.name}/edit`}
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
               "flex-1 gap-1.5",
@@ -168,7 +168,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
             Editar
           </Link>
           <Link
-            href={`/admin/templates/new?from=${theme.name}`}
+            href={`/admin/templates/new?from=${model.name}`}
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
               "flex-1 gap-1.5",
@@ -181,7 +181,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
 
         {/* Delete (separate row so it's visually distinct) */}
         <div className="pt-0">
-          <DeleteThemeButton themeId={theme.id} themeName={theme.label} />
+          <DeleteThemeButton modelId={model.id} themeName={model.label} />
         </div>
       </div>
     </div>
@@ -193,7 +193,7 @@ function ThemeCard({ theme }: { theme: TemplateTheme }) {
 // ---------------------------------------------------------------------------
 
 export default async function TemplatesPage() {
-  const themeList = await getThemes();
+  const models = await getModels();
 
   return (
     <div className="space-y-6">
@@ -202,8 +202,8 @@ export default async function TemplatesPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Modelos</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {themeList.length} modelo{themeList.length !== 1 ? "s" : ""}{" "}
-            disponível{themeList.length !== 1 ? "is" : ""}.
+            {models.length} modelo{models.length !== 1 ? "s" : ""} disponível
+            {models.length !== 1 ? "is" : ""}.
           </p>
         </div>
         <Link
@@ -217,8 +217,8 @@ export default async function TemplatesPage() {
 
       {/* 2×2 grid */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {themeList.map((theme) => (
-          <ThemeCard key={theme.name} theme={theme} />
+        {models.map((model) => (
+          <ThemeCard key={model.name} model={model} />
         ))}
       </div>
     </div>

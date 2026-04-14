@@ -1,5 +1,10 @@
-/** Theme name / slug identifier (e.g. "pink-floral"). Open-ended — themes are stored in the database. */
-export type TemplateName = string;
+/** Model name / slug identifier (e.g. "classic-floral"). Open-ended — models are stored in the database. */
+export type ModelName = string;
+
+/**
+ * @deprecated Use `ModelName` instead. Kept for migration compatibility.
+ */
+export type TemplateName = ModelName;
 
 /** Invitation type — determines what is shown after the envelope cover opens. */
 export type InvitationType = "standard" | "external_video" | "external_link";
@@ -385,12 +390,105 @@ export interface CustomTexts {
   map_unavailableOffline?: string;
 }
 
+// ---------------------------------------------------------------------------
+// InvitationStyles — all visual styling lives here, stored on each invitation
+// ---------------------------------------------------------------------------
+
+/** Complete visual styling for an invitation. Stored as JSON on the invitation record.
+ *  When creating a new invitation, these are initialized from the model component's
+ *  exported DEFAULT_STYLES constant (see components/models/index.ts).
+ *  The invitation then owns its styles independently of the model.
+ */
+export interface InvitationStyles {
+  // Envelope appearance
+  envelope: {
+    base: string;
+    topFlap: string;
+    bottomFlap: string;
+  };
+  // Page background & card styling
+  bg: string;
+  cardBg: string;
+  cardBorder: string;
+  // Color palette
+  primary: string;
+  secondary: string;
+  accent: string;
+  // Text colors
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  // Typography
+  displayFont: string;
+  bodyFont: string;
+  scriptFont?: string;
+  /** UI font for labels, buttons, small text */
+  uiFont: string;
+  /** Dedicated font for section titles. Falls back to uiFont. */
+  sectionTitleFont?: string;
+  /** Default font size for section titles (px). Falls back to 10. */
+  sectionTitleFontSize?: number;
+  /** Default font weight for section titles. Falls back to 400. */
+  sectionTitleFontWeight?: string;
+  // CTA styling
+  ctaPrimaryBg: string;
+  ctaPrimaryText: string;
+  ctaSecondaryBorder: string;
+  ctaSecondaryText: string;
+  /** Border radius for buttons */
+  ctaRadius: string;
+  // Cover
+  monogramColor: string;
+  tapTextColor: string;
+  // Atmospheric / decorative
+  /** Subtle radial gradient wash behind key sections */
+  bgGradient?: string;
+  /** Decorative line/dot color between sections */
+  decorativeColor: string;
+  /** Button hover glow color */
+  ctaGlow?: string;
+  // Envelope shimmer
+  /** Enable/disable the diagonal shimmer highlight animation on the envelope cover. Defaults to true. */
+  envelopeShimmer?: boolean;
+  // Save the Date
+  /** Visual style for the Save the Date section. Defaults to "classic". */
+  saveDateStyle?: SaveDateStyle;
+  // Per-element text style overrides (fonts, colors, sizes)
+  textOverrides?: TextStyleOverrides;
+  // Per-section card background/border overrides
+  cardOverrides?: CardStyleOverrides;
+}
+
+// ---------------------------------------------------------------------------
+// ModelRecord — a model definition stored in the database
+// ---------------------------------------------------------------------------
+
+/** A model record from the database. Models define structure (which React component to use)
+ *  and carry default visual styles that get copied into new invitations.
+ */
+export interface ModelRecord {
+  id: string;
+  name: ModelName;
+  label: string;
+  description: string;
+  /** React component name used to render invitations (e.g. "ClassicFloral") */
+  component: string;
+  /** Optional preview image URL shown in admin model picker */
+  previewImage?: string;
+}
+
+// ---------------------------------------------------------------------------
+// InvitationData — the complete invitation record passed to rendering
+// ---------------------------------------------------------------------------
+
 export interface InvitationData {
   slug: string;
-  /** The theme's database id — used when saving/updating invitations. */
-  themeId: string;
-  /** The theme's slug name (e.g. "pink-floral") — derived from the Theme relation. */
-  template: TemplateName;
+  /** The model's database id — used when saving/updating invitations. */
+  modelId: string;
+  /** The React component name from the Model record (e.g. "ClassicFloral"). */
+  modelComponent: string;
+  /** All visual styling for this invitation (colors, fonts, CTA, envelope, overrides). */
+  styles: InvitationStyles;
   couple: CoupleInfo;
   date: DateInfo;
   quote: string;
@@ -410,10 +508,6 @@ export interface InvitationData {
   faqs?: FAQItem[];
   /** "Manual do bom convidado" section — optional list of icon + label tips for guests. */
   guestGuide?: GuestGuide;
-  /** Per-invitation envelope appearance overrides. Missing fields fall back to theme defaults. */
-  envelope?: EnvelopeConfig;
-  /** Visual style for the Save the Date section. Defaults to "classic". */
-  saveDateStyle?: SaveDateStyle;
   /** Background image for the "cinematic" Save the Date style. Falls back to a default Unsplash photo if empty. */
   cinematicImageUrl?: string;
   /** Optional decorative images placed between sections and in the footer. Each falls back to a default Unsplash photo if not provided. */
@@ -422,10 +516,6 @@ export interface InvitationData {
   parents?: ParentsInfo;
   /** Optional "Nossa História" section — the couple's story. */
   ourStory?: OurStory;
-  /** Per-invitation text style overrides (fonts, colors, sizes). Missing fields fall back to theme defaults. */
-  textStyles?: TextStyleOverrides;
-  /** Per-section card background/border overrides. Missing keys fall back to theme.cardBg / theme.cardBorder. */
-  cardStyles?: CardStyleOverrides;
   /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
   invitationType: InvitationType;
   /** External URL for the iframe page (external_link type). */
@@ -436,55 +526,15 @@ export interface InvitationData {
   customTexts?: CustomTexts;
 }
 
-export interface TemplateTheme {
-  /** The database id (cuid) of the theme record. */
+/**
+ * @deprecated Use `InvitationStyles` for rendering and `ModelRecord` for model metadata.
+ * Kept temporarily during migration — will be removed once all consumers are updated.
+ * This is the old combined type that merged model metadata with visual styling.
+ */
+export interface TemplateTheme extends InvitationStyles {
+  /** The database id (cuid) of the theme/model record. */
   id: string;
-  name: TemplateName;
+  name: ModelName;
   label: string;
   description: string;
-  // Cover envelope colors
-  envelope: {
-    base: string;
-    topFlap: string;
-    bottomFlap: string;
-  };
-  // Invitation page colors
-  bg: string;
-  cardBg: string;
-  cardBorder: string;
-  primary: string;
-  secondary: string;
-  accent: string;
-  textPrimary: string;
-  textSecondary: string;
-  textMuted: string;
-  // Typography
-  displayFont: string;
-  bodyFont: string;
-  scriptFont?: string;
-  /** UI font for labels, buttons, small text (replaces hardcoded Inter) */
-  uiFont: string;
-  /** Dedicated font for section titles (e.g. "Programação", "Nossa História"). Falls back to uiFont. */
-  sectionTitleFont?: string;
-  /** Default font size for section titles (px). Falls back to 10. */
-  sectionTitleFontSize?: number;
-  /** Default font weight for section titles. Falls back to 400. */
-  sectionTitleFontWeight?: string;
-  // CTA styling
-  ctaPrimaryBg: string;
-  ctaPrimaryText: string;
-  ctaSecondaryBorder: string;
-  ctaSecondaryText: string;
-  // Border radius for buttons
-  ctaRadius: string;
-  // Cover
-  monogramColor: string;
-  tapTextColor: string;
-  // Atmospheric / decorative (new)
-  /** Subtle radial gradient wash behind key sections */
-  bgGradient?: string;
-  /** Decorative line/dot color between sections */
-  decorativeColor: string;
-  /** Button hover glow color */
-  ctaGlow?: string;
 }

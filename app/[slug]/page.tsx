@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getInvitation } from "@/lib/invitations";
-import { getTheme } from "@/lib/themes";
 import InvitationView from "./InvitationView";
 
 // ---------------------------------------------------------------------------
@@ -56,11 +55,5 @@ export default async function InvitationSlugPage({
     notFound();
   }
 
-  const theme = await getTheme(invitation.template);
-
-  if (!theme) {
-    notFound();
-  }
-
-  return <InvitationView invitation={invitation} theme={theme} />;
+  return <InvitationView invitation={invitation} />;
 }

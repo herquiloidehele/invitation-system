@@ -8,7 +8,8 @@ import { Video, Link2, CheckCircle2 } from "lucide-react";
 import type {
   InvitationData,
   InvitationType,
-  TemplateTheme,
+  ModelRecord,
+  InvitationStyles,
   EnvelopeConfig,
 } from "@/lib/types";
 
@@ -32,7 +33,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
+import StyleCustomizationSection from "@/components/admin/StyleCustomizationSection";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import { getDefaultStylesForComponent } from "@/components/models";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
 // ---------------------------------------------------------------------------
@@ -60,13 +63,16 @@ function monogramFrom(bride: string, groom: string): string {
 // ---------------------------------------------------------------------------
 
 function getDefaultState(
-  firstTheme?: TemplateTheme,
+  firstModel?: ModelRecord,
   invType: InvitationType = "external_video",
 ): InvitationData {
   return {
     slug: "",
-    themeId: firstTheme?.id ?? "",
-    template: firstTheme?.name ?? "pink-floral",
+    modelId: firstModel?.id ?? "",
+    modelComponent: firstModel?.component ?? "ClassicFloral",
+    styles: getDefaultStylesForComponent(
+      firstModel?.component ?? "ClassicFloral",
+    ),
     couple: { bride: "", groom: "", monogram: "" },
     // These fields are required by the type but unused for external invitations
     date: {
@@ -89,8 +95,6 @@ function getDefaultState(
     videoUrl: "",
     invitationType: invType,
     externalLink: "",
-    saveDateStyle: "classic",
-    envelope: {},
   };
 }
 
@@ -105,7 +109,7 @@ interface ExternalInvitationFormProps {
   mode: "create" | "edit";
   invitationId?: string;
   ownerUrl?: string;
-  themes: TemplateTheme[];
+  models: ModelRecord[];
 }
 
 // ---------------------------------------------------------------------------
@@ -117,13 +121,13 @@ export default function ExternalInvitationForm({
   mode,
   invitationId,
   ownerUrl,
-  themes,
+  models,
 }: ExternalInvitationFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState<InvitationData>(
-    initialData ?? getDefaultState(themes[0]),
+    initialData ?? getDefaultState(models[0]),
   );
 
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
@@ -158,12 +162,16 @@ export default function ExternalInvitationForm({
     [mode],
   );
 
-  // Envelope overrides
+  // Envelope overrides — stored inside form.styles.envelope
   const updateEnvelope = useCallback(
     (field: keyof EnvelopeConfig, value: string | boolean) => {
       setForm((prev) => ({
         ...prev,
-        envelope: { ...prev.envelope, [field]: value },
+        styles: {
+          ...prev.styles,
+          envelope: { ...prev.styles.envelope, [field]: value },
+          ...(field === "shimmer" ? { envelopeShimmer: value as boolean } : {}),
+        },
       }));
     },
     [],
@@ -179,22 +187,21 @@ export default function ExternalInvitationForm({
     }));
   }, []);
 
-  // Current theme for cover preview
-  const currentTheme = useMemo(() => {
-    const base =
-      themes.find((t) => t.id === form.themeId) ??
-      themes.find((t) => t.name === form.template) ??
-      themes[0];
-    const overrides = form.envelope ?? {};
-    return {
-      ...base,
-      envelope: {
-        base: overrides.base || base?.envelope.base || "",
-        topFlap: overrides.topFlap || base?.envelope.topFlap || "",
-        bottomFlap: overrides.bottomFlap || base?.envelope.bottomFlap || "",
-      },
-    };
-  }, [themes, form.themeId, form.template, form.envelope]);
+  // Style change callback for StyleCustomizationSection
+  const onStyleChange = useCallback(
+    <K extends keyof InvitationStyles>(key: K, value: InvitationStyles[K]) => {
+      setForm((prev) => ({
+        ...prev,
+        styles: { ...prev.styles, [key]: value },
+      }));
+    },
+    [],
+  );
+
+  // Current styles for cover preview — invitation owns all styles directly
+  const currentStyles: InvitationStyles = useMemo(() => {
+    return form.styles;
+  }, [form.styles]);
 
   // Submit
   async function handleSubmit() {
@@ -411,34 +418,44 @@ export default function ExternalInvitationForm({
 
             <Separator />
 
-            {/* ── Theme ── */}
+            {/* ── Model ── */}
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium">Tema (capa)</Label>
+              <Label className="text-sm font-medium">Modelo (capa)</Label>
               <Select
-                value={form.themeId}
+                value={form.modelId}
                 onValueChange={(val) => {
-                  const t = themes.find((th) => th.id === val);
-                  if (t) {
+                  const m = models.find((mod) => mod.id === val);
+                  if (m) {
+                    const defaults = getDefaultStylesForComponent(m.component);
                     setForm((prev) => ({
                       ...prev,
-                      themeId: t.id,
-                      template: t.name,
+                      modelId: m.id,
+                      modelComponent: m.component,
+                      styles: {
+                        ...defaults,
+                        ...prev.styles,
+                        envelope: defaults.envelope,
+                      },
                     }));
                   }
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Seleciona um tema" />
+                  <SelectValue placeholder="Seleciona um modelo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {themes.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>
+                  {models.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
                       <div className="flex items-center gap-2">
                         <div
                           className="w-3 h-3 rounded-full border"
-                          style={{ backgroundColor: t.envelope.base }}
+                          style={{
+                            backgroundColor: getDefaultStylesForComponent(
+                              m.component,
+                            ).envelope?.base,
+                          }}
                         />
-                        {t.label}
+                        {m.label}
                       </div>
                     </SelectItem>
                   ))}
@@ -463,14 +480,14 @@ export default function ExternalInvitationForm({
                     <Label>Cor de fundo</Label>
                     <p className="text-xs text-muted-foreground">
                       Deixe em branco para usar a cor padrão do modelo (
-                      {currentTheme?.envelope.base ?? ""})
+                      {currentStyles?.envelope.base ?? ""})
                     </p>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
                         value={
-                          form.envelope?.base ||
-                          currentTheme?.envelope.base ||
+                          form.styles.envelope?.base ||
+                          currentStyles?.envelope.base ||
                           "#ffffff"
                         }
                         onChange={(e) => updateEnvelope("base", e.target.value)}
@@ -479,12 +496,12 @@ export default function ExternalInvitationForm({
                       />
                       <input
                         type="text"
-                        value={form.envelope?.base ?? ""}
+                        value={form.styles.envelope?.base ?? ""}
                         onChange={(e) => updateEnvelope("base", e.target.value)}
-                        placeholder={`Padrão: ${currentTheme?.envelope.base ?? ""}`}
+                        placeholder={`Padrão: ${currentStyles?.envelope.base ?? ""}`}
                         className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
                       />
-                      {form.envelope?.base && (
+                      {form.styles.envelope?.base && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -507,7 +524,7 @@ export default function ExternalInvitationForm({
                       Deixe em branco para usar a imagem padrão.
                     </p>
                     <MediaUpload
-                      value={form.envelope?.topFlap ?? ""}
+                      value={form.styles.envelope?.topFlap ?? ""}
                       onUpload={(url) => updateEnvelope("topFlap", url)}
                       onClear={() => updateEnvelope("topFlap", "")}
                       kind="image"
@@ -525,7 +542,7 @@ export default function ExternalInvitationForm({
                       branco para usar a imagem padrão.
                     </p>
                     <MediaUpload
-                      value={form.envelope?.bottomFlap ?? ""}
+                      value={form.styles.envelope?.bottomFlap ?? ""}
                       onUpload={(url) => updateEnvelope("bottomFlap", url)}
                       onClear={() => updateEnvelope("bottomFlap", "")}
                       kind="image"
@@ -544,10 +561,25 @@ export default function ExternalInvitationForm({
                       </p>
                     </div>
                     <Switch
-                      checked={form.envelope?.shimmer !== false}
+                      checked={form.styles.envelopeShimmer !== false}
                       onCheckedChange={(v) => updateEnvelope("shimmer", v)}
                     />
                   </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            {/* ── Visual Customization ── */}
+            <Accordion defaultValue={[]} className="w-full">
+              <AccordionItem value="styles" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-sm font-medium">
+                  Personalização Visual
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <StyleCustomizationSection
+                    styles={form.styles}
+                    onStyleChange={onStyleChange}
+                  />
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -603,12 +635,12 @@ export default function ExternalInvitationForm({
           className="relative overflow-hidden rounded-2xl shadow-xl"
           style={{ height: "600px", maxWidth: "340px" }}
         >
-          {currentTheme && (
+          {currentStyles && (
             <EnvelopeCover
-              theme={currentTheme}
+              theme={currentStyles}
               onOpen={() => {}}
               monogram={form.couple.monogram || "A&B"}
-              shimmer={form.envelope?.shimmer !== false}
+              shimmer={form.styles.envelopeShimmer !== false}
               imageSettings={form.imageSettings}
             />
           )}

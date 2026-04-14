@@ -10,7 +10,7 @@ import {
 } from "react";
 import { motion } from "framer-motion";
 import { Play, Pause } from "lucide-react";
-import type { AudioConfig, TemplateTheme } from "@/lib/types";
+import type { AudioConfig, InvitationStyles } from "@/lib/types";
 import { EditableText } from "./EditableText";
 
 // ---------------------------------------------------------------------------
@@ -25,8 +25,8 @@ export interface AudioPlayerTheme {
   artistColor: string;
 }
 
-/** Derive player-specific colors from a full TemplateTheme. */
-function derivePlayerTheme(t: TemplateTheme): AudioPlayerTheme {
+/** Derive player-specific colors from a full InvitationStyles. */
+function derivePlayerTheme(t: InvitationStyles): AudioPlayerTheme {
   return {
     bgColor: t.cardBg === "transparent" ? "rgba(255,255,255,0.85)" : t.cardBg,
     playBtnColor: t.accent,
@@ -57,7 +57,7 @@ interface DirectProps {
 
 interface IntegrationProps {
   audio: AudioConfig;
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   externalAudioRef?: MutableRefObject<HTMLAudioElement | null>;
   onPlay?: () => void;
 }

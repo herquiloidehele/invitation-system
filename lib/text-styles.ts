@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { TemplateTheme, TextStyleOverrides, TextStyle } from "./types";
+import type { InvitationStyles, TextStyleOverrides, TextStyle } from "./types";
 
 // ---------------------------------------------------------------------------
 // Resolved styles — fully computed CSSProperties for every text element
@@ -211,7 +211,7 @@ function applyOverride(
  *   4. Invitation element-level overrides (textStyles.elements) — highest priority
  */
 export function resolveTextStyles(
-  theme: TemplateTheme,
+  theme: InvitationStyles,
   overrides?: TextStyleOverrides | null,
 ): ResolvedTextStyles {
   // -- Tier 1: Resolve role-level values --

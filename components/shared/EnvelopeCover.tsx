@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import type { ImageSettingsMap, TemplateTheme } from "@/lib/types";
+import type { ImageSettingsMap, InvitationStyles } from "@/lib/types";
 import { getImageStyle } from "@/lib/image-settings";
 import Image from "next/image";
 
@@ -11,7 +11,7 @@ import Image from "next/image";
 /* ------------------------------------------------------------------ */
 
 interface EnvelopeCoverProps {
-  theme: TemplateTheme;
+  theme: InvitationStyles;
   onOpen: () => void;
   /** Called when the full opening animation has finished playing. */
   onAnimationComplete?: () => void;

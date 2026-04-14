@@ -7,12 +7,12 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DeleteThemeButtonProps {
-  themeId: string;
+  modelId: string;
   themeName: string;
 }
 
 export default function DeleteThemeButton({
-  themeId,
+  modelId,
   themeName,
 }: DeleteThemeButtonProps) {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function DeleteThemeButton({
 
     setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/themes/${themeId}`, {
+      const res = await fetch(`/api/admin/models/${modelId}`, {
         method: "DELETE",
       });
 

@@ -1,13 +1,46 @@
 import type { InvitationData } from "./types";
 
 /**
- * Realistic Portuguese wedding invitation used for theme previews.
- * All fields are populated so every section of InvitationPage renders.
+ * Realistic Portuguese wedding invitation used for model previews.
+ * All fields are populated so every section of the model component renders.
  */
 export const MOCK_INVITATION: InvitationData = {
   slug: "preview",
-  themeId: "theme_pink_floral",
-  template: "pink-floral",
+  modelId: "model_classic_floral",
+  modelComponent: "ClassicFloral",
+
+  styles: {
+    envelope: {
+      base: "#f4f1e9",
+      topFlap: "/images/top.png",
+      bottomFlap: "/images/bottom.png",
+    },
+    bg: "#FEF7F2",
+    cardBg: "rgba(255,255,255,0.65)",
+    cardBorder: "rgba(201,169,98,0.08)",
+    primary: "#8B1A4A",
+    secondary: "#8B5E6B",
+    accent: "#C4A050",
+    textPrimary: "#8B1A4A",
+    textSecondary: "#8B5E6B",
+    textMuted: "rgba(139,94,107,0.45)",
+    displayFont: "'Great Vibes', cursive",
+    bodyFont: "'Cormorant Garamond', serif",
+    scriptFont: "'Great Vibes', cursive",
+    uiFont: "'Outfit', sans-serif",
+    ctaPrimaryBg: "#C4A050",
+    ctaPrimaryText: "#FFFFFF",
+    ctaSecondaryBorder: "#8B1A4A",
+    ctaSecondaryText: "#8B1A4A",
+    ctaRadius: "9999px",
+    monogramColor: "rgba(255,255,255,0.8)",
+    tapTextColor: "rgba(255,255,255,0.7)",
+    bgGradient:
+      "radial-gradient(ellipse at 50% 30%, rgba(196,160,80,0.06) 0%, transparent 70%)",
+    decorativeColor: "rgba(196,160,80,0.18)",
+    ctaGlow: "rgba(196,160,80,0.25)",
+    saveDateStyle: "classic",
+  },
 
   couple: {
     bride: "Sofia",
@@ -167,7 +200,6 @@ export const MOCK_INVITATION: InvitationData = {
     ],
   },
 
-  saveDateStyle: "classic",
   cinematicImageUrl: undefined,
   ourStory: {
     enabled: true,
