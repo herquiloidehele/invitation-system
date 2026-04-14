@@ -24,7 +24,7 @@ No test framework is configured. No formatter script — Prettier uses default c
 - **Models** = structural layout only. Each model maps to a React component in `components/models/<Name>/`. The `Model` DB table has only identity fields: `name`, `label`, `description`, `component`, `previewImage`. No styling in DB.
 - **Invitations** own all visual styling in their `styles` JSON column (`InvitationStyles` type). When creating an invitation, styles are initialized from the model component's exported `DEFAULT_STYLES` constant (`components/models/<Name>/defaults.ts`), then the invitation owns them independently.
 - `components/models/index.ts` exports `MODEL_COMPONENTS` (dynamic import registry), `MODEL_DEFAULT_STYLES` map, and `getDefaultStylesForComponent()` helper.
-- 4 active models: `ClassicFloral`, `ModernMinimal`, `BohoNatural`, `MidnightLuxe`.
+- 1 active model: `ModernMinimal`.
 
 ### Key paths
 
@@ -39,7 +39,7 @@ No test framework is configured. No formatter script — Prettier uses default c
 | `app/admin/invitations/InvitationForm.tsx`         | ~2500 lines. Standard invitation CRUD form.                                                    |
 | `app/admin/invitations/ExternalInvitationForm.tsx` | ~650 lines. External (video/link) invitation form.                                             |
 | `app/api/admin/models/`                            | Models CRUD API.                                                                               |
-| `data/invitations/*.json`                          | Seed fixture data (4 invitations).                                                             |
+| `data/invitations/*.json`                          | Seed fixture data (1 invitation: `ana-miguel.json`).                                           |
 | `prisma.config.ts`                                 | Selects `.env.development` or `.env.production` based on `NODE_ENV` (defaults to development). |
 
 ### Routes
@@ -66,18 +66,18 @@ No test framework is configured. No formatter script — Prettier uses default c
 
 6. **shadcn/ui uses `@base-ui/react` primitives.** Accordion uses `multiple` prop (not `type="multiple"`). Check `components/ui/` for the actual wrapper API before using.
 
-7. **`components/templates/`** is legacy (old names: PinkFloral, BohoChic, MidnightElegance). Active model components are in `components/models/`. Deprecated type aliases `TemplateName` and `TemplateTheme` exist in `lib/types.ts`.
+7. **Most invitation fields are `Json` in Prisma** with no DB-level validation. The TypeScript interfaces in `lib/types.ts` are the only structural contract.
 
-8. **Most invitation fields are `Json` in Prisma** with no DB-level validation. The TypeScript interfaces in `lib/types.ts` are the only structural contract.
+8. **Seed script uses `tsx` with `@/` path aliases.** Do not switch to plain `node`.
 
-9. **Seed script uses `tsx` with `@/` path aliases.** Do not switch to plain `node`.
+9. **`npm run build` runs `prisma migrate dev`** as part of the build — this is a destructive dev command. Be aware in CI/production contexts.
 
-10. **`npm run build` runs `prisma migrate dev`** as part of the build — this is a destructive dev command. Be aware in CI/production contexts.
+10. **All user-facing text is Portuguese.** Code and comments are English. Overridable text uses the `t()` helper from `lib/custom-texts.ts`.
 
-11. **All user-facing text is Portuguese.** Code and comments are English. Overridable text uses the `t()` helper from `lib/custom-texts.ts`.
+11. **10 Google Fonts** are loaded in root layout as CSS variables and also available via dynamic loading (`DynamicFontLoader` + `FontPicker`).
 
-12. **10 Google Fonts** are loaded in root layout as CSS variables and also available via dynamic loading (`DynamicFontLoader` + `FontPicker`).
+12. **`pg` must stay in `serverExternalPackages`** in `next.config.ts` for the native driver to work.
 
-13. **`pg` must stay in `serverExternalPackages`** in `next.config.ts` for the native driver to work.
+13. **No `.env` files are committed.** Both `.env.development` and `.env.production` are gitignored. Required vars: `DATABASE_URL`, `AWS_REGION`, `S3_BUCKET_NAME`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`.
 
-14. **No `.env` files are committed.** Both `.env.development` and `.env.production` are gitignored. Required vars: `DATABASE_URL`, `AWS_REGION`, `S3_BUCKET_NAME`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`.
+14. **PrismaPg adapter does not auto-set `@updatedAt` on create.** Avoid `upsert` with the pg adapter — use a manual find-or-create pattern (`findUnique` + `create`/`update`) instead. See `prisma/seed.ts` for the working pattern.
