@@ -6,10 +6,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
 // Import default styles from model component code
-import { DEFAULT_STYLES as ClassicFloralStyles } from "@/components/models/ClassicFloral/defaults";
 import { DEFAULT_STYLES as ModernMinimalStyles } from "@/components/models/ModernMinimal/defaults";
-import { DEFAULT_STYLES as BohoNaturalStyles } from "@/components/models/BohoNatural/defaults";
-import { DEFAULT_STYLES as MidnightLuxeStyles } from "@/components/models/MidnightLuxe/defaults";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -26,86 +23,65 @@ const prisma = new PrismaClient({ adapter });
 
 const MODELS = [
   {
-    id: "model_classic_floral",
-    name: "classic-floral",
-    label: "Classic Floral",
-    description: "Romântico & Elegante",
-    component: "ClassicFloral",
-  },
-  {
-    id: "model_modern_minimal",
     name: "modern-minimal",
     label: "Modern Minimal",
     description: "Limpo & Sofisticado",
     component: "ModernMinimal",
   },
-  {
-    id: "model_boho_natural",
-    name: "boho-natural",
-    label: "Boho Natural",
-    description: "Rústico & Natural",
-    component: "BohoNatural",
-  },
-  {
-    id: "model_midnight_luxe",
-    name: "midnight-luxe",
-    label: "Midnight Luxe",
-    description: "Luxuoso & Dramático",
-    component: "MidnightLuxe",
-  },
 ];
 
-// Map from model id → default styles (from code constants)
+// Map from model name → default styles (from code constants)
 const MODEL_STYLES: Record<string, object> = {
-  model_classic_floral: ClassicFloralStyles,
-  model_modern_minimal: ModernMinimalStyles,
-  model_boho_natural: BohoNaturalStyles,
-  model_midnight_luxe: MidnightLuxeStyles,
+  "modern-minimal": ModernMinimalStyles,
 };
 
-// Map from old template slug (in JSON files) → model id
-const TEMPLATE_TO_MODEL_ID: Record<string, string> = {
-  "pink-floral": "model_classic_floral",
-  "modern-minimal": "model_modern_minimal",
-  "boho-chic": "model_boho_natural",
-  "midnight-elegance": "model_midnight_luxe",
+// Map from old template slug (in JSON files) → model name
+const TEMPLATE_TO_MODEL_NAME: Record<string, string> = {
+  "modern-minimal": "modern-minimal",
 };
 
 // Read all invitation JSON files
 const DATA_DIR = join(process.cwd(), "data", "invitations");
 
-const jsonFiles = [
-  "kezia-ruben.json",
-  "ana-miguel.json",
-  "sofia-pedro.json",
-  "leonor-diogo.json",
-];
+const jsonFiles = ["ana-miguel.json"];
 
 async function main() {
-  // ── 1. Upsert models ─────────────────────────────────────────────────────
+  // ── 1. Seed models (find-or-create) ───────────────────────────────────────
   console.log("Seeding models...");
 
+  const modelNameToId: Record<string, string> = {};
+
   for (const model of MODELS) {
-    await prisma.model.upsert({
-      where: { id: model.id },
-      update: {
-        name: model.name,
-        label: model.label,
-        description: model.description,
-        component: model.component,
-      },
-      create: {
-        id: model.id,
-        name: model.name,
-        label: model.label,
-        description: model.description,
-        component: model.component,
-      },
+    const existing = await prisma.model.findUnique({
+      where: { name: model.name },
     });
-    console.log(`  ✓ model: ${model.label} (${model.component})`);
+
+    if (existing) {
+      await prisma.model.update({
+        where: { name: model.name },
+        data: {
+          label: model.label,
+          description: model.description,
+          component: model.component,
+        },
+      });
+      modelNameToId[model.name] = existing.id;
+      console.log(`  ✓ model (updated): ${model.label} (${model.component})`);
+    } else {
+      const created = await prisma.model.create({
+        data: {
+          name: model.name,
+          label: model.label,
+          description: model.description,
+          component: model.component,
+        },
+      });
+      modelNameToId[model.name] = created.id;
+      console.log(`  ✓ model (created): ${model.label} (${model.component})`);
+    }
   }
 
-  // ── 2. Upsert invitations ─────────────────────────────────────────────────
+  // ── 2. Seed invitations ───────────────────────────────────────────────────
   console.log("\nSeeding invitations...");
 
   for (const file of jsonFiles) {
@@ -113,53 +89,69 @@ async function main() {
     const raw = readFileSync(filePath, "utf-8");
     const data = JSON.parse(raw);
 
-    const modelId = TEMPLATE_TO_MODEL_ID[data.template as string];
-    if (!modelId) {
+    const modelName = TEMPLATE_TO_MODEL_NAME[data.template as string];
+    if (!modelName) {
       console.warn(
         `  ⚠ Unknown template "${data.template}" for ${file}, skipping`,
       );
       continue;
     }
 
-    // Copy-on-create: the invitation gets the model's default styles from code
-    const styles = MODEL_STYLES[modelId];
+    const modelId = modelNameToId[modelName];
+    if (!modelId) {
+      console.warn(
+        `  ⚠ Model "${modelName}" not found in DB for ${file}, skipping`,
+      );
+      continue;
+    }
 
-    await prisma.invitation.upsert({
+    const styles = MODEL_STYLES[modelName];
+
+    const existingInvitation = await prisma.invitation.findUnique({
       where: { slug: data.slug },
-      update: {
-        modelId,
-        styles,
-        couple: data.couple,
-        date: data.date,
-        quote: data.quote,
-        location: data.location,
-        rsvp: data.rsvp,
-        schedule: data.schedule,
-        dressCode: data.dressCode,
-        giftRegistry: data.giftRegistry,
-        audio: data.audio,
-        heroImage: data.heroImage,
-        videoUrl: data.videoUrl ?? null,
-        faqs: data.faqs ?? null,
-      },
-      create: {
-        slug: data.slug,
-        modelId,
-        styles,
-        couple: data.couple,
-        date: data.date,
-        quote: data.quote,
-        location: data.location,
-        rsvp: data.rsvp,
-        schedule: data.schedule,
-        dressCode: data.dressCode,
-        giftRegistry: data.giftRegistry,
-        audio: data.audio,
-        heroImage: data.heroImage,
-        videoUrl: data.videoUrl ?? null,
-        faqs: data.faqs ?? null,
-      },
     });
+
+    if (existingInvitation) {
+      await prisma.invitation.update({
+        where: { slug: data.slug },
+        data: {
+          modelId,
+          styles,
+          couple: data.couple,
+          date: data.date,
+          quote: data.quote,
+          location: data.location,
+          rsvp: data.rsvp,
+          schedule: data.schedule,
+          dressCode: data.dressCode,
+          giftRegistry: data.giftRegistry,
+          audio: data.audio,
+          heroImage: data.heroImage,
+          videoUrl: data.videoUrl ?? null,
+          faqs: data.faqs ?? null,
+        },
+      });
+    } else {
+      await prisma.invitation.create({
+        data: {
+          slug: data.slug,
+          modelId,
+          styles,
+          couple: data.couple,
+          date: data.date,
+          quote: data.quote,
+          location: data.location,
+          rsvp: data.rsvp,
+          schedule: data.schedule,
+          dressCode: data.dressCode,
+          giftRegistry: data.giftRegistry,
+          audio: data.audio,
+          heroImage: data.heroImage,
+          videoUrl: data.videoUrl ?? null,
+          faqs: data.faqs ?? null,
+        },
+      });
+    }
 
     console.log(
       `  ✓ ${data.slug} (${data.couple.bride} & ${data.couple.groom})`,

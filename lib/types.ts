@@ -471,7 +471,7 @@ export interface ModelRecord {
   name: ModelName;
   label: string;
   description: string;
-  /** React component name used to render invitations (e.g. "ClassicFloral") */
+  /** React component name used to render invitations (e.g. "ModernMinimal") */
   component: string;
   /** Optional preview image URL shown in admin model picker */
   previewImage?: string;
@@ -485,7 +485,7 @@ export interface InvitationData {
   slug: string;
   /** The model's database id — used when saving/updating invitations. */
   modelId: string;
-  /** The React component name from the Model record (e.g. "ClassicFloral"). */
+  /** The React component name from the Model record (e.g. "ModernMinimal"). */
   modelComponent: string;
   /** All visual styling for this invitation (colors, fonts, CTA, envelope, overrides). */
   styles: InvitationStyles;

@@ -61,7 +61,7 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ClassicFloral from "@/components/models/ClassicFloral/ClassicFloral";
+import ModernMinimal from "@/components/models/ModernMinimal/ModernMinimal";
 import { getDefaultStylesForComponent } from "@/components/models";
 import StyleCustomizationSection from "@/components/admin/StyleCustomizationSection";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
@@ -307,9 +307,9 @@ function getDefaultFormState(firstModel?: ModelRecord): InvitationData {
   return {
     slug: "",
     modelId: firstModel?.id ?? "",
-    modelComponent: firstModel?.component ?? "ClassicFloral",
+    modelComponent: firstModel?.component ?? "ModernMinimal",
     styles: getDefaultStylesForComponent(
-      firstModel?.component ?? "ClassicFloral",
+      firstModel?.component ?? "ModernMinimal",
     ),
     couple: { bride: "", groom: "", monogram: "" },
     date: {
@@ -2520,7 +2520,7 @@ export default function InvitationForm({
                 <CardStyleToolbar />
                 <div className="mx-auto origin-top w-full max-h-165 relative">
                   {form.couple.bride && form.couple.groom ? (
-                    <ClassicFloral
+                    <ModernMinimal
                       invitation={form}
                       styles={currentStyles}
                       isPreview

@@ -3,10 +3,7 @@ import type { ComponentType } from "react";
 import type { ModelComponentProps } from "./types";
 import type { InvitationStyles } from "@/lib/types";
 
-import { DEFAULT_STYLES as ClassicFloralDefaults } from "./ClassicFloral/defaults";
 import { DEFAULT_STYLES as ModernMinimalDefaults } from "./ModernMinimal/defaults";
-import { DEFAULT_STYLES as BohoNaturalDefaults } from "./BohoNatural/defaults";
-import { DEFAULT_STYLES as MidnightLuxeDefaults } from "./MidnightLuxe/defaults";
 
 /**
  * Registry of model components, keyed by the `component` field from the Model database record.
@@ -16,10 +13,7 @@ export const MODEL_COMPONENTS: Record<
   string,
   ComponentType<ModelComponentProps>
 > = {
-  ClassicFloral: dynamic(() => import("./ClassicFloral/ClassicFloral")),
   ModernMinimal: dynamic(() => import("./ModernMinimal/ModernMinimal")),
-  BohoNatural: dynamic(() => import("./BohoNatural/BohoNatural")),
-  MidnightLuxe: dynamic(() => import("./MidnightLuxe/MidnightLuxe")),
 };
 
 /**
@@ -28,10 +22,7 @@ export const MODEL_COMPONENTS: Record<
  * Keyed by the same component name used in MODEL_COMPONENTS.
  */
 export const MODEL_DEFAULT_STYLES: Record<string, InvitationStyles> = {
-  ClassicFloral: ClassicFloralDefaults,
   ModernMinimal: ModernMinimalDefaults,
-  BohoNatural: BohoNaturalDefaults,
-  MidnightLuxe: MidnightLuxeDefaults,
 };
 
 /**
@@ -44,10 +35,10 @@ export function getModelComponent(
 }
 
 /**
- * Get the default styles for a model component. Falls back to ClassicFloral if not found.
+ * Get the default styles for a model component. Falls back to ModernMinimal if not found.
  */
 export function getDefaultStylesForComponent(
   componentName: string,
 ): InvitationStyles {
-  return MODEL_DEFAULT_STYLES[componentName] ?? ClassicFloralDefaults;
+  return MODEL_DEFAULT_STYLES[componentName] ?? ModernMinimalDefaults;
 }

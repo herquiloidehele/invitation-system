@@ -172,12 +172,11 @@ export default function ThemeForm({
             id="component"
             value={form.component}
             onChange={(e) => set("component", e.target.value)}
-            placeholder="ClassicFloral"
+            placeholder="ModernMinimal"
             className="font-mono text-xs"
           />
           <p className="text-[11px] text-muted-foreground">
-            Nome do componente React (ex: &quot;ClassicFloral&quot;,
-            &quot;ModernMinimal&quot;).
+            Nome do componente React (ex: &quot;ModernMinimal&quot;).
           </p>
         </div>
 

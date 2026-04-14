@@ -69,9 +69,9 @@ function getDefaultState(
   return {
     slug: "",
     modelId: firstModel?.id ?? "",
-    modelComponent: firstModel?.component ?? "ClassicFloral",
+    modelComponent: firstModel?.component ?? "ModernMinimal",
     styles: getDefaultStylesForComponent(
-      firstModel?.component ?? "ClassicFloral",
+      firstModel?.component ?? "ModernMinimal",
     ),
     couple: { bride: "", groom: "", monogram: "" },
     // These fields are required by the type but unused for external invitations

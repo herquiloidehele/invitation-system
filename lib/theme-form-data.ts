@@ -41,6 +41,6 @@ export const EMPTY_FORM_DATA: ModelFormData = {
   name: "",
   label: "",
   description: "",
-  component: "ClassicFloral",
+  component: "ModernMinimal",
   previewImage: "",
 };

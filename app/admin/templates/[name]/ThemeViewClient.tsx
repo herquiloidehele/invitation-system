@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type { InvitationData, ModelRecord } from "@/lib/types";
-import ClassicFloral from "@/components/models/ClassicFloral/ClassicFloral";
+import ModernMinimal from "@/components/models/ModernMinimal/ModernMinimal";
 import { getDefaultStylesForComponent } from "@/components/models";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
@@ -82,7 +82,7 @@ function PhoneFrame({
         }}
       >
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-        <ClassicFloral
+        <ModernMinimal
           invitation={invitation}
           styles={getDefaultStylesForComponent(model.component)}
         />
