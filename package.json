@@ -8,15 +8,10 @@
     "build": "prisma generate && npm run db:migrate && next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed:dev": "tsx --env-file=.env.development prisma/seed.ts",
-    "db:seed:prod": "tsx --env-file=.env.production prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
     "db:migrate:dev": "cross-env NODE_ENV=development prisma migrate dev",
     "db:migrate:prod": "cross-env NODE_ENV=production prisma migrate dev",
     "db:studio": "prisma studio"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1011.0",
