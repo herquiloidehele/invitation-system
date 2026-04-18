@@ -898,7 +898,7 @@ export default function InvitationForm({
 
   // Style change callback for StyleCustomizationSection
   const onStyleChange = useCallback(
-    <K extends keyof InvitationStyles>(key: K, value: InvitationStyles[K]) => {
+    (key: string, value: unknown) => {
       setForm((prev) => ({
         ...prev,
         styles: { ...prev.styles, [key]: value },
@@ -1260,7 +1260,8 @@ export default function InvitationForm({
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <StyleCustomizationSection
-                    styles={form.styles}
+                    modelComponent={form.modelComponent}
+                    styles={form.styles as unknown as Record<string, unknown>}
                     onStyleChange={onStyleChange}
                   />
                 </AccordionContent>
