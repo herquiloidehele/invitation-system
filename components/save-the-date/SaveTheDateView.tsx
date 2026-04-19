@@ -12,11 +12,12 @@ import CalendarButton from "./CalendarButton";
 
 interface SaveTheDateViewProps {
   saveTheDate: SaveTheDateData;
+  hideEnvelope?: boolean;
 }
 
 const HEART_SIZE = 280;
 
-export default function SaveTheDateView({ saveTheDate }: SaveTheDateViewProps) {
+export default function SaveTheDateView({ saveTheDate, hideEnvelope = false }: SaveTheDateViewProps) {
   const { couple, date, customMessage, theme } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
@@ -134,7 +135,7 @@ export default function SaveTheDateView({ saveTheDate }: SaveTheDateViewProps) {
     >
       {/* Envelope overlay */}
       <AnimatePresence>
-        {hasEnvelope && envelopeTheme && !envelopeDone && (
+        {!hideEnvelope && hasEnvelope && envelopeTheme && !envelopeDone && (
           <EnvelopeCover
             key="envelope"
             theme={envelopeTheme}

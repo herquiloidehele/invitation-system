@@ -613,7 +613,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
             <div className="mx-auto origin-top w-full max-h-165 relative">
               {hasNames && selectedTheme ? (
                 <div className="pointer-events-none">
-                  <SaveTheDateView saveTheDate={previewData} />
+                  <SaveTheDateView saveTheDate={previewData} hideEnvelope />
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-96 text-muted-foreground text-sm text-center px-4">
