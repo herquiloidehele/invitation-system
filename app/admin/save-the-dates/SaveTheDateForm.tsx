@@ -44,6 +44,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
+import { OwnerLinkPanel } from "@/app/admin/invitations/OwnerLinkPanel";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -65,6 +66,7 @@ export interface SaveTheDateFormData {
   envelope?: EnvelopeConfig;
   textStyles?: TextStyleOverrides;
   rsvp?: { enabled: boolean; deadline?: string };
+  ownerToken?: string;
 }
 
 interface Props {
@@ -306,6 +308,13 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                   : "Guardar Alterações"}
             </Button>
           </div>
+
+          {/* Owner link — only shown in edit mode when RSVP is enabled */}
+          {mode === "edit" && data.ownerToken && data.rsvp?.enabled && (
+            <OwnerLinkPanel
+              ownerUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/confirmacoes/${data.ownerToken}`}
+            />
+          )}
 
           <Accordion defaultValue={[]} className="space-y-2">
             {/* ── Casal ── */}

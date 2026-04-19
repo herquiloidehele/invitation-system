@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
+import { CheckCircle } from "lucide-react";
 import type { SaveTheDateData } from "@/lib/save-the-date";
 import type { TemplateTheme } from "@/lib/types";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
@@ -12,6 +13,7 @@ import CalendarButton from "./CalendarButton";
 import RSVPModal from "@/components/shared/RSVPModal";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import { EditableText } from "@/components/shared/EditableText";
+import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 
 interface SaveTheDateViewProps {
   saveTheDate: SaveTheDateData;
@@ -28,8 +30,35 @@ export default function SaveTheDateView({
   const [revealed, setRevealed] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
+  const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
 
   const rsvpEnabled = rsvp?.enabled === true;
+
+  // Check localStorage on mount for already-submitted state
+  useEffect(() => {
+    if (!rsvpEnabled) return;
+    try {
+      const slugs: string[] = JSON.parse(
+        localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+      );
+      if (slugs.includes(saveTheDate.slug)) setRsvpSubmitted(true);
+    } catch {
+      // ignore
+    }
+  }, [rsvpEnabled, saveTheDate.slug]);
+
+  const handleRsvpClose = useCallback(() => {
+    // Re-check localStorage in case the modal wrote a new submission
+    try {
+      const slugs: string[] = JSON.parse(
+        localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+      );
+      if (slugs.includes(saveTheDate.slug)) setRsvpSubmitted(true);
+    } catch {
+      // ignore
+    }
+    setRsvpOpen(false);
+  }, [saveTheDate.slug]);
 
   // Element-level overrides from the shared TextStyleOverrides system
   const titleOverride = textStyles?.elements?.stdTitle;
@@ -297,15 +326,25 @@ export default function SaveTheDateView({
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.7, ease: "easeOut" }}
-            onClick={() => setRsvpOpen(true)}
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95"
+            onClick={() => !rsvpSubmitted && setRsvpOpen(true)}
+            disabled={rsvpSubmitted}
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95 disabled:cursor-default disabled:active:scale-100"
             style={{
-              background: `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+              background: rsvpSubmitted
+                ? "#22c55e"
+                : `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
               color: "#FFFFFF",
               fontFamily: theme.coupleFont,
             }}
           >
-            Confirmar Presença
+            {rsvpSubmitted ? (
+              <>
+                <CheckCircle size={16} />
+                Presença Confirmada
+              </>
+            ) : (
+              "Confirmar Presença"
+            )}
           </motion.button>
         )}
         {!rsvpEnabled && (
@@ -322,7 +361,7 @@ export default function SaveTheDateView({
       {rsvpEnabled && (
         <RSVPModal
           isOpen={rsvpOpen}
-          onClose={() => setRsvpOpen(false)}
+          onClose={handleRsvpClose}
           invitationSlug={saveTheDate.slug}
           apiEndpoint="/api/save-the-date/rsvp"
           slugKey="saveTheDateSlug"

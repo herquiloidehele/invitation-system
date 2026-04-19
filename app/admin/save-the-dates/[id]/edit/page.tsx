@@ -51,6 +51,7 @@ export default async function EditSaveTheDatePage({
     envelope: envelope || undefined,
     textStyles: textStyles || undefined,
     rsvp: rsvp || undefined,
+    ownerToken: item.ownerToken,
   };
 
   return (
