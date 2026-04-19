@@ -361,7 +361,7 @@ export default function SaveTheDateView({
           {/* Title — fades down from above */}
           <motion.h1
             variants={fadeDown}
-            className="mb-4 text-4xl"
+            className="mb-8 text-4xl"
             style={{
               fontFamily: resolvedTitleFont,
               color: titleOverride?.color ?? theme.textColor,
@@ -442,7 +442,7 @@ export default function SaveTheDateView({
           {/* E. Couple names — split into bride / & / groom, staggered */}
           <motion.h2
             variants={fadeUp}
-            className="text-2xl font-light uppercase flex items-baseline gap-[0.3em]"
+            className="text-2xl font-light uppercase flex items-baseline gap-[0.3em] mb-6"
             style={{
               fontFamily: resolvedCoupleFont,
               color: coupleOverride?.color ?? theme.textColor,
@@ -484,78 +484,77 @@ export default function SaveTheDateView({
 
         {/* ── C. Post-reveal choreography ──────────────────────────── */}
         <AnimatePresence>
-          {revealed && (
+          <motion.div
+            className="flex flex-col items-center w-full"
+            variants={revealContainer}
+            initial="hidden"
+            animate={revealed ? "visible" : "hidden"}
+            style={{ visibility: revealed ? "visible" : "hidden" }}
+          >
+            {/* Custom message */}
+            {customMessage && (
+              <motion.p
+                variants={revealFadeUp}
+                className="text-sm tracking-wide"
+                style={{
+                  fontFamily: resolvedCustomMessageFont,
+                  color: customMessageOverride?.color ?? theme.textColor,
+                  opacity: 0.6,
+                  ...(customMessageOverride?.fontSize
+                    ? { fontSize: customMessageOverride.fontSize }
+                    : {}),
+                  ...(customMessageOverride?.fontWeight
+                    ? { fontWeight: customMessageOverride.fontWeight }
+                    : {}),
+                  ...(customMessageOverride?.letterSpacing
+                    ? { letterSpacing: customMessageOverride.letterSpacing }
+                    : {}),
+                }}
+              >
+                <EditableText elementKey="stdCustomMessage">
+                  {customMessage}
+                </EditableText>
+              </motion.p>
+            )}
+
+            {/* RSVP / Calendar button */}
             <motion.div
-              className="mt-6 flex flex-col items-center w-full"
-              variants={revealContainer}
-              initial="hidden"
-              animate="visible"
+              variants={revealFadeUp}
+              className="mt-8 w-full max-w-xs flex flex-col gap-3"
             >
-              {/* Custom message */}
-              {customMessage && (
-                <motion.p
-                  variants={revealFadeUp}
-                  className="text-sm tracking-wide"
+              {rsvpEnabled && (
+                <button
+                  onClick={() => !rsvpSubmitted && setRsvpOpen(true)}
+                  disabled={rsvpSubmitted}
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95 disabled:cursor-default disabled:active:scale-100"
                   style={{
-                    fontFamily: resolvedCustomMessageFont,
-                    color: customMessageOverride?.color ?? theme.textColor,
-                    opacity: 0.6,
-                    ...(customMessageOverride?.fontSize
-                      ? { fontSize: customMessageOverride.fontSize }
-                      : {}),
-                    ...(customMessageOverride?.fontWeight
-                      ? { fontWeight: customMessageOverride.fontWeight }
-                      : {}),
-                    ...(customMessageOverride?.letterSpacing
-                      ? { letterSpacing: customMessageOverride.letterSpacing }
-                      : {}),
+                    background: rsvpSubmitted
+                      ? "#22c55e"
+                      : `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+                    color: "#FFFFFF",
+                    fontFamily: theme.coupleFont,
                   }}
                 >
-                  <EditableText elementKey="stdCustomMessage">
-                    {customMessage}
-                  </EditableText>
-                </motion.p>
+                  {rsvpSubmitted ? (
+                    <>
+                      <CheckCircle size={16} />
+                      Presença Confirmada
+                    </>
+                  ) : (
+                    "Confirmar Presença"
+                  )}
+                </button>
               )}
-
-              {/* RSVP / Calendar button */}
-              <motion.div
-                variants={revealFadeUp}
-                className="mt-8 w-full max-w-xs flex flex-col gap-3"
-              >
-                {rsvpEnabled && (
-                  <button
-                    onClick={() => !rsvpSubmitted && setRsvpOpen(true)}
-                    disabled={rsvpSubmitted}
-                    className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95 disabled:cursor-default disabled:active:scale-100"
-                    style={{
-                      background: rsvpSubmitted
-                        ? "#22c55e"
-                        : `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
-                      color: "#FFFFFF",
-                      fontFamily: theme.coupleFont,
-                    }}
-                  >
-                    {rsvpSubmitted ? (
-                      <>
-                        <CheckCircle size={16} />
-                        Presença Confirmada
-                      </>
-                    ) : (
-                      "Confirmar Presença"
-                    )}
-                  </button>
-                )}
-                {!rsvpEnabled && (
-                  <CalendarButton
-                    date={date}
-                    couple={couple}
-                    theme={theme}
-                    visible
-                  />
-                )}
-              </motion.div>
+              {!rsvpEnabled && (
+                <CalendarButton
+                  date={date}
+                  couple={couple}
+                  theme={theme}
+                  visible
+                />
+              )}
             </motion.div>
-          )}
+          </motion.div>
         </AnimatePresence>
 
         {/* RSVP Modal */}
