@@ -10,7 +10,7 @@
  * This produces a symmetric, well-proportioned heart.
  */
 export const HEART_PATH =
-  "M50 88 C25 70, 0 50, 0 30 C0 12, 12 0, 27 0 C37 0, 45 6, 50 18 C55 6, 63 0, 73 0 C88 0, 100 12, 100 30 C100 50, 75 70, 50 88Z";
+  "M50 88 C25 70, 0 50, 0 30 C0 12, 12 0, 27 0 C37 0, 43 4, 47 14 Q50 24, 53 14 C57 4, 63 0, 73 0 C88 0, 100 12, 100 30 C100 50, 75 70, 50 88Z";
 
 /**
  * Draw the heart path onto a canvas context, scaled to fill width x height.
@@ -40,13 +40,19 @@ export function traceHeartPath(
   );
   path.bezierCurveTo(
     37 * sx, 0 * sy,
-    45 * sx, 6 * sy,
-    50 * sx, 18 * sy
+    43 * sx, 4 * sy,
+    47 * sx, 14 * sy
+  );
+
+  // Top center cleft (deep V-shaped cavity between lobes)
+  path.quadraticCurveTo(
+    50 * sx, 24 * sy,
+    53 * sx, 14 * sy
   );
 
   // Right lobe
   path.bezierCurveTo(
-    55 * sx, 6 * sy,
+    57 * sx, 4 * sy,
     63 * sx, 0 * sy,
     73 * sx, 0 * sy
   );

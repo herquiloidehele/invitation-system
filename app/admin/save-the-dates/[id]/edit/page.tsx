@@ -1,0 +1,45 @@
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/db";
+import { getSaveDateThemes } from "@/lib/save-the-date";
+import SaveTheDateForm from "../../SaveTheDateForm";
+import type { SaveTheDateFormData } from "../../SaveTheDateForm";
+
+export const dynamic = "force-dynamic";
+
+export default async function EditSaveTheDatePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const themes = await getSaveDateThemes();
+
+  const item = await prisma.saveTheDate.findUnique({
+    where: { id },
+    include: { theme: true },
+  });
+
+  if (!item) notFound();
+
+  const couple = item.couple as { bride: string; groom: string };
+  const date = item.date as {
+    iso: string;
+    display: string;
+    day: string;
+    month: string;
+    year: string;
+  };
+
+  const initialData: SaveTheDateFormData = {
+    id: item.id,
+    slug: item.slug,
+    themeId: item.themeId,
+    couple,
+    date,
+    customMessage: item.customMessage || "",
+  };
+
+  return (
+    <SaveTheDateForm mode="edit" initialData={initialData} themes={themes} />
+  );
+}

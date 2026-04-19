@@ -1,12 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  traceHeartPath,
-  loadImage,
-  generateGlitterTexture,
-} from "./GlitterEffect";
+import { generateGlitterTexture, loadImage, traceHeartPath } from "./GlitterEffect";
 
 interface ScratchHeartProps {
   width: number;
@@ -19,15 +15,8 @@ interface ScratchHeartProps {
 }
 
 const SCRATCH_RADIUS = 26;
-const REVEAL_THRESHOLD = 0.50;
+const REVEAL_THRESHOLD = 0.5;
 const SAMPLE_INTERVAL = 6;
-
-/**
- * CSS clip-path for the heart shape (matches our SVG heart path).
- * Used for the shimmer overlay and the content clip.
- */
-const HEART_CLIP_PATH =
-  "path('M 50 88 C 25 70, 0 50, 0 30 C 0 12, 12 0, 27 0 C 37 0, 45 6, 50 18 C 55 6, 63 0, 73 0 C 88 0, 100 12, 100 30 C 100 50, 75 70, 50 88 Z')";
 
 export default function ScratchHeart({
   width,
@@ -85,10 +74,12 @@ export default function ScratchHeart({
     };
 
     if (textureUrl) {
-      loadImage(textureUrl).then(drawHeart).catch(() => {
-        // Fallback to procedural
-        drawHeart(generateGlitterTexture(cw, ch, glitterColors));
-      });
+      loadImage(textureUrl)
+        .then(drawHeart)
+        .catch(() => {
+          // Fallback to procedural
+          drawHeart(generateGlitterTexture(cw, ch, glitterColors));
+        });
     } else {
       drawHeart(generateGlitterTexture(cw, ch, glitterColors));
     }
@@ -163,7 +154,7 @@ export default function ScratchHeart({
         checkReveal();
       }
     },
-    [dpr, redraw]
+    [dpr, redraw],
   );
 
   const checkReveal = () => {
@@ -190,9 +181,7 @@ export default function ScratchHeart({
     const heartCoverage = 0.62;
     const originalHeartPixels = totalPixels * heartCoverage;
     const scratchedRatio =
-      originalHeartPixels > 0
-        ? 1 - visiblePixels / originalHeartPixels
-        : 0;
+      originalHeartPixels > 0 ? 1 - visiblePixels / originalHeartPixels : 0;
 
     if (scratchedRatio >= REVEAL_THRESHOLD) {
       revealedRef.current = true;
@@ -233,11 +222,7 @@ export default function ScratchHeart({
     <motion.div
       className="relative"
       style={{ width, height }}
-      animate={
-        canvasReady && !revealed
-          ? { scale: [1, 1.02, 1] }
-          : undefined
-      }
+      animate={canvasReady && !revealed ? { scale: [1, 1.02, 1] } : undefined}
       transition={
         canvasReady && !revealed
           ? { repeat: Infinity, duration: 2.5, ease: "easeInOut" }

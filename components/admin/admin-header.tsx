@@ -73,6 +73,30 @@ function getBreadcrumbs(pathname: string) {
           href: `/admin/invitations/${segments[2]}/edit`,
         });
       }
+    } else if (segments[1] === "save-the-dates") {
+      crumbs.push({ label: "Admin", href: "/admin" });
+      crumbs.push({ label: "Save the Date", href: "/admin/save-the-dates" });
+
+      if (segments[2] === "new") {
+        crumbs.push({ label: "Criar Novo", href: "/admin/save-the-dates/new" });
+      } else if (segments[2] && segments[3] === "edit") {
+        crumbs.push({
+          label: "Editar",
+          href: `/admin/save-the-dates/${segments[2]}/edit`,
+        });
+      }
+    } else if (segments[1] === "save-the-date-themes") {
+      crumbs.push({ label: "Admin", href: "/admin" });
+      crumbs.push({ label: "Modelos STD", href: "/admin/save-the-date-themes" });
+
+      if (segments[2] === "new") {
+        crumbs.push({ label: "Criar Novo", href: "/admin/save-the-date-themes/new" });
+      } else if (segments[2] && segments[3] === "edit") {
+        crumbs.push({
+          label: "Editar",
+          href: `/admin/save-the-date-themes/${segments[2]}/edit`,
+        });
+      }
     } else {
       crumbs.push({ label: "Painel", href: "/admin" });
     }
