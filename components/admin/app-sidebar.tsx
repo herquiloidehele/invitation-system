@@ -76,6 +76,16 @@ const navMain = [
     icon: FolderKanban,
   },
   {
+    title: "Save the Date",
+    url: "/admin/save-the-dates",
+    icon: Sparkles,
+  },
+  {
+    title: "Modelos STD",
+    url: "/admin/save-the-date-themes",
+    icon: PenTool,
+  },
+  {
     title: "Confirmações",
     url: "/admin/rsvps",
     icon: Users,
