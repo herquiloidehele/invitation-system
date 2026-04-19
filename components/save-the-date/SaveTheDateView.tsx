@@ -32,6 +32,7 @@ export default function SaveTheDateView({
   const coupleOverride = textStyles?.elements?.stdCoupleNames;
   const hintOverride = textStyles?.elements?.stdHint;
   const dateOverride = textStyles?.elements?.stdDate;
+  const dateLabelOverride = textStyles?.elements?.stdDateLabel;
   const customMessageOverride = textStyles?.elements?.stdCustomMessage;
 
   // Resolve fonts — element override wins, fall back to theme
@@ -39,6 +40,7 @@ export default function SaveTheDateView({
   const resolvedCoupleFont = coupleOverride?.fontFamily ?? theme.coupleFont;
   const resolvedHintFont = hintOverride?.fontFamily ?? theme.coupleFont;
   const resolvedDateFont = dateOverride?.fontFamily ?? theme.dateFont;
+  const resolvedDateLabelFont = dateLabelOverride?.fontFamily ?? theme.dateFont;
   const resolvedCustomMessageFont =
     customMessageOverride?.fontFamily ?? theme.dateFont;
 
@@ -48,6 +50,7 @@ export default function SaveTheDateView({
     coupleOverride?.fontFamily ?? null,
     hintOverride?.fontFamily ?? null,
     dateOverride?.fontFamily ?? null,
+    dateLabelOverride?.fontFamily ?? null,
     customMessageOverride?.fontFamily ?? null,
   ]);
 
@@ -217,12 +220,15 @@ export default function SaveTheDateView({
           glitterColors={theme.heartGlitterColors}
           textureUrl={theme.heartTextureUrl}
           onReveal={handleReveal}
+          forceReveal={hideEnvelope}
         >
           <DateReveal
             date={date}
             theme={theme}
             dateOverride={dateOverride}
+            dateLabelOverride={dateLabelOverride}
             resolvedDateFont={resolvedDateFont}
+            resolvedDateLabelFont={resolvedDateLabelFont}
             revealed={revealed}
             forceReveal
           />

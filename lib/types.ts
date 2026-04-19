@@ -317,8 +317,10 @@ export interface TextStyleOverrides {
     stdCoupleNames?: TextStyle;
     /** "Raspe para ver a data" hint text below the heart */
     stdHint?: TextStyle;
-    /** Revealed date (and inner label) inside the scratch heart */
+    /** Revealed date numbers inside the scratch heart (e.g. "12.06.2026") */
     stdDate?: TextStyle;
+    /** "Save the Date" label inside the scratch heart (below the date numbers) */
+    stdDateLabel?: TextStyle;
     /** Custom message shown after the date is revealed */
     stdCustomMessage?: TextStyle;
   };

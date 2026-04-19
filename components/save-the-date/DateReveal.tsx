@@ -12,7 +12,9 @@ interface DateRevealProps {
   date: SaveTheDateDate;
   theme: SaveTheDateThemeData;
   dateOverride?: TextStyle;
+  dateLabelOverride?: TextStyle;
   resolvedDateFont: string;
+  resolvedDateLabelFont: string;
   revealed: boolean;
   forceReveal?: boolean;
 }
@@ -21,7 +23,9 @@ export default function DateReveal({
   date,
   theme,
   dateOverride,
+  dateLabelOverride,
   resolvedDateFont,
+  resolvedDateLabelFont,
   revealed,
   forceReveal = false,
 }: DateRevealProps) {
@@ -35,6 +39,17 @@ export default function DateReveal({
       : {}),
     ...(dateOverride?.letterSpacing
       ? { letterSpacing: dateOverride.letterSpacing }
+      : {}),
+  };
+  const dateLabelStyle = {
+    fontFamily: resolvedDateLabelFont,
+    color: dateLabelOverride?.color ?? theme.textColor,
+    ...(dateLabelOverride?.fontSize ? { fontSize: dateLabelOverride.fontSize } : {}),
+    ...(dateLabelOverride?.fontWeight
+      ? { fontWeight: dateLabelOverride.fontWeight }
+      : {}),
+    ...(dateLabelOverride?.letterSpacing
+      ? { letterSpacing: dateLabelOverride.letterSpacing }
       : {}),
   };
 
@@ -64,9 +79,9 @@ export default function DateReveal({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: forceReveal ? 0 : 0.7, duration: 0.6 }}
               className="text-lg font-bold tracking-[0.3em] uppercase"
-              style={dateStyle}
+              style={dateLabelStyle}
             >
-              <EditableText elementKey="stdDate">Save the Date</EditableText>
+              <EditableText elementKey="stdDateLabel">Save the Date</EditableText>
             </motion.p>
           </>
         )}

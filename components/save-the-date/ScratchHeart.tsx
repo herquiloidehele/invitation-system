@@ -16,6 +16,8 @@ interface ScratchHeartProps {
   textureUrl?: string; // optional real glitter texture image
   onReveal: () => void;
   children: React.ReactNode;
+  /** When true (admin preview) the canvas is hidden so children are clickable. */
+  forceReveal?: boolean;
 }
 
 const SCRATCH_RADIUS = 26;
@@ -30,6 +32,7 @@ export default function ScratchHeart({
   textureUrl,
   onReveal,
   children,
+  forceReveal = false,
 }: ScratchHeartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const heartPathRef = useRef<Path2D | null>(null);
@@ -280,7 +283,7 @@ export default function ScratchHeart({
       <canvas
         ref={canvasRef}
         className="absolute inset-0 z-10 touch-none"
-        style={{ width, height, cursor: "pointer" }}
+        style={{ width, height, cursor: "pointer", display: forceReveal ? "none" : undefined }}
         onMouseDown={handleStart}
         onMouseMove={handleMove}
         onMouseUp={handleEnd}
@@ -291,7 +294,7 @@ export default function ScratchHeart({
       />
 
       {/* Shimmer overlay — CSS animated gradient sweeping over the heart */}
-      {canvasReady && !revealed && (
+      {canvasReady && !revealed && !forceReveal && (
         <div
           className="pointer-events-none absolute inset-0 z-20 animate-shimmer"
           style={{
