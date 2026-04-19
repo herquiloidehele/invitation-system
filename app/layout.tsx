@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Great_Vibes,
   Playfair_Display,
@@ -80,6 +80,13 @@ const pinyonScript = Pinyon_Script({
   subsets: ["latin"],
   variable: "--font-pinyon-script",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "Brindel Studio — Convites Digitais",
