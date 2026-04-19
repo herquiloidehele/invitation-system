@@ -1,9 +1,11 @@
 import { prisma } from "./db";
-import type { EnvelopeConfig } from "./types";
+import type { EnvelopeConfig, TextStyleOverrides } from "./types";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+export type { TextStyleOverrides as STDTextStyleOverrides };
 
 export interface SaveTheDateCouple {
   bride: string;
@@ -52,6 +54,8 @@ export interface SaveTheDateData {
   theme: SaveTheDateThemeData;
   /** Per-STD envelope overrides (base, topFlap, bottomFlap, shimmer). */
   envelope: EnvelopeConfig | null;
+  /** Per-STD font/style overrides (same shape as invitation textStyles). */
+  textStyles: TextStyleOverrides | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +120,9 @@ export async function getSaveTheDate(
     theme: toSaveTheDateTheme(row.theme),
     envelope: row.envelope
       ? (row.envelope as unknown as EnvelopeConfig)
+      : null,
+    textStyles: row.textStyles
+      ? (row.textStyles as unknown as TextStyleOverrides)
       : null,
   };
 }

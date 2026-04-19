@@ -9,6 +9,8 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import ScratchHeart from "./ScratchHeart";
 import DateReveal from "./DateReveal";
 import CalendarButton from "./CalendarButton";
+import { useDynamicFonts } from "@/hooks/useDynamicFont";
+import { EditableText } from "@/components/shared/EditableText";
 
 interface SaveTheDateViewProps {
   saveTheDate: SaveTheDateData;
@@ -21,9 +23,33 @@ export default function SaveTheDateView({
   saveTheDate,
   hideEnvelope = false,
 }: SaveTheDateViewProps) {
-  const { couple, date, customMessage, theme } = saveTheDate;
+  const { couple, date, customMessage, theme, textStyles } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
+
+  // Element-level overrides from the shared TextStyleOverrides system
+  const titleOverride = textStyles?.elements?.stdTitle;
+  const coupleOverride = textStyles?.elements?.stdCoupleNames;
+  const hintOverride = textStyles?.elements?.stdHint;
+  const dateOverride = textStyles?.elements?.stdDate;
+  const customMessageOverride = textStyles?.elements?.stdCustomMessage;
+
+  // Resolve fonts — element override wins, fall back to theme
+  const resolvedTitleFont = titleOverride?.fontFamily ?? theme.titleFont;
+  const resolvedCoupleFont = coupleOverride?.fontFamily ?? theme.coupleFont;
+  const resolvedHintFont = hintOverride?.fontFamily ?? theme.coupleFont;
+  const resolvedDateFont = dateOverride?.fontFamily ?? theme.dateFont;
+  const resolvedCustomMessageFont =
+    customMessageOverride?.fontFamily ?? theme.dateFont;
+
+  // Load any custom Google Fonts that were overridden
+  useDynamicFonts([
+    titleOverride?.fontFamily ?? null,
+    coupleOverride?.fontFamily ?? null,
+    hintOverride?.fontFamily ?? null,
+    dateOverride?.fontFamily ?? null,
+    customMessageOverride?.fontFamily ?? null,
+  ]);
 
   // Determine if this STD has an envelope configured
   const hasEnvelope = Boolean(theme.envelope);
@@ -31,11 +57,8 @@ export default function SaveTheDateView({
   // Build a minimal TemplateTheme-compatible object for EnvelopeCover
   const envelopeTheme = useMemo(() => {
     if (!theme.envelope) return null;
-
-    // Merge per-STD overrides on top of theme defaults
     const env = theme.envelope;
     const overrides = saveTheDate.envelope;
-
     return {
       envelope: {
         base: overrides?.base || env.base,
@@ -58,14 +81,10 @@ export default function SaveTheDateView({
   }, [saveTheDate.slug]);
 
   const handleEnvelopeOpen = useCallback(() => {
-    // Track envelope open
     fetch("/api/save-the-date/event", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        slug: saveTheDate.slug,
-        type: "envelope_open",
-      }),
+      body: JSON.stringify({ slug: saveTheDate.slug, type: "envelope_open" }),
     }).catch(() => {});
   }, [saveTheDate.slug]);
 
@@ -76,17 +95,12 @@ export default function SaveTheDateView({
   const handleReveal = useCallback(() => {
     setRevealed(true);
 
-    // Track scratch event
     fetch("/api/save-the-date/event", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        slug: saveTheDate.slug,
-        type: "heart_scratched",
-      }),
+      body: JSON.stringify({ slug: saveTheDate.slug, type: "heart_scratched" }),
     }).catch(() => {});
 
-    // Fire confetti explosion
     const colors = theme.confettiColors;
     const defaults = {
       spread: 360,
@@ -98,7 +112,6 @@ export default function SaveTheDateView({
       scalar: 1.2,
     };
 
-    // Multiple bursts for a rich effect
     confetti({ ...defaults, particleCount: 80, origin: { x: 0.5, y: 0.45 } });
     setTimeout(() => {
       confetti({
@@ -130,9 +143,7 @@ export default function SaveTheDateView({
   return (
     <div
       className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6"
-      style={{
-        backgroundColor: theme.bgColor,
-      }}
+      style={{ backgroundColor: theme.bgColor }}
     >
       {/* Envelope overlay */}
       <AnimatePresence>
@@ -152,14 +163,46 @@ export default function SaveTheDateView({
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mb-8 text-4xl"
+        className="mb-4 text-4xl"
         style={{
-          fontFamily: theme.titleFont,
-          color: theme.textColor,
+          fontFamily: resolvedTitleFont,
+          color: titleOverride?.color ?? theme.textColor,
+          ...(titleOverride?.fontSize
+            ? { fontSize: titleOverride.fontSize }
+            : {}),
+          ...(titleOverride?.fontWeight
+            ? { fontWeight: titleOverride.fontWeight }
+            : {}),
+          ...(titleOverride?.letterSpacing
+            ? { letterSpacing: titleOverride.letterSpacing }
+            : {}),
         }}
       >
-        Save the Date
+        <EditableText elementKey="stdTitle">Save the Date</EditableText>
       </motion.h1>
+
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.5 }}
+        transition={{ duration: 0.5, delay: 1.0 }}
+        className="mb-4 text-xs tracking-widest uppercase"
+        style={{
+          fontFamily: resolvedHintFont,
+          color: hintOverride?.color ?? theme.textColor,
+          ...(hintOverride?.fontSize
+            ? { fontSize: hintOverride.fontSize }
+            : {}),
+          ...(hintOverride?.fontWeight
+            ? { fontWeight: hintOverride.fontWeight }
+            : {}),
+          ...(hintOverride?.letterSpacing
+            ? { letterSpacing: hintOverride.letterSpacing }
+            : {}),
+          visibility: revealed ? "hidden" : "visible",
+        }}
+      >
+        <EditableText elementKey="stdHint">Raspe para ver a data</EditableText>
+      </motion.p>
 
       {/* Scratch heart with date reveal inside */}
       <motion.div
@@ -175,38 +218,42 @@ export default function SaveTheDateView({
           textureUrl={theme.heartTextureUrl}
           onReveal={handleReveal}
         >
-          <DateReveal date={date} theme={theme} revealed={revealed} />
+          <DateReveal
+            date={date}
+            theme={theme}
+            dateOverride={dateOverride}
+            resolvedDateFont={resolvedDateFont}
+            revealed={revealed}
+            forceReveal
+          />
         </ScratchHeart>
       </motion.div>
 
-      {!revealed ? (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: revealed ? 0 : 0.5 }}
-          transition={{ duration: 0.5, delay: 1.0 }}
-          className="mt-2 text-xs tracking-widest uppercase"
-          style={{
-            fontFamily: theme.coupleFont,
-            color: theme.textColor,
-          }}
-        >
-          Raspe para ver a data
-        </motion.p>
-      ) : !!customMessage ? (
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-sm tracking-wide text-gray-900/70"
-          style={{
-            fontFamily: theme.dateFont,
-            color: theme.textColor,
-            opacity: 0.4,
-          }}
-        >
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+        className="text-sm tracking-wide"
+        style={{
+          fontFamily: resolvedCustomMessageFont,
+          color: customMessageOverride?.color ?? theme.textColor,
+          opacity: 0.4,
+          ...(customMessageOverride?.fontSize
+            ? { fontSize: customMessageOverride.fontSize }
+            : {}),
+          ...(customMessageOverride?.fontWeight
+            ? { fontWeight: customMessageOverride.fontWeight }
+            : {}),
+          ...(customMessageOverride?.letterSpacing
+            ? { letterSpacing: customMessageOverride.letterSpacing }
+            : {}),
+          visibility: !revealed ? "hidden" : "visible",
+        }}
+      >
+        <EditableText elementKey="stdCustomMessage">
           {customMessage}
-        </motion.p>
-      ) : null}
+        </EditableText>
+      </motion.p>
 
       {/* Couple names */}
       <motion.h2
@@ -215,11 +262,22 @@ export default function SaveTheDateView({
         transition={{ duration: 0.8, delay: 0.5 }}
         className="mt-8 text-2xl font-light tracking-[0.15em] uppercase"
         style={{
-          fontFamily: theme.coupleFont,
-          color: theme.textColor,
+          fontFamily: resolvedCoupleFont,
+          color: coupleOverride?.color ?? theme.textColor,
+          ...(coupleOverride?.fontSize
+            ? { fontSize: coupleOverride.fontSize }
+            : {}),
+          ...(coupleOverride?.fontWeight
+            ? { fontWeight: coupleOverride.fontWeight }
+            : {}),
+          ...(coupleOverride?.letterSpacing
+            ? { letterSpacing: coupleOverride.letterSpacing }
+            : {}),
         }}
       >
-        {couple.bride} & {couple.groom}
+        <EditableText elementKey="stdCoupleNames">
+          {couple.bride} &amp; {couple.groom}
+        </EditableText>
       </motion.h2>
 
       {/* Calendar button — only after reveal */}

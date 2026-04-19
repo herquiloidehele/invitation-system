@@ -38,10 +38,12 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SaveTheDateThemeData } from "@/lib/save-the-date";
-import type { EnvelopeConfig, TemplateTheme } from "@/lib/types";
+import type { EnvelopeConfig, TemplateTheme, TextStyle, TextStyleOverrides } from "@/lib/types";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
+import { InlineTextEditProvider } from "@/components/shared/EditableText";
+import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -61,6 +63,7 @@ export interface SaveTheDateFormData {
   };
   customMessage: string;
   envelope?: EnvelopeConfig;
+  textStyles?: TextStyleOverrides;
 }
 
 interface Props {
@@ -156,6 +159,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       customMessage: data.customMessage || null,
       theme: selectedTheme!,
       envelope: data.envelope || null,
+      textStyles: data.textStyles || null,
     }),
     [data, selectedTheme]
   );
@@ -199,6 +203,28 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
     []
   );
 
+  const updateTextStyleElement = useCallback(
+    (
+      element: keyof NonNullable<TextStyleOverrides["elements"]>,
+      field: keyof TextStyle,
+      value: string | number | undefined,
+    ) => {
+      setData((prev) => {
+        const ts = prev.textStyles ?? {};
+        const elements = { ...ts.elements };
+        const el = { ...elements[element], [field]: value || undefined };
+        const elHasAny = Object.values(el).some((v) => v !== undefined);
+        elements[element] = elHasAny ? el : undefined;
+        const hasAny = Object.values(elements).some(Boolean);
+        return {
+          ...prev,
+          textStyles: { ...ts, elements: hasAny ? elements : undefined },
+        };
+      });
+    },
+    [],
+  );
+
   const handleSubmit = async () => {
     if (
       !data.slug ||
@@ -229,6 +255,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           date: data.date,
           customMessage: data.customMessage || null,
           envelope: data.envelope || null,
+          textStyles: data.textStyles || null,
         }),
       });
 
@@ -610,17 +637,21 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
             value="std"
             className="flex-1 overflow-auto m-0 bg-neutral-100"
           >
-            <div className="mx-auto origin-top w-full max-h-165 relative">
-              {hasNames && selectedTheme ? (
-                <div className="pointer-events-none">
+            <InlineTextEditProvider
+              updateTextStyleElement={updateTextStyleElement}
+              textStyles={data.textStyles}
+            >
+              <TextStyleToolbar />
+              <div className="mx-auto origin-top w-full max-h-165 relative">
+                {hasNames && selectedTheme ? (
                   <SaveTheDateView saveTheDate={previewData} hideEnvelope />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-96 text-muted-foreground text-sm text-center px-4">
-                  Insira os nomes do casal para ver a pré-visualização
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="flex items-center justify-center h-96 text-muted-foreground text-sm text-center px-4">
+                    Insira os nomes do casal para ver a pré-visualização
+                  </div>
+                )}
+              </div>
+            </InlineTextEditProvider>
           </TabsContent>
         </Tabs>
       </div>

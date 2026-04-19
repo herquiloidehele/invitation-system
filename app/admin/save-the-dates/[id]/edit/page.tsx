@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getSaveDateThemes } from "@/lib/save-the-date";
+import type { TextStyleOverrides } from "@/lib/types";
 import SaveTheDateForm from "../../SaveTheDateForm";
 import type { SaveTheDateFormData } from "../../SaveTheDateForm";
 
@@ -37,6 +38,8 @@ export default async function EditSaveTheDatePage({
     shimmer?: boolean;
   } | null;
 
+  const textStyles = item.textStyles as TextStyleOverrides | null;
+
   const initialData: SaveTheDateFormData = {
     id: item.id,
     slug: item.slug,
@@ -45,6 +48,7 @@ export default async function EditSaveTheDatePage({
     date,
     customMessage: item.customMessage || "",
     envelope: envelope || undefined,
+    textStyles: textStyles || undefined,
   };
 
   return (

@@ -12,7 +12,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { slug, themeId, couple, date, customMessage, envelope } = body;
+    const { slug, themeId, couple, date, customMessage, envelope, textStyles } = body;
 
     if (!slug || !themeId || !couple || !date) {
       return NextResponse.json(
@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
         date,
         customMessage: customMessage || null,
         envelope: envelope || undefined,
+        textStyles: textStyles || undefined,
       },
       include: { theme: true },
     });

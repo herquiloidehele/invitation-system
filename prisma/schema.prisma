@@ -166,6 +166,7 @@ model SaveTheDate {
   date          Json    // { iso: string, display: string, day: string, month: string, year: string }
   customMessage String? // optional text shown after date reveal
   envelope      Json?   // per-STD envelope overrides { base?, topFlap?, bottomFlap?, shimmer? }
+  textStyles    Json?   // per-STD font/size overrides { titleFont?, coupleFont?, dateFont?, titleFontSize?, coupleFontSize?, dateFontSize? }
 
   ownerToken String   @unique @default(cuid())
   createdAt  DateTime @default(now())

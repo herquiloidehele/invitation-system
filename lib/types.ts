@@ -310,6 +310,17 @@ export interface TextStyleOverrides {
     minimalYear?: TextStyle;
     minimalDayOfWeek?: TextStyle;
     minimalTime?: TextStyle;
+    // -- Save the Date --
+    /** "Save the Date" heading on the STD page */
+    stdTitle?: TextStyle;
+    /** Couple names on the STD page */
+    stdCoupleNames?: TextStyle;
+    /** "Raspe para ver a data" hint text below the heart */
+    stdHint?: TextStyle;
+    /** Revealed date (and inner label) inside the scratch heart */
+    stdDate?: TextStyle;
+    /** Custom message shown after the date is revealed */
+    stdCustomMessage?: TextStyle;
   };
 }
 
