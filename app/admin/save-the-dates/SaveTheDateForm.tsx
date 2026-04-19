@@ -802,10 +802,10 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       <Label>Tipo de média</Label>
                       <Select
                         value={data.bottomHero.mediaType}
-                        onValueChange={(v: "image" | "video") =>
+                        onValueChange={(v) =>
                           setData((p) => ({
                             ...p,
-                            bottomHero: { ...p.bottomHero!, mediaType: v },
+                            bottomHero: { ...p.bottomHero!, mediaType: (v as "image" | "video") || p.bottomHero!.mediaType },
                           }))
                         }
                       >

@@ -323,6 +323,10 @@ export interface TextStyleOverrides {
     stdDateLabel?: TextStyle;
     /** Custom message shown after the date is revealed */
     stdCustomMessage?: TextStyle;
+    /** Bottom hero section title overlay */
+    stdBottomHeroTitle?: TextStyle;
+    /** Bottom hero section description overlay */
+    stdBottomHeroDescription?: TextStyle;
   };
 }
 

@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import type {
   SaveTheDateDate,
   SaveTheDateCouple,
@@ -45,12 +42,7 @@ export default function CalendarButton({
   const url = buildGoogleCalendarUrl(date, couple);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.0, duration: 0.7, ease: "easeOut" }}
-      className="w-full px-8"
-    >
+    <div className="w-full px-8">
       <a
         href={url}
         target="_blank"
@@ -76,6 +68,6 @@ export default function CalendarButton({
         </svg>
         Add to Calendar
       </a>
-    </motion.div>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import type { BottomHeroConfig, SaveTheDateThemeData } from "@/lib/save-the-date";
 import type { TextStyleOverrides } from "@/lib/types";
 import { EditableText } from "@/components/shared/EditableText";
@@ -17,7 +17,7 @@ const textContainer = {
   visible: { transition: { staggerChildren: 0.18, delayChildren: 0.15 } },
 };
 
-const textItem = {
+const textItem: Variants = {
   hidden: { opacity: 0, y: 22 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } },
 };
