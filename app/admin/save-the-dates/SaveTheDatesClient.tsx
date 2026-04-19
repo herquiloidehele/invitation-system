@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { ExternalLink, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ExternalLink, Pencil, Plus, Search, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { SaveTheDateRow } from "./page";
@@ -151,6 +151,21 @@ export function SaveTheDatesClient({ items: initial }: Props) {
                       >
                         <ExternalLink className="size-4" />
                       </Link>
+                      {item.rsvpEnabled && (
+                        <Link
+                          href={`/confirmacoes/${item.ownerToken}`}
+                          target="_blank"
+                          className={cn(
+                            buttonVariants({
+                              variant: "ghost",
+                              size: "icon",
+                            }),
+                          )}
+                          title="Ver confirmações"
+                        >
+                          <Users className="size-4" />
+                        </Link>
+                      )}
                       <Link
                         href={`/admin/save-the-dates/${item.id}/edit`}
                         className={cn(

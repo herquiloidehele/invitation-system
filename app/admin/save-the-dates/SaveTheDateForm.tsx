@@ -64,6 +64,7 @@ export interface SaveTheDateFormData {
   customMessage: string;
   envelope?: EnvelopeConfig;
   textStyles?: TextStyleOverrides;
+  rsvp?: { enabled: boolean; deadline?: string };
 }
 
 interface Props {
@@ -160,6 +161,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       theme: selectedTheme!,
       envelope: data.envelope || null,
       textStyles: data.textStyles || null,
+      rsvp: data.rsvp || null,
     }),
     [data, selectedTheme]
   );
@@ -256,6 +258,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           customMessage: data.customMessage || null,
           envelope: data.envelope || null,
           textStyles: data.textStyles || null,
+          rsvp: data.rsvp || null,
         }),
       });
 
@@ -460,6 +463,107 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     coração.
                   </p>
                 </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* ── Confirmação de Presença ── */}
+            <AccordionItem value="rsvp" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Confirmação de Presença
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <Label>Activar confirmação de presença</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Quando activo, os convidados verão um botão &quot;Confirmar
+                      Presença&quot; em vez de (ou além de) &quot;Add to
+                      Calendar&quot;.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={data.rsvp?.enabled === true}
+                    onCheckedChange={(v) =>
+                      setData((p) => ({
+                        ...p,
+                        rsvp: { ...p.rsvp, enabled: v },
+                      }))
+                    }
+                  />
+                </div>
+                {data.rsvp?.enabled && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="rsvpDeadline">
+                      Prazo limite (opcional)
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="date"
+                        id="rsvpDeadline"
+                        value={
+                          data.rsvp?.deadline
+                            ? (() => {
+                                // Parse "15 de Agosto de 2027" back to ISO for the date input
+                                const match = data.rsvp.deadline.match(
+                                  /(\d+) de (\w+) de (\d{4})/,
+                                );
+                                if (match) {
+                                  const monthIndex = MONTHS_PT.indexOf(match[2]);
+                                  if (monthIndex !== -1) {
+                                    const d = String(match[1]).padStart(2, "0");
+                                    const m = String(monthIndex + 1).padStart(2, "0");
+                                    return `${match[3]}-${m}-${d}`;
+                                  }
+                                }
+                                return "";
+                              })()
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const iso = e.target.value;
+                          if (!iso) {
+                            setData((p) => ({
+                              ...p,
+                              rsvp: { enabled: p.rsvp?.enabled ?? true, deadline: undefined },
+                            }));
+                            return;
+                          }
+                          const d = new Date(iso);
+                          const display = `${d.getUTCDate()} de ${MONTHS_PT[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
+                          setData((p) => ({
+                            ...p,
+                            rsvp: { enabled: p.rsvp?.enabled ?? true, deadline: display },
+                          }));
+                        }}
+                        className="h-9 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring w-full"
+                      />
+                      {data.rsvp?.deadline && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() =>
+                            setData((p) => ({
+                              ...p,
+                              rsvp: { enabled: p.rsvp?.enabled ?? true, deadline: undefined },
+                            }))
+                          }
+                        >
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    {data.rsvp?.deadline && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Será exibido como: <strong>{data.rsvp.deadline}</strong>
+                      </p>
+                    )}
+                    <p className="text-[11px] text-muted-foreground">
+                      Texto mostrado no topo do formulário de confirmação.
+                    </p>
+                  </div>
+                )}
               </AccordionContent>
             </AccordionItem>
 

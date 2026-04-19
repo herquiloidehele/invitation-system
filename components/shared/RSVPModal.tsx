@@ -116,6 +116,10 @@ interface DirectProps {
   onClose: () => void;
   invitationSlug: string;
   theme: RSVPThemeLegacy;
+  /** Override the API endpoint — defaults to "/api/rsvp" */
+  apiEndpoint?: string;
+  /** Override the slug field name sent in the body — defaults to "invitationSlug" */
+  slugKey?: string;
 }
 
 interface IntegrationProps {
@@ -124,6 +128,10 @@ interface IntegrationProps {
   invitation: InvitationData;
   theme: TemplateTheme;
   customTexts?: CustomTexts;
+  /** Override the API endpoint — defaults to "/api/rsvp" */
+  apiEndpoint?: string;
+  /** Override the slug field name sent in the body — defaults to "invitationSlug" */
+  slugKey?: string;
 }
 
 type RSVPModalProps = DirectProps | IntegrationProps;
@@ -175,6 +183,8 @@ export default function RSVPModal(props: RSVPModalProps) {
     ? props.invitation.rsvp.deadline
     : undefined;
   const ct = isIntegration(props) ? props.customTexts : undefined;
+  const apiEndpoint = props.apiEndpoint ?? "/api/rsvp";
+  const slugKey = props.slugKey ?? "invitationSlug";
 
   // Build a guaranteed high-contrast light palette
   const p = buildModalPalette(props.theme);
@@ -224,11 +234,11 @@ export default function RSVPModal(props: RSVPModalProps) {
   const onSubmit = async (data: RSVPFormData) => {
     setSubmitState("loading");
     try {
-      const res = await fetch("/api/rsvp", {
+      const res = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          invitationSlug: slug,
+          [slugKey]: slug,
           guestName: data.name,
           email: data.email || undefined,
           attending: data.attending === "yes",

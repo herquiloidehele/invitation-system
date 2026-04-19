@@ -167,12 +167,14 @@ model SaveTheDate {
   customMessage String? // optional text shown after date reveal
   envelope      Json?   // per-STD envelope overrides { base?, topFlap?, bottomFlap?, shimmer? }
   textStyles    Json?   // per-STD font/size overrides { titleFont?, coupleFont?, dateFont?, titleFontSize?, coupleFontSize?, dateFontSize? }
+  rsvp          Json?   // { enabled: boolean, deadline?: string }
 
   ownerToken String   @unique @default(cuid())
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  events SaveTheDateEvent[]
+  events        SaveTheDateEvent[]
+  rsvpResponses SaveTheDateRsvpResponse[]
 }
 
 model SaveTheDateEvent {
@@ -212,4 +214,19 @@ model RsvpResponse {
   invitation Invitation @relation(fields: [invitationSlug], references: [slug], onDelete: Cascade)
 
   @@index([invitationSlug])
+}
+
+model SaveTheDateRsvpResponse {
+  id                  String   @id @default(cuid())
+  saveTheDateSlug     String
+  guestName           String
+  email               String?
+  attending           Boolean
+  dietaryRestrictions String?
+  message             String?
+  submittedAt         DateTime @default(now())
+
+  saveTheDate SaveTheDate @relation(fields: [saveTheDateSlug], references: [slug], onDelete: Cascade)
+
+  @@index([saveTheDateSlug])
 }

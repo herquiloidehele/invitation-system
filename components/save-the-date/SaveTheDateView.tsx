@@ -9,6 +9,7 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import ScratchHeart from "./ScratchHeart";
 import DateReveal from "./DateReveal";
 import CalendarButton from "./CalendarButton";
+import RSVPModal from "@/components/shared/RSVPModal";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import { EditableText } from "@/components/shared/EditableText";
 
@@ -23,9 +24,12 @@ export default function SaveTheDateView({
   saveTheDate,
   hideEnvelope = false,
 }: SaveTheDateViewProps) {
-  const { couple, date, customMessage, theme, textStyles } = saveTheDate;
+  const { couple, date, customMessage, theme, textStyles, rsvp } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+
+  const rsvpEnabled = rsvp?.enabled === true;
 
   // Element-level overrides from the shared TextStyleOverrides system
   const titleOverride = textStyles?.elements?.stdTitle;
@@ -286,15 +290,58 @@ export default function SaveTheDateView({
         </EditableText>
       </motion.h2>
 
-      {/* Calendar button — only after reveal */}
-      <div className="mt-10 w-full max-w-xs">
-        <CalendarButton
-          date={date}
-          couple={couple}
-          theme={theme}
-          visible={revealed}
-        />
+      {/* Calendar button and/or RSVP button — only after reveal */}
+      <div className="mt-10 w-full max-w-xs flex flex-col gap-3">
+        {rsvpEnabled && revealed && (
+          <motion.button
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.7, ease: "easeOut" }}
+            onClick={() => setRsvpOpen(true)}
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95"
+            style={{
+              background: `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+              color: "#FFFFFF",
+              fontFamily: theme.coupleFont,
+            }}
+          >
+            Confirmar Presença
+          </motion.button>
+        )}
+        {!rsvpEnabled && (
+          <CalendarButton
+            date={date}
+            couple={couple}
+            theme={theme}
+            visible={revealed}
+          />
+        )}
       </div>
+
+      {/* RSVP Modal */}
+      {rsvpEnabled && (
+        <RSVPModal
+          isOpen={rsvpOpen}
+          onClose={() => setRsvpOpen(false)}
+          invitationSlug={saveTheDate.slug}
+          apiEndpoint="/api/save-the-date/rsvp"
+          slugKey="saveTheDateSlug"
+          theme={{
+            bg: theme.bgColor,
+            cardBg: "#FFFFFF",
+            primary: theme.heartColor,
+            textPrimary: "#323232",
+            textSecondary: "#6B6B6B",
+            textMuted: "#A0A0A0",
+            accent: theme.heartColor,
+            ctaPrimaryBg: `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+            ctaPrimaryText: "#FFFFFF",
+            ctaRadius: "9999px",
+            cardBorder: "#E5E5E3",
+            bodyFont: theme.coupleFont,
+          }}
+        />
+      )}
     </div>
   );
 }

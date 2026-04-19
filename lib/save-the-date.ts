@@ -45,6 +45,11 @@ export interface SaveTheDateThemeData {
   envelope: STDEnvelopeTheme | null;
 }
 
+export interface SaveTheDateRsvpConfig {
+  enabled: boolean;
+  deadline?: string;
+}
+
 export interface SaveTheDateData {
   id: string;
   slug: string;
@@ -56,6 +61,8 @@ export interface SaveTheDateData {
   envelope: EnvelopeConfig | null;
   /** Per-STD font/style overrides (same shape as invitation textStyles). */
   textStyles: TextStyleOverrides | null;
+  /** RSVP configuration — null means feature not configured (treat as disabled). */
+  rsvp: SaveTheDateRsvpConfig | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -123,6 +130,9 @@ export async function getSaveTheDate(
       : null,
     textStyles: row.textStyles
       ? (row.textStyles as unknown as TextStyleOverrides)
+      : null,
+    rsvp: row.rsvp
+      ? (row.rsvp as unknown as SaveTheDateRsvpConfig)
       : null,
   };
 }
