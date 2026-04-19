@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -39,6 +40,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SaveTheDateThemeData } from "@/lib/save-the-date";
 import type { EnvelopeConfig, TemplateTheme } from "@/lib/types";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import MediaUpload from "@/components/admin/MediaUpload";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 
 // ---------------------------------------------------------------------------
@@ -441,73 +443,98 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                 className="border rounded-lg px-4"
               >
                 <AccordionTrigger className="text-sm font-medium">
-                  Envelope (overrides)
+                  Envelope
                 </AccordionTrigger>
-                <AccordionContent className="space-y-3 pb-4">
-                  <p className="text-[11px] text-muted-foreground">
-                    Valores opcionais que substituem os predefinidos do tema.
-                    Deixe em branco para usar os valores do tema.
-                  </p>
+                <AccordionContent className="space-y-4 pb-4">
+                  {/* Base color */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="envBase">Cor de fundo do envelope</Label>
+                    <Label>Cor de fundo</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Deixe em branco para usar a cor padrão do modelo (
+                      {selectedTheme?.envelope?.base ?? ""})
+                    </p>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
                         value={
-                          (data.envelope?.base || selectedTheme?.envelope?.base || "#000000").startsWith("#")
-                            ? data.envelope?.base || selectedTheme?.envelope?.base || "#000000"
-                            : "#000000"
+                          data.envelope?.base ||
+                          selectedTheme?.envelope?.base ||
+                          "#ffffff"
                         }
                         onChange={(e) => updateEnvelope("base", e.target.value)}
-                        className="h-8 w-8 cursor-pointer rounded border p-0"
+                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                        title="Escolher cor"
                       />
-                      <Input
-                        id="envBase"
-                        value={data.envelope?.base || ""}
-                        onChange={(e) =>
-                          updateEnvelope("base", e.target.value || undefined)
-                        }
-                        placeholder={selectedTheme?.envelope?.base || "Cor do tema..."}
-                        className="flex-1 font-mono text-xs"
+                      <input
+                        type="text"
+                        value={data.envelope?.base ?? ""}
+                        onChange={(e) => updateEnvelope("base", e.target.value)}
+                        placeholder={`Padrão: ${selectedTheme?.envelope?.base ?? ""}`}
+                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
                       />
+                      {data.envelope?.base && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() => updateEnvelope("base", "")}
+                        >
+                          Repor
+                        </Button>
+                      )}
                     </div>
                   </div>
+
+                  <Separator />
+
+                  {/* Top flap image */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="envTopFlap">URL aba superior</Label>
-                    <Input
-                      id="envTopFlap"
-                      value={data.envelope?.topFlap || ""}
-                      onChange={(e) =>
-                        updateEnvelope("topFlap", e.target.value || undefined)
-                      }
-                      placeholder="https://..."
-                      className="text-xs"
+                    <Label>Imagem da aba superior</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Imagem triangular que cobre a parte superior do envelope.
+                      Deixe em branco para usar a imagem padrão.
+                    </p>
+                    <MediaUpload
+                      value={data.envelope?.topFlap ?? ""}
+                      onUpload={(url) => updateEnvelope("topFlap", url)}
+                      onClear={() => updateEnvelope("topFlap", "")}
+                      kind="image"
+                      maxSizeMB={5}
                     />
                   </div>
+
+                  <Separator />
+
+                  {/* Bottom flap image */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="envBottomFlap">URL aba inferior</Label>
-                    <Input
-                      id="envBottomFlap"
-                      value={data.envelope?.bottomFlap || ""}
-                      onChange={(e) =>
-                        updateEnvelope(
-                          "bottomFlap",
-                          e.target.value || undefined
-                        )
-                      }
-                      placeholder="https://..."
-                      className="text-xs"
+                    <Label>Imagem da aba inferior</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Imagem que cobre a parte inferior do envelope. Deixe em
+                      branco para usar a imagem padrão.
+                    </p>
+                    <MediaUpload
+                      value={data.envelope?.bottomFlap ?? ""}
+                      onUpload={(url) => updateEnvelope("bottomFlap", url)}
+                      onClear={() => updateEnvelope("bottomFlap", "")}
+                      kind="image"
+                      maxSizeMB={5}
                     />
                   </div>
-                  <div className="flex items-center gap-3">
+
+                  <Separator />
+
+                  {/* Shimmer toggle */}
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label>Efeito shimmer</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Animação diagonal de brilho sobre a capa do envelope.
+                      </p>
+                    </div>
                     <Switch
-                      id="envShimmer"
                       checked={data.envelope?.shimmer !== false}
                       onCheckedChange={(v) => updateEnvelope("shimmer", v)}
                     />
-                    <Label htmlFor="envShimmer" className="text-xs">
-                      Efeito shimmer no envelope
-                    </Label>
                   </div>
                 </AccordionContent>
               </AccordionItem>

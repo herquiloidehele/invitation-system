@@ -266,7 +266,7 @@ export default function SaveTheDateThemeForm({ mode, initialData }: Props) {
     if (enabled) {
       setData((p) => ({
         ...p,
-        envelope: { base: "#1a1a1a", topFlap: "", bottomFlap: "" },
+        envelope: { base: "#F7F0E8", topFlap: "/images/top.png", bottomFlap: "/images/bottom.png" },
       }));
     } else {
       setData((p) => ({ ...p, envelope: null }));
@@ -527,33 +527,37 @@ export default function SaveTheDateThemeForm({ mode, initialData }: Props) {
                   <>
                     <ColorField
                       id="envBase"
-                      label="Cor de fundo do envelope"
+                      label="Cor de Fundo do Envelope"
                       value={data.envelope.base}
                       onChange={(v) => updateEnvelope("base", v)}
                     />
-                    <div className="space-y-1.5">
-                      <Label htmlFor="envTopFlap">URL aba superior</Label>
-                      <Input
-                        id="envTopFlap"
-                        value={data.envelope.topFlap}
-                        onChange={(e) =>
-                          updateEnvelope("topFlap", e.target.value)
-                        }
-                        placeholder="https://..."
-                        className="text-xs"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="envBottomFlap">URL aba inferior</Label>
-                      <Input
-                        id="envBottomFlap"
-                        value={data.envelope.bottomFlap}
-                        onChange={(e) =>
-                          updateEnvelope("bottomFlap", e.target.value)
-                        }
-                        placeholder="https://..."
-                        className="text-xs"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">
+                          URL Imagem Aba Superior
+                        </Label>
+                        <Input
+                          value={data.envelope.topFlap}
+                          onChange={(e) =>
+                            updateEnvelope("topFlap", e.target.value)
+                          }
+                          placeholder="https://..."
+                          className="text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">
+                          URL Imagem Aba Inferior
+                        </Label>
+                        <Input
+                          value={data.envelope.bottomFlap}
+                          onChange={(e) =>
+                            updateEnvelope("bottomFlap", e.target.value)
+                          }
+                          placeholder="https://..."
+                          className="text-xs"
+                        />
+                      </div>
                     </div>
                   </>
                 )}
