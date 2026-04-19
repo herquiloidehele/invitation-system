@@ -120,6 +120,80 @@ model InvitationEvent {
   @@index([createdAt])
 }
 
+// ---------------------------------------------------------------------------
+// Save The Date — separate product type
+// ---------------------------------------------------------------------------
+
+model SaveTheDateTheme {
+  id          String @id @default(cuid())
+  name        String @unique // slug identifier, e.g. "golden-heart"
+  label       String
+  description String
+
+  // Heart appearance
+  heartColor         String // primary heart fill, e.g. "#D4AF37"
+  heartGlitterColors Json   // string[] — hex colors for the shimmer gradient
+  heartTextureUrl    String? // optional URL to a real glitter texture image
+
+  // Background
+  bgColor String // page background color
+
+  // Typography
+  titleFont  String // "Save the Date" heading font
+  coupleFont String // couple names font
+  dateFont   String // revealed date font
+  textColor  String // primary text color
+
+  // Confetti
+  confettiColors Json // string[] — hex colors for the explosion
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  saveDates SaveTheDate[]
+}
+
+model SaveTheDate {
+  id      String @id @default(cuid())
+  slug    String @unique
+  themeId String
+  theme   SaveTheDateTheme @relation(fields: [themeId], references: [id])
+
+  couple        Json    // { bride: string, groom: string }
+  date          Json    // { iso: string, display: string, day: string, month: string, year: string }
+  customMessage String? // optional text shown after date reveal
+
+  ownerToken String   @unique @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  events SaveTheDateEvent[]
+}
+
+model SaveTheDateEvent {
+  id   String @id @default(cuid())
+  slug String
+
+  saveTheDate SaveTheDate @relation(fields: [slug], references: [slug], onDelete: Cascade)
+
+  /// "page_view" | "heart_scratched" | "calendar_click"
+  type      String
+  visitorId String
+  sessionId String
+  device    String?
+  referrer  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([slug])
+  @@index([slug, type])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// RSVP
+// ---------------------------------------------------------------------------
+
 model RsvpResponse {
   id                  String   @id @default(cuid())
   invitationSlug      String
