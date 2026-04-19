@@ -47,6 +47,14 @@ export default async function EditSaveTheDatePage({
     title: string;
   } | null;
 
+  const bottomHero = item.bottomHero as {
+    enabled: boolean;
+    mediaUrl: string;
+    mediaType: "image" | "video";
+    title: string;
+    description: string;
+  } | null;
+
   const initialData: SaveTheDateFormData = {
     id: item.id,
     slug: item.slug,
@@ -58,6 +66,7 @@ export default async function EditSaveTheDatePage({
     textStyles: textStyles || undefined,
     rsvp: rsvp || undefined,
     audio: audio || undefined,
+    bottomHero: bottomHero || undefined,
     ownerToken: item.ownerToken,
   };
 

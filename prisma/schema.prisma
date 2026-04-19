@@ -169,6 +169,7 @@ model SaveTheDate {
   textStyles    Json?   // per-STD font/size overrides { titleFont?, coupleFont?, dateFont?, titleFontSize?, coupleFontSize?, dateFontSize? }
   rsvp          Json?   // { enabled: boolean, deadline?: string }
   audio         Json?   // { enabled: boolean, src: string, artist: string, title: string }
+  bottomHero    Json?   // { enabled: boolean, mediaUrl: string, mediaType: "image"|"video", title: string, description: string }
 
   ownerToken String   @unique @default(cuid())
   createdAt  DateTime @default(now())

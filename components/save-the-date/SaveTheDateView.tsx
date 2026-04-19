@@ -10,6 +10,7 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import ScratchHeart from "./ScratchHeart";
 import DateReveal from "./DateReveal";
 import CalendarButton from "./CalendarButton";
+import SaveTheDateBottomHero from "./SaveTheDateBottomHero";
 import RSVPModal from "@/components/shared/RSVPModal";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import { EditableText } from "@/components/shared/EditableText";
@@ -26,7 +27,7 @@ export default function SaveTheDateView({
   saveTheDate,
   hideEnvelope = false,
 }: SaveTheDateViewProps) {
-  const { couple, date, customMessage, theme, textStyles, rsvp, audio } = saveTheDate;
+  const { couple, date, customMessage, theme, textStyles, rsvp, audio, bottomHero } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
@@ -239,7 +240,10 @@ export default function SaveTheDateView({
     }, 500);
   }, [theme.confettiColors, saveTheDate.slug]);
 
+  const showBottomHero = bottomHero?.enabled && !!bottomHero.mediaUrl;
+
   return (
+    <div className="relative">
     <div
       className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6"
       style={{ backgroundColor: theme.bgColor }}
@@ -454,6 +458,12 @@ export default function SaveTheDateView({
             bodyFont: theme.coupleFont,
           }}
         />
+      )}
+    </div>
+
+      {/* Bottom hero section */}
+      {showBottomHero && (hideEnvelope || envelopeDone) && (
+        <SaveTheDateBottomHero config={bottomHero} theme={theme} textStyles={textStyles} isPreview={hideEnvelope} />
       )}
     </div>
   );

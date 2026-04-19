@@ -67,6 +67,7 @@ export interface SaveTheDateFormData {
   textStyles?: TextStyleOverrides;
   rsvp?: { enabled: boolean; deadline?: string };
   audio?: { enabled: boolean; src: string; artist: string; title: string };
+  bottomHero?: { enabled: boolean; mediaUrl: string; mediaType: "image" | "video"; title: string; description: string };
   ownerToken?: string;
 }
 
@@ -166,6 +167,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       textStyles: data.textStyles || null,
       rsvp: data.rsvp || null,
       audio: data.audio || { enabled: false, src: "", artist: "", title: "" },
+      bottomHero: data.bottomHero || null,
     }),
     [data, selectedTheme]
   );
@@ -284,6 +286,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           textStyles: data.textStyles || null,
           rsvp: data.rsvp || null,
           audio: data.audio || null,
+          bottomHero: data.bottomHero || null,
         }),
       });
 
@@ -760,6 +763,116 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     </div>
                   )}
                 </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* ── Bottom Hero ── */}
+            <AccordionItem value="bottomHero" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Secção Inferior{" "}
+                {data.bottomHero?.enabled ? "(ativa)" : "(desativada)"}
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Ativar secção inferior</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Secção com imagem ou vídeo de fundo que aparece ao fazer scroll.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={data.bottomHero?.enabled ?? false}
+                    onCheckedChange={(v) =>
+                      setData((p) => ({
+                        ...p,
+                        bottomHero: {
+                          enabled: v,
+                          mediaUrl: p.bottomHero?.mediaUrl ?? "",
+                          mediaType: p.bottomHero?.mediaType ?? "image",
+                          title: p.bottomHero?.title ?? "",
+                          description: p.bottomHero?.description ?? "",
+                        },
+                      }))
+                    }
+                  />
+                </div>
+                {data.bottomHero?.enabled && (
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label>Tipo de média</Label>
+                      <Select
+                        value={data.bottomHero.mediaType}
+                        onValueChange={(v: "image" | "video") =>
+                          setData((p) => ({
+                            ...p,
+                            bottomHero: { ...p.bottomHero!, mediaType: v },
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="image">Imagem</SelectItem>
+                          <SelectItem value="video">Vídeo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>
+                        {data.bottomHero.mediaType === "video"
+                          ? "Vídeo de fundo"
+                          : "Imagem de fundo"}
+                      </Label>
+                      <MediaUpload
+                        kind={data.bottomHero.mediaType}
+                        maxSizeMB={data.bottomHero.mediaType === "video" ? 100 : 5}
+                        value={data.bottomHero.mediaUrl || undefined}
+                        onUpload={(url) =>
+                          setData((p) => ({
+                            ...p,
+                            bottomHero: { ...p.bottomHero!, mediaUrl: url },
+                          }))
+                        }
+                        onClear={() =>
+                          setData((p) => ({
+                            ...p,
+                            bottomHero: { ...p.bottomHero!, mediaUrl: "" },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="bottomHeroTitle">Título</Label>
+                      <Input
+                        id="bottomHeroTitle"
+                        value={data.bottomHero.title}
+                        onChange={(e) =>
+                          setData((p) => ({
+                            ...p,
+                            bottomHero: { ...p.bottomHero!, title: e.target.value },
+                          }))
+                        }
+                        placeholder="e.g. Vemo-nos em breve"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="bottomHeroDesc">Descrição</Label>
+                      <Textarea
+                        id="bottomHeroDesc"
+                        value={data.bottomHero.description}
+                        onChange={(e) =>
+                          setData((p) => ({
+                            ...p,
+                            bottomHero: { ...p.bottomHero!, description: e.target.value },
+                          }))
+                        }
+                        placeholder="e.g. Mal podemos esperar para celebrar convosco"
+                        rows={2}
+                      />
+                    </div>
+                  </div>
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>

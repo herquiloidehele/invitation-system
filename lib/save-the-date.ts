@@ -50,6 +50,14 @@ export interface SaveTheDateRsvpConfig {
   deadline?: string;
 }
 
+export interface BottomHeroConfig {
+  enabled: boolean;
+  mediaUrl: string;
+  mediaType: "image" | "video";
+  title: string;
+  description: string;
+}
+
 export interface SaveTheDateData {
   id: string;
   slug: string;
@@ -65,6 +73,8 @@ export interface SaveTheDateData {
   rsvp: SaveTheDateRsvpConfig | null;
   /** Audio configuration — plays on envelope open when enabled. */
   audio: AudioConfig;
+  /** Bottom hero section — full-viewport media section below the main content. */
+  bottomHero: BottomHeroConfig | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -139,6 +149,9 @@ export async function getSaveTheDate(
     audio: row.audio
       ? (row.audio as unknown as AudioConfig)
       : { enabled: false, src: "", artist: "", title: "" },
+    bottomHero: row.bottomHero
+      ? (row.bottomHero as unknown as BottomHeroConfig)
+      : null,
   };
 }
 
