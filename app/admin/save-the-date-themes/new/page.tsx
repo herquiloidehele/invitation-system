@@ -17,6 +17,7 @@ export default function NewSaveTheDateThemePage() {
     dateFont: "'Cormorant Garamond', serif",
     textColor: "#2C2C2C",
     confettiColors: ["#D4AF37", "#C5A028", "#E8C547", "#F5E6A3", "#8B7536"],
+    envelope: null,
   };
 
   return (

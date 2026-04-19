@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import type { EnvelopeConfig } from "./types";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -17,6 +18,13 @@ export interface SaveTheDateDate {
   year: string;
 }
 
+/** Envelope config on theme level — all fields required (the theme defaults). */
+export interface STDEnvelopeTheme {
+  base: string;
+  topFlap: string;
+  bottomFlap: string;
+}
+
 export interface SaveTheDateThemeData {
   id: string;
   name: string;
@@ -31,6 +39,8 @@ export interface SaveTheDateThemeData {
   dateFont: string;
   textColor: string;
   confettiColors: string[];
+  /** Envelope cover configuration. Null means no envelope for this theme. */
+  envelope: STDEnvelopeTheme | null;
 }
 
 export interface SaveTheDateData {
@@ -40,6 +50,8 @@ export interface SaveTheDateData {
   date: SaveTheDateDate;
   customMessage: string | null;
   theme: SaveTheDateThemeData;
+  /** Per-STD envelope overrides (base, topFlap, bottomFlap, shimmer). */
+  envelope: EnvelopeConfig | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -60,6 +72,7 @@ function toSaveTheDateTheme(row: {
   dateFont: string;
   textColor: string;
   confettiColors: unknown;
+  envelope: unknown;
 }): SaveTheDateThemeData {
   return {
     id: row.id,
@@ -75,6 +88,9 @@ function toSaveTheDateTheme(row: {
     dateFont: row.dateFont,
     textColor: row.textColor,
     confettiColors: row.confettiColors as string[],
+    envelope: row.envelope
+      ? (row.envelope as unknown as STDEnvelopeTheme)
+      : null,
   };
 }
 
@@ -98,6 +114,9 @@ export async function getSaveTheDate(
     date: row.date as unknown as SaveTheDateDate,
     customMessage: row.customMessage,
     theme: toSaveTheDateTheme(row.theme),
+    envelope: row.envelope
+      ? (row.envelope as unknown as EnvelopeConfig)
+      : null,
   };
 }
 

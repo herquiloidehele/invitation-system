@@ -241,6 +241,37 @@ export default function ScratchHeart({
         {children}
       </div>
 
+      {/* Inner shadow overlay using SVG filter for true inner shadow along heart edge */}
+      <svg
+        className="pointer-events-none absolute inset-0 z-[5]"
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        <defs>
+          <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+            {/* Create an inverted alpha from the shape */}
+            <feComponentTransfer in="SourceAlpha">
+              <feFuncA type="table" tableValues="1 0" />
+            </feComponentTransfer>
+            {/* Blur the inverted shape */}
+            <feGaussianBlur stdDeviation="4" />
+            {/* Offset slightly if desired */}
+            <feOffset dx="0" dy="1" result="offsetblur" />
+            {/* Colorize the shadow */}
+            <feFlood floodColor="rgba(50,50,50,0.2)" result="color" />
+            <feComposite in2="offsetblur" operator="in" />
+            {/* Composite back onto original shape */}
+            <feComposite in2="SourceAlpha" operator="in" />
+          </filter>
+        </defs>
+        <path
+          d={`M ${width * 0.5} ${height * 0.88} C ${width * 0.25} ${height * 0.7}, 0 ${height * 0.5}, 0 ${height * 0.3} C 0 ${height * 0.12}, ${width * 0.12} 0, ${width * 0.27} 0 C ${width * 0.37} 0, ${width * 0.45} ${height * 0.06}, ${width * 0.5} ${height * 0.18} C ${width * 0.55} ${height * 0.06}, ${width * 0.63} 0, ${width * 0.73} 0 C ${width * 0.88} 0, ${width} ${height * 0.12}, ${width} ${height * 0.3} C ${width} ${height * 0.5}, ${width * 0.75} ${height * 0.7}, ${width * 0.5} ${height * 0.88} Z`}
+          fill="black"
+          filter="url(#innerShadow)"
+        />
+      </svg>
+
       {/* Scratchable glitter heart canvas */}
       <canvas
         ref={canvasRef}

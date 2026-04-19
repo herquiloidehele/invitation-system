@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import type { SaveTheDateData } from "@/lib/save-the-date";
+import type { TemplateTheme } from "@/lib/types";
+import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import ScratchHeart from "./ScratchHeart";
 import DateReveal from "./DateReveal";
 import CalendarButton from "./CalendarButton";
@@ -17,6 +19,31 @@ const HEART_SIZE = 280;
 export default function SaveTheDateView({ saveTheDate }: SaveTheDateViewProps) {
   const { couple, date, customMessage, theme } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
+  const [envelopeOpen, setEnvelopeOpen] = useState(false);
+  const [envelopeDone, setEnvelopeDone] = useState(false);
+
+  // Determine if this STD has an envelope configured
+  const hasEnvelope = Boolean(theme.envelope);
+
+  // Build a minimal TemplateTheme-compatible object for EnvelopeCover
+  const envelopeTheme = useMemo(() => {
+    if (!theme.envelope) return null;
+
+    // Merge per-STD overrides on top of theme defaults
+    const env = theme.envelope;
+    const overrides = saveTheDate.envelope;
+
+    return {
+      envelope: {
+        base: overrides?.base || env.base,
+        topFlap: overrides?.topFlap || env.topFlap,
+        bottomFlap: overrides?.bottomFlap || env.bottomFlap,
+      },
+      bg: theme.bgColor,
+    } as TemplateTheme;
+  }, [theme.envelope, theme.bgColor, saveTheDate.envelope]);
+
+  const shimmer = saveTheDate.envelope?.shimmer !== false;
 
   // Track page view
   useEffect(() => {
@@ -26,6 +53,23 @@ export default function SaveTheDateView({ saveTheDate }: SaveTheDateViewProps) {
       body: JSON.stringify({ slug: saveTheDate.slug, type: "page_view" }),
     }).catch(() => {});
   }, [saveTheDate.slug]);
+
+  const handleEnvelopeOpen = useCallback(() => {
+    setEnvelopeOpen(true);
+    // Track envelope open
+    fetch("/api/save-the-date/event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slug: saveTheDate.slug,
+        type: "envelope_open",
+      }),
+    }).catch(() => {});
+  }, [saveTheDate.slug]);
+
+  const handleEnvelopeDone = useCallback(() => {
+    setEnvelopeDone(true);
+  }, []);
 
   const handleReveal = useCallback(() => {
     setRevealed(true);
@@ -88,6 +132,19 @@ export default function SaveTheDateView({ saveTheDate }: SaveTheDateViewProps) {
         backgroundColor: theme.bgColor,
       }}
     >
+      {/* Envelope overlay */}
+      <AnimatePresence>
+        {hasEnvelope && envelopeTheme && !envelopeDone && (
+          <EnvelopeCover
+            key="envelope"
+            theme={envelopeTheme}
+            onOpen={handleEnvelopeOpen}
+            onAnimationComplete={handleEnvelopeDone}
+            shimmer={shimmer}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Title */}
       <motion.h1
         initial={{ opacity: 0, y: -20 }}

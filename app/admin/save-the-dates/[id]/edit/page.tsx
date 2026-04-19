@@ -30,6 +30,13 @@ export default async function EditSaveTheDatePage({
     year: string;
   };
 
+  const envelope = item.envelope as {
+    base?: string;
+    topFlap?: string;
+    bottomFlap?: string;
+    shimmer?: boolean;
+  } | null;
+
   const initialData: SaveTheDateFormData = {
     id: item.id,
     slug: item.slug,
@@ -37,6 +44,7 @@ export default async function EditSaveTheDatePage({
     couple,
     date,
     customMessage: item.customMessage || "",
+    envelope: envelope || undefined,
   };
 
   return (

@@ -32,6 +32,7 @@ export default async function EditSaveTheDateThemePage({
     dateFont: theme.dateFont,
     textColor: theme.textColor,
     confettiColors: theme.confettiColors as string[],
+    envelope: theme.envelope as { base: string; topFlap: string; bottomFlap: string } | null,
   };
 
   return (

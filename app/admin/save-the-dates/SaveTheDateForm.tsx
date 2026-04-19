@@ -3,12 +3,13 @@
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -22,8 +23,22 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SaveTheDateThemeData } from "@/lib/save-the-date";
+import type { EnvelopeConfig, TemplateTheme } from "@/lib/types";
+import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 
 // ---------------------------------------------------------------------------
@@ -43,6 +58,7 @@ export interface SaveTheDateFormData {
     year: string;
   };
   customMessage: string;
+  envelope?: EnvelopeConfig;
 }
 
 interface Props {
@@ -110,7 +126,25 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
     [themes, data.themeId]
   );
 
-  // Preview data
+  // Has envelope configured on theme?
+  const hasEnvelope = Boolean(selectedTheme?.envelope);
+
+  // Build merged envelope theme for the preview
+  const envelopeTheme = useMemo(() => {
+    if (!selectedTheme?.envelope) return null;
+    const env = selectedTheme.envelope;
+    const overrides = data.envelope;
+    return {
+      envelope: {
+        base: overrides?.base || env.base,
+        topFlap: overrides?.topFlap || env.topFlap,
+        bottomFlap: overrides?.bottomFlap || env.bottomFlap,
+      },
+      bg: selectedTheme.bgColor,
+    } as TemplateTheme;
+  }, [selectedTheme, data.envelope]);
+
+  // Preview data for SaveTheDateView
   const previewData = useMemo(
     () => ({
       id: data.id || "preview",
@@ -118,7 +152,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       couple: data.couple,
       date: data.date,
       customMessage: data.customMessage || null,
-      theme: selectedTheme,
+      theme: selectedTheme!,
+      envelope: data.envelope || null,
     }),
     [data, selectedTheme]
   );
@@ -152,8 +187,24 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
     }));
   }, []);
 
+  const updateEnvelope = useCallback(
+    <K extends keyof EnvelopeConfig>(key: K, value: EnvelopeConfig[K]) => {
+      setData((prev) => ({
+        ...prev,
+        envelope: { ...prev.envelope, [key]: value },
+      }));
+    },
+    []
+  );
+
   const handleSubmit = async () => {
-    if (!data.slug || !data.themeId || !data.couple.bride || !data.couple.groom || !data.date.iso) {
+    if (
+      !data.slug ||
+      !data.themeId ||
+      !data.couple.bride ||
+      !data.couple.groom ||
+      !data.date.iso
+    ) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -175,6 +226,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           couple: data.couple,
           date: data.date,
           customMessage: data.customMessage || null,
+          envelope: data.envelope || null,
         }),
       });
 
@@ -186,15 +238,14 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       const result = await res.json();
       toast.success(
         mode === "create"
-          ? "Save the Date criado com sucesso!"
+          ? "Save the Date criado!"
           : "Save the Date atualizado!"
       );
 
       if (mode === "create") {
         router.push(`/admin/save-the-dates/${result.id}/edit`);
-      } else {
-        router.refresh();
       }
+      router.refresh();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erro ao guardar");
     } finally {
@@ -202,52 +253,59 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
     }
   };
 
+  const hasNames = Boolean(data.couple.bride && data.couple.groom);
+
   return (
-    <div className="flex gap-6 h-[calc(100vh-5rem)]">
-      {/* Left: Form */}
-      <ScrollArea className="w-[55%] pr-4">
-        <div className="space-y-6 pb-10">
+    <div className="flex h-[calc(100vh-5rem)] gap-0">
+      {/* ── Left: form fields ─────────────────────────────────────── */}
+      <ScrollArea className="flex-1 min-w-0">
+        <div className="space-y-4 p-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-2xl font-semibold tracking-tight">
               {mode === "create"
                 ? "Novo Save the Date"
                 : "Editar Save the Date"}
             </h1>
             <Button onClick={handleSubmit} disabled={saving}>
-              {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
-              {mode === "create" ? "Criar" : "Guardar"}
+              {saving
+                ? "A guardar..."
+                : mode === "create"
+                  ? "Criar"
+                  : "Guardar Alterações"}
             </Button>
           </div>
 
-          <Accordion
-            defaultValue={["couple", "theme", "date", "message"]}
-            className="space-y-2"
-          >
-            {/* Couple */}
-            <AccordionItem value="couple">
-              <AccordionTrigger>Casal</AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Noiva</Label>
+          <Accordion defaultValue={[]} className="space-y-2">
+            {/* ── Casal ── */}
+            <AccordionItem value="couple" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Casal
+              </AccordionTrigger>
+              <AccordionContent className="space-y-3 pb-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="bride">Noiva</Label>
                     <Input
+                      id="bride"
                       value={data.couple.bride}
                       onChange={(e) => updateCouple("bride", e.target.value)}
-                      placeholder="Alba"
+                      placeholder="e.g. Alba"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Noivo</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="groom">Noivo</Label>
                     <Input
+                      id="groom"
                       value={data.couple.groom}
                       onChange={(e) => updateCouple("groom", e.target.value)}
-                      placeholder="Javier"
+                      placeholder="e.g. Javier"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Slug (URL)</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="slug">Slug (URL)</Label>
                   <Input
+                    id="slug"
                     value={data.slug}
                     onChange={(e) =>
                       setData((p) => ({ ...p, slug: e.target.value }))
@@ -255,26 +313,28 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     placeholder="alba-javier"
                     className="font-mono text-sm"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    URL: /s/{data.slug || "..."}
+                  <p className="text-[11px] text-muted-foreground">
+                    Acessível em /s/{data.slug || "..."}
                   </p>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            {/* Theme */}
-            <AccordionItem value="theme">
-              <AccordionTrigger>Modelo</AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2">
-                <div className="space-y-2">
-                  <Label>Tema</Label>
+            {/* ── Modelo ── */}
+            <AccordionItem value="theme" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Modelo
+              </AccordionTrigger>
+              <AccordionContent className="space-y-3 pb-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="themeId">Tema</Label>
                   <Select
                     value={data.themeId}
                     onValueChange={(v) =>
                       setData((p) => ({ ...p, themeId: v || p.themeId }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="themeId">
                       <SelectValue placeholder="Selecionar tema..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -289,43 +349,51 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Date */}
-            <AccordionItem value="date">
-              <AccordionTrigger>Data</AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2">
-                <div className="space-y-2">
-                  <Label>Data do Evento (ISO)</Label>
+            {/* ── Data ── */}
+            <AccordionItem value="date" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Data & Hora
+              </AccordionTrigger>
+              <AccordionContent className="space-y-3 pb-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="dateIso">Data do Evento</Label>
                   <Input
+                    id="dateIso"
                     type="date"
                     value={data.date.iso}
                     onChange={(e) => updateDate(e.target.value)}
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label>Dia</Label>
-                    <Input value={data.date.day} readOnly className="bg-muted" />
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Dia</Label>
+                    <Input
+                      value={data.date.day}
+                      readOnly
+                      className="bg-muted text-muted-foreground"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Mês</Label>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Mês</Label>
                     <Input
                       value={data.date.month}
                       readOnly
-                      className="bg-muted"
+                      className="bg-muted text-muted-foreground"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Ano</Label>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Ano</Label>
                     <Input
                       value={data.date.year}
                       readOnly
-                      className="bg-muted"
+                      className="bg-muted text-muted-foreground"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Display</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="dateDisplay">Texto de exibição</Label>
                   <Input
+                    id="dateDisplay"
                     value={data.date.display}
                     onChange={(e) =>
                       setData((p) => ({
@@ -339,13 +407,18 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Custom message */}
-            <AccordionItem value="message">
-              <AccordionTrigger>Mensagem personalizada</AccordionTrigger>
-              <AccordionContent className="space-y-4 pt-2">
-                <div className="space-y-2">
-                  <Label>Mensagem (aparece após revelação)</Label>
+            {/* ── Mensagem ── */}
+            <AccordionItem value="message" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Mensagem Personalizada
+              </AccordionTrigger>
+              <AccordionContent className="space-y-3 pb-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="customMessage">
+                    Mensagem (aparece após revelação)
+                  </Label>
                   <Textarea
+                    id="customMessage"
                     value={data.customMessage}
                     onChange={(e) =>
                       setData((p) => ({ ...p, customMessage: e.target.value }))
@@ -353,34 +426,176 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     placeholder="estão convidados para celebrar o dia"
                     rows={3}
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    Este texto aparece acima da data, após o utilizador raspar o
+                    coração.
+                  </p>
                 </div>
               </AccordionContent>
             </AccordionItem>
+
+            {/* ── Envelope overrides ── */}
+            {hasEnvelope && (
+              <AccordionItem
+                value="envelope"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Envelope (overrides)
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pb-4">
+                  <p className="text-[11px] text-muted-foreground">
+                    Valores opcionais que substituem os predefinidos do tema.
+                    Deixe em branco para usar os valores do tema.
+                  </p>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="envBase">Cor de fundo do envelope</Label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={
+                          (data.envelope?.base || selectedTheme?.envelope?.base || "#000000").startsWith("#")
+                            ? data.envelope?.base || selectedTheme?.envelope?.base || "#000000"
+                            : "#000000"
+                        }
+                        onChange={(e) => updateEnvelope("base", e.target.value)}
+                        className="h-8 w-8 cursor-pointer rounded border p-0"
+                      />
+                      <Input
+                        id="envBase"
+                        value={data.envelope?.base || ""}
+                        onChange={(e) =>
+                          updateEnvelope("base", e.target.value || undefined)
+                        }
+                        placeholder={selectedTheme?.envelope?.base || "Cor do tema..."}
+                        className="flex-1 font-mono text-xs"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="envTopFlap">URL aba superior</Label>
+                    <Input
+                      id="envTopFlap"
+                      value={data.envelope?.topFlap || ""}
+                      onChange={(e) =>
+                        updateEnvelope("topFlap", e.target.value || undefined)
+                      }
+                      placeholder="https://..."
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="envBottomFlap">URL aba inferior</Label>
+                    <Input
+                      id="envBottomFlap"
+                      value={data.envelope?.bottomFlap || ""}
+                      onChange={(e) =>
+                        updateEnvelope(
+                          "bottomFlap",
+                          e.target.value || undefined
+                        )
+                      }
+                      placeholder="https://..."
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      id="envShimmer"
+                      checked={data.envelope?.shimmer !== false}
+                      onCheckedChange={(v) => updateEnvelope("shimmer", v)}
+                    />
+                    <Label htmlFor="envShimmer" className="text-xs">
+                      Efeito shimmer no envelope
+                    </Label>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
           </Accordion>
         </div>
       </ScrollArea>
 
-      {/* Right: Live preview */}
-      <div className="w-[45%] flex items-start justify-center pt-4">
-        <div className="sticky top-4">
-          {/* Phone frame */}
-          <div className="relative mx-auto w-[320px] h-[640px] rounded-[2.5rem] border-[8px] border-gray-800 bg-gray-800 shadow-2xl overflow-hidden">
-            {/* Dynamic island */}
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 w-[100px] h-[28px] bg-black rounded-full" />
-            {/* Screen content */}
-            <div className="h-full w-full overflow-auto rounded-[2rem] bg-white">
-              {selectedTheme ? (
-                <div className="pointer-events-none scale-[0.85] origin-top">
-                  <SaveTheDateView saveTheDate={previewData} />
-                </div>
+      {/* ── Right: tabbed preview panel ───────────────────────────── */}
+      <div className="w-[35%] min-w-[380px] border-l flex flex-col h-full">
+        <Tabs defaultValue="std" className="flex flex-col h-full">
+          {/* Tab bar */}
+          <div className="px-4 pt-3 pb-0 border-b bg-muted/50 flex items-center justify-between gap-2 shrink-0">
+            <TabsList className="h-8">
+              {hasEnvelope && (
+                <TabsTrigger value="envelope" className="text-xs px-3 h-7">
+                  Envelope
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="std" className="text-xs px-3 h-7">
+                Save the Date
+              </TabsTrigger>
+            </TabsList>
+            <div className="flex items-center gap-1">
+              {mode === "edit" && data.slug ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <a
+                          href={`/s/${data.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors"
+                        />
+                      }
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>Ver página pública</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-                  Selecione um tema
-                </div>
+                <ExternalLink className="h-4 w-4 opacity-40" />
               )}
             </div>
           </div>
-        </div>
+
+          {/* ── Tab: Envelope preview ── */}
+          {hasEnvelope && (
+            <TabsContent
+              value="envelope"
+              className="flex-1 overflow-hidden m-0"
+            >
+              <div className="h-full relative overflow-hidden bg-neutral-200 max-h-165">
+                {hasNames && envelopeTheme ? (
+                  <EnvelopeCover
+                    theme={envelopeTheme}
+                    onOpen={() => {}}
+                    shimmer={data.envelope?.shimmer !== false}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
+                    Insira os nomes do casal para ver a pré-visualização
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          )}
+
+          {/* ── Tab: Save the Date preview ── */}
+          <TabsContent
+            value="std"
+            className="flex-1 overflow-auto m-0 bg-neutral-100"
+          >
+            <div className="mx-auto origin-top w-full max-h-165 relative">
+              {hasNames && selectedTheme ? (
+                <div className="pointer-events-none">
+                  <SaveTheDateView saveTheDate={previewData} />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-96 text-muted-foreground text-sm text-center px-4">
+                  Insira os nomes do casal para ver a pré-visualização
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
