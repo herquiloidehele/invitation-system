@@ -2,7 +2,11 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { generateGlitterTexture, loadImage, traceHeartPath } from "./GlitterEffect";
+import {
+  generateGlitterTexture,
+  loadImage,
+  traceHeartPath,
+} from "./GlitterEffect";
 
 interface ScratchHeartProps {
   width: number;
@@ -231,7 +235,7 @@ export default function ScratchHeart({
     >
       {/* Bottom layer: content to reveal (clipped to heart shape) */}
       <div
-        className="absolute inset-0 flex items-center justify-center"
+        className="absolute inset-0 flex items-center justify-center -top-8"
         style={{
           width,
           height,

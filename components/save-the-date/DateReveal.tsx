@@ -1,42 +1,23 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import type { SaveTheDateDate, SaveTheDateThemeData } from "@/lib/save-the-date";
+import { AnimatePresence, motion } from "framer-motion";
+import type {
+  SaveTheDateDate,
+  SaveTheDateThemeData,
+} from "@/lib/save-the-date";
 
 interface DateRevealProps {
   date: SaveTheDateDate;
-  customMessage: string | null;
   theme: SaveTheDateThemeData;
   revealed: boolean;
 }
 
-export default function DateReveal({
-  date,
-  customMessage,
-  theme,
-  revealed,
-}: DateRevealProps) {
+export default function DateReveal({ date, theme, revealed }: DateRevealProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+    <div className="flex flex-col items-center justify-center gap-3 text-center">
       <AnimatePresence>
         {revealed && (
           <>
-            {customMessage && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="text-sm tracking-wide"
-                style={{
-                  fontFamily: theme.dateFont,
-                  color: theme.textColor,
-                  opacity: 0.7,
-                }}
-              >
-                {customMessage}
-              </motion.p>
-            )}
-
             <motion.p
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import type { SaveTheDateData } from "@/lib/save-the-date";
@@ -17,10 +17,12 @@ interface SaveTheDateViewProps {
 
 const HEART_SIZE = 280;
 
-export default function SaveTheDateView({ saveTheDate, hideEnvelope = false }: SaveTheDateViewProps) {
+export default function SaveTheDateView({
+  saveTheDate,
+  hideEnvelope = false,
+}: SaveTheDateViewProps) {
   const { couple, date, customMessage, theme } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
-  const [envelopeOpen, setEnvelopeOpen] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
 
   // Determine if this STD has an envelope configured
@@ -56,7 +58,6 @@ export default function SaveTheDateView({ saveTheDate, hideEnvelope = false }: S
   }, [saveTheDate.slug]);
 
   const handleEnvelopeOpen = useCallback(() => {
-    setEnvelopeOpen(true);
     // Track envelope open
     fetch("/api/save-the-date/event", {
       method: "POST",
@@ -174,28 +175,38 @@ export default function SaveTheDateView({ saveTheDate, hideEnvelope = false }: S
           textureUrl={theme.heartTextureUrl}
           onReveal={handleReveal}
         >
-          <DateReveal
-            date={date}
-            customMessage={customMessage}
-            theme={theme}
-            revealed={revealed}
-          />
+          <DateReveal date={date} theme={theme} revealed={revealed} />
         </ScratchHeart>
       </motion.div>
 
-      {/* Hint text */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: revealed ? 0 : 0.5 }}
-        transition={{ duration: 0.5, delay: 1.0 }}
-        className="mt-4 text-xs tracking-widest uppercase"
-        style={{
-          fontFamily: theme.coupleFont,
-          color: theme.textColor,
-        }}
-      >
-        {!revealed && "Scratch the heart to reveal"}
-      </motion.p>
+      {!revealed ? (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: revealed ? 0 : 0.5 }}
+          transition={{ duration: 0.5, delay: 1.0 }}
+          className="mt-2 text-xs tracking-widest uppercase"
+          style={{
+            fontFamily: theme.coupleFont,
+            color: theme.textColor,
+          }}
+        >
+          Raspe para ver a data
+        </motion.p>
+      ) : !!customMessage ? (
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="text-sm tracking-wide text-gray-900/70"
+          style={{
+            fontFamily: theme.dateFont,
+            color: theme.textColor,
+            opacity: 0.4,
+          }}
+        >
+          {customMessage}
+        </motion.p>
+      ) : null}
 
       {/* Couple names */}
       <motion.h2
