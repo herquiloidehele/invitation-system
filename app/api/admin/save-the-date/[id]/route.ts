@@ -21,7 +21,7 @@ export async function PUT(
   const { id } = await params;
   try {
     const body = await req.json();
-    const { slug, themeId, couple, date, customMessage, envelope, textStyles, rsvp } = body;
+    const { slug, themeId, couple, date, customMessage, envelope, textStyles, rsvp, audio } = body;
     const item = await prisma.saveTheDate.update({
       where: { id },
       data: {
@@ -33,6 +33,7 @@ export async function PUT(
         envelope: envelope || undefined,
         textStyles: textStyles || undefined,
         rsvp: rsvp || undefined,
+        audio: audio || undefined,
       },
       include: { theme: true },
     });

@@ -168,6 +168,7 @@ model SaveTheDate {
   envelope      Json?   // per-STD envelope overrides { base?, topFlap?, bottomFlap?, shimmer? }
   textStyles    Json?   // per-STD font/size overrides { titleFont?, coupleFont?, dateFont?, titleFontSize?, coupleFontSize?, dateFontSize? }
   rsvp          Json?   // { enabled: boolean, deadline?: string }
+  audio         Json?   // { enabled: boolean, src: string, artist: string, title: string }
 
   ownerToken String   @unique @default(cuid())
   createdAt  DateTime @default(now())

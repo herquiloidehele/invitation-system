@@ -1,5 +1,5 @@
 import { prisma } from "./db";
-import type { EnvelopeConfig, TextStyleOverrides } from "./types";
+import type { AudioConfig, EnvelopeConfig, TextStyleOverrides } from "./types";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -63,6 +63,8 @@ export interface SaveTheDateData {
   textStyles: TextStyleOverrides | null;
   /** RSVP configuration — null means feature not configured (treat as disabled). */
   rsvp: SaveTheDateRsvpConfig | null;
+  /** Audio configuration — plays on envelope open when enabled. */
+  audio: AudioConfig;
 }
 
 // ---------------------------------------------------------------------------
@@ -134,6 +136,9 @@ export async function getSaveTheDate(
     rsvp: row.rsvp
       ? (row.rsvp as unknown as SaveTheDateRsvpConfig)
       : null,
+    audio: row.audio
+      ? (row.audio as unknown as AudioConfig)
+      : { enabled: false, src: "", artist: "", title: "" },
   };
 }
 

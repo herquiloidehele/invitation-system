@@ -40,6 +40,12 @@ export default async function EditSaveTheDatePage({
 
   const textStyles = item.textStyles as TextStyleOverrides | null;
   const rsvp = item.rsvp as { enabled: boolean; deadline?: string } | null;
+  const audio = item.audio as {
+    enabled: boolean;
+    src: string;
+    artist: string;
+    title: string;
+  } | null;
 
   const initialData: SaveTheDateFormData = {
     id: item.id,
@@ -51,6 +57,7 @@ export default async function EditSaveTheDatePage({
     envelope: envelope || undefined,
     textStyles: textStyles || undefined,
     rsvp: rsvp || undefined,
+    audio: audio || undefined,
     ownerToken: item.ownerToken,
   };
 

@@ -66,6 +66,7 @@ export interface SaveTheDateFormData {
   envelope?: EnvelopeConfig;
   textStyles?: TextStyleOverrides;
   rsvp?: { enabled: boolean; deadline?: string };
+  audio?: { enabled: boolean; src: string; artist: string; title: string };
   ownerToken?: string;
 }
 
@@ -164,6 +165,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       envelope: data.envelope || null,
       textStyles: data.textStyles || null,
       rsvp: data.rsvp || null,
+      audio: data.audio || { enabled: false, src: "", artist: "", title: "" },
     }),
     [data, selectedTheme]
   );
@@ -202,6 +204,26 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       setData((prev) => ({
         ...prev,
         envelope: { ...prev.envelope, [key]: value },
+      }));
+    },
+    []
+  );
+
+  const updateAudio = useCallback(
+    <K extends keyof NonNullable<SaveTheDateFormData["audio"]>>(
+      key: K,
+      value: NonNullable<SaveTheDateFormData["audio"]>[K]
+    ) => {
+      setData((prev) => ({
+        ...prev,
+        audio: {
+          enabled: false,
+          src: "",
+          artist: "",
+          title: "",
+          ...prev.audio,
+          [key]: value,
+        },
       }));
     },
     []
@@ -261,6 +283,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           envelope: data.envelope || null,
           textStyles: data.textStyles || null,
           rsvp: data.rsvp || null,
+          audio: data.audio || null,
         }),
       });
 
@@ -679,6 +702,66 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                 </AccordionContent>
               </AccordionItem>
             )}
+
+            {/* ── Audio ── */}
+            <AccordionItem value="audio" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Áudio{" "}
+                {data.audio?.enabled ? "(ativo)" : "(desativado)"}
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Áudio Ativado</Label>
+                    <Switch
+                      checked={data.audio?.enabled ?? false}
+                      onCheckedChange={(v) => updateAudio("enabled", v)}
+                    />
+                  </div>
+                  {data.audio?.enabled && (
+                    <div className="space-y-3">
+                      <div className="space-y-1.5">
+                        <Label>Ficheiro de Áudio</Label>
+                        <MediaUpload
+                          kind="audio"
+                          maxSizeMB={20}
+                          value={data.audio.src || undefined}
+                          onUpload={(url) => updateAudio("src", url)}
+                          onClear={() => updateAudio("src", "")}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="stdAudioArtist">Artista</Label>
+                          <Input
+                            id="stdAudioArtist"
+                            value={data.audio.artist}
+                            onChange={(e) =>
+                              updateAudio("artist", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="stdAudioTitle">Título</Label>
+                          <Input
+                            id="stdAudioTitle"
+                            value={data.audio.title}
+                            onChange={(e) =>
+                              updateAudio("title", e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+                      {!hasEnvelope && (
+                        <p className="text-xs text-muted-foreground">
+                          O áudio só é reproduzido quando o Save the Date tem envelope configurado.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </div>
       </ScrollArea>

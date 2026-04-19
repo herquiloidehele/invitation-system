@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { CheckCircle } from "lucide-react";
@@ -26,11 +26,18 @@ export default function SaveTheDateView({
   saveTheDate,
   hideEnvelope = false,
 }: SaveTheDateViewProps) {
-  const { couple, date, customMessage, theme, textStyles, rsvp } = saveTheDate;
+  const { couple, date, customMessage, theme, textStyles, rsvp, audio } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
+
+  // Audio refs (same pattern as InvitationView)
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const hasAudio =
+    audio.enabled && !!audio.src && Boolean(theme.envelope);
 
   const rsvpEnabled = rsvp?.enabled === true;
 
@@ -116,13 +123,69 @@ export default function SaveTheDateView({
     }).catch(() => {});
   }, [saveTheDate.slug]);
 
+  // Pause audio when tab is hidden; resume on return
+  useEffect(() => {
+    let wasPlayingBeforeHide = false;
+    const handleVisibilityChange = () => {
+      const el = audioRef.current;
+      if (!el) return;
+      if (document.hidden) {
+        wasPlayingBeforeHide = !el.paused;
+        if (wasPlayingBeforeHide) el.pause();
+      } else {
+        if (wasPlayingBeforeHide) el.play().catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+        fadeIntervalRef.current = null;
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   const handleEnvelopeOpen = useCallback(() => {
     fetch("/api/save-the-date/event", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug: saveTheDate.slug, type: "envelope_open" }),
     }).catch(() => {});
-  }, [saveTheDate.slug]);
+
+    // Start music with cinematic volume fade-in (same as InvitationView)
+    if (hasAudio) {
+      try {
+        const el = audioRef.current;
+        if (!el) return;
+        el.loop = true;
+        el.volume = 0.03;
+        el.play()
+          .then(() => {
+            let vol = 0.03;
+            const fade = setInterval(() => {
+              vol = Math.min(vol + 0.02, 0.5);
+              el.volume = vol;
+              if (vol >= 0.5) clearInterval(fade);
+            }, 200);
+            fadeIntervalRef.current = fade;
+          })
+          .catch(() => {});
+      } catch {
+        /* silent */
+      }
+    }
+  }, [saveTheDate.slug, hasAudio]);
 
   const handleEnvelopeDone = useCallback(() => {
     setEnvelopeDone(true);
@@ -181,6 +244,17 @@ export default function SaveTheDateView({
       className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6"
       style={{ backgroundColor: theme.bgColor }}
     >
+      {/* Hidden pre-buffered audio element */}
+      {hasAudio && (
+        <audio
+          ref={audioRef}
+          src={audio.src}
+          preload="auto"
+          aria-hidden
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }}
+        />
+      )}
+
       {/* Envelope overlay */}
       <AnimatePresence>
         {!hideEnvelope && hasEnvelope && envelopeTheme && !envelopeDone && (
