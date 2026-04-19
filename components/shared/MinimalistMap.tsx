@@ -65,6 +65,7 @@ interface MinimalistMapProps {
   latitude: number;
   longitude: number;
   theme: TemplateTheme;
+  venueName?: string;
   className?: string;
 }
 
@@ -72,6 +73,7 @@ export default function MinimalistMap({
   latitude,
   longitude,
   theme,
+  venueName,
   className = "",
 }: MinimalistMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,9 +84,9 @@ export default function MinimalistMap({
 
     const map = L.map(containerRef.current, {
       center: [latitude, longitude],
-      zoom: 15,
+      zoom: 17,
       zoomControl: false,
-      attributionControl: false,
+      attributionControl: true,
       dragging: false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
@@ -96,13 +98,27 @@ export default function MinimalistMap({
     const tileUrl = isDarkTheme(theme) ? TILES_DARK : TILES_LIGHT;
 
     L.tileLayer(tileUrl, {
-      maxZoom: 19,
+      maxZoom: 80,
       subdomains: "abcd",
     }).addTo(map);
 
     // Custom pin marker using theme primary color
     const icon = createPinIcon(theme.secondary);
-    L.marker([latitude, longitude], { icon, interactive: false }).addTo(map);
+    const marker = L.marker([latitude, longitude], { icon, interactive: false }).addTo(map);
+
+    // Popup with venue name
+    if (venueName) {
+      const popup = L.popup({
+        closeButton: false,
+        offset: [0, -30],
+        className: "minimalist-map-popup",
+        autoPan: false,
+      })
+        .setLatLng([latitude, longitude])
+        .setContent(`<span style="font-weight:600;font-size:12px;white-space:nowrap;">${venueName}</span>`);
+      popup.openOn(map);
+      void marker; // suppress unused warning
+    }
 
     mapRef.current = map;
 
@@ -111,7 +127,7 @@ export default function MinimalistMap({
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latitude, longitude, theme.name]);
+  }, [latitude, longitude, theme.name, venueName]);
 
   return (
     <>
@@ -120,6 +136,22 @@ export default function MinimalistMap({
         .minimalist-map-pin {
           background: none !important;
           border: none !important;
+        }
+        .minimalist-map-popup .leaflet-popup-content-wrapper {
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          padding: 0;
+        }
+        .minimalist-map-popup .leaflet-popup-content {
+          margin: 6px 10px;
+        }
+        .minimalist-map-popup .leaflet-popup-tip-container {
+          display: none;
+        }
+        .leaflet-attribution-flag { display: none !important; }
+        .leaflet-control-attribution {
+          font-size: 9px !important;
+          opacity: 0.5;
         }
       `}</style>
       <div

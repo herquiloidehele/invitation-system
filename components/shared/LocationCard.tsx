@@ -6,13 +6,7 @@ import { motion } from "framer-motion";
 import { ExternalLink, MapPin } from "lucide-react";
 import Image from "next/image";
 
-import type {
-  CustomTexts,
-  ImageSettingsKey,
-  ImageSettingsMap,
-  LocationInfo,
-  TemplateTheme,
-} from "@/lib/types";
+import type { CustomTexts, ImageSettingsKey, ImageSettingsMap, LocationInfo, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { getImageStyle } from "@/lib/image-settings";
@@ -99,7 +93,7 @@ export default function LocationCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.8, ease: EASE }}
-      className="flex flex-col overflow-hidden pt-5"
+      className="flex flex-col overflow-hidden"
       style={{
         background: effectiveCardBg,
         backdropFilter: "blur(12px)",
@@ -110,9 +104,9 @@ export default function LocationCard({
       }}
     >
       {/* Venue image — shown only if imageUrl is provided */}
-      {location.imageUrl && (
+      {location.imageUrl ? (
         <div
-          className="relative w-full overflow-hidden"
+          className="relative w-full overflow-hidden mb-4"
           style={{ height: 180 }}
         >
           <Image
@@ -126,38 +120,38 @@ export default function LocationCard({
             }
           />
         </div>
-      )}
+      ) : (
+        <div className="flex flex-col gap-0 px-5 pb-3 pt-3">
+          <EditableText elementKey="locationName">
+            <span
+              style={{
+                fontFamily: ts?.bodyFont ?? theme.bodyFont,
+                fontSize: 14,
+                fontWeight: 600,
+                color: ts?.textPrimary ?? theme.textPrimary,
+                ...(ts?.locationName ?? {}),
+              }}
+            >
+              {location.name}
+            </span>
+          </EditableText>
 
-      {/* Venue name + address */}
-      <div className="flex flex-col gap-1 px-5 pb-3">
-        <EditableText elementKey="locationName">
-          <span
-            style={{
-              fontFamily: ts?.bodyFont ?? theme.bodyFont,
-              fontSize: 16,
-              fontWeight: 600,
-              color: ts?.textPrimary ?? theme.textPrimary,
-              ...(ts?.locationName ?? {}),
-            }}
-          >
-            {location.name}
-          </span>
-        </EditableText>
-        <EditableText elementKey="locationAddress">
-          <span
-            style={{
-              fontFamily: ts?.uiFont ?? theme.uiFont,
-              fontSize: 14,
-              fontWeight: 400,
-              color: ts?.textSecondary ?? theme.textSecondary,
-              lineHeight: 1.5,
-              ...(ts?.locationAddress ?? {}),
-            }}
-          >
-            {location.address}
-          </span>
-        </EditableText>
-      </div>
+          <EditableText elementKey="locationAddress">
+            <span
+              style={{
+                fontFamily: ts?.uiFont ?? theme.uiFont,
+                fontSize: 14,
+                fontWeight: 400,
+                color: ts?.textSecondary ?? theme.textSecondary,
+                lineHeight: 1.5,
+                ...(ts?.locationAddress ?? {}),
+              }}
+            >
+              {location.address}
+            </span>
+          </EditableText>
+        </div>
+      )}
 
       {/* Map preview */}
       {hasCoordinates && (
@@ -165,7 +159,7 @@ export default function LocationCard({
           <div
             className="relative w-full overflow-hidden"
             style={{
-              height: 180,
+              height: 220,
               borderRadius: 12,
               border: `1px solid ${effectiveCardBorder}`,
             }}
@@ -207,6 +201,7 @@ export default function LocationCard({
                   latitude={location.latitude!}
                   longitude={location.longitude!}
                   theme={theme}
+                  venueName={location.name}
                 />
               </Suspense>
             </ErrorBoundary>
