@@ -90,7 +90,16 @@ export default function SaveTheDateView({
   saveTheDate,
   hideEnvelope = false,
 }: SaveTheDateViewProps) {
-  const { couple, date, customMessage, theme, textStyles, rsvp, audio, bottomHero } = saveTheDate;
+  const {
+    couple,
+    date,
+    customMessage,
+    theme,
+    textStyles,
+    rsvp,
+    audio,
+    bottomHero,
+  } = saveTheDate;
   const [revealed, setRevealed] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
@@ -100,8 +109,7 @@ export default function SaveTheDateView({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const hasAudio =
-    audio.enabled && !!audio.src && Boolean(theme.envelope);
+  const hasAudio = audio.enabled && !!audio.src && Boolean(theme.envelope);
 
   const rsvpEnabled = rsvp?.enabled === true;
 
@@ -307,246 +315,283 @@ export default function SaveTheDateView({
 
   return (
     <div className="relative">
-    <div
-      className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6"
-      style={{ backgroundColor: theme.bgColor }}
-    >
-      {/* Hidden pre-buffered audio element */}
-      {hasAudio && (
-        <audio
-          ref={audioRef}
-          src={audio.src}
-          preload="auto"
-          aria-hidden
-          style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }}
-        />
-      )}
-
-      {/* Envelope overlay */}
-      <AnimatePresence>
-        {!hideEnvelope && hasEnvelope && envelopeTheme && !envelopeDone && (
-          <EnvelopeCover
-            key="envelope"
-            theme={envelopeTheme}
-            onOpen={handleEnvelopeOpen}
-            onAnimationComplete={handleEnvelopeDone}
-            shimmer={shimmer}
+      <div
+        className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6"
+        style={{ backgroundColor: theme.bgColor }}
+      >
+        {/* Hidden pre-buffered audio element */}
+        {hasAudio && (
+          <audio
+            ref={audioRef}
+            src={audio.src}
+            preload="auto"
+            aria-hidden
+            style={{
+              position: "absolute",
+              width: 0,
+              height: 0,
+              opacity: 0,
+              pointerEvents: "none",
+            }}
           />
         )}
-      </AnimatePresence>
 
-      {/* ── A. Entrance stagger container ────────────────────────── */}
-      <motion.div
-        className="flex flex-col items-center"
-        variants={entranceContainer}
-        initial="hidden"
-        animate={hideEnvelope || envelopeDone || !hasEnvelope ? "visible" : "hidden"}
-      >
-        {/* Title — fades down from above */}
-        <motion.h1
-          variants={fadeDown}
-          className="mb-4 text-4xl"
-          style={{
-            fontFamily: resolvedTitleFont,
-            color: titleOverride?.color ?? theme.textColor,
-            ...(titleOverride?.fontSize ? { fontSize: titleOverride.fontSize } : {}),
-            ...(titleOverride?.fontWeight ? { fontWeight: titleOverride.fontWeight } : {}),
-            ...(titleOverride?.letterSpacing ? { letterSpacing: titleOverride.letterSpacing } : {}),
-          }}
-        >
-          <EditableText elementKey="stdTitle">Save the Date</EditableText>
-        </motion.h1>
-
-        {/* D. Hint text — fades in, then exits gracefully on reveal */}
+        {/* Envelope overlay */}
         <AnimatePresence>
-          {!revealed && (
-            <motion.p
-              key="hint"
-              variants={{ ...hintFade, ...hintExit }}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="mb-4 text-xs tracking-widest uppercase"
-              style={{
-                fontFamily: resolvedHintFont,
-                color: hintOverride?.color ?? theme.textColor,
-                ...(hintOverride?.fontSize ? { fontSize: hintOverride.fontSize } : {}),
-                ...(hintOverride?.fontWeight ? { fontWeight: hintOverride.fontWeight } : {}),
-                ...(hintOverride?.letterSpacing ? { letterSpacing: hintOverride.letterSpacing } : {}),
-              }}
-            >
-              <EditableText elementKey="stdHint">Raspe para ver a data</EditableText>
-            </motion.p>
+          {!hideEnvelope && hasEnvelope && envelopeTheme && !envelopeDone && (
+            <EnvelopeCover
+              key="envelope"
+              theme={envelopeTheme}
+              onOpen={handleEnvelopeOpen}
+              onAnimationComplete={handleEnvelopeDone}
+              shimmer={shimmer}
+            />
           )}
         </AnimatePresence>
 
-        {/* B. Heart — scales in, then pulses while waiting for scratch */}
-        <motion.div variants={scaleIn}>
-          <motion.div
-            variants={heartPulse}
-            animate={revealed ? "still" : "pulse"}
-          >
-            <ScratchHeart
-              width={HEART_SIZE}
-              height={HEART_SIZE}
-              heartColor={theme.heartColor}
-              glitterColors={theme.heartGlitterColors}
-              textureUrl={theme.heartTextureUrl}
-              onReveal={handleReveal}
-              forceReveal={hideEnvelope}
-            >
-              <DateReveal
-                date={date}
-                theme={theme}
-                dateOverride={dateOverride}
-                dateLabelOverride={dateLabelOverride}
-                resolvedDateFont={resolvedDateFont}
-                resolvedDateLabelFont={resolvedDateLabelFont}
-                revealed={revealed}
-                forceReveal
-              />
-            </ScratchHeart>
-          </motion.div>
-        </motion.div>
-
-        {/* E. Couple names — split into bride / & / groom, staggered */}
-        <motion.h2
-          variants={fadeUp}
-          className="mt-8 text-2xl font-light uppercase flex items-baseline gap-[0.3em]"
-          style={{
-            fontFamily: resolvedCoupleFont,
-            color: coupleOverride?.color ?? theme.textColor,
-            letterSpacing: coupleOverride?.letterSpacing ?? "0.15em",
-            ...(coupleOverride?.fontSize ? { fontSize: coupleOverride.fontSize } : {}),
-            ...(coupleOverride?.fontWeight ? { fontWeight: coupleOverride.fontWeight } : {}),
-          }}
+        {/* ── A. Entrance stagger container ────────────────────────── */}
+        <motion.div
+          className="flex flex-col items-center"
+          variants={entranceContainer}
+          initial="hidden"
+          animate={
+            hideEnvelope || envelopeDone || !hasEnvelope ? "visible" : "hidden"
+          }
         >
-          <EditableText elementKey="stdCoupleNames">
-            <motion.span
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, delay: 0.8, ease: EASE }}
-            >
-              {couple.bride}
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 0.6, scale: 1 }}
-              transition={{ duration: 0.7, delay: 1.0, ease: EASE }}
-              className="text-[0.7em]"
-            >
-              &amp;
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, delay: 1.2, ease: EASE }}
-            >
-              {couple.groom}
-            </motion.span>
-          </EditableText>
-        </motion.h2>
-      </motion.div>
-
-      {/* ── C. Post-reveal choreography ──────────────────────────── */}
-      <AnimatePresence>
-        {revealed && (
-          <motion.div
-            className="mt-6 flex flex-col items-center w-full"
-            variants={revealContainer}
-            initial="hidden"
-            animate="visible"
+          {/* Title — fades down from above */}
+          <motion.h1
+            variants={fadeDown}
+            className="mb-4 text-4xl"
+            style={{
+              fontFamily: resolvedTitleFont,
+              color: titleOverride?.color ?? theme.textColor,
+              ...(titleOverride?.fontSize
+                ? { fontSize: titleOverride.fontSize }
+                : {}),
+              ...(titleOverride?.fontWeight
+                ? { fontWeight: titleOverride.fontWeight }
+                : {}),
+              ...(titleOverride?.letterSpacing
+                ? { letterSpacing: titleOverride.letterSpacing }
+                : {}),
+            }}
           >
-            {/* Custom message */}
-            {customMessage && (
+            <EditableText elementKey="stdTitle">Save the Date</EditableText>
+          </motion.h1>
+
+          {/* D. Hint text — fades in, then exits gracefully on reveal */}
+          <AnimatePresence>
+            {!revealed && (
               <motion.p
-                variants={revealFadeUp}
-                className="text-sm tracking-wide"
+                key="hint"
+                variants={{ ...hintFade, ...hintExit }}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="text-xs tracking-widest uppercase"
                 style={{
-                  fontFamily: resolvedCustomMessageFont,
-                  color: customMessageOverride?.color ?? theme.textColor,
-                  opacity: 0.6,
-                  ...(customMessageOverride?.fontSize ? { fontSize: customMessageOverride.fontSize } : {}),
-                  ...(customMessageOverride?.fontWeight ? { fontWeight: customMessageOverride.fontWeight } : {}),
-                  ...(customMessageOverride?.letterSpacing ? { letterSpacing: customMessageOverride.letterSpacing } : {}),
+                  fontFamily: resolvedHintFont,
+                  color: hintOverride?.color ?? theme.textColor,
+                  ...(hintOverride?.fontSize
+                    ? { fontSize: hintOverride.fontSize }
+                    : {}),
+                  ...(hintOverride?.fontWeight
+                    ? { fontWeight: hintOverride.fontWeight }
+                    : {}),
+                  ...(hintOverride?.letterSpacing
+                    ? { letterSpacing: hintOverride.letterSpacing }
+                    : {}),
                 }}
               >
-                <EditableText elementKey="stdCustomMessage">
-                  {customMessage}
+                <EditableText elementKey="stdHint">
+                  Raspe para ver a data
                 </EditableText>
               </motion.p>
             )}
+          </AnimatePresence>
 
-            {/* RSVP / Calendar button */}
+          {/* B. Heart — scales in, then pulses while waiting for scratch */}
+          <motion.div variants={scaleIn} className={"mt-5 mb-8"}>
             <motion.div
-              variants={revealFadeUp}
-              className="mt-8 w-full max-w-xs flex flex-col gap-3"
+              variants={heartPulse}
+              animate={revealed ? "still" : "pulse"}
             >
-              {rsvpEnabled && (
-                <button
-                  onClick={() => !rsvpSubmitted && setRsvpOpen(true)}
-                  disabled={rsvpSubmitted}
-                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95 disabled:cursor-default disabled:active:scale-100"
-                  style={{
-                    background: rsvpSubmitted
-                      ? "#22c55e"
-                      : `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
-                    color: "#FFFFFF",
-                    fontFamily: theme.coupleFont,
-                  }}
-                >
-                  {rsvpSubmitted ? (
-                    <>
-                      <CheckCircle size={16} />
-                      Presença Confirmada
-                    </>
-                  ) : (
-                    "Confirmar Presença"
-                  )}
-                </button>
-              )}
-              {!rsvpEnabled && (
-                <CalendarButton
+              <ScratchHeart
+                width={HEART_SIZE}
+                height={HEART_SIZE}
+                heartColor={theme.heartColor}
+                glitterColors={theme.heartGlitterColors}
+                textureUrl={theme.heartTextureUrl}
+                onReveal={handleReveal}
+                forceReveal={hideEnvelope}
+              >
+                <DateReveal
                   date={date}
-                  couple={couple}
                   theme={theme}
-                  visible
+                  dateOverride={dateOverride}
+                  dateLabelOverride={dateLabelOverride}
+                  resolvedDateFont={resolvedDateFont}
+                  resolvedDateLabelFont={resolvedDateLabelFont}
+                  revealed={revealed}
+                  forceReveal
                 />
-              )}
+              </ScratchHeart>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* RSVP Modal */}
-      {rsvpEnabled && (
-        <RSVPModal
-          isOpen={rsvpOpen}
-          onClose={handleRsvpClose}
-          invitationSlug={saveTheDate.slug}
-          apiEndpoint="/api/save-the-date/rsvp"
-          slugKey="saveTheDateSlug"
-          theme={{
-            bg: theme.bgColor,
-            cardBg: "#FFFFFF",
-            primary: theme.heartColor,
-            textPrimary: "#323232",
-            textSecondary: "#6B6B6B",
-            textMuted: "#A0A0A0",
-            accent: theme.heartColor,
-            ctaPrimaryBg: `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
-            ctaPrimaryText: "#FFFFFF",
-            ctaRadius: "9999px",
-            cardBorder: "#E5E5E3",
-            bodyFont: theme.coupleFont,
-          }}
-        />
-      )}
-    </div>
+          {/* E. Couple names — split into bride / & / groom, staggered */}
+          <motion.h2
+            variants={fadeUp}
+            className="text-2xl font-light uppercase flex items-baseline gap-[0.3em]"
+            style={{
+              fontFamily: resolvedCoupleFont,
+              color: coupleOverride?.color ?? theme.textColor,
+              letterSpacing: coupleOverride?.letterSpacing ?? "0.15em",
+              ...(coupleOverride?.fontSize
+                ? { fontSize: coupleOverride.fontSize }
+                : {}),
+              ...(coupleOverride?.fontWeight
+                ? { fontWeight: coupleOverride.fontWeight }
+                : {}),
+            }}
+          >
+            <EditableText elementKey="stdCoupleNames">
+              <motion.span
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.9, delay: 0.8, ease: EASE }}
+              >
+                {couple.bride}
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 0.6, scale: 1 }}
+                transition={{ duration: 0.7, delay: 1.0, ease: EASE }}
+                className="text-[0.7em]"
+              >
+                &amp;
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.9, delay: 1.2, ease: EASE }}
+              >
+                {couple.groom}
+              </motion.span>
+            </EditableText>
+          </motion.h2>
+        </motion.div>
+
+        {/* ── C. Post-reveal choreography ──────────────────────────── */}
+        <AnimatePresence>
+          {revealed && (
+            <motion.div
+              className="mt-6 flex flex-col items-center w-full"
+              variants={revealContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {/* Custom message */}
+              {customMessage && (
+                <motion.p
+                  variants={revealFadeUp}
+                  className="text-sm tracking-wide"
+                  style={{
+                    fontFamily: resolvedCustomMessageFont,
+                    color: customMessageOverride?.color ?? theme.textColor,
+                    opacity: 0.6,
+                    ...(customMessageOverride?.fontSize
+                      ? { fontSize: customMessageOverride.fontSize }
+                      : {}),
+                    ...(customMessageOverride?.fontWeight
+                      ? { fontWeight: customMessageOverride.fontWeight }
+                      : {}),
+                    ...(customMessageOverride?.letterSpacing
+                      ? { letterSpacing: customMessageOverride.letterSpacing }
+                      : {}),
+                  }}
+                >
+                  <EditableText elementKey="stdCustomMessage">
+                    {customMessage}
+                  </EditableText>
+                </motion.p>
+              )}
+
+              {/* RSVP / Calendar button */}
+              <motion.div
+                variants={revealFadeUp}
+                className="mt-8 w-full max-w-xs flex flex-col gap-3"
+              >
+                {rsvpEnabled && (
+                  <button
+                    onClick={() => !rsvpSubmitted && setRsvpOpen(true)}
+                    disabled={rsvpSubmitted}
+                    className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95 disabled:cursor-default disabled:active:scale-100"
+                    style={{
+                      background: rsvpSubmitted
+                        ? "#22c55e"
+                        : `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+                      color: "#FFFFFF",
+                      fontFamily: theme.coupleFont,
+                    }}
+                  >
+                    {rsvpSubmitted ? (
+                      <>
+                        <CheckCircle size={16} />
+                        Presença Confirmada
+                      </>
+                    ) : (
+                      "Confirmar Presença"
+                    )}
+                  </button>
+                )}
+                {!rsvpEnabled && (
+                  <CalendarButton
+                    date={date}
+                    couple={couple}
+                    theme={theme}
+                    visible
+                  />
+                )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* RSVP Modal */}
+        {rsvpEnabled && (
+          <RSVPModal
+            isOpen={rsvpOpen}
+            onClose={handleRsvpClose}
+            invitationSlug={saveTheDate.slug}
+            apiEndpoint="/api/save-the-date/rsvp"
+            slugKey="saveTheDateSlug"
+            theme={{
+              bg: theme.bgColor,
+              cardBg: "#FFFFFF",
+              primary: theme.heartColor,
+              textPrimary: "#323232",
+              textSecondary: "#6B6B6B",
+              textMuted: "#A0A0A0",
+              accent: theme.heartColor,
+              ctaPrimaryBg: `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+              ctaPrimaryText: "#FFFFFF",
+              ctaRadius: "9999px",
+              cardBorder: "#E5E5E3",
+              bodyFont: theme.coupleFont,
+            }}
+          />
+        )}
+      </div>
 
       {/* Bottom hero section */}
       {showBottomHero && (hideEnvelope || envelopeDone) && (
-        <SaveTheDateBottomHero config={bottomHero} theme={theme} textStyles={textStyles} isPreview={hideEnvelope} />
+        <SaveTheDateBottomHero
+          config={bottomHero}
+          theme={theme}
+          textStyles={textStyles}
+          isPreview={hideEnvelope}
+        />
       )}
     </div>
   );
