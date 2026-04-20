@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Video, Link2, CheckCircle2 } from "lucide-react";
+import { Video, Link2, CheckCircle2, Copy, Check, ExternalLink } from "lucide-react";
 
 import type {
   InvitationData,
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectTrigger,
@@ -106,6 +107,78 @@ interface ExternalInvitationFormProps {
   invitationId?: string;
   ownerUrl?: string;
   themes: TemplateTheme[];
+}
+
+// ---------------------------------------------------------------------------
+// RsvpLinkPanel — shows the shareable /confirmar/[slug] URL
+// ---------------------------------------------------------------------------
+
+function RsvpLinkPanel({ slug }: { slug: string }) {
+  const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const rsvpUrl = origin ? `${origin}/confirmar/${slug}` : `/confirmar/${slug}`;
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(rsvpUrl);
+      setCopied(true);
+      toast.success("Link de confirmação copiado!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Não foi possível copiar o link.");
+    }
+  }
+
+  return (
+    <div className="rounded-lg border bg-muted/40 p-4 space-y-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium">Link de confirmação (RSVP)</p>
+            <Badge variant="secondary" className="text-xs">Convidados</Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Partilhe este link para os convidados confirmarem presença.
+          </p>
+        </div>
+        <a
+          href={rsvpUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          title="Abrir página de confirmação"
+        >
+          <ExternalLink className="size-4" />
+        </a>
+      </div>
+      <div className="flex gap-2">
+        <Input
+          readOnly
+          value={rsvpUrl}
+          className="font-mono text-xs h-8 bg-background"
+          onClick={(e) => (e.target as HTMLInputElement).select()}
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          className="shrink-0 h-8"
+          onClick={handleCopy}
+        >
+          {copied ? (
+            <Check className="size-3.5 text-emerald-500" />
+          ) : (
+            <Copy className="size-3.5" />
+          )}
+          {copied ? "Copiado!" : "Copiar"}
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -281,6 +354,11 @@ export default function ExternalInvitationForm({
             {/* Owner link (edit only) */}
             {mode === "edit" && ownerUrl && (
               <OwnerLinkPanel ownerUrl={ownerUrl} />
+            )}
+
+            {/* RSVP confirmation link (edit only, external_link type) */}
+            {mode === "edit" && subType === "external_link" && form.slug && (
+              <RsvpLinkPanel slug={form.slug} />
             )}
 
             {/* ── Sub-type picker ── */}
