@@ -8,6 +8,7 @@ import {
   Calendar,
   MapPin,
 } from "lucide-react";
+import { ExportButton } from "./ExportButton";
 
 export const dynamic = "force-dynamic";
 
@@ -55,13 +56,19 @@ async function InvitationRsvpView({ token }: { token: string }) {
     <div className="min-h-screen bg-stone-50">
       <header className="border-b bg-white">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-2 text-rose-500 mb-3">
-            <Heart className="size-5 fill-rose-500" />
-            <span className="text-sm font-medium uppercase tracking-widest">
-              Brindel Studio
-            </span>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2 text-rose-500">
+              <Heart className="size-5 fill-rose-500" />
+              <span className="text-sm font-medium uppercase tracking-widest">
+                Brindel Studio
+              </span>
+            </div>
+            <ExportButton
+              token={token}
+              filename={`confirmacoes-${invitation.slug}.pdf`}
+            />
           </div>
-          <h1 className="text-2xl font-semibold text-stone-800">
+          <h1 className="text-2xl font-semibold text-stone-800 mt-3">
             {couple.bride} &amp; {couple.groom}
           </h1>
           <div className="flex flex-wrap gap-4 mt-2 text-sm text-stone-500">
@@ -127,13 +134,19 @@ async function SaveTheDateRsvpView({ token }: { token: string }) {
     <div className="min-h-screen bg-stone-50">
       <header className="border-b bg-white">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-2 text-rose-500 mb-3">
-            <Heart className="size-5 fill-rose-500" />
-            <span className="text-sm font-medium uppercase tracking-widest">
-              Brindel Studio — Save the Date
-            </span>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2 text-rose-500">
+              <Heart className="size-5 fill-rose-500" />
+              <span className="text-sm font-medium uppercase tracking-widest">
+                Brindel Studio — Save the Date
+              </span>
+            </div>
+            <ExportButton
+              token={token}
+              filename={`confirmacoes-std-${std.slug}.pdf`}
+            />
           </div>
-          <h1 className="text-2xl font-semibold text-stone-800">
+          <h1 className="text-2xl font-semibold text-stone-800 mt-3">
             {couple.bride} &amp; {couple.groom}
           </h1>
           <div className="flex flex-wrap gap-4 mt-2 text-sm text-stone-500">
