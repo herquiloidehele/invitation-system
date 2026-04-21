@@ -98,7 +98,7 @@ function TopFlap({
   return (
     <motion.div
       className="absolute top-0 left-0 w-full origin-bottom"
-      style={{ zIndex: 10, height: "calc(50% + 10vh)" }}
+      style={{ zIndex: 10 }}
       initial={{
         filter: "drop-shadow(0 0px 0px rgba(0,0,0,0))",
         scale: 1,
@@ -144,10 +144,7 @@ function BottomFlap({
   imgStyle?: React.CSSProperties;
 }) {
   return (
-    <div
-      className="absolute bottom-0 left-0 w-full origin-top"
-      style={{ height: "calc(50% + 10vh)" }}
-    >
+    <div className="absolute bottom-0 left-0 w-full origin-top">
       <Image
         src={image}
         width={500}
