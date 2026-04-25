@@ -13,7 +13,6 @@ import Image from "next/image";
 interface EnvelopeCoverProps {
   theme: TemplateTheme;
   onOpen: () => void;
-  /** Called when the full opening animation has finished playing. */
   onAnimationComplete?: () => void;
   /** Enable the diagonal shimmer highlight animation. Defaults to true. */
   shimmer?: boolean;
