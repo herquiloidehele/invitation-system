@@ -224,7 +224,6 @@ function BottomFlap({
 /* ------------------------------------------------------------------ */
 /*  Main component                                                     */
 /* ------------------------------------------------------------------ */
-
 export default function EnvelopeCover({
   theme,
   onOpen,
