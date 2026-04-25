@@ -33,7 +33,6 @@ const T = {
   /** Top flap swings open (3D rotation) */
   flapOpen: { dur: 5, del: 0 },
   bottomFlap: { dur: 15, del: 0 },
-  /** Entire scene fades to transparent */
   sceneFade: { dur: 2, del: 2 },
 } as const;
 
