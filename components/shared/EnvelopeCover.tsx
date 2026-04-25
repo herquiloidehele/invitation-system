@@ -25,7 +25,6 @@ interface EnvelopeCoverProps {
 
 /* ------------------------------------------------------------------ */
 /*  Timing constants (seconds)                                         */
-/*                                                                     */
 /*  Slow cinematic feel ~5 s. Simplified without side-flaps / letter.  */
 /* ------------------------------------------------------------------ */
 
