@@ -16,7 +16,6 @@ interface EnvelopeCoverProps {
   onAnimationComplete?: () => void;
   /** Enable the diagonal shimmer highlight animation. Defaults to true. */
   shimmer?: boolean;
-  /** Monogram text displayed on the envelope (passed through but unused in this component). */
   monogram?: string;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
