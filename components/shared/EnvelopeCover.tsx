@@ -95,6 +95,7 @@ function TopFlap({
           transformOrigin: "top center",
           willChange: "transform, opacity",
           opacity: 0,
+          height: "calc(50% + 10vh)",
         }}
         initial={{
           opacity: 0,
@@ -127,6 +128,8 @@ function TopFlap({
             filter: "brightness(0) blur(28px)",
             opacity: 0.75,
             transform: "translateZ(0)",
+            height: "calc(100%)",
+            width: "100vw",
             ...imgStyle,
           }}
         />
@@ -140,6 +143,7 @@ function TopFlap({
           transformStyle: "preserve-3d",
           backfaceVisibility: "hidden",
           willChange: "transform",
+          height: "calc(50% + 10vh)",
         }}
         initial={{
           transform: topFlapTransform(0),
@@ -192,7 +196,8 @@ function BottomFlap({
 }) {
   return (
     <motion.div
-      className="absolute bottom-0 left-0 w-full origin-top"
+      className="absolute bottom-0 left-0 w-full origin-top flex items-end"
+      style={{ height: "calc(50% + 10vh)" }}
       initial={{
         bottom: 0,
       }}
@@ -211,7 +216,7 @@ function BottomFlap({
         height={500}
         alt={"Top Envelop Flap"}
         className={"w-full h-full object-cover object-top"}
-        style={imgStyle}
+        style={{ height: "calc(100% + 10vh)", ...imgStyle }}
       />
     </motion.div>
   );
