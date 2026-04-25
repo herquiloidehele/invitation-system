@@ -143,7 +143,7 @@ function TopFlap({
           transformStyle: "preserve-3d",
           backfaceVisibility: "hidden",
           willChange: "transform",
-          height: "calc(50% + 10vh)",
+          height: "calc(50% + 12vh)",
         }}
         initial={{
           transform: topFlapTransform(0),
