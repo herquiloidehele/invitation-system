@@ -267,6 +267,7 @@ export default function InvitationView({
             <EnvelopeCover
               key="envelope-cover"
               theme={mergedTheme}
+              coverBackground={invitation.envelope?.coverBackground}
               onOpen={handleOpen}
               onAnimationComplete={handleAnimationComplete}
               monogram={invitation.couple.monogram}

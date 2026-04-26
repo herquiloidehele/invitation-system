@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import type { ImageSettingsMap, TemplateTheme } from "@/lib/types";
 import { getImageStyle } from "@/lib/image-settings";
+import { getCoverBackgroundStyle } from "@/lib/envelope-cover-background";
 import Image from "next/image";
 
 /* ------------------------------------------------------------------ */
@@ -16,6 +17,8 @@ interface EnvelopeCoverProps {
   onAnimationComplete?: () => void;
   /** Enable the diagonal shimmer highlight animation. Defaults to true. */
   shimmer?: boolean;
+  /** Color or image URL used as the full envelope cover background. */
+  coverBackground?: string;
   monogram?: string;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
@@ -61,13 +64,11 @@ function topFlapShadowTransform(yPercent = 0, scaleX = 1, scaleY = 1): string {
 /*  Envelope body (the back panel visible behind the flaps)            */
 /* ------------------------------------------------------------------ */
 
-function EnvelopeBody({ color }: { color: string }) {
+function EnvelopeBody({ style }: { style: React.CSSProperties }) {
   return (
     <div
       className="absolute inset-0"
-      style={{
-        backgroundColor: color,
-      }}
+      style={style}
     />
   );
 }
@@ -230,6 +231,7 @@ export default function EnvelopeCover({
   onOpen,
   onAnimationComplete,
   shimmer = true,
+  coverBackground,
   imageSettings,
 }: EnvelopeCoverProps) {
   const [opening, setOpening] = useState(false);
@@ -245,12 +247,16 @@ export default function EnvelopeCover({
 
   const topFlapStyle = getImageStyle(imageSettings, "envelopeTopFlap");
   const bottomFlapStyle = getImageStyle(imageSettings, "envelopeBottomFlap");
+  const coverBackgroundStyle = getCoverBackgroundStyle(
+    coverBackground,
+    theme.envelope.base,
+  );
 
   return (
     <motion.div
       className="absolute inset-0 z-[100] cursor-pointer overflow-hidden"
       style={{
-        backgroundColor: theme.envelope.base,
+        ...coverBackgroundStyle,
         transformStyle: "preserve-3d",
       }}
       onClick={handleTap}
@@ -258,7 +264,7 @@ export default function EnvelopeCover({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      <EnvelopeBody color={theme.envelope.base} />
+      <EnvelopeBody style={coverBackgroundStyle} />
 
       {/* Shimmer highlight — diagonal sweep across envelope */}
       {shimmer && !opening && (

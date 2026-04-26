@@ -137,6 +137,8 @@ export type ImageSettingsMap = Partial<Record<ImageSettingsKey, ImageSettings>>;
 export interface EnvelopeConfig {
   /** Override the envelope body fill color (hex). Falls back to theme default if empty. */
   base?: string;
+  /** Override the full envelope cover background with a color or image URL. Falls back to base/theme color if empty. */
+  coverBackground?: string;
   /** Override the top flap image URL. Falls back to theme default if empty. */
   topFlap?: string;
   /** Override the bottom flap image URL. Falls back to theme default if empty. */
