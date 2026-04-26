@@ -65,7 +65,7 @@ export interface SaveTheDateData {
   date: SaveTheDateDate;
   customMessage: string | null;
   theme: SaveTheDateThemeData;
-  /** Per-STD envelope overrides (base, topFlap, bottomFlap, shimmer). */
+  /** Per-STD envelope overrides (base, coverBackground, topFlap, bottomFlap, shimmer). */
   envelope: EnvelopeConfig | null;
   /** Per-STD font/style overrides (same shape as invitation textStyles). */
   textStyles: TextStyleOverrides | null;

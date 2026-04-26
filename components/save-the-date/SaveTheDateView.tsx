@@ -6,6 +6,7 @@ import confetti from "canvas-confetti";
 import { CheckCircle } from "lucide-react";
 import type { SaveTheDateData } from "@/lib/save-the-date";
 import type { TemplateTheme } from "@/lib/types";
+import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import ScratchHeart from "./ScratchHeart";
 import DateReveal from "./DateReveal";
@@ -100,31 +101,27 @@ export default function SaveTheDateView({
     audio,
     bottomHero,
   } = saveTheDate;
+  const rsvpEnabled = rsvp?.enabled === true;
   const [revealed, setRevealed] = useState(false);
   const [envelopeDone, setEnvelopeDone] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
-  const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
+  const [rsvpSubmitted, setRsvpSubmitted] = useState(() => {
+    if (!rsvpEnabled || typeof window === "undefined") return false;
+    try {
+      const slugs: string[] = JSON.parse(
+        window.localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+      );
+      return slugs.includes(saveTheDate.slug);
+    } catch {
+      return false;
+    }
+  });
 
   // Audio refs (same pattern as InvitationView)
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const hasAudio = audio.enabled && !!audio.src && Boolean(theme.envelope);
-
-  const rsvpEnabled = rsvp?.enabled === true;
-
-  // Check localStorage on mount for already-submitted state
-  useEffect(() => {
-    if (!rsvpEnabled) return;
-    try {
-      const slugs: string[] = JSON.parse(
-        localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
-      );
-      if (slugs.includes(saveTheDate.slug)) setRsvpSubmitted(true);
-    } catch {
-      // ignore
-    }
-  }, [rsvpEnabled, saveTheDate.slug]);
 
   const handleRsvpClose = useCallback(() => {
     // Re-check localStorage in case the modal wrote a new submission
@@ -183,6 +180,13 @@ export default function SaveTheDateView({
       bg: theme.bgColor,
     } as TemplateTheme;
   }, [theme.envelope, theme.bgColor, saveTheDate.envelope]);
+
+  const coverBackground = theme.envelope
+    ? getSaveTheDateEnvelopeCoverBackground(
+        theme.envelope,
+        saveTheDate.envelope,
+      )
+    : undefined;
 
   const shimmer = saveTheDate.envelope?.shimmer !== false;
 
@@ -342,6 +346,7 @@ export default function SaveTheDateView({
             <EnvelopeCover
               key="envelope"
               theme={envelopeTheme}
+              coverBackground={coverBackground}
               onOpen={handleEnvelopeOpen}
               onAnimationComplete={handleEnvelopeDone}
               shimmer={shimmer}
