@@ -39,6 +39,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SaveTheDateThemeData } from "@/lib/save-the-date";
 import type { EnvelopeConfig, TemplateTheme, TextStyle, TextStyleOverrides } from "@/lib/types";
+import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
@@ -122,6 +123,10 @@ function deriveDateFields(iso: string) {
   }
 }
 
+function colorPickerValue(value: string | undefined, fallback: string): string {
+  return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -153,6 +158,13 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       bg: selectedTheme.bgColor,
     } as TemplateTheme;
   }, [selectedTheme, data.envelope]);
+
+  const coverBackground = selectedTheme?.envelope
+    ? getSaveTheDateEnvelopeCoverBackground(
+        selectedTheme.envelope,
+        data.envelope,
+      )
+    : undefined;
 
   // Preview data for SaveTheDateView
   const previewData = useMemo(
@@ -653,6 +665,60 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
 
                   <Separator />
 
+                  {/* Cover background */}
+                  <div className="space-y-1.5">
+                    <Label>Fundo da capa</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Cor ou imagem usada no fundo da capa do envelope. Deixe em
+                      branco para usar a cor do envelope.
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={colorPickerValue(
+                          data.envelope?.coverBackground,
+                          data.envelope?.base ||
+                            selectedTheme?.envelope?.base ||
+                            "#ffffff",
+                        )}
+                        onChange={(e) =>
+                          updateEnvelope("coverBackground", e.target.value)
+                        }
+                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                        title="Escolher cor"
+                      />
+                      <input
+                        type="text"
+                        value={data.envelope?.coverBackground ?? ""}
+                        onChange={(e) =>
+                          updateEnvelope("coverBackground", e.target.value)
+                        }
+                        placeholder={`Padrão: ${data.envelope?.base || selectedTheme?.envelope?.base || ""}`}
+                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                      />
+                      {data.envelope?.coverBackground && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() => updateEnvelope("coverBackground", "")}
+                        >
+                          Repor
+                        </Button>
+                      )}
+                    </div>
+                    <MediaUpload
+                      value={data.envelope?.coverBackground ?? ""}
+                      onUpload={(url) => updateEnvelope("coverBackground", url)}
+                      onClear={() => updateEnvelope("coverBackground", "")}
+                      kind="image"
+                      maxSizeMB={5}
+                      label="Arraste uma imagem de fundo"
+                    />
+                  </div>
+
+                  <Separator />
+
                   {/* Top flap image */}
                   <div className="space-y-1.5">
                     <Label>Imagem da aba superior</Label>
@@ -929,6 +995,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                 {hasNames && envelopeTheme ? (
                   <EnvelopeCover
                     theme={envelopeTheme}
+                    coverBackground={coverBackground}
                     onOpen={() => {}}
                     shimmer={data.envelope?.shimmer !== false}
                   />

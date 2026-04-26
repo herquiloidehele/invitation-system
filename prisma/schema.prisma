@@ -81,7 +81,7 @@ model Invitation {
   videoUrl     String?
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
-  envelope     Json?    // EnvelopeConfig { base?, topFlap?, bottomFlap? }
+  envelope     Json?    // EnvelopeConfig { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }
   saveDateStyle  String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line"
   cinematicImageUrl String? // background image for the cinematic Save the Date style
   sectionImages  Json?   // SectionImages { image1?, image2?, image3?, image4? }
@@ -165,7 +165,7 @@ model SaveTheDate {
   couple        Json    // { bride: string, groom: string }
   date          Json    // { iso: string, display: string, day: string, month: string, year: string }
   customMessage String? // optional text shown after date reveal
-  envelope      Json?   // per-STD envelope overrides { base?, topFlap?, bottomFlap?, shimmer? }
+  envelope      Json?   // per-STD envelope overrides { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }
   textStyles    Json?   // per-STD font/size overrides { titleFont?, coupleFont?, dateFont?, titleFontSize?, coupleFontSize?, dateFontSize? }
   rsvp          Json?   // { enabled: boolean, deadline?: string }
   audio         Json?   // { enabled: boolean, src: string, artist: string, title: string }

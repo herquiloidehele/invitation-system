@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Video, Link2, CheckCircle2, Copy, Check, ExternalLink } from "lucide-react";
@@ -54,6 +54,10 @@ function monogramFrom(bride: string, groom: string): string {
   const b = bride.trim().charAt(0).toUpperCase();
   const g = groom.trim().charAt(0).toUpperCase();
   return b && g ? `${b}&${g}` : "";
+}
+
+function colorPickerValue(value: string | undefined, fallback: string): string {
+  return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
 }
 
 // ---------------------------------------------------------------------------
@@ -114,12 +118,10 @@ interface ExternalInvitationFormProps {
 // ---------------------------------------------------------------------------
 
 function RsvpLinkPanel({ slug }: { slug: string }) {
-  const [origin, setOrigin] = useState("");
+  const [origin] = useState(() =>
+    typeof window === "undefined" ? "" : window.location.origin,
+  );
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
 
   const rsvpUrl = origin ? `${origin}/confirmar/${slug}` : `/confirmar/${slug}`;
 
@@ -577,6 +579,60 @@ export default function ExternalInvitationForm({
 
                   <Separator />
 
+                  {/* Cover background */}
+                  <div className="space-y-1.5">
+                    <Label>Fundo da capa</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Cor ou imagem usada no fundo da capa do envelope. Deixe em
+                      branco para usar a cor do envelope.
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={colorPickerValue(
+                          form.envelope?.coverBackground,
+                          form.envelope?.base ||
+                            currentTheme?.envelope.base ||
+                            "#ffffff",
+                        )}
+                        onChange={(e) =>
+                          updateEnvelope("coverBackground", e.target.value)
+                        }
+                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                        title="Escolher cor"
+                      />
+                      <input
+                        type="text"
+                        value={form.envelope?.coverBackground ?? ""}
+                        onChange={(e) =>
+                          updateEnvelope("coverBackground", e.target.value)
+                        }
+                        placeholder={`Padrão: ${form.envelope?.base || currentTheme?.envelope.base || ""}`}
+                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                      />
+                      {form.envelope?.coverBackground && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() => updateEnvelope("coverBackground", "")}
+                        >
+                          Repor
+                        </Button>
+                      )}
+                    </div>
+                    <MediaUpload
+                      value={form.envelope?.coverBackground ?? ""}
+                      onUpload={(url) => updateEnvelope("coverBackground", url)}
+                      onClear={() => updateEnvelope("coverBackground", "")}
+                      kind="image"
+                      maxSizeMB={5}
+                      label="Arraste uma imagem de fundo"
+                    />
+                  </div>
+
+                  <Separator />
+
                   {/* Top flap image */}
                   <div className="space-y-1.5">
                     <Label>Imagem da aba superior</Label>
@@ -684,6 +740,7 @@ export default function ExternalInvitationForm({
           {currentTheme && (
             <EnvelopeCover
               theme={currentTheme}
+              coverBackground={form.envelope?.coverBackground}
               onOpen={() => {}}
               monogram={form.couple.monogram || "A&B"}
               shimmer={form.envelope?.shimmer !== false}

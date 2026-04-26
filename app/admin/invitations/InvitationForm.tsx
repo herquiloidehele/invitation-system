@@ -91,6 +91,10 @@ function monogramFrom(bride: string, groom: string): string {
   return b && g ? `${b}&${g}` : "";
 }
 
+function colorPickerValue(value: string | undefined, fallback: string): string {
+  return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
+}
+
 function deriveDateFields(iso: string) {
   if (!iso) return {};
   try {
@@ -1157,6 +1161,60 @@ export default function InvitationForm({
                         </Button>
                       )}
                     </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Cover background */}
+                  <div className="space-y-1.5">
+                    <Label>Fundo da capa</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Cor ou imagem usada no fundo da capa do envelope. Deixe em
+                      branco para usar a cor do envelope.
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={colorPickerValue(
+                          form.envelope?.coverBackground,
+                          form.envelope?.base ||
+                            currentTheme?.envelope.base ||
+                            "#ffffff",
+                        )}
+                        onChange={(e) =>
+                          updateEnvelope("coverBackground", e.target.value)
+                        }
+                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                        title="Escolher cor"
+                      />
+                      <input
+                        type="text"
+                        value={form.envelope?.coverBackground ?? ""}
+                        onChange={(e) =>
+                          updateEnvelope("coverBackground", e.target.value)
+                        }
+                        placeholder={`Padrão: ${form.envelope?.base || currentTheme?.envelope.base || ""}`}
+                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                      />
+                      {form.envelope?.coverBackground && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() => updateEnvelope("coverBackground", "")}
+                        >
+                          Repor
+                        </Button>
+                      )}
+                    </div>
+                    <MediaUpload
+                      value={form.envelope?.coverBackground ?? ""}
+                      onUpload={(url) => updateEnvelope("coverBackground", url)}
+                      onClear={() => updateEnvelope("coverBackground", "")}
+                      kind="image"
+                      maxSizeMB={5}
+                      label="Arraste uma imagem de fundo"
+                    />
                   </div>
 
                   <Separator />
@@ -2433,6 +2491,7 @@ export default function InvitationForm({
               {form.couple.bride && form.couple.groom ? (
                 <EnvelopeCover
                   theme={currentTheme}
+                  coverBackground={form.envelope?.coverBackground}
                   onOpen={() => {}}
                   monogram={form.couple.monogram}
                   shimmer={form.envelope?.shimmer !== false}
