@@ -620,7 +620,7 @@ export default function SaveTheDateView({
           {/* E. Couple names — split into bride / & / groom, staggered */}
           <motion.h2
             variants={fadeUp}
-            className="text-2xl font-light uppercase flex items-baseline gap-[0.3em] mb-6"
+            className="text-2xl font-light flex items-baseline gap-[0.3em] mb-6"
             style={{
               fontFamily: resolvedCoupleFont,
               color: coupleOverride?.color ?? theme.textColor,

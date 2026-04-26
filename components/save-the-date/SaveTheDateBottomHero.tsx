@@ -1,7 +1,10 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
-import type { BottomHeroConfig, SaveTheDateThemeData } from "@/lib/save-the-date";
+import type {
+  BottomHeroConfig,
+  SaveTheDateThemeData,
+} from "@/lib/save-the-date";
 import type { TextStyleOverrides } from "@/lib/types";
 import { EditableText } from "@/components/shared/EditableText";
 
@@ -19,7 +22,11 @@ const textContainer = {
 
 const textItem: Variants = {
   hidden: { opacity: 0, y: 22 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 export default function SaveTheDateBottomHero({
@@ -70,19 +77,27 @@ export default function SaveTheDateBottomHero({
         initial="hidden"
         {...(isPreview
           ? { animate: "visible" }
-          : { whileInView: "visible", viewport: { once: true, margin: "-80px" } }
-        )}
+          : {
+              whileInView: "visible",
+              viewport: { once: true, margin: "-80px" },
+            })}
       >
         {config.title && (
           <motion.h2
             variants={textItem}
-            className="text-3xl font-light tracking-[0.12em] uppercase sm:text-4xl md:text-5xl"
+            className="text-3xl font-light tracking-[0.12em]  sm:text-4xl md:text-5xl"
             style={{
               fontFamily: titleOverride?.fontFamily ?? theme.coupleFont,
               color: titleOverride?.color ?? "#FFFFFF",
-              ...(titleOverride?.fontSize ? { fontSize: titleOverride.fontSize } : {}),
-              ...(titleOverride?.fontWeight ? { fontWeight: titleOverride.fontWeight } : {}),
-              ...(titleOverride?.letterSpacing ? { letterSpacing: titleOverride.letterSpacing } : {}),
+              ...(titleOverride?.fontSize
+                ? { fontSize: titleOverride.fontSize }
+                : {}),
+              ...(titleOverride?.fontWeight
+                ? { fontWeight: titleOverride.fontWeight }
+                : {}),
+              ...(titleOverride?.letterSpacing
+                ? { letterSpacing: titleOverride.letterSpacing }
+                : {}),
             }}
           >
             <EditableText elementKey="stdBottomHeroTitle">
@@ -97,9 +112,15 @@ export default function SaveTheDateBottomHero({
             style={{
               fontFamily: descOverride?.fontFamily ?? theme.coupleFont,
               color: descOverride?.color ?? "rgba(255,255,255,0.85)",
-              ...(descOverride?.fontSize ? { fontSize: descOverride.fontSize } : {}),
-              ...(descOverride?.fontWeight ? { fontWeight: descOverride.fontWeight } : {}),
-              ...(descOverride?.letterSpacing ? { letterSpacing: descOverride.letterSpacing } : {}),
+              ...(descOverride?.fontSize
+                ? { fontSize: descOverride.fontSize }
+                : {}),
+              ...(descOverride?.fontWeight
+                ? { fontWeight: descOverride.fontWeight }
+                : {}),
+              ...(descOverride?.letterSpacing
+                ? { letterSpacing: descOverride.letterSpacing }
+                : {}),
             }}
           >
             <EditableText elementKey="stdBottomHeroDescription">
