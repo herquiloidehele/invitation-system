@@ -22,6 +22,7 @@ import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import { EditableText } from "@/components/shared/EditableText";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { getSaveTheDateSparkles } from "@/lib/save-the-date-motion";
+import { getSaveTheDateRsvpButtonBackground } from "@/lib/save-the-date-rsvp-button";
 
 interface SaveTheDateViewProps {
   saveTheDate: SaveTheDateData;
@@ -366,6 +367,7 @@ export default function SaveTheDateView({
   }, [theme.confettiColors, saveTheDate.slug]);
 
   const showBottomHero = bottomHero?.enabled && !!bottomHero.mediaUrl;
+  const rsvpButtonBackground = getSaveTheDateRsvpButtonBackground(theme);
 
   return (
     <div className="relative" style={{ backgroundColor: theme.bgColor }}>
@@ -722,7 +724,7 @@ export default function SaveTheDateView({
                       ? undefined
                       : {
                           y: -2,
-                          boxShadow: `0 14px 34px ${theme.heartColor}45`,
+                          boxShadow: `0 14px 34px ${rsvpButtonBackground}45`,
                         }
                   }
                   whileTap={
@@ -740,7 +742,7 @@ export default function SaveTheDateView({
                   style={{
                     background: rsvpSubmitted
                       ? "#22c55e"
-                      : `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+                      : rsvpButtonBackground,
                     color: "#FFFFFF",
                     fontFamily: theme.coupleFont,
                   }}
@@ -792,7 +794,7 @@ export default function SaveTheDateView({
               textSecondary: "#6B6B6B",
               textMuted: "#A0A0A0",
               accent: theme.heartColor,
-              ctaPrimaryBg: `linear-gradient(135deg, ${theme.heartColor}, ${theme.heartGlitterColors[0] || theme.heartColor})`,
+              ctaPrimaryBg: rsvpButtonBackground,
               ctaPrimaryText: "#FFFFFF",
               ctaRadius: "9999px",
               cardBorder: "#E5E5E3",

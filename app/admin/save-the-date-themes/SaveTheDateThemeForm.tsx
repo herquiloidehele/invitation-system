@@ -36,6 +36,7 @@ export interface STDThemeFormData {
   description: string;
   heartColor: string;
   heartGlitterColors: string[];
+  rsvpButtonBgColor: string;
   heartTextureUrl: string;
   bgColor: string;
   titleFont: string;
@@ -209,6 +210,16 @@ function STDContentPreview({ data }: { data: STDThemeFormData }) {
         style={{ fontFamily: data.dateFont, color: data.textColor }}
       >
         12.09.2027
+      </span>
+
+      <span
+        className="rounded-full px-5 py-2 text-xs font-semibold tracking-wider text-white uppercase"
+        style={{
+          background: data.rsvpButtonBgColor,
+          fontFamily: data.coupleFont,
+        }}
+      >
+        Confirmar Presença
       </span>
 
       {/* Confetti swatches */}
@@ -445,6 +456,12 @@ export default function SaveTheDateThemeForm({ mode, initialData }: Props) {
                   label="Cor do Texto"
                   value={data.textColor}
                   onChange={(v) => update("textColor", v)}
+                />
+                <ColorField
+                  id="rsvpButtonBgColor"
+                  label="Fundo do Botão RSVP"
+                  value={data.rsvpButtonBgColor}
+                  onChange={(v) => update("rsvpButtonBgColor", v)}
                 />
               </AccordionContent>
             </AccordionItem>

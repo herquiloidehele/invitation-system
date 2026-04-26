@@ -1,0 +1,2 @@
+ALTER TABLE "SaveTheDateTheme"
+ADD COLUMN "rsvpButtonBgColor" TEXT NOT NULL DEFAULT '#D4AF37';

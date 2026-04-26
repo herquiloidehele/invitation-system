@@ -10,6 +10,7 @@ export default function NewSaveTheDateThemePage() {
     description: "",
     heartColor: "#D4AF37",
     heartGlitterColors: ["#D4AF37", "#C5A028", "#E8C547", "#F5E6A3", "#FFFFFF"],
+    rsvpButtonBgColor: "#8B7536",
     heartTextureUrl: "",
     bgColor: "#FFFFFF",
     titleFont: "'Great Vibes', cursive",

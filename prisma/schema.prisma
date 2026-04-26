@@ -133,6 +133,7 @@ model SaveTheDateTheme {
   // Heart appearance
   heartColor         String // primary heart fill, e.g. "#D4AF37"
   heartGlitterColors Json   // string[] — hex colors for the shimmer gradient
+  rsvpButtonBgColor  String @default("#D4AF37") // RSVP button background color
   heartTextureUrl    String? // optional URL to a real glitter texture image
 
   // Background

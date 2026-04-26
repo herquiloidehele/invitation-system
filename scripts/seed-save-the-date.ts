@@ -14,6 +14,7 @@ async function main() {
       label: "Golden Heart",
       description: "Classic gold glitter heart scratch-off",
       heartColor: "#D4AF37",
+      rsvpButtonBgColor: "#8B7536",
       heartGlitterColors: [
         "#D4AF37",
         "#C5A028",

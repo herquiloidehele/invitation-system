@@ -25,6 +25,7 @@ export default async function EditSaveTheDateThemePage({
     description: theme.description,
     heartColor: theme.heartColor,
     heartGlitterColors: theme.heartGlitterColors as string[],
+    rsvpButtonBgColor: theme.rsvpButtonBgColor,
     heartTextureUrl: theme.heartTextureUrl || "",
     bgColor: theme.bgColor,
     titleFont: theme.titleFont,

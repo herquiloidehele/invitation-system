@@ -34,6 +34,7 @@ export interface SaveTheDateThemeData {
   description: string;
   heartColor: string;
   heartGlitterColors: string[];
+  rsvpButtonBgColor: string;
   heartTextureUrl?: string; // optional real glitter texture image URL
   bgColor: string;
   titleFont: string;
@@ -88,6 +89,7 @@ function toSaveTheDateTheme(row: {
   description: string;
   heartColor: string;
   heartGlitterColors: unknown;
+  rsvpButtonBgColor: string;
   heartTextureUrl: string | null;
   bgColor: string;
   titleFont: string;
@@ -104,6 +106,7 @@ function toSaveTheDateTheme(row: {
     description: row.description,
     heartColor: row.heartColor,
     heartGlitterColors: row.heartGlitterColors as string[],
+    rsvpButtonBgColor: row.rsvpButtonBgColor,
     heartTextureUrl: row.heartTextureUrl ?? undefined,
     bgColor: row.bgColor,
     titleFont: row.titleFont,
