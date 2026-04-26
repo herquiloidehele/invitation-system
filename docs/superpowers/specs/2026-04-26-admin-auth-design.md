@@ -28,7 +28,7 @@ The password is stored as a bcrypt hash rather than plaintext so the actual pass
 
 1. User visits any `/admin/*` route.
 2. `middleware.ts` checks for an `auth-token` cookie containing a valid JWT.
-3. If missing or invalid, redirect to `/admin/login`.
+3. If missing or invalid, redirect to `/login`.
 4. User enters username and password on the login page.
 5. `POST /api/auth/login` validates username against `ADMIN_USERNAME` and verifies the password against `ADMIN_PASSWORD_HASH` using bcrypt.
 6. On success, sets an HTTP-only, Secure, SameSite=Lax cookie containing a signed JWT (7-day expiry).
@@ -38,13 +38,13 @@ The password is stored as a bcrypt hash rather than plaintext so the actual pass
 
 1. The "Sair" button in the admin sidebar calls `POST /api/auth/logout`.
 2. That route clears the `auth-token` cookie.
-3. Redirects to `/admin/login`.
+3. Redirects to `/login`.
 
 ### Middleware
 
 `middleware.ts` at the project root intercepts all requests matching:
 
-- `/admin/:path*` (excluding `/admin/login`)
+- `/admin/:path*`
 - `/api/admin/:path*`
 - `/api/upload/presign`
 
@@ -52,7 +52,7 @@ Behavior:
 
 - Uses `jose` to verify the JWT signature and expiration from the `auth-token` cookie.
 - **Valid JWT:** request proceeds normally.
-- **Invalid/missing JWT on page routes:** redirect to `/admin/login`.
+- **Invalid/missing JWT on page routes:** redirect to `/login`.
 - **Invalid/missing JWT on API routes:** return `401 { error: "Unauthorized" }`.
 
 bcrypt does not run in Edge Runtime, so password verification happens only in the `/api/auth/login` route handler (Node.js runtime). The middleware only verifies JWT signatures.
@@ -87,7 +87,7 @@ No Brindel Studio branding beyond the page title. Clean and minimal.
 | File | Purpose |
 |------|---------|
 | `middleware.ts` | Root middleware -- JWT verification, route protection |
-| `app/admin/login/page.tsx` | Login page -- centered form with shadcn/ui components |
+| `app/login/page.tsx` | Login page -- centered form with shadcn/ui components (outside `/admin` to avoid sidebar layout) |
 | `app/api/auth/login/route.ts` | POST -- validate credentials, set JWT cookie |
 | `app/api/auth/logout/route.ts` | POST -- clear cookie, redirect |
 | `lib/auth.ts` | Shared auth constants and JWT helper functions |
