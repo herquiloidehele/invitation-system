@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { signJwt, AUTH_COOKIE_NAME } from "@/lib/auth";
+import { AUTH_COOKIE_NAME, signJwt } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,27 +9,34 @@ export async function POST(request: NextRequest) {
     if (!username || !password) {
       return NextResponse.json(
         { error: "Nome de utilizador e palavra-passe são obrigatórios" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const adminUsername = process.env.ADMIN_USERNAME;
     const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
 
+    console.log("Log credentials", {
+      username,
+      password,
+      adminUsername,
+      adminPasswordHash,
+    });
+
     if (!adminUsername || !adminPasswordHash) {
       console.error(
-        "Admin credentials not configured in environment variables"
+        "Admin credentials not configured in environment variables",
       );
       return NextResponse.json(
         { error: "Erro de configuração do servidor" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     if (username !== adminUsername) {
       return NextResponse.json(
         { error: "Credenciais inválidas" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -38,7 +45,7 @@ export async function POST(request: NextRequest) {
     if (!passwordValid) {
       return NextResponse.json(
         { error: "Credenciais inválidas" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -55,10 +62,11 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch {
+  } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Erro interno do servidor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
