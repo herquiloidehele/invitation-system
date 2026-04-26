@@ -13,11 +13,9 @@ import Image from "next/image";
 interface EnvelopeCoverProps {
   theme: TemplateTheme;
   onOpen: () => void;
-  /** Called when the full opening animation has finished playing. */
   onAnimationComplete?: () => void;
   /** Enable the diagonal shimmer highlight animation. Defaults to true. */
   shimmer?: boolean;
-  /** Monogram text displayed on the envelope (passed through but unused in this component). */
   monogram?: string;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
@@ -25,42 +23,38 @@ interface EnvelopeCoverProps {
 
 /* ------------------------------------------------------------------ */
 /*  Timing constants (seconds)                                         */
-/*                                                                     */
 /*  Slow cinematic feel ~5 s. Simplified without side-flaps / letter.  */
 /* ------------------------------------------------------------------ */
 
 const T = {
   /** Top flap swings open (3D rotation) */
-  flapOpen: { dur: 10, del: 1 },
-  /** Bottom flap drops */
-  bottomDrop: { dur: 10, del: 2 },
-  /** Entire scene fades to transparent */
-  sceneFade: { dur: 2, del: 3 },
+  flapOpen: { dur: 5, del: 0 },
+  bottomFlap: { dur: 15, del: 0 },
+  sceneFade: { dur: 2, del: 2 },
 } as const;
 
 /** Milliseconds from tap until onAnimationComplete fires */
-const TOTAL_MS = (T.flapOpen.dur - 5) * 1000;
+const TOTAL_MS = T.flapOpen.dur * 1000;
 
 /** Smooth ease-out bezier for a natural, gentle deceleration */
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const TOP_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const BOTTOM_EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
+/** Stop the flap around a natural mid-open position instead of fully flipping. */
+const TOP_FLAP_OPEN_ANGLE = 40;
+const TOP_FLAP_PERSPECTIVE = 1300;
 
-/**
- * Derive a shadow colour from the envelope base colour so it blends
- * naturally with any envelope hue instead of using a fixed gray.
- */
-function shadowColorFromBase(hex: string, opacity = 0.65): string {
-  const raw = hex.replace("#", "");
-  const r = parseInt(raw.slice(0, 2), 16);
-  const g = parseInt(raw.slice(2, 4), 16);
-  const b = parseInt(raw.slice(4, 6), 16);
+function topFlapTransform(
+  rotateX: number,
+  yPercent = 0,
+  zPx = 0,
+  ty = "0px",
+): string {
+  return `perspective(${TOP_FLAP_PERSPECTIVE}px) translate3d(0, ${yPercent}%, ${zPx}px) rotateX(${rotateX}deg) translateY(${ty})`;
+}
 
-  // Darken each channel to ~25 % of the original
-  const factor = 0.25;
-  return `rgba(${Math.round(r * factor)},${Math.round(g * factor)},${Math.round(b * factor)},${opacity})`;
+function topFlapShadowTransform(yPercent = 0, scaleX = 1, scaleY = 1): string {
+  return `translate3d(0, ${yPercent}%, 0) scale(${scaleX}, ${scaleY})`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -85,57 +79,114 @@ function EnvelopeBody({ color }: { color: string }) {
 function TopFlap({
   opening,
   image,
-  baseColor,
   imgStyle,
 }: {
   opening: boolean;
   image: string;
-  baseColor: string;
   imgStyle?: React.CSSProperties;
 }) {
-  const shadow = shadowColorFromBase(baseColor);
-
   return (
-    <motion.div
-      className="absolute top-0 left-0 w-full origin-bottom"
-      style={{ zIndex: 10, height: "calc(50% + 10vh)" }}
-      initial={{
-        filter: "drop-shadow(0 0px 0px rgba(0,0,0,0))",
-        scale: 1,
-        y: 0,
-      }}
-      animate={
-        opening
-          ? {
-              filter: `drop-shadow(0 50px 90px ${shadow})`,
-              scale: 1.15,
-              y: "-25%",
-            }
-          : {
-              filter: "drop-shadow(0 0px 0px rgba(0,0,0,0))",
-              scale: 1,
-              y: 0,
-            }
-      }
-      transition={{
-        duration: T.flapOpen.dur,
-        delay: T.flapOpen.del,
-        ease: EASE,
-      }}
-    >
-      <Image
-        src={image}
-        width={500}
-        height={500}
-        alt={"Top Envelop Flap"}
-        className={"w-full h-full object-cover object-bottom"}
-        style={imgStyle}
-      />
-    </motion.div>
+    <>
+      <motion.div
+        aria-hidden="true"
+        className="absolute top-0 left-0 w-full pointer-events-none"
+        style={{
+          zIndex: 19,
+          transformOrigin: "top center",
+          willChange: "transform, opacity",
+          opacity: 0,
+          height: "calc(50% + 10vh)",
+        }}
+        initial={{
+          opacity: 0,
+          transform: topFlapShadowTransform(0, 1, 1),
+        }}
+        animate={
+          opening
+            ? {
+                opacity: 1,
+                transform: topFlapShadowTransform(18, 1, 1),
+              }
+            : {
+                opacity: 0,
+                transform: topFlapShadowTransform(0, 1, 1),
+              }
+        }
+        transition={{
+          duration: T.flapOpen.dur,
+          delay: T.flapOpen.del,
+          ease: TOP_EASE,
+        }}
+      >
+        <Image
+          src={image}
+          width={500}
+          height={500}
+          alt=""
+          className="w-full h-full object-cover object-bottom"
+          style={{
+            filter: "brightness(0) blur(28px)",
+            opacity: 0.75,
+            transform: "translateZ(0)",
+            height: "calc(100%)",
+            width: "100vw",
+            ...imgStyle,
+          }}
+        />
+      </motion.div>
+
+      <motion.div
+        className="absolute top-0 left-0 w-full"
+        style={{
+          zIndex: 20,
+          transformOrigin: "top center",
+          transformStyle: "preserve-3d",
+          backfaceVisibility: "hidden",
+          willChange: "transform",
+          height: "calc(50% + 12vh)",
+        }}
+        initial={{
+          transform: topFlapTransform(0),
+        }}
+        animate={
+          opening
+            ? {
+                transform: topFlapTransform(
+                  TOP_FLAP_OPEN_ANGLE,
+                  -2,
+                  24,
+                  "-20px",
+                ),
+              }
+            : {
+                transform: topFlapTransform(0),
+              }
+        }
+        transition={{
+          duration: T.flapOpen.dur,
+          delay: T.flapOpen.del,
+          ease: TOP_EASE,
+        }}
+      >
+        <Image
+          src={image}
+          width={500}
+          height={500}
+          alt={"Top Envelop Flap"}
+          className={"w-full h-full object-cover object-bottom"}
+          style={{
+            backfaceVisibility: "hidden",
+            transform: "translateZ(0)",
+            ...imgStyle,
+          }}
+        />
+      </motion.div>
+    </>
   );
 }
 
 function BottomFlap({
+  opening,
   image,
   imgStyle,
 }: {
@@ -144,9 +195,20 @@ function BottomFlap({
   imgStyle?: React.CSSProperties;
 }) {
   return (
-    <div
-      className="absolute bottom-0 left-0 w-full origin-top"
+    <motion.div
+      className="absolute bottom-0 left-0 w-full origin-top flex items-end"
       style={{ height: "calc(50% + 10vh)" }}
+      initial={{
+        bottom: 0,
+      }}
+      animate={{
+        bottom: opening ? "-8%" : 0,
+      }}
+      transition={{
+        duration: T.bottomFlap.dur,
+        delay: T.bottomFlap.del,
+        ease: BOTTOM_EASE,
+      }}
     >
       <Image
         src={image}
@@ -154,16 +216,15 @@ function BottomFlap({
         height={500}
         alt={"Top Envelop Flap"}
         className={"w-full h-full object-cover object-top"}
-        style={imgStyle}
+        style={{ height: "calc(100% + 10vh)", ...imgStyle }}
       />
-    </div>
+    </motion.div>
   );
 }
 
 /* ------------------------------------------------------------------ */
 /*  Main component                                                     */
 /* ------------------------------------------------------------------ */
-
 export default function EnvelopeCover({
   theme,
   onOpen,
@@ -188,7 +249,10 @@ export default function EnvelopeCover({
   return (
     <motion.div
       className="absolute inset-0 z-[100] cursor-pointer overflow-hidden"
-      style={{ backgroundColor: theme.envelope.base, perspective: "1200px" }}
+      style={{
+        backgroundColor: theme.envelope.base,
+        transformStyle: "preserve-3d",
+      }}
       onClick={handleTap}
       /* Exit animation: fast fade-out so there's no gap before the invitation */
       exit={{ opacity: 0 }}
@@ -218,9 +282,9 @@ export default function EnvelopeCover({
       <TopFlap
         opening={opening}
         image={theme.envelope.topFlap}
-        baseColor={theme.envelope.base}
         imgStyle={topFlapStyle}
       />
+
       <BottomFlap
         opening={opening}
         image={theme.envelope.bottomFlap}

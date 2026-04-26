@@ -43,5 +43,6 @@ next-env.d.ts
 .idea
 .idea/*
 .opencode
+.superpowers/
 
 /lib/generated/prisma
