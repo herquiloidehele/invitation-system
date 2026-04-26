@@ -1124,47 +1124,6 @@ export default function InvitationForm({
                   Envelope
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-4">
-                  {/* Base color */}
-                  <div className="space-y-1.5">
-                    <Label>Cor de fundo</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Deixe em branco para usar a cor padrão do modelo (
-                      {currentTheme?.envelope.base ?? ""})
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={
-                          form.envelope?.base ||
-                          currentTheme?.envelope.base ||
-                          "#ffffff"
-                        }
-                        onChange={(e) => updateEnvelope("base", e.target.value)}
-                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
-                        title="Escolher cor"
-                      />
-                      <input
-                        type="text"
-                        value={form.envelope?.base ?? ""}
-                        onChange={(e) => updateEnvelope("base", e.target.value)}
-                        placeholder={`Padrão: ${currentTheme?.envelope.base ?? ""}`}
-                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
-                      />
-                      {form.envelope?.base && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="shrink-0 text-muted-foreground"
-                          onClick={() => updateEnvelope("base", "")}
-                        >
-                          Repor
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  <Separator />
-
                   {/* Cover background */}
                   <div className="space-y-1.5">
                     <Label>Fundo da capa</Label>
