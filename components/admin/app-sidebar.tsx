@@ -19,7 +19,6 @@ import {
   MoreHorizontal,
   Plus,
   LogOut,
-  Settings,
   Sparkles,
 } from "lucide-react";
 
@@ -228,12 +227,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 align="end"
                 sideOffset={4}
               >
-                <DropdownMenuItem>
-                  <Settings className="mr-2 size-4" />
-                  Configurações
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={async () => {
+                    await fetch("/api/auth/logout", { method: "POST" });
+                    window.location.href = "/login";
+                  }}
+                >
                   <LogOut className="mr-2 size-4" />
                   Sair
                 </DropdownMenuItem>
