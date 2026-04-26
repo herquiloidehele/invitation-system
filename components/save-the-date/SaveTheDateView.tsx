@@ -318,9 +318,9 @@ export default function SaveTheDateView({
   const showBottomHero = bottomHero?.enabled && !!bottomHero.mediaUrl;
 
   return (
-    <div className="relative">
+    <div className="relative" style={{ backgroundColor: theme.bgColor }}>
       <div
-        className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6"
+        className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 max-w-125 mx-auto"
         style={{ backgroundColor: theme.bgColor }}
       >
         {/* Hidden pre-buffered audio element */}
