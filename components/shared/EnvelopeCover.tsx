@@ -65,12 +65,7 @@ function topFlapShadowTransform(yPercent = 0, scaleX = 1, scaleY = 1): string {
 /* ------------------------------------------------------------------ */
 
 function EnvelopeBody({ style }: { style: React.CSSProperties }) {
-  return (
-    <div
-      className="absolute inset-0"
-      style={style}
-    />
-  );
+  return <div className="absolute inset-0" style={style} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -144,7 +139,7 @@ function TopFlap({
           transformStyle: "preserve-3d",
           backfaceVisibility: "hidden",
           willChange: "transform",
-          height: "calc(50% + 12vh)",
+          height: "calc(50% + 13vh)",
         }}
         initial={{
           transform: topFlapTransform(0),
@@ -156,7 +151,7 @@ function TopFlap({
                   TOP_FLAP_OPEN_ANGLE,
                   -2,
                   24,
-                  "-20px",
+                  "-30px",
                 ),
               }
             : {
@@ -203,7 +198,7 @@ function BottomFlap({
         bottom: 0,
       }}
       animate={{
-        bottom: opening ? "-8%" : 0,
+        bottom: opening ? "-8.5%" : 0,
       }}
       transition={{
         duration: T.bottomFlap.dur,
