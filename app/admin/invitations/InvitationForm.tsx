@@ -64,6 +64,7 @@ import InvitationPage from "@/components/shared/InvitationPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
+import { FlapTintPicker } from "@/components/admin/FlapTintPicker";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
@@ -1201,6 +1202,20 @@ export default function InvitationForm({
                         }
                       />
                     )}
+                    <FlapTintPicker
+                      label="Cor da aba superior (opcional)"
+                      value={form.envelope?.topFlapTintColor}
+                      onChange={(hex) =>
+                        updateEnvelope("topFlapTintColor", hex)
+                      }
+                      onClear={() =>
+                        updateEnvelope("topFlapTintColor", "")
+                      }
+                      previewSrc={
+                        form.envelope?.topFlap ||
+                        currentTheme?.envelope.topFlap
+                      }
+                    />
                   </div>
 
                   <Separator />
@@ -1228,6 +1243,20 @@ export default function InvitationForm({
                         }
                       />
                     )}
+                    <FlapTintPicker
+                      label="Cor da aba inferior (opcional)"
+                      value={form.envelope?.bottomFlapTintColor}
+                      onChange={(hex) =>
+                        updateEnvelope("bottomFlapTintColor", hex)
+                      }
+                      onClear={() =>
+                        updateEnvelope("bottomFlapTintColor", "")
+                      }
+                      previewSrc={
+                        form.envelope?.bottomFlap ||
+                        currentTheme?.envelope.bottomFlap
+                      }
+                    />
                   </div>
 
                   <Separator />
@@ -2455,6 +2484,8 @@ export default function InvitationForm({
                   monogram={form.couple.monogram}
                   shimmer={form.envelope?.shimmer !== false}
                   imageSettings={form.imageSettings}
+                  topFlapTintColor={form.envelope?.topFlapTintColor}
+                  bottomFlapTintColor={form.envelope?.bottomFlapTintColor}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">

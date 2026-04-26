@@ -273,6 +273,8 @@ export default function InvitationView({
               monogram={invitation.couple.monogram}
               shimmer={invitation.envelope?.shimmer !== false}
               imageSettings={invitation.imageSettings}
+              topFlapTintColor={invitation.envelope?.topFlapTintColor}
+              bottomFlapTintColor={invitation.envelope?.bottomFlapTintColor}
             />
           )}
         </AnimatePresence>

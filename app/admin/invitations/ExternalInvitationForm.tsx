@@ -33,6 +33,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
+import { FlapTintPicker } from "@/components/admin/FlapTintPicker";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
@@ -647,6 +648,20 @@ export default function ExternalInvitationForm({
                       kind="image"
                       maxSizeMB={5}
                     />
+                    <FlapTintPicker
+                      label="Cor da aba superior (opcional)"
+                      value={form.envelope?.topFlapTintColor}
+                      onChange={(hex) =>
+                        updateEnvelope("topFlapTintColor", hex)
+                      }
+                      onClear={() =>
+                        updateEnvelope("topFlapTintColor", "")
+                      }
+                      previewSrc={
+                        form.envelope?.topFlap ||
+                        currentTheme?.envelope.topFlap
+                      }
+                    />
                   </div>
 
                   <Separator />
@@ -664,6 +679,20 @@ export default function ExternalInvitationForm({
                       onClear={() => updateEnvelope("bottomFlap", "")}
                       kind="image"
                       maxSizeMB={5}
+                    />
+                    <FlapTintPicker
+                      label="Cor da aba inferior (opcional)"
+                      value={form.envelope?.bottomFlapTintColor}
+                      onChange={(hex) =>
+                        updateEnvelope("bottomFlapTintColor", hex)
+                      }
+                      onClear={() =>
+                        updateEnvelope("bottomFlapTintColor", "")
+                      }
+                      previewSrc={
+                        form.envelope?.bottomFlap ||
+                        currentTheme?.envelope.bottomFlap
+                      }
                     />
                   </div>
 
@@ -745,6 +774,8 @@ export default function ExternalInvitationForm({
               monogram={form.couple.monogram || "A&B"}
               shimmer={form.envelope?.shimmer !== false}
               imageSettings={form.imageSettings}
+              topFlapTintColor={form.envelope?.topFlapTintColor}
+              bottomFlapTintColor={form.envelope?.bottomFlapTintColor}
             />
           )}
         </div>

@@ -42,6 +42,7 @@ import type { EnvelopeConfig, TemplateTheme, TextStyle, TextStyleOverrides } fro
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
+import { FlapTintPicker } from "@/components/admin/FlapTintPicker";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
@@ -733,6 +734,20 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       kind="image"
                       maxSizeMB={5}
                     />
+                    <FlapTintPicker
+                      label="Cor da aba superior (opcional)"
+                      value={data.envelope?.topFlapTintColor}
+                      onChange={(hex) =>
+                        updateEnvelope("topFlapTintColor", hex)
+                      }
+                      onClear={() =>
+                        updateEnvelope("topFlapTintColor", "")
+                      }
+                      previewSrc={
+                        data.envelope?.topFlap ||
+                        selectedTheme?.envelope?.topFlap
+                      }
+                    />
                   </div>
 
                   <Separator />
@@ -750,6 +765,20 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       onClear={() => updateEnvelope("bottomFlap", "")}
                       kind="image"
                       maxSizeMB={5}
+                    />
+                    <FlapTintPicker
+                      label="Cor da aba inferior (opcional)"
+                      value={data.envelope?.bottomFlapTintColor}
+                      onChange={(hex) =>
+                        updateEnvelope("bottomFlapTintColor", hex)
+                      }
+                      onClear={() =>
+                        updateEnvelope("bottomFlapTintColor", "")
+                      }
+                      previewSrc={
+                        data.envelope?.bottomFlap ||
+                        selectedTheme?.envelope?.bottomFlap
+                      }
                     />
                   </div>
 
@@ -998,6 +1027,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     coverBackground={coverBackground}
                     onOpen={() => {}}
                     shimmer={data.envelope?.shimmer !== false}
+                    topFlapTintColor={data.envelope?.topFlapTintColor}
+                    bottomFlapTintColor={data.envelope?.bottomFlapTintColor}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">

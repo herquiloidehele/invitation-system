@@ -438,6 +438,8 @@ export default function SaveTheDateView({
               onOpen={handleEnvelopeOpen}
               onAnimationComplete={handleEnvelopeDone}
               shimmer={shimmer}
+              topFlapTintColor={saveTheDate.envelope?.topFlapTintColor}
+              bottomFlapTintColor={saveTheDate.envelope?.bottomFlapTintColor}
             />
           )}
         </AnimatePresence>
