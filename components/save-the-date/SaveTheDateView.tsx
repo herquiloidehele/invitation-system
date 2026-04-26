@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, type Variants } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type Variants,
+} from "framer-motion";
 import confetti from "canvas-confetti";
 import { CheckCircle } from "lucide-react";
 import type { SaveTheDateData } from "@/lib/save-the-date";
@@ -16,6 +21,7 @@ import RSVPModal from "@/components/shared/RSVPModal";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import { EditableText } from "@/components/shared/EditableText";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { getSaveTheDateSparkles } from "@/lib/save-the-date-motion";
 
 interface SaveTheDateViewProps {
   saveTheDate: SaveTheDateData;
@@ -41,23 +47,40 @@ const entranceContainer: Variants = {
 
 // Individual entrance items
 const fadeDown: Variants = {
-  hidden: { opacity: 0, y: -24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 1, ease: EASE } },
+  hidden: { opacity: 0, y: -28, scale: 0.96, filter: "blur(8px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 1, ease: EASE },
+  },
 };
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 1, ease: EASE } },
+  hidden: { opacity: 0, y: 24, scale: 0.97, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 1, ease: EASE },
+  },
 };
 
 const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.88 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.9, ease: EASE } },
+  hidden: { opacity: 0, scale: 0.86, rotate: -3 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: { duration: 0.9, ease: EASE },
+  },
 };
 
 const hintFade: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 0.5, transition: { duration: 0.8, ease: EASE } },
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 0.62, y: 0, transition: { duration: 0.8, ease: EASE } },
 };
 
 // D. Hint exit animation
@@ -67,8 +90,13 @@ const hintExit: Variants = {
 
 // C. Post-reveal items — triggered when revealed becomes true
 const revealFadeUp: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
+  hidden: { opacity: 0, y: 18, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.8, ease: EASE },
+  },
 };
 
 const revealContainer: Variants = {
@@ -81,10 +109,30 @@ const revealContainer: Variants = {
 // B. Heart breathing pulse
 const heartPulse: Variants = {
   pulse: {
-    scale: [1, 1.03, 1],
-    transition: { duration: 2.5, ease: "easeInOut", repeat: Infinity },
+    scale: [1, 1.035, 1],
+    rotate: [0, -0.8, 0.8, 0],
+    transition: { duration: 2.7, ease: "easeInOut", repeat: Infinity },
   },
-  still: { scale: 1 },
+  still: { scale: 1, rotate: 0 },
+};
+
+const sparkleFloat: Variants = {
+  hidden: { opacity: 0, scale: 0 },
+  visible: {
+    opacity: [0, 0.85, 0.25, 0.85],
+    scale: [0.4, 1, 0.75, 1],
+    y: [0, -12, 0],
+  },
+};
+
+const revealSparkle: Variants = {
+  hidden: { opacity: 0, scale: 0.4, y: 6 },
+  visible: {
+    opacity: [0, 1, 0],
+    scale: [0.4, 1.35, 0.8],
+    y: [6, -18, -26],
+    transition: { duration: 1.3, ease: EASE },
+  },
 };
 
 export default function SaveTheDateView({
@@ -116,6 +164,8 @@ export default function SaveTheDateView({
       return false;
     }
   });
+  const shouldReduceMotion = useReducedMotion();
+  const sparkles = useMemo(() => getSaveTheDateSparkles(), []);
 
   // Audio refs (same pattern as InvitationView)
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -340,6 +390,44 @@ export default function SaveTheDateView({
           />
         )}
 
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          initial="hidden"
+          animate={
+            !shouldReduceMotion &&
+            (hideEnvelope || envelopeDone || !hasEnvelope)
+              ? "visible"
+              : "hidden"
+          }
+        >
+          {sparkles.map((sparkle, index) => (
+            <motion.span
+              key={`${sparkle.top}-${sparkle.left}`}
+              variants={sparkleFloat}
+              className="absolute rounded-full"
+              style={{
+                top: sparkle.top,
+                left: sparkle.left,
+                width: sparkle.size,
+                height: sparkle.size,
+                backgroundColor:
+                  theme.heartGlitterColors[
+                    index % theme.heartGlitterColors.length
+                  ] ?? theme.heartColor,
+                boxShadow: `0 0 ${sparkle.size * 4}px ${theme.heartGlitterColors[index % theme.heartGlitterColors.length] ?? theme.heartColor}`,
+              }}
+              transition={{
+                delay: sparkle.delay,
+                duration: sparkle.duration,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "mirror",
+              }}
+            />
+          ))}
+        </motion.div>
+
         {/* Envelope overlay */}
         <AnimatePresence>
           {!hideEnvelope && hasEnvelope && envelopeTheme && !envelopeDone && (
@@ -366,6 +454,14 @@ export default function SaveTheDateView({
           {/* Title — fades down from above */}
           <motion.h1
             variants={fadeDown}
+            whileHover={
+              shouldReduceMotion
+                ? undefined
+                : {
+                    scale: 1.03,
+                    textShadow: `0 0 18px ${theme.heartColor}66`,
+                  }
+            }
             className="mb-8 text-4xl"
             style={{
               fontFamily: resolvedTitleFont,
@@ -391,7 +487,30 @@ export default function SaveTheDateView({
                 key="hint"
                 variants={{ ...hintFade, ...hintExit }}
                 initial="hidden"
-                animate="visible"
+                animate={
+                  shouldReduceMotion
+                    ? "visible"
+                    : {
+                        opacity: [0.45, 0.75, 0.45],
+                        y: [0, -4, 0],
+                      }
+                }
+                transition={
+                  shouldReduceMotion
+                    ? undefined
+                    : {
+                        opacity: {
+                          duration: 2.4,
+                          ease: "easeInOut",
+                          repeat: Infinity,
+                        },
+                        y: {
+                          duration: 2.4,
+                          ease: "easeInOut",
+                          repeat: Infinity,
+                        },
+                      }
+                }
                 exit="exit"
                 className="text-xs tracking-widest uppercase"
                 style={{
@@ -416,10 +535,29 @@ export default function SaveTheDateView({
           </AnimatePresence>
 
           {/* B. Heart — scales in, then pulses while waiting for scratch */}
-          <motion.div variants={scaleIn} className={"mt-5 mb-8"}>
+          <motion.div variants={scaleIn} className="relative mt-5 mb-8">
+            <motion.div
+              aria-hidden
+              className="absolute inset-8 rounded-full blur-3xl"
+              style={{
+                background: `radial-gradient(circle, ${theme.heartColor}45 0%, ${theme.heartColor}16 42%, transparent 72%)`,
+              }}
+              animate={
+                shouldReduceMotion || revealed
+                  ? { opacity: 0.35, scale: 1 }
+                  : { opacity: [0.28, 0.62, 0.28], scale: [0.92, 1.08, 0.92] }
+              }
+              transition={{
+                duration: 2.8,
+                ease: "easeInOut",
+                repeat: Infinity,
+              }}
+            />
             <motion.div
               variants={heartPulse}
-              animate={revealed ? "still" : "pulse"}
+              animate={shouldReduceMotion || revealed ? "still" : "pulse"}
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.045 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
             >
               <ScratchHeart
                 width={HEART_SIZE}
@@ -442,6 +580,41 @@ export default function SaveTheDateView({
                 />
               </ScratchHeart>
             </motion.div>
+            <AnimatePresence>
+              {revealed && !shouldReduceMotion && (
+                <motion.div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 z-20"
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                >
+                  {[0, 1, 2, 3, 4, 5].map((item) => (
+                    <motion.span
+                      key={item}
+                      variants={revealSparkle}
+                      className="absolute rounded-full"
+                      style={{
+                        top: `${24 + (item % 3) * 20}%`,
+                        left: `${24 + item * 9}%`,
+                        width: 6,
+                        height: 6,
+                        backgroundColor:
+                          theme.heartGlitterColors[
+                            item % theme.heartGlitterColors.length
+                          ] ?? theme.heartColor,
+                        boxShadow: `0 0 18px ${theme.heartColor}`,
+                      }}
+                      transition={{
+                        delay: item * 0.08,
+                        duration: 1.1,
+                        ease: EASE,
+                      }}
+                    />
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
           {/* E. Couple names — split into bride / & / groom, staggered */}
@@ -463,14 +636,23 @@ export default function SaveTheDateView({
             <EditableText elementKey="stdCoupleNames">
               <motion.span
                 initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  y: revealed && !shouldReduceMotion ? [0, -3, 0] : 0,
+                }}
                 transition={{ duration: 0.9, delay: 0.8, ease: EASE }}
               >
                 {couple.bride}
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 0.6, scale: 1 }}
+                animate={{
+                  opacity:
+                    revealed && !shouldReduceMotion ? [0.6, 1, 0.6] : 0.6,
+                  scale: revealed && !shouldReduceMotion ? [1, 1.2, 1] : 1,
+                  rotate: revealed && !shouldReduceMotion ? [0, -8, 8, 0] : 0,
+                }}
                 transition={{ duration: 0.7, delay: 1.0, ease: EASE }}
                 className="text-[0.7em]"
               >
@@ -478,7 +660,11 @@ export default function SaveTheDateView({
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  y: revealed && !shouldReduceMotion ? [0, -3, 0] : 0,
+                }}
                 transition={{ duration: 0.9, delay: 1.2, ease: EASE }}
               >
                 {couple.groom}
@@ -528,9 +714,28 @@ export default function SaveTheDateView({
               className="mt-8 w-full max-w-xs flex flex-col gap-3"
             >
               {rsvpEnabled && (
-                <button
+                <motion.button
                   onClick={() => !rsvpSubmitted && setRsvpOpen(true)}
                   disabled={rsvpSubmitted}
+                  whileHover={
+                    shouldReduceMotion || rsvpSubmitted
+                      ? undefined
+                      : {
+                          y: -2,
+                          boxShadow: `0 14px 34px ${theme.heartColor}45`,
+                        }
+                  }
+                  whileTap={
+                    shouldReduceMotion || rsvpSubmitted
+                      ? undefined
+                      : { scale: 0.96 }
+                  }
+                  animate={
+                    rsvpSubmitted && !shouldReduceMotion
+                      ? { scale: [1, 1.04, 1] }
+                      : undefined
+                  }
+                  transition={{ duration: 0.45, ease: EASE }}
                   className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95 disabled:cursor-default disabled:active:scale-100"
                   style={{
                     background: rsvpSubmitted
@@ -542,13 +747,22 @@ export default function SaveTheDateView({
                 >
                   {rsvpSubmitted ? (
                     <>
-                      <CheckCircle size={16} />
+                      <motion.span
+                        animate={
+                          shouldReduceMotion
+                            ? undefined
+                            : { rotate: [0, -12, 12, 0] }
+                        }
+                        transition={{ duration: 0.5, ease: EASE }}
+                      >
+                        <CheckCircle size={16} />
+                      </motion.span>
                       Presença Confirmada
                     </>
                   ) : (
                     "Confirmar Presença"
                   )}
-                </button>
+                </motion.button>
               )}
               {!rsvpEnabled && (
                 <CalendarButton
