@@ -453,6 +453,12 @@ export interface InvitationData {
   imageSettings?: ImageSettingsMap;
   /** Per-invitation UI text overrides. Missing keys fall back to built-in Portuguese defaults. */
   customTexts?: CustomTexts;
+  /** Whether the guest-management feature is active for this invitation. */
+  guestManagementEnabled?: boolean;
+  /** WhatsApp/SMS message template with `{name}` and `{link}` placeholders. */
+  guestMessageTemplate?: string;
+  /** When the page was opened with `?g=<token>`, the matched guest. */
+  guest?: PublicGuestData;
 }
 
 export interface TemplateTheme {
@@ -506,4 +512,52 @@ export interface TemplateTheme {
   decorativeColor: string;
   /** Button hover glow color */
   ctaGlow?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Guest management
+// ---------------------------------------------------------------------------
+
+/** Public-safe guest data exposed to the invitation page (no phone). */
+export interface PublicGuestData {
+  /** Cuid token used in the URL (?g=<token>). */
+  token: string;
+  /** Display name. */
+  name: string;
+  /** Optional companion name. */
+  companion?: string;
+  /** Free-form table label, e.g. "7" or "Mesa Os Amigos". */
+  tableLabel: string;
+  /** Optional host note for this guest. */
+  note?: string;
+  /** Whether this guest can invite secondary guests. */
+  canInviteOthers: boolean;
+  /** The slug of the invitation this guest belongs to. */
+  invitationSlug: string;
+}
+
+/** Full guest data — used by host/admin management UI and APIs. */
+export interface GuestData extends PublicGuestData {
+  id: string;
+  slugifiedName: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  /** Id of the inviter, when this guest was self-registered. */
+  invitedById?: string;
+  /** Display name of the inviter, when known. */
+  invitedByName?: string;
+  /** ISO timestamps. */
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Input shape used by both admin and owner-token APIs to create/update guests. */
+export interface GuestUpsertInput {
+  name: string;
+  companion?: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  tableLabel: string;
+  canInviteOthers?: boolean;
+  note?: string;
 }

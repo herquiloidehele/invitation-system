@@ -48,6 +48,8 @@ type InvitationWithTheme = {
   cardStyles: unknown;
   imageSettings: unknown;
   customTexts: unknown;
+  guestManagementEnabled: boolean;
+  guestMessageTemplate: string | null;
 };
 
 function toInvitationData(row: InvitationWithTheme): InvitationData {
@@ -81,6 +83,8 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     customTexts: (row.customTexts as CustomTexts | null) ?? undefined,
+    guestManagementEnabled: row.guestManagementEnabled ?? false,
+    guestMessageTemplate: row.guestMessageTemplate ?? undefined,
   };
 }
 

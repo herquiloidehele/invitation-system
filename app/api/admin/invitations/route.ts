@@ -135,6 +135,8 @@ export async function POST(request: NextRequest) {
         cardStyles: sanitizeJsonField(body.cardStyles, null),
         imageSettings: sanitizeJsonField(body.imageSettings, null),
         customTexts: sanitizeJsonField(body.customTexts, null),
+        guestManagementEnabled: body.guestManagementEnabled === true,
+        guestMessageTemplate: body.guestMessageTemplate ?? null,
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

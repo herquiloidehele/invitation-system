@@ -184,6 +184,12 @@ export async function PUT(
         ...(body.customTexts !== undefined && {
           customTexts: sanitizeJsonField(body.customTexts, null),
         }),
+        ...(body.guestManagementEnabled !== undefined && {
+          guestManagementEnabled: body.guestManagementEnabled === true,
+        }),
+        ...(body.guestMessageTemplate !== undefined && {
+          guestMessageTemplate: body.guestMessageTemplate || null,
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },
