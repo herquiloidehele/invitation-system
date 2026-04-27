@@ -49,20 +49,16 @@ export default function PersonalGuestCard({
               color: theme.textPrimary,
             }}
           >
-            Olá, {guest.name}
+            <p>{guest.name}</p>
+            {guest.companion ? (
+              <>
+                <p className={"text-gray-500"}>&</p>
+                <p>{guest.companion}</p>
+              </>
+            ) : (
+              ""
+            )}
           </h2>
-
-          {guest.companion && (
-            <p
-              className="mt-1 text-sm"
-              style={{
-                fontFamily: theme.bodyFont,
-                color: theme.textSecondary,
-              }}
-            >
-              &amp; {guest.companion}
-            </p>
-          )}
 
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <InfoPill
