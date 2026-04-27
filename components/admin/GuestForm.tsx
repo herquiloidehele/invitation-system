@@ -124,10 +124,7 @@ export default function GuestForm({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-full sm:max-w-md overflow-y-auto"
-      >
+      <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
             {guest ? "Editar convidado" : "Adicionar convidado"}
@@ -159,17 +156,15 @@ export default function GuestForm({
             <Input id="guest-companion" {...register("companion")} />
           </div>
 
-          <div className="grid grid-cols-[140px_1fr] gap-2">
-            <div className="space-y-1.5">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5 w-full">
               <Label htmlFor="guest-cc">Indicativo *</Label>
               <Select
                 value={countryCode}
                 onValueChange={(value) =>
-                  setValue(
-                    "phoneCountryCode",
-                    value ?? DEFAULT_COUNTRY_CODE,
-                    { shouldDirty: true },
-                  )
+                  setValue("phoneCountryCode", value ?? DEFAULT_COUNTRY_CODE, {
+                    shouldDirty: true,
+                  })
                 }
               >
                 <SelectTrigger id="guest-cc">
