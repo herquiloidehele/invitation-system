@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Users, MessageCircle, UserPlus } from "lucide-react";
+import { MessageCircle, UserPlus, Users } from "lucide-react";
 
 import type { PublicGuestData, TemplateTheme } from "@/lib/types";
 import InviteOthersModal from "./InviteOthersModal";
@@ -25,7 +25,7 @@ export default function PersonalGuestCard({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
-        className="relative px-6 py-12"
+        className="relative px-6 pt-12 pb-4"
         style={{ zIndex: 2 }}
       >
         <div
