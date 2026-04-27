@@ -70,6 +70,8 @@ import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
+import GuestListEditor from "@/components/admin/GuestListEditor";
+import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -359,6 +361,8 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     invitationType: "standard",
     externalLink: "",
     imageSettings: {},
+    guestManagementEnabled: false,
+    guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
 }
 
@@ -2361,6 +2365,89 @@ export default function InvitationForm({
                     <RotateCcw size={12} className="mr-1" />
                     Repor todos os textos padrão
                   </Button>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem
+                value="guest-management"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Gestão de Convidados
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                    <div>
+                      <Label className="cursor-pointer">
+                        Activar gestão de convidados
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Quando activo, podes pré-registar convidados, gerar
+                        links pessoais e enviar convites por WhatsApp ou SMS.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.guestManagementEnabled === true}
+                      onCheckedChange={(value) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          guestManagementEnabled: value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {form.guestManagementEnabled && (
+                    <>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="guest-msg-template">
+                          Mensagem de convite (template)
+                        </Label>
+                        <Textarea
+                          id="guest-msg-template"
+                          rows={3}
+                          value={
+                            form.guestMessageTemplate ??
+                            DEFAULT_GUEST_MESSAGE_TEMPLATE
+                          }
+                          onChange={(e) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              guestMessageTemplate: e.target.value,
+                            }))
+                          }
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Usa <code>{"{name}"}</code> para o nome do convidado e{" "}
+                          <code>{"{link}"}</code> para o link pessoal.
+                        </p>
+                      </div>
+
+                      {initialData?.id ? (
+                        <div className="rounded-lg border p-3">
+                          <GuestListEditor
+                            apiBasePath={`/api/admin/invitations/${initialData.id}/guests`}
+                            invitationSlug={form.slug}
+                            invitationOrigin={
+                              typeof window !== "undefined"
+                                ? window.location.origin
+                                : ""
+                            }
+                            messageTemplate={
+                              form.guestMessageTemplate ??
+                              DEFAULT_GUEST_MESSAGE_TEMPLATE
+                            }
+                            title="Lista de convidados"
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">
+                          Guarda o convite primeiro para gerir a lista de
+                          convidados.
+                        </p>
+                      )}
+                    </>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

@@ -13,6 +13,8 @@ const rsvpSchema = z.object({
   attending: z.boolean({ error: "Confirmação de presença é obrigatória" }),
   dietaryRestrictions: z.string().optional(),
   message: z.string().optional(),
+  /** Optional guest token from `?g=<token>` link — links the RSVP to a Guest. */
+  guestToken: z.string().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -43,6 +45,7 @@ export async function POST(request: NextRequest) {
     // Verify that the invitation exists
     const invitation = await prisma.invitation.findUnique({
       where: { slug: data.invitationSlug },
+      select: { slug: true },
     });
 
     if (!invitation) {
@@ -55,6 +58,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // If a guestToken is provided, validate it belongs to this invitation
+    let guestId: string | null = null;
+    if (data.guestToken) {
+      const guest = await prisma.guest.findUnique({
+        where: { token: data.guestToken },
+        select: { id: true, invitationSlug: true },
+      });
+      if (!guest || guest.invitationSlug !== invitation.slug) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Convidado não pertence a este convite",
+          },
+          { status: 400 },
+        );
+      }
+      guestId = guest.id;
+    }
+
     // Persist to database
     await prisma.rsvpResponse.create({
       data: {
@@ -64,10 +86,17 @@ export async function POST(request: NextRequest) {
         attending: data.attending,
         dietaryRestrictions: data.dietaryRestrictions ?? null,
         message: data.message ?? null,
+        guestId,
       },
     });
 
-    console.log("[RSVP] Saved:", data.guestName, "for", data.invitationSlug);
+    console.log(
+      "[RSVP] Saved:",
+      data.guestName,
+      "for",
+      data.invitationSlug,
+      guestId ? `(guestId=${guestId})` : "",
+    );
 
     return NextResponse.json({
       success: true,

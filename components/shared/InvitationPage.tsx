@@ -11,6 +11,7 @@ import { t } from "@/lib/custom-texts";
 import AudioPlayer from "./AudioPlayer";
 import ScheduleItem from "./ScheduleItem";
 import RSVPModal from "./RSVPModal";
+import PersonalGuestCard from "./PersonalGuestCard";
 import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
@@ -650,6 +651,13 @@ export default function InvitationPage({
           </div>
         )}
       </section>
+
+      {/* ================================================================= */}
+      {/* Personal guest card — shown when ?g=<token> matches a guest       */}
+      {/* ================================================================= */}
+      {invitation.guest && (
+        <PersonalGuestCard guest={invitation.guest} theme={theme} />
+      )}
 
       {/* ================================================================= */}
       {/* 2. Names (no-video fallback)                                      */}
@@ -1500,6 +1508,7 @@ export default function InvitationPage({
         invitation={invitation}
         theme={theme}
         customTexts={invitation.customTexts}
+        guest={invitation.guest}
       />
     </div>
   );

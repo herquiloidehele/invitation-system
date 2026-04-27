@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import {
   CheckCircle2,
@@ -9,11 +10,13 @@ import {
   MapPin,
 } from "lucide-react";
 import { ExportButton } from "./ExportButton";
+import GuestsTabClient from "./GuestsTabClient";
 
 export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ token: string }>;
+  searchParams: Promise<{ tab?: string }>;
 };
 
 // ---------------------------------------------------------------------------
@@ -31,10 +34,59 @@ function formatDate(date: Date) {
 }
 
 // ---------------------------------------------------------------------------
+// Tab navigation (server-rendered, link-based)
+// ---------------------------------------------------------------------------
+
+function TabNav({
+  active,
+  token,
+  showGuests,
+}: {
+  active: "rsvps" | "guests";
+  token: string;
+  showGuests: boolean;
+}) {
+  return (
+    <div className="border-b mb-6">
+      <nav className="flex gap-6">
+        <Link
+          href={`/confirmacoes/${token}`}
+          className={`pb-3 -mb-px text-sm font-medium border-b-2 transition-colors ${
+            active === "rsvps"
+              ? "border-stone-800 text-stone-800"
+              : "border-transparent text-stone-500 hover:text-stone-700"
+          }`}
+        >
+          Confirmações
+        </Link>
+        {showGuests && (
+          <Link
+            href={`/confirmacoes/${token}?tab=guests`}
+            className={`pb-3 -mb-px text-sm font-medium border-b-2 transition-colors ${
+              active === "guests"
+                ? "border-stone-800 text-stone-800"
+                : "border-transparent text-stone-500 hover:text-stone-700"
+            }`}
+          >
+            Convidados
+          </Link>
+        )}
+      </nav>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Invitation RSVP view
 // ---------------------------------------------------------------------------
 
-async function InvitationRsvpView({ token }: { token: string }) {
+async function InvitationRsvpView({
+  token,
+  tab,
+}: {
+  token: string;
+  tab: "rsvps" | "guests";
+}) {
   const invitation = await prisma.invitation.findUnique({
     where: { ownerToken: token },
     include: {
@@ -51,6 +103,8 @@ async function InvitationRsvpView({ token }: { token: string }) {
   const responses = invitation.rsvpResponses;
   const totalAttending = responses.filter((r) => r.attending).length;
   const totalDeclined = responses.filter((r) => !r.attending).length;
+  const showGuests = invitation.guestManagementEnabled === true;
+  const activeTab = showGuests && tab === "guests" ? "guests" : "rsvps";
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -63,10 +117,12 @@ async function InvitationRsvpView({ token }: { token: string }) {
                 Brindel Studio
               </span>
             </div>
-            <ExportButton
-              token={token}
-              filename={`confirmacoes-${invitation.slug}.pdf`}
-            />
+            {activeTab === "rsvps" && (
+              <ExportButton
+                token={token}
+                filename={`confirmacoes-${invitation.slug}.pdf`}
+              />
+            )}
           </div>
           <h1 className="text-2xl font-semibold text-stone-800 mt-3">
             {couple.bride} &amp; {couple.groom}
@@ -84,24 +140,36 @@ async function InvitationRsvpView({ token }: { token: string }) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        <RsvpSummary
-          total={responses.length}
-          attending={totalAttending}
-          declined={totalDeclined}
-        />
-        <RsvpList
-          responses={responses.map((r) => ({
-            id: r.id,
-            guestName: r.guestName,
-            email: r.email,
-            attending: r.attending,
-            dietaryRestrictions: r.dietaryRestrictions,
-            message: r.message,
-            submittedAt: r.submittedAt,
-          }))}
-          emptyLabel="Os convidados ainda não responderam ao convite."
-        />
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        <TabNav active={activeTab} token={token} showGuests={showGuests} />
+
+        {activeTab === "rsvps" ? (
+          <div className="space-y-6">
+            <RsvpSummary
+              total={responses.length}
+              attending={totalAttending}
+              declined={totalDeclined}
+            />
+            <RsvpList
+              responses={responses.map((r) => ({
+                id: r.id,
+                guestName: r.guestName,
+                email: r.email,
+                attending: r.attending,
+                dietaryRestrictions: r.dietaryRestrictions,
+                message: r.message,
+                submittedAt: r.submittedAt,
+              }))}
+              emptyLabel="Os convidados ainda não responderam ao convite."
+            />
+          </div>
+        ) : (
+          <GuestsTabClient
+            ownerToken={token}
+            invitationSlug={invitation.slug}
+            messageTemplate={invitation.guestMessageTemplate ?? ""}
+          />
+        )}
       </main>
 
       <PageFooter />
@@ -110,7 +178,7 @@ async function InvitationRsvpView({ token }: { token: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Save the Date RSVP view
+// Save the Date RSVP view (unchanged — STD has no guest management)
 // ---------------------------------------------------------------------------
 
 async function SaveTheDateRsvpView({ token }: { token: string }) {
@@ -184,7 +252,7 @@ async function SaveTheDateRsvpView({ token }: { token: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Shared UI pieces
+// Shared UI pieces (unchanged from the previous version)
 // ---------------------------------------------------------------------------
 
 function RsvpSummary({
@@ -233,7 +301,9 @@ function RsvpList({
     <div className="bg-white rounded-xl border overflow-hidden">
       <div className="px-5 py-4 border-b">
         <h2 className="font-semibold text-stone-800">Lista de Confirmações</h2>
-        <p className="text-sm text-stone-500 mt-0.5">Actualizada em tempo real</p>
+        <p className="text-sm text-stone-500 mt-0.5">
+          Actualizada em tempo real
+        </p>
       </div>
 
       {responses.length === 0 ? (
@@ -302,8 +372,10 @@ function PageFooter() {
 // Page — detects whether token belongs to invitation or save-the-date
 // ---------------------------------------------------------------------------
 
-export default async function OwnerRsvpPage({ params }: Props) {
+export default async function OwnerRsvpPage({ params, searchParams }: Props) {
   const { token } = await params;
+  const { tab } = await searchParams;
+  const activeTab = tab === "guests" ? "guests" : "rsvps";
 
   // Try invitation first (most common case)
   const invitation = await prisma.invitation.findUnique({
@@ -311,7 +383,7 @@ export default async function OwnerRsvpPage({ params }: Props) {
   });
 
   if (invitation) {
-    return <InvitationRsvpView token={token} />;
+    return <InvitationRsvpView token={token} tab={activeTab} />;
   }
 
   // Try save-the-date

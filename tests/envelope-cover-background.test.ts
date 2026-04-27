@@ -1,25 +1,34 @@
-import assert from "node:assert/strict";
+import { describe, expect, it } from "vitest";
 import { getCoverBackgroundStyle } from "../lib/envelope-cover-background";
 
-const colorStyle = getCoverBackgroundStyle("#111827", "#ffffff");
-assert.deepEqual(colorStyle, { backgroundColor: "#111827" });
+describe("getCoverBackgroundStyle", () => {
+  it("returns backgroundColor for a hex color", () => {
+    expect(getCoverBackgroundStyle("#111827", "#ffffff")).toEqual({
+      backgroundColor: "#111827",
+    });
+  });
 
-const emptyStyle = getCoverBackgroundStyle("", "#f7f0e8");
-assert.deepEqual(emptyStyle, { backgroundColor: "#f7f0e8" });
+  it("falls back to the second arg when value is empty", () => {
+    expect(getCoverBackgroundStyle("", "#f7f0e8")).toEqual({
+      backgroundColor: "#f7f0e8",
+    });
+  });
 
-const imageStyle = getCoverBackgroundStyle(
-  "https://cdn.example.com/envelope.jpg",
-  "#ffffff",
-);
-assert.deepEqual(imageStyle, {
-  backgroundImage: "url(\"https://cdn.example.com/envelope.jpg\")",
-  backgroundPosition: "center",
-  backgroundSize: "cover",
-});
+  it("returns a backgroundImage for an absolute URL", () => {
+    expect(
+      getCoverBackgroundStyle("https://cdn.example.com/envelope.jpg", "#ffffff"),
+    ).toEqual({
+      backgroundImage: 'url("https://cdn.example.com/envelope.jpg")',
+      backgroundPosition: "center",
+      backgroundSize: "cover",
+    });
+  });
 
-const localImageStyle = getCoverBackgroundStyle("/images/envelope.png", "#ffffff");
-assert.deepEqual(localImageStyle, {
-  backgroundImage: "url(\"/images/envelope.png\")",
-  backgroundPosition: "center",
-  backgroundSize: "cover",
+  it("returns a backgroundImage for a local path", () => {
+    expect(getCoverBackgroundStyle("/images/envelope.png", "#ffffff")).toEqual({
+      backgroundImage: 'url("/images/envelope.png")',
+      backgroundPosition: "center",
+      backgroundSize: "cover",
+    });
+  });
 });

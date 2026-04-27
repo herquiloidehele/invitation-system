@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getInvitation } from "@/lib/invitations";
+import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
 import InvitationView from "./InvitationView";
 
@@ -46,10 +47,14 @@ export async function generateMetadata({
 
 export default async function InvitationSlugPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ g?: string; n?: string }>;
 }) {
   const { slug } = await params;
+  const { g: guestToken } = await searchParams;
+
   const invitation = await getInvitation(slug);
 
   if (!invitation) {
@@ -62,5 +67,18 @@ export default async function InvitationSlugPage({
     notFound();
   }
 
-  return <InvitationView invitation={invitation} theme={theme} />;
+  // Look up the personal guest if a token was provided. Silently fall back
+  // when the token does not exist, belongs to another invitation, or the
+  // feature is disabled — the rest of the page still works normally.
+  let guest = undefined;
+  if (guestToken && invitation.guestManagementEnabled) {
+    const found = await getPublicGuestByToken(guestToken);
+    if (found && found.invitationSlug === slug) {
+      guest = found;
+    }
+  }
+
+  return (
+    <InvitationView invitation={{ ...invitation, guest }} theme={theme} />
+  );
 }

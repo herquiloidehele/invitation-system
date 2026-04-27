@@ -6,7 +6,12 @@ import { X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CustomTexts,
+  InvitationData,
+  PublicGuestData,
+  TemplateTheme,
+} from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { t } from "@/lib/custom-texts";
 
@@ -132,6 +137,11 @@ interface IntegrationProps {
   apiEndpoint?: string;
   /** Override the slug field name sent in the body — defaults to "invitationSlug" */
   slugKey?: string;
+  /** Optional pre-registered guest (from `?g=<token>` link). When present:
+   *  - the form prefills the name (read-only)
+   *  - the body includes `guestToken` so the server can link the RSVP to this guest
+   */
+  guest?: PublicGuestData;
 }
 
 type RSVPModalProps = DirectProps | IntegrationProps;
@@ -183,6 +193,7 @@ export default function RSVPModal(props: RSVPModalProps) {
     ? props.invitation.rsvp.deadline
     : undefined;
   const ct = isIntegration(props) ? props.customTexts : undefined;
+  const guest = isIntegration(props) ? props.guest : undefined;
   const apiEndpoint = props.apiEndpoint ?? "/api/rsvp";
   const slugKey = props.slugKey ?? "invitationSlug";
 
@@ -209,13 +220,21 @@ export default function RSVPModal(props: RSVPModalProps) {
   } = useForm<RSVPFormData>({
     resolver: zodResolver(rsvpSchema) as unknown as Resolver<RSVPFormData>,
     defaultValues: {
-      name: "",
+      name: guest?.name ?? "",
       email: "",
       attending: undefined,
       dietaryRestrictions: "",
       message: "",
     },
   });
+
+  // When a guest token is present, keep the name field synced to the guest name
+  useEffect(() => {
+    if (guest?.name) {
+      reset((prev) => ({ ...prev, name: guest.name }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guest?.name]);
 
   const attending = watch("attending");
 
@@ -244,6 +263,7 @@ export default function RSVPModal(props: RSVPModalProps) {
           attending: data.attending === "yes",
           dietaryRestrictions: data.dietaryRestrictions || undefined,
           message: data.message || undefined,
+          guestToken: guest?.token,
         }),
       });
       if (!res.ok) throw new Error("Failed to submit");
@@ -472,7 +492,9 @@ export default function RSVPModal(props: RSVPModalProps) {
                     <input
                       {...register("name")}
                       placeholder={t(ct, "rsvp_namePlaceholder")}
-                      className={inputClass}
+                      readOnly={!!guest}
+                      aria-readonly={!!guest}
+                      className={`${inputClass} ${guest ? "cursor-not-allowed opacity-80" : ""}`}
                       style={inputStyle}
                     />
                     {errors.name && (

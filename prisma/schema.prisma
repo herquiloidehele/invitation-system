@@ -93,12 +93,15 @@ model Invitation {
   customTexts    Json?   // CustomTexts — per-invitation UI text overrides (section titles, buttons, RSVP labels, etc.)
   invitationType String  @default("standard") // "standard" | "external_video" | "external_link"
   externalLink   String? // URL for the external link / iframe (external_link type)
+  guestManagementEnabled Boolean @default(false)
+  guestMessageTemplate   String?
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   rsvpResponses RsvpResponse[]
   events        InvitationEvent[]
+  guests        Guest[]
 }
 
 model InvitationEvent {
@@ -216,7 +219,46 @@ model RsvpResponse {
 
   invitation Invitation @relation(fields: [invitationSlug], references: [slug], onDelete: Cascade)
 
+  guestId String?
+  guest   Guest?  @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
   @@index([invitationSlug])
+  @@index([guestId])
+}
+
+// ---------------------------------------------------------------------------
+// Guest management — per-invitation pre-registered guests
+// ---------------------------------------------------------------------------
+
+model Guest {
+  id              String   @id @default(cuid())
+  invitationSlug  String
+  invitation      Invitation @relation(fields: [invitationSlug], references: [slug], onDelete: Cascade)
+
+  token           String   @unique @default(cuid())
+
+  name            String
+  slugifiedName   String
+  companion       String?
+
+  phoneCountryCode String
+  phoneNumber      String
+
+  tableLabel      String
+  canInviteOthers Boolean  @default(false)
+  note            String?
+
+  invitedById   String?
+  invitedBy     Guest?  @relation("GuestInvitations", fields: [invitedById], references: [id], onDelete: SetNull)
+  invitedGuests Guest[] @relation("GuestInvitations")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rsvpResponses RsvpResponse[]
+
+  @@index([invitationSlug])
+  @@index([token])
 }
 
 model SaveTheDateRsvpResponse {

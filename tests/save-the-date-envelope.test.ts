@@ -1,20 +1,29 @@
-import assert from "node:assert/strict";
+import { describe, expect, it } from "vitest";
 import { getSaveTheDateEnvelopeCoverBackground } from "../lib/save-the-date-envelope";
 
-const overrideBackground = getSaveTheDateEnvelopeCoverBackground(
-  { base: "#f7f0e8", topFlap: "/top.png", bottomFlap: "/bottom.png" },
-  { coverBackground: "https://cdn.example.com/std-cover.jpg" },
-);
-assert.equal(overrideBackground, "https://cdn.example.com/std-cover.jpg");
+const themeEnvelope = {
+  base: "#f7f0e8",
+  topFlap: "/top.png",
+  bottomFlap: "/bottom.png",
+};
 
-const fallbackBackground = getSaveTheDateEnvelopeCoverBackground(
-  { base: "#f7f0e8", topFlap: "/top.png", bottomFlap: "/bottom.png" },
-  { base: "#111827" },
-);
-assert.equal(fallbackBackground, "#111827");
+describe("getSaveTheDateEnvelopeCoverBackground", () => {
+  it("returns the override coverBackground when provided", () => {
+    const result = getSaveTheDateEnvelopeCoverBackground(themeEnvelope, {
+      coverBackground: "https://cdn.example.com/std-cover.jpg",
+    });
+    expect(result).toBe("https://cdn.example.com/std-cover.jpg");
+  });
 
-const themeFallbackBackground = getSaveTheDateEnvelopeCoverBackground(
-  { base: "#f7f0e8", topFlap: "/top.png", bottomFlap: "/bottom.png" },
-  null,
-);
-assert.equal(themeFallbackBackground, "#f7f0e8");
+  it("falls back to override.base when coverBackground is missing", () => {
+    const result = getSaveTheDateEnvelopeCoverBackground(themeEnvelope, {
+      base: "#111827",
+    });
+    expect(result).toBe("#111827");
+  });
+
+  it("falls back to the theme envelope.base when no override is provided", () => {
+    const result = getSaveTheDateEnvelopeCoverBackground(themeEnvelope, null);
+    expect(result).toBe("#f7f0e8");
+  });
+});
