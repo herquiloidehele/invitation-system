@@ -6,7 +6,7 @@
 
 **Architecture:** New relational `Guest` model with a unique public token, plus `guestManagementEnabled` + `guestMessageTemplate` columns on `Invitation` and a nullable `guestId` FK on `RsvpResponse`. Owner-token-scoped APIs at `/api/owner/[token]/guests` mirror admin endpoints under `/api/admin/invitations/[id]/guests`. Public invite reads `?g=<token>` to render a personalized card and prefill the RSVP. The host page `/confirmacoes/[token]` becomes tabbed (Confirmações + Convidados).
 
-**Tech Stack:** Next.js 16 (App Router), Prisma 7 + PostgreSQL, React 19, TypeScript, react-hook-form + zod, shadcn/ui (Sheet, Dialog, Tabs, Accordion, Switch, Select), framer-motion, sonner (toasts), node:assert + tsx for tests.
+**Tech Stack:** Next.js 16 (App Router), Prisma 7 + PostgreSQL, React 19, TypeScript, react-hook-form + zod, shadcn/ui (Sheet, Dialog, Tabs, Accordion, Switch, Select), framer-motion, sonner (toasts), Vitest for unit tests.
 
 **Spec:** `docs/superpowers/specs/2026-04-27-guest-management-design.md`
 
@@ -43,23 +43,57 @@
 | `app/confirmacoes/[token]/page.tsx` | Modified: tabbed layout (Confirmações + Convidados) |
 | `app/confirmacoes/[token]/GuestsTabClient.tsx` | New client wrapper that mounts `<GuestListEditor>` for owner-token API |
 | `app/admin/invitations/InvitationForm.tsx` | Modified: add "Gestão de Convidados" accordion section |
-| `tests/guest-links.test.ts` | Pure unit tests for `lib/guest-links.ts` |
-| `tests/guests-slug.test.ts` | Pure unit tests for the slugifier |
-| `package.json` | Modified: add `test` script |
+| `vitest.config.ts` | Vitest config (Node environment, `tests/**/*.test.ts` glob) |
+| `tests/guest-links.test.ts` | Vitest unit tests for `lib/guest-links.ts` |
+| `tests/guests-slug.test.ts` | Vitest unit tests for the slugifier |
+| `tests/envelope-cover-background.test.ts` | Modified: ported to Vitest |
+| `tests/save-the-date-envelope.test.ts` | Modified: ported to Vitest |
+| `tests/save-the-date-rsvp-button.test.ts` | Modified: ported to Vitest |
+| `package.json` | Modified: add Vitest dev dependency, `test` and `test:watch` scripts |
 
 ---
 
-## Task 1: Add `npm test` script and verify existing tests still run
+## Task 1: Install Vitest, configure it, and migrate existing tests
 
 **Files:**
 - Modify: `package.json`
+- Create: `vitest.config.ts`
+- Modify: `tests/envelope-cover-background.test.ts`
+- Modify: `tests/save-the-date-envelope.test.ts`
+- Modify: `tests/save-the-date-rsvp-button.test.ts`
 
-- [ ] **Step 1: Add `test` script to `package.json`**
+- [ ] **Step 1: Install Vitest**
 
-In the `scripts` object, add a new `test` entry below `db:studio`:
+Run: `npm install --save-dev vitest@^2`
+
+Expected: installs `vitest` and its peers. Verify with:
+
+Run: `npx vitest --version`
+
+Expected: prints something like `vitest/2.x.x`.
+
+- [ ] **Step 2: Create `vitest.config.ts` at the repo root**
+
+```typescript
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    environment: "node",
+    include: ["tests/**/*.test.ts"],
+    // Tests are pure-utility unit tests; no globals or DOM needed.
+    globals: false,
+  },
+});
+```
+
+- [ ] **Step 3: Add `test` and `test:watch` scripts to `package.json`**
+
+In the `scripts` object, add two entries below `db:studio` (or anywhere in the block):
 
 ```json
-"test": "for f in tests/*.test.ts; do echo \"\\n--- $f ---\"; npx tsx \"$f\" || exit 1; done"
+"test": "vitest run",
+"test:watch": "vitest",
 ```
 
 The final `scripts` block should look like (excerpt):
@@ -71,23 +105,130 @@ The final `scripts` block should look like (excerpt):
   "build": "prisma generate && prisma migrate deploy && next build",
   "start": "next start",
   "lint": "eslint",
-  "test": "for f in tests/*.test.ts; do echo \"\\n--- $f ---\"; npx tsx \"$f\" || exit 1; done",
+  "test": "vitest run",
+  "test:watch": "vitest",
   "db:seed:dev": "tsx --env-file=.env.development prisma/seed.ts",
   ...
 }
 ```
 
-- [ ] **Step 2: Run the existing tests**
+- [ ] **Step 4: Migrate `tests/envelope-cover-background.test.ts`**
+
+Replace the file contents with:
+
+```typescript
+import { describe, expect, it } from "vitest";
+import { getCoverBackgroundStyle } from "../lib/envelope-cover-background";
+
+describe("getCoverBackgroundStyle", () => {
+  it("returns backgroundColor for a hex color", () => {
+    expect(getCoverBackgroundStyle("#111827", "#ffffff")).toEqual({
+      backgroundColor: "#111827",
+    });
+  });
+
+  it("falls back to the second arg when value is empty", () => {
+    expect(getCoverBackgroundStyle("", "#f7f0e8")).toEqual({
+      backgroundColor: "#f7f0e8",
+    });
+  });
+
+  it("returns a backgroundImage for an absolute URL", () => {
+    expect(
+      getCoverBackgroundStyle("https://cdn.example.com/envelope.jpg", "#ffffff"),
+    ).toEqual({
+      backgroundImage: 'url("https://cdn.example.com/envelope.jpg")',
+      backgroundPosition: "center",
+      backgroundSize: "cover",
+    });
+  });
+
+  it("returns a backgroundImage for a local path", () => {
+    expect(getCoverBackgroundStyle("/images/envelope.png", "#ffffff")).toEqual({
+      backgroundImage: 'url("/images/envelope.png")',
+      backgroundPosition: "center",
+      backgroundSize: "cover",
+    });
+  });
+});
+```
+
+- [ ] **Step 5: Migrate `tests/save-the-date-envelope.test.ts`**
+
+Replace the file contents with:
+
+```typescript
+import { describe, expect, it } from "vitest";
+import { getSaveTheDateEnvelopeCoverBackground } from "../lib/save-the-date-envelope";
+
+const themeEnvelope = {
+  base: "#f7f0e8",
+  topFlap: "/top.png",
+  bottomFlap: "/bottom.png",
+};
+
+describe("getSaveTheDateEnvelopeCoverBackground", () => {
+  it("returns the override coverBackground when provided", () => {
+    const result = getSaveTheDateEnvelopeCoverBackground(themeEnvelope, {
+      coverBackground: "https://cdn.example.com/std-cover.jpg",
+    });
+    expect(result).toBe("https://cdn.example.com/std-cover.jpg");
+  });
+
+  it("falls back to override.base when coverBackground is missing", () => {
+    const result = getSaveTheDateEnvelopeCoverBackground(themeEnvelope, {
+      base: "#111827",
+    });
+    expect(result).toBe("#111827");
+  });
+
+  it("falls back to the theme envelope.base when no override is provided", () => {
+    const result = getSaveTheDateEnvelopeCoverBackground(themeEnvelope, null);
+    expect(result).toBe("#f7f0e8");
+  });
+});
+```
+
+- [ ] **Step 6: Migrate `tests/save-the-date-rsvp-button.test.ts`**
+
+Replace the file contents with:
+
+```typescript
+import { describe, expect, it } from "vitest";
+import { getSaveTheDateRsvpButtonBackground } from "../lib/save-the-date-rsvp-button";
+
+describe("getSaveTheDateRsvpButtonBackground", () => {
+  it("returns the explicit rsvpButtonBgColor", () => {
+    const background = getSaveTheDateRsvpButtonBackground({
+      heartColor: "#D4AF37",
+      heartGlitterColors: ["#F5E6A3"],
+      rsvpButtonBgColor: "#8B5CF6",
+    });
+    expect(background).toBe("#8B5CF6");
+  });
+});
+```
+
+- [ ] **Step 7: Run the tests**
 
 Run: `npm test`
 
-Expected: three `--- tests/<name>.test.ts ---` headers print and the command exits 0 (existing `envelope-cover-background`, `save-the-date-envelope`, `save-the-date-rsvp-button` tests pass).
+Expected: Vitest reports 3 test files, several passing tests (4 + 3 + 1 = 8), and exits 0. Output looks like:
 
-- [ ] **Step 3: Commit**
+```
+ ✓ tests/envelope-cover-background.test.ts (4)
+ ✓ tests/save-the-date-envelope.test.ts (3)
+ ✓ tests/save-the-date-rsvp-button.test.ts (1)
+
+ Test Files  3 passed (3)
+      Tests  8 passed (8)
+```
+
+- [ ] **Step 8: Commit**
 
 ```bash
-git add package.json
-git commit -m "chore: add npm test script that runs all tests/*.test.ts files"
+git add package.json package-lock.json vitest.config.ts tests/
+git commit -m "chore(test): adopt Vitest and migrate existing unit tests"
 ```
 
 ---
@@ -103,7 +244,7 @@ git commit -m "chore: add npm test script that runs all tests/*.test.ts files"
 Create `tests/guest-links.test.ts`:
 
 ```typescript
-import assert from "node:assert/strict";
+import { describe, expect, it } from "vitest";
 import {
   buildPersonalInviteUrl,
   buildWhatsAppUrl,
@@ -113,155 +254,179 @@ import {
   slugifyName,
 } from "../lib/guest-links";
 
-// ---------- slugifyName ----------
-assert.equal(slugifyName("José"), "jose");
-assert.equal(slugifyName("Conceição da Silva"), "conceicao-da-silva");
-assert.equal(slugifyName("  Maria   Silva  "), "maria-silva");
-assert.equal(slugifyName("Ana--Beatriz"), "ana-beatriz");
-assert.equal(slugifyName(""), "");
-assert.equal(slugifyName("João & Maria"), "joao-maria");
+describe("slugifyName", () => {
+  it("strips accents and lowercases", () => {
+    expect(slugifyName("José")).toBe("jose");
+  });
 
-// ---------- buildPersonalInviteUrl ----------
-assert.equal(
-  buildPersonalInviteUrl({
-    origin: "https://example.com",
-    slug: "ana-pedro",
-    token: "tok123",
-    name: "Maria Silva",
-  }),
-  "https://example.com/ana-pedro?g=tok123&n=maria-silva",
-);
+  it("slugifies multi-word accented names", () => {
+    expect(slugifyName("Conceição da Silva")).toBe("conceicao-da-silva");
+  });
 
-// trailing slash on origin is normalized
-assert.equal(
-  buildPersonalInviteUrl({
-    origin: "https://example.com/",
-    slug: "ana-pedro",
-    token: "tok123",
-    name: "Maria Silva",
-  }),
-  "https://example.com/ana-pedro?g=tok123&n=maria-silva",
-);
+  it("collapses repeated whitespace and trims", () => {
+    expect(slugifyName("  Maria   Silva  ")).toBe("maria-silva");
+  });
 
-// accented name slugified
-assert.equal(
-  buildPersonalInviteUrl({
-    origin: "https://example.com",
-    slug: "ana-pedro",
-    token: "tok",
-    name: "José",
-  }),
-  "https://example.com/ana-pedro?g=tok&n=jose",
-);
+  it("collapses repeated separators", () => {
+    expect(slugifyName("Ana--Beatriz")).toBe("ana-beatriz");
+  });
 
-// empty name -> n param omitted
-assert.equal(
-  buildPersonalInviteUrl({
-    origin: "https://example.com",
-    slug: "ana-pedro",
-    token: "tok",
-    name: "",
-  }),
-  "https://example.com/ana-pedro?g=tok",
-);
+  it("returns empty string for empty input", () => {
+    expect(slugifyName("")).toBe("");
+  });
 
-// ---------- buildWhatsAppUrl ----------
-// Strips '+' and joins, encodes message
-assert.equal(
-  buildWhatsAppUrl({
-    countryCode: "+258",
-    phoneNumber: "841234567",
-    message: "Olá Maria",
-  }),
-  "https://wa.me/258841234567?text=Ol%C3%A1%20Maria",
-);
+  it("strips non-alphanumeric symbols like &", () => {
+    expect(slugifyName("João & Maria")).toBe("joao-maria");
+  });
+});
 
-// Spaces in phone digits are stripped
-assert.equal(
-  buildWhatsAppUrl({
-    countryCode: "+351",
-    phoneNumber: "912 345 678",
-    message: "Test",
-  }),
-  "https://wa.me/351912345678?text=Test",
-);
+describe("buildPersonalInviteUrl", () => {
+  it("builds the canonical URL with g and n params", () => {
+    expect(
+      buildPersonalInviteUrl({
+        origin: "https://example.com",
+        slug: "ana-pedro",
+        token: "tok123",
+        name: "Maria Silva",
+      }),
+    ).toBe("https://example.com/ana-pedro?g=tok123&n=maria-silva");
+  });
 
-// Empty message -> no `?text=` segment
-assert.equal(
-  buildWhatsAppUrl({
-    countryCode: "+258",
-    phoneNumber: "841234567",
-    message: "",
-  }),
-  "https://wa.me/258841234567",
-);
+  it("normalizes a trailing slash on the origin", () => {
+    expect(
+      buildPersonalInviteUrl({
+        origin: "https://example.com/",
+        slug: "ana-pedro",
+        token: "tok123",
+        name: "Maria Silva",
+      }),
+    ).toBe("https://example.com/ana-pedro?g=tok123&n=maria-silva");
+  });
 
-// ---------- buildSmsUrl ----------
-// Keeps '+', URL-encodes body
-assert.equal(
-  buildSmsUrl({
-    countryCode: "+258",
-    phoneNumber: "841234567",
-    message: "Olá Maria",
-  }),
-  "sms:+258841234567?body=Ol%C3%A1%20Maria",
-);
+  it("slugifies accented names for the n param", () => {
+    expect(
+      buildPersonalInviteUrl({
+        origin: "https://example.com",
+        slug: "ana-pedro",
+        token: "tok",
+        name: "José",
+      }),
+    ).toBe("https://example.com/ana-pedro?g=tok&n=jose");
+  });
 
-// Empty message -> bare sms: URI
-assert.equal(
-  buildSmsUrl({
-    countryCode: "+1",
-    phoneNumber: "5551234",
-    message: "",
-  }),
-  "sms:+15551234",
-);
+  it("omits the n param when the name is empty", () => {
+    expect(
+      buildPersonalInviteUrl({
+        origin: "https://example.com",
+        slug: "ana-pedro",
+        token: "tok",
+        name: "",
+      }),
+    ).toBe("https://example.com/ana-pedro?g=tok");
+  });
+});
 
-// ---------- renderMessageTemplate ----------
-assert.equal(
-  renderMessageTemplate("Olá {name}, link: {link}", {
-    name: "Maria",
-    link: "https://x.com/y",
-  }),
-  "Olá Maria, link: https://x.com/y",
-);
+describe("buildWhatsAppUrl", () => {
+  it("strips the leading + and percent-encodes spaces in the message", () => {
+    expect(
+      buildWhatsAppUrl({
+        countryCode: "+258",
+        phoneNumber: "841234567",
+        message: "Olá Maria",
+      }),
+    ).toBe("https://wa.me/258841234567?text=Ol%C3%A1%20Maria");
+  });
 
-// Multiple occurrences of the same placeholder
-assert.equal(
-  renderMessageTemplate("{name} {name}", { name: "A", link: "" }),
-  "A A",
-);
+  it("strips spaces from phone digits", () => {
+    expect(
+      buildWhatsAppUrl({
+        countryCode: "+351",
+        phoneNumber: "912 345 678",
+        message: "Test",
+      }),
+    ).toBe("https://wa.me/351912345678?text=Test");
+  });
 
-// Unknown placeholders are left untouched
-assert.equal(
-  renderMessageTemplate("hi {name} {unknown}", { name: "A", link: "" }),
-  "hi A {unknown}",
-);
+  it("omits ?text= when the message is empty", () => {
+    expect(
+      buildWhatsAppUrl({
+        countryCode: "+258",
+        phoneNumber: "841234567",
+        message: "",
+      }),
+    ).toBe("https://wa.me/258841234567");
+  });
+});
 
-// Empty template -> empty string
-assert.equal(
-  renderMessageTemplate("", { name: "A", link: "B" }),
-  "",
-);
+describe("buildSmsUrl", () => {
+  it("keeps the leading + and url-encodes the body", () => {
+    expect(
+      buildSmsUrl({
+        countryCode: "+258",
+        phoneNumber: "841234567",
+        message: "Olá Maria",
+      }),
+    ).toBe("sms:+258841234567?body=Ol%C3%A1%20Maria");
+  });
 
-// ---------- COUNTRY_CODES ----------
-assert.equal(COUNTRY_CODES[0].code, "+258");
-assert.equal(COUNTRY_CODES[0].label, "Moçambique");
-assert.ok(COUNTRY_CODES.some((c) => c.code === "+351"));
-assert.ok(COUNTRY_CODES.some((c) => c.code === "+55"));
-assert.ok(COUNTRY_CODES.some((c) => c.code === "+1"));
-assert.ok(COUNTRY_CODES.some((c) => c.code === "+44"));
-assert.ok(COUNTRY_CODES.some((c) => c.code === "+34"));
-assert.ok(COUNTRY_CODES.some((c) => c.code === "+27"));
+  it("returns a bare sms: URI when the message is empty", () => {
+    expect(
+      buildSmsUrl({
+        countryCode: "+1",
+        phoneNumber: "5551234",
+        message: "",
+      }),
+    ).toBe("sms:+15551234");
+  });
+});
 
-console.log("guest-links.test.ts — all assertions passed");
+describe("renderMessageTemplate", () => {
+  it("substitutes {name} and {link}", () => {
+    expect(
+      renderMessageTemplate("Olá {name}, link: {link}", {
+        name: "Maria",
+        link: "https://x.com/y",
+      }),
+    ).toBe("Olá Maria, link: https://x.com/y");
+  });
+
+  it("substitutes multiple occurrences of the same placeholder", () => {
+    expect(
+      renderMessageTemplate("{name} {name}", { name: "A", link: "" }),
+    ).toBe("A A");
+  });
+
+  it("leaves unknown placeholders untouched", () => {
+    expect(
+      renderMessageTemplate("hi {name} {unknown}", { name: "A", link: "" }),
+    ).toBe("hi A {unknown}");
+  });
+
+  it("returns empty string for an empty template", () => {
+    expect(renderMessageTemplate("", { name: "A", link: "B" })).toBe("");
+  });
+});
+
+describe("COUNTRY_CODES", () => {
+  it("starts with Mozambique as the default", () => {
+    expect(COUNTRY_CODES[0].code).toBe("+258");
+    expect(COUNTRY_CODES[0].label).toBe("Moçambique");
+  });
+
+  it("includes the documented set of country codes", () => {
+    const codes = COUNTRY_CODES.map((c) => c.code);
+    expect(codes).toEqual(
+      expect.arrayContaining(["+258", "+351", "+55", "+1", "+44", "+34", "+27"]),
+    );
+  });
+});
 ```
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `npx tsx tests/guest-links.test.ts`
+Run: `npx vitest run tests/guest-links.test.ts`
 
-Expected: FAIL with `Error: Cannot find module '../lib/guest-links'` or similar.
+Expected: FAIL with `Error: Failed to resolve import "../lib/guest-links"` or similar (the implementation does not yet exist).
 
 - [ ] **Step 3: Implement `lib/guest-links.ts`**
 
@@ -406,15 +571,15 @@ export const DEFAULT_GUEST_MESSAGE_TEMPLATE =
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx tsx tests/guest-links.test.ts`
+Run: `npx vitest run tests/guest-links.test.ts`
 
-Expected: prints `guest-links.test.ts — all assertions passed` and exits 0.
+Expected: Vitest reports `tests/guest-links.test.ts (N passed)` for all describe blocks (`slugifyName`, `buildPersonalInviteUrl`, `buildWhatsAppUrl`, `buildSmsUrl`, `renderMessageTemplate`, `COUNTRY_CODES`) and exits 0.
 
 - [ ] **Step 5: Run full test suite**
 
 Run: `npm test`
 
-Expected: all four `tests/*.test.ts` files pass.
+Expected: 4 test files (`envelope-cover-background`, `save-the-date-envelope`, `save-the-date-rsvp-button`, `guest-links`) all pass.
 
 - [ ] **Step 6: Commit**
 
@@ -945,34 +1110,57 @@ git commit -m "feat(guests): add server-side guest data access (lib/guests.ts)"
 - [ ] **Step 1: Write the test**
 
 ```typescript
-import assert from "node:assert/strict";
+import { describe, expect, it } from "vitest";
 import { slugifyName } from "../lib/guest-links";
 
-// The slugifier in lib/guests.ts is the same function exported from
-// lib/guest-links.ts (re-exported via `slugifyName`). This file pins down
-// the exact behaviour we depend on for the `slugifiedName` DB column and
-// the `?n=` URL param.
+// The slugifier in lib/guests.ts re-uses `slugifyName` from
+// lib/guest-links.ts. This file pins down the exact behaviour we depend on
+// for the `slugifiedName` DB column and the `?n=` URL param across a wider
+// range of inputs than the guest-links test covers.
 
-assert.equal(slugifyName("Maria Silva"), "maria-silva");
-assert.equal(slugifyName("José"), "jose");
-assert.equal(slugifyName("Conceição da Silva"), "conceicao-da-silva");
-assert.equal(slugifyName("João  Pedro"), "joao-pedro");
-assert.equal(slugifyName("Ana--Beatriz"), "ana-beatriz");
-assert.equal(slugifyName("  trim me  "), "trim-me");
-assert.equal(slugifyName(""), "");
-assert.equal(slugifyName("---"), "");
-assert.equal(slugifyName("João & Maria"), "joao-maria");
-assert.equal(slugifyName("Numbers 123"), "numbers-123");
-assert.equal(slugifyName("UPPER CASE"), "upper-case");
+describe("slugifyName — extended cases", () => {
+  it("handles plain ASCII names", () => {
+    expect(slugifyName("Maria Silva")).toBe("maria-silva");
+  });
 
-console.log("guests-slug.test.ts — all assertions passed");
+  it("strips diacritics", () => {
+    expect(slugifyName("José")).toBe("jose");
+    expect(slugifyName("Conceição da Silva")).toBe("conceicao-da-silva");
+  });
+
+  it("collapses repeated whitespace and dashes", () => {
+    expect(slugifyName("João  Pedro")).toBe("joao-pedro");
+    expect(slugifyName("Ana--Beatriz")).toBe("ana-beatriz");
+  });
+
+  it("trims leading/trailing whitespace", () => {
+    expect(slugifyName("  trim me  ")).toBe("trim-me");
+  });
+
+  it("returns empty string for empty / dash-only input", () => {
+    expect(slugifyName("")).toBe("");
+    expect(slugifyName("---")).toBe("");
+  });
+
+  it("strips symbols", () => {
+    expect(slugifyName("João & Maria")).toBe("joao-maria");
+  });
+
+  it("preserves digits", () => {
+    expect(slugifyName("Numbers 123")).toBe("numbers-123");
+  });
+
+  it("lowercases ASCII", () => {
+    expect(slugifyName("UPPER CASE")).toBe("upper-case");
+  });
+});
 ```
 
 - [ ] **Step 2: Run the test**
 
-Run: `npx tsx tests/guests-slug.test.ts`
+Run: `npx vitest run tests/guests-slug.test.ts`
 
-Expected: prints `guests-slug.test.ts — all assertions passed`.
+Expected: 8 passing tests under the `slugifyName — extended cases` describe block.
 
 - [ ] **Step 3: Run the full test suite**
 
@@ -4031,16 +4219,18 @@ git commit -m "feat(host): tabbed Confirmações + Convidados page at /confirmac
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Run all unit tests**
+- [ ] **Step 1: Run all unit tests via Vitest**
 
 Run: `npm test`
 
-Expected: 5 test files run and all pass:
+Expected: Vitest reports 5 test files passing:
 - `tests/envelope-cover-background.test.ts`
 - `tests/save-the-date-envelope.test.ts`
 - `tests/save-the-date-rsvp-button.test.ts`
 - `tests/guest-links.test.ts`
 - `tests/guests-slug.test.ts`
+
+The summary line should read `Test Files  5 passed (5)` and `Tests  N passed (N)` with N matching the total `it(...)` blocks.
 
 - [ ] **Step 2: Type-check the whole project**
 
