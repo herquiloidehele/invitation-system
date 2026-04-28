@@ -18,6 +18,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -25,9 +34,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Loader2 } from "lucide-react";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "@/lib/guest-links";
 import type { GuestData, GuestUpsertInput } from "@/lib/types";
+import {
+  getGuestFormShellVariant,
+  getGuestFormSheetProps,
+} from "./guest-form-sheet";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -66,6 +80,9 @@ export default function GuestForm({
   onSubmit,
   saving,
 }: GuestFormProps) {
+  const isMobile = useIsMobile();
+  const shellVariant = getGuestFormShellVariant(isMobile);
+  const sheetProps = getGuestFormSheetProps();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -122,23 +139,17 @@ export default function GuestForm({
     });
   }
 
-  return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>
-            {guest ? "Editar convidado" : "Adicionar convidado"}
-          </SheetTitle>
-          <SheetDescription>
-            {guest
-              ? "Actualiza os detalhes deste convidado."
-              : "Preenche os detalhes do novo convidado."}
-          </SheetDescription>
-        </SheetHeader>
+  const title = guest ? "Editar convidado" : "Adicionar convidado";
+  const description = guest
+    ? "Actualiza os detalhes deste convidado."
+    : "Preenche os detalhes do novo convidado.";
 
+  const formContent = (
+    <>
+      <div className={sheetProps.bodyClassName}>
         <form
           onSubmit={handleSubmit(submit)}
-          className="space-y-4 px-4 pb-4"
+          className={sheetProps.formClassName}
           id="guest-form"
         >
           <div className="space-y-1.5">
@@ -241,20 +252,66 @@ export default function GuestForm({
           </div>
         </form>
 
-        <SheetFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
-          >
-            Cancelar
-          </Button>
-          <Button type="submit" form="guest-form" disabled={saving}>
-            {saving && <Loader2 className="mr-1 size-3.5 animate-spin" />}
-            {guest ? "Guardar" : "Adicionar"}
-          </Button>
-        </SheetFooter>
+        <div className="sr-only" aria-live="polite">
+          {title}
+        </div>
+      </div>
+    </>
+  );
+
+  if (shellVariant === "drawer") {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{title}</DrawerTitle>
+            <DrawerDescription>{description}</DrawerDescription>
+          </DrawerHeader>
+
+          {formContent}
+
+          <DrawerFooter className={sheetProps.footerClassName}>
+            <DrawerClose asChild>
+              <Button type="button" variant="outline" disabled={saving}>
+                Cancelar
+              </Button>
+            </DrawerClose>
+            <Button type="submit" form="guest-form" disabled={saving}>
+              {saving && <Loader2 className="mr-1 size-3.5 animate-spin" />}
+              {guest ? "Guardar" : "Adicionar"}
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side={sheetProps.side} className={sheetProps.className}>
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>{description}</SheetDescription>
+        </SheetHeader>
+
+        {formContent}
+
+        <div className={sheetProps.bodyClassName}>
+          <SheetFooter className={sheetProps.footerClassName}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={saving}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" form="guest-form" disabled={saving}>
+              {saving && <Loader2 className="mr-1 size-3.5 animate-spin" />}
+              {guest ? "Guardar" : "Adicionar"}
+            </Button>
+          </SheetFooter>
+        </div>
       </SheetContent>
     </Sheet>
   );
