@@ -72,7 +72,9 @@ import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import GuestListEditor from "@/components/admin/GuestListEditor";
+import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
+import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import {
   buildInvitationMonogram,
   buildInvitationSlug,
@@ -396,6 +398,10 @@ export default function InvitationForm({
   const isWedding = isWeddingEventType(form.eventType);
   const hasRequiredNames = Boolean(
     form.couple.bride && (!isWedding || form.couple.groom),
+  );
+  const resolvedSocialPreview = resolveInvitationSocialPreview(
+    form,
+    typeof window !== "undefined" ? window.location.origin : "",
   );
 
   // Google Maps link auto-fill state
@@ -2529,6 +2535,22 @@ export default function InvitationForm({
                   )}
                 </AccordionContent>
               </AccordionItem>
+
+              <SocialPreviewSection
+                accordionValue="socialPreview"
+                value={form.socialPreview}
+                onChange={(next) =>
+                  setForm((prev) => ({ ...prev, socialPreview: next }))
+                }
+                resolvedImage={resolvedSocialPreview.image}
+                resolvedTitle={resolvedSocialPreview.title}
+                resolvedDescription={resolvedSocialPreview.description}
+                publicUrl={
+                  form.slug
+                    ? `${typeof window !== "undefined" ? window.location.origin : ""}/${form.slug}`
+                    : undefined
+                }
+              />
             </Accordion>
           </div>
         </ScrollArea>
