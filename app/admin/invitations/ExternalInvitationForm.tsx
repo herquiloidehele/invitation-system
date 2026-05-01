@@ -53,6 +53,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
+import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
+import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import {
   getExternalInvitationEmbedSrc,
@@ -226,6 +228,10 @@ export default function ExternalInvitationForm({
 
   const isWedding = isWeddingEventType(form.eventType);
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
+  const resolvedSocialPreview = resolveInvitationSocialPreview(
+    form,
+    typeof window !== "undefined" ? window.location.origin : "",
+  );
   const showAudioControls = shouldShowExternalInvitationAudioControls(subType);
   const publicHref = getExternalInvitationPublicHref(form.slug);
   const externalEmbedSrc = form.externalLink
@@ -916,6 +922,26 @@ export default function ExternalInvitationForm({
                 </div>
               </>
             )}
+
+            <Separator />
+
+            <Accordion defaultValue={[]} className="w-full">
+              <SocialPreviewSection
+                accordionValue="socialPreview"
+                value={form.socialPreview}
+                onChange={(next) =>
+                  setForm((prev) => ({ ...prev, socialPreview: next }))
+                }
+                resolvedImage={resolvedSocialPreview.image}
+                resolvedTitle={resolvedSocialPreview.title}
+                resolvedDescription={resolvedSocialPreview.description}
+                publicUrl={
+                  form.slug
+                    ? `${typeof window !== "undefined" ? window.location.origin : ""}/${form.slug}`
+                    : undefined
+                }
+              />
+            </Accordion>
           </div>
         </ScrollArea>
       </div>
