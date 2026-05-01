@@ -1,24 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
+import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
-
-/**
- * Reject empty strings for JSON columns — they cause `JSON.parse("")`
- * failures in the pg adapter. For non-nullable JSON columns the fallback
- * is the existing DB value; for nullable columns pass `null`.
- */
-function sanitizeJsonField(
-  value: unknown,
-  fallback: Prisma.InputJsonValue | null,
-): Prisma.InputJsonValue | typeof Prisma.JsonNull {
-  if (value === "" || (typeof value === "string" && value.trim() === "")) {
-    return fallback === null
-      ? Prisma.JsonNull
-      : (fallback as Prisma.InputJsonValue);
-  }
-  return value as Prisma.InputJsonValue;
-}
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations/[id] — Get a single invitation
