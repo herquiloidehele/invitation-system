@@ -1,5 +1,10 @@
 import { prisma } from "./db";
-import type { AudioConfig, EnvelopeConfig, TextStyleOverrides } from "./types";
+import type {
+  AudioConfig,
+  EnvelopeConfig,
+  SocialPreview,
+  TextStyleOverrides,
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -77,6 +82,8 @@ export interface SaveTheDateData {
   audio: AudioConfig;
   /** Bottom hero section — full-viewport media section below the main content. */
   bottomHero: BottomHeroConfig | null;
+  /** Override values used only for OG/Twitter meta tags. Image is never rendered on the page. */
+  socialPreview: SocialPreview | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -151,6 +158,9 @@ export async function getSaveTheDate(
       : { enabled: false, src: "", artist: "", title: "" },
     bottomHero: row.bottomHero
       ? (row.bottomHero as unknown as BottomHeroConfig)
+      : null,
+    socialPreview: row.socialPreview
+      ? (row.socialPreview as unknown as SocialPreview)
       : null,
   };
 }

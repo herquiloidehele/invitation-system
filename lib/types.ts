@@ -71,6 +71,20 @@ export interface AudioConfig {
   title: string;
 }
 
+// ---------------------------------------------------------------------------
+// Social preview / Open Graph
+// ---------------------------------------------------------------------------
+
+/** Optional override values shown when a public link is unfurled on social platforms. */
+export interface SocialPreview {
+  /** Full URL to a 1200×630 image. Falls back to per-subsystem fallback chain when absent. */
+  image?: string;
+  /** OG/Twitter title override. Falls back to per-subsystem default. */
+  title?: string;
+  /** OG/Twitter description override. Falls back to per-subsystem default. */
+  description?: string;
+}
+
 export interface FAQItem {
   question: string;
   answer: string;
@@ -468,6 +482,8 @@ export interface InvitationData {
   guestManagementEnabled?: boolean;
   /** WhatsApp/SMS message template with `{name}` and `{link}` placeholders. */
   guestMessageTemplate?: string;
+  /** Override values used only for OG/Twitter meta tags. Image is never rendered on the page. */
+  socialPreview?: SocialPreview;
   /** When the page was opened with `?g=<token>`, the matched guest. */
   guest?: PublicGuestData;
 }

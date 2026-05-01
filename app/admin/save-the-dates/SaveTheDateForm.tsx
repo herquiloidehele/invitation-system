@@ -186,6 +186,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       rsvp: data.rsvp || null,
       audio: data.audio || { enabled: false, src: "", artist: "", title: "" },
       bottomHero: data.bottomHero || null,
+      socialPreview: null,
     }),
     [data, selectedTheme],
   );

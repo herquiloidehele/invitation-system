@@ -96,6 +96,7 @@ model Invitation {
   externalLink   String? // URL for the external link / iframe (external_link type)
   guestManagementEnabled Boolean @default(false)
   guestMessageTemplate   String?
+  socialPreview Json?    // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -175,6 +176,7 @@ model SaveTheDate {
   rsvp          Json?   // { enabled: boolean, deadline?: string }
   audio         Json?   // { enabled: boolean, src: string, artist: string, title: string }
   bottomHero    Json?   // { enabled: boolean, mediaUrl: string, mediaType: "image"|"video", title: string, description: string }
+  socialPreview Json?   // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
 
   ownerToken String   @unique @default(cuid())
   createdAt  DateTime @default(now())
