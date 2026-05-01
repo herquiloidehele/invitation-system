@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { sanitizeJsonField } from "@/lib/json-sanitize";
 
 export async function GET() {
   const items = await prisma.saveTheDate.findMany({
@@ -12,12 +13,24 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { slug, themeId, couple, date, customMessage, envelope, textStyles, rsvp, audio, bottomHero } = body;
+    const {
+      slug,
+      themeId,
+      couple,
+      date,
+      customMessage,
+      envelope,
+      textStyles,
+      rsvp,
+      audio,
+      bottomHero,
+      socialPreview,
+    } = body;
 
     if (!slug || !themeId || !couple || !date) {
       return NextResponse.json(
         { error: "Missing required fields: slug, themeId, couple, date" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -25,14 +38,15 @@ export async function POST(req: NextRequest) {
       data: {
         slug,
         themeId,
-        couple,
-        date,
+        couple: sanitizeJsonField(couple, {}),
+        date: sanitizeJsonField(date, {}),
         customMessage: customMessage || null,
-        envelope: envelope || undefined,
-        textStyles: textStyles || undefined,
-        rsvp: rsvp || undefined,
-        audio: audio || undefined,
-        bottomHero: bottomHero || undefined,
+        envelope: sanitizeJsonField(envelope, null),
+        textStyles: sanitizeJsonField(textStyles, null),
+        rsvp: sanitizeJsonField(rsvp, null),
+        audio: sanitizeJsonField(audio, null),
+        bottomHero: sanitizeJsonField(bottomHero, null),
+        socialPreview: sanitizeJsonField(socialPreview, null),
       },
       include: { theme: true },
     });

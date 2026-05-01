@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { sanitizeJsonField } from "@/lib/json-sanitize";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const item = await prisma.saveTheDate.findUnique({
@@ -16,25 +17,49 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   try {
     const body = await req.json();
-    const { slug, themeId, couple, date, customMessage, envelope, textStyles, rsvp, audio, bottomHero } = body;
+
+    const existing = await prisma.saveTheDate.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
     const item = await prisma.saveTheDate.update({
       where: { id },
       data: {
-        slug,
-        themeId,
-        couple,
-        date,
-        customMessage: customMessage || null,
-        envelope: envelope || undefined,
-        textStyles: textStyles || undefined,
-        rsvp: rsvp || undefined,
-        audio: audio || undefined,
-        bottomHero: bottomHero || undefined,
+        ...(body.slug !== undefined && { slug: body.slug }),
+        ...(body.themeId !== undefined && { themeId: body.themeId }),
+        ...(body.couple !== undefined && {
+          couple: sanitizeJsonField(body.couple, existing.couple),
+        }),
+        ...(body.date !== undefined && {
+          date: sanitizeJsonField(body.date, existing.date),
+        }),
+        ...(body.customMessage !== undefined && {
+          customMessage: body.customMessage || null,
+        }),
+        ...(body.envelope !== undefined && {
+          envelope: sanitizeJsonField(body.envelope, null),
+        }),
+        ...(body.textStyles !== undefined && {
+          textStyles: sanitizeJsonField(body.textStyles, null),
+        }),
+        ...(body.rsvp !== undefined && {
+          rsvp: sanitizeJsonField(body.rsvp, null),
+        }),
+        ...(body.audio !== undefined && {
+          audio: sanitizeJsonField(body.audio, null),
+        }),
+        ...(body.bottomHero !== undefined && {
+          bottomHero: sanitizeJsonField(body.bottomHero, null),
+        }),
+        ...(body.socialPreview !== undefined && {
+          socialPreview: sanitizeJsonField(body.socialPreview, null),
+        }),
       },
       include: { theme: true },
     });
@@ -47,7 +72,7 @@ export async function PUT(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   try {
