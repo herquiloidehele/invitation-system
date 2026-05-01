@@ -419,6 +419,7 @@ export interface InvitationData {
   rsvp: {
     enabled: boolean;
     deadline?: string;
+    showEmail?: boolean;
   };
   schedule: ScheduleEvent[];
   dressCode: DressCode;

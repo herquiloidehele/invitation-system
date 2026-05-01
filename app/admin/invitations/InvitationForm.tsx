@@ -331,7 +331,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       longitude: undefined,
       imageUrl: "",
     },
-    rsvp: { enabled: true, deadline: "" },
+    rsvp: { enabled: true, deadline: "", showEmail: false },
     schedule: [],
     dressCode: { enabled: false, text: "" },
     giftRegistry: { enabled: false, text: "", link: "" },
@@ -2008,17 +2008,32 @@ export default function InvitationForm({
                       />
                     </div>
                     {form.rsvp.enabled && (
-                      <div className="space-y-1.5">
-                        <Label htmlFor="rsvpDeadline">Prazo (opcional)</Label>
-                        <Input
-                          id="rsvpDeadline"
-                          value={form.rsvp.deadline ?? ""}
-                          onChange={(e) =>
-                            updateRsvp("deadline", e.target.value)
-                          }
-                          placeholder="e.g. 15 de Agosto de 2026"
-                        />
-                      </div>
+                      <>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="rsvpDeadline">Prazo (opcional)</Label>
+                          <Input
+                            id="rsvpDeadline"
+                            value={form.rsvp.deadline ?? ""}
+                            onChange={(e) =>
+                              updateRsvp("deadline", e.target.value)
+                            }
+                            placeholder="e.g. 15 de Agosto de 2026"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Pedir email no RSVP</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Quando ativo, o formulário pede o email do
+                              convidado.
+                            </p>
+                          </div>
+                          <Switch
+                            checked={form.rsvp.showEmail === true}
+                            onCheckedChange={(v) => updateRsvp("showEmail", v)}
+                          />
+                        </div>
+                      </>
                     )}
                   </div>
 

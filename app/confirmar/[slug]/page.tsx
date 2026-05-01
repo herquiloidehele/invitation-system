@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import type { CustomTexts } from "@/lib/types";
+import { shouldShowRsvpEmail } from "@/lib/rsvp-config";
 import RsvpPage from "./RsvpPage";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,11 @@ export default async function ConfirmarPage({ params }: Props) {
 
   const couple = invitation.couple as { bride: string; groom: string };
   const date = invitation.date as { display: string };
-  const rsvp = invitation.rsvp as { enabled?: boolean; deadline?: string };
+  const rsvp = invitation.rsvp as {
+    enabled?: boolean;
+    deadline?: string;
+    showEmail?: boolean;
+  };
   const customTexts =
     (invitation.customTexts as CustomTexts | null) ?? undefined;
 
@@ -55,6 +60,7 @@ export default async function ConfirmarPage({ params }: Props) {
       dateDisplay={date.display}
       deadline={rsvp.deadline}
       deadlinePassed={deadlinePassed}
+      showEmail={shouldShowRsvpEmail(rsvp)}
       customTexts={customTexts}
     />
   );

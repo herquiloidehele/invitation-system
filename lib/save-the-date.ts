@@ -49,6 +49,7 @@ export interface SaveTheDateThemeData {
 export interface SaveTheDateRsvpConfig {
   enabled: boolean;
   deadline?: string;
+  showEmail?: boolean;
 }
 
 export interface BottomHeroConfig {
@@ -125,7 +126,7 @@ function toSaveTheDateTheme(row: {
 // ---------------------------------------------------------------------------
 
 export async function getSaveTheDate(
-  slug: string
+  slug: string,
 ): Promise<SaveTheDateData | null> {
   const row = await prisma.saveTheDate.findUnique({
     where: { slug },
@@ -140,15 +141,11 @@ export async function getSaveTheDate(
     date: row.date as unknown as SaveTheDateDate,
     customMessage: row.customMessage,
     theme: toSaveTheDateTheme(row.theme),
-    envelope: row.envelope
-      ? (row.envelope as unknown as EnvelopeConfig)
-      : null,
+    envelope: row.envelope ? (row.envelope as unknown as EnvelopeConfig) : null,
     textStyles: row.textStyles
       ? (row.textStyles as unknown as TextStyleOverrides)
       : null,
-    rsvp: row.rsvp
-      ? (row.rsvp as unknown as SaveTheDateRsvpConfig)
-      : null,
+    rsvp: row.rsvp ? (row.rsvp as unknown as SaveTheDateRsvpConfig) : null,
     audio: row.audio
       ? (row.audio as unknown as AudioConfig)
       : { enabled: false, src: "", artist: "", title: "" },
@@ -166,7 +163,7 @@ export async function getSaveDateThemes(): Promise<SaveTheDateThemeData[]> {
 }
 
 export async function getSaveDateTheme(
-  name: string
+  name: string,
 ): Promise<SaveTheDateThemeData | null> {
   const row = await prisma.saveTheDateTheme.findUnique({
     where: { name },

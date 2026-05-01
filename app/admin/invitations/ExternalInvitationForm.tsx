@@ -104,7 +104,7 @@ function getDefaultState(
     },
     quote: "",
     location: { name: "", address: "", googleMapsUrl: "" },
-    rsvp: { enabled: false },
+    rsvp: { enabled: false, showEmail: false },
     schedule: [],
     dressCode: { enabled: false, text: "" },
     giftRegistry: { enabled: false, text: "" },
@@ -161,7 +161,9 @@ function RsvpLinkPanel({ slug }: { slug: string }) {
         <div>
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium">Link de confirmação (RSVP)</p>
-            <Badge variant="secondary" className="text-xs">Convidados</Badge>
+            <Badge variant="secondary" className="text-xs">
+              Convidados
+            </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             Partilhe este link para os convidados confirmarem presença.
@@ -770,7 +772,8 @@ export default function ExternalInvitationForm({
                     <div className="space-y-0.5">
                       <Label>Áudio de fundo</Label>
                       <p className="text-xs text-muted-foreground">
-                        Toca em background depois do convidado abrir a capa, sem controlos visíveis.
+                        Toca em background depois do convidado abrir a capa, sem
+                        controlos visíveis.
                       </p>
                     </div>
                     <Switch
@@ -796,7 +799,9 @@ export default function ExternalInvitationForm({
                           <Input
                             id="externalAudioArtist"
                             value={form.audio.artist}
-                            onChange={(e) => updateAudio("artist", e.target.value)}
+                            onChange={(e) =>
+                              updateAudio("artist", e.target.value)
+                            }
                           />
                         </div>
                         <div className="space-y-1.5">
@@ -804,7 +809,9 @@ export default function ExternalInvitationForm({
                           <Input
                             id="externalAudioTitle"
                             value={form.audio.title}
-                            onChange={(e) => updateAudio("title", e.target.value)}
+                            onChange={(e) =>
+                              updateAudio("title", e.target.value)
+                            }
                           />
                         </div>
                       </div>

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
 import type { CustomTexts } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
@@ -61,6 +61,7 @@ interface RsvpPageProps {
   dateDisplay: string;
   deadline?: string;
   deadlinePassed: boolean;
+  showEmail?: boolean;
   customTexts?: CustomTexts;
 }
 
@@ -76,13 +77,18 @@ const palette = {
   textMuted: "#A5A39F",
   border: "#E6E4E0",
   fieldBg: "#F4F3F0",
-  accent: "#BE8C7A",        // warm neutral rose
+  accent: "#BE8C7A", // warm neutral rose
   ctaBg: "#2C2C2B",
   ctaText: "#FFFFFF",
   ctaRadius: "10px",
 };
 
-type SubmitState = "idle" | "loading" | "success" | "error" | "already_submitted";
+type SubmitState =
+  | "idle"
+  | "loading"
+  | "success"
+  | "error"
+  | "already_submitted";
 
 // ---------------------------------------------------------------------------
 // Component
@@ -95,6 +101,7 @@ export default function RsvpPage({
   dateDisplay,
   deadline,
   deadlinePassed,
+  showEmail = false,
   customTexts: ct,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
@@ -172,7 +179,10 @@ export default function RsvpPage({
   return (
     <div
       className="min-h-dvh flex flex-col"
-      style={{ backgroundColor: palette.bg, fontFamily: "'Inter', system-ui, sans-serif" }}
+      style={{
+        backgroundColor: palette.bg,
+        fontFamily: "'Inter', system-ui, sans-serif",
+      }}
     >
       {/* ── Header ── */}
       <header
@@ -187,7 +197,10 @@ export default function RsvpPage({
         </p>
         <h1
           className="text-3xl font-light tracking-tight"
-          style={{ color: palette.text, fontFamily: "'Georgia', 'Times New Roman', serif" }}
+          style={{
+            color: palette.text,
+            fontFamily: "'Georgia', 'Times New Roman', serif",
+          }}
         >
           {bride} &amp; {groom}
         </h1>
@@ -207,7 +220,11 @@ export default function RsvpPage({
           {/* ── Deadline closed ── */}
           {deadlinePassed ? (
             <div className="flex flex-col items-center gap-4 px-6 py-14 text-center">
-              <Clock size={44} strokeWidth={1.3} style={{ color: palette.textMuted }} />
+              <Clock
+                size={44}
+                strokeWidth={1.3}
+                style={{ color: palette.textMuted }}
+              />
               <p
                 className="text-lg font-medium"
                 style={{ color: palette.text }}
@@ -236,7 +253,11 @@ export default function RsvpPage({
           ) : submitState === "success" ? (
             /* ── Success ── */
             <div className="flex flex-col items-center gap-4 px-6 py-14 text-center">
-              <CheckCircle size={44} strokeWidth={1.3} style={{ color: palette.accent }} />
+              <CheckCircle
+                size={44}
+                strokeWidth={1.3}
+                style={{ color: palette.accent }}
+              />
               <p
                 className="text-lg font-medium"
                 style={{ color: palette.text }}
@@ -287,7 +308,10 @@ export default function RsvpPage({
                   {t(ct, "rsvp_modalTitle")}
                 </h2>
                 {deadline && (
-                  <p className="mt-1 text-xs" style={{ color: palette.textMuted }}>
+                  <p
+                    className="mt-1 text-xs"
+                    style={{ color: palette.textMuted }}
+                  >
                     {t(ct, "rsvp_deadlinePrefix")} {deadline}
                   </p>
                 )}
@@ -303,41 +327,51 @@ export default function RsvpPage({
                   style={inputStyle}
                 />
                 {errors.name && (
-                  <span className="text-xs text-red-500">{errors.name.message}</span>
+                  <span className="text-xs text-red-500">
+                    {errors.name.message}
+                  </span>
                 )}
               </div>
 
-              {/* Email */}
-              <div className="flex flex-col gap-1.5">
-                <label style={labelStyle}>{t(ct, "rsvp_emailLabel")}</label>
-                <input
-                  {...register("email")}
-                  type="email"
-                  placeholder={t(ct, "rsvp_emailPlaceholder")}
-                  className={inputBase}
-                  style={inputStyle}
-                />
-                {errors.email && (
-                  <span className="text-xs text-red-500">{errors.email.message}</span>
-                )}
-              </div>
+              {showEmail && (
+                <div className="flex flex-col gap-1.5">
+                  <label style={labelStyle}>{t(ct, "rsvp_emailLabel")}</label>
+                  <input
+                    {...register("email")}
+                    type="email"
+                    placeholder={t(ct, "rsvp_emailPlaceholder")}
+                    className={inputBase}
+                    style={inputStyle}
+                  />
+                  {errors.email && (
+                    <span className="text-xs text-red-500">
+                      {errors.email.message}
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Attending */}
               <div className="flex flex-col gap-2">
                 <label style={labelStyle}>{t(ct, "rsvp_attendingLabel")}</label>
                 <div className="flex gap-3">
                   {(["yes", "no"] as const).map((val) => {
-                    const label = val === "yes"
-                      ? t(ct, "rsvp_attendingYes")
-                      : t(ct, "rsvp_attendingNo");
+                    const label =
+                      val === "yes"
+                        ? t(ct, "rsvp_attendingYes")
+                        : t(ct, "rsvp_attendingNo");
                     const selected = attending === val;
                     return (
                       <label
                         key={val}
                         className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition-all"
                         style={{
-                          borderColor: selected ? palette.accent : palette.border,
-                          backgroundColor: selected ? palette.accent + "18" : "transparent",
+                          borderColor: selected
+                            ? palette.accent
+                            : palette.border,
+                          backgroundColor: selected
+                            ? palette.accent + "18"
+                            : "transparent",
                           color: palette.text,
                           fontFamily: "'Inter', system-ui, sans-serif",
                         }}
@@ -354,7 +388,9 @@ export default function RsvpPage({
                   })}
                 </div>
                 {errors.attending && (
-                  <span className="text-xs text-red-500">{errors.attending.message}</span>
+                  <span className="text-xs text-red-500">
+                    {errors.attending.message}
+                  </span>
                 )}
               </div>
 

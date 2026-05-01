@@ -14,6 +14,7 @@ import type {
 } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { t } from "@/lib/custom-texts";
+import { shouldShowRsvpEmail } from "@/lib/rsvp-config";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -121,6 +122,7 @@ interface DirectProps {
   onClose: () => void;
   invitationSlug: string;
   theme: RSVPThemeLegacy;
+  showEmail?: boolean;
   /** Override the API endpoint — defaults to "/api/rsvp" */
   apiEndpoint?: string;
   /** Override the slug field name sent in the body — defaults to "invitationSlug" */
@@ -194,6 +196,9 @@ export default function RSVPModal(props: RSVPModalProps) {
     : undefined;
   const ct = isIntegration(props) ? props.customTexts : undefined;
   const guest = isIntegration(props) ? props.guest : undefined;
+  const showEmail = isIntegration(props)
+    ? shouldShowRsvpEmail(props.invitation.rsvp)
+    : props.showEmail === true;
   const apiEndpoint = props.apiEndpoint ?? "/api/rsvp";
   const slugKey = props.slugKey ?? "invitationSlug";
 
@@ -504,22 +509,25 @@ export default function RSVPModal(props: RSVPModalProps) {
                     )}
                   </div>
 
-                  {/* Email */}
-                  <div className="flex flex-col gap-1.5">
-                    <label style={labelStyle}>{t(ct, "rsvp_emailLabel")}</label>
-                    <input
-                      {...register("email")}
-                      type="email"
-                      placeholder={t(ct, "rsvp_emailPlaceholder")}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
-                    {errors.email && (
-                      <span className="text-xs text-red-500">
-                        {errors.email.message}
-                      </span>
-                    )}
-                  </div>
+                  {showEmail && (
+                    <div className="flex flex-col gap-1.5">
+                      <label style={labelStyle}>
+                        {t(ct, "rsvp_emailLabel")}
+                      </label>
+                      <input
+                        {...register("email")}
+                        type="email"
+                        placeholder={t(ct, "rsvp_emailPlaceholder")}
+                        className={inputClass}
+                        style={inputStyle}
+                      />
+                      {errors.email && (
+                        <span className="text-xs text-red-500">
+                          {errors.email.message}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Attending */}
                   <div className="flex flex-col gap-2">

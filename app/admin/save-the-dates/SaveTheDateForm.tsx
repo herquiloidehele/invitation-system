@@ -24,12 +24,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +33,12 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SaveTheDateThemeData } from "@/lib/save-the-date";
-import type { EnvelopeConfig, TemplateTheme, TextStyle, TextStyleOverrides } from "@/lib/types";
+import type {
+  EnvelopeConfig,
+  TemplateTheme,
+  TextStyle,
+  TextStyleOverrides,
+} from "@/lib/types";
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
@@ -66,9 +66,15 @@ export interface SaveTheDateFormData {
   customMessage: string;
   envelope?: EnvelopeConfig;
   textStyles?: TextStyleOverrides;
-  rsvp?: { enabled: boolean; deadline?: string };
+  rsvp?: { enabled: boolean; deadline?: string; showEmail?: boolean };
   audio?: { enabled: boolean; src: string; artist: string; title: string };
-  bottomHero?: { enabled: boolean; mediaUrl: string; mediaType: "image" | "video"; title: string; description: string };
+  bottomHero?: {
+    enabled: boolean;
+    mediaUrl: string;
+    mediaType: "image" | "video";
+    title: string;
+    description: string;
+  };
   ownerToken?: string;
 }
 
@@ -138,7 +144,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
 
   const selectedTheme = useMemo(
     () => themes.find((t) => t.id === data.themeId) || themes[0],
-    [themes, data.themeId]
+    [themes, data.themeId],
   );
 
   // Has envelope configured on theme?
@@ -181,7 +187,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       audio: data.audio || { enabled: false, src: "", artist: "", title: "" },
       bottomHero: data.bottomHero || null,
     }),
-    [data, selectedTheme]
+    [data, selectedTheme],
   );
 
   const updateCouple = useCallback(
@@ -196,7 +202,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
         };
       });
     },
-    [mode]
+    [mode],
   );
 
   const updateDate = useCallback((iso: string) => {
@@ -220,13 +226,13 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
         envelope: { ...prev.envelope, [key]: value },
       }));
     },
-    []
+    [],
   );
 
   const updateAudio = useCallback(
     <K extends keyof NonNullable<SaveTheDateFormData["audio"]>>(
       key: K,
-      value: NonNullable<SaveTheDateFormData["audio"]>[K]
+      value: NonNullable<SaveTheDateFormData["audio"]>[K],
     ) => {
       setData((prev) => ({
         ...prev,
@@ -240,7 +246,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
         },
       }));
     },
-    []
+    [],
   );
 
   const updateTextStyleElement = useCallback(
@@ -311,7 +317,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       toast.success(
         mode === "create"
           ? "Save the Date criado!"
-          : "Save the Date atualizado!"
+          : "Save the Date atualizado!",
       );
 
       if (mode === "create") {
@@ -523,9 +529,9 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                   <div className="space-y-0.5">
                     <Label>Activar confirmação de presença</Label>
                     <p className="text-xs text-muted-foreground">
-                      Quando activo, os convidados verão um botão &quot;Confirmar
-                      Presença&quot; em vez de (ou além de) &quot;Add to
-                      Calendar&quot;.
+                      Quando activo, os convidados verão um botão
+                      &quot;Confirmar Presença&quot; em vez de (ou além de)
+                      &quot;Add to Calendar&quot;.
                     </p>
                   </div>
                   <Switch
@@ -539,77 +545,121 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                   />
                 </div>
                 {data.rsvp?.enabled && (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="rsvpDeadline">
-                      Prazo limite (opcional)
-                    </Label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="date"
-                        id="rsvpDeadline"
-                        value={
-                          data.rsvp?.deadline
-                            ? (() => {
-                                // Parse "15 de Agosto de 2027" back to ISO for the date input
-                                const match = data.rsvp.deadline.match(
-                                  /(\d+) de (\w+) de (\d{4})/,
-                                );
-                                if (match) {
-                                  const monthIndex = MONTHS_PT.indexOf(match[2]);
-                                  if (monthIndex !== -1) {
-                                    const d = String(match[1]).padStart(2, "0");
-                                    const m = String(monthIndex + 1).padStart(2, "0");
-                                    return `${match[3]}-${m}-${d}`;
+                  <>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="rsvpDeadline">
+                        Prazo limite (opcional)
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="date"
+                          id="rsvpDeadline"
+                          value={
+                            data.rsvp?.deadline
+                              ? (() => {
+                                  // Parse "15 de Agosto de 2027" back to ISO for the date input
+                                  const match = data.rsvp.deadline.match(
+                                    /(\d+) de (\w+) de (\d{4})/,
+                                  );
+                                  if (match) {
+                                    const monthIndex = MONTHS_PT.indexOf(
+                                      match[2],
+                                    );
+                                    if (monthIndex !== -1) {
+                                      const d = String(match[1]).padStart(
+                                        2,
+                                        "0",
+                                      );
+                                      const m = String(monthIndex + 1).padStart(
+                                        2,
+                                        "0",
+                                      );
+                                      return `${match[3]}-${m}-${d}`;
+                                    }
                                   }
-                                }
-                                return "";
-                              })()
-                            : ""
-                        }
-                        onChange={(e) => {
-                          const iso = e.target.value;
-                          if (!iso) {
+                                  return "";
+                                })()
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const iso = e.target.value;
+                            if (!iso) {
+                              setData((p) => ({
+                                ...p,
+                                rsvp: {
+                                  ...p.rsvp,
+                                  enabled: p.rsvp?.enabled ?? true,
+                                  deadline: undefined,
+                                },
+                              }));
+                              return;
+                            }
+                            const d = new Date(iso);
+                            const display = `${d.getUTCDate()} de ${MONTHS_PT[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
                             setData((p) => ({
                               ...p,
-                              rsvp: { enabled: p.rsvp?.enabled ?? true, deadline: undefined },
+                              rsvp: {
+                                ...p.rsvp,
+                                enabled: p.rsvp?.enabled ?? true,
+                                deadline: display,
+                              },
                             }));
-                            return;
-                          }
-                          const d = new Date(iso);
-                          const display = `${d.getUTCDate()} de ${MONTHS_PT[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
+                          }}
+                          className="h-9 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring w-full"
+                        />
+                        {data.rsvp?.deadline && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="shrink-0 text-muted-foreground"
+                            onClick={() =>
+                              setData((p) => ({
+                                ...p,
+                                rsvp: {
+                                  ...p.rsvp,
+                                  enabled: p.rsvp?.enabled ?? true,
+                                  deadline: undefined,
+                                },
+                              }))
+                            }
+                          >
+                            Limpar
+                          </Button>
+                        )}
+                      </div>
+                      {data.rsvp?.deadline && (
+                        <p className="text-[11px] text-muted-foreground">
+                          Será exibido como:{" "}
+                          <strong>{data.rsvp.deadline}</strong>
+                        </p>
+                      )}
+                      <p className="text-[11px] text-muted-foreground">
+                        Texto mostrado no topo do formulário de confirmação.
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Pedir email no RSVP</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Quando activo, o formulário pede o email do convidado.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={data.rsvp?.showEmail === true}
+                        onCheckedChange={(v) =>
                           setData((p) => ({
                             ...p,
-                            rsvp: { enabled: p.rsvp?.enabled ?? true, deadline: display },
-                          }));
-                        }}
-                        className="h-9 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring w-full"
+                            rsvp: {
+                              ...p.rsvp,
+                              enabled: p.rsvp?.enabled ?? true,
+                              showEmail: v,
+                            },
+                          }))
+                        }
                       />
-                      {data.rsvp?.deadline && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="shrink-0 text-muted-foreground"
-                          onClick={() =>
-                            setData((p) => ({
-                              ...p,
-                              rsvp: { enabled: p.rsvp?.enabled ?? true, deadline: undefined },
-                            }))
-                          }
-                        >
-                          Limpar
-                        </Button>
-                      )}
                     </div>
-                    {data.rsvp?.deadline && (
-                      <p className="text-[11px] text-muted-foreground">
-                        Será exibido como: <strong>{data.rsvp.deadline}</strong>
-                      </p>
-                    )}
-                    <p className="text-[11px] text-muted-foreground">
-                      Texto mostrado no topo do formulário de confirmação.
-                    </p>
-                  </div>
+                  </>
                 )}
               </AccordionContent>
             </AccordionItem>
@@ -775,8 +825,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
             {/* ── Audio ── */}
             <AccordionItem value="audio" className="border rounded-lg px-4">
               <AccordionTrigger className="text-sm font-medium">
-                Áudio{" "}
-                {data.audio?.enabled ? "(ativo)" : "(desativado)"}
+                Áudio {data.audio?.enabled ? "(ativo)" : "(desativado)"}
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pb-4">
                 <div className="space-y-3">
@@ -823,7 +872,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       </div>
                       {!hasEnvelope && (
                         <p className="text-xs text-muted-foreground">
-                          O áudio só é reproduzido quando o Save the Date tem envelope configurado.
+                          O áudio só é reproduzido quando o Save the Date tem
+                          envelope configurado.
                         </p>
                       )}
                     </div>
@@ -833,7 +883,10 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
             </AccordionItem>
 
             {/* ── Bottom Hero ── */}
-            <AccordionItem value="bottomHero" className="border rounded-lg px-4">
+            <AccordionItem
+              value="bottomHero"
+              className="border rounded-lg px-4"
+            >
               <AccordionTrigger className="text-sm font-medium">
                 Secção Inferior{" "}
                 {data.bottomHero?.enabled ? "(ativa)" : "(desativada)"}
@@ -843,7 +896,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                   <div className="space-y-0.5">
                     <Label>Ativar secção inferior</Label>
                     <p className="text-xs text-muted-foreground">
-                      Secção com imagem ou vídeo de fundo que aparece ao fazer scroll.
+                      Secção com imagem ou vídeo de fundo que aparece ao fazer
+                      scroll.
                     </p>
                   </div>
                   <Switch
@@ -871,7 +925,12 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                         onValueChange={(v) =>
                           setData((p) => ({
                             ...p,
-                            bottomHero: { ...p.bottomHero!, mediaType: (v as "image" | "video") || p.bottomHero!.mediaType },
+                            bottomHero: {
+                              ...p.bottomHero!,
+                              mediaType:
+                                (v as "image" | "video") ||
+                                p.bottomHero!.mediaType,
+                            },
                           }))
                         }
                       >
@@ -892,7 +951,9 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       </Label>
                       <MediaUpload
                         kind={data.bottomHero.mediaType}
-                        maxSizeMB={data.bottomHero.mediaType === "video" ? 100 : 5}
+                        maxSizeMB={
+                          data.bottomHero.mediaType === "video" ? 100 : 5
+                        }
                         value={data.bottomHero.mediaUrl || undefined}
                         onUpload={(url) =>
                           setData((p) => ({
@@ -916,7 +977,10 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                         onChange={(e) =>
                           setData((p) => ({
                             ...p,
-                            bottomHero: { ...p.bottomHero!, title: e.target.value },
+                            bottomHero: {
+                              ...p.bottomHero!,
+                              title: e.target.value,
+                            },
                           }))
                         }
                         placeholder="e.g. Vemo-nos em breve"
@@ -930,7 +994,10 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                         onChange={(e) =>
                           setData((p) => ({
                             ...p,
-                            bottomHero: { ...p.bottomHero!, description: e.target.value },
+                            bottomHero: {
+                              ...p.bottomHero!,
+                              description: e.target.value,
+                            },
                           }))
                         }
                         placeholder="e.g. Mal podemos esperar para celebrar convosco"

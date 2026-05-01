@@ -23,6 +23,7 @@ import { EditableText } from "@/components/shared/EditableText";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { getSaveTheDateSparkles } from "@/lib/save-the-date-motion";
 import { getSaveTheDateRsvpButtonBackground } from "@/lib/save-the-date-rsvp-button";
+import { shouldShowRsvpEmail } from "@/lib/rsvp-config";
 
 interface SaveTheDateViewProps {
   saveTheDate: SaveTheDateData;
@@ -786,6 +787,7 @@ export default function SaveTheDateView({
             invitationSlug={saveTheDate.slug}
             apiEndpoint="/api/save-the-date/rsvp"
             slugKey="saveTheDateSlug"
+            showEmail={shouldShowRsvpEmail(saveTheDate.rsvp)}
             theme={{
               bg: theme.bgColor,
               cardBg: "#FFFFFF",
