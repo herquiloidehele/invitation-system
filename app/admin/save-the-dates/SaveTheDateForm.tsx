@@ -35,14 +35,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SaveTheDateThemeData } from "@/lib/save-the-date";
 import type {
   EnvelopeConfig,
+  SocialPreview,
   TemplateTheme,
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
+import { resolveSaveTheDateSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
+import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import { OwnerLinkPanel } from "@/app/admin/invitations/OwnerLinkPanel";
@@ -75,6 +78,7 @@ export interface SaveTheDateFormData {
     title: string;
     description: string;
   };
+  socialPreview?: SocialPreview;
   ownerToken?: string;
 }
 
@@ -186,9 +190,14 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       rsvp: data.rsvp || null,
       audio: data.audio || { enabled: false, src: "", artist: "", title: "" },
       bottomHero: data.bottomHero || null,
-      socialPreview: null,
+      socialPreview: data.socialPreview ?? null,
     }),
     [data, selectedTheme],
+  );
+
+  const resolvedSocialPreview = resolveSaveTheDateSocialPreview(
+    previewData,
+    typeof window !== "undefined" ? window.location.origin : "",
   );
 
   const updateCouple = useCallback(
@@ -306,6 +315,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           rsvp: data.rsvp || null,
           audio: data.audio || null,
           bottomHero: data.bottomHero || null,
+          socialPreview: data.socialPreview ?? null,
         }),
       });
 
@@ -1009,6 +1019,22 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                 )}
               </AccordionContent>
             </AccordionItem>
+
+            <SocialPreviewSection
+              accordionValue="socialPreview"
+              value={data.socialPreview}
+              onChange={(next) =>
+                setData((p) => ({ ...p, socialPreview: next }))
+              }
+              resolvedImage={resolvedSocialPreview.image}
+              resolvedTitle={resolvedSocialPreview.title}
+              resolvedDescription={resolvedSocialPreview.description}
+              publicUrl={
+                data.slug
+                  ? `${typeof window !== "undefined" ? window.location.origin : ""}/s/${data.slug}`
+                  : undefined
+              }
+            />
           </Accordion>
         </div>
       </ScrollArea>

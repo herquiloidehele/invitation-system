@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getSaveDateThemes } from "@/lib/save-the-date";
-import type { TextStyleOverrides } from "@/lib/types";
+import type { SocialPreview, TextStyleOverrides } from "@/lib/types";
 import SaveTheDateForm from "../../SaveTheDateForm";
 import type { SaveTheDateFormData } from "../../SaveTheDateForm";
 
@@ -67,6 +67,8 @@ export default async function EditSaveTheDatePage({
     rsvp: rsvp || undefined,
     audio: audio || undefined,
     bottomHero: bottomHero || undefined,
+    socialPreview:
+      (item.socialPreview as SocialPreview | null) ?? undefined,
     ownerToken: item.ownerToken,
   };
 
