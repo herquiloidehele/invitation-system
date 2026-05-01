@@ -101,7 +101,7 @@ function TopFlap({
           opening
             ? {
                 opacity: 1,
-                transform: topFlapShadowTransform(18, 1, 1),
+                transform: topFlapShadowTransform(12, 1, 1),
               }
             : {
                 opacity: 0,
@@ -121,8 +121,8 @@ function TopFlap({
           alt=""
           className="w-full h-full object-cover object-bottom"
           style={{
-            filter: "brightness(0) blur(28px)",
-            opacity: 0.75,
+            filter: "brightness(0) blur(40px)",
+            opacity: 0.8,
             transform: "translateZ(0)",
             height: "calc(100%)",
             width: "100vw",
