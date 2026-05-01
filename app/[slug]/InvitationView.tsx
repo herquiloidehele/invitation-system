@@ -24,6 +24,7 @@ export default function InvitationView({
   const [coverVisible, setCoverVisible] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [videoVisible, setVideoVisible] = useState(false);
+  const [externalLinkVisible, setExternalLinkVisible] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<ExternalVideoPageHandle | null>(null);
@@ -31,6 +32,10 @@ export default function InvitationView({
 
   const isExternalVideo =
     (invitation.invitationType ?? "standard") === "external_video";
+
+  const isExternalLink =
+    (invitation.invitationType ?? "standard") === "external_link" &&
+    !!invitation.externalLink;
 
   // Standard invitations with a hero video need the bytes pre-buffered
   // before the invite is opened, so the video plays instantly.
@@ -152,6 +157,14 @@ export default function InvitationView({
       return;
     }
 
+    // For external links the <iframe> has been pre-loading behind the
+    // envelope cover. Just reveal it — no extra fetch needed.
+    if (type === "external_link") {
+      setExternalLinkVisible(true);
+      requestAnimationFrame(() => setCoverVisible(false));
+      return;
+    }
+
     setShowContent(true);
     requestAnimationFrame(() => {
       setCoverVisible(false);
@@ -160,13 +173,9 @@ export default function InvitationView({
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
-    const type = invitation.invitationType ?? "standard";
-
-    if (type === "external_link" && invitation.externalLink) {
-      return <ExternalLinkPage externalLink={invitation.externalLink} />;
-    }
-
-    // Default: standard full invitation page
+    // External link/video are rendered as persistent siblings (outside this
+    // AnimatePresence) so they can prefetch behind the envelope cover.
+    // Default: standard full invitation page.
     return (
       <InvitationPage
         invitation={invitation}
@@ -197,6 +206,17 @@ export default function InvitationView({
             visible={videoVisible}
             invitation={invitation}
             theme={mergedTheme}
+          />
+        )}
+
+        {/* External link iframe — same pattern: mounted immediately so the
+            upstream Canva page (proxied through /canva-proxy) starts loading
+            in parallel with the envelope animation, then revealed once the
+            envelope finishes opening. */}
+        {isExternalLink && (
+          <ExternalLinkPage
+            externalLink={invitation.externalLink!}
+            visible={externalLinkVisible}
           />
         )}
 
