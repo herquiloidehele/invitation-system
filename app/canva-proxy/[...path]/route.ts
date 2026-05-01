@@ -93,13 +93,52 @@ function buildRequestHeaders(req: NextRequest, host: string): Headers {
   return headers;
 }
 
-function buildResponseHeaders(upstream: Response): Headers {
+/**
+ * Decide a sensible `Cache-Control` for the proxied response.
+ *
+ * Canva sets `no-store, no-cache` on every response, which is fine for the
+ * HTML document but counter-productive for content-hashed static assets:
+ * we want the browser to cache them so that the iframe's "reveal reload"
+ * (see ExternalLinkPage) is near-instant.
+ *
+ * `_assets/*` paths in Canva's output are immutable (filenames embed a
+ * content hash), so they are safe to cache aggressively.
+ */
+function pickCacheControl(
+  upstreamPath: string,
+  upstreamCacheControl: string | null,
+): string {
+  const isHashedAsset =
+    /\/_assets\//.test(upstreamPath) ||
+    /\.(?:js|css|woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico|mp4|webm|mp3|json)$/i.test(
+      upstreamPath,
+    );
+
+  if (isHashedAsset) {
+    return "public, max-age=31536000, immutable";
+  }
+  // Fall back to whatever the upstream said for HTML / unknown content.
+  return upstreamCacheControl ?? "no-store";
+}
+
+function buildResponseHeaders(
+  upstream: Response,
+  upstreamPath: string,
+): Headers {
   const headers = new Headers();
   upstream.headers.forEach((value, key) => {
     if (!STRIPPED_RESPONSE_HEADERS.has(key.toLowerCase())) {
       headers.set(key, value);
     }
   });
+
+  // Override caching so static assets persist across the prefetch→reveal
+  // reload (see ExternalLinkPage's loadKey logic).
+  headers.set(
+    "cache-control",
+    pickCacheControl(upstreamPath, upstream.headers.get("cache-control")),
+  );
+
   // Same-origin requests don't strictly need CORS, but Canva's <link> tags
   // include `crossorigin="anonymous"`, which causes the browser to perform a
   // CORS check even on same-origin URLs. Granting `*` keeps those loads happy.
@@ -186,7 +225,7 @@ export async function GET(
     );
   }
 
-  const responseHeaders = buildResponseHeaders(resp);
+  const responseHeaders = buildResponseHeaders(resp, upstream.url.pathname);
   const contentType = resp.headers.get("content-type") ?? "";
 
   // For HTML responses, inject a <base> tag so relative URLs resolve correctly.

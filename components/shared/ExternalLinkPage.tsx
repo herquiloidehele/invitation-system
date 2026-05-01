@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 /* ------------------------------------------------------------------ */
 /*  ExternalLinkPage                                                    */
 /*                                                                      */
@@ -11,9 +13,21 @@
 /*  rewritten to go through `/canva-proxy/<host>/<path>`, a Next.js    */
 /*  route that strips framing-blocking response headers.                */
 /*                                                                      */
-/*  When `visible` is false the iframe is mounted but visually hidden  */
-/*  so the upstream content can pre-load behind the envelope cover —   */
-/*  the same prefetch pattern used by ExternalVideoPage.                */
+/*  Load timing strategy:                                               */
+/*                                                                      */
+/*    1. The iframe mounts immediately, even while `visible` is false. */
+/*       This pre-warms the HTTP cache: HTML, JS, CSS, fonts and       */
+/*       images all download in the background while the envelope      */
+/*       cover is still on top.                                         */
+/*                                                                      */
+/*    2. When `visible` flips to true (envelope animation complete)    */
+/*       we force a fresh load of the iframe by bumping its `key`.     */
+/*       This restarts Canva's intro animations from frame 0, but the */
+/*       second load is near-instant because every asset is cached.    */
+/*                                                                      */
+/*  Without step 2 the user would see the invitation mid-animation —   */
+/*  Canva's scripts kick off the moment the document parses, which is */
+/*  long before the envelope opens.                                     */
 /* ------------------------------------------------------------------ */
 
 interface ExternalLinkPageProps {
@@ -47,6 +61,18 @@ export default function ExternalLinkPage({
 }: ExternalLinkPageProps) {
   const src = toProxiedUrl(externalLink);
 
+  // The key bump triggers a fresh iframe load when we transition from
+  // hidden → visible, restarting upstream animations from the start.
+  const [loadKey, setLoadKey] = useState(0);
+  const hasRevealedRef = useRef(false);
+
+  useEffect(() => {
+    if (visible && !hasRevealedRef.current) {
+      hasRevealedRef.current = true;
+      setLoadKey((k) => k + 1);
+    }
+  }, [visible]);
+
   return (
     <div
       aria-hidden={!visible}
@@ -66,6 +92,7 @@ export default function ExternalLinkPage({
       }}
     >
       <iframe
+        key={loadKey}
         src={src}
         title="Convite externo"
         allowFullScreen
