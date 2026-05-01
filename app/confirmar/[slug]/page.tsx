@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import type { CustomTexts } from "@/lib/types";
+import type { CustomTexts, InvitationEventType } from "@/lib/types";
 import { shouldShowRsvpEmail } from "@/lib/rsvp-config";
 import RsvpPage from "./RsvpPage";
 
@@ -35,6 +35,7 @@ export default async function ConfirmarPage({ params }: Props) {
       date: true,
       rsvp: true,
       customTexts: true,
+      eventType: true,
     },
   });
 
@@ -55,6 +56,7 @@ export default async function ConfirmarPage({ params }: Props) {
   return (
     <RsvpPage
       slug={slug}
+      eventType={(invitation.eventType as InvitationEventType) ?? "wedding"}
       bride={couple.bride}
       groom={couple.groom}
       dateDisplay={date.display}

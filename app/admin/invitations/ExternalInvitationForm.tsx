@@ -14,10 +14,16 @@ import {
 
 import type {
   InvitationData,
+  InvitationEventType,
   InvitationType,
   TemplateTheme,
   EnvelopeConfig,
 } from "@/lib/types";
+import {
+  buildInvitationMonogram,
+  buildInvitationSlug,
+  isWeddingEventType,
+} from "@/lib/invitation-event-types";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,21 +65,16 @@ import { OwnerLinkPanel } from "./OwnerLinkPanel";
 // Helpers
 // ---------------------------------------------------------------------------
 
-function slugify(bride: string, groom: string): string {
-  return `${bride}-${groom}`
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function monogramFrom(bride: string, groom: string): string {
-  const b = bride.trim().charAt(0).toUpperCase();
-  const g = groom.trim().charAt(0).toUpperCase();
-  return b && g ? `${b}&${g}` : "";
-}
+const EVENT_TYPE_OPTIONS: {
+  value: InvitationEventType;
+  label: string;
+}[] = [
+  { value: "wedding", label: "Casamento" },
+  { value: "anniversary", label: "Aniversário" },
+  { value: "baptism", label: "Batizado" },
+  { value: "engagement", label: "Noivado" },
+  { value: "other", label: "Outro" },
+];
 
 function colorPickerValue(value: string | undefined, fallback: string): string {
   return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
@@ -103,6 +104,7 @@ function getDefaultState(
       year: "",
     },
     quote: "",
+    eventType: "wedding",
     location: { name: "", address: "", googleMapsUrl: "" },
     rsvp: { enabled: false, showEmail: false },
     schedule: [],
@@ -222,6 +224,7 @@ export default function ExternalInvitationForm({
     initialData ?? getDefaultState(themes[0]),
   );
 
+  const isWedding = isWeddingEventType(form.eventType);
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
   const showAudioControls = shouldShowExternalInvitationAudioControls(subType);
   const publicHref = getExternalInvitationPublicHref(form.slug);
@@ -242,18 +245,47 @@ export default function ExternalInvitationForm({
     (field: "bride" | "groom", value: string) => {
       setForm((prev) => {
         const couple = { ...prev.couple, [field]: value };
-        couple.monogram = monogramFrom(
-          field === "bride" ? value : prev.couple.bride,
-          field === "groom" ? value : prev.couple.groom,
-        );
+        couple.monogram = buildInvitationMonogram({
+          eventType: prev.eventType,
+          primaryName: field === "bride" ? value : prev.couple.bride,
+          secondaryName: field === "groom" ? value : prev.couple.groom,
+        });
         const newSlug =
           mode === "create"
-            ? slugify(
-                field === "bride" ? value : prev.couple.bride,
-                field === "groom" ? value : prev.couple.groom,
-              )
+            ? buildInvitationSlug({
+                eventType: prev.eventType,
+                primaryName: field === "bride" ? value : prev.couple.bride,
+                secondaryName: field === "groom" ? value : prev.couple.groom,
+              })
             : prev.slug;
         return { ...prev, couple, slug: newSlug };
+      });
+    },
+    [mode],
+  );
+
+  const updateEventType = useCallback(
+    (eventType: InvitationEventType) => {
+      setForm((prev) => {
+        const couple = {
+          ...prev.couple,
+          monogram: buildInvitationMonogram({
+            eventType,
+            primaryName: prev.couple.bride,
+            secondaryName: prev.couple.groom,
+          }),
+        };
+        const next: InvitationData = { ...prev, eventType, couple };
+        return mode === "create"
+          ? {
+              ...next,
+              slug: buildInvitationSlug({
+                eventType,
+                primaryName: prev.couple.bride,
+                secondaryName: prev.couple.groom,
+              }),
+            }
+          : next;
       });
     },
     [mode],
@@ -326,8 +358,12 @@ export default function ExternalInvitationForm({
       toast.error("O slug é obrigatório");
       return;
     }
-    if (!form.couple.bride || !form.couple.groom) {
-      toast.error("Os nomes da noiva e do noivo são obrigatórios");
+    if (!form.couple.bride || (isWedding && !form.couple.groom)) {
+      toast.error(
+        isWedding
+          ? "Os nomes da noiva e do noivo são obrigatórios"
+          : "O nome é obrigatório",
+      );
       return;
     }
     if (subType === "external_video" && !form.videoUrl) {
@@ -491,36 +527,65 @@ export default function ExternalInvitationForm({
 
             {/* ── Couple names ── */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Casal</Label>
+              <Label className="text-sm font-medium">
+                {isWedding ? "Casal" : "Pessoa / Evento"}
+              </Label>
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="eventType"
+                  className="text-xs text-muted-foreground"
+                >
+                  Tipo de convite
+                </Label>
+                <Select
+                  value={form.eventType}
+                  onValueChange={(value) =>
+                    updateEventType(value as InvitationEventType)
+                  }
+                >
+                  <SelectTrigger id="eventType">
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EVENT_TYPE_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="bride"
                     className="text-xs text-muted-foreground"
                   >
-                    Noiva
+                    {isWedding ? "Noiva" : "Nome"}
                   </Label>
                   <Input
                     id="bride"
                     value={form.couple.bride}
                     onChange={(e) => updateCouple("bride", e.target.value)}
-                    placeholder="ex: Sofia"
+                    placeholder={isWedding ? "ex: Sofia" : "ex: Sofia"}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="groom"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Noivo
-                  </Label>
-                  <Input
-                    id="groom"
-                    value={form.couple.groom}
-                    onChange={(e) => updateCouple("groom", e.target.value)}
-                    placeholder="ex: Miguel"
-                  />
-                </div>
+                {isWedding && (
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="groom"
+                      className="text-xs text-muted-foreground"
+                    >
+                      Noivo
+                    </Label>
+                    <Input
+                      id="groom"
+                      value={form.couple.groom}
+                      onChange={(e) => updateCouple("groom", e.target.value)}
+                      placeholder="ex: Miguel"
+                    />
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">

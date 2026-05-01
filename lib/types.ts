@@ -4,6 +4,14 @@ export type TemplateName = string;
 /** Invitation type — determines what is shown after the envelope cover opens. */
 export type InvitationType = "standard" | "external_video" | "external_link";
 
+/** Event type — determines whether the invitation displays one or two names. */
+export type InvitationEventType =
+  | "wedding"
+  | "anniversary"
+  | "baptism"
+  | "engagement"
+  | "other";
+
 /** Visual style for the Save the Date section in the invitation page */
 export type SaveDateStyle =
   | "classic"
@@ -446,6 +454,8 @@ export interface InvitationData {
   textStyles?: TextStyleOverrides;
   /** Per-section card background/border overrides. Missing keys fall back to theme.cardBg / theme.cardBorder. */
   cardStyles?: CardStyleOverrides;
+  /** Event type — wedding invitations show two names; other event types show only the primary name. */
+  eventType: InvitationEventType;
   /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
   invitationType: InvitationType;
   /** External URL for the iframe page (external_link type). */

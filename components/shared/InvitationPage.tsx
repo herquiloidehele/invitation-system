@@ -22,6 +22,7 @@ import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { isWeddingEventType } from "@/lib/invitation-event-types";
 
 // ---------------------------------------------------------------------------
 // Animation variants — each section has its own entrance
@@ -370,6 +371,7 @@ export default function InvitationPage({
   }, [invitation.slug]);
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
+  const isWedding = isWeddingEventType(invitation.eventType);
 
   /** Resolve card bg/border/borderRadius for a given section, falling back to theme defaults. */
   const cs = (section: CardSectionKey, defaultRadius: number) => ({
@@ -490,19 +492,26 @@ export default function InvitationPage({
                   </EditableText>
                 </motion.h1>
 
-                <motion.span
-                  variants={heroTextItem}
-                  className="my-2"
-                  style={ts.ampersandVideo}
-                >
-                  <EditableText elementKey="ampersand">&amp;</EditableText>
-                </motion.span>
+                {isWedding && (
+                  <>
+                    <motion.span
+                      variants={heroTextItem}
+                      className="my-2"
+                      style={ts.ampersandVideo}
+                    >
+                      <EditableText elementKey="ampersand">&amp;</EditableText>
+                    </motion.span>
 
-                <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
-                  <EditableText elementKey="coupleNames">
-                    {invitation.couple.groom}
-                  </EditableText>
-                </motion.h1>
+                    <motion.h1
+                      variants={heroTextItem}
+                      style={ts.coupleNamesVideo}
+                    >
+                      <EditableText elementKey="coupleNames">
+                        {invitation.couple.groom}
+                      </EditableText>
+                    </motion.h1>
+                  </>
+                )}
 
                 {/* Blessing message */}
                 <motion.span
@@ -590,20 +599,28 @@ export default function InvitationPage({
                 </motion.h1>
 
                 {/* Ampersand */}
-                <motion.span
-                  variants={heroTextItem}
-                  className="my-2"
-                  style={ts.ampersandVideo}
-                >
-                  <EditableText elementKey="ampersand">&amp;</EditableText>
-                </motion.span>
+                {isWedding && (
+                  <>
+                    {/* Ampersand */}
+                    <motion.span
+                      variants={heroTextItem}
+                      className="my-2"
+                      style={ts.ampersandVideo}
+                    >
+                      <EditableText elementKey="ampersand">&amp;</EditableText>
+                    </motion.span>
 
-                {/* Groom */}
-                <motion.h1 variants={heroTextItem} style={ts.coupleNamesVideo}>
-                  <EditableText elementKey="coupleNames">
-                    {invitation.couple.groom}
-                  </EditableText>
-                </motion.h1>
+                    {/* Groom */}
+                    <motion.h1
+                      variants={heroTextItem}
+                      style={ts.coupleNamesVideo}
+                    >
+                      <EditableText elementKey="coupleNames">
+                        {invitation.couple.groom}
+                      </EditableText>
+                    </motion.h1>
+                  </>
+                )}
 
                 {/* Label */}
                 <motion.span
@@ -678,15 +695,19 @@ export default function InvitationPage({
                   </EditableText>
                 </h1>
 
-                <span className="my-2" style={ts.ampersand}>
-                  <EditableText elementKey="ampersand">&amp;</EditableText>
-                </span>
+                {isWedding && (
+                  <>
+                    <span className="my-2" style={ts.ampersand}>
+                      <EditableText elementKey="ampersand">&amp;</EditableText>
+                    </span>
 
-                <h1 style={ts.coupleNames}>
-                  <EditableText elementKey="coupleNames">
-                    {invitation.couple.groom}
-                  </EditableText>
-                </h1>
+                    <h1 style={ts.coupleNames}>
+                      <EditableText elementKey="coupleNames">
+                        {invitation.couple.groom}
+                      </EditableText>
+                    </h1>
+                  </>
+                )}
 
                 {/* Decorative accent line */}
                 <motion.div
@@ -813,15 +834,19 @@ export default function InvitationPage({
                   </EditableText>
                 </h1>
 
-                <span className="my-2" style={ts.ampersand}>
-                  <EditableText elementKey="ampersand">&amp;</EditableText>
-                </span>
+                {isWedding && (
+                  <>
+                    <span className="my-2" style={ts.ampersand}>
+                      <EditableText elementKey="ampersand">&amp;</EditableText>
+                    </span>
 
-                <h1 style={ts.coupleNames}>
-                  <EditableText elementKey="coupleNames">
-                    {invitation.couple.groom}
-                  </EditableText>
-                </h1>
+                    <h1 style={ts.coupleNames}>
+                      <EditableText elementKey="coupleNames">
+                        {invitation.couple.groom}
+                      </EditableText>
+                    </h1>
+                  </>
+                )}
 
                 {/* Decorative accent line */}
                 <motion.div

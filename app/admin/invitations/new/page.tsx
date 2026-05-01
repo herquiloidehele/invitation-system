@@ -33,6 +33,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
           year: "",
         },
         quote: "",
+        eventType: "wedding",
         location: {
           name: "",
           address: "",

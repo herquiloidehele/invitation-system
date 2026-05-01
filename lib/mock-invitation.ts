@@ -28,6 +28,8 @@ export const MOCK_INVITATION: InvitationData = {
   quote:
     "Dois corações, uma história — queremos partilhar este momento único convosco.",
 
+  eventType: "wedding",
+
   location: {
     name: "Quinta do Lago Azul",
     address: "Rua das Amendoeiras, 45 — Sintra, Lisboa",

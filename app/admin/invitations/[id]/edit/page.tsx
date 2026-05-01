@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getThemes } from "@/lib/themes";
 import type {
   InvitationData,
+  InvitationEventType,
   InvitationType,
   ImageSettingsMap,
   ParentsInfo,
@@ -78,6 +79,7 @@ export default async function EditInvitationPage({
       (row.cardStyles as unknown as CardStyleOverrides | null) ?? undefined,
     imageSettings:
       (row.imageSettings as unknown as ImageSettingsMap | null) ?? undefined,
+    eventType: (row.eventType as InvitationEventType | null) ?? "wedding",
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
   };

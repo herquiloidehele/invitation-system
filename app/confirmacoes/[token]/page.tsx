@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { ExportButton } from "./ExportButton";
 import GuestsTabClient from "./GuestsTabClient";
+import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
+import type { InvitationEventType } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +99,11 @@ async function InvitationRsvpView({
   if (!invitation) return null;
 
   const couple = invitation.couple as { bride: string; groom: string };
+  const invitationName = buildInvitationDisplayName({
+    eventType: invitation.eventType as InvitationEventType,
+    primaryName: couple.bride,
+    secondaryName: couple.groom,
+  });
   const date = invitation.date as { display: string };
   const location = invitation.location as { name: string; address?: string };
 
@@ -125,7 +132,7 @@ async function InvitationRsvpView({
             )}
           </div>
           <h1 className="text-2xl font-semibold text-stone-800 mt-3">
-            {couple.bride} &amp; {couple.groom}
+            {invitationName}
           </h1>
           <div className="flex flex-wrap gap-4 mt-2 text-sm text-stone-500">
             <span className="flex items-center gap-1.5">

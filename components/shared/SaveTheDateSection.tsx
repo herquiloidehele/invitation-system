@@ -12,6 +12,7 @@ import type {
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { t } from "@/lib/custom-texts";
+import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import CalendarButton from "./CalendarButton";
 import { EditableText } from "./EditableText";
 
@@ -99,6 +100,7 @@ function CalendarCTA({
       date={invitation.date}
       location={invitation.location}
       couple={invitation.couple}
+      eventType={invitation.eventType}
       onCalendarClick={onCalendarClick}
       className="mt-5 flex items-center justify-center gap-2 px-5 py-2 transition-all"
     >
@@ -329,6 +331,11 @@ function SaveTheDateCountdown({
     timeLeft.hours === 0 &&
     timeLeft.minutes === 0 &&
     timeLeft.seconds === 0;
+  const displayName = buildInvitationDisplayName({
+    eventType: invitation.eventType,
+    primaryName: invitation.couple.bride,
+    secondaryName: invitation.couple.groom,
+  });
 
   return (
     <div
@@ -376,7 +383,7 @@ function SaveTheDateCountdown({
           </span>
           <span style={ts.celebrationCouple}>
             <EditableText elementKey="celebrationCouple">
-              {invitation.couple.bride} &amp; {invitation.couple.groom}
+              {displayName}
             </EditableText>
           </span>
         </div>
@@ -613,6 +620,11 @@ function SaveTheDateCinematic({
   const bgImage =
     invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
   const cinematicImgStyle = getImageStyle(imageSettings, "cinematicImage");
+  const displayName = buildInvitationDisplayName({
+    eventType: invitation.eventType,
+    primaryName: invitation.couple.bride,
+    secondaryName: invitation.couple.groom,
+  });
 
   return (
     <div
@@ -704,7 +716,7 @@ function SaveTheDateCinematic({
             style={ts.cinematicCouple}
           >
             <EditableText elementKey="cinematicCouple">
-              {invitation.couple.bride} &amp; {invitation.couple.groom}
+              {displayName}
             </EditableText>
           </motion.span>
 

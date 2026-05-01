@@ -5,6 +5,10 @@ import { getInvitation } from "@/lib/invitations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
 import InvitationView from "./InvitationView";
+import {
+  buildInvitationDisplayName,
+  isWeddingEventType,
+} from "@/lib/invitation-event-types";
 
 // ---------------------------------------------------------------------------
 // Force dynamic rendering (data comes from the database)
@@ -29,13 +33,25 @@ export async function generateMetadata({
   }
 
   const { bride, groom } = invitation.couple;
+  const isWedding = isWeddingEventType(invitation.eventType);
+  const invitationName = buildInvitationDisplayName({
+    eventType: invitation.eventType,
+    primaryName: bride,
+    secondaryName: groom,
+  });
 
   return {
-    title: `${bride} & ${groom} — Convite de Casamento`,
-    description: `${bride} e ${groom} convidam você para celebrar o casamento em ${invitation.date.display}. ${invitation.quote}`,
+    title: isWedding
+      ? `${invitationName} — Convite de Casamento`
+      : `${invitationName} — Convite`,
+    description: isWedding
+      ? `${bride} e ${groom} convidam você para celebrar o casamento em ${invitation.date.display}. ${invitation.quote}`
+      : `${invitationName} convida você para celebrar este momento em ${invitation.date.display}. ${invitation.quote}`,
     openGraph: {
-      title: `${bride} & ${groom}`,
-      description: `Casamento em ${invitation.date.display}`,
+      title: invitationName,
+      description: isWedding
+        ? `Casamento em ${invitation.date.display}`
+        : `Evento em ${invitation.date.display}`,
       images: invitation.heroImage ? [invitation.heroImage] : [],
     },
   };

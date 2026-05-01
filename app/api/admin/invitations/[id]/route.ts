@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
+import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 
 /**
  * Reject empty strings for JSON columns — they cause `JSON.parse("")`
@@ -183,6 +184,9 @@ export async function PUT(
         }),
         ...(body.customTexts !== undefined && {
           customTexts: sanitizeJsonField(body.customTexts, null),
+        }),
+        ...(body.eventType !== undefined && {
+          eventType: normalizeInvitationEventType(body.eventType),
         }),
         ...(body.guestManagementEnabled !== undefined && {
           guestManagementEnabled: body.guestManagementEnabled === true,

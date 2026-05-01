@@ -13,6 +13,7 @@ import type {
   ImageSettings,
   ImageSettingsKey,
   InvitationData,
+  InvitationEventType,
   LocationInfo,
   ParentsInfo,
   SaveDateStyle,
@@ -72,26 +73,15 @@ import { InlineCardEditProvider } from "@/components/shared/EditableCard";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
+import {
+  buildInvitationMonogram,
+  buildInvitationSlug,
+  isWeddingEventType,
+} from "@/lib/invitation-event-types";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function slugify(bride: string, groom: string): string {
-  return `${bride}-${groom}`
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function monogramFrom(bride: string, groom: string): string {
-  const b = bride.trim().charAt(0).toUpperCase();
-  const g = groom.trim().charAt(0).toUpperCase();
-  return b && g ? `${b}&${g}` : "";
-}
 
 function colorPickerValue(value: string | undefined, fallback: string): string {
   return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
@@ -302,6 +292,17 @@ const SAVE_DATE_STYLE_OPTIONS: {
   },
 ];
 
+const EVENT_TYPE_OPTIONS: {
+  value: InvitationEventType;
+  label: string;
+}[] = [
+  { value: "wedding", label: "Casamento" },
+  { value: "anniversary", label: "Aniversário" },
+  { value: "baptism", label: "Batizado" },
+  { value: "engagement", label: "Noivado" },
+  { value: "other", label: "Outro" },
+];
+
 // ---------------------------------------------------------------------------
 // Default form state
 // ---------------------------------------------------------------------------
@@ -322,6 +323,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       year: "",
     },
     quote: "",
+    eventType: "wedding",
     location: {
       name: "",
       address: "",
@@ -390,6 +392,10 @@ export default function InvitationForm({
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<InvitationData>(
     initialData ?? getDefaultFormState(themes[0]),
+  );
+  const isWedding = isWeddingEventType(form.eventType);
+  const hasRequiredNames = Boolean(
+    form.couple.bride && (!isWedding || form.couple.groom),
   );
 
   // Google Maps link auto-fill state
@@ -470,20 +476,49 @@ export default function InvitationForm({
         const couple = { ...prev.couple, [field]: value };
         // Auto-derive monogram
         if (field === "bride" || field === "groom") {
-          couple.monogram = monogramFrom(
-            field === "bride" ? value : prev.couple.bride,
-            field === "groom" ? value : prev.couple.groom,
-          );
+          couple.monogram = buildInvitationMonogram({
+            eventType: prev.eventType,
+            primaryName: field === "bride" ? value : prev.couple.bride,
+            secondaryName: field === "groom" ? value : prev.couple.groom,
+          });
         }
         // Auto-derive slug when creating
         if (mode === "create" && (field === "bride" || field === "groom")) {
-          const slug = slugify(
-            field === "bride" ? value : prev.couple.bride,
-            field === "groom" ? value : prev.couple.groom,
-          );
+          const slug = buildInvitationSlug({
+            eventType: prev.eventType,
+            primaryName: field === "bride" ? value : prev.couple.bride,
+            secondaryName: field === "groom" ? value : prev.couple.groom,
+          });
           return { ...prev, couple, slug };
         }
         return { ...prev, couple };
+      });
+    },
+    [mode],
+  );
+
+  const updateEventType = useCallback(
+    (eventType: InvitationEventType) => {
+      setForm((prev) => {
+        const couple = {
+          ...prev.couple,
+          monogram: buildInvitationMonogram({
+            eventType,
+            primaryName: prev.couple.bride,
+            secondaryName: prev.couple.groom,
+          }),
+        };
+        const next: InvitationData = { ...prev, eventType, couple };
+        return mode === "create"
+          ? {
+              ...next,
+              slug: buildInvitationSlug({
+                eventType,
+                primaryName: prev.couple.bride,
+                secondaryName: prev.couple.groom,
+              }),
+            }
+          : next;
       });
     },
     [mode],
@@ -904,8 +939,12 @@ export default function InvitationForm({
       toast.error("O slug é obrigatório");
       return;
     }
-    if (!form.couple.bride || !form.couple.groom) {
-      toast.error("Os nomes da noiva e do noivo são obrigatórios");
+    if (!form.couple.bride || (isWedding && !form.couple.groom)) {
+      toast.error(
+        isWedding
+          ? "Os nomes da noiva e do noivo são obrigatórios"
+          : "O nome é obrigatório",
+      );
       return;
     }
 
@@ -975,28 +1014,53 @@ export default function InvitationForm({
               {/* ── Couple ── */}
               <AccordionItem value="couple" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
-                  Casal
+                  {isWedding ? "Casal" : "Pessoa / Evento"}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="eventType">Tipo de convite</Label>
+                    <Select
+                      value={form.eventType}
+                      onValueChange={(value) =>
+                        updateEventType(value as InvitationEventType)
+                      }
+                    >
+                      <SelectTrigger id="eventType">
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EVENT_TYPE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="bride">Noiva</Label>
+                      <Label htmlFor="bride">{isWedding ? "Noiva" : "Nome"}</Label>
                       <Input
                         id="bride"
                         value={form.couple.bride}
                         onChange={(e) => updateCouple("bride", e.target.value)}
-                        placeholder="e.g. Maria"
+                        placeholder={isWedding ? "e.g. Maria" : "e.g. Sofia"}
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="groom">Noivo</Label>
-                      <Input
-                        id="groom"
-                        value={form.couple.groom}
-                        onChange={(e) => updateCouple("groom", e.target.value)}
-                        placeholder="e.g. João"
-                      />
-                    </div>
+                    {isWedding && (
+                      <div className="space-y-1.5">
+                        <Label htmlFor="groom">Noivo</Label>
+                        <Input
+                          id="groom"
+                          value={form.couple.groom}
+                          onChange={(e) =>
+                            updateCouple("groom", e.target.value)
+                          }
+                          placeholder="e.g. João"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
@@ -2549,7 +2613,7 @@ export default function InvitationForm({
           {/* ── Tab: Envelope preview ── */}
           <TabsContent value="envelope" className="flex-1 overflow-hidden m-0">
             <div className="h-full relative overflow-hidden bg-neutral-200 max-h-165">
-              {form.couple.bride && form.couple.groom ? (
+              {hasRequiredNames ? (
                 <EnvelopeCover
                   theme={currentTheme}
                   coverBackground={form.envelope?.coverBackground}
@@ -2560,7 +2624,9 @@ export default function InvitationForm({
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
-                  Insira os nomes do casal para ver a pré-visualização
+                  {isWedding
+                    ? "Insira os nomes do casal para ver a pré-visualização"
+                    : "Insira o nome para ver a pré-visualização"}
                 </div>
               )}
             </div>
@@ -2582,7 +2648,7 @@ export default function InvitationForm({
                 <TextStyleToolbar />
                 <CardStyleToolbar />
                 <div className="mx-auto origin-top w-full max-h-165 relative">
-                  {form.couple.bride && form.couple.groom ? (
+                  {hasRequiredNames ? (
                     <InvitationPage
                       invitation={form}
                       theme={currentTheme}
@@ -2590,7 +2656,9 @@ export default function InvitationForm({
                     />
                   ) : (
                     <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
-                      Insira os nomes do casal para ver a pré-visualização
+                      {isWedding
+                        ? "Insira os nomes do casal para ver a pré-visualização"
+                        : "Insira o nome para ver a pré-visualização"}
                     </div>
                   )}
                 </div>

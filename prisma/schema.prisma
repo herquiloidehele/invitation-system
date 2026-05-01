@@ -91,6 +91,7 @@ model Invitation {
   cardStyles     Json?   // CardStyleOverrides — per-section card background/border overrides
   imageSettings  Json?   // ImageSettingsMap — per-image position & zoom overrides
   customTexts    Json?   // CustomTexts — per-invitation UI text overrides (section titles, buttons, RSVP labels, etc.)
+  eventType      String  @default("wedding") // "wedding" | "anniversary" | "baptism" | "engagement" | "other"
   invitationType String  @default("standard") // "standard" | "external_video" | "external_link"
   externalLink   String? // URL for the external link / iframe (external_link type)
   guestManagementEnabled Boolean @default(false)

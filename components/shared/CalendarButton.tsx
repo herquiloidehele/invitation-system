@@ -1,7 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { DateInfo, LocationInfo, CoupleInfo } from "@/lib/types";
+import type {
+  CoupleInfo,
+  DateInfo,
+  InvitationEventType,
+  LocationInfo,
+} from "@/lib/types";
+import { buildInvitationDisplayName, isWeddingEventType } from "@/lib/invitation-event-types";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -11,6 +17,7 @@ interface CalendarButtonProps {
   date: DateInfo;
   location: LocationInfo;
   couple: CoupleInfo;
+  eventType: InvitationEventType;
   className?: string;
   children: ReactNode;
   onCalendarClick?: () => void;
@@ -32,9 +39,19 @@ function buildGoogleCalendarUrl(
   date: DateInfo,
   location: LocationInfo,
   couple: CoupleInfo,
+  eventType: InvitationEventType,
 ): string {
-  const title = `Casamento ${couple.bride} & ${couple.groom}`;
-  const details = `Cerimônia de casamento de ${couple.bride} e ${couple.groom}.\n\n${location.name}\n${location.address}`;
+  const displayName = buildInvitationDisplayName({
+    eventType,
+    primaryName: couple.bride,
+    secondaryName: couple.groom,
+  });
+  const title = isWeddingEventType(eventType)
+    ? `Casamento ${displayName}`
+    : `Evento ${displayName}`;
+  const details = isWeddingEventType(eventType)
+    ? `Cerimônia de casamento de ${couple.bride} e ${couple.groom}.\n\n${location.name}\n${location.address}`
+    : `Celebração de ${displayName}.\n\n${location.name}\n${location.address}`;
 
   // Parse ISO date and create start/end (3-hour window)
   const start = new Date(date.iso);
@@ -66,13 +83,14 @@ export default function CalendarButton({
   date,
   location,
   couple,
+  eventType,
   className,
   children,
   onCalendarClick,
 }: CalendarButtonProps) {
   const handleClick = () => {
     onCalendarClick?.();
-    const url = buildGoogleCalendarUrl(date, location, couple);
+    const url = buildGoogleCalendarUrl(date, location, couple, eventType);
     window.open(url, "_blank", "noopener,noreferrer");
   };
 

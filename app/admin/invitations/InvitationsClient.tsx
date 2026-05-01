@@ -62,6 +62,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { InvitationRow } from "./page";
+import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 
 const TEMPLATE_LABELS: Record<string, string> = {
   "pink-floral": "Pink Floral",
@@ -317,7 +318,7 @@ export function InvitationsClient({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Casal</TableHead>
+                    <TableHead>Nome</TableHead>
                     <TableHead>Slug</TableHead>
                     <TableHead>Modelo</TableHead>
                     <TableHead>Data</TableHead>
@@ -331,7 +332,11 @@ export function InvitationsClient({
                 </TableHeader>
                 <TableBody>
                   {filtered.map((inv) => {
-                    const coupleName = `${inv.couple.bride} & ${inv.couple.groom}`;
+                    const coupleName = buildInvitationDisplayName({
+                      eventType: inv.eventType,
+                      primaryName: inv.couple.bride,
+                      secondaryName: inv.couple.groom,
+                    });
                     return (
                       <TableRow key={inv.id}>
                         <TableCell className="font-medium whitespace-nowrap">

@@ -5,9 +5,10 @@ import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
-import type { CustomTexts } from "@/lib/types";
+import type { CustomTexts, InvitationEventType } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 
 // ---------------------------------------------------------------------------
 // Schema — identical to RSVPModal
@@ -56,6 +57,7 @@ function hasSubmittedRsvp(slug: string): boolean {
 
 interface RsvpPageProps {
   slug: string;
+  eventType: InvitationEventType;
   bride: string;
   groom: string;
   dateDisplay: string;
@@ -96,6 +98,7 @@ type SubmitState =
 
 export default function RsvpPage({
   slug,
+  eventType,
   bride,
   groom,
   dateDisplay,
@@ -131,6 +134,11 @@ export default function RsvpPage({
   });
 
   const attending = watch("attending");
+  const invitationName = buildInvitationDisplayName({
+    eventType,
+    primaryName: bride,
+    secondaryName: groom,
+  });
 
   const onSubmit = async (data: RSVPFormData) => {
     setSubmitState("loading");
@@ -202,7 +210,7 @@ export default function RsvpPage({
             fontFamily: "'Georgia', 'Times New Roman', serif",
           }}
         >
-          {bride} &amp; {groom}
+          {invitationName}
         </h1>
         {dateDisplay && (
           <p className="mt-2 text-sm" style={{ color: palette.textSoft }}>
