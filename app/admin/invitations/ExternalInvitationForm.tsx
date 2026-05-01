@@ -283,6 +283,16 @@ export default function ExternalInvitationForm({
     [],
   );
 
+  const updateRsvp = useCallback(
+    (field: keyof InvitationData["rsvp"], value: boolean | string) => {
+      setForm((prev) => ({
+        ...prev,
+        rsvp: { ...prev.rsvp, [field]: value },
+      }));
+    },
+    [],
+  );
+
   // Switch sub-type
   const switchSubType = useCallback((t: ExternalSubType) => {
     setForm((prev) => ({
@@ -453,6 +463,27 @@ export default function ExternalInvitationForm({
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* ── RSVP settings ── */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">
+                Confirmação de presença
+              </Label>
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <Label>Pedir email no RSVP</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Quando ativo, o formulário pede o email do convidado.
+                  </p>
+                </div>
+                <Switch
+                  checked={form.rsvp.showEmail === true}
+                  onCheckedChange={(v) => updateRsvp("showEmail", v)}
+                />
               </div>
             </div>
 
