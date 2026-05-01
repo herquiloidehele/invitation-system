@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSaveTheDate } from "@/lib/save-the-date";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
+import {
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+  resolveSaveTheDateSocialPreview,
+} from "@/lib/social-preview";
 
 export const dynamic = "force-dynamic";
 
@@ -17,14 +22,27 @@ export async function generateMetadata({
     return { title: "Save the Date — Not Found" };
   }
 
-  const { bride, groom } = data.couple;
+  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const { image, title, description } = resolveSaveTheDateSocialPreview(
+    data,
+    siteOrigin,
+  );
 
   return {
-    title: `${bride} & ${groom} — Save the Date`,
-    description: `${bride} & ${groom} invite you to save the date: ${data.date.display}`,
+    title,
+    description,
     openGraph: {
-      title: `${bride} & ${groom} — Save the Date`,
-      description: `Save the date: ${data.date.display}`,
+      title,
+      description,
+      images: [{ url: image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
+      type: "website",
+      url: `${siteOrigin}/s/${slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
     },
   };
 }

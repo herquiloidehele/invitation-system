@@ -6,9 +6,10 @@ import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
 import InvitationView from "./InvitationView";
 import {
-  buildInvitationDisplayName,
-  isWeddingEventType,
-} from "@/lib/invitation-event-types";
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+  resolveInvitationSocialPreview,
+} from "@/lib/social-preview";
 
 // ---------------------------------------------------------------------------
 // Force dynamic rendering (data comes from the database)
@@ -32,27 +33,27 @@ export async function generateMetadata({
     return { title: "Convite não encontrado" };
   }
 
-  const { bride, groom } = invitation.couple;
-  const isWedding = isWeddingEventType(invitation.eventType);
-  const invitationName = buildInvitationDisplayName({
-    eventType: invitation.eventType,
-    primaryName: bride,
-    secondaryName: groom,
-  });
+  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const { image, title, description } = resolveInvitationSocialPreview(
+    invitation,
+    siteOrigin,
+  );
 
   return {
-    title: isWedding
-      ? `${invitationName} — Convite de Casamento`
-      : `${invitationName} — Convite`,
-    description: isWedding
-      ? `${bride} e ${groom} convidam você para celebrar o casamento em ${invitation.date.display}. ${invitation.quote}`
-      : `${invitationName} convida você para celebrar este momento em ${invitation.date.display}. ${invitation.quote}`,
+    title,
+    description,
     openGraph: {
-      title: invitationName,
-      description: isWedding
-        ? `Casamento em ${invitation.date.display}`
-        : `Evento em ${invitation.date.display}`,
-      images: invitation.heroImage ? [invitation.heroImage] : [],
+      title,
+      description,
+      images: [{ url: image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
+      type: "website",
+      url: `${siteOrigin}/${slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
     },
   };
 }
