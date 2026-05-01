@@ -3,7 +3,14 @@
 import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Video, Link2, CheckCircle2, Copy, Check, ExternalLink } from "lucide-react";
+import {
+  Video,
+  Link2,
+  CheckCircle2,
+  Copy,
+  Check,
+  ExternalLink,
+} from "lucide-react";
 
 import type {
   InvitationData,
@@ -25,6 +32,13 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import {
   Accordion,
@@ -34,7 +48,11 @@ import {
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
-import { shouldShowExternalInvitationAudioControls } from "@/lib/external-invitation-form";
+import {
+  getExternalInvitationEmbedSrc,
+  getExternalInvitationPublicHref,
+  shouldShowExternalInvitationAudioControls,
+} from "@/lib/external-invitation-form";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
 // ---------------------------------------------------------------------------
@@ -204,6 +222,10 @@ export default function ExternalInvitationForm({
 
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
   const showAudioControls = shouldShowExternalInvitationAudioControls(subType);
+  const publicHref = getExternalInvitationPublicHref(form.slug);
+  const externalEmbedSrc = form.externalLink
+    ? getExternalInvitationEmbedSrc(form.externalLink)
+    : "";
 
   // Generic field updater
   const update = useCallback(
@@ -795,37 +817,89 @@ export default function ExternalInvitationForm({
         </ScrollArea>
       </div>
 
-      {/* ──────────── Right: Cover preview ──────────── */}
-      <div className="hidden lg:flex flex-col gap-4 w-[340px] shrink-0">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
-          Pré-visualização da capa
-        </p>
-        <div
-          className="relative overflow-hidden rounded-2xl shadow-xl"
-          style={{ height: "600px", maxWidth: "340px" }}
-        >
-          {currentTheme && (
-            <EnvelopeCover
-              theme={currentTheme}
-              coverBackground={form.envelope?.coverBackground}
-              onOpen={() => {}}
-              monogram={form.couple.monogram || "A&B"}
-              shimmer={form.envelope?.shimmer !== false}
-              imageSettings={form.imageSettings}
-            />
-          )}
-        </div>
-        {/* Info pill */}
-        <div className="rounded-lg border bg-muted/40 px-4 py-3 space-y-1">
-          <p className="text-xs font-medium">
-            {subType === "external_video" ? "Após a capa:" : "Após a capa:"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {subType === "external_video"
-              ? "Vídeo em ecrã completo com reprodução automática"
-              : "Site externo incorporado em ecrã completo"}
-          </p>
-        </div>
+      {/* ──────────── Right: Live Preview ──────────── */}
+      <div className="hidden lg:flex w-[35%] min-w-[380px] border-l flex-col h-full">
+        <Tabs defaultValue="invite" className="flex flex-col h-full">
+          <div className="px-4 pt-3 pb-0 border-b bg-muted/50 flex items-center justify-between gap-2 shrink-0">
+            <TabsList className="h-8">
+              <TabsTrigger value="envelope" className="text-xs px-3 h-7">
+                Envelope
+              </TabsTrigger>
+              <TabsTrigger value="invite" className="text-xs px-3 h-7">
+                Convite
+              </TabsTrigger>
+            </TabsList>
+            <span className="text-xs text-muted-foreground shrink-0">
+              {publicHref ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <a
+                          href={publicHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors"
+                        />
+                      }
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>Ver convite público</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <ExternalLink className="h-4 w-4 opacity-40" />
+              )}
+            </span>
+          </div>
+
+          <TabsContent value="envelope" className="flex-1 overflow-hidden m-0">
+            <div className="h-full relative overflow-hidden bg-neutral-200 max-h-165">
+              {currentTheme && (
+                <EnvelopeCover
+                  theme={currentTheme}
+                  coverBackground={form.envelope?.coverBackground}
+                  onOpen={() => {}}
+                  monogram={form.couple.monogram || "A&B"}
+                  shimmer={form.envelope?.shimmer !== false}
+                  imageSettings={form.imageSettings}
+                />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="invite" className="flex-1 overflow-hidden m-0">
+            <div className="relative h-full max-h-165 overflow-hidden bg-black">
+              {subType === "external_video" ? (
+                form.videoUrl ? (
+                  <video
+                    src={form.videoUrl}
+                    controls
+                    playsInline
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                    Carrega um vídeo para ver a pré-visualização do convite
+                  </div>
+                )
+              ) : form.externalLink ? (
+                <iframe
+                  src={externalEmbedSrc}
+                  title="Convite externo"
+                  allowFullScreen
+                  loading="eager"
+                  className="absolute inset-0 h-full w-full border-0 bg-background"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                  Introduz o link externo para ver a pré-visualização do convite
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
