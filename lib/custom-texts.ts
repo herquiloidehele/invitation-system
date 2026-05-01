@@ -50,7 +50,7 @@ export const DEFAULT_TEXTS: Required<CustomTexts> = {
   rsvp_attendingNo: "Não poderei ir",
   rsvp_dietaryLabel: "Restrições alimentares",
   rsvp_dietaryPlaceholder: "Vegetariano, sem glúten…",
-  rsvp_messageLabel: "Mensagem para os noivos",
+  rsvp_messageLabel: "Mensagem",
   rsvp_messagePlaceholder: "Deixe uma mensagem especial…",
 
   // -- RSVP Modal: States & Actions --
