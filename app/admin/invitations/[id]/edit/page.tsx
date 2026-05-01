@@ -82,6 +82,9 @@ export default async function EditInvitationPage({
     eventType: (row.eventType as InvitationEventType | null) ?? "wedding",
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
+    socialPreview:
+      (row.socialPreview as unknown as InvitationData["socialPreview"]) ??
+      undefined,
   };
 
   const isExternal =
