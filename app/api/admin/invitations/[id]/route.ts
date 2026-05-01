@@ -177,6 +177,9 @@ export async function PUT(
         ...(body.guestMessageTemplate !== undefined && {
           guestMessageTemplate: body.guestMessageTemplate || null,
         }),
+        ...(body.socialPreview !== undefined && {
+          socialPreview: sanitizeJsonField(body.socialPreview, null),
+        }),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

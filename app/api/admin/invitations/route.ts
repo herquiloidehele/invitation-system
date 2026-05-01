@@ -117,6 +117,7 @@ export async function POST(request: NextRequest) {
         eventType: normalizeInvitationEventType(body.eventType),
         guestManagementEnabled: body.guestManagementEnabled === true,
         guestMessageTemplate: body.guestMessageTemplate ?? null,
+        socialPreview: sanitizeJsonField(body.socialPreview, null),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

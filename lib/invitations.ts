@@ -52,6 +52,7 @@ type InvitationWithTheme = {
   eventType: string;
   guestManagementEnabled: boolean;
   guestMessageTemplate: string | null;
+  socialPreview: unknown;
 };
 
 function toInvitationData(row: InvitationWithTheme): InvitationData {
@@ -88,6 +89,8 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     eventType: (row.eventType as InvitationEventType) ?? "wedding",
     guestManagementEnabled: row.guestManagementEnabled ?? false,
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
+    socialPreview:
+      (row.socialPreview as InvitationData["socialPreview"]) ?? undefined,
   };
 }
 
