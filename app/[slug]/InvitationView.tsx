@@ -9,6 +9,7 @@ import InvitationPage from "@/components/shared/InvitationPage";
 import ExternalVideoPage, {
   type ExternalVideoPageHandle,
 } from "@/components/shared/ExternalVideoPage";
+import ExternalLinkPage from "@/components/shared/ExternalLinkPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface InvitationViewProps {
@@ -142,12 +143,6 @@ export default function InvitationView({
   const handleAnimationComplete = useCallback(() => {
     const type = invitation.invitationType ?? "standard";
 
-    // For external links, redirect the browser after the envelope animation
-    if (type === "external_link" && invitation.externalLink) {
-      window.location.href = invitation.externalLink;
-      return;
-    }
-
     // For external video: play imperatively (within the gesture context) and
     // reveal the video. The <video> element is already mounted and preloading.
     if (type === "external_video") {
@@ -161,15 +156,14 @@ export default function InvitationView({
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
-  }, [invitation.invitationType, invitation.externalLink]);
+  }, [invitation.invitationType]);
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
     const type = invitation.invitationType ?? "standard";
 
-    if (type === "external_link") {
-      // Redirect is handled in handleAnimationComplete; render nothing here
-      return null;
+    if (type === "external_link" && invitation.externalLink) {
+      return <ExternalLinkPage externalLink={invitation.externalLink} />;
     }
 
     // Default: standard full invitation page
