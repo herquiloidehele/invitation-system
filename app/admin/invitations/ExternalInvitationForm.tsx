@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import { shouldShowExternalInvitationAudioControls } from "@/lib/external-invitation-form";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 
 // ---------------------------------------------------------------------------
@@ -202,6 +203,7 @@ export default function ExternalInvitationForm({
   );
 
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
+  const showAudioControls = shouldShowExternalInvitationAudioControls(subType);
 
   // Generic field updater
   const update = useCallback(
@@ -239,6 +241,19 @@ export default function ExternalInvitationForm({
       setForm((prev) => ({
         ...prev,
         envelope: { ...prev.envelope, [field]: value },
+      }));
+    },
+    [],
+  );
+
+  const updateAudio = useCallback(
+    <K extends keyof InvitationData["audio"]>(
+      field: K,
+      value: InvitationData["audio"][K],
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        audio: { ...prev.audio, [field]: value },
       }));
     },
     [],
@@ -723,6 +738,58 @@ export default function ExternalInvitationForm({
                   placeholder="https://..."
                 />
               </div>
+            )}
+
+            {showAudioControls && (
+              <>
+                <Separator />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label>Áudio de fundo</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Toca em background depois do convidado abrir a capa, sem controlos visíveis.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.audio.enabled}
+                      onCheckedChange={(v) => updateAudio("enabled", v)}
+                    />
+                  </div>
+                  {form.audio.enabled && (
+                    <div className="space-y-3">
+                      <div className="space-y-1.5">
+                        <Label>Ficheiro de áudio</Label>
+                        <MediaUpload
+                          kind="audio"
+                          maxSizeMB={20}
+                          value={form.audio.src || undefined}
+                          onUpload={(url) => updateAudio("src", url)}
+                          onClear={() => updateAudio("src", "")}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="externalAudioArtist">Artista</Label>
+                          <Input
+                            id="externalAudioArtist"
+                            value={form.audio.artist}
+                            onChange={(e) => updateAudio("artist", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="externalAudioTitle">Título</Label>
+                          <Input
+                            id="externalAudioTitle"
+                            value={form.audio.title}
+                            onChange={(e) => updateAudio("title", e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </ScrollArea>

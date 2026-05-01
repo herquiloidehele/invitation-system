@@ -11,6 +11,7 @@ import ExternalVideoPage, {
 } from "@/components/shared/ExternalVideoPage";
 import ExternalLinkPage from "@/components/shared/ExternalLinkPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 
 interface InvitationViewProps {
   invitation: InvitationData;
@@ -45,10 +46,10 @@ export default function InvitationView({
 
   // Likewise, pre-buffer the background audio so it plays immediately
   // when the user taps the envelope instead of waiting for a download.
-  const isStandardWithAudio =
-    (invitation.invitationType ?? "standard") === "standard" &&
-    invitation.audio.enabled &&
-    !!invitation.audio.src;
+  const hasBackgroundAudio = shouldUseBackgroundAudio(
+    invitation.invitationType,
+    invitation.audio,
+  );
 
   const { trackEvent } = useAnalytics(invitation.slug);
 
@@ -77,7 +78,7 @@ export default function InvitationView({
     trackEvent("envelope_open");
 
     // Use the pre-buffered <audio> element so playback starts instantly
-    if (isStandardWithAudio) {
+    if (hasBackgroundAudio) {
       try {
         const audio = audioRef.current;
         if (!audio) return;
@@ -100,7 +101,7 @@ export default function InvitationView({
         /* silent */
       }
     }
-  }, [isStandardWithAudio, trackEvent]);
+  }, [hasBackgroundAudio, trackEvent]);
 
   /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
   useEffect(() => {
@@ -244,7 +245,7 @@ export default function InvitationView({
         {/* Persistent prefetch audio — mounted once so the browser downloads
             the audio file while the envelope animation is visible. Reused by
             handleOpen to start playback instantly without waiting for a fetch. */}
-        {isStandardWithAudio && (
+        {hasBackgroundAudio && (
           <audio
             ref={audioRef}
             src={invitation.audio.src}
