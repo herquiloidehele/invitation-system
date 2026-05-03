@@ -37,7 +37,7 @@ const T = {
 } as const;
 
 /** Milliseconds from tap until onAnimationComplete fires */
-const TOTAL_MS = T.flapOpen.dur * 1000;
+const TOTAL_MS = (T.flapOpen.dur - 1) * 1000;
 
 /** Smooth ease-out bezier for a natural, gentle deceleration */
 const TOP_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -198,7 +198,7 @@ function BottomFlap({
         bottom: 0,
       }}
       animate={{
-        bottom: opening ? "-10%" : 0,
+        bottom: opening ? "-9.5%" : 0,
       }}
       transition={{
         duration: T.bottomFlap.dur,
