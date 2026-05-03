@@ -193,12 +193,12 @@ function BottomFlap({
   return (
     <motion.div
       className="absolute bottom-0 left-0 w-full origin-top flex items-end"
-      style={{ height: "calc(50% + 10vh)" }}
+      style={{ height: "calc(50% + 12vh)" }}
       initial={{
         bottom: 0,
       }}
       animate={{
-        bottom: opening ? "-8.5%" : 0,
+        bottom: opening ? "-10%" : 0,
       }}
       transition={{
         duration: T.bottomFlap.dur,
