@@ -76,8 +76,21 @@ export async function generateViewport({
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
+    viewportFit: "cover",
     themeColor,
   };
+}
+
+function BrowserUiColorStyle({ color }: { color?: string }) {
+  if (!color) return null;
+
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: `html,body{background-color:${color};}`,
+      }}
+    />
+  );
 }
 
 export default async function SaveTheDatePage({
@@ -92,5 +105,16 @@ export default async function SaveTheDatePage({
     notFound();
   }
 
-  return <SaveTheDateView saveTheDate={data} />;
+  const browserUiColor = resolveBrowserUiColor({
+    envelope: data.envelope,
+    themeEnvelopeBase: data.theme.envelope?.base,
+    pageBackground: data.theme.bgColor,
+  });
+
+  return (
+    <>
+      <BrowserUiColorStyle color={browserUiColor} />
+      <SaveTheDateView saveTheDate={data} />
+    </>
+  );
 }

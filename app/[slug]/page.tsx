@@ -88,8 +88,21 @@ export async function generateViewport({
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
+    viewportFit: "cover",
     themeColor,
   };
+}
+
+function BrowserUiColorStyle({ color }: { color?: string }) {
+  if (!color) return null;
+
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: `html,body{background-color:${color};}`,
+      }}
+    />
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -118,6 +131,12 @@ export default async function InvitationSlugPage({
     notFound();
   }
 
+  const browserUiColor = resolveBrowserUiColor({
+    envelope: invitation.envelope,
+    themeEnvelopeBase: theme.envelope.base,
+    pageBackground: theme.bg,
+  });
+
   // Look up the personal guest if a token was provided. Silently fall back
   // when the token does not exist, belongs to another invitation, or the
   // feature is disabled — the rest of the page still works normally.
@@ -130,6 +149,9 @@ export default async function InvitationSlugPage({
   }
 
   return (
-    <InvitationView invitation={{ ...invitation, guest }} theme={theme} />
+    <>
+      <BrowserUiColorStyle color={browserUiColor} />
+      <InvitationView invitation={{ ...invitation, guest }} theme={theme} />
+    </>
   );
 }
