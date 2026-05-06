@@ -161,6 +161,8 @@ export interface EnvelopeConfig {
   base?: string;
   /** Override the full envelope cover background with a color or image URL. Falls back to base/theme color if empty. */
   coverBackground?: string;
+  /** Color used for supported mobile browser UI chrome. Falls back to cover/base colors when empty. */
+  browserUiColor?: string;
   /** Override the top flap image URL. Falls back to theme default if empty. */
   topFlap?: string;
   /** Override the bottom flap image URL. Falls back to theme default if empty. */

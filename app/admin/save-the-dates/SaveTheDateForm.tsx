@@ -40,6 +40,7 @@ import type {
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
+import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import { resolveSaveTheDateSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
@@ -803,6 +804,61 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       maxSizeMB={5}
                       label="Arraste uma imagem de fundo"
                     />
+                  </div>
+
+                  <Separator />
+
+                  {/* Browser UI color */}
+                  <div className="space-y-1.5">
+                    <Label>Cor do browser</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Cor usada pela barra do browser em mobile. Deixe em
+                      branco para combinar automaticamente com a capa do
+                      envelope.
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={colorPickerValue(
+                          data.envelope?.browserUiColor,
+                          resolveBrowserUiColor({
+                            envelope: data.envelope,
+                            themeEnvelopeBase: selectedTheme?.envelope?.base,
+                            pageBackground: selectedTheme?.bgColor,
+                          }) ?? "#ffffff",
+                        )}
+                        onChange={(e) =>
+                          updateEnvelope("browserUiColor", e.target.value)
+                        }
+                        className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                        title="Escolher cor"
+                      />
+                      <input
+                        type="text"
+                        value={data.envelope?.browserUiColor ?? ""}
+                        onChange={(e) =>
+                          updateEnvelope("browserUiColor", e.target.value)
+                        }
+                        placeholder={`Automático: ${
+                          resolveBrowserUiColor({
+                            envelope: data.envelope,
+                            themeEnvelopeBase: selectedTheme?.envelope?.base,
+                            pageBackground: selectedTheme?.bgColor,
+                          }) ?? ""
+                        }`}
+                        className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                      />
+                      {data.envelope?.browserUiColor && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 text-muted-foreground"
+                          onClick={() => updateEnvelope("browserUiColor", "")}
+                        >
+                          Repor
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
                   <Separator />

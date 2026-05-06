@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
+import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getInvitation } from "@/lib/invitations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
@@ -55,6 +56,39 @@ export async function generateMetadata({
       description,
       images: [image],
     },
+  };
+}
+
+export async function generateViewport({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Viewport> {
+  const { slug } = await params;
+  const invitation = await getInvitation(slug);
+
+  if (!invitation) {
+    return {
+      width: "device-width",
+      initialScale: 1,
+      maximumScale: 1,
+      userScalable: false,
+    };
+  }
+
+  const theme = await getTheme(invitation.template);
+  const themeColor = resolveBrowserUiColor({
+    envelope: invitation.envelope,
+    themeEnvelopeBase: theme?.envelope.base,
+    pageBackground: theme?.bg,
+  });
+
+  return {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor,
   };
 }
 

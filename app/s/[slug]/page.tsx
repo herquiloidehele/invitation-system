@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getSaveTheDate } from "@/lib/save-the-date";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 import {
@@ -44,6 +45,38 @@ export async function generateMetadata({
       description,
       images: [image],
     },
+  };
+}
+
+export async function generateViewport({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Viewport> {
+  const { slug } = await params;
+  const data = await getSaveTheDate(slug);
+
+  if (!data) {
+    return {
+      width: "device-width",
+      initialScale: 1,
+      maximumScale: 1,
+      userScalable: false,
+    };
+  }
+
+  const themeColor = resolveBrowserUiColor({
+    envelope: data.envelope,
+    themeEnvelopeBase: data.theme.envelope?.base,
+    pageBackground: data.theme.bgColor,
+  });
+
+  return {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor,
   };
 }
 
