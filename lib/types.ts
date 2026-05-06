@@ -442,6 +442,7 @@ export interface InvitationData {
     enabled: boolean;
     deadline?: string;
     showEmail?: boolean;
+    showDietaryRestrictions?: boolean;
   };
   schedule: ScheduleEvent[];
   dressCode: DressCode;

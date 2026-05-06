@@ -14,7 +14,10 @@ import type {
 } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { t } from "@/lib/custom-texts";
-import { shouldShowRsvpEmail } from "@/lib/rsvp-config";
+import {
+  shouldShowRsvpDietaryRestrictions,
+  shouldShowRsvpEmail,
+} from "@/lib/rsvp-config";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -123,6 +126,7 @@ interface DirectProps {
   invitationSlug: string;
   theme: RSVPThemeLegacy;
   showEmail?: boolean;
+  showDietaryRestrictions?: boolean;
   /** Override the API endpoint — defaults to "/api/rsvp" */
   apiEndpoint?: string;
   /** Override the slug field name sent in the body — defaults to "invitationSlug" */
@@ -199,6 +203,9 @@ export default function RSVPModal(props: RSVPModalProps) {
   const showEmail = isIntegration(props)
     ? shouldShowRsvpEmail(props.invitation.rsvp)
     : props.showEmail === true;
+  const showDietaryRestrictions = isIntegration(props)
+    ? shouldShowRsvpDietaryRestrictions(props.invitation.rsvp)
+    : props.showDietaryRestrictions !== false;
   const apiEndpoint = props.apiEndpoint ?? "/api/rsvp";
   const slugKey = props.slugKey ?? "invitationSlug";
 
@@ -585,7 +592,7 @@ export default function RSVPModal(props: RSVPModalProps) {
                   </div>
 
                   {/* Dietary restrictions */}
-                  {attending === "yes" && (
+                  {attending === "yes" && showDietaryRestrictions && (
                     <div className="flex flex-col gap-1.5">
                       <label style={labelStyle}>
                         {t(ct, "rsvp_dietaryLabel")}

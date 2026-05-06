@@ -13,7 +13,7 @@ export default async function NewSaveTheDatePage() {
     couple: { bride: "", groom: "" },
     date: { iso: "", display: "", day: "", month: "", year: "" },
     customMessage: "",
-    rsvp: { enabled: false, showEmail: false },
+    rsvp: { enabled: false, showEmail: false, showDietaryRestrictions: true },
   };
 
   return (

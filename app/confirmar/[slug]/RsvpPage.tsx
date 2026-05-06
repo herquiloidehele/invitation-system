@@ -64,6 +64,7 @@ interface RsvpPageProps {
   deadline?: string;
   deadlinePassed: boolean;
   showEmail?: boolean;
+  showDietaryRestrictions?: boolean;
   customTexts?: CustomTexts;
 }
 
@@ -105,6 +106,7 @@ export default function RsvpPage({
   deadline,
   deadlinePassed,
   showEmail = false,
+  showDietaryRestrictions = true,
   customTexts: ct,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
@@ -403,7 +405,7 @@ export default function RsvpPage({
               </div>
 
               {/* Dietary restrictions — only if attending */}
-              {attending === "yes" && (
+              {attending === "yes" && showDietaryRestrictions && (
                 <div className="flex flex-col gap-1.5">
                   <label style={labelStyle}>{t(ct, "rsvp_dietaryLabel")}</label>
                   <input

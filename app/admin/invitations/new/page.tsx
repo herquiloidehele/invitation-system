@@ -43,7 +43,12 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
           longitude: undefined,
           imageUrl: "",
         },
-        rsvp: { enabled: true, deadline: "", showEmail: false },
+        rsvp: {
+          enabled: true,
+          deadline: "",
+          showEmail: false,
+          showDietaryRestrictions: true,
+        },
         schedule: [],
         dressCode: { enabled: false, text: "" },
         giftRegistry: { enabled: false, text: "", link: "" },

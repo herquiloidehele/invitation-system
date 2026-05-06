@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import type { CustomTexts, InvitationEventType } from "@/lib/types";
-import { shouldShowRsvpEmail } from "@/lib/rsvp-config";
+import {
+  shouldShowRsvpDietaryRestrictions,
+  shouldShowRsvpEmail,
+} from "@/lib/rsvp-config";
 import RsvpPage from "./RsvpPage";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +50,7 @@ export default async function ConfirmarPage({ params }: Props) {
     enabled?: boolean;
     deadline?: string;
     showEmail?: boolean;
+    showDietaryRestrictions?: boolean;
   };
   const customTexts =
     (invitation.customTexts as CustomTexts | null) ?? undefined;
@@ -63,6 +67,7 @@ export default async function ConfirmarPage({ params }: Props) {
       deadline={rsvp.deadline}
       deadlinePassed={deadlinePassed}
       showEmail={shouldShowRsvpEmail(rsvp)}
+      showDietaryRestrictions={shouldShowRsvpDietaryRestrictions(rsvp)}
       customTexts={customTexts}
     />
   );

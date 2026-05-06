@@ -69,7 +69,12 @@ export interface SaveTheDateFormData {
   customMessage: string;
   envelope?: EnvelopeConfig;
   textStyles?: TextStyleOverrides;
-  rsvp?: { enabled: boolean; deadline?: string; showEmail?: boolean };
+  rsvp?: {
+    enabled: boolean;
+    deadline?: string;
+    showEmail?: boolean;
+    showDietaryRestrictions?: boolean;
+  };
   audio?: { enabled: boolean; src: string; artist: string; title: string };
   bottomHero?: {
     enabled: boolean;
@@ -665,6 +670,28 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                               ...p.rsvp,
                               enabled: p.rsvp?.enabled ?? true,
                               showEmail: v,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Pedir restrições alimentares no RSVP</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Quando activo, o formulário pede as restrições
+                          alimentares do convidado.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={data.rsvp?.showDietaryRestrictions !== false}
+                        onCheckedChange={(v) =>
+                          setData((p) => ({
+                            ...p,
+                            rsvp: {
+                              ...p.rsvp,
+                              enabled: p.rsvp?.enabled ?? true,
+                              showDietaryRestrictions: v,
                             },
                           }))
                         }

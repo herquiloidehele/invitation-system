@@ -108,7 +108,11 @@ function getDefaultState(
     quote: "",
     eventType: "wedding",
     location: { name: "", address: "", googleMapsUrl: "" },
-    rsvp: { enabled: false, showEmail: false },
+    rsvp: {
+      enabled: false,
+      showEmail: false,
+      showDietaryRestrictions: true,
+    },
     schedule: [],
     dressCode: { enabled: false, text: "" },
     giftRegistry: { enabled: false, text: "" },
@@ -525,6 +529,21 @@ export default function ExternalInvitationForm({
                 <Switch
                   checked={form.rsvp.showEmail === true}
                   onCheckedChange={(v) => updateRsvp("showEmail", v)}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <Label>Pedir restrições alimentares no RSVP</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Quando ativo, o formulário pede as restrições alimentares do
+                    convidado.
+                  </p>
+                </div>
+                <Switch
+                  checked={form.rsvp.showDietaryRestrictions !== false}
+                  onCheckedChange={(v) =>
+                    updateRsvp("showDietaryRestrictions", v)
+                  }
                 />
               </div>
             </div>

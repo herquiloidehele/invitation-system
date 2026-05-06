@@ -55,6 +55,7 @@ export interface SaveTheDateRsvpConfig {
   enabled: boolean;
   deadline?: string;
   showEmail?: boolean;
+  showDietaryRestrictions?: boolean;
 }
 
 export interface BottomHeroConfig {
