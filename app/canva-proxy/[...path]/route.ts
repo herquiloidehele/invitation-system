@@ -138,6 +138,9 @@ function buildResponseHeaders(
     "cache-control",
     pickCacheControl(upstreamPath, upstream.headers.get("cache-control")),
   );
+  if (headers.get("cache-control")?.startsWith("public,")) {
+    headers.set("vercel-cdn-cache-control", headers.get("cache-control")!);
+  }
 
   // Same-origin requests don't strictly need CORS, but Canva's <link> tags
   // include `crossorigin="anonymous"`, which causes the browser to perform a
@@ -199,6 +202,14 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
 ) {
+  return proxyCanvaRequest(req, { params }, "GET");
+}
+
+async function proxyCanvaRequest(
+  req: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> },
+  method: "GET" | "HEAD",
+) {
   const { path } = await params;
   const upstream = buildUpstreamUrl(path ?? [], req.nextUrl.search);
 
@@ -212,7 +223,7 @@ export async function GET(
   let resp: Response;
   try {
     resp = await fetch(upstream.url, {
-      method: "GET",
+      method,
       headers: buildRequestHeaders(req, upstream.host),
       redirect: "follow",
       // Don't cache aggressively; let the browser/CDN decide via passed headers.
@@ -226,6 +237,13 @@ export async function GET(
   }
 
   const responseHeaders = buildResponseHeaders(resp, upstream.url.pathname);
+  if (method === "HEAD") {
+    return new NextResponse(null, {
+      status: resp.status,
+      headers: responseHeaders,
+    });
+  }
+
   const contentType = resp.headers.get("content-type") ?? "";
 
   // For HTML responses, inject a <base> tag so relative URLs resolve correctly.
@@ -259,10 +277,5 @@ export async function HEAD(
   req: NextRequest,
   ctx: { params: Promise<{ path: string[] }> },
 ) {
-  // Some browsers issue HEAD probes; reuse GET logic but return no body.
-  const res = await GET(req, ctx);
-  return new NextResponse(null, {
-    status: res.status,
-    headers: res.headers,
-  });
+  return proxyCanvaRequest(req, ctx, "HEAD");
 }
