@@ -48,6 +48,7 @@ export default function CurtainsHero({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [state, setState] = useState<HeroState>("idle");
   const [heroInfoVisible, setHeroInfoVisible] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   // Notify the parent the first time we reach the revealed state so it can
   // unlock the page scroll. Fires for both the natural video-end path and
@@ -59,6 +60,20 @@ export default function CurtainsHero({
       onRevealed?.();
     }
   }, [state, onRevealed]);
+
+  // Force the browser to start downloading the video as soon as the hero
+  // mounts. Mobile WebKit often downgrades `preload="auto"` to "metadata"
+  // until something nudges it; calling `load()` explicitly kicks off the
+  // fetch so playback starts almost instantly when the user taps.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    try {
+      video.load();
+    } catch {
+      /* some browsers throw if load() is called too early — ignore */
+    }
+  }, []);
 
   const tapLabel = t(customTexts, "curtain_tapToOpen");
   const videoSrc = resolveCurtainVideoSrc(videoUrl);
@@ -130,6 +145,13 @@ export default function CurtainsHero({
     }
   }, [heroInfoVisible]);
 
+  // Fired once the video element has rendered its first frame and is
+  // actually progressing. We use this to fade out the poster overlay so
+  // the swap from poster image → video is invisible to the user.
+  const handleVideoPlaying = useCallback(() => {
+    setVideoReady(true);
+  }, []);
+
   // Whole hero is the tap target while idle.
   const isInteractive = state === "idle";
 
@@ -156,6 +178,24 @@ export default function CurtainsHero({
           : undefined
       }
     >
+      {/* Poster overlay painted as a background image directly on the
+          section. Sits behind the <video> and stays opaque until playback
+          actually starts (`playing` event), so the user never sees a blank
+          rectangle while the browser swaps from poster → first decoded
+          frame. The fade-out is brief so the transition feels instant. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url(${videoPoster})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: videoReady ? 0 : 1,
+          transition: "opacity 200ms ease-out",
+          zIndex: 1,
+        }}
+      />
+
       <video
         ref={videoRef}
         src={videoSrc}
@@ -165,9 +205,10 @@ export default function CurtainsHero({
         preload="auto"
         onEnded={handleVideoEnded}
         onError={handleVideoError}
+        onPlaying={handleVideoPlaying}
         onTimeUpdate={handleVideoTimeUpdate}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        style={{ cursor: isInteractive ? "pointer" : "default" }}
+        style={{ cursor: isInteractive ? "pointer" : "default", zIndex: 2 }}
       />
 
       {/* Hero info (monogram, names, quote). Fades in when the curtain video
