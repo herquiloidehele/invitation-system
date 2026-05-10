@@ -1,9 +1,13 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useCallback, useRef, type CSSProperties } from "react";
 import type { CustomTexts, TemplateTheme } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
-import { resolveCoinColors, shortMonthName } from "@/lib/curtain-canva";
+import {
+  resolveCelebrationPalette,
+  resolveCoinColors,
+  shortMonthName,
+} from "@/lib/curtain-canva";
 import ScratchCoin from "./ScratchCoin";
 
 interface ScratchDateRevealProps {
@@ -24,6 +28,59 @@ export default function ScratchDateReveal({
 }: ScratchDateRevealProps) {
   const { baseColor, accentColor } = resolveCoinColors(theme);
   const monthShort = shortMonthName(date.iso, date.month);
+
+  // Track which coins have been revealed so we can fire confetti exactly
+  // once when all three are done. We use a ref so the callback identity is
+  // stable across renders.
+  const revealedCoinsRef = useRef<Set<string>>(new Set());
+  const celebratedRef = useRef(false);
+
+  const fireCelebration = useCallback(() => {
+    if (celebratedRef.current) return;
+    celebratedRef.current = true;
+
+    // Lazy-load canvas-confetti so the dependency only ships when the user
+    // actually reaches this moment.
+    import("canvas-confetti").then(({ default: confetti }) => {
+      const colors = resolveCelebrationPalette(theme);
+
+      // Two angled bursts from the bottom corners — classy, theme-tinted.
+      const baseOptions = {
+        particleCount: 90,
+        spread: 70,
+        startVelocity: 45,
+        scalar: 1,
+        ticks: 220,
+        gravity: 1.05,
+        colors,
+      };
+      confetti({ ...baseOptions, angle: 60, origin: { x: 0.05, y: 0.85 } });
+      confetti({ ...baseOptions, angle: 120, origin: { x: 0.95, y: 0.85 } });
+
+      // A small follow-up burst from the centre for emphasis.
+      window.setTimeout(() => {
+        confetti({
+          particleCount: 60,
+          spread: 100,
+          startVelocity: 35,
+          scalar: 0.9,
+          ticks: 200,
+          colors,
+          origin: { x: 0.5, y: 0.6 },
+        });
+      }, 180);
+    });
+  }, [theme]);
+
+  const handleCoinRevealed = useCallback(
+    (key: "day" | "month" | "year") => {
+      revealedCoinsRef.current.add(key);
+      if (revealedCoinsRef.current.size === 3) {
+        fireCelebration();
+      }
+    },
+    [fireCelebration],
+  );
 
   const datePartStyle: CSSProperties = {
     fontFamily: theme.displayFont,
@@ -85,6 +142,7 @@ export default function ScratchDateReveal({
           content={date.day || "—"}
           subLabel={t(customTexts, "saveDate_dayLabel")}
           theme={theme}
+          onRevealed={() => handleCoinRevealed("day")}
         />
         <CoinWithLabel
           coinSize={coinSize}
@@ -95,6 +153,7 @@ export default function ScratchDateReveal({
           content={monthShort || "—"}
           subLabel={t(customTexts, "saveDate_monthLabel")}
           theme={theme}
+          onRevealed={() => handleCoinRevealed("month")}
         />
         <CoinWithLabel
           coinSize={coinSize}
@@ -105,6 +164,7 @@ export default function ScratchDateReveal({
           content={date.year || "—"}
           subLabel={t(customTexts, "saveDate_yearLabel")}
           theme={theme}
+          onRevealed={() => handleCoinRevealed("year")}
         />
       </div>
     </section>
@@ -120,6 +180,7 @@ function CoinWithLabel({
   content,
   subLabel,
   theme,
+  onRevealed,
 }: {
   coinSize: string;
   baseColor: string;
@@ -129,6 +190,7 @@ function CoinWithLabel({
   content: string;
   subLabel: string;
   theme: TemplateTheme;
+  onRevealed?: () => void;
 }) {
   return (
     <div className="flex flex-col items-center gap-2">
@@ -140,6 +202,7 @@ function CoinWithLabel({
           accentColor={accentColor}
           ariaLabel={ariaLabel}
           revealedContent={<span style={contentStyle}>{content}</span>}
+          onRevealed={onRevealed}
         />
       </div>
       <span

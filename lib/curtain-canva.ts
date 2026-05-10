@@ -84,3 +84,28 @@ export function shouldShowHeroInfoAtProgress(
   if (!Number.isFinite(currentTime) || currentTime < 0) return false;
   return currentTime / duration >= HERO_INFO_REVEAL_PROGRESS;
 }
+
+/**
+ * Builds a small celebratory color palette derived from the theme's accent
+ * and decorative colors. Used by the confetti burst that fires after the
+ * user scratches the last save-the-date coin. Falls back to a warm gold
+ * + ivory palette so the burst still feels on-brand for unset themes.
+ */
+export function resolveCelebrationPalette(
+  theme: Pick<TemplateTheme, "accent" | "decorativeColor"> | {
+    accent?: string;
+    decorativeColor?: string;
+  },
+): string[] {
+  const accent = theme.accent?.trim();
+  const decorative = theme.decorativeColor?.trim();
+  const palette = [
+    accent || "#C9A961",
+    decorative || "#F4E4A1",
+    "#FFFFFF",
+    "#E8D7A8",
+  ];
+  // Deduplicate while preserving order so the burst doesn't render the same
+  // color twice when accent === decorativeColor.
+  return Array.from(new Set(palette));
+}
