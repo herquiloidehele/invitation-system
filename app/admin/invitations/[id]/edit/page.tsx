@@ -62,6 +62,7 @@ export default async function EditInvitationPage({
     audio: row.audio as unknown as InvitationData["audio"],
     heroImage: row.heroImage,
     videoUrl: row.videoUrl ?? undefined,
+    videoPoster: row.videoPoster ?? undefined,
     faqs: (row.faqs as unknown as InvitationData["faqs"]) ?? undefined,
     envelope:
       (row.envelope as unknown as InvitationData["envelope"]) ?? undefined,

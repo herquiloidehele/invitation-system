@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
         }),
         heroImage: body.heroImage ?? "",
         videoUrl: body.videoUrl ?? null,
+        videoPoster: body.videoPoster ?? null,
         faqs: sanitizeJsonField(body.faqs, null),
         guestGuide: sanitizeJsonField(body.guestGuide, null),
         envelope: sanitizeJsonField(body.envelope, null),

@@ -55,6 +55,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         audio: { enabled: false, src: "", artist: "", title: "" },
         heroImage: "",
         videoUrl: "",
+        videoPoster: "",
         faqs: [],
         saveDateStyle: "classic",
         cinematicImageUrl: "",

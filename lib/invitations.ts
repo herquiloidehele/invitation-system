@@ -35,6 +35,7 @@ type InvitationWithTheme = {
   audio: unknown;
   heroImage: string;
   videoUrl: string | null;
+  videoPoster: string | null;
   faqs: unknown;
   guestGuide: unknown;
   envelope: unknown;
@@ -72,6 +73,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     audio: row.audio as InvitationData["audio"],
     heroImage: row.heroImage,
     videoUrl: row.videoUrl ?? undefined,
+    videoPoster: row.videoPoster ?? undefined,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
     guestGuide: (row.guestGuide as InvitationData["guestGuide"]) ?? undefined,
     envelope: row.envelope as InvitationData["envelope"],

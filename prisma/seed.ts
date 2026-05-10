@@ -280,6 +280,7 @@ async function main() {
         audio: data.audio,
         heroImage: data.heroImage,
         videoUrl: data.videoUrl ?? null,
+        videoPoster: data.videoPoster ?? null,
         faqs: data.faqs ?? null,
       },
       create: {
@@ -296,6 +297,7 @@ async function main() {
         audio: data.audio,
         heroImage: data.heroImage,
         videoUrl: data.videoUrl ?? null,
+        videoPoster: data.videoPoster ?? null,
         faqs: data.faqs ?? null,
       },
     });

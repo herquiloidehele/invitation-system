@@ -122,6 +122,7 @@ function getDefaultState(
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
     videoUrl: "",
+    videoPoster: "",
     invitationType: invType,
     externalLink: "",
     saveDateStyle: "classic",
@@ -973,8 +974,17 @@ export default function ExternalInvitationForm({
                   kind="video"
                   maxSizeMB={500}
                   value={form.videoUrl}
-                  onUpload={(url) => update("videoUrl", url)}
-                  onClear={() => update("videoUrl", "")}
+                  onUpload={(url, meta) => {
+                    update("videoUrl", url);
+                    // The server-side ffmpeg job returns a poster URL on
+                    // success. Persist it so the public renderer can show
+                    // it as the <video> poster instead of a static asset.
+                    update("videoPoster", meta?.posterUrl ?? "");
+                  }}
+                  onClear={() => {
+                    update("videoUrl", "");
+                    update("videoPoster", "");
+                  }}
                 />
               </div>
             )}
@@ -1104,8 +1114,18 @@ export default function ExternalInvitationForm({
                           kind="video"
                           maxSizeMB={500}
                           value={form.videoUrl}
-                          onUpload={(url) => update("videoUrl", url)}
-                          onClear={() => update("videoUrl", "")}
+                          onUpload={(url, meta) => {
+                            update("videoUrl", url);
+                            // First-frame poster auto-extracted by the
+                            // server. Used by CurtainsHero so iOS shows
+                            // the closed-curtain still while the video
+                            // loads, instead of a blank rectangle.
+                            update("videoPoster", meta?.posterUrl ?? "");
+                          }}
+                          onClear={() => {
+                            update("videoUrl", "");
+                            update("videoPoster", "");
+                          }}
                         />
                       </div>
 

@@ -84,6 +84,7 @@ model Invitation {
   audio        Json     // { enabled, src, artist, title }
   heroImage    String
   videoUrl     String?
+  videoPoster  String?  // Poster image shown before the curtains video plays. Optional — falls back to a static asset.
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
   envelope     Json?    // EnvelopeConfig { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }

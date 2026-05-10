@@ -1,4 +1,8 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const region = process.env.AWS_REGION!;
@@ -57,4 +61,68 @@ export async function generatePresignedUploadUrl(
   const publicUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 
   return { presignedUrl, publicUrl, key };
+}
+
+/**
+ * Returns the public S3 URL for a given key in our bucket. Used when we
+ * upload server-side and want to expose the same `https://…amazonaws.com/key`
+ * shape that `generatePresignedUploadUrl` produces.
+ */
+export function publicUrlForKey(key: string): string {
+  return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+}
+
+/**
+ * If `url` lives in our bucket, returns the object key; otherwise null.
+ * Accepts both the `s3.<region>.amazonaws.com` and `bucket.s3.<region>` styles
+ * we actually generate.
+ */
+export function s3KeyFromUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    const expectedHost = `${bucket}.s3.${region}.amazonaws.com`;
+    if (u.host !== expectedHost) return null;
+    return u.pathname.replace(/^\//, "");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Downloads an S3 object's bytes into a Buffer. Used for short-lived
+ * server-side processing (e.g. ffmpeg poster extraction). Avoid for very
+ * large files in serverless environments — consider streaming instead.
+ */
+export async function getObjectBuffer(key: string): Promise<Buffer> {
+  const client = getS3Client();
+  const res = await client.send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  if (!res.Body) {
+    throw new Error(`S3 object ${key} returned no body`);
+  }
+  // The AWS SDK v3 returns the body as a web ReadableStream in Node 18+.
+  const arrayBuffer = await res.Body.transformToByteArray();
+  return Buffer.from(arrayBuffer);
+}
+
+/**
+ * Uploads a Buffer to S3 with the given key + content type and returns the
+ * public URL.
+ */
+export async function putObjectBuffer(
+  key: string,
+  body: Buffer,
+  contentType: string,
+): Promise<string> {
+  const client = getS3Client();
+  await client.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    }),
+  );
+  return publicUrlForKey(key);
 }

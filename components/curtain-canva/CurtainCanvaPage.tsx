@@ -250,6 +250,7 @@ export default function CurtainCanvaPage({
         theme={theme}
         audioRef={audioRef}
         videoUrl={invitation.videoUrl}
+        videoPoster={invitation.videoPoster}
         customTexts={invitation.customTexts}
         onTapped={handleTapped}
         onRevealed={handleRevealed}

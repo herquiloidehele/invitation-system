@@ -24,11 +24,25 @@ import { cn } from "@/lib/utils";
 
 type MediaKind = "image" | "svg" | "video" | "audio";
 
+/**
+ * Extra metadata returned alongside an upload. For videos, MediaUpload tries
+ * to extract a first-frame poster server-side and surfaces the resulting
+ * URL here so callers can persist it without the admin having to upload a
+ * second image. Optional — callers that don't care can ignore it.
+ */
+export interface MediaUploadMeta {
+  posterUrl?: string;
+}
+
 interface MediaUploadProps {
   /** Current value (an S3 URL or existing URL) */
   value?: string;
-  /** Called when a new file has been uploaded and we have a public URL */
-  onUpload: (url: string) => void;
+  /**
+   * Called when a new file has been uploaded and we have a public URL.
+   * The optional `meta` arg carries derived assets — currently the auto-
+   * generated poster URL for video uploads.
+   */
+  onUpload: (url: string, meta?: MediaUploadMeta) => void;
   /** Called when the user clears the current value */
   onClear: () => void;
   /** The kind of media to accept */
@@ -44,6 +58,7 @@ type UploadState =
   | { status: "idle" }
   | { status: "compressing" }
   | { status: "uploading"; progress: number }
+  | { status: "extracting-poster" }
   | { status: "done"; url: string }
   | { status: "error"; message: string };
 
@@ -153,8 +168,41 @@ export default function MediaUpload({
           },
         });
 
+        // Best-effort poster extraction for videos. We try to grab the
+        // first frame server-side so callers that show a poster image
+        // (e.g. the curtain hero) don't need a second admin upload. A
+        // failure here never blocks the video upload itself.
+        let posterUrl: string | undefined;
+        if (kind === "video") {
+          setUploadState({ status: "extracting-poster" });
+          try {
+            const posterRes = await fetch(
+              "/api/admin/media/extract-poster",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ videoUrl: publicUrl }),
+              },
+            );
+            if (posterRes.ok) {
+              const json = (await posterRes.json()) as { posterUrl?: string };
+              if (json.posterUrl) posterUrl = json.posterUrl;
+            } else {
+              console.warn(
+                "[MediaUpload] Poster extraction returned non-2xx status",
+                posterRes.status,
+              );
+            }
+          } catch (posterErr) {
+            console.warn(
+              "[MediaUpload] Poster extraction failed; continuing without it",
+              posterErr,
+            );
+          }
+        }
+
         setUploadState({ status: "done", url: publicUrl });
-        onUpload(publicUrl);
+        onUpload(publicUrl, posterUrl ? { posterUrl } : undefined);
       } catch (err) {
         setUploadState({
           status: "error",
@@ -178,7 +226,8 @@ export default function MediaUpload({
     },
     disabled:
       uploadState.status === "compressing" ||
-      uploadState.status === "uploading",
+      uploadState.status === "uploading" ||
+      uploadState.status === "extracting-poster",
     noClick: !!value,
     noDrag: !!value,
   });
@@ -254,12 +303,14 @@ export default function MediaUpload({
     );
   }
 
-  // ── Render: uploading / compressing ──
+  // ── Render: uploading / compressing / extracting poster ──
   if (
     uploadState.status === "compressing" ||
-    uploadState.status === "uploading"
+    uploadState.status === "uploading" ||
+    uploadState.status === "extracting-poster"
   ) {
     const isCompressing = uploadState.status === "compressing";
+    const isExtracting = uploadState.status === "extracting-poster";
     const progress =
       uploadState.status === "uploading" ? uploadState.progress : 0;
 
@@ -268,11 +319,11 @@ export default function MediaUpload({
         <div className="flex flex-col items-center gap-3">
           <Loader2Icon className="h-8 w-8 text-primary animate-spin" />
           <p className="text-sm font-medium">
-            {isCompressing
-              ? "A comprimir imagem..."
-              : `A carregar... ${progress}%`}
+            {isCompressing && "A comprimir imagem..."}
+            {isExtracting && "A gerar miniatura do vídeo..."}
+            {!isCompressing && !isExtracting && `A carregar... ${progress}%`}
           </p>
-          {!isCompressing && (
+          {!isCompressing && !isExtracting && (
             <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
               <div
                 className="h-full bg-primary transition-all duration-200 rounded-full"

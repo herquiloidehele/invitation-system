@@ -348,6 +348,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
     videoUrl: "",
+    videoPoster: "",
     faqs: [],
     guestGuide: { enabled: false, items: [] },
     envelope: {},
@@ -1441,8 +1442,18 @@ export default function InvitationForm({
                       kind="video"
                       maxSizeMB={100}
                       value={form.videoUrl || undefined}
-                      onUpload={(url) => update("videoUrl", url)}
-                      onClear={() => update("videoUrl", undefined)}
+                      onUpload={(url, meta) => {
+                        update("videoUrl", url);
+                        // Persist the auto-generated first-frame poster so
+                        // public renderers can show it while the video
+                        // loads. Falls back to undefined when extraction
+                        // is unavailable.
+                        update("videoPoster", meta?.posterUrl ?? undefined);
+                      }}
+                      onClear={() => {
+                        update("videoUrl", undefined);
+                        update("videoPoster", undefined);
+                      }}
                     />
                   </div>
 

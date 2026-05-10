@@ -126,6 +126,9 @@ export async function PUT(
         }),
         ...(body.heroImage !== undefined && { heroImage: body.heroImage }),
         ...(body.videoUrl !== undefined && { videoUrl: body.videoUrl }),
+        ...(body.videoPoster !== undefined && {
+          videoPoster: body.videoPoster,
+        }),
         ...(body.faqs !== undefined && {
           faqs: sanitizeJsonField(body.faqs, null),
         }),

@@ -1,10 +1,19 @@
 "use client";
 
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
-import { resolveCurtainVideoSrc, shouldShowHeroInfoAtProgress } from "@/lib/curtain-canva";
+import {
+  resolveCurtainVideoSrc,
+  shouldShowHeroInfoAtProgress,
+} from "@/lib/curtain-canva";
 
 interface CurtainsHeroProps {
   couple: InvitationData["couple"];
@@ -12,6 +21,7 @@ interface CurtainsHeroProps {
   theme: TemplateTheme;
   audioRef: RefObject<HTMLAudioElement | null>;
   videoUrl?: string;
+  videoPoster?: string;
   customTexts?: CustomTexts;
   onTapped?: () => void;
   /**
@@ -30,6 +40,7 @@ export default function CurtainsHero({
   theme,
   audioRef,
   videoUrl,
+  videoPoster,
   customTexts,
   onTapped,
   onRevealed,
@@ -148,6 +159,7 @@ export default function CurtainsHero({
       <video
         ref={videoRef}
         src={videoSrc}
+        poster={videoPoster}
         muted
         playsInline
         preload="auto"

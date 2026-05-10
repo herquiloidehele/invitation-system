@@ -457,6 +457,8 @@ export interface InvitationData {
   audio: AudioConfig;
   heroImage: string;
   videoUrl?: string;
+  /** Poster image displayed by the curtain video before playback / while it loads. Optional — falls back to a static bundled poster. */
+  videoPoster?: string;
   faqs?: FAQItem[];
   /** "Manual do bom convidado" section — optional list of icon + label tips for guests. */
   guestGuide?: GuestGuide;
