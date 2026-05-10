@@ -83,6 +83,15 @@ export default function CanvaEmbed({
         height: contentHeight ? `${contentHeight}px` : undefined,
         aspectRatio: contentHeight ? undefined : ar,
         background: theme.bg,
+        // Critical: disable browser scroll anchoring on this section.
+        // When the iframe finishes loading on a slow connection, its
+        // measured height jumps from the aspect-ratio placeholder to
+        // several thousand pixels. By default Chrome/Safari then scroll
+        // the viewport down to keep an "anchor" element in place — which
+        // in our layout means yanking the user mid-page just as they
+        // started reading. Disabling overflow-anchor here keeps their
+        // scroll position fixed while the section grows beneath them.
+        overflowAnchor: "none",
       }}
     >
       <iframe
