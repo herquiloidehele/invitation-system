@@ -263,8 +263,23 @@ export default function CurtainCanvaPage({
           customTexts={invitation.customTexts}
         />
 
+        {/* CanvaEmbed mounts immediately and starts fetching the proxied
+            Canva page while the curtain video is still on screen. In
+            `preloading` mode the iframe sits in a fixed off-screen wrapper
+            that does not participate in document flow, and the section
+            collapses to height 0 — so there is no layout shift inside the
+            (currently invisible) reveal wrapper either. By the time the
+            user finishes the curtain and scrolls, the iframe document is
+            already loaded and measured, so Safari has nothing to
+            scroll-anchor against. Once revealed, the same iframe (no
+            remount, no refetch) snaps into the section with the
+            already-measured height applied. */}
         {invitation.externalLink && (
-          <CanvaEmbed externalLink={invitation.externalLink} theme={theme} />
+          <CanvaEmbed
+            externalLink={invitation.externalLink}
+            theme={theme}
+            preloading={!revealed}
+          />
         )}
 
         {invitation.rsvp.enabled && (

@@ -11,6 +11,16 @@ interface CanvaEmbedProps {
   aspectRatio?: number;
   /** iframe accessibility title. Defaults to "Convite". */
   title?: string;
+  /**
+   * When true, the iframe mounts and starts fetching but is positioned
+   * off-screen (fixed, far below the viewport) so it never participates
+   * in document layout. This lets the Canva page download AND finish
+   * measuring while the curtain hero is still on screen — by the time
+   * the user reveals the page, the height is already known and Safari
+   * has nothing to scroll-anchor against. Once `preloading` flips to
+   * false the same iframe slots into normal flow with no extra fetch.
+   */
+  preloading?: boolean;
 }
 
 export default function CanvaEmbed({
@@ -18,6 +28,7 @@ export default function CanvaEmbed({
   theme,
   aspectRatio,
   title,
+  preloading = false,
 }: CanvaEmbedProps) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const measureTimerRef = useRef<number[]>([]);
@@ -75,11 +86,24 @@ export default function CanvaEmbed({
 
   if (!externalLink) return null;
 
-  return (
-    <section
-      id="details"
-      className="relative w-full"
-      style={{
+  // The section reserves layout space. When preloading, height collapses to
+  // 0 so it occupies no flow; when revealed, we use the measured height
+  // (or aspect-ratio fallback) so the page lays out correctly. Crucially,
+  // the iframe element itself is NEVER remounted — only its wrapper's
+  // positioning flips between fixed-offscreen and absolute-fill — so the
+  // browser keeps the same loaded document across the transition.
+  const sectionStyle = preloading
+    ? {
+        width: "100%",
+        height: 0,
+        overflow: "hidden" as const,
+        background: theme.bg,
+        overflowAnchor: "none" as const,
+      }
+    : {
+        // If preloading already ran we have a measured height — apply it
+        // immediately so there is no aspect-ratio placeholder → measured
+        // height jump on Safari.
         height: contentHeight ? `${contentHeight}px` : undefined,
         aspectRatio: contentHeight ? undefined : ar,
         background: theme.bg,
@@ -91,21 +115,71 @@ export default function CanvaEmbed({
         // in our layout means yanking the user mid-page just as they
         // started reading. Disabling overflow-anchor here keeps their
         // scroll position fixed while the section grows beneath them.
-        overflowAnchor: "none",
-      }}
+        overflowAnchor: "none" as const,
+      };
+
+  // While preloading the iframe lives in a fixed, far-off-screen wrapper
+  // so the browser fetches AND lays it out (giving us a measured height)
+  // without ever affecting document flow. When revealed, the same wrapper
+  // becomes an absolute fill of the section, no remount, no refetch.
+  const wrapperStyle: React.CSSProperties = preloading
+    ? {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        // Leave the wrapper tall enough that the iframe can render its full
+        // content during preload. The exact value doesn't matter as long as
+        // it's larger than the eventual measured height — Canva embeds top
+        // out around 8000–10000 px in practice.
+        height: 12000,
+        transform: "translateY(200vh)",
+        pointerEvents: "none",
+        opacity: 0,
+        zIndex: -1,
+        overflow: "hidden",
+        contain: "strict",
+        // The CanvaEmbed lives inside a `visibility: hidden` reveal wrapper
+        // pre-reveal. Iframes inside a hidden subtree are painted at zero
+        // size on Safari, which would defeat the whole point of the preload.
+        // Force the off-screen wrapper visible so the iframe document
+        // actually fetches and lays out.
+        visibility: "visible",
+      }
+    : {
+        position: "absolute",
+        inset: 0,
+      };
+
+  return (
+    <section
+      id="details"
+      className={preloading ? undefined : "relative w-full"}
+      aria-hidden={preloading || undefined}
+      style={sectionStyle}
     >
-      <iframe
-        ref={iframeRef}
-        src={proxiedUrl}
-        title={title ?? "Convite"}
-        loading="lazy"
-        onLoad={handleLoad}
-        allow="autoplay; fullscreen; clipboard-write"
-        referrerPolicy="no-referrer"
-        scrolling="no"
-        className="block w-full h-full"
-        style={{ border: "none", display: "block" }}
-      />
+      <div style={wrapperStyle} aria-hidden={preloading}>
+        <iframe
+          ref={iframeRef}
+          src={proxiedUrl}
+          title={title ?? "Convite"}
+          loading="eager"
+          onLoad={handleLoad}
+          allow="autoplay; fullscreen; clipboard-write"
+          referrerPolicy="no-referrer"
+          scrolling="no"
+          style={{
+            border: "none",
+            display: "block",
+            width: "100%",
+            height: preloading
+              ? contentHeight
+                ? `${contentHeight}px`
+                : "100%"
+              : "100%",
+          }}
+        />
+      </div>
     </section>
   );
 }
