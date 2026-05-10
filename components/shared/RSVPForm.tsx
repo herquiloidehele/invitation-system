@@ -14,6 +14,8 @@ import type {
 } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { t } from "@/lib/custom-texts";
+import { resolveTextElementOverride } from "@/lib/curtain-canva";
+import { EditableText } from "@/components/shared/EditableText";
 import {
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
@@ -189,6 +191,18 @@ export default function RSVPForm(props: RSVPFormProps) {
 
   const p = buildModalPalette(props.theme);
 
+  // Per-element text style overrides — only available in integration mode
+  // (legacy direct-theme callers pass no `invitation`). Resolved once per
+  // render and spread on top of inline styles so admin customizations win
+  // without losing the form's typography defaults.
+  const textStyles = isIntegration(props)
+    ? props.invitation.textStyles
+    : undefined;
+  const titleOverride = resolveTextElementOverride(textStyles, "sectionTitles");
+  const labelsOverride = resolveTextElementOverride(textStyles, "labels");
+  const bodyTextOverride = resolveTextElementOverride(textStyles, "bodyText");
+  const ctaLabelOverride = resolveTextElementOverride(textStyles, "ctaLabel");
+
   const [submitState, setSubmitState] = useState<SubmitState>(() =>
     hasSubmittedRsvp(slug) ? "already_submitted" : "idle",
   );
@@ -270,6 +284,8 @@ export default function RSVPForm(props: RSVPFormProps) {
     letterSpacing: 1,
     textTransform: "uppercase" as const,
     color: p.textSoft,
+    // Admin per-element override for ALL field labels, applied last so it wins.
+    ...labelsOverride,
   };
 
   return (
@@ -290,9 +306,12 @@ export default function RSVPForm(props: RSVPFormProps) {
             fontFamily: p.displayFont,
             fontSize: inline ? 28 : 18,
             color: props.theme.accent,
+            ...titleOverride,
           }}
         >
-          {t(ct, "rsvp_modalTitle")}
+          <EditableText elementKey="sectionTitles">
+            {t(ct, "rsvp_modalTitle")}
+          </EditableText>
         </h2>
         {!inline && (
           <button
@@ -320,12 +339,23 @@ export default function RSVPForm(props: RSVPFormProps) {
             <CheckCircle size={48} color="#22c55e" strokeWidth={1.5} />
             <p
               className="text-lg font-medium"
-              style={{ fontFamily: p.displayFont, color: p.text }}
+              style={{
+                fontFamily: p.displayFont,
+                color: p.text,
+                ...titleOverride,
+              }}
             >
-              {t(ct, "rsvp_alreadyTitle")}
+              <EditableText elementKey="sectionTitles">
+                {t(ct, "rsvp_alreadyTitle")}
+              </EditableText>
             </p>
-            <p className="text-sm" style={{ color: p.textSoft }}>
-              {t(ct, "rsvp_alreadyMessage")}
+            <p
+              className="text-sm"
+              style={{ color: p.textSoft, ...bodyTextOverride }}
+            >
+              <EditableText elementKey="bodyText">
+                {t(ct, "rsvp_alreadyMessage")}
+              </EditableText>
             </p>
             {!inline && (
               <button
@@ -336,9 +366,12 @@ export default function RSVPForm(props: RSVPFormProps) {
                   background: "#22c55e",
                   color: "#fff",
                   borderRadius: p.ctaRadius,
+                  ...ctaLabelOverride,
                 }}
               >
-                {t(ct, "rsvp_closeButton")}
+                <EditableText elementKey="ctaLabel">
+                  {t(ct, "rsvp_closeButton")}
+                </EditableText>
               </button>
             )}
           </motion.div>
@@ -353,12 +386,23 @@ export default function RSVPForm(props: RSVPFormProps) {
             <CheckCircle size={48} color={p.accent} strokeWidth={1.5} />
             <p
               className="text-lg font-medium"
-              style={{ fontFamily: p.displayFont, color: p.text }}
+              style={{
+                fontFamily: p.displayFont,
+                color: p.text,
+                ...titleOverride,
+              }}
             >
-              {t(ct, "rsvp_successTitle")}
+              <EditableText elementKey="sectionTitles">
+                {t(ct, "rsvp_successTitle")}
+              </EditableText>
             </p>
-            <p className="text-sm" style={{ color: p.textSoft }}>
-              {t(ct, "rsvp_successMessage")}
+            <p
+              className="text-sm"
+              style={{ color: p.textSoft, ...bodyTextOverride }}
+            >
+              <EditableText elementKey="bodyText">
+                {t(ct, "rsvp_successMessage")}
+              </EditableText>
             </p>
             {!inline && (
               <button
@@ -369,9 +413,12 @@ export default function RSVPForm(props: RSVPFormProps) {
                   background: p.ctaBg,
                   color: p.ctaText,
                   borderRadius: p.ctaRadius,
+                  ...ctaLabelOverride,
                 }}
               >
-                {t(ct, "rsvp_closeButton")}
+                <EditableText elementKey="ctaLabel">
+                  {t(ct, "rsvp_closeButton")}
+                </EditableText>
               </button>
             )}
           </motion.div>
@@ -386,12 +433,23 @@ export default function RSVPForm(props: RSVPFormProps) {
             <AlertCircle size={48} color="#ef4444" strokeWidth={1.5} />
             <p
               className="text-lg font-medium"
-              style={{ fontFamily: p.displayFont, color: p.text }}
+              style={{
+                fontFamily: p.displayFont,
+                color: p.text,
+                ...titleOverride,
+              }}
             >
-              {t(ct, "rsvp_errorTitle")}
+              <EditableText elementKey="sectionTitles">
+                {t(ct, "rsvp_errorTitle")}
+              </EditableText>
             </p>
-            <p className="text-sm" style={{ color: p.textSoft }}>
-              {t(ct, "rsvp_errorMessage")}
+            <p
+              className="text-sm"
+              style={{ color: p.textSoft, ...bodyTextOverride }}
+            >
+              <EditableText elementKey="bodyText">
+                {t(ct, "rsvp_errorMessage")}
+              </EditableText>
             </p>
             <button
               onClick={() => setSubmitState("idle")}
@@ -401,9 +459,12 @@ export default function RSVPForm(props: RSVPFormProps) {
                 background: p.ctaBg,
                 color: p.ctaText,
                 borderRadius: p.ctaRadius,
+                ...ctaLabelOverride,
               }}
             >
-              {t(ct, "rsvp_retryButton")}
+              <EditableText elementKey="ctaLabel">
+                {t(ct, "rsvp_retryButton")}
+              </EditableText>
             </button>
           </motion.div>
         )}
@@ -420,14 +481,21 @@ export default function RSVPForm(props: RSVPFormProps) {
                   fontFamily: uiFont,
                   fontSize: 13,
                   color: p.textMuted,
+                  ...bodyTextOverride,
                 }}
               >
-                {t(ct, "rsvp_deadlinePrefix")} {deadline}
+                <EditableText elementKey="bodyText">
+                  {t(ct, "rsvp_deadlinePrefix")} {deadline}
+                </EditableText>
               </p>
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label style={labelStyle}>{t(ct, "rsvp_nameLabel")}</label>
+              <label style={labelStyle}>
+                <EditableText elementKey="labels">
+                  {t(ct, "rsvp_nameLabel")}
+                </EditableText>
+              </label>
               <input
                 {...register("name")}
                 placeholder={t(ct, "rsvp_namePlaceholder")}
@@ -445,7 +513,11 @@ export default function RSVPForm(props: RSVPFormProps) {
 
             {showEmail && (
               <div className="flex flex-col gap-1.5">
-                <label style={labelStyle}>{t(ct, "rsvp_emailLabel")}</label>
+                <label style={labelStyle}>
+                  <EditableText elementKey="labels">
+                    {t(ct, "rsvp_emailLabel")}
+                  </EditableText>
+                </label>
                 <input
                   {...register("email")}
                   type="email"
@@ -463,7 +535,9 @@ export default function RSVPForm(props: RSVPFormProps) {
 
             <div className="flex flex-col gap-2">
               <label style={labelStyle}>
-                {t(ct, "rsvp_attendingLabel")}
+                <EditableText elementKey="labels">
+                  {t(ct, "rsvp_attendingLabel")}
+                </EditableText>
               </label>
               <div className="flex gap-3">
                 <label
@@ -474,6 +548,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                       attending === "yes" ? p.accent + "15" : "transparent",
                     color: p.text,
                     fontFamily: uiFont,
+                    ...bodyTextOverride,
                   }}
                 >
                   <input
@@ -482,7 +557,9 @@ export default function RSVPForm(props: RSVPFormProps) {
                     value="yes"
                     className="sr-only"
                   />
-                  {t(ct, "rsvp_attendingYes")}
+                  <EditableText elementKey="bodyText">
+                    {t(ct, "rsvp_attendingYes")}
+                  </EditableText>
                 </label>
                 <label
                   className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
@@ -492,6 +569,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                       attending === "no" ? p.accent + "15" : "transparent",
                     color: p.text,
                     fontFamily: uiFont,
+                    ...bodyTextOverride,
                   }}
                 >
                   <input
@@ -500,7 +578,9 @@ export default function RSVPForm(props: RSVPFormProps) {
                     value="no"
                     className="sr-only"
                   />
-                  {t(ct, "rsvp_attendingNo")}
+                  <EditableText elementKey="bodyText">
+                    {t(ct, "rsvp_attendingNo")}
+                  </EditableText>
                 </label>
               </div>
               {errors.attending && (
@@ -513,7 +593,9 @@ export default function RSVPForm(props: RSVPFormProps) {
             {attending === "yes" && showDietaryRestrictions && (
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
-                  {t(ct, "rsvp_dietaryLabel")}
+                  <EditableText elementKey="labels">
+                    {t(ct, "rsvp_dietaryLabel")}
+                  </EditableText>
                 </label>
                 <input
                   {...register("dietaryRestrictions")}
@@ -526,7 +608,9 @@ export default function RSVPForm(props: RSVPFormProps) {
 
             <div className="flex flex-col gap-1.5">
               <label style={labelStyle}>
-                {t(ct, "rsvp_messageLabel")}
+                <EditableText elementKey="labels">
+                  {t(ct, "rsvp_messageLabel")}
+                </EditableText>
               </label>
               <textarea
                 {...register("message")}
@@ -534,6 +618,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                 placeholder={t(ct, "rsvp_messagePlaceholder")}
                 className={`${inputClass} resize-none`}
                 style={inputStyle}
+                suppressHydrationWarning
               />
             </div>
 
@@ -546,15 +631,20 @@ export default function RSVPForm(props: RSVPFormProps) {
                 background: p.ctaBg,
                 color: p.ctaText,
                 borderRadius: p.ctaRadius,
+                ...ctaLabelOverride,
               }}
             >
               {submitState === "loading" ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  {t(ct, "rsvp_submitting")}
+                  <EditableText elementKey="ctaLabel">
+                    {t(ct, "rsvp_submitting")}
+                  </EditableText>
                 </>
               ) : (
-                t(ct, "rsvp_submitButton")
+                <EditableText elementKey="ctaLabel">
+                  {t(ct, "rsvp_submitButton")}
+                </EditableText>
               )}
             </button>
           </form>
