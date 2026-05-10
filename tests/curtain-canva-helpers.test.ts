@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   isCurtainCanvaLayout,
   resolveCurtainVideoSrc,
+  resolveRevealContentStyle,
   shortMonthName,
   resolveCoinColors,
 } from "../lib/curtain-canva";
@@ -54,5 +55,21 @@ describe("resolveCurtainVideoSrc", () => {
   it("falls back to the bundled curtains video when empty", () => {
     expect(resolveCurtainVideoSrc("")).toBe("/videos/curtains.mp4");
     expect(resolveCurtainVideoSrc(undefined)).toBe("/videos/curtains.mp4");
+  });
+});
+
+describe("resolveRevealContentStyle", () => {
+  it("keeps below-fold content mounted but hidden before reveal", () => {
+    expect(resolveRevealContentStyle(false)).toEqual({
+      visibility: "hidden",
+      pointerEvents: "none",
+    });
+  });
+
+  it("shows below-fold content after reveal", () => {
+    expect(resolveRevealContentStyle(true)).toEqual({
+      visibility: "visible",
+      pointerEvents: "auto",
+    });
   });
 });

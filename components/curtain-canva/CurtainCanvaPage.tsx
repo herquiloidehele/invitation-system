@@ -13,6 +13,7 @@ import CurtainsHero from "./CurtainsHero";
 import ScratchDateReveal from "./ScratchDateReveal";
 import CanvaEmbed from "./CanvaEmbed";
 import RSVPForm from "@/components/shared/RSVPForm";
+import { resolveRevealContentStyle } from "@/lib/curtain-canva";
 
 interface CurtainCanvaPageProps {
   invitation: InvitationData;
@@ -128,9 +129,9 @@ export default function CurtainCanvaPage({
     };
   }, []);
 
-  // When below-fold sections mount after the reveal, reset scroll and then
-  // release the fixed-body lock. Keeping the lock until after mount prevents
-  // a visible jump directly to the full-bleed iframe.
+  // Below-fold sections stay mounted from first paint and are only hidden
+  // until reveal. That keeps document height stable and prevents the browser
+  // from re-anchoring to the iframe when the curtain opens.
   useEffect(() => {
     if (!revealed) return;
 
@@ -148,19 +149,20 @@ export default function CurtainCanvaPage({
       const previous = scrollLockRef.current;
       resetScroll();
 
-      if (!previous) return;
-      document.body.style.overflow = previous.bodyOverflow;
-      document.body.style.position = previous.bodyPosition;
-      document.body.style.top = previous.bodyTop;
-      document.body.style.left = previous.bodyLeft;
-      document.body.style.right = previous.bodyRight;
-      document.body.style.width = previous.bodyWidth;
-      document.documentElement.style.overflow = previous.htmlOverflow;
-      document.body.style.overflowAnchor = previous.bodyOverflowAnchor;
-      document.documentElement.style.overflowAnchor =
-        previous.htmlOverflowAnchor;
-      history.scrollRestoration = previous.scrollRestoration;
-      scrollLockRef.current = null;
+      if (previous) {
+        document.body.style.overflow = previous.bodyOverflow;
+        document.body.style.position = previous.bodyPosition;
+        document.body.style.top = previous.bodyTop;
+        document.body.style.left = previous.bodyLeft;
+        document.body.style.right = previous.bodyRight;
+        document.body.style.width = previous.bodyWidth;
+        document.documentElement.style.overflow = previous.htmlOverflow;
+        document.body.style.overflowAnchor = previous.bodyOverflowAnchor;
+        document.documentElement.style.overflowAnchor =
+          previous.htmlOverflowAnchor;
+        history.scrollRestoration = previous.scrollRestoration;
+        scrollLockRef.current = null;
+      }
 
       const keepAtTop = () => {
         resetScroll();
@@ -182,6 +184,7 @@ export default function CurtainCanvaPage({
 
   const audioEnabled =
     invitation.audio?.enabled === true && !!invitation.audio?.src;
+  const revealContentStyle = resolveRevealContentStyle(revealed);
 
   return (
     <main
@@ -221,60 +224,58 @@ export default function CurtainCanvaPage({
         onRevealed={handleRevealed}
       />
 
-      {revealed && (
-        <>
-          <ScratchDateReveal
-            date={invitation.date}
-            theme={theme}
-            customTexts={invitation.customTexts}
-          />
+      <div style={revealContentStyle} aria-hidden={!revealed}>
+        <ScratchDateReveal
+          date={invitation.date}
+          theme={theme}
+          customTexts={invitation.customTexts}
+        />
 
-          {invitation.externalLink && (
-            <CanvaEmbed externalLink={invitation.externalLink} theme={theme} />
-          )}
+        {invitation.externalLink && (
+          <CanvaEmbed externalLink={invitation.externalLink} theme={theme} />
+        )}
 
-          {invitation.rsvp.enabled && (
-            <>
-              <SectionOrnament theme={theme} />
-              <section
-                id="rsvp"
-                className="pt-12 pb-24 md:pt-16 md:pb-28 max-w-[600px] mx-auto px-6"
-              >
-                <div className="text-center mb-8">
-                  <span
-                    className="uppercase"
-                    style={{
-                      fontFamily: theme.uiFont,
-                      color: theme.textSecondary,
-                      fontSize: 11,
-                      letterSpacing: "0.3em",
-                    }}
-                  >
-                    RSVP
-                  </span>
-                  <div
-                    aria-hidden
-                    className="mx-auto mt-3"
-                    style={{
-                      width: 40,
-                      height: 1,
-                      background: theme.accent || "#C9A961",
-                      opacity: 0.7,
-                    }}
-                  />
-                </div>
-                <RSVPForm
-                  inline
-                  invitation={invitation}
-                  theme={theme}
-                  customTexts={invitation.customTexts}
-                  guest={invitation.guest}
+        {invitation.rsvp.enabled && (
+          <>
+            <SectionOrnament theme={theme} />
+            <section
+              id="rsvp"
+              className="pt-12 pb-24 md:pt-16 md:pb-28 max-w-[600px] mx-auto px-6"
+            >
+              <div className="text-center mb-8">
+                <span
+                  className="uppercase"
+                  style={{
+                    fontFamily: theme.uiFont,
+                    color: theme.textSecondary,
+                    fontSize: 11,
+                    letterSpacing: "0.3em",
+                  }}
+                >
+                  RSVP
+                </span>
+                <div
+                  aria-hidden
+                  className="mx-auto mt-3"
+                  style={{
+                    width: 40,
+                    height: 1,
+                    background: theme.accent || "#C9A961",
+                    opacity: 0.7,
+                  }}
                 />
-              </section>
-            </>
-          )}
-        </>
-      )}
+              </div>
+              <RSVPForm
+                inline
+                invitation={invitation}
+                theme={theme}
+                customTexts={invitation.customTexts}
+                guest={invitation.guest}
+              />
+            </section>
+          </>
+        )}
+      </div>
     </main>
   );
 }

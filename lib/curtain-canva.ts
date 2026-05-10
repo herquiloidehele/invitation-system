@@ -1,4 +1,5 @@
 import type { TemplateTheme } from "./types";
+import type { CSSProperties } from "react";
 
 export const DEFAULT_CURTAIN_VIDEO_SRC = "/videos/curtains.mp4";
 
@@ -51,4 +52,11 @@ export function resolveCoinColors(
  */
 export function resolveCurtainVideoSrc(videoUrl?: string | null): string {
   return videoUrl || DEFAULT_CURTAIN_VIDEO_SRC;
+}
+
+export function resolveRevealContentStyle(revealed: boolean): CSSProperties {
+  return {
+    visibility: revealed ? "visible" : "hidden",
+    pointerEvents: revealed ? "auto" : "none",
+  };
 }
