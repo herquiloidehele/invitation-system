@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { injectIframeNoScrollStyle } from "@/lib/canva-proxy-html";
+import {
+  injectIframeNoScrollStyle,
+  shouldDisableProxiedScroll,
+} from "@/lib/canva-proxy-html";
 
 /* ------------------------------------------------------------------ */
 /*  Canva Reverse Proxy                                                 */
@@ -251,9 +254,19 @@ async function proxyCanvaRequest(
   if (contentType.toLowerCase().includes("text/html")) {
     const html = await resp.text();
     const proxyOrigin = req.nextUrl.origin;
-    const rewritten = injectIframeNoScrollStyle(
-      rewriteHtml(html, upstream.host, proxyOrigin, upstream.url.pathname),
+    const baseRewritten = rewriteHtml(
+      html,
+      upstream.host,
+      proxyOrigin,
+      upstream.url.pathname,
     );
+    // Only inject the no-scroll style when the consumer explicitly asks
+    // for it (curtain-canva embed appends `?disableScroll=1`). The default
+    // ExternalLinkPage renders Canva at fixed size and relies on the
+    // iframe document's own scroll, so it must be left untouched.
+    const rewritten = shouldDisableProxiedScroll(req.nextUrl)
+      ? injectIframeNoScrollStyle(baseRewritten)
+      : baseRewritten;
     responseHeaders.set(
       "content-type",
       contentType || "text/html; charset=utf-8",

@@ -4,6 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { TemplateTheme } from "@/lib/types";
 import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 
+/**
+ * Appends the proxy's no-scroll opt-in flag to a same-origin URL string.
+ * Preserves any existing query parameters the upstream Canva URL carried.
+ */
+function appendDisableScrollFlag(src: string): string {
+  if (!src) return src;
+  return src + (src.includes("?") ? "&" : "?") + "disableScroll=1";
+}
+
 interface CanvaEmbedProps {
   externalLink: string;
   theme: TemplateTheme;
@@ -33,8 +42,12 @@ export default function CanvaEmbed({
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const measureTimerRef = useRef<number[]>([]);
   const [contentHeight, setContentHeight] = useState<number | null>(null);
+  // We size the iframe element to the proxied document's full content
+  // height, so the embedded page must not scroll independently. The
+  // proxy honours `?disableScroll=1` to inject the no-scroll style block;
+  // ExternalLinkPage omits the flag and gets the Canva page rendered as-is.
   const proxiedUrl = externalLink
-    ? getExternalInvitationEmbedSrc(externalLink)
+    ? appendDisableScrollFlag(getExternalInvitationEmbedSrc(externalLink))
     : "";
   const ar = aspectRatio ?? 9 / 16;
 
