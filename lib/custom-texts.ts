@@ -66,6 +66,11 @@ export const DEFAULT_TEXTS: Required<CustomTexts> = {
   rsvp_retryButton: "Tentar novamente",
   rsvp_closeButton: "Fechar",
 
+  // -- Curtain-Canva Template --
+  curtain_tapToOpen: "Toque para abrir",
+  scratch_title: "Revele",
+  scratch_subtitle: "Raspe para descobrir a data",
+
   // -- Misc --
   map_unavailableOffline: "Mapa indisponível offline",
 };

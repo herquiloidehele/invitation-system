@@ -424,6 +424,11 @@ export interface CustomTexts {
   rsvp_retryButton?: string;
   rsvp_closeButton?: string;
 
+  // -- Curtain-Canva Template --
+  curtain_tapToOpen?: string;
+  scratch_title?: string;
+  scratch_subtitle?: string;
+
   // -- Misc --
   map_unavailableOffline?: string;
 }
@@ -542,6 +547,13 @@ export interface TemplateTheme {
   decorativeColor: string;
   /** Button hover glow color */
   ctaGlow?: string;
+  /**
+   * Selects the rendering pipeline:
+   * - "default" (or undefined): standard envelope + InvitationPage flow
+   * - "curtain-canva": new CurtainCanvaPage flow (skips envelope, plays curtains
+   *   video, scratch date reveal, Canva iframe, inline RSVP)
+   */
+  layout?: "default" | "curtain-canva";
 }
 
 // ---------------------------------------------------------------------------

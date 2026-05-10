@@ -56,6 +56,11 @@ model Theme {
   decorativeColor String
   ctaGlow         String?
 
+  // Layout selector — controls which renderer is used in InvitationView.
+  // "default" routes to the standard envelope+InvitationPage flow.
+  // "curtain-canva" routes to the new CurtainCanvaPage flow.
+  layout String @default("default")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

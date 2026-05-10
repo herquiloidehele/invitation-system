@@ -10,7 +10,9 @@ import ExternalVideoPage, {
   type ExternalVideoPageHandle,
 } from "@/components/shared/ExternalVideoPage";
 import ExternalLinkPage from "@/components/shared/ExternalLinkPage";
+import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 
 interface InvitationViewProps {
@@ -19,6 +21,19 @@ interface InvitationViewProps {
 }
 
 export default function InvitationView({
+  invitation,
+  theme,
+}: InvitationViewProps) {
+  // Curtain-Canva templates skip the entire envelope flow and render
+  // their own self-contained page. Branch at the top so the
+  // envelope-specific hook tree is never instantiated for these themes.
+  if (isCurtainCanvaLayout(theme)) {
+    return <CurtainCanvaPage invitation={invitation} theme={theme} />;
+  }
+  return <EnvelopeInvitationView invitation={invitation} theme={theme} />;
+}
+
+function EnvelopeInvitationView({
   invitation,
   theme,
 }: InvitationViewProps) {

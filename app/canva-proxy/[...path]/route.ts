@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { injectIframeNoScrollStyle } from "@/lib/canva-proxy-html";
 
 /* ------------------------------------------------------------------ */
 /*  Canva Reverse Proxy                                                 */
@@ -250,11 +251,8 @@ async function proxyCanvaRequest(
   if (contentType.toLowerCase().includes("text/html")) {
     const html = await resp.text();
     const proxyOrigin = req.nextUrl.origin;
-    const rewritten = rewriteHtml(
-      html,
-      upstream.host,
-      proxyOrigin,
-      upstream.url.pathname,
+    const rewritten = injectIframeNoScrollStyle(
+      rewriteHtml(html, upstream.host, proxyOrigin, upstream.url.pathname),
     );
     responseHeaders.set(
       "content-type",

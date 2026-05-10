@@ -1,5 +1,7 @@
 "use client";
 
+import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
+
 /* ------------------------------------------------------------------ */
 /*  ExternalLinkPage                                                    */
 /*                                                                      */
@@ -22,26 +24,6 @@ interface ExternalLinkPageProps {
   visible?: boolean;
 }
 
-/**
- * Convert an absolute external URL into a same-origin proxied URL so it
- * can be embedded in an iframe even when the target sets a restrictive
- * `frame-ancestors` CSP (e.g. Canva).
- *
- * Falls back to the original URL when parsing fails.
- */
-function toProxiedUrl(externalLink: string): string {
-  try {
-    const u = new URL(externalLink);
-    if (u.protocol !== "https:" && u.protocol !== "http:") {
-      return externalLink;
-    }
-    const path = u.pathname === "/" ? "" : u.pathname;
-    return `/canva-proxy/${u.host}${path}${u.search}`;
-  } catch {
-    return externalLink;
-  }
-}
-
 export function shouldMountExternalInvitationIframe(visible: boolean): boolean {
   return visible;
 }
@@ -50,7 +32,7 @@ export default function ExternalLinkPage({
   externalLink,
   visible = true,
 }: ExternalLinkPageProps) {
-  const src = toProxiedUrl(externalLink);
+  const src = getExternalInvitationEmbedSrc(externalLink);
   const shouldMountIframe = shouldMountExternalInvitationIframe(visible);
 
   return (
