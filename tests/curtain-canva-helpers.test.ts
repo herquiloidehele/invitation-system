@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   isCurtainCanvaLayout,
+  shouldShowHeroInfoAtProgress,
   resolveCurtainVideoSrc,
   resolveRevealContentStyle,
   shortMonthName,
@@ -71,5 +72,21 @@ describe("resolveRevealContentStyle", () => {
       visibility: "visible",
       pointerEvents: "auto",
     });
+  });
+});
+
+describe("shouldShowHeroInfoAtProgress", () => {
+  it("returns false before the curtain video reaches 80%", () => {
+    expect(shouldShowHeroInfoAtProgress(7.9, 10)).toBe(false);
+  });
+
+  it("returns true once the curtain video reaches 80%", () => {
+    expect(shouldShowHeroInfoAtProgress(8, 10)).toBe(true);
+    expect(shouldShowHeroInfoAtProgress(9, 10)).toBe(true);
+  });
+
+  it("returns false when duration is missing or invalid", () => {
+    expect(shouldShowHeroInfoAtProgress(1, 0)).toBe(false);
+    expect(shouldShowHeroInfoAtProgress(1, Number.NaN)).toBe(false);
   });
 });

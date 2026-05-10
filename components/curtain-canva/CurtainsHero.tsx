@@ -1,10 +1,19 @@
 "use client";
 
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
-import { resolveCurtainVideoSrc } from "@/lib/curtain-canva";
+import {
+  resolveCurtainVideoSrc,
+  shouldShowHeroInfoAtProgress,
+} from "@/lib/curtain-canva";
 
 interface CurtainsHeroProps {
   couple: InvitationData["couple"];
@@ -25,9 +34,6 @@ interface CurtainsHeroProps {
 
 type HeroState = "idle" | "playing" | "revealed";
 
-const POSTER_CLOSED = "/videos/curtains-poster.jpg";
-const POSTER_OPEN = "/videos/curtains-poster-open.jpg";
-
 export default function CurtainsHero({
   couple,
   date,
@@ -41,6 +47,7 @@ export default function CurtainsHero({
 }: CurtainsHeroProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [state, setState] = useState<HeroState>("idle");
+  const [heroInfoVisible, setHeroInfoVisible] = useState(false);
 
   // Notify the parent the first time we reach the revealed state so it can
   // unlock the page scroll. Fires for both the natural video-end path and
@@ -105,12 +112,23 @@ export default function CurtainsHero({
         /* ignore */
       }
     }
+    setHeroInfoVisible(true);
     setState("revealed");
   }, []);
 
   const handleVideoError = useCallback(() => {
+    setHeroInfoVisible(true);
     setState("revealed");
   }, []);
+
+  const handleVideoTimeUpdate = useCallback(() => {
+    if (heroInfoVisible) return;
+    const video = videoRef.current;
+    if (!video) return;
+    if (shouldShowHeroInfoAtProgress(video.currentTime, video.duration)) {
+      setHeroInfoVisible(true);
+    }
+  }, [heroInfoVisible]);
 
   // Whole hero is the tap target while idle.
   const isInteractive = state === "idle";
@@ -146,13 +164,16 @@ export default function CurtainsHero({
         preload="auto"
         onEnded={handleVideoEnded}
         onError={handleVideoError}
+        onTimeUpdate={handleVideoTimeUpdate}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         style={{ cursor: isInteractive ? "pointer" : "default" }}
       />
 
-      {/* Revealed: hero info (monogram, names, date, quote) */}
+      {/* Hero info (monogram, names, date, quote). Fades in when the curtain
+          video reaches the configured progress threshold (default 80%) so it
+          is in place before the curtain is fully open. */}
       <AnimatePresence>
-        {state === "revealed" && (
+        {heroInfoVisible && (
           <motion.div
             className="absolute inset-0 flex flex-col items-center justify-center text-center px-10 sm:px-14 md:px-20 max-w-2xl mx-auto z-10"
             initial={{ opacity: 0 }}

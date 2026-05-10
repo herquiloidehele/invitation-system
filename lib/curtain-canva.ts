@@ -60,3 +60,27 @@ export function resolveRevealContentStyle(revealed: boolean): CSSProperties {
     pointerEvents: revealed ? "auto" : "none",
   };
 }
+
+/**
+ * Curtain hero progress threshold for showing the invitation info while the
+ * curtain video is still playing. We reveal the names/date/quote when the
+ * video is at least 80% through so the text is in place before the curtain
+ * is fully open.
+ */
+export const HERO_INFO_REVEAL_PROGRESS = 0.5;
+
+/**
+ * Returns true when the curtain video has played far enough that the hero
+ * info should fade in (currently `currentTime / duration >= 0.8`).
+ *
+ * Returns false when duration is missing, zero, or non-finite — in those
+ * cases the caller should keep the info hidden until the video ends.
+ */
+export function shouldShowHeroInfoAtProgress(
+  currentTime: number,
+  duration: number,
+): boolean {
+  if (!Number.isFinite(duration) || duration <= 0) return false;
+  if (!Number.isFinite(currentTime) || currentTime < 0) return false;
+  return currentTime / duration >= HERO_INFO_REVEAL_PROGRESS;
+}
