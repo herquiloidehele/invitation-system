@@ -1,23 +1,13 @@
 "use client";
 
-import {
-  type RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
-import {
-  resolveCurtainVideoSrc,
-  shouldShowHeroInfoAtProgress,
-} from "@/lib/curtain-canva";
+import { resolveCurtainVideoSrc, shouldShowHeroInfoAtProgress } from "@/lib/curtain-canva";
 
 interface CurtainsHeroProps {
   couple: InvitationData["couple"];
-  date: InvitationData["date"];
   quote: string;
   theme: TemplateTheme;
   audioRef: RefObject<HTMLAudioElement | null>;
@@ -36,7 +26,6 @@ type HeroState = "idle" | "playing" | "revealed";
 
 export default function CurtainsHero({
   couple,
-  date,
   quote,
   theme,
   audioRef,
@@ -169,13 +158,14 @@ export default function CurtainsHero({
         style={{ cursor: isInteractive ? "pointer" : "default" }}
       />
 
-      {/* Hero info (monogram, names, date, quote). Fades in when the curtain
-          video reaches the configured progress threshold (default 80%) so it
-          is in place before the curtain is fully open. */}
+      {/* Hero info (monogram, names, quote). Fades in when the curtain video
+          reaches the configured progress threshold (default 80%) so it is
+          in place before the curtain is fully open. The date is shown later
+          in the dedicated scratch-reveal section, not here. */}
       <AnimatePresence>
         {heroInfoVisible && (
           <motion.div
-            className="absolute inset-0 flex flex-col items-center justify-center text-center px-10 sm:px-14 md:px-20 max-w-2xl mx-auto z-10"
+            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 sm:px-10 md:px-16 max-w-3xl mx-auto z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
@@ -194,11 +184,14 @@ export default function CurtainsHero({
               {couple.monogram}
             </motion.div>
 
+            {/* Couple names stacked vertically: name / & / name. Each line
+                gets its own block so long names never collide on narrow
+                viewports. */}
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="mt-5"
+              className="mt-5 flex flex-col items-center"
               style={{
                 fontFamily: theme.displayFont,
                 color: theme.textPrimary,
@@ -209,69 +202,33 @@ export default function CurtainsHero({
                 hyphens: "auto",
               }}
             >
-              {couple.bride}
-              <br className="sm:hidden" />
+              <span>{couple.bride}</span>
               <span
-                className="sm:inline mx-3 align-baseline"
-                style={{ opacity: 0.55, fontStyle: "italic" }}
+                aria-hidden
+                className="my-1"
+                style={{
+                  opacity: 0.55,
+                  fontStyle: "italic",
+                  fontSize: "0.85em",
+                }}
               >
-                &
+                &amp;
               </span>
-              {couple.groom}
+              <span>{couple.groom}</span>
             </motion.h1>
-
-            {(date.dayOfWeek || date.display) && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                className="mt-7 flex flex-col items-center gap-2"
-              >
-                {/* Decorative gold rule */}
-                <span
-                  aria-hidden
-                  style={{
-                    width: 56,
-                    height: 1,
-                    background: theme.accent || "#C9A961",
-                    opacity: 0.7,
-                  }}
-                />
-                <p
-                  className="uppercase"
-                  style={{
-                    fontFamily: theme.uiFont,
-                    color: theme.textSecondary,
-                    fontSize: 12,
-                    letterSpacing: "0.28em",
-                  }}
-                >
-                  {[date.dayOfWeek, date.display].filter(Boolean).join("  ·  ")}
-                </p>
-                <span
-                  aria-hidden
-                  style={{
-                    width: 56,
-                    height: 1,
-                    background: theme.accent || "#C9A961",
-                    opacity: 0.7,
-                  }}
-                />
-              </motion.div>
-            )}
 
             {quote && (
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-                className="mt-6 italic"
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="mt-8 italic"
                 style={{
                   fontFamily: theme.bodyFont,
                   color: theme.textMuted,
-                  fontSize: "clamp(0.95rem, 2.4vw, 1.05rem)",
-                  lineHeight: 1.55,
-                  maxWidth: "32ch",
+                  fontSize: "clamp(1rem, 2.4vw, 1.15rem)",
+                  lineHeight: 1.6,
+                  maxWidth: "40ch",
                 }}
               >
                 {quote}

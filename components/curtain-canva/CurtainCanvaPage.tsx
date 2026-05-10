@@ -246,7 +246,6 @@ export default function CurtainCanvaPage({
 
       <CurtainsHero
         couple={invitation.couple}
-        date={invitation.date}
         quote={invitation.quote}
         theme={theme}
         audioRef={audioRef}
