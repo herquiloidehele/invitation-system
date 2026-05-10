@@ -55,8 +55,21 @@ export default function CanvaEmbed({
   const handleLoad = useCallback(() => {
     measureIframe();
     measureTimerRef.current.forEach((timer) => window.clearTimeout(timer));
-    measureTimerRef.current = [100, 500, 1000].map((delay) =>
+    measureTimerRef.current = [100, 500, 1000, 2500].map((delay) =>
       window.setTimeout(measureIframe, delay),
+    );
+
+    // Subscribe to size changes inside the iframe document so dynamic Canva
+    // content (lazy-loaded sections, fonts, images) keeps the host iframe
+    // height in sync. Same-origin via the proxy makes this access legal.
+    const doc = iframeRef.current?.contentDocument;
+    const target = doc?.documentElement;
+    if (!doc || !target || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => measureIframe());
+    observer.observe(target);
+    if (doc.body) observer.observe(doc.body);
+    measureTimerRef.current.push(
+      window.setTimeout(() => observer.disconnect(), 60_000),
     );
   }, [measureIframe]);
 

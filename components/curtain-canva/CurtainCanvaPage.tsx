@@ -129,14 +129,10 @@ export default function CurtainCanvaPage({
     };
   }, []);
 
-  // Below-fold sections stay mounted from first paint and are only hidden
-  // until reveal. That keeps document height stable and prevents the browser
-  // from re-anchoring to the iframe when the curtain opens.
   useEffect(() => {
     if (!revealed) return;
 
     let frame = 0;
-    let attempts = 0;
     const resetScroll = () => {
       const scrollingElement = document.scrollingElement;
       if (scrollingElement) scrollingElement.scrollTop = 0;
@@ -164,18 +160,54 @@ export default function CurtainCanvaPage({
         scrollLockRef.current = null;
       }
 
-      const keepAtTop = () => {
+      // Phase 1: pin to top every frame for a short window so any sync layout
+      // shifts on reveal cannot scroll-anchor the viewport.
+      const startedAt = performance.now();
+      const PIN_DURATION_MS = 250;
+      const pinAtTop = () => {
         resetScroll();
-        attempts += 1;
-        if (attempts < 10) {
-          frame = requestAnimationFrame(keepAtTop);
+        if (performance.now() - startedAt < PIN_DURATION_MS) {
+          frame = requestAnimationFrame(pinAtTop);
         }
       };
-
-      keepAtTop();
+      pinAtTop();
     });
 
-    return () => cancelAnimationFrame(frame);
+    // Phase 2: while the iframe finishes measuring, the document height keeps
+    // growing for up to a few seconds. Whenever scrollHeight changes within
+    // this window, snap back to the top so the user is not yanked down to the
+    // newly-tall iframe section. We only intervene if the user has not yet
+    // scrolled deliberately.
+    let lastScrollHeight = document.documentElement.scrollHeight;
+    let userScrolled = false;
+    const onUserScroll = () => {
+      if (window.scrollY > 4) userScrolled = true;
+    };
+    window.addEventListener("wheel", onUserScroll, { passive: true });
+    window.addEventListener("touchmove", onUserScroll, { passive: true });
+    window.addEventListener("keydown", onUserScroll);
+
+    const heightWatcherStart = performance.now();
+    const HEIGHT_WATCHER_MS = 4000;
+    const heightWatcher = window.setInterval(() => {
+      if (performance.now() - heightWatcherStart > HEIGHT_WATCHER_MS) {
+        window.clearInterval(heightWatcher);
+        return;
+      }
+      const next = document.documentElement.scrollHeight;
+      if (next !== lastScrollHeight) {
+        lastScrollHeight = next;
+        if (!userScrolled) resetScroll();
+      }
+    }, 80);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearInterval(heightWatcher);
+      window.removeEventListener("wheel", onUserScroll);
+      window.removeEventListener("touchmove", onUserScroll);
+      window.removeEventListener("keydown", onUserScroll);
+    };
   }, [revealed]);
 
   const handleTapped = () => {
