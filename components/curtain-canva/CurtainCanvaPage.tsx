@@ -247,6 +247,7 @@ export default function CurtainCanvaPage({
       <CurtainsHero
         couple={invitation.couple}
         quote={invitation.quote}
+        inviteMessage={invitation.parents?.inviteMessage}
         theme={theme}
         audioRef={audioRef}
         videoUrl={invitation.videoUrl}

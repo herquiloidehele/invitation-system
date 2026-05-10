@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TemplateTheme } from "@/lib/types";
+import { measureIframeBodyHeight } from "@/lib/canva-embed-measurement";
 import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 
 /**
@@ -53,15 +54,20 @@ export default function CanvaEmbed({
 
   const measureIframe = useCallback(() => {
     const doc = iframeRef.current?.contentDocument;
-    if (!doc) return;
-    const nextHeight = Math.max(
-      doc.documentElement.scrollHeight,
-      doc.body?.scrollHeight ?? 0,
-      doc.documentElement.offsetHeight,
-      doc.body?.offsetHeight ?? 0,
-    );
+    const body = doc?.body;
+    if (!body) return;
 
-    if (nextHeight > 0) {
+    // We deliberately ignore `documentElement.scrollHeight` here: during
+    // off-screen preload the iframe is forced to a large fixed height by
+    // its wrapper, which makes the iframe's <html> report that wrapper
+    // size as its viewport. The <body> is the only honest signal for the
+    // proxied Canva content's true height.
+    const nextHeight = measureIframeBodyHeight({
+      bodyScrollHeight: body.scrollHeight,
+      bodyOffsetHeight: body.offsetHeight,
+    });
+
+    if (nextHeight !== null) {
       setContentHeight(nextHeight);
     }
   }, []);

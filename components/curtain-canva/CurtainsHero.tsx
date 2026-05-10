@@ -20,6 +20,7 @@ import {
 interface CurtainsHeroProps {
   couple: InvitationData["couple"];
   quote: string;
+  inviteMessage?: string;
   theme: TemplateTheme;
   audioRef: RefObject<HTMLAudioElement | null>;
   videoUrl?: string;
@@ -39,6 +40,7 @@ type HeroState = "idle" | "playing" | "revealed";
 export default function CurtainsHero({
   couple,
   quote,
+  inviteMessage,
   theme,
   audioRef,
   videoUrl,
@@ -289,19 +291,23 @@ export default function CurtainsHero({
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              style={{
-                fontFamily: theme.scriptFont || theme.displayFont,
-                color: theme.monogramColor || theme.accent,
-                fontSize: "clamp(2.25rem, 8vw, 3.25rem)",
-                lineHeight: 1,
-              }}
-            >
-              {couple.monogram}
-            </motion.div>
+            {quote && (
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="italic"
+                style={{
+                  fontFamily: theme.bodyFont,
+                  color: theme.textMuted,
+                  fontSize: "clamp(1rem, 2.4vw, 1.15rem)",
+                  lineHeight: 1.6,
+                  maxWidth: "38ch",
+                }}
+              >
+                {quote}
+              </motion.p>
+            )}
 
             {/* Couple names stacked vertically: name / & / name. Each line
                 gets its own block so long names never collide on narrow
@@ -336,21 +342,21 @@ export default function CurtainsHero({
               <span>{couple.groom}</span>
             </motion.h1>
 
-            {quote && (
+            {inviteMessage && (
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                className="mt-8 italic"
+                className="mt-8"
                 style={{
                   fontFamily: theme.bodyFont,
                   color: theme.textMuted,
-                  fontSize: "clamp(1rem, 2.4vw, 1.15rem)",
+                  fontSize: "clamp(0.9rem, 2.2vw, 1.05rem)",
                   lineHeight: 1.6,
                   maxWidth: "40ch",
                 }}
               >
-                {quote}
+                {inviteMessage}
               </motion.p>
             )}
           </motion.div>
