@@ -73,6 +73,18 @@ export async function extractFirstFrameJpeg(
     );
   }
 
+  // When Next.js (or any bundler) inlines `ffmpeg-static`, the `__dirname`
+  // baked into its export gets rewritten to a virtual path like `/ROOT/...`
+  // that doesn't exist on disk, and `spawn` fails with a confusing ENOENT.
+  // Surface the configuration cause explicitly so the fix is obvious.
+  const { existsSync } = await import("node:fs");
+  if (!existsSync(ffmpegPath)) {
+    throw new PosterExtractionError(
+      `ffmpeg-static resolved to a path that doesn't exist on disk: ${ffmpegPath}. ` +
+        `Add 'ffmpeg-static' to next.config.ts -> serverExternalPackages and restart the dev server.`,
+    );
+  }
+
   const workDir = await mkdtemp(path.join(os.tmpdir(), "video-poster-"));
   const inputPath = path.join(workDir, "input");
   const outputPath = path.join(workDir, "frame.jpg");
