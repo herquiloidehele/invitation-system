@@ -74,6 +74,27 @@ export function shouldShowHeroInfoAtProgress(
 }
 
 /**
+ * Curtain video progress threshold for the celebration confetti burst.
+ * Fires near the end of the curtain animation so the burst lands as the
+ * curtain finishes opening, not at the visual end (which would feel late).
+ */
+export const CONFETTI_REVEAL_PROGRESS = 0.8;
+
+/**
+ * Returns true when the curtain video has crossed the configured confetti
+ * threshold (defaults to 80% of duration). Returns false when duration is
+ * missing/invalid so the caller can defer to the on-end handler instead.
+ */
+export function shouldFireConfettiAtProgress(
+  currentTime: number,
+  duration: number,
+): boolean {
+  if (!Number.isFinite(duration) || duration <= 0) return false;
+  if (!Number.isFinite(currentTime) || currentTime < 0) return false;
+  return currentTime / duration >= CONFETTI_REVEAL_PROGRESS;
+}
+
+/**
  * Builds a small celebratory color palette derived from the theme's accent
  * and decorative colors. Used by the confetti burst that fires after the
  * user scratches the last save-the-date coin. Falls back to a warm gold

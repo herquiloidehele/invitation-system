@@ -8,10 +8,12 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
 import {
   resolveCurtainVideoSrc,
+  shouldFireConfettiAtProgress,
   shouldShowHeroInfoAtProgress,
 } from "@/lib/curtain-canva";
 
@@ -49,6 +51,12 @@ export default function CurtainsHero({
   const [state, setState] = useState<HeroState>("idle");
   const [heroInfoVisible, setHeroInfoVisible] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  // Tracks whether the celebratory confetti has already fired in this play
+  // session. Confetti is triggered at ~80% of the curtain video so the
+  // burst lands as the curtain finishes opening; this ref prevents the
+  // burst from re-firing on every subsequent `timeupdate` and from
+  // double-firing alongside the on-end fallback below.
+  const confettiFiredRef = useRef(false);
 
   // Notify the parent the first time we reach the revealed state so it can
   // unlock the page scroll. Fires for both the natural video-end path and
@@ -117,6 +125,50 @@ export default function CurtainsHero({
     }
   }, [state, onTapped, audioRef]);
 
+  const fireConfetti = useCallback(() => {
+    if (confettiFiredRef.current) return;
+    confettiFiredRef.current = true;
+
+    // Two side cannons firing inward for a celebratory wedding burst.
+    // Colors are pulled from the active theme so the confetti feels at
+    // home with the invitation palette.
+    const colors = [
+      theme.accent,
+      theme.monogramColor || theme.accent,
+      theme.textPrimary,
+      "#ffffff",
+    ].filter(Boolean) as string[];
+
+    const duration = 1000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 10,
+        angle: 60,
+        spread: 70,
+        startVelocity: 55,
+        origin: { x: 0, y: 0.7 },
+        colors,
+        zIndex: 50,
+      });
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+
+    // Initial center burst for impact, then trailing side cannons.
+    confetti({
+      particleCount: 80,
+      spread: 100,
+      startVelocity: 45,
+      origin: { x: 0.5, y: 0.6 },
+      colors,
+      zIndex: 50,
+    });
+    requestAnimationFrame(frame);
+  }, [theme.accent, theme.monogramColor, theme.textPrimary]);
+
   const handleVideoEnded = useCallback(() => {
     const video = videoRef.current;
     if (video) {
@@ -129,7 +181,8 @@ export default function CurtainsHero({
     }
     setHeroInfoVisible(true);
     setState("revealed");
-  }, []);
+    fireConfetti();
+  }, [fireConfetti]);
 
   const handleVideoError = useCallback(() => {
     setHeroInfoVisible(true);
@@ -137,13 +190,26 @@ export default function CurtainsHero({
   }, []);
 
   const handleVideoTimeUpdate = useCallback(() => {
-    if (heroInfoVisible) return;
     const video = videoRef.current;
     if (!video) return;
-    if (shouldShowHeroInfoAtProgress(video.currentTime, video.duration)) {
+
+    if (
+      !heroInfoVisible &&
+      shouldShowHeroInfoAtProgress(video.currentTime, video.duration)
+    ) {
       setHeroInfoVisible(true);
     }
-  }, [heroInfoVisible]);
+
+    // Fire confetti once the curtain video crosses the celebration
+    // threshold (default 80%). The `fireConfetti` helper has its own
+    // run-once guard so this is safe to call on every `timeupdate`.
+    if (
+      !confettiFiredRef.current &&
+      shouldFireConfettiAtProgress(video.currentTime, video.duration)
+    ) {
+      fireConfetti();
+    }
+  }, [fireConfetti, heroInfoVisible]);
 
   // Fired once the video element has rendered its first frame and is
   // actually progressing. We use this to fade out the poster overlay so
