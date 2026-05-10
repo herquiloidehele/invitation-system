@@ -49,6 +49,7 @@ function toTemplateTheme(row: Theme): TemplateTheme {
     bgGradient: row.bgGradient ?? undefined,
     decorativeColor: row.decorativeColor,
     ctaGlow: row.ctaGlow ?? undefined,
+    layout: (row.layout as TemplateTheme["layout"]) ?? "default",
   };
 }
 

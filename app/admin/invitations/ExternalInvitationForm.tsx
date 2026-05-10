@@ -57,6 +57,8 @@ import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
+import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import {
   getExternalInvitationEmbedSrc,
   getExternalInvitationPublicHref,
@@ -336,15 +338,64 @@ export default function ExternalInvitationForm({
     [],
   );
 
+  // Date editor helper — only used by the curtain-canva accordion.
+  // When the user picks an ISO date, derive display/dayOfWeek/day/month/year
+  // (in pt-PT) so the renderer has every field it needs.
+  const updateDate = useCallback(
+    (field: keyof InvitationData["date"], value: string) => {
+      setForm((prev) => {
+        const next = { ...prev.date, [field]: value };
+        if (field === "iso" && value) {
+          try {
+            const d = new Date(value);
+            if (!Number.isNaN(d.getTime())) {
+              const display = new Intl.DateTimeFormat("pt-PT", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }).format(d);
+              const dayOfWeek = new Intl.DateTimeFormat("pt-PT", {
+                weekday: "long",
+              }).format(d);
+              const month = new Intl.DateTimeFormat("pt-PT", {
+                month: "long",
+              }).format(d);
+              next.display = display;
+              next.dayOfWeek = dayOfWeek;
+              next.day = String(d.getUTCDate());
+              next.month = month;
+              next.year = String(d.getUTCFullYear());
+            }
+          } catch {
+            /* ignore — leave derived fields untouched */
+          }
+        }
+        return { ...prev, date: next };
+      });
+    },
+    [],
+  );
+
   // Switch sub-type
-  const switchSubType = useCallback((t: ExternalSubType) => {
-    setForm((prev) => ({
-      ...prev,
-      invitationType: t,
-      videoUrl: t === "external_video" ? prev.videoUrl : "",
-      externalLink: t === "external_link" ? prev.externalLink : "",
-    }));
-  }, []);
+  const switchSubType = useCallback(
+    (t: ExternalSubType) => {
+      setForm((prev) => {
+        const selectedTheme =
+          themes.find((theme) => theme.id === prev.themeId) ??
+          themes.find((theme) => theme.name === prev.template) ??
+          themes[0];
+        const preserveVideo = isCurtainCanvaLayout(selectedTheme);
+
+        return {
+          ...prev,
+          invitationType: t,
+          videoUrl: t === "external_video" || preserveVideo ? prev.videoUrl : "",
+          externalLink: t === "external_link" ? prev.externalLink : "",
+        };
+      });
+    },
+    [themes],
+  );
 
   // Current theme for cover preview
   const currentTheme = useMemo(() => {
@@ -362,6 +413,13 @@ export default function ExternalInvitationForm({
       },
     };
   }, [themes, form.themeId, form.template, form.envelope]);
+
+  // True when the selected theme uses the curtain-canva renderer.
+  // Drives the conditional fields accordion and the preview swap.
+  const isCurtainCanva = useMemo(
+    () => isCurtainCanvaLayout(currentTheme),
+    [currentTheme],
+  );
 
   // Submit
   async function handleSubmit() {
@@ -941,6 +999,139 @@ export default function ExternalInvitationForm({
               </div>
             )}
 
+            {/* ── Curtain-Canva extra fields ── */}
+            {/* Visible only when the chosen theme uses the curtain-canva
+                layout. These fields are required by the CurtainCanvaPage
+                renderer (date for the scratch reveal, quote for the hero,
+                rsvp.enabled to show the inline RSVP form). */}
+            {isCurtainCanva && (
+              <>
+                <Separator />
+                <Accordion defaultValue={["curtainCanva"]} className="w-full">
+                  <AccordionItem
+                    value="curtainCanva"
+                    className="border rounded-lg px-4"
+                  >
+                    <AccordionTrigger className="text-sm font-medium">
+                      Detalhes do convite (Curtain &amp; Canva)
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-5 pb-4">
+                      {/* Date */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Data</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label
+                              htmlFor="ccDateIso"
+                              className="text-xs text-muted-foreground"
+                            >
+                              Data
+                            </Label>
+                            <Input
+                              id="ccDateIso"
+                              type="date"
+                              value={
+                                form.date.iso
+                                  ? form.date.iso.split("T")[0]
+                                  : ""
+                              }
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                updateDate(
+                                  "iso",
+                                  val ? `${val}T00:00:00.000Z` : "",
+                                );
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label
+                              htmlFor="ccTime"
+                              className="text-xs text-muted-foreground"
+                            >
+                              Hora
+                            </Label>
+                            <Input
+                              id="ccTime"
+                              value={form.date.time}
+                              onChange={(e) =>
+                                updateDate("time", e.target.value)
+                              }
+                              placeholder="16:00"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          A data de exibição, dia da semana, dia, mês e ano
+                          são derivados automaticamente.
+                        </p>
+                      </div>
+
+                      <Separator />
+
+                      {/* Quote */}
+                      <div className="space-y-1.5">
+                        <Label
+                          htmlFor="ccQuote"
+                          className="text-sm font-medium"
+                        >
+                          Frase / citação
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Aparece sob os nomes do casal no hero, depois das
+                          cortinas abrirem.
+                        </p>
+                        <Input
+                          id="ccQuote"
+                          value={form.quote}
+                          onChange={(e) => update("quote", e.target.value)}
+                          placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                        />
+                      </div>
+
+                      <Separator />
+
+                      {/* Curtain video */}
+                      <div className="space-y-1.5">
+                        <Label className="text-sm font-medium">
+                          Vídeo das cortinas
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Animação reproduzida quando o convidado toca para
+                          abrir. Se ficar vazio, usa o vídeo padrão.
+                        </p>
+                        <MediaUpload
+                          kind="video"
+                          maxSizeMB={500}
+                          value={form.videoUrl}
+                          onUpload={(url) => update("videoUrl", url)}
+                          onClear={() => update("videoUrl", "")}
+                        />
+                      </div>
+
+                      <Separator />
+
+                      {/* RSVP enabled */}
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Ativar formulário de RSVP</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, o formulário aparece no fundo da
+                            página (sem modal). Os toggles de email e
+                            restrições alimentares acima continuam a aplicar-se.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.enabled === true}
+                          onCheckedChange={(v) => updateRsvp("enabled", v)}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </>
+            )}
+
             {showAudioControls && (
               <>
                 <Separator />
@@ -1075,7 +1266,18 @@ export default function ExternalInvitationForm({
 
           <TabsContent value="invite" className="flex-1 overflow-hidden m-0">
             <div className="relative h-full max-h-165 overflow-hidden bg-black">
-              {subType === "external_video" ? (
+              {isCurtainCanva ? (
+                /* Curtain-Canva layout: render the actual public-facing page
+                   so admins see exactly what guests will see (curtains hero,
+                   scratch reveal, Canva iframe section, inline RSVP). The
+                   preview is scrollable inside the pane. */
+                <div className="absolute inset-0 overflow-y-auto bg-background">
+                  <CurtainCanvaPage
+                    invitation={form}
+                    theme={currentTheme as TemplateTheme}
+                  />
+                </div>
+              ) : subType === "external_video" ? (
                 form.videoUrl ? (
                   <video
                     src={form.videoUrl}

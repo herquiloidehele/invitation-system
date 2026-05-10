@@ -1,0 +1,54 @@
+import type { TemplateTheme } from "./types";
+
+export const DEFAULT_CURTAIN_VIDEO_SRC = "/videos/curtains.mp4";
+
+/**
+ * Returns true when the theme should render via the CurtainCanvaPage
+ * pipeline (skips envelope, plays curtains video, etc.).
+ */
+export function isCurtainCanvaLayout(
+  theme: Pick<TemplateTheme, "layout"> | { layout?: string | null },
+): boolean {
+  return theme.layout === "curtain-canva";
+}
+
+/**
+ * Returns the abbreviated month name in pt-PT for an ISO date string.
+ * Strips the trailing dot that pt-PT formatters often append.
+ *
+ * If `iso` is invalid, returns the optional `fallback` (e.g. invitation.date.month)
+ * or an empty string.
+ */
+export function shortMonthName(iso: string, fallback = ""): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return fallback;
+  try {
+    return new Intl.DateTimeFormat("pt-PT", { month: "short" })
+      .format(d)
+      .replace(".", "");
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Derives the gold-coin base + accent colors from the theme.
+ * The base color uses `theme.decorativeColor` when present; otherwise
+ * a brushed-gold default. The accent (lighter highlight) is currently
+ * a fixed light gold — a future task may derive it from the base.
+ */
+export function resolveCoinColors(
+  theme: Pick<TemplateTheme, "decorativeColor"> | { decorativeColor?: string },
+): { baseColor: string; accentColor: string } {
+  const baseColor = theme.decorativeColor || "#C9A961";
+  const accentColor = "#F4E4A1";
+  return { baseColor, accentColor };
+}
+
+/**
+ * Curtain-canva uses invitation.videoUrl as the optional curtain animation.
+ * If not set, the bundled default keeps existing invitations working.
+ */
+export function resolveCurtainVideoSrc(videoUrl?: string | null): string {
+  return videoUrl || DEFAULT_CURTAIN_VIDEO_SRC;
+}
