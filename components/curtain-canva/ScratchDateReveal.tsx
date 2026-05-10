@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useRef, type CSSProperties } from "react";
+import { type CSSProperties, useCallback, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import type { CustomTexts, TemplateTheme } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
 import { resolveCelebrationPalette, shortMonthName } from "@/lib/curtain-canva";
@@ -23,6 +24,7 @@ export default function ScratchDateReveal({
   customTexts,
 }: ScratchDateRevealProps) {
   const monthShort = shortMonthName(date.iso, date.month);
+  const reduceMotion = useReducedMotion();
 
   // Track which coins have been revealed so we can fire confetti exactly
   // once when all three are done. We use a ref so the callback identity is
@@ -90,9 +92,15 @@ export default function ScratchDateReveal({
   const coinSize = "clamp(72px, 22vw, 96px)";
 
   return (
-    <section
+    <motion.section
       id="date"
       className="py-20 md:py-28 px-6 max-w-[640px] mx-auto text-center"
+      // Subtle fade-in-up the first time the section enters the viewport.
+      // Reduced-motion users skip the offset and animation duration.
+      initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <h2
         style={{
@@ -156,7 +164,7 @@ export default function ScratchDateReveal({
           onRevealed={() => handleCoinRevealed("year")}
         />
       </div>
-    </section>
+    </motion.section>
   );
 }
 
