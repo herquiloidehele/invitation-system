@@ -127,6 +127,7 @@ function getDefaultState(
     externalLink: "",
     saveDateStyle: "classic",
     envelope: {},
+    parents: { enabled: false, inviteMessage: "", blessingMessage: "", bridesFather: "", bridesMother: "", groomsFather: "", groomsMother: "" },
   };
 }
 
@@ -334,6 +335,19 @@ export default function ExternalInvitationForm({
       setForm((prev) => ({
         ...prev,
         rsvp: { ...prev.rsvp, [field]: value },
+      }));
+    },
+    [],
+  );
+
+  const updateParents = useCallback(
+    <K extends keyof NonNullable<InvitationData["parents"]>>(
+      field: K,
+      value: NonNullable<InvitationData["parents"]>[K],
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        parents: { ...(prev.parents ?? {}), [field]: value } as NonNullable<InvitationData["parents"]>,
       }));
     },
     [],
@@ -1079,27 +1093,48 @@ export default function ExternalInvitationForm({
 
                       <Separator />
 
-                      {/* Quote */}
-                      <div className="space-y-1.5">
-                        <Label
-                          htmlFor="ccQuote"
-                          className="text-sm font-medium"
-                        >
-                          Frase / citação
-                        </Label>
-                        <p className="text-xs text-muted-foreground">
-                          Aparece sob os nomes do casal no hero, depois das
-                          cortinas abrirem.
-                        </p>
-                        <Input
-                          id="ccQuote"
-                          value={form.quote}
-                          onChange={(e) => update("quote", e.target.value)}
-                          placeholder='ex: "O amor é paciente, o amor é bondoso."'
-                        />
-                      </div>
+                       {/* Quote */}
+                       <div className="space-y-1.5">
+                         <Label
+                           htmlFor="ccQuote"
+                           className="text-sm font-medium"
+                         >
+                           Frase / citação
+                         </Label>
+                         <p className="text-xs text-muted-foreground">
+                           Aparece sob os nomes do casal no hero, depois das
+                           cortinas abrirem.
+                         </p>
+                         <Input
+                           id="ccQuote"
+                           value={form.quote}
+                           onChange={(e) => update("quote", e.target.value)}
+                           placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                         />
+                       </div>
 
-                      <Separator />
+                       {/* Invite message */}
+                       <div className="space-y-1.5">
+                         <Label
+                           htmlFor="ccInviteMessage"
+                           className="text-sm font-medium"
+                         >
+                           Mensagem de convite
+                         </Label>
+                         <p className="text-xs text-muted-foreground">
+                           Aparece sob os nomes do casal no hero, após a frase.
+                         </p>
+                         <Input
+                           id="ccInviteMessage"
+                           value={form.parents?.inviteMessage ?? ""}
+                           onChange={(e) =>
+                             updateParents("inviteMessage", e.target.value)
+                           }
+                           placeholder="Convidamos para o nosso casamento"
+                         />
+                       </div>
+
+                       <Separator />
 
                       {/* Curtain video */}
                       <div className="space-y-1.5">
