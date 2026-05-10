@@ -1,5 +1,24 @@
-import type { TemplateTheme } from "./types";
+import type { TemplateTheme, TextStyle, TextStyleOverrides } from "./types";
 import type { CSSProperties } from "react";
+
+type CurtainElementKey = keyof NonNullable<TextStyleOverrides["elements"]>;
+
+/**
+ * Returns the per-element text style override stored on an invitation for
+ * the given element key, or an empty object when nothing has been set.
+ *
+ * Curtain-canva components apply this on top of their own inline styles so
+ * the admin's element-level overrides (font, size, weight, color, letter
+ * spacing) win without us having to plug into the larger `resolveTextStyles`
+ * pipeline used by the standard invitation. The empty-object fallback lets
+ * callers spread it unconditionally: `style={{ ...defaults, ...override }}`.
+ */
+export function resolveTextElementOverride(
+  overrides: TextStyleOverrides | undefined | null,
+  element: CurtainElementKey,
+): TextStyle {
+  return overrides?.elements?.[element] ?? {};
+}
 
 export const DEFAULT_CURTAIN_VIDEO_SRC = "/videos/curtains.mp4";
 

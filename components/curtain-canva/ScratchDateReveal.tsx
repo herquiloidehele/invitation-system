@@ -2,9 +2,19 @@
 
 import { type CSSProperties, useCallback, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import type { CustomTexts, TemplateTheme } from "@/lib/types";
+import type {
+  CustomTexts,
+  TemplateTheme,
+  TextStyle,
+  TextStyleOverrides,
+} from "@/lib/types";
 import { t } from "@/lib/custom-texts";
-import { resolveCelebrationPalette, shortMonthName } from "@/lib/curtain-canva";
+import {
+  resolveCelebrationPalette,
+  resolveTextElementOverride,
+  shortMonthName,
+} from "@/lib/curtain-canva";
+import { EditableText } from "@/components/shared/EditableText";
 import ScratchCoin from "./ScratchCoin";
 
 interface ScratchDateRevealProps {
@@ -16,13 +26,26 @@ interface ScratchDateRevealProps {
   };
   theme: TemplateTheme;
   customTexts?: CustomTexts;
+  /**
+   * Per-invitation text style overrides. Applied on top of the section's
+   * default inline styles so admin element-level customizations (section
+   * title, labels, date day/month/year) win without losing the curtain-
+   * specific typography defaults.
+   */
+  textStyles?: TextStyleOverrides;
 }
 
 export default function ScratchDateReveal({
   date,
   theme,
   customTexts,
+  textStyles,
 }: ScratchDateRevealProps) {
+  const titleOverride = resolveTextElementOverride(textStyles, "sectionTitles");
+  const labelsOverride = resolveTextElementOverride(textStyles, "labels");
+  const dateDayOverride = resolveTextElementOverride(textStyles, "dateDay");
+  const dateMonthOverride = resolveTextElementOverride(textStyles, "dateMonth");
+  const dateYearOverride = resolveTextElementOverride(textStyles, "dateYear");
   const monthShort = shortMonthName(date.iso, date.month);
   const reduceMotion = useReducedMotion();
 
@@ -108,9 +131,12 @@ export default function ScratchDateReveal({
           color: theme.textPrimary,
           fontSize: "clamp(2rem, 7vw, 2.75rem)",
           lineHeight: 1.05,
+          ...titleOverride,
         }}
       >
-        {t(customTexts, "scratch_title")}
+        <EditableText elementKey="sectionTitles">
+          {t(customTexts, "scratch_title")}
+        </EditableText>
       </h2>
       {/* Decorative gold rule */}
       <div
@@ -130,9 +156,12 @@ export default function ScratchDateReveal({
           color: theme.textSecondary,
           fontSize: "clamp(0.65rem, 2.4vw, 0.75rem)",
           letterSpacing: "0.22em",
+          ...labelsOverride,
         }}
       >
-        {t(customTexts, "scratch_subtitle")}
+        <EditableText elementKey="labels">
+          {t(customTexts, "scratch_subtitle")}
+        </EditableText>
       </p>
 
       <div className="mt-10 flex justify-center items-end gap-3 sm:gap-5">
@@ -140,8 +169,11 @@ export default function ScratchDateReveal({
           coinSize={coinSize}
           ariaLabel="Raspe para revelar o dia"
           contentStyle={datePartStyle}
+          contentOverride={dateDayOverride}
           content={date.day || "—"}
+          contentElementKey="dateDay"
           subLabel={t(customTexts, "saveDate_dayLabel")}
+          subLabelOverride={labelsOverride}
           theme={theme}
           onRevealed={() => handleCoinRevealed("day")}
         />
@@ -149,8 +181,11 @@ export default function ScratchDateReveal({
           coinSize={coinSize}
           ariaLabel="Raspe para revelar o mês"
           contentStyle={datePartStyle}
+          contentOverride={dateMonthOverride}
           content={monthShort || "—"}
+          contentElementKey="dateMonth"
           subLabel={t(customTexts, "saveDate_monthLabel")}
+          subLabelOverride={labelsOverride}
           theme={theme}
           onRevealed={() => handleCoinRevealed("month")}
         />
@@ -158,8 +193,11 @@ export default function ScratchDateReveal({
           coinSize={coinSize}
           ariaLabel="Raspe para revelar o ano"
           contentStyle={datePartStyle}
+          contentOverride={dateYearOverride}
           content={date.year || "—"}
+          contentElementKey="dateYear"
           subLabel={t(customTexts, "saveDate_yearLabel")}
+          subLabelOverride={labelsOverride}
           theme={theme}
           onRevealed={() => handleCoinRevealed("year")}
         />
@@ -172,16 +210,29 @@ function CoinWithLabel({
   coinSize,
   ariaLabel,
   contentStyle,
+  contentOverride,
   content,
+  contentElementKey,
   subLabel,
+  subLabelOverride,
   theme,
   onRevealed,
 }: {
   coinSize: string;
   ariaLabel: string;
   contentStyle: CSSProperties;
+  /**
+   * Admin element-level override for the revealed date part. Applied on
+   * top of `contentStyle` so font/size/color customizations win without
+   * losing the coin's intrinsic typography defaults.
+   */
+  contentOverride: TextStyle;
   content: string;
+  /** EditableText key for the revealed date part (dateDay/dateMonth/dateYear). */
+  contentElementKey: "dateDay" | "dateMonth" | "dateYear";
   subLabel: string;
+  /** Admin override for the small `DIA` / `MÊS` / `ANO` labels under each coin. */
+  subLabelOverride: TextStyle;
   theme: TemplateTheme;
   onRevealed?: () => void;
 }) {
@@ -192,7 +243,13 @@ function CoinWithLabel({
           size={undefined as unknown as number /* size driven by parent */}
           fillParent
           ariaLabel={ariaLabel}
-          revealedContent={<span style={contentStyle}>{content}</span>}
+          revealedContent={
+            <span style={{ ...contentStyle, ...contentOverride }}>
+              <EditableText elementKey={contentElementKey}>
+                {content}
+              </EditableText>
+            </span>
+          }
           onRevealed={onRevealed}
         />
       </div>
@@ -203,9 +260,10 @@ function CoinWithLabel({
           color: theme.textMuted,
           fontSize: 10,
           letterSpacing: "0.2em",
+          ...subLabelOverride,
         }}
       >
-        {subLabel}
+        <EditableText elementKey="labels">{subLabel}</EditableText>
       </span>
     </div>
   );

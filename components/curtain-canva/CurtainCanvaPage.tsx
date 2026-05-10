@@ -13,7 +13,11 @@ import CurtainsHero from "./CurtainsHero";
 import ScratchDateReveal from "./ScratchDateReveal";
 import CanvaEmbed from "./CanvaEmbed";
 import RSVPForm from "@/components/shared/RSVPForm";
-import { resolveRevealContentStyle } from "@/lib/curtain-canva";
+import { EditableText } from "@/components/shared/EditableText";
+import {
+  resolveRevealContentStyle,
+  resolveTextElementOverride,
+} from "@/lib/curtain-canva";
 
 interface CurtainCanvaPageProps {
   invitation: InvitationData;
@@ -253,6 +257,7 @@ export default function CurtainCanvaPage({
         videoUrl={invitation.videoUrl}
         videoPoster={invitation.videoPoster}
         customTexts={invitation.customTexts}
+        textStyles={invitation.textStyles}
         onTapped={handleTapped}
         onRevealed={handleRevealed}
       />
@@ -262,6 +267,7 @@ export default function CurtainCanvaPage({
           date={invitation.date}
           theme={theme}
           customTexts={invitation.customTexts}
+          textStyles={invitation.textStyles}
         />
 
         {/* CanvaEmbed mounts immediately and starts fetching the proxied
@@ -298,9 +304,15 @@ export default function CurtainCanvaPage({
                     color: theme.textSecondary,
                     fontSize: 11,
                     letterSpacing: "0.3em",
+                    // Apply per-element override last so admin customizations
+                    // win over the curtain's inline defaults.
+                    ...resolveTextElementOverride(
+                      invitation.textStyles,
+                      "inviteLabel",
+                    ),
                   }}
                 >
-                  RSVP
+                  <EditableText elementKey="inviteLabel">RSVP</EditableText>
                 </span>
                 <div
                   aria-hidden

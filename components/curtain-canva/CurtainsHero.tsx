@@ -9,10 +9,17 @@ import {
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import type { CustomTexts, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CustomTexts,
+  InvitationData,
+  TemplateTheme,
+  TextStyleOverrides,
+} from "@/lib/types";
 import { t } from "@/lib/custom-texts";
+import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveCurtainVideoSrc,
+  resolveTextElementOverride,
   shouldFireConfettiAtProgress,
   shouldShowHeroInfoAtProgress,
 } from "@/lib/curtain-canva";
@@ -26,6 +33,13 @@ interface CurtainsHeroProps {
   videoUrl?: string;
   videoPoster?: string;
   customTexts?: CustomTexts;
+  /**
+   * Per-invitation text style overrides. Applied on top of the hero's
+   * default inline styles so admin element-level customizations (couple
+   * names, ampersand, quote, invite message) win without losing the
+   * curtain-specific typography defaults (clamp sizing, etc.).
+   */
+  textStyles?: TextStyleOverrides;
   onTapped?: () => void;
   /**
    * Fires when the curtain reveal completes (video ended or reduced-motion
@@ -46,9 +60,23 @@ export default function CurtainsHero({
   videoUrl,
   videoPoster,
   customTexts,
+  textStyles,
   onTapped,
   onRevealed,
 }: CurtainsHeroProps) {
+  // Per-element overrides applied to inline styles below. Resolved once
+  // per render so we keep the existing curtain typography defaults and
+  // only merge in the admin's customizations.
+  const coupleNamesOverride = resolveTextElementOverride(
+    textStyles,
+    "coupleNames",
+  );
+  const ampersandOverride = resolveTextElementOverride(textStyles, "ampersand");
+  const quoteOverride = resolveTextElementOverride(textStyles, "quote");
+  const inviteMessageOverride = resolveTextElementOverride(
+    textStyles,
+    "inviteMessage",
+  );
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [state, setState] = useState<HeroState>("idle");
   const [heroInfoVisible, setHeroInfoVisible] = useState(false);
@@ -303,9 +331,10 @@ export default function CurtainsHero({
                   fontSize: "clamp(1rem, 2.4vw, 1.15rem)",
                   lineHeight: 1.6,
                   maxWidth: "38ch",
+                  ...quoteOverride,
                 }}
               >
-                {quote}
+                <EditableText elementKey="quote">{quote}</EditableText>
               </motion.p>
             )}
 
@@ -325,9 +354,14 @@ export default function CurtainsHero({
                 fontWeight: 500,
                 wordBreak: "break-word",
                 hyphens: "auto",
+                ...coupleNamesOverride,
               }}
             >
-              <span>{couple.bride}</span>
+              <span>
+                <EditableText elementKey="coupleNames">
+                  {couple.bride}
+                </EditableText>
+              </span>
               <span
                 aria-hidden
                 className="my-1"
@@ -335,11 +369,16 @@ export default function CurtainsHero({
                   opacity: 0.55,
                   fontStyle: "italic",
                   fontSize: "0.85em",
+                  ...ampersandOverride,
                 }}
               >
-                &amp;
+                <EditableText elementKey="ampersand">&amp;</EditableText>
               </span>
-              <span>{couple.groom}</span>
+              <span>
+                <EditableText elementKey="coupleNames">
+                  {couple.groom}
+                </EditableText>
+              </span>
             </motion.h1>
 
             {inviteMessage && (
@@ -354,9 +393,12 @@ export default function CurtainsHero({
                   fontSize: "clamp(0.9rem, 2.2vw, 1.05rem)",
                   lineHeight: 1.6,
                   maxWidth: "40ch",
+                  ...inviteMessageOverride,
                 }}
               >
-                {inviteMessage}
+                <EditableText elementKey="inviteMessage">
+                  {inviteMessage}
+                </EditableText>
               </motion.p>
             )}
           </motion.div>

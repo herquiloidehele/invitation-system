@@ -18,6 +18,8 @@ import type {
   InvitationType,
   TemplateTheme,
   EnvelopeConfig,
+  TextStyle,
+  TextStyleOverrides,
 } from "@/lib/types";
 import {
   buildInvitationMonogram,
@@ -57,6 +59,8 @@ import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import { InlineTextEditProvider } from "@/components/shared/EditableText";
+import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import {
@@ -251,6 +255,34 @@ export default function ExternalInvitationForm({
   const update = useCallback(
     <K extends keyof InvitationData>(key: K, value: InvitationData[K]) => {
       setForm((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
+
+  // Per-element text style override updater. Mirrors the helper in
+  // InvitationForm so the curtain-canva preview supports the same inline
+  // text editing UI (selects an EditableText element → toolbar updates
+  // the matching entry in `form.textStyles.elements`). When all fields on
+  // an element are cleared, the element is dropped; when no elements
+  // remain, `textStyles.elements` itself is dropped.
+  const updateTextStyleElement = useCallback(
+    (
+      element: keyof NonNullable<TextStyleOverrides["elements"]>,
+      field: keyof TextStyle,
+      value: string | number | undefined,
+    ) => {
+      setForm((prev) => {
+        const ts = prev.textStyles ?? {};
+        const elements = { ...ts.elements };
+        const el = { ...elements[element], [field]: value || undefined };
+        const elHasAny = Object.values(el).some((v) => v !== undefined);
+        elements[element] = elHasAny ? el : undefined;
+        const hasAny = Object.values(elements).some(Boolean);
+        return {
+          ...prev,
+          textStyles: { ...ts, elements: hasAny ? elements : undefined },
+        };
+      });
     },
     [],
   );
@@ -1325,13 +1357,26 @@ export default function ExternalInvitationForm({
                 /* Curtain-Canva layout: render the actual public-facing page
                    so admins see exactly what guests will see (curtains hero,
                    scratch reveal, Canva iframe section, inline RSVP). The
-                   preview is scrollable inside the pane. */
-                <div className="absolute inset-0 overflow-y-auto bg-background">
-                  <CurtainCanvaPage
-                    invitation={form}
-                    theme={currentTheme as TemplateTheme}
-                  />
-                </div>
+                   preview is scrollable inside the pane.
+
+                   Wrapping the preview with InlineTextEditProvider lights up
+                   every <EditableText> in the curtain flow — clicking a name,
+                   the ampersand, the quote, the scratch labels, etc. opens
+                   the floating TextStyleToolbar so the admin can adjust per-
+                   element font/size/weight/color overrides exactly like in
+                   the standard invitation preview. */
+                <InlineTextEditProvider
+                  updateTextStyleElement={updateTextStyleElement}
+                  textStyles={form.textStyles}
+                >
+                  <TextStyleToolbar />
+                  <div className="absolute inset-0 overflow-y-auto bg-background">
+                    <CurtainCanvaPage
+                      invitation={form}
+                      theme={currentTheme as TemplateTheme}
+                    />
+                  </div>
+                </InlineTextEditProvider>
               ) : subType === "external_video" ? (
                 form.videoUrl ? (
                   <video
