@@ -20,6 +20,7 @@ import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveCurtainVideoSrc,
   resolveTextElementOverride,
+  scrollToNextHeroSection,
   shouldFireConfettiAtProgress,
   shouldShowHeroInfoAtProgress,
 } from "@/lib/curtain-canva";
@@ -248,6 +249,14 @@ export default function CurtainsHero({
     setVideoReady(true);
   }, []);
 
+  const handleScrollNext = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      scrollToNextHeroSection();
+    },
+    [],
+  );
+
   // Whole hero is the tap target while idle.
   const isInteractive = state === "idle";
 
@@ -402,6 +411,48 @@ export default function CurtainsHero({
               </motion.p>
             )}
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {heroInfoVisible && (
+          <motion.button
+            type="button"
+            aria-label="Scroll to next section"
+            className="absolute left-1/2 z-20 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-white/70  transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style={{
+              bottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+              borderColor: `${theme.textPrimary}33`,
+              color: theme.textPrimary,
+              cursor: "pointer",
+            }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: [0, 9, 0] }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{
+              opacity: { delay: 0.8, duration: 0.35 },
+              y: {
+                delay: 1,
+                duration: 1.4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+            }}
+            onClick={handleScrollNext}
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-7 w-7"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </motion.button>
         )}
       </AnimatePresence>
     </section>

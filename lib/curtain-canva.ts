@@ -68,6 +68,12 @@ export function resolveRevealContentStyle(revealed: boolean): CSSProperties {
   };
 }
 
+type ScrollWindow = Pick<Window, "innerHeight" | "scrollTo">;
+
+export function scrollToNextHeroSection(win: ScrollWindow = window): void {
+  win.scrollTo({ top: win.innerHeight, behavior: "smooth" });
+}
+
 /**
  * Curtain hero progress threshold for showing the invitation info while the
  * curtain video is still playing. We reveal the names/date/quote at this
