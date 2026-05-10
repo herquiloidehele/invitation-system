@@ -3,11 +3,7 @@
 import { useCallback, useRef, type CSSProperties } from "react";
 import type { CustomTexts, TemplateTheme } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
-import {
-  resolveCelebrationPalette,
-  resolveCoinColors,
-  shortMonthName,
-} from "@/lib/curtain-canva";
+import { resolveCelebrationPalette, shortMonthName } from "@/lib/curtain-canva";
 import ScratchCoin from "./ScratchCoin";
 
 interface ScratchDateRevealProps {
@@ -26,7 +22,6 @@ export default function ScratchDateReveal({
   theme,
   customTexts,
 }: ScratchDateRevealProps) {
-  const { baseColor, accentColor } = resolveCoinColors(theme);
   const monthShort = shortMonthName(date.iso, date.month);
 
   // Track which coins have been revealed so we can fire confetti exactly
@@ -135,8 +130,6 @@ export default function ScratchDateReveal({
       <div className="mt-10 flex justify-center items-end gap-3 sm:gap-5">
         <CoinWithLabel
           coinSize={coinSize}
-          baseColor={baseColor}
-          accentColor={accentColor}
           ariaLabel="Raspe para revelar o dia"
           contentStyle={datePartStyle}
           content={date.day || "—"}
@@ -146,8 +139,6 @@ export default function ScratchDateReveal({
         />
         <CoinWithLabel
           coinSize={coinSize}
-          baseColor={baseColor}
-          accentColor={accentColor}
           ariaLabel="Raspe para revelar o mês"
           contentStyle={datePartStyle}
           content={monthShort || "—"}
@@ -157,8 +148,6 @@ export default function ScratchDateReveal({
         />
         <CoinWithLabel
           coinSize={coinSize}
-          baseColor={baseColor}
-          accentColor={accentColor}
           ariaLabel="Raspe para revelar o ano"
           contentStyle={datePartStyle}
           content={date.year || "—"}
@@ -173,8 +162,6 @@ export default function ScratchDateReveal({
 
 function CoinWithLabel({
   coinSize,
-  baseColor,
-  accentColor,
   ariaLabel,
   contentStyle,
   content,
@@ -183,8 +170,6 @@ function CoinWithLabel({
   onRevealed,
 }: {
   coinSize: string;
-  baseColor: string;
-  accentColor: string;
   ariaLabel: string;
   contentStyle: CSSProperties;
   content: string;
@@ -198,8 +183,6 @@ function CoinWithLabel({
         <ScratchCoin
           size={undefined as unknown as number /* size driven by parent */}
           fillParent
-          baseColor={baseColor}
-          accentColor={accentColor}
           ariaLabel={ariaLabel}
           revealedContent={<span style={contentStyle}>{content}</span>}
           onRevealed={onRevealed}
