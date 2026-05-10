@@ -152,12 +152,16 @@ export default function ScratchCoin({
     );
     baseGrad.addColorStop(0, accentColor);
     baseGrad.addColorStop(0.55, baseColor);
-    baseGrad.addColorStop(1, shadeColor(baseColor, -25));
+    // Rim shade — only mildly darker than the base, so the coin reads as
+    // a polished gold disc rather than a shadowed olive token.
+    baseGrad.addColorStop(1, shadeColor(baseColor, -10));
     ctx.fillStyle = baseGrad;
     ctx.fillRect(0, 0, cw, ch);
 
     // 2. Brushed-metal concentric striations — short radial lines emanating
     //    from the center, drawn at varying alphas to simulate spun metal.
+    //    The light striations dominate; the dark ones are kept very subtle
+    //    so they don't darken the overall hue.
     ctx.save();
     ctx.translate(cx, cy);
     const totalStrokes = 220;
@@ -165,7 +169,7 @@ export default function ScratchCoin({
       const angle = (i / totalStrokes) * Math.PI * 2;
       const innerR = r * 0.08;
       const outerR = r * 0.96;
-      const alpha = 0.04 + Math.random() * 0.08;
+      const alpha = 0.06 + Math.random() * 0.1;
       ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
       ctx.lineWidth = 1 * dpr;
       ctx.beginPath();
@@ -173,12 +177,12 @@ export default function ScratchCoin({
       ctx.lineTo(Math.cos(angle) * outerR, Math.sin(angle) * outerR);
       ctx.stroke();
     }
-    // Darker striations interleaved for depth
+    // Darker striations interleaved for depth — kept faint.
     for (let i = 0; i < totalStrokes / 2; i++) {
       const angle = Math.random() * Math.PI * 2;
       const innerR = r * 0.1;
       const outerR = r * (0.8 + Math.random() * 0.18);
-      const alpha = 0.04 + Math.random() * 0.08;
+      const alpha = 0.02 + Math.random() * 0.04;
       ctx.strokeStyle = `rgba(0, 0, 0, ${alpha})`;
       ctx.lineWidth = 1 * dpr;
       ctx.beginPath();
@@ -195,24 +199,26 @@ export default function ScratchCoin({
       0,
       cx - r * 0.35,
       cy - r * 0.45,
-      r * 0.55,
+      r * 0.6,
     );
-    specGrad.addColorStop(0, "rgba(255, 255, 255, 0.55)");
-    specGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.18)");
+    specGrad.addColorStop(0, "rgba(255, 255, 255, 0.7)");
+    specGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.25)");
     specGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
     ctx.fillStyle = specGrad;
     ctx.fillRect(0, 0, cw, ch);
 
-    // 4. Edge vignette so the rim reads as deeper / more 3-dimensional
-    const vignette = ctx.createRadialGradient(cx, cy, r * 0.78, cx, cy, r);
+    // 4. Edge vignette — gentler than before so the rim doesn't read as
+    //    a heavy black ring on light page backgrounds.
+    const vignette = ctx.createRadialGradient(cx, cy, r * 0.85, cx, cy, r);
     vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
-    vignette.addColorStop(1, "rgba(0, 0, 0, 0.32)");
+    vignette.addColorStop(1, "rgba(0, 0, 0, 0.16)");
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, cw, ch);
 
-    // 5. Inner darker ring just inside the perimeter for definition
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.18)";
-    ctx.lineWidth = Math.max(1.2, r * 0.025);
+    // 5. Inner ring just inside the perimeter for definition. Subtler than
+    //    before so the overall coin stays bright.
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+    ctx.lineWidth = Math.max(1, r * 0.02);
     ctx.beginPath();
     ctx.arc(cx, cy, r * 0.95, 0, Math.PI * 2);
     ctx.stroke();
@@ -354,6 +360,20 @@ export default function ScratchCoin({
           : undefined
       }
     >
+      {/* Post-reveal plate: a subtle grey filled circle with a thin ring.
+          Sits behind the revealed content and fades in once the coin is
+          scratched off, giving the date/text a quiet surface to live on. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background: "rgba(0, 0, 0, 0.04)",
+          boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.08)",
+          opacity: revealed ? 1 : 0,
+          transition: reduceMotion ? "none" : "opacity 0.35s ease-out",
+        }}
+      />
+
       {/* Revealed content (sits behind the canvas) */}
       <div className="absolute inset-0 flex items-center justify-center">
         {revealedContent}

@@ -33,17 +33,25 @@ export function shortMonthName(iso: string, fallback = ""): string {
 }
 
 /**
- * Derives the gold-coin base + accent colors from the theme.
- * The base color uses `theme.decorativeColor` when present; otherwise
- * a brushed-gold default. The accent (lighter highlight) is currently
- * a fixed light gold — a future task may derive it from the base.
+ * Brushed-gold palette used for the scratch coins. We deliberately keep this
+ * fixed across themes so the coin always renders as a polished, opaque gold
+ * surface. Theme `decorativeColor` was previously used here, but most themes
+ * store it as a low-opacity rgba for accents elsewhere, which made the
+ * radial gradient render muddy/dark.
+ */
+const COIN_GOLD_BASE = "#D9B96A";
+const COIN_GOLD_HIGHLIGHT = "#F8E7B0";
+
+/**
+ * Returns the brushed-gold colors used to paint a `ScratchCoin`. The
+ * argument is kept (and accepts the theme) for forward-compatibility — for
+ * example a theme could opt into a custom coin color in the future — but
+ * today it returns the fixed palette regardless of the input.
  */
 export function resolveCoinColors(
-  theme: Pick<TemplateTheme, "decorativeColor"> | { decorativeColor?: string },
+  _theme: Pick<TemplateTheme, "decorativeColor"> | { decorativeColor?: string },
 ): { baseColor: string; accentColor: string } {
-  const baseColor = theme.decorativeColor || "#C9A961";
-  const accentColor = "#F4E4A1";
-  return { baseColor, accentColor };
+  return { baseColor: COIN_GOLD_BASE, accentColor: COIN_GOLD_HIGHLIGHT };
 }
 
 /**
