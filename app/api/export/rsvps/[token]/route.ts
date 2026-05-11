@@ -26,7 +26,7 @@ function str(val: unknown, fallback = ""): string {
 const DEFAULT_PDF_THEME = {
   primary: "#96643a",
   accent: "#b8845c",
-  textPrimary: "#3d2b1a",
+  textPrimary: "#1b1b1b",
   textSecondary: "#6b4c30",
   textMuted: "#9e8272",
   cardBg: "#f5ede0",
@@ -41,18 +41,21 @@ const DEFAULT_PDF_THEME = {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ token: string }> }
+  { params }: { params: Promise<{ token: string }> },
 ) {
   const { token } = await params;
 
   // Dynamically import all PDF code — this keeps @react-pdf/renderer bundled
   // by webpack as a single async chunk (avoids ESM/CJS require() conflicts).
-  const [{ renderToBuffer }, React, { RsvpExportDocument, tryRegisterGoogleFont }] =
-    await Promise.all([
-      import("@react-pdf/renderer"),
-      import("react"),
-      import("@/components/pdf/RsvpExportDocument"),
-    ]);
+  const [
+    { renderToBuffer },
+    React,
+    { RsvpExportDocument, tryRegisterGoogleFont },
+  ] = await Promise.all([
+    import("@react-pdf/renderer"),
+    import("react"),
+    import("@/components/pdf/RsvpExportDocument"),
+  ]);
 
   // ── Try Invitation ────────────────────────────────────────────────────────
   const invitation = await prisma.invitation.findUnique({
@@ -73,7 +76,7 @@ export async function GET(
     const pdfTheme = {
       primary: t?.primary ?? DEFAULT_PDF_THEME.primary,
       accent: t?.accent ?? DEFAULT_PDF_THEME.accent,
-      textPrimary: t?.textPrimary ?? DEFAULT_PDF_THEME.textPrimary,
+      textPrimary: DEFAULT_PDF_THEME.textPrimary,
       textSecondary: t?.textSecondary ?? DEFAULT_PDF_THEME.textSecondary,
       textMuted: t?.textMuted ?? DEFAULT_PDF_THEME.textMuted,
       cardBg: t?.cardBg ?? DEFAULT_PDF_THEME.cardBg,
@@ -107,7 +110,7 @@ export async function GET(
         responses,
         theme: pdfTheme,
         documentType: "invitation",
-      }) as any
+      }) as any,
     );
 
     return new NextResponse(new Uint8Array(buffer), {
@@ -172,7 +175,7 @@ export async function GET(
         responses,
         theme: pdfTheme,
         documentType: "save-the-date",
-      }) as any
+      }) as any,
     );
 
     return new NextResponse(new Uint8Array(buffer), {
