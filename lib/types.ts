@@ -457,6 +457,8 @@ export interface InvitationData {
   giftRegistry: GiftRegistry;
   audio: AudioConfig;
   heroImage: string;
+  /** Pixel height for image-based heroes. Missing values fall back to 300px. */
+  heroHeight?: number;
   videoUrl?: string;
   /** Poster image displayed by the curtain video before playback / while it loads. Optional — falls back to a static bundled poster. */
   videoPoster?: string;

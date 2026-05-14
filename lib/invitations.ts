@@ -34,6 +34,7 @@ type InvitationWithTheme = {
   giftRegistry: unknown;
   audio: unknown;
   heroImage: string;
+  heroHeight: number | null;
   videoUrl: string | null;
   videoPoster: string | null;
   faqs: unknown;
@@ -72,6 +73,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     giftRegistry: row.giftRegistry as InvitationData["giftRegistry"],
     audio: row.audio as InvitationData["audio"],
     heroImage: row.heroImage,
+    heroHeight: row.heroHeight ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,

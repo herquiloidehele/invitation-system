@@ -88,6 +88,7 @@ export async function PUT(
       if (theme) themeId = theme.id;
     }
 
+    console.log("[Admin API] Updating invitation with data:", [body]);
     const invitation = await prisma.invitation.update({
       where: { id },
       data: {
@@ -125,7 +126,11 @@ export async function PUT(
           audio: sanitizeJsonField(body.audio, existing.audio),
         }),
         ...(body.heroImage !== undefined && { heroImage: body.heroImage }),
-        ...(body.videoUrl !== undefined && { videoUrl: body.videoUrl }),
+        ...(body.heroHeight !== undefined && {
+          heroHeight:
+            typeof body.heroHeight === "number" ? body.heroHeight : null,
+        }),
+        ...{ videoUrl: body.videoUrl || "" },
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,
         }),

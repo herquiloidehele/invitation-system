@@ -306,6 +306,11 @@ const EVENT_TYPE_OPTIONS: {
   { value: "other", label: "Outro" },
 ];
 
+const DEFAULT_HERO_HEIGHT = 300;
+const MIN_HERO_HEIGHT = 200;
+const MAX_HERO_HEIGHT = 700;
+const HERO_HEIGHT_STEP = 10;
+
 // ---------------------------------------------------------------------------
 // Default form state
 // ---------------------------------------------------------------------------
@@ -347,6 +352,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     giftRegistry: { enabled: false, text: "", link: "" },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
+    heroHeight: DEFAULT_HERO_HEIGHT,
     videoUrl: "",
     videoPoster: "",
     faqs: [],
@@ -1053,7 +1059,9 @@ export default function InvitationForm({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="bride">{isWedding ? "Noiva" : "Nome"}</Label>
+                      <Label htmlFor="bride">
+                        {isWedding ? "Noiva" : "Nome"}
+                      </Label>
                       <Input
                         id="bride"
                         value={form.couple.bride}
@@ -1263,9 +1271,8 @@ export default function InvitationForm({
                   <div className="space-y-1.5">
                     <Label>Cor do browser</Label>
                     <p className="text-xs text-muted-foreground">
-                      Cor usada pela barra do browser em mobile. Deixe em
-                      branco para combinar automaticamente com a capa do
-                      envelope.
+                      Cor usada pela barra do browser em mobile. Deixe em branco
+                      para combinar automaticamente com a capa do envelope.
                     </p>
                     <div className="flex items-center gap-2">
                       <input
@@ -1435,6 +1442,26 @@ export default function InvitationForm({
                         onChange={(s) => updateImageSettings("heroImage", s)}
                       />
                     )}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="heroHeight">Altura do hero</Label>
+                        <span className="text-xs text-muted-foreground tabular-nums">
+                          {form.heroHeight ?? DEFAULT_HERO_HEIGHT}px
+                        </span>
+                      </div>
+                      <input
+                        id="heroHeight"
+                        type="range"
+                        min={MIN_HERO_HEIGHT}
+                        max={MAX_HERO_HEIGHT}
+                        step={HERO_HEIGHT_STEP}
+                        value={form.heroHeight ?? DEFAULT_HERO_HEIGHT}
+                        onChange={(e) =>
+                          update("heroHeight", parseInt(e.target.value, 10))
+                        }
+                        className="w-full accent-foreground cursor-pointer"
+                      />
+                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label>Vídeo (opcional)</Label>

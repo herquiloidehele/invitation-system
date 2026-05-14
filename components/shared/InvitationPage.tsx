@@ -107,6 +107,16 @@ const staggerContainer: Variants = {
 // Helpers
 // ---------------------------------------------------------------------------
 
+const DEFAULT_IMAGE_HERO_HEIGHT = 300;
+
+export function getHeroSectionHeight(
+  invitation: Pick<InvitationData, "videoUrl" | "heroHeight">,
+): "100dvh" | number {
+  return invitation.videoUrl
+    ? "100dvh"
+    : invitation.heroHeight ?? DEFAULT_IMAGE_HERO_HEIGHT;
+}
+
 function toAudioTheme(theme: TemplateTheme) {
   return {
     bgColor: theme.cardBg,
@@ -423,7 +433,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       <section
         className="relative overflow-hidden"
-        style={{ height: invitation.videoUrl ? "100dvh" : 300 }}
+        style={{ height: getHeroSectionHeight(invitation) }}
       >
         {/* Background media */}
         {invitation.videoUrl ? (
