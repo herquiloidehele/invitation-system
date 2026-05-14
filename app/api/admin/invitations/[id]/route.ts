@@ -158,6 +158,9 @@ export async function PUT(
         ...(body.ourStory !== undefined && {
           ourStory: sanitizeJsonField(body.ourStory, null),
         }),
+        ...(body.scratchReveal !== undefined && {
+          scratchReveal: sanitizeJsonField(body.scratchReveal, null),
+        }),
         ...(body.invitationType !== undefined && {
           invitationType: body.invitationType,
         }),

@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
         sectionImages: sanitizeJsonField(body.sectionImages, null),
         parents: sanitizeJsonField(body.parents, null),
         ourStory: sanitizeJsonField(body.ourStory, null),
+        scratchReveal: sanitizeJsonField(body.scratchReveal, null),
         invitationType: body.invitationType ?? "standard",
         externalLink: body.externalLink ?? null,
         textStyles: sanitizeJsonField(body.textStyles, null),

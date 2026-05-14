@@ -10,9 +10,11 @@ import ExternalVideoPage, {
   type ExternalVideoPageHandle,
 } from "@/components/shared/ExternalVideoPage";
 import ExternalLinkPage from "@/components/shared/ExternalLinkPage";
+import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
+import { hasRichExternalSections } from "@/lib/external-invitation-form";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 
 interface InvitationViewProps {
@@ -49,14 +51,23 @@ function EnvelopeInvitationView({
   const isExternalVideo =
     (invitation.invitationType ?? "standard") === "external_video";
 
+  const isRichExternalLink =
+    (invitation.invitationType ?? "standard") === "external_link" &&
+    hasRichExternalSections(invitation);
+
+  // Bare-iframe external_link path — only when the rich layout is NOT used.
   const isExternalLink =
     (invitation.invitationType ?? "standard") === "external_link" &&
-    !!invitation.externalLink;
+    !!invitation.externalLink &&
+    !isRichExternalLink;
 
   // Standard invitations with a hero video need the bytes pre-buffered
   // before the invite is opened, so the video plays instantly.
+  // Rich external_link invitations may also have a hero video for their
+  // InvitationHero section — share the same prefetch slot.
   const isStandardWithVideo =
-    (invitation.invitationType ?? "standard") === "standard" &&
+    ((invitation.invitationType ?? "standard") === "standard" ||
+      isRichExternalLink) &&
     !!invitation.videoUrl;
 
   // Likewise, pre-buffer the background audio so it plays immediately
@@ -173,9 +184,18 @@ function EnvelopeInvitationView({
       return;
     }
 
-    // For external links the <iframe> has been pre-loading behind the
-    // envelope cover. Just reveal it — no extra fetch needed.
+    // For external links, the behavior depends on whether the rich layout
+    // is enabled:
+    //  - Rich layout: behave like a standard invitation — fade in the full
+    //    scrollable page (hero → scratch → iframe → RSVP) after the envelope.
+    //  - Bare layout: the <iframe> has been pre-loading behind the envelope
+    //    cover; just reveal it — no extra fetch needed.
     if (type === "external_link") {
+      if (hasRichExternalSections(invitation)) {
+        setShowContent(true);
+        requestAnimationFrame(() => setCoverVisible(false));
+        return;
+      }
       setExternalLinkVisible(true);
       requestAnimationFrame(() => setCoverVisible(false));
       return;
@@ -191,6 +211,19 @@ function EnvelopeInvitationView({
   function renderContent() {
     // External link/video are rendered as persistent siblings (outside this
     // AnimatePresence) so they can prefetch behind the envelope cover.
+    // For rich external_link invitations, render the full scrollable page
+    // (composed inline, not as a sibling) so it animates in like a standard
+    // invitation when the envelope completes.
+    if (isRichExternalLink) {
+      return (
+        <RichExternalLinkPage
+          invitation={invitation}
+          theme={theme}
+          audioRef={audioRef}
+          prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+        />
+      );
+    }
     // Default: standard full invitation page.
     return (
       <InvitationPage

@@ -20,7 +20,10 @@ import type {
   EnvelopeConfig,
   TextStyle,
   TextStyleOverrides,
+  ImageSettings,
+  ImageSettingsKey,
 } from "@/lib/types";
+import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import {
   buildInvitationMonogram,
   buildInvitationSlug,
@@ -55,6 +58,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
+import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
@@ -62,10 +66,12 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
+import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import {
   getExternalInvitationEmbedSrc,
   getExternalInvitationPublicHref,
+  hasRichExternalSections,
   shouldShowExternalInvitationAudioControls,
 } from "@/lib/external-invitation-form";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
@@ -88,6 +94,11 @@ const EVENT_TYPE_OPTIONS: {
 function colorPickerValue(value: string | undefined, fallback: string): string {
   return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
 }
+
+const DEFAULT_HERO_HEIGHT = 300;
+const MIN_HERO_HEIGHT = 200;
+const MAX_HERO_HEIGHT = 700;
+const HERO_HEIGHT_STEP = 10;
 
 // ---------------------------------------------------------------------------
 // Default state
@@ -125,13 +136,24 @@ function getDefaultState(
     giftRegistry: { enabled: false, text: "" },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
+    heroHeight: DEFAULT_HERO_HEIGHT,
     videoUrl: "",
     videoPoster: "",
     invitationType: invType,
     externalLink: "",
     saveDateStyle: "classic",
     envelope: {},
-    parents: { enabled: false, inviteMessage: "", blessingMessage: "", bridesFather: "", bridesMother: "", groomsFather: "", groomsMother: "" },
+    parents: {
+      enabled: false,
+      inviteMessage: "",
+      blessingMessage: "",
+      bridesFather: "",
+      bridesMother: "",
+      groomsFather: "",
+      groomsMother: "",
+    },
+    scratchReveal: { enabled: false },
+    imageSettings: {},
   };
 }
 
@@ -379,10 +401,34 @@ export default function ExternalInvitationForm({
     ) => {
       setForm((prev) => ({
         ...prev,
-        parents: { ...(prev.parents ?? {}), [field]: value } as NonNullable<InvitationData["parents"]>,
+        parents: { ...(prev.parents ?? {}), [field]: value } as NonNullable<
+          InvitationData["parents"]
+        >,
       }));
     },
     [],
+  );
+
+  const updateScratchReveal = useCallback((enabled: boolean) => {
+    setForm((prev) => ({ ...prev, scratchReveal: { enabled } }));
+  }, []);
+
+  // Image position/zoom settings — used by ImagePositionEditor for the hero
+  // image in rich external_link invitations.
+  const updateImageSettings = useCallback(
+    (key: ImageSettingsKey, settings: ImageSettings) => {
+      setForm((prev) => ({
+        ...prev,
+        imageSettings: { ...prev.imageSettings, [key]: settings },
+      }));
+    },
+    [],
+  );
+
+  const imgSettings = useCallback(
+    (key: ImageSettingsKey): ImageSettings =>
+      form.imageSettings?.[key] ?? DEFAULT_IMAGE_SETTINGS,
+    [form.imageSettings],
   );
 
   // Date editor helper — only used by the curtain-canva accordion.
@@ -436,7 +482,8 @@ export default function ExternalInvitationForm({
         return {
           ...prev,
           invitationType: t,
-          videoUrl: t === "external_video" || preserveVideo ? prev.videoUrl : "",
+          videoUrl:
+            t === "external_video" || preserveVideo ? prev.videoUrl : "",
           externalLink: t === "external_link" ? prev.externalLink : "",
         };
       });
@@ -618,184 +665,115 @@ export default function ExternalInvitationForm({
               </div>
             </div>
 
-            <Separator />
-
-            {/* ── RSVP settings ── */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">
-                Confirmação de presença
-              </Label>
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-0.5">
-                  <Label>Pedir email no RSVP</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Quando ativo, o formulário pede o email do convidado.
-                  </p>
-                </div>
-                <Switch
-                  checked={form.rsvp.showEmail === true}
-                  onCheckedChange={(v) => updateRsvp("showEmail", v)}
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-0.5">
-                  <Label>Pedir restrições alimentares no RSVP</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Quando ativo, o formulário pede as restrições alimentares do
-                    convidado.
-                  </p>
-                </div>
-                <Switch
-                  checked={form.rsvp.showDietaryRestrictions !== false}
-                  onCheckedChange={(v) =>
-                    updateRsvp("showDietaryRestrictions", v)
-                  }
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* ── Couple names ── */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">
-                {isWedding ? "Casal" : "Pessoa / Evento"}
-              </Label>
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="eventType"
-                  className="text-xs text-muted-foreground"
-                >
-                  Tipo de convite
-                </Label>
-                <Select
-                  value={form.eventType}
-                  onValueChange={(value) =>
-                    updateEventType(value as InvitationEventType)
-                  }
-                >
-                  <SelectTrigger id="eventType">
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EVENT_TYPE_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="bride"
-                    className="text-xs text-muted-foreground"
-                  >
-                    {isWedding ? "Noiva" : "Nome"}
-                  </Label>
-                  <Input
-                    id="bride"
-                    value={form.couple.bride}
-                    onChange={(e) => updateCouple("bride", e.target.value)}
-                    placeholder={isWedding ? "ex: Sofia" : "ex: Sofia"}
-                  />
-                </div>
-                {isWedding && (
+            {/* ── Accordion: all settings ── */}
+            <Accordion defaultValue={[]} className="space-y-2">
+              {/* ── Couple ── */}
+              <AccordionItem value="couple" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-sm font-medium">
+                  {isWedding ? "Casal" : "Pessoa / Evento"}
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pb-4">
                   <div className="space-y-1.5">
                     <Label
-                      htmlFor="groom"
+                      htmlFor="eventType"
                       className="text-xs text-muted-foreground"
                     >
-                      Noivo
+                      Tipo de convite
                     </Label>
-                    <Input
-                      id="groom"
-                      value={form.couple.groom}
-                      onChange={(e) => updateCouple("groom", e.target.value)}
-                      placeholder="ex: Miguel"
-                    />
+                    <Select
+                      value={form.eventType}
+                      onValueChange={(value) =>
+                        updateEventType(value as InvitationEventType)
+                      }
+                    >
+                      <SelectTrigger id="eventType">
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EVENT_TYPE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="monogram"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Monograma
-                  </Label>
-                  <Input
-                    id="monogram"
-                    value={form.couple.monogram}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        couple: { ...prev.couple, monogram: e.target.value },
-                      }))
-                    }
-                    placeholder="ex: S&M"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="slug"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Slug (URL)
-                  </Label>
-                  <Input
-                    id="slug"
-                    value={form.slug}
-                    onChange={(e) => update("slug", e.target.value)}
-                    placeholder="ex: sofia-miguel"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* ── Theme ── */}
-            <div className="space-y-1.5">
-              <Label className="text-sm font-medium">Tema (capa)</Label>
-              <Select
-                value={form.themeId}
-                onValueChange={(val) => {
-                  const t = themes.find((th) => th.id === val);
-                  if (t) {
-                    setForm((prev) => ({
-                      ...prev,
-                      themeId: t.id,
-                      template: t.name,
-                    }));
-                  }
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleciona um tema" />
-                </SelectTrigger>
-                <SelectContent>
-                  {themes.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full border"
-                          style={{ backgroundColor: t.envelope.base }}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label
+                        htmlFor="bride"
+                        className="text-xs text-muted-foreground"
+                      >
+                        {isWedding ? "Noiva" : "Nome"}
+                      </Label>
+                      <Input
+                        id="bride"
+                        value={form.couple.bride}
+                        onChange={(e) => updateCouple("bride", e.target.value)}
+                        placeholder={isWedding ? "ex: Sofia" : "ex: Sofia"}
+                      />
+                    </div>
+                    {isWedding && (
+                      <div className="space-y-1.5">
+                        <Label
+                          htmlFor="groom"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Noivo
+                        </Label>
+                        <Input
+                          id="groom"
+                          value={form.couple.groom}
+                          onChange={(e) =>
+                            updateCouple("groom", e.target.value)
+                          }
+                          placeholder="ex: Miguel"
                         />
-                        {t.label}
                       </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label
+                        htmlFor="monogram"
+                        className="text-xs text-muted-foreground"
+                      >
+                        Monograma
+                      </Label>
+                      <Input
+                        id="monogram"
+                        value={form.couple.monogram}
+                        onChange={(e) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            couple: {
+                              ...prev.couple,
+                              monogram: e.target.value,
+                            },
+                          }))
+                        }
+                        placeholder="ex: S&M"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label
+                        htmlFor="slug"
+                        className="text-xs text-muted-foreground"
+                      >
+                        Slug (URL)
+                      </Label>
+                      <Input
+                        id="slug"
+                        value={form.slug}
+                        onChange={(e) => update("slug", e.target.value)}
+                        placeholder="ex: sofia-miguel"
+                      />
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-            <Separator />
-
-            {/* ── Envelope editor ── */}
-            <Accordion defaultValue={[]} className="w-full">
+              {/* ── Envelope editor ── */}
               <AccordionItem
                 value="envelope"
                 className="border rounded-lg px-4"
@@ -804,6 +782,43 @@ export default function ExternalInvitationForm({
                   Personalizar capa
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-4">
+                  {/* Theme */}
+                  <div className="space-y-1.5">
+                    <Label>Tema</Label>
+                    <Select
+                      value={form.themeId}
+                      onValueChange={(val) => {
+                        const t = themes.find((th) => th.id === val);
+                        if (t) {
+                          setForm((prev) => ({
+                            ...prev,
+                            themeId: t.id,
+                            template: t.name,
+                          }));
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleciona um tema" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {themes.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full border"
+                                style={{ backgroundColor: t.envelope.base }}
+                              />
+                              {t.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Separator />
+
                   {/* Base color */}
                   <div className="space-y-1.5">
                     <Label>Cor de fundo</Label>
@@ -903,9 +918,8 @@ export default function ExternalInvitationForm({
                   <div className="space-y-1.5">
                     <Label>Cor do browser</Label>
                     <p className="text-xs text-muted-foreground">
-                      Cor usada pela barra do browser em mobile. Deixe em
-                      branco para combinar automaticamente com a capa do
-                      envelope.
+                      Cor usada pela barra do browser em mobile. Deixe em branco
+                      para combinar automaticamente com a capa do envelope.
                     </p>
                     <div className="flex items-center gap-2">
                       <input
@@ -1005,91 +1019,198 @@ export default function ExternalInvitationForm({
                   </div>
                 </AccordionContent>
               </AccordionItem>
-            </Accordion>
 
-            <Separator />
+              {/* ── Video upload (conditional) ── */}
+              {subType === "external_video" && (
+                <AccordionItem value="video" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-sm font-medium">
+                    Vídeo
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-1.5 pb-4">
+                    <p className="text-xs text-muted-foreground">
+                      Abre em ecrã completo com reprodução automática, sem
+                      controlos
+                    </p>
+                    <MediaUpload
+                      kind="video"
+                      maxSizeMB={500}
+                      value={form.videoUrl}
+                      onUpload={(url, meta) => {
+                        update("videoUrl", url);
+                        // The server-side ffmpeg job returns a poster URL on
+                        // success. Persist it so the public renderer can show
+                        // it as the <video> poster instead of a static asset.
+                        update("videoPoster", meta?.posterUrl ?? "");
+                      }}
+                      onClear={() => {
+                        update("videoUrl", "");
+                        update("videoPoster", "");
+                      }}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
-            {/* ── Video upload (conditional) ── */}
-            {subType === "external_video" && (
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Vídeo</Label>
-                <p className="text-xs text-muted-foreground">
-                  Abre em ecrã completo com reprodução automática, sem controlos
-                </p>
-                <MediaUpload
-                  kind="video"
-                  maxSizeMB={500}
-                  value={form.videoUrl}
-                  onUpload={(url, meta) => {
-                    update("videoUrl", url);
-                    // The server-side ffmpeg job returns a poster URL on
-                    // success. Persist it so the public renderer can show
-                    // it as the <video> poster instead of a static asset.
-                    update("videoPoster", meta?.posterUrl ?? "");
-                  }}
-                  onClear={() => {
-                    update("videoUrl", "");
-                    update("videoPoster", "");
-                  }}
-                />
-              </div>
-            )}
+              {/* ── External link (conditional) ── */}
+              {subType === "external_link" && (
+                <AccordionItem
+                  value="externalLink"
+                  className="border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="text-sm font-medium">
+                    Link externo
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-1.5 pb-4">
+                    <p className="text-xs text-muted-foreground">
+                      O site externo será incorporado em ecrã completo após a
+                      abertura da capa
+                    </p>
+                    <Input
+                      id="externalLink"
+                      type="url"
+                      value={form.externalLink ?? ""}
+                      onChange={(e) => update("externalLink", e.target.value)}
+                      placeholder="https://..."
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
-            {/* ── External link (conditional) ── */}
-            {subType === "external_link" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="externalLink" className="text-sm font-medium">
-                  Link externo
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  O site externo será incorporado em ecrã completo após a
-                  abertura da capa
-                </p>
-                <Input
-                  id="externalLink"
-                  type="url"
-                  value={form.externalLink ?? ""}
-                  onChange={(e) => update("externalLink", e.target.value)}
-                  placeholder="https://..."
-                />
-              </div>
-            )}
+              {/* ── Rich sections for external_link ── */}
+              {/* Optional Hero, ScratchDateReveal, and inline RSVP sections
+                  composed around the embedded iframe. When all toggles are off
+                  (and no heroImage / videoUrl is set) the public page renders
+                  the bare fullscreen iframe behavior. */}
+              {subType === "external_link" && (
+                <AccordionItem
+                  value="externalLinkRich"
+                  className="border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="text-sm font-medium">
+                    Conteúdo da página
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-5 pb-4">
+                    {/* HERO SUBSECTION */}
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium">Hero</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Aparece no topo da página, antes do convite externo.
+                          Deixa imagem e vídeo em branco para ocultar.
+                        </p>
+                      </div>
 
-            {/* ── Curtain-Canva extra fields ── */}
-            {/* Visible only when the chosen theme uses the curtain-canva
-                layout. These fields are required by the CurtainCanvaPage
-                renderer (date for the scratch reveal, quote for the hero,
-                rsvp.enabled to show the inline RSVP form). */}
-            {isCurtainCanva && (
-              <>
-                <Separator />
-                <Accordion defaultValue={["curtainCanva"]} className="w-full">
-                  <AccordionItem
-                    value="curtainCanva"
-                    className="border rounded-lg px-4"
-                  >
-                    <AccordionTrigger className="text-sm font-medium">
-                      Detalhes do convite (Curtain &amp; Canva)
-                    </AccordionTrigger>
-                    <AccordionContent className="space-y-5 pb-4">
+                      {/* heroImage */}
+                      <div className="space-y-1.5">
+                        <Label>Imagem do hero</Label>
+                        <MediaUpload
+                          kind="image"
+                          maxSizeMB={5}
+                          value={form.heroImage || undefined}
+                          onUpload={(url) => update("heroImage", url)}
+                          onClear={() => update("heroImage", "")}
+                        />
+                        {form.heroImage && (
+                          <ImagePositionEditor
+                            src={form.heroImage}
+                            settings={imgSettings("heroImage")}
+                            onChange={(s) =>
+                              updateImageSettings("heroImage", s)
+                            }
+                          />
+                        )}
+                        <div className="space-y-1.5 pt-2">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="ellHeroHeight">
+                              Altura do hero
+                            </Label>
+                            <span className="text-xs text-muted-foreground tabular-nums">
+                              {form.heroHeight ?? DEFAULT_HERO_HEIGHT}px
+                            </span>
+                          </div>
+                          <input
+                            id="ellHeroHeight"
+                            type="range"
+                            min={MIN_HERO_HEIGHT}
+                            max={MAX_HERO_HEIGHT}
+                            step={HERO_HEIGHT_STEP}
+                            value={form.heroHeight ?? DEFAULT_HERO_HEIGHT}
+                            onChange={(e) =>
+                              update("heroHeight", parseInt(e.target.value, 10))
+                            }
+                            className="w-full accent-foreground cursor-pointer"
+                          />
+                        </div>
+                      </div>
+
+                      {/* videoUrl */}
+                      <div className="space-y-1.5">
+                        <Label>Vídeo do hero (opcional)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Quando definido, substitui a imagem do hero por um
+                          vídeo de fundo a 100% da altura.
+                        </p>
+                        <MediaUpload
+                          kind="video"
+                          maxSizeMB={100}
+                          value={form.videoUrl || undefined}
+                          onUpload={(url, meta) => {
+                            update("videoUrl", url);
+                            update("videoPoster", meta?.posterUrl ?? undefined);
+                          }}
+                          onClear={() => {
+                            update("videoUrl", "");
+                            update("videoPoster", "");
+                          }}
+                        />
+                      </div>
+
+                      {/* Monogram */}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="ellMonogram">Monograma</Label>
+                        <Input
+                          id="ellMonogram"
+                          value={form.couple.monogram}
+                          onChange={(e) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              couple: {
+                                ...prev.couple,
+                                monogram: e.target.value,
+                              },
+                            }))
+                          }
+                          placeholder="A & B"
+                        />
+                      </div>
+
+                      {/* Quote */}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="ellQuote">Frase / citação</Label>
+                        <Input
+                          id="ellQuote"
+                          value={form.quote}
+                          onChange={(e) => update("quote", e.target.value)}
+                          placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                        />
+                      </div>
+
                       {/* Date */}
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">Data</Label>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-1.5">
                             <Label
-                              htmlFor="ccDateIso"
+                              htmlFor="ellDateIso"
                               className="text-xs text-muted-foreground"
                             >
                               Data
                             </Label>
                             <Input
-                              id="ccDateIso"
+                              id="ellDateIso"
                               type="date"
                               value={
-                                form.date.iso
-                                  ? form.date.iso.split("T")[0]
-                                  : ""
+                                form.date.iso ? form.date.iso.split("T")[0] : ""
                               }
                               onChange={(e) => {
                                 const val = e.target.value;
@@ -1102,13 +1223,13 @@ export default function ExternalInvitationForm({
                           </div>
                           <div className="space-y-1.5">
                             <Label
-                              htmlFor="ccTime"
+                              htmlFor="ellTime"
                               className="text-xs text-muted-foreground"
                             >
                               Hora
                             </Label>
                             <Input
-                              id="ccTime"
+                              id="ellTime"
                               value={form.date.time}
                               onChange={(e) =>
                                 updateDate("time", e.target.value)
@@ -1117,168 +1238,352 @@ export default function ExternalInvitationForm({
                             />
                           </div>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          A data de exibição, dia da semana, dia, mês e ano
-                          são derivados automaticamente.
-                        </p>
                       </div>
 
-                      <Separator />
-
-                       {/* Quote */}
-                       <div className="space-y-1.5">
-                         <Label
-                           htmlFor="ccQuote"
-                           className="text-sm font-medium"
-                         >
-                           Frase / citação
-                         </Label>
-                         <p className="text-xs text-muted-foreground">
-                           Aparece sob os nomes do casal no hero, depois das
-                           cortinas abrirem.
-                         </p>
-                         <Input
-                           id="ccQuote"
-                           value={form.quote}
-                           onChange={(e) => update("quote", e.target.value)}
-                           placeholder='ex: "O amor é paciente, o amor é bondoso."'
-                         />
-                       </div>
-
-                       {/* Invite message */}
-                       <div className="space-y-1.5">
-                         <Label
-                           htmlFor="ccInviteMessage"
-                           className="text-sm font-medium"
-                         >
-                           Mensagem de convite
-                         </Label>
-                         <p className="text-xs text-muted-foreground">
-                           Aparece sob os nomes do casal no hero, após a frase.
-                         </p>
-                         <Input
-                           id="ccInviteMessage"
-                           value={form.parents?.inviteMessage ?? ""}
-                           onChange={(e) =>
-                             updateParents("inviteMessage", e.target.value)
-                           }
-                           placeholder="Convidamos para o nosso casamento"
-                         />
-                       </div>
-
-                       <Separator />
-
-                      {/* Curtain video */}
-                      <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">
-                          Vídeo das cortinas
-                        </Label>
-                        <p className="text-xs text-muted-foreground">
-                          Animação reproduzida quando o convidado toca para
-                          abrir. Se ficar vazio, usa o vídeo padrão.
-                        </p>
-                        <MediaUpload
-                          kind="video"
-                          maxSizeMB={500}
-                          value={form.videoUrl}
-                          onUpload={(url, meta) => {
-                            update("videoUrl", url);
-                            // First-frame poster auto-extracted by the
-                            // server. Used by CurtainsHero so iOS shows
-                            // the closed-curtain still while the video
-                            // loads, instead of a blank rectangle.
-                            update("videoPoster", meta?.posterUrl ?? "");
-                          }}
-                          onClear={() => {
-                            update("videoUrl", "");
-                            update("videoPoster", "");
-                          }}
-                        />
-                      </div>
-
-                      <Separator />
-
-                      {/* RSVP enabled */}
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="space-y-0.5">
-                          <Label>Ativar formulário de RSVP</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Quando ativo, o formulário aparece no fundo da
-                            página (sem modal). Os toggles de email e
-                            restrições alimentares acima continuam a aplicar-se.
-                          </p>
+                      {/* Parents block */}
+                      <div className="space-y-2 pt-2 border-t">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Bênção dos pais</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Aparece sobre o hero (mensagem de bênção + nomes
+                              dos pais + mensagem de convite).
+                            </p>
+                          </div>
+                          <Switch
+                            checked={form.parents?.enabled === true}
+                            onCheckedChange={(v) => updateParents("enabled", v)}
+                          />
                         </div>
-                        <Switch
-                          checked={form.rsvp.enabled === true}
-                          onCheckedChange={(v) => updateRsvp("enabled", v)}
-                        />
+                        {form.parents?.enabled && (
+                          <div className="space-y-2 pt-2">
+                            <Input
+                              placeholder="Mensagem de bênção"
+                              value={form.parents.blessingMessage ?? ""}
+                              onChange={(e) =>
+                                updateParents("blessingMessage", e.target.value)
+                              }
+                            />
+                            <Input
+                              placeholder="Mensagem de convite"
+                              value={form.parents.inviteMessage ?? ""}
+                              onChange={(e) =>
+                                updateParents("inviteMessage", e.target.value)
+                              }
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <Input
+                                placeholder="Pai da noiva"
+                                value={form.parents.bridesFather ?? ""}
+                                onChange={(e) =>
+                                  updateParents("bridesFather", e.target.value)
+                                }
+                              />
+                              <Input
+                                placeholder="Mãe da noiva"
+                                value={form.parents.bridesMother ?? ""}
+                                onChange={(e) =>
+                                  updateParents("bridesMother", e.target.value)
+                                }
+                              />
+                              <Input
+                                placeholder="Pai do noivo"
+                                value={form.parents.groomsFather ?? ""}
+                                onChange={(e) =>
+                                  updateParents("groomsFather", e.target.value)
+                                }
+                              />
+                              <Input
+                                placeholder="Mãe do noivo"
+                                value={form.parents.groomsMother ?? ""}
+                                onChange={(e) =>
+                                  updateParents("groomsMother", e.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </>
-            )}
+                    </div>
 
-            {showAudioControls && (
-              <>
-                <Separator />
-                <div className="space-y-3">
+                    <Separator />
+
+                    {/* SCRATCH REVEAL SUBSECTION */}
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Revelação da data (raspadinha)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Mostra moedas raspadinhas com dia / mês / ano entre o
+                          hero e o convite externo.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.scratchReveal?.enabled === true}
+                        onCheckedChange={updateScratchReveal}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* RSVP NOTE */}
+                    <p className="text-xs text-muted-foreground">
+                      O formulário de RSVP é controlado na secção
+                      &ldquo;Confirmação de presença&rdquo; abaixo e aparece no
+                      fundo da página.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
+              {/* ── Curtain-Canva extra fields ── */}
+              {/* Visible only when the chosen theme uses the curtain-canva
+                  layout. These fields are required by the CurtainCanvaPage
+                  renderer (date for the scratch reveal, quote for the hero,
+                  rsvp.enabled to show the inline RSVP form). */}
+              {isCurtainCanva && (
+                <AccordionItem
+                  value="curtainCanva"
+                  className="border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="text-sm font-medium">
+                    Detalhes do convite (Curtain &amp; Canva)
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-5 pb-4">
+                    {/* Date */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Data</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label
+                            htmlFor="ccDateIso"
+                            className="text-xs text-muted-foreground"
+                          >
+                            Data
+                          </Label>
+                          <Input
+                            id="ccDateIso"
+                            type="date"
+                            value={
+                              form.date.iso ? form.date.iso.split("T")[0] : ""
+                            }
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              updateDate(
+                                "iso",
+                                val ? `${val}T00:00:00.000Z` : "",
+                              );
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label
+                            htmlFor="ccTime"
+                            className="text-xs text-muted-foreground"
+                          >
+                            Hora
+                          </Label>
+                          <Input
+                            id="ccTime"
+                            value={form.date.time}
+                            onChange={(e) => updateDate("time", e.target.value)}
+                            placeholder="16:00"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        A data de exibição, dia da semana, dia, mês e ano são
+                        derivados automaticamente.
+                      </p>
+                    </div>
+
+                    <Separator />
+
+                    {/* Quote */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="ccQuote" className="text-sm font-medium">
+                        Frase / citação
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Aparece sob os nomes do casal no hero, depois das
+                        cortinas abrirem.
+                      </p>
+                      <Input
+                        id="ccQuote"
+                        value={form.quote}
+                        onChange={(e) => update("quote", e.target.value)}
+                        placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                      />
+                    </div>
+
+                    {/* Invite message */}
+                    <div className="space-y-1.5">
+                      <Label
+                        htmlFor="ccInviteMessage"
+                        className="text-sm font-medium"
+                      >
+                        Mensagem de convite
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Aparece sob os nomes do casal no hero, após a frase.
+                      </p>
+                      <Input
+                        id="ccInviteMessage"
+                        value={form.parents?.inviteMessage ?? ""}
+                        onChange={(e) =>
+                          updateParents("inviteMessage", e.target.value)
+                        }
+                        placeholder="Convidamos para o nosso casamento"
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* Curtain video */}
+                    <div className="space-y-1.5">
+                      <Label className="text-sm font-medium">
+                        Vídeo das cortinas
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Animação reproduzida quando o convidado toca para abrir.
+                        Se ficar vazio, usa o vídeo padrão.
+                      </p>
+                      <MediaUpload
+                        kind="video"
+                        maxSizeMB={500}
+                        value={form.videoUrl}
+                        onUpload={(url, meta) => {
+                          update("videoUrl", url);
+                          // First-frame poster auto-extracted by the
+                          // server. Used by CurtainsHero so iOS shows
+                          // the closed-curtain still while the video
+                          // loads, instead of a blank rectangle.
+                          update("videoPoster", meta?.posterUrl ?? "");
+                        }}
+                        onClear={() => {
+                          update("videoUrl", "");
+                          update("videoPoster", "");
+                        }}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
+              {/* ── Audio ── */}
+              {showAudioControls && (
+                <AccordionItem value="audio" className="border rounded-lg px-4">
+                  <AccordionTrigger className="text-sm font-medium">
+                    Áudio de fundo
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-3 pb-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Ativar áudio de fundo</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Toca em background depois do convidado abrir a capa,
+                          sem controlos visíveis.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.audio.enabled}
+                        onCheckedChange={(v) => updateAudio("enabled", v)}
+                      />
+                    </div>
+                    {form.audio.enabled && (
+                      <div className="space-y-3">
+                        <div className="space-y-1.5">
+                          <Label>Ficheiro de áudio</Label>
+                          <MediaUpload
+                            kind="audio"
+                            maxSizeMB={20}
+                            value={form.audio.src || undefined}
+                            onUpload={(url) => updateAudio("src", url)}
+                            onClear={() => updateAudio("src", "")}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label htmlFor="externalAudioArtist">Artista</Label>
+                            <Input
+                              id="externalAudioArtist"
+                              value={form.audio.artist}
+                              onChange={(e) =>
+                                updateAudio("artist", e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="externalAudioTitle">Título</Label>
+                            <Input
+                              id="externalAudioTitle"
+                              value={form.audio.title}
+                              onChange={(e) =>
+                                updateAudio("title", e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
+              {/* ── RSVP settings ── */}
+              <AccordionItem value="rsvp" className="border rounded-lg px-4">
+                <AccordionTrigger className="text-sm font-medium">
+                  Confirmação de presença
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pb-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="space-y-0.5">
-                      <Label>Áudio de fundo</Label>
+                      <Label>Ativar formulário de RSVP</Label>
                       <p className="text-xs text-muted-foreground">
-                        Toca em background depois do convidado abrir a capa, sem
-                        controlos visíveis.
+                        Quando ativo, o formulário aparece no fundo da página
+                        (Curtain-Canva e link externo com secções extra).
                       </p>
                     </div>
                     <Switch
-                      checked={form.audio.enabled}
-                      onCheckedChange={(v) => updateAudio("enabled", v)}
+                      checked={form.rsvp.enabled === true}
+                      onCheckedChange={(v) => updateRsvp("enabled", v)}
                     />
                   </div>
-                  {form.audio.enabled && (
-                    <div className="space-y-3">
-                      <div className="space-y-1.5">
-                        <Label>Ficheiro de áudio</Label>
-                        <MediaUpload
-                          kind="audio"
-                          maxSizeMB={20}
-                          value={form.audio.src || undefined}
-                          onUpload={(url) => updateAudio("src", url)}
-                          onClear={() => updateAudio("src", "")}
+                  {form.rsvp.enabled && (
+                    <>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Pedir email no RSVP</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, o formulário pede o email do
+                            convidado.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.showEmail === true}
+                          onCheckedChange={(v) => updateRsvp("showEmail", v)}
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <Label htmlFor="externalAudioArtist">Artista</Label>
-                          <Input
-                            id="externalAudioArtist"
-                            value={form.audio.artist}
-                            onChange={(e) =>
-                              updateAudio("artist", e.target.value)
-                            }
-                          />
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Pedir restrições alimentares no RSVP</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, o formulário pede as restrições
+                            alimentares do convidado.
+                          </p>
                         </div>
-                        <div className="space-y-1.5">
-                          <Label htmlFor="externalAudioTitle">Título</Label>
-                          <Input
-                            id="externalAudioTitle"
-                            value={form.audio.title}
-                            onChange={(e) =>
-                              updateAudio("title", e.target.value)
-                            }
-                          />
-                        </div>
+                        <Switch
+                          checked={form.rsvp.showDietaryRestrictions !== false}
+                          onCheckedChange={(v) =>
+                            updateRsvp("showDietaryRestrictions", v)
+                          }
+                        />
                       </div>
-                    </div>
+                    </>
                   )}
-                </div>
-              </>
-            )}
+                </AccordionContent>
+              </AccordionItem>
 
-            <Separator />
-
-            <Accordion defaultValue={[]} className="w-full">
+              {/* ── Social Preview ── */}
               <SocialPreviewSection
                 accordionValue="socialPreview"
                 value={form.socialPreview}
@@ -1390,6 +1695,25 @@ export default function ExternalInvitationForm({
                     Carrega um vídeo para ver a pré-visualização do convite
                   </div>
                 )
+              ) : subType === "external_link" &&
+                hasRichExternalSections(form) ? (
+                /* Rich external_link layout: render the actual public-facing
+                   page so admins see hero / scratch / iframe / RSVP composed
+                   exactly as guests will. InlineTextEditProvider wires up the
+                   TextStyleToolbar for per-element overrides. */
+                <InlineTextEditProvider
+                  updateTextStyleElement={updateTextStyleElement}
+                  textStyles={form.textStyles}
+                >
+                  <TextStyleToolbar />
+                  <div className="absolute inset-0 overflow-y-auto bg-background">
+                    <RichExternalLinkPage
+                      invitation={form}
+                      theme={currentTheme as TemplateTheme}
+                      isPreview
+                    />
+                  </div>
+                </InlineTextEditProvider>
               ) : form.externalLink ? (
                 <iframe
                   src={externalEmbedSrc}
