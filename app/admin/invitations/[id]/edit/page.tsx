@@ -2,18 +2,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getThemes } from "@/lib/themes";
-import type {
-  InvitationData,
-  InvitationEventType,
-  InvitationType,
-  ImageSettingsMap,
-  ParentsInfo,
-  SaveDateStyle,
-  SectionImages,
-  OurStory,
-  TextStyleOverrides,
-  CardStyleOverrides,
-} from "@/lib/types";
+import { toAdminInvitationInitialData } from "@/lib/invitation-admin-initial-data";
 import InvitationForm from "../../InvitationForm";
 import ExternalInvitationForm from "../../ExternalInvitationForm";
 
@@ -43,50 +32,7 @@ export default async function EditInvitationPage({
   const proto = headersList.get("x-forwarded-proto") ?? "http";
   const ownerUrl = `${proto}://${host}/confirmacoes/${row.ownerToken}`;
 
-  // Convert Prisma row to InvitationData shape for the form
-  const initialData: InvitationData & { id: string } = {
-    id: row.id,
-    slug: row.slug,
-    themeId: row.themeId,
-    template: row.theme.name,
-    couple: row.couple as unknown as InvitationData["couple"],
-    date: row.date as unknown as InvitationData["date"],
-    quote: row.quote,
-    location: row.location as unknown as InvitationData["location"],
-    location2:
-      (row.location2 as unknown as InvitationData["location2"]) ?? undefined,
-    rsvp: row.rsvp as unknown as InvitationData["rsvp"],
-    schedule: row.schedule as unknown as InvitationData["schedule"],
-    dressCode: row.dressCode as unknown as InvitationData["dressCode"],
-    giftRegistry: row.giftRegistry as unknown as InvitationData["giftRegistry"],
-    audio: row.audio as unknown as InvitationData["audio"],
-    heroImage: row.heroImage,
-    videoUrl: row.videoUrl ?? undefined,
-    videoPoster: row.videoPoster ?? undefined,
-    faqs: (row.faqs as unknown as InvitationData["faqs"]) ?? undefined,
-    envelope:
-      (row.envelope as unknown as InvitationData["envelope"]) ?? undefined,
-    guestGuide:
-      (row.guestGuide as unknown as InvitationData["guestGuide"]) ?? undefined,
-    saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
-    cinematicImageUrl: row.cinematicImageUrl ?? undefined,
-    sectionImages:
-      (row.sectionImages as unknown as SectionImages | null) ?? undefined,
-    parents: (row.parents as unknown as ParentsInfo | null) ?? undefined,
-    ourStory: (row.ourStory as unknown as OurStory | null) ?? undefined,
-    textStyles:
-      (row.textStyles as unknown as TextStyleOverrides | null) ?? undefined,
-    cardStyles:
-      (row.cardStyles as unknown as CardStyleOverrides | null) ?? undefined,
-    imageSettings:
-      (row.imageSettings as unknown as ImageSettingsMap | null) ?? undefined,
-    eventType: (row.eventType as InvitationEventType | null) ?? "wedding",
-    invitationType: (row.invitationType as InvitationType) ?? "standard",
-    externalLink: row.externalLink ?? undefined,
-    socialPreview:
-      (row.socialPreview as unknown as InvitationData["socialPreview"]) ??
-      undefined,
-  };
+  const initialData = toAdminInvitationInitialData(row);
 
   const isExternal =
     initialData.invitationType === "external_video" ||
