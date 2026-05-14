@@ -1,13 +1,13 @@
 "use client";
 
-import type { MutableRefObject, RefObject } from "react";
+import { useEffect, type MutableRefObject, type RefObject } from "react";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 
 import InvitationHero, { InvitationHeroNames } from "./InvitationHero";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
+import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import RSVPForm from "./RSVPForm";
 import { EditableText } from "./EditableText";
 
@@ -45,6 +45,18 @@ export default function RichExternalLinkPage({
   const rsvpOn = Boolean(invitation.rsvp?.enabled);
   const externalLink = invitation.externalLink ?? "";
 
+  // The envelope cover flips this component into the DOM only after the
+  // user opens the invite. Pin the viewport to the top so the user lands
+  // on the hero, not somewhere inside the iframe. (Without this, browser
+  // scroll-anchoring on the loading iframe can yank the page down as it
+  // grows.) Skipped in the admin preview, which lives in a scroll-
+  // contained pane.
+  useEffect(() => {
+    if (isPreview) return;
+    if (typeof window === "undefined") return;
+    window.scrollTo(0, 0);
+  }, [isPreview]);
+
   return (
     <main
       style={{
@@ -79,22 +91,11 @@ export default function RichExternalLinkPage({
       )}
 
       {externalLink && (
-        <section
-          aria-label="Convite"
-          style={{ height: "100dvh", width: "100%" }}
-        >
-          <iframe
-            src={getExternalInvitationEmbedSrc(externalLink)}
-            title="Convite"
-            style={{
-              width: "100%",
-              height: "100%",
-              border: 0,
-              display: "block",
-            }}
-            allow="autoplay; encrypted-media; fullscreen"
-          />
-        </section>
+        <CanvaEmbed
+          externalLink={externalLink}
+          theme={theme}
+          title="Convite"
+        />
       )}
 
       {rsvpOn && (
