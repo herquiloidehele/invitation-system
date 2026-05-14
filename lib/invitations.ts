@@ -45,6 +45,7 @@ type InvitationWithTheme = {
   sectionImages: unknown;
   parents: unknown;
   ourStory: unknown;
+  scratchReveal: unknown;
   invitationType: string;
   externalLink: string | null;
   textStyles: unknown;
@@ -84,6 +85,9 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
+    scratchReveal:
+      (row.scratchReveal as InvitationData["scratchReveal"] | null) ??
+      undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
