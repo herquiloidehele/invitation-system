@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, useCallback, useRef } from "react";
+import { type CSSProperties, useCallback, useMemo, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type {
   CustomTexts,
@@ -11,6 +11,7 @@ import type {
 import { t } from "@/lib/custom-texts";
 import {
   resolveCelebrationPalette,
+  resolveCoinGlitterPalette,
   resolveTextElementOverride,
   shortMonthName,
 } from "@/lib/curtain-canva";
@@ -114,6 +115,15 @@ export default function ScratchDateReveal({
   // mobile (≈ width / 4 each, capped at 96px desktop).
   const coinSize = "clamp(72px, 22vw, 96px)";
 
+  // Theme-derived glitter palette so each invitation's coins match its
+  // accent/decorative colors instead of always rendering as gold. Memoized
+  // because ScratchCoin's texture-painting effect depends on the array
+  // identity — a new reference every render would repaint on every render.
+  const glitterColors = useMemo(
+    () => resolveCoinGlitterPalette(theme),
+    [theme],
+  );
+
   return (
     <motion.section
       id="date"
@@ -175,6 +185,7 @@ export default function ScratchDateReveal({
           subLabel={t(customTexts, "saveDate_dayLabel")}
           subLabelOverride={labelsOverride}
           theme={theme}
+          glitterColors={glitterColors}
           onRevealed={() => handleCoinRevealed("day")}
         />
         <CoinWithLabel
@@ -187,6 +198,7 @@ export default function ScratchDateReveal({
           subLabel={t(customTexts, "saveDate_monthLabel")}
           subLabelOverride={labelsOverride}
           theme={theme}
+          glitterColors={glitterColors}
           onRevealed={() => handleCoinRevealed("month")}
         />
         <CoinWithLabel
@@ -199,6 +211,7 @@ export default function ScratchDateReveal({
           subLabel={t(customTexts, "saveDate_yearLabel")}
           subLabelOverride={labelsOverride}
           theme={theme}
+          glitterColors={glitterColors}
           onRevealed={() => handleCoinRevealed("year")}
         />
       </div>
@@ -216,6 +229,7 @@ function CoinWithLabel({
   subLabel,
   subLabelOverride,
   theme,
+  glitterColors,
   onRevealed,
 }: {
   coinSize: string;
@@ -234,6 +248,12 @@ function CoinWithLabel({
   /** Admin override for the small `DIA` / `MÊS` / `ANO` labels under each coin. */
   subLabelOverride: TextStyle;
   theme: TemplateTheme;
+  /**
+   * Glitter palette painted onto the scratchable surface. Computed once by
+   * the parent (`ScratchDateReveal`) from the theme's accent/decorative
+   * colors so every coin shares the same memoized array reference.
+   */
+  glitterColors: string[];
   onRevealed?: () => void;
 }) {
   return (
@@ -243,6 +263,7 @@ function CoinWithLabel({
           size={undefined as unknown as number /* size driven by parent */}
           fillParent
           ariaLabel={ariaLabel}
+          glitterColors={glitterColors}
           revealedContent={
             <span style={{ ...contentStyle, ...contentOverride }}>
               <EditableText elementKey={contentElementKey}>

@@ -1,5 +1,6 @@
 import type { TemplateTheme, TextStyle, TextStyleOverrides } from "./types";
 import type { CSSProperties } from "react";
+import { GOLDEN_GLITTER_PALETTE } from "./scratch-texture";
 
 type CurtainElementKey = keyof NonNullable<TextStyleOverrides["elements"]>;
 
@@ -142,4 +143,96 @@ export function resolveCelebrationPalette(
   // Deduplicate while preserving order so the burst doesn't render the same
   // color twice when accent === decorativeColor.
   return Array.from(new Set(palette));
+}
+
+// ---------------------------------------------------------------------------
+// Coin glitter palette (ScratchDateReveal / ScratchCoin)
+// ---------------------------------------------------------------------------
+
+/**
+ * Parses a `#rgb` or `#rrggbb` hex string into RGB components. Returns null
+ * for any input that isn't a well-formed hex color so callers can fall back
+ * to a safe default instead of generating NaN-filled colors.
+ */
+function parseHexColor(input: string): { r: number; g: number; b: number } | null {
+  const m = input.trim().match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+  if (!m) return null;
+  let hex = m[1];
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  const num = parseInt(hex, 16);
+  return {
+    r: (num >> 16) & 0xff,
+    g: (num >> 8) & 0xff,
+    b: num & 0xff,
+  };
+}
+
+function toHex(n: number): string {
+  return Math.max(0, Math.min(255, Math.round(n)))
+    .toString(16)
+    .padStart(2, "0");
+}
+
+/**
+ * Returns a new hex color that is `amount` (0..1) of the way toward black
+ * (negative amount) or toward white (positive amount). Used to spread a
+ * single accent color into the multi-tone glitter palette so the coin
+ * material has enough internal variation to read as metallic.
+ */
+function shiftHexColor(hex: string, amount: number): string | null {
+  const rgb = parseHexColor(hex);
+  if (!rgb) return null;
+  const target = amount >= 0 ? 255 : 0;
+  const a = Math.abs(amount);
+  const r = rgb.r + (target - rgb.r) * a;
+  const g = rgb.g + (target - rgb.g) * a;
+  const b = rgb.b + (target - rgb.b) * a;
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+/**
+ * Builds the glitter palette used by the scratch-off coins on the curtain-
+ * canva save-the-date. The shape mirrors `GOLDEN_GLITTER_PALETTE` (base,
+ * dark variant, light variant, pale variant, white highlight) so the
+ * existing `generateGlitterTexture` layering logic keeps producing a
+ * believable metallic surface — only the hue changes per theme.
+ *
+ * Falls back to the default gold palette when accent is missing or
+ * malformed so unset themes still render the original look.
+ */
+export function resolveCoinGlitterPalette(
+  theme:
+    | Pick<TemplateTheme, "accent" | "decorativeColor">
+    | { accent?: string; decorativeColor?: string },
+): string[] {
+  const accent = theme.accent?.trim();
+  const decorative = theme.decorativeColor?.trim();
+
+  if (!accent || !parseHexColor(accent)) {
+    return [...GOLDEN_GLITTER_PALETTE];
+  }
+
+  const base = accent.toUpperCase();
+  const dark = shiftHexColor(base, -0.18) ?? base;
+  const light = shiftHexColor(base, 0.22) ?? base;
+  const pale =
+    decorative && parseHexColor(decorative)
+      ? decorative.toUpperCase()
+      : shiftHexColor(base, 0.55) ?? base;
+
+  const palette = [base, dark, light, pale, "#FFFFFF"];
+  // Dedupe (case-insensitive) so the texture generator doesn't waste
+  // particles on identical colors when accent/decorative collide.
+  const seen = new Set<string>();
+  return palette.filter((c) => {
+    const key = c.toUpperCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
