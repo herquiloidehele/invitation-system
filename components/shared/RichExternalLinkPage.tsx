@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type MutableRefObject, type RefObject } from "react";
+import { type MutableRefObject, type RefObject, useEffect } from "react";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
@@ -90,13 +90,12 @@ export default function RichExternalLinkPage({
         />
       )}
 
-      {externalLink && (
-        <CanvaEmbed
-          externalLink={externalLink}
-          theme={theme}
-          title="Convite"
-        />
-      )}
+      <CanvaEmbed
+        externalLink={externalLink}
+        theme={theme}
+        title="Convite"
+        preloading={false}
+      />
 
       {rsvpOn && (
         <>
