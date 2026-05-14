@@ -1854,6 +1854,26 @@ export default function InvitationForm({
                     </div>
                   </div>
                   <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="mapZoom">Zoom do Mapa</Label>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {form.location.mapZoom ?? 17}
+                      </span>
+                    </div>
+                    <input
+                      id="mapZoom"
+                      type="range"
+                      min={1}
+                      max={20}
+                      step={1}
+                      value={form.location.mapZoom ?? 17}
+                      onChange={(e) =>
+                        updateLocation("mapZoom", parseInt(e.target.value, 10))
+                      }
+                      className="w-full accent-foreground cursor-pointer"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
                     <Label>Imagem do Local</Label>
                     <MediaUpload
                       kind="image"
@@ -2022,6 +2042,29 @@ export default function InvitationForm({
                             }
                           />
                         </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="mapZoom2">Zoom do Mapa</Label>
+                          <span className="text-xs text-muted-foreground tabular-nums">
+                            {form.location2.mapZoom ?? 17}
+                          </span>
+                        </div>
+                        <input
+                          id="mapZoom2"
+                          type="range"
+                          min={1}
+                          max={20}
+                          step={1}
+                          value={form.location2.mapZoom ?? 17}
+                          onChange={(e) =>
+                            updateLocation2(
+                              "mapZoom",
+                              parseInt(e.target.value, 10),
+                            )
+                          }
+                          className="w-full accent-foreground cursor-pointer"
+                        />
                       </div>
                       <div className="space-y-1.5">
                         <Label>Imagem do Local</Label>

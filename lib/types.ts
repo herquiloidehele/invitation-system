@@ -44,6 +44,7 @@ export interface LocationInfo {
   latitude?: number;
   longitude?: number;
   imageUrl?: string;
+  mapZoom?: number;
 }
 
 export interface ScheduleEvent {

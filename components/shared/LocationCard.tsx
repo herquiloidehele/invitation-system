@@ -202,6 +202,7 @@ export default function LocationCard({
                   longitude={location.longitude!}
                   theme={theme}
                   venueName={location.name}
+                  zoom={location.mapZoom}
                 />
               </Suspense>
             </ErrorBoundary>

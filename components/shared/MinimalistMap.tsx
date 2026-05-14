@@ -67,6 +67,7 @@ interface MinimalistMapProps {
   theme: TemplateTheme;
   venueName?: string;
   className?: string;
+  zoom?: number;
 }
 
 export default function MinimalistMap({
@@ -75,6 +76,7 @@ export default function MinimalistMap({
   theme,
   venueName,
   className = "",
+  zoom = 17,
 }: MinimalistMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -84,7 +86,7 @@ export default function MinimalistMap({
 
     const map = L.map(containerRef.current, {
       center: [latitude, longitude],
-      zoom: 17,
+      zoom,
       zoomControl: false,
       attributionControl: true,
       dragging: false,
@@ -104,7 +106,10 @@ export default function MinimalistMap({
 
     // Custom pin marker using theme primary color
     const icon = createPinIcon(theme.secondary);
-    const marker = L.marker([latitude, longitude], { icon, interactive: false }).addTo(map);
+    const marker = L.marker([latitude, longitude], {
+      icon,
+      interactive: false,
+    }).addTo(map);
 
     // Popup with venue name
     if (venueName) {
@@ -115,7 +120,9 @@ export default function MinimalistMap({
         autoPan: false,
       })
         .setLatLng([latitude, longitude])
-        .setContent(`<span style="font-weight:600;font-size:12px;white-space:nowrap;">${venueName}</span>`);
+        .setContent(
+          `<span style="font-weight:600;font-size:12px;white-space:nowrap;">${venueName}</span>`,
+        );
       popup.openOn(map);
       void marker; // suppress unused warning
     }
@@ -127,7 +134,7 @@ export default function MinimalistMap({
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latitude, longitude, theme.name, venueName]);
+  }, [latitude, longitude, theme.name, venueName, zoom]);
 
   return (
     <>
