@@ -477,6 +477,8 @@ export interface InvitationData {
   parents?: ParentsInfo;
   /** Optional "Nossa História" section — the couple's story. */
   ourStory?: OurStory;
+  /** Toggles the ScratchDateReveal section on external_link invitation pages. */
+  scratchReveal?: { enabled: boolean };
   /** Per-invitation text style overrides (fonts, colors, sizes). Missing fields fall back to theme defaults. */
   textStyles?: TextStyleOverrides;
   /** Per-section card background/border overrides. Missing keys fall back to theme.cardBg / theme.cardBorder. */

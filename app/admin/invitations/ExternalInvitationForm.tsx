@@ -20,7 +20,10 @@ import type {
   EnvelopeConfig,
   TextStyle,
   TextStyleOverrides,
+  ImageSettings,
+  ImageSettingsKey,
 } from "@/lib/types";
+import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import {
   buildInvitationMonogram,
   buildInvitationSlug,
@@ -55,6 +58,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
+import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
@@ -62,10 +66,12 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
+import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import {
   getExternalInvitationEmbedSrc,
   getExternalInvitationPublicHref,
+  hasRichExternalSections,
   shouldShowExternalInvitationAudioControls,
 } from "@/lib/external-invitation-form";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
@@ -88,6 +94,11 @@ const EVENT_TYPE_OPTIONS: {
 function colorPickerValue(value: string | undefined, fallback: string): string {
   return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
 }
+
+const DEFAULT_HERO_HEIGHT = 300;
+const MIN_HERO_HEIGHT = 200;
+const MAX_HERO_HEIGHT = 700;
+const HERO_HEIGHT_STEP = 10;
 
 // ---------------------------------------------------------------------------
 // Default state
@@ -125,6 +136,7 @@ function getDefaultState(
     giftRegistry: { enabled: false, text: "" },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
+    heroHeight: DEFAULT_HERO_HEIGHT,
     videoUrl: "",
     videoPoster: "",
     invitationType: invType,
@@ -132,6 +144,8 @@ function getDefaultState(
     saveDateStyle: "classic",
     envelope: {},
     parents: { enabled: false, inviteMessage: "", blessingMessage: "", bridesFather: "", bridesMother: "", groomsFather: "", groomsMother: "" },
+    scratchReveal: { enabled: false },
+    imageSettings: {},
   };
 }
 
@@ -385,6 +399,28 @@ export default function ExternalInvitationForm({
     [],
   );
 
+  const updateScratchReveal = useCallback((enabled: boolean) => {
+    setForm((prev) => ({ ...prev, scratchReveal: { enabled } }));
+  }, []);
+
+  // Image position/zoom settings — used by ImagePositionEditor for the hero
+  // image in rich external_link invitations.
+  const updateImageSettings = useCallback(
+    (key: ImageSettingsKey, settings: ImageSettings) => {
+      setForm((prev) => ({
+        ...prev,
+        imageSettings: { ...prev.imageSettings, [key]: settings },
+      }));
+    },
+    [],
+  );
+
+  const imgSettings = useCallback(
+    (key: ImageSettingsKey): ImageSettings =>
+      form.imageSettings?.[key] ?? DEFAULT_IMAGE_SETTINGS,
+    [form.imageSettings],
+  );
+
   // Date editor helper — only used by the curtain-canva accordion.
   // When the user picks an ISO date, derive display/dayOfWeek/day/month/year
   // (in pt-PT) so the renderer has every field it needs.
@@ -627,31 +663,48 @@ export default function ExternalInvitationForm({
               </Label>
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
-                  <Label>Pedir email no RSVP</Label>
+                  <Label>Ativar formulário de RSVP</Label>
                   <p className="text-xs text-muted-foreground">
-                    Quando ativo, o formulário pede o email do convidado.
+                    Quando ativo, o formulário aparece no fundo da página
+                    (Curtain-Canva e link externo com secções extra).
                   </p>
                 </div>
                 <Switch
-                  checked={form.rsvp.showEmail === true}
-                  onCheckedChange={(v) => updateRsvp("showEmail", v)}
+                  checked={form.rsvp.enabled === true}
+                  onCheckedChange={(v) => updateRsvp("enabled", v)}
                 />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-0.5">
-                  <Label>Pedir restrições alimentares no RSVP</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Quando ativo, o formulário pede as restrições alimentares do
-                    convidado.
-                  </p>
-                </div>
-                <Switch
-                  checked={form.rsvp.showDietaryRestrictions !== false}
-                  onCheckedChange={(v) =>
-                    updateRsvp("showDietaryRestrictions", v)
-                  }
-                />
-              </div>
+              {form.rsvp.enabled && (
+                <>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label>Pedir email no RSVP</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Quando ativo, o formulário pede o email do convidado.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.rsvp.showEmail === true}
+                      onCheckedChange={(v) => updateRsvp("showEmail", v)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label>Pedir restrições alimentares no RSVP</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Quando ativo, o formulário pede as restrições
+                        alimentares do convidado.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.rsvp.showDietaryRestrictions !== false}
+                      onCheckedChange={(v) =>
+                        updateRsvp("showDietaryRestrictions", v)
+                      }
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <Separator />
@@ -1055,6 +1108,296 @@ export default function ExternalInvitationForm({
               </div>
             )}
 
+            {/* ── Rich sections for external_link ── */}
+            {/* Optional Hero, ScratchDateReveal, and inline RSVP sections
+                composed around the embedded iframe. When all toggles are off
+                (and no heroImage / videoUrl is set) the public page renders
+                the bare fullscreen iframe behavior. */}
+            {subType === "external_link" && (
+              <>
+                <Separator />
+                <Accordion defaultValue={[]} className="w-full">
+                  <AccordionItem
+                    value="externalLinkRich"
+                    className="border rounded-lg px-4"
+                  >
+                    <AccordionTrigger className="text-sm font-medium">
+                      Conteúdo da página
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-5 pb-4">
+                      {/* HERO SUBSECTION */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-sm font-medium">Hero</h4>
+                          <p className="text-xs text-muted-foreground">
+                            Aparece no topo da página, antes do convite
+                            externo. Deixa imagem e vídeo em branco para
+                            ocultar.
+                          </p>
+                        </div>
+
+                        {/* heroImage */}
+                        <div className="space-y-1.5">
+                          <Label>Imagem do hero</Label>
+                          <MediaUpload
+                            kind="image"
+                            maxSizeMB={5}
+                            value={form.heroImage || undefined}
+                            onUpload={(url) => update("heroImage", url)}
+                            onClear={() => update("heroImage", "")}
+                          />
+                          {form.heroImage && (
+                            <ImagePositionEditor
+                              src={form.heroImage}
+                              settings={imgSettings("heroImage")}
+                              onChange={(s) =>
+                                updateImageSettings("heroImage", s)
+                              }
+                            />
+                          )}
+                          <div className="space-y-1.5 pt-2">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="ellHeroHeight">
+                                Altura do hero
+                              </Label>
+                              <span className="text-xs text-muted-foreground tabular-nums">
+                                {form.heroHeight ?? DEFAULT_HERO_HEIGHT}px
+                              </span>
+                            </div>
+                            <input
+                              id="ellHeroHeight"
+                              type="range"
+                              min={MIN_HERO_HEIGHT}
+                              max={MAX_HERO_HEIGHT}
+                              step={HERO_HEIGHT_STEP}
+                              value={form.heroHeight ?? DEFAULT_HERO_HEIGHT}
+                              onChange={(e) =>
+                                update(
+                                  "heroHeight",
+                                  parseInt(e.target.value, 10),
+                                )
+                              }
+                              className="w-full accent-foreground cursor-pointer"
+                            />
+                          </div>
+                        </div>
+
+                        {/* videoUrl */}
+                        <div className="space-y-1.5">
+                          <Label>Vídeo do hero (opcional)</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando definido, substitui a imagem do hero por um
+                            vídeo de fundo a 100% da altura.
+                          </p>
+                          <MediaUpload
+                            kind="video"
+                            maxSizeMB={100}
+                            value={form.videoUrl || undefined}
+                            onUpload={(url, meta) => {
+                              update("videoUrl", url);
+                              update(
+                                "videoPoster",
+                                meta?.posterUrl ?? undefined,
+                              );
+                            }}
+                            onClear={() => {
+                              update("videoUrl", "");
+                              update("videoPoster", "");
+                            }}
+                          />
+                        </div>
+
+                        {/* Monogram */}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="ellMonogram">Monograma</Label>
+                          <Input
+                            id="ellMonogram"
+                            value={form.couple.monogram}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                couple: {
+                                  ...prev.couple,
+                                  monogram: e.target.value,
+                                },
+                              }))
+                            }
+                            placeholder="A & B"
+                          />
+                        </div>
+
+                        {/* Quote */}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="ellQuote">Frase / citação</Label>
+                          <Input
+                            id="ellQuote"
+                            value={form.quote}
+                            onChange={(e) => update("quote", e.target.value)}
+                            placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                          />
+                        </div>
+
+                        {/* Date */}
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">Data</Label>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label
+                                htmlFor="ellDateIso"
+                                className="text-xs text-muted-foreground"
+                              >
+                                Data
+                              </Label>
+                              <Input
+                                id="ellDateIso"
+                                type="date"
+                                value={
+                                  form.date.iso
+                                    ? form.date.iso.split("T")[0]
+                                    : ""
+                                }
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  updateDate(
+                                    "iso",
+                                    val ? `${val}T00:00:00.000Z` : "",
+                                  );
+                                }}
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label
+                                htmlFor="ellTime"
+                                className="text-xs text-muted-foreground"
+                              >
+                                Hora
+                              </Label>
+                              <Input
+                                id="ellTime"
+                                value={form.date.time}
+                                onChange={(e) =>
+                                  updateDate("time", e.target.value)
+                                }
+                                placeholder="16:00"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Parents block */}
+                        <div className="space-y-2 pt-2 border-t">
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="space-y-0.5">
+                              <Label>Bênção dos pais</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Aparece sobre o hero (mensagem de bênção + nomes
+                                dos pais + mensagem de convite).
+                              </p>
+                            </div>
+                            <Switch
+                              checked={form.parents?.enabled === true}
+                              onCheckedChange={(v) =>
+                                updateParents("enabled", v)
+                              }
+                            />
+                          </div>
+                          {form.parents?.enabled && (
+                            <div className="space-y-2 pt-2">
+                              <Input
+                                placeholder="Mensagem de bênção"
+                                value={form.parents.blessingMessage ?? ""}
+                                onChange={(e) =>
+                                  updateParents(
+                                    "blessingMessage",
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                              <Input
+                                placeholder="Mensagem de convite"
+                                value={form.parents.inviteMessage ?? ""}
+                                onChange={(e) =>
+                                  updateParents("inviteMessage", e.target.value)
+                                }
+                              />
+                              <div className="grid grid-cols-2 gap-2">
+                                <Input
+                                  placeholder="Pai da noiva"
+                                  value={form.parents.bridesFather ?? ""}
+                                  onChange={(e) =>
+                                    updateParents(
+                                      "bridesFather",
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                                <Input
+                                  placeholder="Mãe da noiva"
+                                  value={form.parents.bridesMother ?? ""}
+                                  onChange={(e) =>
+                                    updateParents(
+                                      "bridesMother",
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                                <Input
+                                  placeholder="Pai do noivo"
+                                  value={form.parents.groomsFather ?? ""}
+                                  onChange={(e) =>
+                                    updateParents(
+                                      "groomsFather",
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                                <Input
+                                  placeholder="Mãe do noivo"
+                                  value={form.parents.groomsMother ?? ""}
+                                  onChange={(e) =>
+                                    updateParents(
+                                      "groomsMother",
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* SCRATCH REVEAL SUBSECTION */}
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Revelação da data (raspadinha)</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Mostra moedas raspadinhas com dia / mês / ano entre
+                            o hero e o convite externo.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.scratchReveal?.enabled === true}
+                          onCheckedChange={updateScratchReveal}
+                        />
+                      </div>
+
+                      <Separator />
+
+                      {/* RSVP NOTE */}
+                      <p className="text-xs text-muted-foreground">
+                        O formulário de RSVP é controlado na secção
+                        &ldquo;Confirmação de presença&rdquo; acima e aparece
+                        no fundo da página.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </>
+            )}
+
             {/* ── Curtain-Canva extra fields ── */}
             {/* Visible only when the chosen theme uses the curtain-canva
                 layout. These fields are required by the CurtainCanvaPage
@@ -1196,23 +1539,6 @@ export default function ExternalInvitationForm({
                         />
                       </div>
 
-                      <Separator />
-
-                      {/* RSVP enabled */}
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="space-y-0.5">
-                          <Label>Ativar formulário de RSVP</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Quando ativo, o formulário aparece no fundo da
-                            página (sem modal). Os toggles de email e
-                            restrições alimentares acima continuam a aplicar-se.
-                          </p>
-                        </div>
-                        <Switch
-                          checked={form.rsvp.enabled === true}
-                          onCheckedChange={(v) => updateRsvp("enabled", v)}
-                        />
-                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
@@ -1390,6 +1716,25 @@ export default function ExternalInvitationForm({
                     Carrega um vídeo para ver a pré-visualização do convite
                   </div>
                 )
+              ) : subType === "external_link" &&
+                hasRichExternalSections(form) ? (
+                /* Rich external_link layout: render the actual public-facing
+                   page so admins see hero / scratch / iframe / RSVP composed
+                   exactly as guests will. InlineTextEditProvider wires up the
+                   TextStyleToolbar for per-element overrides. */
+                <InlineTextEditProvider
+                  updateTextStyleElement={updateTextStyleElement}
+                  textStyles={form.textStyles}
+                >
+                  <TextStyleToolbar />
+                  <div className="absolute inset-0 overflow-y-auto bg-background">
+                    <RichExternalLinkPage
+                      invitation={form}
+                      theme={currentTheme as TemplateTheme}
+                      isPreview
+                    />
+                  </div>
+                </InlineTextEditProvider>
               ) : form.externalLink ? (
                 <iframe
                   src={externalEmbedSrc}
