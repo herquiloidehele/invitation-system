@@ -11,6 +11,8 @@ import {
   DM_Serif_Display,
   Pinyon_Script,
   Geist,
+  Manrope,
+  Fraunces,
 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -81,6 +83,19 @@ const pinyonScript = Pinyon_Script({
   variable: "--font-pinyon-script",
 });
 
+const manrope = Manrope({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-manrope",
+});
+
+const fraunces = Fraunces({
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+});
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -89,8 +104,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Brindel Studio — Convites Digitais",
-  description: "Convites de casamento interativos e memoráveis",
+  title: "Brindeal Studio — Convites Digitais",
+  description:
+    "Convites digitais elegantes, interactivos e personalizados para casamentos e celebrações em Portugal.",
 };
 
 // Build the S3 origin at startup for DNS preconnect (e.g. "https://bucket.s3.region.amazonaws.com")
@@ -122,7 +138,7 @@ export default function RootLayout({
         )}
       </head>
       <body
-        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} ${pinyonScript.variable} antialiased`}
+        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} ${pinyonScript.variable} ${manrope.variable} ${fraunces.variable} antialiased`}
       >
         {children}
       </body>
