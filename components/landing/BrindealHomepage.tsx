@@ -359,7 +359,7 @@ function HeroPhone({ reduceMotion }: { reduceMotion: boolean | null }) {
     <motion.div
       animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
       transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      className="relative z-10 mx-auto aspect-[9/16] w-full max-w-[17rem] rotate-[7deg] overflow-hidden rounded-[2.75rem] border-[6px] border-[#3F4E3F] bg-[#FAFBF9] shadow-[0_35px_100px_rgba(31,36,32,0.16)] sm:max-w-[19rem] lg:max-w-[21rem]"
+      className="relative z-10 mx-auto aspect-[9/16] w-full max-w-[17rem] overflow-hidden rounded-[2.75rem] border-[6px] border-[#3F4E3F] bg-[#FAFBF9] shadow-[0_35px_100px_rgba(31,36,32,0.16)] sm:max-w-[19rem] lg:max-w-[21rem]"
     >
       <Image
         src="/images/demo-invite.jpg"
@@ -505,7 +505,7 @@ function GallerySection({
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="font-[var(--font-fraunces)] text-2xl font-semibold italic tracking-[-0.02em] text-[#1F2420]">
+                  <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
                     {item.title}
                   </h3>
                   <p className="mt-3 text-sm text-[#5C605A]">
@@ -556,8 +556,8 @@ function ProcessSection() {
                 }`}
               >
                 <div className="flex items-start justify-between gap-6">
-                  <p className={`font-[var(--font-fraunces)] text-5xl italic leading-none ${dark ? "text-white" : "text-[#3F4E3F]"}`}>
-                    <span className="font-[var(--font-outfit)] text-lg not-italic">•</span>{" "}
+                  <p className={`text-5xl font-semibold leading-none ${dark ? "text-white" : "text-[#3F4E3F]"}`}>
+                    <span className="text-lg">•</span>{" "}
                     {number}
                   </p>
                   <span
@@ -590,7 +590,7 @@ function ProcessSection() {
           })}
         </div>
         <div className="mt-14 flex flex-col items-center justify-center gap-5 text-center sm:flex-row">
-          <p className="font-[var(--font-fraunces)] text-2xl italic text-[#1F2420]">
+          <p className="text-2xl font-medium text-[#1F2420]">
             Pronto para começar a vossa história?
           </p>
           <a
@@ -683,7 +683,7 @@ function FeaturesSection() {
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#F6F7F5]">
               • Favorito dos noivos
             </p>
-            <h3 className="mt-7 font-[var(--font-fraunces)] text-4xl italic leading-tight tracking-[-0.02em] sm:text-5xl">
+            <h3 className="mt-7 text-4xl font-semibold leading-tight tracking-[-0.02em] sm:text-5xl">
               RSVP em tempo real
             </h3>
             <p className="mt-5 max-w-3xl text-sm leading-7 text-[#E8EBE7] sm:text-base">
@@ -760,8 +760,8 @@ function FeaturesSection() {
                 ))}
               </div>
             </div>
-            <p className="mt-3 font-[var(--font-fraunces)] text-3xl italic text-[#3F4E3F]">
-              +38% <span className="font-[var(--font-outfit)] text-xs not-italic text-[#5C605A]">esta semana</span>
+            <p className="mt-3 text-3xl font-semibold text-[#3F4E3F]">
+              +38% <span className="text-xs font-normal text-[#5C605A]">esta semana</span>
             </p>
           </FeatureSmallCard>
 
@@ -792,8 +792,8 @@ function FeaturesSection() {
             <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.28em] text-[#5C605A]">
               Tipografia
             </p>
-            <p className="mt-2 font-[var(--font-fraunces)] text-3xl italic text-[#1F2420]">
-              Aa <span className="font-[var(--font-outfit)] text-2xl not-italic">Aa</span>
+            <p className="mt-2 text-3xl font-semibold text-[#1F2420]">
+              Aa <span className="text-2xl font-normal">Aa</span>
             </p>
           </FeatureSmallCard>
         </div>
@@ -890,7 +890,7 @@ function LiveDemoSection() {
           <div className="flex justify-center">
             <SectionEyebrow>Demo ao vivo</SectionEyebrow>
           </div>
-          <h2 className="mt-5 font-[var(--font-fraunces)] text-4xl italic tracking-[-0.02em] sm:text-5xl">
+          <h2 className="mt-5 text-4xl font-medium tracking-[-0.02em] sm:text-5xl">
             Veja o convite a respirar.
           </h2>
           <p className="mt-5 text-[#5C605A]">
@@ -898,222 +898,38 @@ function LiveDemoSection() {
             tudo o que o evento precisa.
           </p>
         </div>
-        <div className="mt-18 grid items-start gap-12 lg:grid-cols-[1fr_0.58fr_1fr] lg:gap-10">
-          <DemoColumn
-            number="01"
-            label="Clássico essencial"
-            title="Sara & Bruno"
-            description="Esteticamente atemporal, calorosa, sensível."
-            variant="classic"
-          />
-          <DemoCompare />
-          <DemoColumn
-            number="02"
-            label="Premium cinemático"
-            title="Inês & Tomás"
-            description="Cortina cinematográfica, vídeo e som ambiente."
-            variant="premium"
-          />
+        <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <PhoneIframePreview title="Leonor & Diogo" src="/leonor-diogo" />
+          <PhoneIframePreview title="Sofia & Pedro" src="/sofia-pedro" />
         </div>
-        <DemoMetricsStrip />
       </div>
     </AnimatedSection>
   );
 }
 
-function DemoColumn({
-  number,
-  label,
-  title,
-  description,
-  variant,
-}: {
-  number: string;
-  label: string;
-  title: string;
-  description: string;
-  variant: "classic" | "premium";
-}) {
-  const premium = variant === "premium";
-
+function PhoneIframePreview({ title, src }: { title: string; src: string }) {
   return (
-    <div className="text-center">
-      <div className="mb-8 flex items-center justify-center gap-4">
-        <span className="font-[var(--font-fraunces)] text-3xl italic text-[#3F4E3F]">
-          {number}
-        </span>
-        <span className="h-px w-12 bg-[#E5E7E4]" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.36em] text-[#5C605A]">
-          {label}
-        </span>
+    <article className="text-center">
+      <div className="mx-auto aspect-[9/16] w-full max-w-[20rem] overflow-hidden rounded-[2.75rem] border-[7px] border-[#3F4E3F] bg-white shadow-[0_28px_90px_rgba(31,36,32,0.16)]">
+        <iframe
+          title={`Pré-visualização do convite ${title}`}
+          src={src}
+          className="h-full w-full border-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          loading="lazy"
+        />
       </div>
-      <div className="relative mx-auto w-full max-w-[19rem]">
-        {!premium && (
-          <>
-            <DemoCallout className="-left-28 top-16 hidden lg:flex" text="Carrega em <1s" />
-            <DemoCallout className="-left-28 top-72 hidden lg:flex" text="RSVP em 1 toque" />
-            <DemoCallout muted className="-left-28 bottom-24 hidden lg:flex" text="Mapa integrado" />
-          </>
-        )}
-        {premium && (
-          <>
-            <DemoCallout className="-right-28 top-28 hidden lg:flex" text="Vídeo de fundo" />
-            <DemoCallout className="-right-28 top-72 hidden lg:flex" text="Som ambiente" />
-            <DemoCallout active className="-right-32 bottom-24 hidden lg:flex" text="Cortina cinemática" />
-          </>
-        )}
-        <DemoPhone premium={premium} />
-      </div>
-      <div className="mt-8">
-        <span className={`rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.28em] ${premium ? "bg-[#3F4E3F] text-white" : "border border-[#E5E7E4] bg-white text-[#3F4E3F]"}`}>
-          {premium ? "• Premium" : "Clássico"}
-        </span>
-        <h3 className="mt-4 font-[var(--font-fraunces)] text-3xl font-semibold italic tracking-[-0.02em] text-[#1F2420]">
-          {title}
-        </h3>
-        <p className="mt-3 text-sm text-[#5C605A]">{description}</p>
-        <a
-          href={buildWhatsappUrl(`Olá! Gostava de ver o convite ${title}.`)}
-          target="_blank"
-          rel="noreferrer"
-          className={`mt-5 inline-flex rounded-full px-6 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4 ${premium ? "bg-[#3F4E3F] text-white hover:bg-[#2D3A2D]" : "border border-[#E5E7E4] bg-white text-[#1F2420] hover:border-[#3F4E3F]"}`}
-        >
-          Ver convite completo →
-        </a>
-      </div>
-    </div>
-  );
-}
-
-function DemoPhone({ premium }: { premium: boolean }) {
-  return (
-    <div className={`mx-auto aspect-[9/16] w-full overflow-hidden rounded-[2.5rem] border-[7px] shadow-[0_25px_80px_rgba(31,36,32,0.14)] ${premium ? "border-[#0D1510] bg-[#0D1510]" : "border-[#1F2420] bg-white"}`}>
-      <div className={`flex h-full flex-col p-5 ${premium ? "bg-[linear-gradient(180deg,#0D1510_0%,#253529_55%,#6B7E68_100%)] text-white" : "bg-white text-[#1F2420]"}`}>
-        <div className="flex items-center justify-between text-xs font-semibold">
-          <span>9:41</span>
-          <span>{premium ? "●●●▱ ▰" : "⌁  ◡  ▰"}</span>
-        </div>
-        {premium ? (
-          <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <div className="grid h-16 w-16 place-items-center rounded-full border border-white/30 bg-white/90 text-[#3F4E3F] shadow-lg">
-              ▶
-            </div>
-            <span className="mt-8 rounded-full bg-white/12 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.24em]">
-              Vídeo · 00:42
-            </span>
-            <span className="mt-18 rounded-full bg-white/12 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.24em]">
-              Premium
-            </span>
-            <p className="mt-6 font-[var(--font-pinyon-script)] text-5xl">
-              Inês & Tomás
-            </p>
-            <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.32em]">
-              05 · Junho · 2026
-            </p>
-            <button className="mt-10 w-full rounded-full bg-white/10 px-5 py-4 text-sm font-semibold">
-              Abrir convite →
-            </button>
-          </div>
-        ) : (
-          <div className="flex flex-1 flex-col pt-5 text-center">
-            <div className="relative aspect-[1.1/1] overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#D7E2D2,#F2D5A8)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(63,78,63,0.35),transparent_24%),linear-gradient(to_bottom,transparent,rgba(255,255,255,0.45))]" />
-            </div>
-            <p className="mt-7 font-[var(--font-pinyon-script)] text-5xl text-[#3F4E3F]">
-              Sara & Bruno
-            </p>
-            <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.32em] text-[#5C605A]">
-              12 · Setembro · 2026
-            </p>
-            <p className="mt-5 font-[var(--font-fraunces)] text-sm italic text-[#5C605A]">
-              “Queremos partilhar este momento convosco.”
-            </p>
-            <span className="mx-auto mt-5 rounded-full bg-[#F6F7F5] px-4 py-2 text-xs text-[#5C605A]">
-              • faltam 118 dias
-            </span>
-            <button className="mt-5 rounded-full bg-[#3F4E3F] px-5 py-4 text-sm font-semibold text-white">
-              Confirmar presença
-            </button>
-            <div className="mt-auto grid grid-cols-3 pb-2 pt-5 text-[10px] text-[#3F4E3F]">
-              <span>Mapas</span>
-              <span>Ementa</span>
-              <span>Música</span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function DemoCallout({
-  text,
-  className,
-  muted,
-  active,
-}: {
-  text: string;
-  className: string;
-  muted?: boolean;
-  active?: boolean;
-}) {
-  return (
-    <div className={`absolute z-10 items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shadow-[0_12px_35px_rgba(31,36,32,0.12)] ${active ? "bg-[#3F4E3F] text-white" : "bg-white text-[#1F2420]"} ${className}`}>
-      <span className={`h-2 w-2 rounded-full ${muted ? "bg-[#E5E7E4]" : active ? "bg-white" : "bg-[#3F4E3F]"}`} />
-      {text}
-    </div>
-  );
-}
-
-function DemoCompare() {
-  const rows = [
-    ["Hero estático", true, true],
-    ["RSVP 1 toque", true, true],
-    ["Mapa integrado", true, true],
-    ["Vídeo de fundo", false, true],
-    ["Som ambiente", false, true],
-    ["Cortina cinemática", false, true],
-  ] as const;
-
-  return (
-    <div className="hidden pt-28 text-center lg:block">
-      <p className="mb-12 text-[10px] font-bold uppercase tracking-[0.35em] text-[#A3A496]">
-        Comparar
-      </p>
-      <div className="space-y-5 text-sm text-[#1F2420]">
-        {rows.map(([label, left, right], index) => (
-          <div key={label} className={`grid grid-cols-[1fr_2fr_1fr] items-center gap-4 ${index === 3 ? "border-t border-[#E5E7E4] pt-5" : ""}`}>
-            <span className={left ? "text-[#3F4E3F]" : "text-[#A3A496]"}>●</span>
-            <span>{label}</span>
-            <span className={right ? "text-[#3F4E3F]" : "text-[#A3A496]"}>●</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function DemoMetricsStrip() {
-  const metrics = [
-    ["<1s", "Carregamento instantâneo"],
-    ["0 apps", "Só um link — sem instalar"],
-    ["100%", "Móvel · Tablet · Desktop"],
-    ["PT . EN . ES", "Três idiomas · um convite"],
-  ];
-
-  return (
-    <div className="mt-20 grid gap-8 rounded-[1.5rem] bg-[#243326] p-8 text-center text-white md:grid-cols-4 md:divide-x md:divide-white/10 lg:p-10">
-      {metrics.map(([value, label]) => (
-        <div key={label}>
-          <p className="font-[var(--font-fraunces)] text-4xl italic leading-none">
-            {value}
-          </p>
-          <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#E8EBE7]">
-            {label}
-          </p>
-        </div>
-      ))}
-    </div>
+      <h3 className="mt-6 text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
+        {title}
+      </h3>
+      <a
+        href={src}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-4 inline-flex rounded-full border border-[#E5E7E4] bg-white px-6 py-3 text-sm font-semibold text-[#1F2420] transition hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+      >
+        Abrir convite →
+      </a>
+    </article>
   );
 }
 
@@ -1195,7 +1011,7 @@ function ContactSection({
           <SectionEyebrow>Vamos criar juntos</SectionEyebrow>
           <h2 className="mt-6 text-4xl font-medium leading-[1.08] tracking-[-0.03em] text-[#1F2420] sm:text-5xl">
             O vosso convite
-            <span className="block font-[var(--font-fraunces)] italic text-[#3F4E3F]">
+            <span className="block text-[#3F4E3F]">
               começa hoje.
             </span>
           </h2>
@@ -1212,10 +1028,10 @@ function ContactSection({
           <h3 className="text-2xl font-semibold">Pedir orçamento</h3>
           <p className="mt-2 text-sm text-[#5C605A]">Resposta no mesmo dia.</p>
           <div className="mt-7 grid gap-4 sm:grid-cols-2">
-            <TextField label="Nome" value={formState.name} onChange={(value) => onFieldChange("name", value)} />
-            <TextField label="Tipo de evento" value={formState.eventType} onChange={(value) => onFieldChange("eventType", value)} />
-            <TextField label="Data" value={formState.date} onChange={(value) => onFieldChange("date", value)} />
-            <TextField label="Convidados" value={formState.guests} onChange={(value) => onFieldChange("guests", value)} />
+            <TextField label="Nome" placeholder="Maria Silva" value={formState.name} onChange={(value) => onFieldChange("name", value)} />
+            <TextField label="Tipo de evento" placeholder="Casamento" value={formState.eventType} onChange={(value) => onFieldChange("eventType", value)} />
+            <TextField label="Data" placeholder="12 Setembro 2026" value={formState.date} onChange={(value) => onFieldChange("date", value)} />
+            <TextField label="Convidados" placeholder="120" value={formState.guests} onChange={(value) => onFieldChange("guests", value)} />
           </div>
           <label className="mt-4 block text-sm font-semibold text-[#1F2420]">
             Mensagem
@@ -1240,10 +1056,12 @@ function ContactSection({
 
 function TextField({
   label,
+  placeholder,
   value,
   onChange,
 }: {
   label: string;
+  placeholder: string;
   value: string;
   onChange: (value: string) => void;
 }) {
@@ -1252,6 +1070,7 @@ function TextField({
       {label}
       <input
         value={value}
+        placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         className="mt-2 h-12 w-full rounded-2xl border border-[#E5E7E4] bg-[#F6F7F5] px-4 text-sm font-normal outline-none transition focus:border-[#3F4E3F] focus:ring-2 focus:ring-[#3F4E3F]/20"
       />
