@@ -377,6 +377,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     },
     invitationType: "standard",
     externalLink: "",
+    isDemo: false,
     imageSettings: {},
     guestManagementEnabled: false,
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
@@ -1104,6 +1105,20 @@ export default function InvitationForm({
                         placeholder="maria-joao"
                       />
                     </div>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="isDemo">Convite de demonstração</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Marca este convite como demo apenas na área admin.
+                      </p>
+                    </div>
+                    <Switch
+                      id="isDemo"
+                      checked={form.isDemo === true}
+                      onCheckedChange={(checked) => update("isDemo", checked)}
+                    />
                   </div>
 
                   <Separator />

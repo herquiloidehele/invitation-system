@@ -45,6 +45,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buttonVariants } from "@/components/ui/button-variants";
 import {
   Heart,
@@ -82,6 +83,7 @@ export function InvitationsClient({
   const [invitations, setInvitations] = useState(initialInvitations);
   const [search, setSearch] = useState("");
   const [templateFilter, setTemplateFilter] = useState("all");
+  const [demoTab, setDemoTab] = useState<"real" | "demo">("real");
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Derived stats
@@ -100,11 +102,20 @@ export function InvitationsClient({
         : "0",
     [invitations, totalRsvps],
   );
+  const realCount = useMemo(
+    () => invitations.filter((inv) => !inv.isDemo).length,
+    [invitations],
+  );
+  const demoCount = useMemo(
+    () => invitations.filter((inv) => inv.isDemo).length,
+    [invitations],
+  );
 
   // Filtered list
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     return invitations.filter((inv) => {
+      const matchesDemoTab = demoTab === "demo" ? inv.isDemo : !inv.isDemo;
       const matchesSearch =
         !q ||
         inv.couple.bride.toLowerCase().includes(q) ||
@@ -112,9 +123,9 @@ export function InvitationsClient({
         inv.slug.toLowerCase().includes(q);
       const matchesTemplate =
         templateFilter === "all" || inv.template === templateFilter;
-      return matchesSearch && matchesTemplate;
+      return matchesDemoTab && matchesSearch && matchesTemplate;
     });
-  }, [invitations, search, templateFilter]);
+  }, [invitations, search, templateFilter, demoTab]);
 
   const handleDelete = useCallback(
     async (id: string, coupleName: string) => {
@@ -256,6 +267,16 @@ export function InvitationsClient({
             </DropdownMenu>
           </div>
 
+          <Tabs
+            value={demoTab}
+            onValueChange={(value) => setDemoTab(value as "real" | "demo")}
+          >
+            <TabsList>
+              <TabsTrigger value="real">Real ({realCount})</TabsTrigger>
+              <TabsTrigger value="demo">Demo ({demoCount})</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
           {/* Filters */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center pt-1">
             <div className="relative flex-1">
@@ -293,7 +314,9 @@ export function InvitationsClient({
               <p className="text-lg font-medium">
                 {invitations.length === 0
                   ? "Nenhum convite criado ainda"
-                  : "Nenhum convite encontrado"}
+                  : demoTab === "demo"
+                    ? "Nenhum convite demo encontrado"
+                    : "Nenhum convite real encontrado"}
               </p>
               <p className="text-sm mt-1">
                 {invitations.length === 0
@@ -492,8 +515,8 @@ export function InvitationsClient({
           {/* Results count when filtering */}
           {(search || templateFilter !== "all") && filtered.length > 0 && (
             <p className="text-xs text-muted-foreground mt-3">
-              {filtered.length} de {invitations.length} convite
-              {invitations.length !== 1 ? "s" : ""}
+              {filtered.length} convite{filtered.length !== 1 ? "s" : ""} no
+              separador {demoTab === "demo" ? "Demo" : "Real"}
             </p>
           )}
         </CardContent>

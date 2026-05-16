@@ -69,6 +69,7 @@ export default async function EditSaveTheDatePage({
     bottomHero: bottomHero || undefined,
     socialPreview:
       (item.socialPreview as SocialPreview | null) ?? undefined,
+    isDemo: item.isDemo,
     ownerToken: item.ownerToken,
   };
 

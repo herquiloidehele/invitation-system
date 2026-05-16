@@ -489,6 +489,8 @@ export interface InvitationData {
   invitationType: InvitationType;
   /** External URL for the iframe page (external_link type). */
   externalLink?: string;
+  /** Admin-only marker for demonstration invitations. Public pages ignore it. */
+  isDemo?: boolean;
   /** Per-image position & zoom overrides. Missing keys use the default (centred, zoom 1). */
   imageSettings?: ImageSettingsMap;
   /** Per-invitation UI text overrides. Missing keys fall back to built-in Portuguese defaults. */

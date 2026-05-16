@@ -167,6 +167,9 @@ export async function PUT(
         ...(body.externalLink !== undefined && {
           externalLink: body.externalLink,
         }),
+        ...(body.isDemo !== undefined && {
+          isDemo: body.isDemo === true,
+        }),
         ...(body.textStyles !== undefined && {
           textStyles: sanitizeJsonField(body.textStyles, null),
         }),

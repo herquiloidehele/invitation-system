@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       audio,
       bottomHero,
       socialPreview,
+      isDemo,
     } = body;
 
     if (!slug || !themeId || !couple || !date) {
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
         audio: sanitizeJsonField(audio, null),
         bottomHero: sanitizeJsonField(bottomHero, null),
         socialPreview: sanitizeJsonField(socialPreview, null),
+        isDemo: isDemo === true,
       },
       include: { theme: true },
     });

@@ -44,6 +44,7 @@ type AdminInvitationInitialDataRow = {
   eventType: string | null;
   invitationType: string;
   externalLink: string | null;
+  isDemo: boolean;
   socialPreview: unknown;
 };
 
@@ -84,6 +85,7 @@ export function toAdminInvitationInitialData(
     eventType: (row.eventType as InvitationEventType | null) ?? "wedding",
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
+    isDemo: row.isDemo,
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"] | null) ??
       undefined,

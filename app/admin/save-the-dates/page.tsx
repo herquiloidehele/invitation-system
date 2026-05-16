@@ -12,6 +12,7 @@ export type SaveTheDateRow = {
   createdAt: Date | string;
   ownerToken: string;
   rsvpEnabled: boolean;
+  isDemo: boolean;
 };
 
 export default async function AdminSaveTheDatesPage() {
@@ -31,6 +32,7 @@ export default async function AdminSaveTheDatesPage() {
       createdAt: item.createdAt,
       ownerToken: item.ownerToken,
       rsvpEnabled: rsvp?.enabled === true,
+      isDemo: item.isDemo,
     };
   });
 

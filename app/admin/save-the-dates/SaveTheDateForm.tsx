@@ -85,6 +85,7 @@ export interface SaveTheDateFormData {
     description: string;
   };
   socialPreview?: SocialPreview;
+  isDemo?: boolean;
   ownerToken?: string;
 }
 
@@ -197,6 +198,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       audio: data.audio || { enabled: false, src: "", artist: "", title: "" },
       bottomHero: data.bottomHero || null,
       socialPreview: data.socialPreview ?? null,
+      isDemo: data.isDemo === true,
     }),
     [data, selectedTheme],
   );
@@ -322,6 +324,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           audio: data.audio || null,
           bottomHero: data.bottomHero || null,
           socialPreview: data.socialPreview ?? null,
+          isDemo: data.isDemo === true,
         }),
       });
 
@@ -418,6 +421,23 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                   <p className="text-[11px] text-muted-foreground">
                     Acessível em /s/{data.slug || "..."}
                   </p>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="std-isDemo">
+                      Save the Date de demonstração
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Marca este save the date como demo apenas na área admin.
+                    </p>
+                  </div>
+                  <Switch
+                    id="std-isDemo"
+                    checked={data.isDemo === true}
+                    onCheckedChange={(checked) =>
+                      setData((p) => ({ ...p, isDemo: checked }))
+                    }
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>

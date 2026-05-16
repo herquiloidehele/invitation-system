@@ -9,6 +9,7 @@ export type InvitationRow = {
   template: string;
   couple: { bride: string; groom: string; monogram?: string };
   eventType: "wedding" | "anniversary" | "baptism" | "engagement" | "other";
+  isDemo: boolean;
   date: { display: string; iso?: string };
   rsvp: { enabled: boolean };
   createdAt: Date | string;
@@ -24,6 +25,7 @@ export default async function AdminInvitationsPage() {
       theme: { select: { name: true } },
       couple: true,
       eventType: true,
+      isDemo: true,
       date: true,
       rsvp: true,
       createdAt: true,

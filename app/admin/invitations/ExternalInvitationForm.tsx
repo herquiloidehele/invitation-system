@@ -141,6 +141,7 @@ function getDefaultState(
     videoPoster: "",
     invitationType: invType,
     externalLink: "",
+    isDemo: false,
     saveDateStyle: "classic",
     envelope: {},
     parents: {
@@ -769,6 +770,21 @@ export default function ExternalInvitationForm({
                         placeholder="ex: sofia-miguel"
                       />
                     </div>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="external-isDemo">
+                        Convite de demonstração
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Marca este convite como demo apenas na área admin.
+                      </p>
+                    </div>
+                    <Switch
+                      id="external-isDemo"
+                      checked={form.isDemo === true}
+                      onCheckedChange={(checked) => update("isDemo", checked)}
+                    />
                   </div>
                 </AccordionContent>
               </AccordionItem>

@@ -18,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ExternalLink, Pencil, Plus, Search, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -32,18 +33,30 @@ export function SaveTheDatesClient({ items: initial }: Props) {
   const router = useRouter();
   const [items, setItems] = useState(initial);
   const [search, setSearch] = useState("");
+  const [demoTab, setDemoTab] = useState<"real" | "demo">("real");
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const realCount = useMemo(
+    () => items.filter((item) => !item.isDemo).length,
+    [items],
+  );
+  const demoCount = useMemo(
+    () => items.filter((item) => item.isDemo).length,
+    [items],
+  );
+
   const filtered = useMemo(() => {
-    if (!search) return items;
-    const q = search.toLowerCase();
-    return items.filter(
-      (i) =>
+    const q = search.toLowerCase().trim();
+    return items.filter((i) => {
+      const matchesDemoTab = demoTab === "demo" ? i.isDemo : !i.isDemo;
+      const matchesSearch =
+        !q ||
         i.couple.bride.toLowerCase().includes(q) ||
         i.couple.groom.toLowerCase().includes(q) ||
-        i.slug.toLowerCase().includes(q),
-    );
-  }, [items, search]);
+        i.slug.toLowerCase().includes(q);
+      return matchesDemoTab && matchesSearch;
+    });
+  }, [items, search, demoTab]);
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
@@ -89,6 +102,16 @@ export function SaveTheDatesClient({ items: initial }: Props) {
         </Link>
       </div>
 
+      <Tabs
+        value={demoTab}
+        onValueChange={(value) => setDemoTab(value as "real" | "demo")}
+      >
+        <TabsList>
+          <TabsTrigger value="real">Real ({realCount})</TabsTrigger>
+          <TabsTrigger value="demo">Demo ({demoCount})</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {/* Search */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
@@ -119,7 +142,9 @@ export function SaveTheDatesClient({ items: initial }: Props) {
             {filtered.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
-                  Nenhum save the date encontrado.
+                  {demoTab === "demo"
+                    ? "Nenhum save the date demo encontrado."
+                    : "Nenhum save the date real encontrado."}
                 </TableCell>
               </TableRow>
             ) : (

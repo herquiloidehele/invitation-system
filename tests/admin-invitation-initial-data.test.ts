@@ -37,9 +37,11 @@ describe("toAdminInvitationInitialData", () => {
       eventType: "wedding",
       invitationType: "standard",
       externalLink: null,
+      isDemo: false,
       socialPreview: null,
     });
 
     expect(initialData.heroHeight).toBe(520);
+    expect(initialData.isDemo).toBe(false);
   });
 });

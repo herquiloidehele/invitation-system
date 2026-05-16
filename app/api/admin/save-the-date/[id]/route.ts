@@ -60,6 +60,9 @@ export async function PUT(
         ...(body.socialPreview !== undefined && {
           socialPreview: sanitizeJsonField(body.socialPreview, null),
         }),
+        ...(body.isDemo !== undefined && {
+          isDemo: body.isDemo === true,
+        }),
       },
       include: { theme: true },
     });
