@@ -8,7 +8,7 @@ export function PhoneIframePreview({ title, src }: { title: string; src: string 
 
     iframeDocument.documentElement.style.scrollbarWidth = "none";
     iframeDocument.body.style.scrollbarWidth = "none";
-    iframeDocument.body.style.msOverflowStyle = "none";
+    (iframeDocument.body.style as CSSStyleDeclaration & { msOverflowStyle?: string }).msOverflowStyle = "none";
 
     if (!iframeDocument.getElementById("brindeal-hide-scrollbar")) {
       const style = iframeDocument.createElement("style");
