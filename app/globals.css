@@ -252,6 +252,29 @@ body {
   }
 }
 
+/* Landing features — animated equalizer */
+@keyframes landing-eq {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.landing-eq-bar {
+  transform-origin: bottom;
+  animation: landing-eq 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-eq-bar {
+    animation: none;
+    transform: scaleY(0.7);
+  }
+}
+
 /* ===================================================================
    Brindel Gallery page styles
    =================================================================== */

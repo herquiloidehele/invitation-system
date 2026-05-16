@@ -1,7 +1,6 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
 import {
   galleryCategories,
@@ -22,25 +21,17 @@ export function GallerySection({
   return (
     <AnimatedSection id="galeria" className="bg-white px-5 py-24 sm:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
-          <div>
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="flex justify-center">
             <SectionEyebrow>Galeria</SectionEyebrow>
-            <h2 className="mt-5 max-w-3xl text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-              Histórias que inspiram
-            </h2>
-            <p className="mt-5 max-w-3xl text-[#5C605A]">
-              Convites reais de casais reais. Cada projecto contado com
-              sensibilidade.
-            </p>
           </div>
-          <a
-            href={buildWhatsappUrl()}
-            target="_blank"
-            rel="noreferrer"
-            className="w-fit rounded-full border border-[#E5E7E4] px-6 py-3 text-sm font-semibold transition hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
-          >
-            Ver tudo →
-          </a>
+          <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
+            Histórias que inspiram
+          </h2>
+          <p className="mt-5 text-[#5C605A]">
+            Convites reais de casais reais. Cada projecto contado com
+            sensibilidade.
+          </p>
         </div>
         <div className="mt-12 flex flex-wrap justify-center gap-2">
           {galleryCategories.map((category) => (
