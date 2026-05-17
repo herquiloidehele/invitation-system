@@ -41,8 +41,8 @@ export const DEFAULT_TEXTS: Required<CustomTexts> = {
 
   // -- RSVP Modal: Form --
   rsvp_modalTitle: "Confirmar Presença",
-  rsvp_nameLabel: "Nome *",
-  rsvp_namePlaceholder: "Seu nome completo",
+  rsvp_nameLabel: "Nome(s) *",
+  rsvp_namePlaceholder: "Nome do(s) Convidados(s)",
   rsvp_emailLabel: "Email",
   rsvp_emailPlaceholder: "seu@email.com",
   rsvp_attendingLabel: "Você irá comparecer? *",
