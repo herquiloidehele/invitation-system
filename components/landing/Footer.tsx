@@ -1,31 +1,34 @@
-export const FOOTER_LINK_GROUPS = [
-  {
-    heading: "Produto",
-    links: [
-      { label: "Casamento", href: "#galeria" },
-      { label: "Save the Date", href: "#galeria" },
-      { label: "Baptizado", href: "#galeria" },
-      { label: "Noivado", href: "#galeria" },
-    ],
-  },
-  {
-    heading: "Recursos",
-    links: [
-      { label: "Galeria", href: "#galeria" },
-      { label: "Como funciona", href: "#processo" },
-      { label: "FAQ", href: "#faq" },
-    ],
-  },
-  {
-    heading: "Empresa",
-    links: [
-      { label: "Sobre", href: "#recursos" },
-      { label: "Contacto", href: "#orcamento" },
-    ],
-  },
-] as const;
+import { useTranslations } from "next-intl";
 
 export function Footer() {
+  const t = useTranslations("LandingFooter");
+  const linkGroups = [
+    {
+      heading: t("product"),
+      links: [
+        { label: t("wedding"), href: "#galeria" },
+        { label: t("saveTheDate"), href: "#galeria" },
+        { label: t("baptism"), href: "#galeria" },
+        { label: t("engagement"), href: "#galeria" },
+      ],
+    },
+    {
+      heading: t("resources"),
+      links: [
+        { label: t("gallery"), href: "#galeria" },
+        { label: t("process"), href: "#processo" },
+        { label: t("faq"), href: "#faq" },
+      ],
+    },
+    {
+      heading: t("company"),
+      links: [
+        { label: t("about"), href: "#recursos" },
+        { label: t("contact"), href: "#orcamento" },
+      ],
+    },
+  ];
+
   return (
     <footer className="bg-[#1F2420] px-5 py-16 text-[#E8EBE7] sm:px-8">
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
@@ -35,10 +38,10 @@ export function Footer() {
             brindeal
           </div>
           <p className="mt-5 max-w-xs text-sm leading-6 text-[#A3A496]">
-            Convites digitais pessoais, elegantes e feitos com cuidado em Lisboa.
+            {t("description")}
           </p>
         </div>
-        {FOOTER_LINK_GROUPS.map(({ heading, links }) => (
+        {linkGroups.map(({ heading, links }) => (
           <div key={heading} className="space-y-3 text-sm">
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-white">
               {heading}
@@ -56,8 +59,8 @@ export function Footer() {
         ))}
       </div>
       <div className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-4 border-t border-white/10 pt-8 text-xs text-[#A3A496] sm:flex-row">
-        <p>© 2026 Brindeal Studio · Feito com cuidado em Lisboa</p>
-        <p>Português · English · Español</p>
+        <p>{t("copyright")}</p>
+        <p>{t("languages")}</p>
       </div>
     </footer>
   );

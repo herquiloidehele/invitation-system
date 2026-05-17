@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
@@ -25,13 +26,14 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const invitation = await getInvitation(slug);
 
   if (!invitation) {
-    return { title: "Convite não encontrado" };
+    const t = await getTranslations("Metadata");
+    return { title: t("invitationNotFound") };
   }
 
   const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -62,7 +64,7 @@ export async function generateMetadata({
 export async function generateViewport({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Viewport> {
   const { slug } = await params;
   const invitation = await getInvitation(slug);
@@ -113,7 +115,7 @@ export default async function InvitationSlugPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<{ g?: string; n?: string }>;
 }) {
   const { slug } = await params;

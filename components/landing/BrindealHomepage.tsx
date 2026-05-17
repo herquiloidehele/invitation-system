@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import {
   buildContactMessage,
   buildWhatsappUrl,
@@ -23,7 +24,7 @@ import { LandingNav } from "./LandingNav";
 import { LiveDemoSection } from "./LiveDemoSection";
 import { ProcessSection } from "./ProcessSection";
 import { TypesSection } from "./TypesSection";
-import { type GalleryCategory } from "./landing-data";
+import { type GalleryCategoryKey } from "./landing-data";
 
 export function BrindealHomepage({
   heroFeature,
@@ -35,8 +36,10 @@ export function BrindealHomepage({
   liveDemoFeatures: LiveDemoFeature[];
 }) {
   const reduceMotion = useReducedMotion();
+  const landingT = useTranslations("Landing");
+  const whatsappT = useTranslations("Whatsapp");
   const [activeGalleryCategory, setActiveGalleryCategory] =
-    useState<GalleryCategory>("Todos");
+    useState<GalleryCategoryKey>("all");
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
   const [formState, setFormState] = useState<ContactMessageFields>({
     name: "",
@@ -53,7 +56,19 @@ export function BrindealHomepage({
   function handleContactSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     window.open(
-      buildWhatsappUrl(buildContactMessage(formState)),
+      buildWhatsappUrl(
+        buildContactMessage({
+          fields: formState,
+          intro: landingT("defaultWhatsappMessage"),
+          labels: {
+            name: whatsappT("name"),
+            eventType: whatsappT("eventType"),
+            date: whatsappT("date"),
+            guests: whatsappT("guests"),
+            message: whatsappT("message"),
+          },
+        }),
+      ),
       "_blank",
       "noopener,noreferrer",
     );

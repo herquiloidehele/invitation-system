@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { buildWhatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "@/lib/landing-whatsapp";
+import { useTranslations } from "next-intl";
+import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import type { HeroFeature } from "@/lib/landing-features";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
@@ -37,6 +38,8 @@ export function HeroSection({
 }
 
 function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
+  const t = useTranslations("Landing");
+
   return (
     <motion.div
       initial={reduceMotion ? false : { opacity: 0, y: 24 }}
@@ -44,42 +47,42 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
       transition={{ duration: 0.8 }}
       className="relative z-10 max-w-3xl lg:pt-10"
     >
-      <SectionEyebrow>Convites digitais feitos com cuidado</SectionEyebrow>
+      <SectionEyebrow>{t("heroEyebrow")}</SectionEyebrow>
       <h1 className="mt-8 text-balance text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-[#3F4E3F] sm:text-6xl lg:text-7xl">
-        <span className="block">O convite digital</span>
+        <span className="block">{t("heroTitleLine1")}</span>
         <span className="mt-5 block font-medium text-[#2D2D23]">
-          ideal para vocês
+          {t("heroTitleLine2")}
         </span>
       </h1>
       <p className="mt-7 max-w-2xl text-md leading-8 text-[#5C605A]">
-        Desenhamos convites elegantes, pessoais e fáceis de partilhar, com RSVP,
-        mapa, música e todos os detalhes que ajudam os convidados a chegar ao
-        grande dia sem dúvidas.
+        {t("heroBody")}
       </p>
       <div className="mt-9 flex flex-col gap-3 sm:flex-row">
         <a
-          href={buildWhatsappUrl(DEFAULT_WHATSAPP_MESSAGE)}
+          href={buildWhatsappUrl(t("defaultWhatsappMessage"))}
           target="_blank"
           rel="noreferrer"
           className="rounded-full bg-[#3F4E3F] px-7 py-4 text-center text-sm font-semibold text-white shadow-[0_18px_60px_rgba(63,78,63,0.24)] transition hover:-translate-y-0.5 hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
         >
-          Começar o meu convite →
+          {t("heroPrimaryCta")}
         </a>
         <a
           href="#galeria"
           className="rounded-full border border-[#E5E7E4] px-7 py-4 text-center text-sm font-semibold text-[#1F2420] transition hover:-translate-y-0.5 hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
         >
-          Ver exemplos reais
+          {t("heroSecondaryCta")}
         </a>
       </div>
       <p className="mt-8 text-sm font-medium text-[#5C605A]">
-        Resposta no mesmo dia · +200 convites feitos
+        {t("heroProof")}
       </p>
     </motion.div>
   );
 }
 
 function HeroPhone({ reduceMotion }: { reduceMotion: boolean | null }) {
+  const t = useTranslations("LandingLiveDemo");
+
   return (
     <motion.div
       animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
@@ -88,7 +91,7 @@ function HeroPhone({ reduceMotion }: { reduceMotion: boolean | null }) {
     >
       <Image
         src="/images/demo-invite.jpg"
-        alt="Pré-visualização de convite digital Brindeal"
+        alt={t("fallbackInvitation")}
         fill
         priority
         sizes="(min-width: 1024px) 360px, 80vw"

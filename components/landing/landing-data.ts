@@ -1,114 +1,90 @@
 import type { GalleryCategory as DbGalleryCategory } from "@/lib/landing-features";
 
-export type GalleryCategory =
-  | "Todos"
-  | "Casamentos"
-  | "Save the Date"
-  | "Baptizados"
-  | "Aniversários"
-  | "Noivado";
+export type GalleryCategoryKey =
+  | "all"
+  | "wedding"
+  | "saveTheDate"
+  | "baptism"
+  | "anniversary"
+  | "engagement";
+
+export type GalleryCategory = { key: GalleryCategoryKey; label: string };
 
 export type FaqItem = {
   question: string;
   answer: string;
 };
 
-export const dbCategoryToTab: Record<DbGalleryCategory, GalleryCategory> = {
-  wedding: "Casamentos",
-  save_the_date: "Save the Date",
-  baptism: "Baptizados",
-  anniversary: "Aniversários",
-  engagement: "Noivado",
+export const dbCategoryToTabKey: Record<DbGalleryCategory, GalleryCategoryKey> = {
+  wedding: "wedding",
+  save_the_date: "saveTheDate",
+  baptism: "baptism",
+  anniversary: "anniversary",
+  engagement: "engagement",
 };
 
-export const navLinks = [
-  { label: "Tipos", href: "#tipos" },
-  { label: "Galeria", href: "#galeria" },
-  { label: "Como funciona", href: "#processo" },
-  { label: "Recursos", href: "#recursos" },
-  { label: "FAQ", href: "#faq" },
-];
+export type LandingTranslator = {
+  (key: string): string;
+  raw?(key: string): unknown;
+};
 
-export const invitationTypes = [
-  {
-    title: "Save The Date",
-    text: "Anunciem a data com leveza, contagem decrescente e um primeiro vislumbre do que vem aí.",
-    icon: "01",
-  },
-  {
-    title: "Casamento",
-    text: "O convite completo para o grande dia: história, programa, RSVP, mapa, música e detalhes úteis num só lugar.",
-    icon: "02",
-    featured: true,
-  },
-  {
-    title: "Noivado",
-    text: "Um convite íntimo para reunir as pessoas certas e marcar o início desta nova fase.",
-    icon: "03",
-  },
-];
+export function getNavLinks(t: (key: string) => string) {
+  return [
+    { label: t("types"), href: "#tipos" },
+    { label: t("gallery"), href: "#galeria" },
+    { label: t("process"), href: "#processo" },
+    { label: t("features"), href: "#recursos" },
+    { label: t("faq"), href: "#faq" },
+  ];
+}
 
-export const galleryCategories: GalleryCategory[] = [
-  "Todos",
-  "Casamentos",
-  "Save the Date",
-  "Baptizados",
-  "Aniversários",
-  "Noivado",
-];
+export function getInvitationTypes(t: (key: string) => string) {
+  return [
+    {
+      key: "saveTheDate",
+      title: t("items.saveTheDate.title"),
+      text: t("items.saveTheDate.text"),
+      icon: "01",
+      featured: false,
+    },
+    {
+      key: "wedding",
+      title: t("items.wedding.title"),
+      text: t("items.wedding.text"),
+      icon: "02",
+      featured: true,
+    },
+    {
+      key: "engagement",
+      title: t("items.engagement.title"),
+      text: t("items.engagement.text"),
+      icon: "03",
+      featured: false,
+    },
+  ] as const;
+}
 
-export const processSteps = [
-  [
-    "01",
-    "Conversa inicial",
-    "Falamos sobre o vosso evento, o estilo que imaginam e o que querem que os convidados sintam. Recebem uma proposta clara no mesmo dia.",
-  ],
-  [
-    "02",
-    "Design à medida",
-    "Recolhemos fotografias, textos e referências. Desenhamos um convite com o vosso ritmo, as vossas cores e a vossa história.",
-  ],
-  [
-    "03",
-    "Revisão & ajustes",
-    "Comentam, ajustamos e refinamos convosco. Pequenas alterações ficam prontas rapidamente, sem complicar o processo.",
-  ],
-  [
-    "04",
-    "Publicação & partilha",
-    "Colocamos o convite ao vivo, pronto a partilhar, com RSVP em tempo real num painel privado.",
-  ],
-] as const;
+export function getGalleryCategories(
+  t: (key: string) => string,
+): GalleryCategory[] {
+  return [
+    { key: "all", label: t("categories.all") },
+    { key: "wedding", label: t("categories.wedding") },
+    { key: "saveTheDate", label: t("categories.saveTheDate") },
+    { key: "baptism", label: t("categories.baptism") },
+    { key: "anniversary", label: t("categories.anniversary") },
+    { key: "engagement", label: t("categories.engagement") },
+  ];
+}
 
-export const faqs: FaqItem[] = [
-  {
-    question: "Quanto tempo demora?",
-    answer:
-      "Tipicamente 3 a 5 dias úteis depois de recebermos fotografias e textos. Para datas próximas, fazemos versões expressas em 48h.",
-  },
-  {
-    question: "Posso usar para outros eventos além de casamento?",
-    answer:
-      "Sim. Adaptamos a experiência para save the date, baptizados, noivados, aniversários e celebrações privadas.",
-  },
-  {
-    question: "Como funciona o RSVP?",
-    answer:
-      "Os convidados confirmam directamente no convite. Acompanham tudo num painel privado, em tempo real.",
-  },
-  {
-    question: "Posso enviar a convidados individuais?",
-    answer:
-      "Sim. Cada convidado pode receber um link personalizado com nomes, mesa e detalhes específicos.",
-  },
-  {
-    question: "Posso editar depois de publicado?",
-    answer:
-      "Sim. Ajustes de texto, horários, mapas e detalhes podem ser actualizados depois da publicação.",
-  },
-  {
-    question: "Quanto custa?",
-    answer:
-      "Depende do nível de personalização, conteúdos e funcionalidades. Enviamos uma proposta clara no mesmo dia.",
-  },
-];
+export function getProcessSteps(t: LandingTranslator) {
+  return t.raw?.("steps") as ReadonlyArray<readonly [string, string, string]>;
+}
+
+export function getProcessBadges(t: LandingTranslator) {
+  return t.raw?.("badges") as ReadonlyArray<string>;
+}
+
+export function getFaqs(t: LandingTranslator): FaqItem[] {
+  return t.raw?.("items") as FaqItem[];
+}

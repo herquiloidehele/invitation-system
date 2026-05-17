@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/db";
 import {
   CheckCircle2,
@@ -13,11 +14,16 @@ import { ExportButton } from "./ExportButton";
 import GuestsTabClient from "./GuestsTabClient";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import type { InvitationEventType } from "@/lib/types";
+import {
+  getDateFormatLocale,
+  resolveLocale,
+  type AppLocale,
+} from "@/i18n/locales";
 
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: Promise<{ token: string }>;
+  params: Promise<{ locale: string; token: string }>;
   searchParams: Promise<{ tab?: string }>;
 };
 
@@ -25,8 +31,8 @@ type Props = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(date: Date) {
-  return new Date(date).toLocaleDateString("pt-PT", {
+function formatDate(date: Date, locale: AppLocale) {
+  return new Date(date).toLocaleDateString(getDateFormatLocale(locale), {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -34,6 +40,23 @@ function formatDate(date: Date) {
     minute: "2-digit",
   });
 }
+
+type OwnerLabels = {
+  rsvpsTab: string;
+  guestsTab: string;
+  responses: string;
+  attending: string;
+  declined: string;
+  listTitle: string;
+  updated: string;
+  emptyTitle: string;
+  emptyInvitation: string;
+  emptySaveTheDate: string;
+  attendingBadge: string;
+  declinedBadge: string;
+  dietaryRestrictions: (value: string) => string;
+  footer: string;
+};
 
 // ---------------------------------------------------------------------------
 // Tab navigation (server-rendered, link-based)
@@ -43,10 +66,12 @@ function TabNav({
   active,
   token,
   showGuests,
+  labels,
 }: {
   active: "rsvps" | "guests";
   token: string;
   showGuests: boolean;
+  labels: OwnerLabels;
 }) {
   return (
     <div className="border-b mb-6">
@@ -59,7 +84,7 @@ function TabNav({
               : "border-transparent text-stone-500 hover:text-stone-700"
           }`}
         >
-          Confirmações
+          {labels.rsvpsTab}
         </Link>
         {showGuests && (
           <Link
@@ -70,7 +95,7 @@ function TabNav({
                 : "border-transparent text-stone-500 hover:text-stone-700"
             }`}
           >
-            Convidados
+            {labels.guestsTab}
           </Link>
         )}
       </nav>
@@ -85,9 +110,13 @@ function TabNav({
 async function InvitationRsvpView({
   token,
   tab,
+  locale,
+  labels,
 }: {
   token: string;
   tab: "rsvps" | "guests";
+  locale: AppLocale;
+  labels: OwnerLabels;
 }) {
   const invitation = await prisma.invitation.findUnique({
     where: { ownerToken: token },
@@ -148,7 +177,7 @@ async function InvitationRsvpView({
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <TabNav active={activeTab} token={token} showGuests={showGuests} />
+        <TabNav active={activeTab} token={token} showGuests={showGuests} labels={labels} />
 
         {activeTab === "rsvps" ? (
           <div className="space-y-6">
@@ -156,8 +185,11 @@ async function InvitationRsvpView({
               total={responses.length}
               attending={totalAttending}
               declined={totalDeclined}
+              labels={labels}
             />
             <RsvpList
+              locale={locale}
+              labels={labels}
               responses={responses.map((r) => ({
                 id: r.id,
                 guestName: r.guestName,
@@ -167,7 +199,7 @@ async function InvitationRsvpView({
                 message: r.message,
                 submittedAt: r.submittedAt,
               }))}
-              emptyLabel="Os convidados ainda não responderam ao convite."
+              emptyLabel={labels.emptyInvitation}
             />
           </div>
         ) : (
@@ -179,7 +211,7 @@ async function InvitationRsvpView({
         )}
       </main>
 
-      <PageFooter />
+      <PageFooter labels={labels} />
     </div>
   );
 }
@@ -188,7 +220,15 @@ async function InvitationRsvpView({
 // Save the Date RSVP view (unchanged — STD has no guest management)
 // ---------------------------------------------------------------------------
 
-async function SaveTheDateRsvpView({ token }: { token: string }) {
+async function SaveTheDateRsvpView({
+  token,
+  locale,
+  labels,
+}: {
+  token: string;
+  locale: AppLocale;
+  labels: OwnerLabels;
+}) {
   const std = await prisma.saveTheDate.findUnique({
     where: { ownerToken: token },
     include: {
@@ -238,8 +278,11 @@ async function SaveTheDateRsvpView({ token }: { token: string }) {
           total={responses.length}
           attending={totalAttending}
           declined={totalDeclined}
+          labels={labels}
         />
         <RsvpList
+          locale={locale}
+          labels={labels}
           responses={responses.map((r) => ({
             id: r.id,
             guestName: r.guestName,
@@ -249,11 +292,11 @@ async function SaveTheDateRsvpView({ token }: { token: string }) {
             message: r.message,
             submittedAt: r.submittedAt,
           }))}
-          emptyLabel="Os convidados ainda não responderam ao Save the Date."
+          emptyLabel={labels.emptySaveTheDate}
         />
       </main>
 
-      <PageFooter />
+      <PageFooter labels={labels} />
     </div>
   );
 }
@@ -266,24 +309,26 @@ function RsvpSummary({
   total,
   attending,
   declined,
+  labels,
 }: {
   total: number;
   attending: number;
   declined: number;
+  labels: OwnerLabels;
 }) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       <div className="bg-white rounded-xl border p-4 text-center">
         <div className="text-3xl font-bold text-stone-800">{total}</div>
-        <div className="text-xs text-stone-500 mt-1">Respostas</div>
+        <div className="text-xs text-stone-500 mt-1">{labels.responses}</div>
       </div>
       <div className="bg-white rounded-xl border p-4 text-center">
         <div className="text-3xl font-bold text-emerald-600">{attending}</div>
-        <div className="text-xs text-stone-500 mt-1">Confirmados</div>
+        <div className="text-xs text-stone-500 mt-1">{labels.attending}</div>
       </div>
       <div className="bg-white rounded-xl border p-4 text-center">
         <div className="text-3xl font-bold text-rose-500">{declined}</div>
-        <div className="text-xs text-stone-500 mt-1">Não vão</div>
+        <div className="text-xs text-stone-500 mt-1">{labels.declined}</div>
       </div>
     </div>
   );
@@ -292,6 +337,8 @@ function RsvpSummary({
 function RsvpList({
   responses,
   emptyLabel,
+  locale,
+  labels,
 }: {
   responses: Array<{
     id: string;
@@ -303,20 +350,22 @@ function RsvpList({
     submittedAt: Date;
   }>;
   emptyLabel: string;
+  locale: AppLocale;
+  labels: OwnerLabels;
 }) {
   return (
     <div className="bg-white rounded-xl border overflow-hidden">
       <div className="px-5 py-4 border-b">
-        <h2 className="font-semibold text-stone-800">Lista de Confirmações</h2>
+        <h2 className="font-semibold text-stone-800">{labels.listTitle}</h2>
         <p className="text-sm text-stone-500 mt-0.5">
-          Actualizada em tempo real
+          {labels.updated}
         </p>
       </div>
 
       {responses.length === 0 ? (
         <div className="py-16 text-center text-stone-400">
           <Users className="size-10 mx-auto mb-3 opacity-30" />
-          <p className="font-medium">Sem respostas ainda</p>
+          <p className="font-medium">{labels.emptyTitle}</p>
           <p className="text-sm mt-1">{emptyLabel}</p>
         </div>
       ) : (
@@ -332,12 +381,12 @@ function RsvpList({
                     {r.attending ? (
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                         <CheckCircle2 className="size-3" />
-                        Confirma presença
+                        {labels.attendingBadge}
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">
                         <XCircle className="size-3" />
-                        Não vai comparecer
+                        {labels.declinedBadge}
                       </span>
                     )}
                   </div>
@@ -346,7 +395,7 @@ function RsvpList({
                   )}
                   {r.dietaryRestrictions && (
                     <p className="text-sm text-amber-700 mt-1 bg-amber-50 px-2 py-1 rounded-md inline-block">
-                      Restrições: {r.dietaryRestrictions}
+                      {labels.dietaryRestrictions(r.dietaryRestrictions)}
                     </p>
                   )}
                   {r.message && (
@@ -356,7 +405,7 @@ function RsvpList({
                   )}
                 </div>
                 <time className="text-xs text-stone-400 whitespace-nowrap shrink-0 mt-0.5">
-                  {formatDate(r.submittedAt)}
+                  {formatDate(r.submittedAt, locale)}
                 </time>
               </div>
             </li>
@@ -367,10 +416,10 @@ function RsvpList({
   );
 }
 
-function PageFooter() {
+function PageFooter({ labels }: { labels: OwnerLabels }) {
   return (
     <footer className="border-t mt-12 py-6 text-center text-xs text-stone-400">
-      Brindel Studio &mdash; Convites Digitais para Casamentos
+      {labels.footer}
     </footer>
   );
 }
@@ -380,9 +429,27 @@ function PageFooter() {
 // ---------------------------------------------------------------------------
 
 export default async function OwnerRsvpPage({ params, searchParams }: Props) {
-  const { token } = await params;
+  const { locale: rawLocale, token } = await params;
   const { tab } = await searchParams;
   const activeTab = tab === "guests" ? "guests" : "rsvps";
+  const locale = resolveLocale(rawLocale);
+  const t = await getTranslations("OwnerConfirmations");
+  const labels: OwnerLabels = {
+    rsvpsTab: t("rsvpsTab"),
+    guestsTab: t("guestsTab"),
+    responses: t("responses"),
+    attending: t("attending"),
+    declined: t("declined"),
+    listTitle: t("listTitle"),
+    updated: t("updated"),
+    emptyTitle: t("emptyTitle"),
+    emptyInvitation: t("emptyInvitation"),
+    emptySaveTheDate: t("emptySaveTheDate"),
+    attendingBadge: t("attendingBadge"),
+    declinedBadge: t("declinedBadge"),
+    dietaryRestrictions: (value) => t("dietaryRestrictions", { value }),
+    footer: t("footer"),
+  };
 
   // Try invitation first (most common case)
   const invitation = await prisma.invitation.findUnique({
@@ -390,7 +457,14 @@ export default async function OwnerRsvpPage({ params, searchParams }: Props) {
   });
 
   if (invitation) {
-    return <InvitationRsvpView token={token} tab={activeTab} />;
+    return (
+      <InvitationRsvpView
+        token={token}
+        tab={activeTab}
+        locale={locale}
+        labels={labels}
+      />
+    );
   }
 
   // Try save-the-date
@@ -399,7 +473,7 @@ export default async function OwnerRsvpPage({ params, searchParams }: Props) {
   });
 
   if (std) {
-    return <SaveTheDateRsvpView token={token} />;
+    return <SaveTheDateRsvpView token={token} locale={locale} labels={labels} />;
   }
 
   notFound();

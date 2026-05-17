@@ -6,9 +6,10 @@ import {
   MessageSquare,
   Palette,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
-import { processSteps } from "./landing-data";
+import { getProcessBadges, getProcessSteps } from "./landing-data";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -20,7 +21,10 @@ const STEP_ICONS: LucideIcon[] = [
 ];
 
 export function ProcessSection() {
-  const badges = ["No mesmo dia", "4 a 10 dias úteis", "Iterativo", "Ao vivo"];
+  const t = useTranslations("LandingProcess");
+  const landingT = useTranslations("Landing");
+  const badges = getProcessBadges(t);
+  const processSteps = getProcessSteps(t);
 
   return (
     <AnimatedSection
@@ -30,14 +34,13 @@ export function ProcessSection() {
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
-            <SectionEyebrow>Processo</SectionEyebrow>
+            <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Nós guiamos. Vocês aprovam.
+            {t("title")}
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Ajudamos a transformar ideias soltas num convite pronto a enviar,
-            sem vos deixar perdidos entre textos, cores e decisões técnicas.
+            {t("body")}
           </p>
         </div>
         <div className="mt-16 grid gap-5 lg:grid-cols-2">
@@ -97,15 +100,15 @@ export function ProcessSection() {
         </div>
         <div className="mt-14 flex flex-col items-center justify-center gap-5 text-center sm:flex-row">
           <p className="text-2xl font-medium text-[#1F2420]">
-            Prontos para criar algo que pareça mesmo vosso?
+            {t("closing")}
           </p>
           <a
-            href={buildWhatsappUrl()}
+            href={buildWhatsappUrl(landingT("defaultWhatsappMessage"))}
             target="_blank"
             rel="noreferrer"
             className="rounded-full bg-[#3F4E3F] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
           >
-            Começar conversa →
+            {t("cta")}
           </a>
         </div>
       </div>
@@ -114,12 +117,14 @@ export function ProcessSection() {
 }
 
 function ProcessPreview({ index }: { index: number }) {
+  const t = useTranslations("LandingProcess");
+
   if (index === 0) {
     return (
       <div className="mt-6 space-y-2 rounded-2xl bg-[#243326]/85 p-4 text-xs text-white">
         <div className="flex items-end gap-2">
           <div className="rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-[#1F2420] shadow-sm">
-            Olá! Casamento em Julho 🌿
+            {t("previewMessageA")}
           </div>
           <span className="text-[9px] uppercase tracking-[0.18em] text-white/45">
             10:24
@@ -130,14 +135,14 @@ function ProcessPreview({ index }: { index: number }) {
             10:26
           </span>
           <div className="rounded-2xl rounded-br-sm bg-[#6B7E68] px-3 py-2 text-white shadow-sm">
-            Perfeito! Envio proposta hoje ✦
+            {t("previewMessageB")}
           </div>
         </div>
         <div className="flex items-center gap-1.5 pt-1 text-[10px] text-white/60">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white [animation-delay:120ms]" />
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white [animation-delay:240ms]" />
-          A escrever…
+          {t("typing")}
         </div>
       </div>
     );
@@ -148,7 +153,7 @@ function ProcessPreview({ index }: { index: number }) {
       <div className="mt-6 grid grid-cols-[1fr_auto] gap-3 rounded-2xl bg-[#F6F7F5] p-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#5C605A]">
-            Paleta
+            {t("palette")}
           </p>
           <div className="mt-3 flex gap-2">
             {["#3F4E3F", "#6B7E68", "#E8EBE7", "#DEE1DC"].map((color) => (
@@ -160,7 +165,7 @@ function ProcessPreview({ index }: { index: number }) {
             ))}
           </div>
           <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#5C605A]">
-            Tipografia
+            {t("typography")}
           </p>
           <p className="mt-1.5 text-xl font-semibold tracking-[-0.02em] text-[#1F2420]">
             Aa{" "}
@@ -212,13 +217,13 @@ function ProcessPreview({ index }: { index: number }) {
             <span className="grid h-4 w-4 place-items-center rounded-full bg-[#3F4E3F] text-[8px] font-bold text-white">
               1
             </span>
-            Mover título 8px abaixo
+            {t("revisionA")}
           </div>
           <div className="flex items-center gap-2 text-[#5C605A]">
             <span className="grid h-4 w-4 place-items-center rounded-full bg-[#3F4E3F] text-[8px] font-bold text-white">
               2
             </span>
-            Trocar foto da capa
+            {t("revisionB")}
           </div>
           <span className="inline-flex rounded-full bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#3F4E3F]">
             v3 · aprovado
@@ -239,16 +244,16 @@ function ProcessPreview({ index }: { index: number }) {
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between rounded-full bg-white px-3 py-1.5 text-[11px] shadow-sm">
-          <span>Confirmados</span>
+          <span>{t("confirmed")}</span>
           <span className="font-semibold text-[#3F4E3F]">142</span>
         </div>
         <div className="flex items-center justify-between rounded-full bg-white px-3 py-1.5 text-[11px] shadow-sm">
-          <span>Mensagens</span>
+          <span>{t("messages")}</span>
           <span className="font-semibold text-[#3F4E3F]">18</span>
         </div>
         <div className="flex items-center justify-between rounded-full bg-[#3F4E3F] px-3 py-1.5 text-[11px] text-white">
-          <span>● Em tempo real</span>
-          <span className="font-semibold">ao vivo</span>
+          <span>{t("realTime")}</span>
+          <span className="font-semibold">{t("live")}</span>
         </div>
       </div>
     </div>

@@ -5,8 +5,8 @@ import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { CustomTexts, InvitationEventType } from "@/lib/types";
-import { t } from "@/lib/custom-texts";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 
@@ -14,15 +14,17 @@ import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 // Schema — identical to RSVPModal
 // ---------------------------------------------------------------------------
 
-const rsvpSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("Email inválido").or(z.literal("")),
-  attending: z.enum(["yes", "no"], { error: "Selecione uma opção" }),
-  dietaryRestrictions: z.string(),
-  message: z.string(),
-});
+function createRsvpSchema(t: (key: string) => string) {
+  return z.object({
+    name: z.string().min(1, t("nameRequired")),
+    email: z.string().email(t("invalidEmail")).or(z.literal("")),
+    attending: z.enum(["yes", "no"], { error: t("selectOption") }),
+    dietaryRestrictions: z.string(),
+    message: z.string(),
+  });
+}
 
-type RSVPFormData = z.output<typeof rsvpSchema>;
+type RSVPFormData = z.output<ReturnType<typeof createRsvpSchema>>;
 
 // ---------------------------------------------------------------------------
 // localStorage helpers — same key as RSVPModal so the guard is shared
@@ -110,6 +112,9 @@ export default function RsvpPage({
   customTexts: ct,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const rsvpT = useTranslations("RSVP");
+  const resolveText = (key: keyof CustomTexts) => ct?.[key] || rsvpT(key);
+  const rsvpSchema = createRsvpSchema(rsvpT);
 
   // Check localStorage on mount
   useEffect(() => {
@@ -203,7 +208,7 @@ export default function RsvpPage({
           className="text-xs tracking-[0.15em] uppercase mb-3"
           style={{ color: palette.textMuted }}
         >
-          {t(ct, "cta_confirmLabel")}
+          {resolveText("cta_confirmLabel")}
         </p>
         <h1
           className="text-3xl font-light tracking-tight"
@@ -239,11 +244,14 @@ export default function RsvpPage({
                 className="text-lg font-medium"
                 style={{ color: palette.text }}
               >
-                Prazo encerrado
+                {rsvpT("deadlineClosedTitle")}
               </p>
               <p className="text-sm" style={{ color: palette.textSoft }}>
-                O prazo para confirmação de presença terminou
-                {deadline ? ` em ${deadline}` : ""}.
+                {rsvpT("deadlineClosedMessage", {
+                  deadline: deadline
+                    ? rsvpT("deadlineDatePrefix", { deadline })
+                    : "",
+                })}
               </p>
             </div>
           ) : submitState === "already_submitted" ? (
@@ -254,10 +262,10 @@ export default function RsvpPage({
                 className="text-lg font-medium"
                 style={{ color: palette.text }}
               >
-                {t(ct, "rsvp_alreadyTitle")}
+                {resolveText("rsvp_alreadyTitle")}
               </p>
               <p className="text-sm" style={{ color: palette.textSoft }}>
-                {t(ct, "rsvp_alreadyMessage")}
+                {resolveText("rsvp_alreadyMessage")}
               </p>
             </div>
           ) : submitState === "success" ? (
@@ -272,10 +280,10 @@ export default function RsvpPage({
                 className="text-lg font-medium"
                 style={{ color: palette.text }}
               >
-                {t(ct, "rsvp_successTitle")}
+                {resolveText("rsvp_successTitle")}
               </p>
               <p className="text-sm" style={{ color: palette.textSoft }}>
-                {t(ct, "rsvp_successMessage")}
+                {resolveText("rsvp_successMessage")}
               </p>
             </div>
           ) : submitState === "error" ? (
@@ -286,10 +294,10 @@ export default function RsvpPage({
                 className="text-lg font-medium"
                 style={{ color: palette.text }}
               >
-                {t(ct, "rsvp_errorTitle")}
+                {resolveText("rsvp_errorTitle")}
               </p>
               <p className="text-sm" style={{ color: palette.textSoft }}>
-                {t(ct, "rsvp_errorMessage")}
+                {resolveText("rsvp_errorMessage")}
               </p>
               <button
                 onClick={() => setSubmitState("idle")}
@@ -300,7 +308,7 @@ export default function RsvpPage({
                   borderRadius: palette.ctaRadius,
                 }}
               >
-                {t(ct, "rsvp_retryButton")}
+                {resolveText("rsvp_retryButton")}
               </button>
             </div>
           ) : (
@@ -315,24 +323,24 @@ export default function RsvpPage({
                   className="text-base font-semibold"
                   style={{ color: palette.text }}
                 >
-                  {t(ct, "rsvp_modalTitle")}
+                  {resolveText("rsvp_modalTitle")}
                 </h2>
                 {deadline && (
                   <p
                     className="mt-1 text-xs"
                     style={{ color: palette.textMuted }}
                   >
-                    {t(ct, "rsvp_deadlinePrefix")} {deadline}
+                    {resolveText("rsvp_deadlinePrefix")} {deadline}
                   </p>
                 )}
               </div>
 
               {/* Name */}
               <div className="flex flex-col gap-1.5">
-                <label style={labelStyle}>{t(ct, "rsvp_nameLabel")}</label>
+                <label style={labelStyle}>{resolveText("rsvp_nameLabel")}</label>
                 <input
                   {...register("name")}
-                  placeholder={t(ct, "rsvp_namePlaceholder")}
+                  placeholder={resolveText("rsvp_namePlaceholder")}
                   className={inputBase}
                   style={inputStyle}
                 />
@@ -345,11 +353,11 @@ export default function RsvpPage({
 
               {showEmail && (
                 <div className="flex flex-col gap-1.5">
-                  <label style={labelStyle}>{t(ct, "rsvp_emailLabel")}</label>
+                  <label style={labelStyle}>{resolveText("rsvp_emailLabel")}</label>
                   <input
                     {...register("email")}
                     type="email"
-                    placeholder={t(ct, "rsvp_emailPlaceholder")}
+                    placeholder={resolveText("rsvp_emailPlaceholder")}
                     className={inputBase}
                     style={inputStyle}
                   />
@@ -363,13 +371,13 @@ export default function RsvpPage({
 
               {/* Attending */}
               <div className="flex flex-col gap-2">
-                <label style={labelStyle}>{t(ct, "rsvp_attendingLabel")}</label>
+                <label style={labelStyle}>{resolveText("rsvp_attendingLabel")}</label>
                 <div className="flex gap-3">
                   {(["yes", "no"] as const).map((val) => {
                     const label =
                       val === "yes"
-                        ? t(ct, "rsvp_attendingYes")
-                        : t(ct, "rsvp_attendingNo");
+                        ? resolveText("rsvp_attendingYes")
+                        : resolveText("rsvp_attendingNo");
                     const selected = attending === val;
                     return (
                       <label
@@ -407,10 +415,10 @@ export default function RsvpPage({
               {/* Dietary restrictions — only if attending */}
               {attending === "yes" && showDietaryRestrictions && (
                 <div className="flex flex-col gap-1.5">
-                  <label style={labelStyle}>{t(ct, "rsvp_dietaryLabel")}</label>
+                  <label style={labelStyle}>{resolveText("rsvp_dietaryLabel")}</label>
                   <input
                     {...register("dietaryRestrictions")}
-                    placeholder={t(ct, "rsvp_dietaryPlaceholder")}
+                    placeholder={resolveText("rsvp_dietaryPlaceholder")}
                     className={inputBase}
                     style={inputStyle}
                   />
@@ -419,11 +427,11 @@ export default function RsvpPage({
 
               {/* Message */}
               <div className="flex flex-col gap-1.5">
-                <label style={labelStyle}>{t(ct, "rsvp_messageLabel")}</label>
+                <label style={labelStyle}>{resolveText("rsvp_messageLabel")}</label>
                 <textarea
                   {...register("message")}
                   rows={3}
-                  placeholder={t(ct, "rsvp_messagePlaceholder")}
+                  placeholder={resolveText("rsvp_messagePlaceholder")}
                   className={`${inputBase} resize-none`}
                   style={inputStyle}
                 />
@@ -444,10 +452,10 @@ export default function RsvpPage({
                 {submitState === "loading" ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    {t(ct, "rsvp_submitting")}
+                    {resolveText("rsvp_submitting")}
                   </>
                 ) : (
-                  t(ct, "rsvp_submitButton")
+                  resolveText("rsvp_submitButton")
                 )}
               </button>
             </form>

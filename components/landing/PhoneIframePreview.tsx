@@ -37,7 +37,7 @@ export function PhoneIframePreview({
           aria-hidden="true"
           className="absolute left-1/2 top-3 z-20 h-3.5 w-16 -translate-x-1/2 rounded-full bg-[#0D1510] shadow-[0_2px_6px_rgba(0,0,0,0.45)]"
         />
-        <div className="absolute inset-0 overflow-hidden rounded-[1.6rem]">
+        <div className="absolute inset-0 overflow-hidden rounded-[1.4rem]">
           <iframe
             title={`Pré-visualização do convite ${title}`}
             src={src}

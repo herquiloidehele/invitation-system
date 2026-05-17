@@ -1,7 +1,15 @@
 export const WHATSAPP_NUMBER = "351910671757";
 export const DISPLAY_WHATSAPP_NUMBER = "+351 910 671 757";
-export const DEFAULT_WHATSAPP_MESSAGE =
+export const DEFAULT_CONTACT_MESSAGE =
   "Olá! Gostava de pedir um orçamento para um convite digital Brindeal.";
+
+export const DEFAULT_CONTACT_MESSAGE_LABELS = {
+  name: "Nome",
+  eventType: "Tipo de evento",
+  date: "Data",
+  guests: "Convidados",
+  message: "Mensagem",
+} as const;
 
 export type ContactMessageFields = {
   name: string;
@@ -11,18 +19,29 @@ export type ContactMessageFields = {
   message: string;
 };
 
-export function buildWhatsappUrl(message = DEFAULT_WHATSAPP_MESSAGE) {
+export type ContactMessageLabels = Record<keyof ContactMessageFields, string>;
+
+export function buildWhatsappUrl(message = DEFAULT_CONTACT_MESSAGE) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-export function buildContactMessage(fields: ContactMessageFields) {
+export function buildContactMessage({
+  fields,
+  intro = DEFAULT_CONTACT_MESSAGE,
+  labels = DEFAULT_CONTACT_MESSAGE_LABELS,
+}: {
+  fields: ContactMessageFields;
+  intro?: string;
+  labels?: ContactMessageLabels;
+}) {
   return [
-    DEFAULT_WHATSAPP_MESSAGE,
-    fields.name.trim() && `Nome: ${fields.name.trim()}`,
-    fields.eventType.trim() && `Tipo de evento: ${fields.eventType.trim()}`,
-    fields.date.trim() && `Data: ${fields.date.trim()}`,
-    fields.guests.trim() && `Convidados: ${fields.guests.trim()}`,
-    fields.message.trim() && `Mensagem: ${fields.message.trim()}`,
+    intro,
+    fields.name.trim() && `${labels.name}: ${fields.name.trim()}`,
+    fields.eventType.trim() &&
+      `${labels.eventType}: ${fields.eventType.trim()}`,
+    fields.date.trim() && `${labels.date}: ${fields.date.trim()}`,
+    fields.guests.trim() && `${labels.guests}: ${fields.guests.trim()}`,
+    fields.message.trim() && `${labels.message}: ${fields.message.trim()}`,
   ]
     .filter(Boolean)
     .join("\n");

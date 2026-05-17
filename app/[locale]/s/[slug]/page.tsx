@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getSaveTheDate } from "@/lib/save-the-date";
@@ -14,13 +15,14 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const data = await getSaveTheDate(slug);
 
   if (!data) {
-    return { title: "Save the Date — Not Found" };
+    const t = await getTranslations("Metadata");
+    return { title: t("saveTheDateNotFound") };
   }
 
   const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -51,7 +53,7 @@ export async function generateMetadata({
 export async function generateViewport({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Viewport> {
   const { slug } = await params;
   const data = await getSaveTheDate(slug);
@@ -96,7 +98,7 @@ function BrowserUiColorStyle({ color }: { color?: string }) {
 export default async function SaveTheDatePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
   const { slug } = await params;
   const data = await getSaveTheDate(slug);

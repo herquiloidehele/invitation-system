@@ -7,11 +7,14 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AnimatedSection } from "./AnimatedSection";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function FeaturesSection() {
+  const t = useTranslations("LandingFeatures");
+
   return (
     <AnimatedSection
       id="recursos"
@@ -20,14 +23,13 @@ export function FeaturesSection() {
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
-            <SectionEyebrow>Recursos</SectionEyebrow>
+            <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Bonito para ver. Simples para usar.
+            {t("title")}
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Os convidados recebem um link claro. Vocês acompanham confirmações,
-            escolhas e mensagens sem folhas soltas nem conversas perdidas.
+            {t("body")}
           </p>
         </div>
         <div className="mt-14 grid gap-5 lg:grid-cols-12">
@@ -36,38 +38,38 @@ export function FeaturesSection() {
           <div className="grid gap-5 lg:col-span-5">
             <FeatureWideCard
               icon="♫"
-              title="Música ambiente"
-              text="A banda sonora certa, no momento certo."
+              title={t("musicTitle")}
+              text={t("musicText")}
               visual={<MusicPlayer />}
             />
             <FeatureWideCard
               icon="◎"
-              title="Mapa interactivo"
-              text="Direcções, GPS e detalhes para chegar sem stress."
+              title={t("mapTitle")}
+              text={t("mapText")}
               visual={<MapTile />}
             />
           </div>
 
           <FeatureSmallCard
             icon={Users}
-            title="Gestão de convidados"
-            text="Mesa, link pessoal e acompanhantes sempre organizados."
+            title={t("guestsTitle")}
+            text={t("guestsText")}
           >
             <GuestTable />
           </FeatureSmallCard>
 
           <FeatureSmallCard
             icon={BarChart3}
-            title="Analytics"
-            text="Saibam quem abriu, confirmou e respondeu."
+            title={t("analyticsTitle")}
+            text={t("analyticsText")}
           >
             <AnalyticsChart />
           </FeatureSmallCard>
 
           <FeatureSmallCard
             icon={Languages}
-            title="Multi-idioma"
-            text="Português, inglês e espanhol para receber todos bem."
+            title={t("languagesTitle")}
+            text={t("languagesText")}
             tinted
           >
             <LanguageList />
@@ -75,8 +77,8 @@ export function FeaturesSection() {
 
           <FeatureSmallCard
             icon={Palette}
-            title="Personalização total"
-            text="Tipografia, cores e fotografias escolhidas para o vosso dia."
+            title={t("customTitle")}
+            text={t("customText")}
           >
             <CustomizationPanel />
           </FeatureSmallCard>
@@ -87,28 +89,28 @@ export function FeaturesSection() {
 }
 
 function RsvpHero() {
+  const t = useTranslations("LandingFeatures");
   const guests = [
     { name: "Luena Santos", imageUrl: landingImages.guestPortraitA },
     { name: "Dário Monteiro", imageUrl: landingImages.guestPortraitB },
     { name: "Ana Pereira", imageUrl: landingImages.guestPortraitC },
   ];
-  const ementa = ["Carne", "Peixe", "Vegetariano"];
+  const menu = [t("menuMeat"), t("menuFish"), t("menuVegetarian")];
 
   return (
     <article className="min-h-[360px] rounded-[1.75rem] bg-[#3F4E3F] p-8 text-white sm:p-10 lg:col-span-7 lg:min-h-[430px]">
       <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#F6F7F5]">
-        • Para cuidar dos convidados
+        {t("rsvpEyebrow")}
       </p>
       <h3 className="mt-7 text-4xl font-semibold leading-tight tracking-[-0.02em] sm:text-5xl">
-        RSVP em tempo real
+        {t("rsvpTitle")}
       </h3>
       <p className="mt-5 max-w-3xl text-sm leading-7 text-[#E8EBE7] sm:text-base">
-        Os convidados confirmam, escolhem ementa e deixam uma mensagem. Vocês
-        acompanham tudo num painel privado, sincronizado ao minuto.
+        {t("rsvpBody")}
       </p>
       <div className="mt-10 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#E8EBE7]">
-        Ementa
-        {ementa.map((item) => (
+        {t("menu")}
+        {menu.map((item) => (
           <span
             key={item}
             className="rounded-full bg-white/12 px-3 py-1.5 text-[11px] font-semibold normal-case tracking-normal text-white"
@@ -119,7 +121,7 @@ function RsvpHero() {
       </div>
       <div className="mt-6 rounded-2xl bg-[#243326]/70 p-5 backdrop-blur">
         <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-[#F6F7F5]">
-          <span>Confirmações recebidas</span>
+          <span>{t("received")}</span>
           <span>142 / 150</span>
         </div>
         <div className="mt-5 h-2 rounded-full bg-black/20">
@@ -145,7 +147,7 @@ function RsvpHero() {
               +138
             </span>
           </div>
-          <span className="text-xs text-[#E8EBE7]">actualizado agora</span>
+          <span className="text-xs text-[#E8EBE7]">{t("updatedNow")}</span>
         </div>
       </div>
     </article>
@@ -228,6 +230,8 @@ function MusicPlayer() {
 }
 
 function MapTile() {
+  const t = useTranslations("LandingFeatures");
+
   return (
     <div
       className="relative h-24 w-32 overflow-hidden rounded-2xl border border-[#E5E7E4] bg-[#F6F7F5]"
@@ -253,13 +257,14 @@ function MapTile() {
         <span className="h-2.5 w-2.5 rounded-full bg-[#3F4E3F]" />
       </span>
       <span className="absolute bottom-2 left-2 rounded-full bg-white px-2 py-0.5 text-[9px] font-semibold text-[#3F4E3F] shadow">
-        Quinta da Aroeira
+        {t("mapVenue")}
       </span>
     </div>
   );
 }
 
 function GuestTable() {
+  const t = useTranslations("LandingFeatures");
   const rows = [
     { name: "Leonor S.", table: 1, state: "✓" },
     { name: "Diogo M.", table: 1, state: "✓" },
@@ -269,8 +274,8 @@ function GuestTable() {
   return (
     <div className="mt-5 overflow-hidden rounded-xl bg-[#F6F7F5]">
       <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#5C605A]">
-        <span>Convidado</span>
-        <span>Mesa</span>
+        <span>{t("guest")}</span>
+        <span>{t("table")}</span>
         <span>RSVP</span>
       </div>
       <div className="space-y-1 px-2 pb-2">
@@ -303,13 +308,14 @@ function GuestTable() {
 }
 
 function AnalyticsChart() {
+  const t = useTranslations("LandingFeatures");
   const bars = [22, 40, 30, 48, 63, 54, 78];
 
   return (
     <>
       <div className="mt-5 rounded-xl bg-[#F6F7F5] p-4">
         <div className="flex items-end justify-between text-[9px] font-semibold uppercase tracking-[0.18em] text-[#5C605A]">
-          <span>Semana 12</span>
+          <span>{t("visits")}</span>
           <span>RSVPs</span>
         </div>
         <div className="mt-3 flex h-20 items-end justify-between gap-3">
@@ -331,7 +337,7 @@ function AnalyticsChart() {
       </div>
       <p className="mt-3 text-3xl font-semibold text-[#3F4E3F]">
         +38%{" "}
-        <span className="text-xs font-normal text-[#5C605A]">esta semana</span>
+        <span className="text-xs font-normal text-[#5C605A]">{t("updatedNow")}</span>
       </p>
     </>
   );
@@ -366,6 +372,7 @@ function LanguageList() {
 }
 
 function CustomizationPanel() {
+  const t = useTranslations("LandingProcess");
   const tiles = [
     { src: landingImages.personalisationA, alt: "Casal" },
     { src: landingImages.personalisationB, alt: "Flores" },
@@ -391,7 +398,7 @@ function CustomizationPanel() {
         ))}
       </div>
       <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.28em] text-[#5C605A]">
-        Paleta
+        {t("palette")}
       </p>
       <div className="mt-2 flex gap-2">
         {["#3F4E3F", "#2D3A2D", "#E8EBE7", "#DEE1DC"].map((color) => (
@@ -403,7 +410,7 @@ function CustomizationPanel() {
         ))}
       </div>
       <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#5C605A]">
-        Tipografia
+        {t("typography")}
       </p>
       <p className="mt-1.5 text-2xl font-semibold text-[#1F2420]">
         Aa <span className="text-base font-normal text-[#5C605A]">Manrope</span>

@@ -1,9 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { DISPLAY_WHATSAPP_NUMBER } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
-import { faqs } from "./landing-data";
+import { getFaqs } from "./landing-data";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function FaqSection({
@@ -13,20 +14,22 @@ export function FaqSection({
   openIndex: number;
   setOpenIndex: (index: number) => void;
 }) {
+  const t = useTranslations("LandingFaq");
+  const faqs = getFaqs(t);
+
   return (
     <AnimatedSection id="faq" className="bg-white px-5 py-24 sm:px-8">
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1fr]">
         <div>
-          <SectionEyebrow>FAQ</SectionEyebrow>
+          <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em]">
-            Perguntas frequentes
+            {t("title")}
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Tudo o que precisa de saber antes de começarmos. Não encontra a
-            resposta? Falamos no WhatsApp.
+            {t("body")}
           </p>
           <div className="mt-8 rounded-2xl bg-[#F6F7F5] p-6 text-sm text-[#3F4E3F]">
-            <p className="font-semibold text-[#1F2420]">Falar agora</p>
+            <p className="font-semibold text-[#1F2420]">{t("contactTitle")}</p>
             <p className="mt-2">WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
             <p>E-mail · ola@brindeal.studio</p>
           </div>

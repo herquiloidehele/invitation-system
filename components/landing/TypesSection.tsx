@@ -2,26 +2,29 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
-import { invitationTypes } from "./landing-data";
+import { getInvitationTypes } from "./landing-data";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function TypesSection() {
+  const t = useTranslations("LandingTypes");
+  const invitationTypes = getInvitationTypes(t);
+
   return (
     <AnimatedSection id="tipos" className="bg-[#F6F7F5] px-5 py-24 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
-            <SectionEyebrow>Para cada celebração</SectionEyebrow>
+              <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Cada celebração tem o seu tom
+            {t("title")}
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Do save the date ao casamento, adaptamos o texto, o ritmo e os
-            detalhes para que o convite pareça feito para a vossa história.
+            {t("body")}
           </p>
         </div>
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
@@ -38,7 +41,7 @@ export function TypesSection() {
                     : "border border-[#E5E7E4] bg-white text-[#1F2420] shadow-[0_12px_40px_rgba(31,36,32,0.05)]"
                 }`}
               >
-                <TypeVisual title={type.title} featured={featured} />
+                <TypeVisual typeKey={type.key} featured={featured} />
                 <div className="p-7">
                   <div
                     className={`mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${
@@ -59,13 +62,13 @@ export function TypesSection() {
                   </p>
                   <a
                     href={buildWhatsappUrl(
-                      `Olá! Gostava de saber mais sobre ${type.title}.`,
+                      t("typeQuestion", { type: type.title }),
                     )}
                     target="_blank"
                     rel="noreferrer"
                     className="mt-8 inline-flex items-center gap-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
                   >
-                    Saber mais <span aria-hidden="true">→</span>
+                    {t("learnMore")} <span aria-hidden="true">→</span>
                   </a>
                 </div>
               </motion.article>
@@ -77,29 +80,37 @@ export function TypesSection() {
   );
 }
 
-function TypeVisual({ title, featured }: { title: string; featured: boolean }) {
-  if (title === "Save The Date") {
+function TypeVisual({
+  typeKey,
+  featured,
+}: {
+  typeKey: "saveTheDate" | "wedding" | "engagement";
+  featured: boolean;
+}) {
+  const t = useTranslations("LandingTypes");
+
+  if (typeKey === "saveTheDate") {
     return (
       <PhotoVisual
         src={landingImages.saveTheDate}
-        alt="Casal ao pôr do sol"
+        alt={t("visualSaveTheDateAlt")}
         overlay="bg-[linear-gradient(180deg,rgba(31,36,32,0.05),rgba(31,36,32,0.55))]"
       >
         <p className="text-2xl font-semibold tracking-[-0.02em] text-white drop-shadow">
           18 · 07 · 26
         </p>
         <span className="mt-2 inline-flex rounded-full bg-[#3F4E3F] px-3 py-1 text-[10px] font-semibold text-white">
-          142 dias
+          {t("visualSaveTheDateDays")}
         </span>
       </PhotoVisual>
     );
   }
 
-  if (title === "Casamento") {
+  if (typeKey === "wedding") {
     return (
       <PhotoVisual
         src={landingImages.wedding}
-        alt="Noivos no dia do casamento"
+        alt={t("visualWeddingAlt")}
         overlay={`bg-[linear-gradient(180deg,rgba(31,36,32,0.2),rgba(31,36,32,${
           featured ? "0.6" : "0.45"
         }))]`}
@@ -109,13 +120,13 @@ function TypeVisual({ title, featured }: { title: string; featured: boolean }) {
         </p>
         <div className="mt-3 flex gap-2 text-[10px] font-semibold text-[#3F4E3F]">
           <span className="rounded-full bg-white/90 px-2.5 py-1 backdrop-blur">
-            ♫ Música
+            {t("visualWeddingMusic")}
           </span>
           <span className="rounded-full bg-white/90 px-2.5 py-1 backdrop-blur">
-            ◎ Mapa
+            {t("visualWeddingMap")}
           </span>
           <span className="rounded-full bg-white/90 px-2.5 py-1 backdrop-blur">
-            ✦ Ementa
+            {t("visualWeddingMenu")}
           </span>
         </div>
       </PhotoVisual>
@@ -125,11 +136,11 @@ function TypeVisual({ title, featured }: { title: string; featured: boolean }) {
   return (
     <PhotoVisual
       src={landingImages.engagement}
-      alt="Detalhe de alianças"
+      alt={t("visualEngagementAlt")}
       overlay="bg-[linear-gradient(180deg,rgba(255,253,249,0.05),rgba(31,36,32,0.45))]"
     >
       <p className="text-lg font-semibold text-white drop-shadow">
-        O primeiro grande dia
+        {t("visualEngagementText")}
       </p>
     </PhotoVisual>
   );

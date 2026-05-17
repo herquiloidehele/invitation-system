@@ -3,42 +3,45 @@
 import { useMemo } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import type {
   GalleryCategory as DbGalleryCategory,
   GalleryFeature,
 } from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
 import {
-  dbCategoryToTab,
-  galleryCategories,
-  type GalleryCategory,
+  dbCategoryToTabKey,
+  getGalleryCategories,
+  type GalleryCategoryKey,
 } from "./landing-data";
 import { SectionEyebrow } from "./SectionEyebrow";
 
-type GalleryCard = GalleryFeature & { tab: GalleryCategory };
+type GalleryCard = GalleryFeature & { tab: GalleryCategoryKey };
 
 export function GallerySection({
   activeCategory,
   onCategoryChange,
   itemsByCategory,
 }: {
-  activeCategory: GalleryCategory;
-  onCategoryChange: (category: GalleryCategory) => void;
+  activeCategory: GalleryCategoryKey;
+  onCategoryChange: (category: GalleryCategoryKey) => void;
   itemsByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
 }) {
+  const t = useTranslations("LandingGallery");
+  const galleryCategories = getGalleryCategories(t);
   const allItems = useMemo<GalleryCard[]>(
     () =>
       Object.entries(itemsByCategory).flatMap(([key, list]) =>
         list.map((item) => ({
           ...item,
-          tab: dbCategoryToTab[key as DbGalleryCategory],
+          tab: dbCategoryToTabKey[key as DbGalleryCategory],
         })),
       ),
     [itemsByCategory],
   );
 
   const visibleItems =
-    activeCategory === "Todos"
+    activeCategory === "all"
       ? allItems
       : allItems.filter((item) => item.tab === activeCategory);
 
@@ -47,35 +50,34 @@ export function GallerySection({
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
-            <SectionEyebrow>Galeria</SectionEyebrow>
+            <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Exemplos com alma
+            {t("title")}
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Cada convite nasce de uma conversa: as vossas fotografias, o vosso
-            estilo, as palavras que querem que os convidados guardem.
+            {t("body")}
           </p>
         </div>
         <div className="mt-12 flex flex-wrap justify-center gap-2">
           {galleryCategories.map((category) => (
             <button
-              key={category}
+              key={category.key}
               type="button"
-              onClick={() => onCategoryChange(category)}
+              onClick={() => onCategoryChange(category.key)}
               className={`rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4 ${
-                activeCategory === category
+                activeCategory === category.key
                   ? "bg-[#3F4E3F] text-white"
                   : "border border-[#E5E7E4] text-[#1F2420] hover:border-[#3F4E3F]"
               }`}
             >
-              {category}
+              {category.label}
             </button>
           ))}
         </div>
         {visibleItems.length === 0 ? (
           <p className="mt-16 text-center text-sm text-[#5C605A]">
-            Ainda sem convites em destaque nesta categoria.
+            {t("empty")}
           </p>
         ) : (
           <motion.div
@@ -97,7 +99,7 @@ export function GallerySection({
                     {item.imageUrl ? (
                       <Image
                         src={item.imageUrl}
-                        alt={item.title || "Convite"}
+                        alt={item.title || t("fallbackTitle")}
                         fill
                         sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw"
                         className="object-cover transition duration-500 group-hover:scale-[1.03]"
@@ -107,7 +109,7 @@ export function GallerySection({
                   </div>
                   <div className="p-5">
                     <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
-                      {item.title || "Convite"}
+                      {item.title || t("fallbackTitle")}
                     </h3>
                     {item.subtitle ? (
                       <p className="mt-1.5 text-xs text-[#5C605A]">

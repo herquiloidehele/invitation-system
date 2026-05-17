@@ -9,7 +9,7 @@ import RsvpPage from "./RsvpPage";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ locale: string; slug: string }> };
 
 // ---------------------------------------------------------------------------
 // Deadline helper — tries to parse the deadline string and compare to now.
