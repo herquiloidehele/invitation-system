@@ -1,3 +1,30 @@
+export const FOOTER_LINK_GROUPS = [
+  {
+    heading: "Produto",
+    links: [
+      { label: "Casamento", href: "#galeria" },
+      { label: "Save the Date", href: "#galeria" },
+      { label: "Baptizado", href: "#galeria" },
+      { label: "Noivado", href: "#galeria" },
+    ],
+  },
+  {
+    heading: "Recursos",
+    links: [
+      { label: "Galeria", href: "#galeria" },
+      { label: "Como funciona", href: "#processo" },
+      { label: "FAQ", href: "#faq" },
+    ],
+  },
+  {
+    heading: "Empresa",
+    links: [
+      { label: "Sobre", href: "#recursos" },
+      { label: "Contacto", href: "#orcamento" },
+    ],
+  },
+] as const;
+
 export function Footer() {
   return (
     <footer className="bg-[#1F2420] px-5 py-16 text-[#E8EBE7] sm:px-8">
@@ -11,18 +38,18 @@ export function Footer() {
             Convites digitais feitos com cuidado, em Lisboa.
           </p>
         </div>
-        {[
-          ["Produto", "Casamento", "Save the Date", "Baptizado", "Noivado"],
-          ["Recursos", "Galeria", "Como funciona", "FAQ", "Blog"],
-          ["Empresa", "Sobre", "Contacto", "Termos", "Privacidade"],
-        ].map(([heading, ...links]) => (
+        {FOOTER_LINK_GROUPS.map(({ heading, links }) => (
           <div key={heading} className="space-y-3 text-sm">
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-white">
               {heading}
             </p>
             {links.map((link) => (
-              <a key={link} href="#top" className="block text-[#A3A496] transition hover:text-white">
-                {link}
+              <a
+                key={link.label}
+                href={link.href}
+                className="block text-[#A3A496] transition hover:text-white"
+              >
+                {link.label}
               </a>
             ))}
           </div>
