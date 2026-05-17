@@ -80,7 +80,7 @@ export function GallerySection({
         ) : (
           <motion.div
             layout
-            className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+            className="mt-12 grid gap-3 md:grid-cols-2 lg:grid-cols-3"
           >
             <AnimatePresence mode="popLayout">
               {visibleItems.map((item) => (
@@ -104,21 +104,18 @@ export function GallerySection({
                       />
                     ) : null}
                     <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,rgba(31,36,32,0.16))]" />
-                    <div className="absolute bottom-4 left-4 rounded-full bg-white px-4 py-2 text-[11px] font-bold tracking-[0.14em] text-[#3F4E3F] shadow-sm">
-                      {item.tab}
-                    </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
+                  <div className="p-5">
+                    <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
                       {item.title || "Convite"}
                     </h3>
-                    <p className="mt-3 text-sm text-[#5C605A]">
-                      {[item.displayDate, item.subtitle]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
+                    {item.subtitle ? (
+                      <p className="mt-1.5 text-xs text-[#5C605A]">
+                        {item.subtitle}
+                      </p>
+                    ) : null}
                     {item.priceLabel ? (
-                      <p className="mt-2 text-base font-bold text-[#3F4E3F]">
+                      <p className="mt-2 text-xs font-medium text-[#8A8E86]">
                         {item.priceLabel}
                       </p>
                     ) : null}
