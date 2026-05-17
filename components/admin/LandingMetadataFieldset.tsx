@@ -1,5 +1,7 @@
 "use client";
 
+import MediaUpload from "@/components/admin/MediaUpload";
+
 export type LandingMetadata = {
   priceFromCents: number | null;
   currency: string | null;
@@ -45,18 +47,17 @@ export function LandingMetadataFieldset({
         />
       </label>
 
-      <label className="block text-sm">
-        Imagem destaque (URL)
-        <input
-          type="url"
-          value={value.landingImageUrl ?? ""}
-          onChange={(event) =>
-            update({ landingImageUrl: event.target.value || null })
-          }
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-          placeholder="https://…"
+      <div className="block text-sm">
+        <span className="mb-1 block">Imagem destaque</span>
+        <MediaUpload
+          kind="image"
+          maxSizeMB={5}
+          value={value.landingImageUrl ?? undefined}
+          onUpload={(url) => update({ landingImageUrl: url })}
+          onClear={() => update({ landingImageUrl: null })}
+          label="Carregar imagem destaque"
         />
-      </label>
+      </div>
 
       <label className="block text-sm">
         Subtítulo (linha 2 do cartão)
