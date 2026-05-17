@@ -1,23 +1,47 @@
 "use client";
 
+import { useMemo } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import type {
+  GalleryCategory as DbGalleryCategory,
+  GalleryFeature,
+} from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
 import {
+  dbCategoryToTab,
   galleryCategories,
   type GalleryCategory,
-  type GalleryItem,
 } from "./landing-data";
 import { SectionEyebrow } from "./SectionEyebrow";
+
+type GalleryCard = GalleryFeature & { tab: GalleryCategory };
 
 export function GallerySection({
   activeCategory,
   onCategoryChange,
-  items,
+  itemsByCategory,
 }: {
   activeCategory: GalleryCategory;
   onCategoryChange: (category: GalleryCategory) => void;
-  items: GalleryItem[];
+  itemsByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
 }) {
+  const allItems = useMemo<GalleryCard[]>(
+    () =>
+      Object.entries(itemsByCategory).flatMap(([key, list]) =>
+        list.map((item) => ({
+          ...item,
+          tab: dbCategoryToTab[key as DbGalleryCategory],
+        })),
+      ),
+    [itemsByCategory],
+  );
+
+  const visibleItems =
+    activeCategory === "Todos"
+      ? allItems
+      : allItems.filter((item) => item.tab === activeCategory);
+
   return (
     <AnimatedSection id="galeria" className="bg-white px-5 py-24 sm:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
@@ -49,44 +73,61 @@ export function GallerySection({
             </button>
           ))}
         </div>
-        <motion.div layout className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {items.map((item) => (
-              <motion.article
-                key={item.title}
-                layout
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                className="group overflow-hidden rounded-[1.5rem] border border-[#E5E7E4] bg-white shadow-[0_12px_40px_rgba(31,36,32,0.045)]"
-              >
-                <div className={`relative h-72 overflow-hidden ${item.gradient}`}>
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_35%,rgba(255,255,255,0.42),transparent_22%),linear-gradient(to_bottom,transparent_55%,rgba(31,36,32,0.16))] transition duration-500 group-hover:scale-[1.03]" />
-                  <div className="absolute bottom-4 left-4 rounded-full bg-white px-4 py-2 text-[11px] font-bold tracking-[0.14em] text-[#3F4E3F] shadow-sm">
-                    {item.category === "Casamentos"
-                      ? "Casamento"
-                      : item.category === "Save the Date"
-                        ? "Save the Date"
-                        : item.category === "Aniversários"
-                          ? "Aniversário"
-                          : item.category}
+        {visibleItems.length === 0 ? (
+          <p className="mt-16 text-center text-sm text-[#5C605A]">
+            Ainda sem convites em destaque nesta categoria.
+          </p>
+        ) : (
+          <motion.div
+            layout
+            className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
+            <AnimatePresence mode="popLayout">
+              {visibleItems.map((item) => (
+                <motion.a
+                  key={item.id}
+                  href={item.href}
+                  layout
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  className="group overflow-hidden rounded-[1.5rem] border border-[#E5E7E4] bg-white shadow-[0_12px_40px_rgba(31,36,32,0.045)] transition hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(31,36,32,0.08)]"
+                >
+                  <div className="relative h-72 overflow-hidden bg-[linear-gradient(135deg,#E5E7E4,#C9D0C6)]">
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title || "Convite"}
+                        fill
+                        sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw"
+                        className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                      />
+                    ) : null}
+                    <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,rgba(31,36,32,0.16))]" />
+                    <div className="absolute bottom-4 left-4 rounded-full bg-white px-4 py-2 text-[11px] font-bold tracking-[0.14em] text-[#3F4E3F] shadow-sm">
+                      {item.tab}
+                    </div>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-[#5C605A]">
-                    {item.date} · {item.location}
-                  </p>
-                  <p className="mt-2 text-base font-bold text-[#3F4E3F]">
-                    {item.price}
-                  </p>
-                </div>
-              </motion.article>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
+                      {item.title || "Convite"}
+                    </h3>
+                    <p className="mt-3 text-sm text-[#5C605A]">
+                      {[item.displayDate, item.subtitle]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                    {item.priceLabel ? (
+                      <p className="mt-2 text-base font-bold text-[#3F4E3F]">
+                        {item.priceLabel}
+                      </p>
+                    ) : null}
+                  </div>
+                </motion.a>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
       </div>
     </AnimatedSection>
   );

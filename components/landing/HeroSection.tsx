@@ -6,9 +6,17 @@ import {
   buildWhatsappUrl,
   DEFAULT_WHATSAPP_MESSAGE,
 } from "@/lib/landing-whatsapp";
+import type { HeroFeature } from "@/lib/landing-features";
+import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
-export function HeroSection({ reduceMotion }: { reduceMotion: boolean | null }) {
+export function HeroSection({
+  reduceMotion,
+  feature,
+}: {
+  reduceMotion: boolean | null;
+  feature: HeroFeature | null;
+}) {
   return (
     <section
       id="top"
@@ -16,7 +24,17 @@ export function HeroSection({ reduceMotion }: { reduceMotion: boolean | null }) 
     >
       <div className="absolute left-1/2 top-24 -z-0 h-72 w-72 rounded-full bg-[#E8EBE7] blur-3xl" />
       <HeroCopy reduceMotion={reduceMotion} />
-      <HeroPhone reduceMotion={reduceMotion} />
+      {feature ? (
+        <div className="relative z-10 mx-auto w-full max-w-[20rem] sm:max-w-[22rem] lg:max-w-[24rem]">
+          <PhoneIframePreview
+            title={feature.title || "Convite Brindeal"}
+            src={feature.href}
+            showCaption={false}
+          />
+        </div>
+      ) : (
+        <HeroPhone reduceMotion={reduceMotion} />
+      )}
     </section>
   );
 }

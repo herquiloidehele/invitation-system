@@ -1,12 +1,18 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import {
   buildContactMessage,
   buildWhatsappUrl,
   type ContactMessageFields,
 } from "@/lib/landing-whatsapp";
+import type {
+  GalleryCategory as DbGalleryCategory,
+  GalleryFeature,
+  HeroFeature,
+  LiveDemoFeature,
+} from "@/lib/landing-features";
 import { ContactSection } from "./ContactSection";
 import { FaqSection } from "./FaqSection";
 import { FeaturesSection } from "./FeaturesSection";
@@ -17,9 +23,17 @@ import { LandingNav } from "./LandingNav";
 import { LiveDemoSection } from "./LiveDemoSection";
 import { ProcessSection } from "./ProcessSection";
 import { TypesSection } from "./TypesSection";
-import { galleryItems, type GalleryCategory } from "./landing-data";
+import { type GalleryCategory } from "./landing-data";
 
-export function BrindealHomepage() {
+export function BrindealHomepage({
+  heroFeature,
+  galleryByCategory,
+  liveDemoFeatures,
+}: {
+  heroFeature: HeroFeature | null;
+  galleryByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
+  liveDemoFeatures: LiveDemoFeature[];
+}) {
   const reduceMotion = useReducedMotion();
   const [activeGalleryCategory, setActiveGalleryCategory] =
     useState<GalleryCategory>("Todos");
@@ -31,14 +45,6 @@ export function BrindealHomepage() {
     guests: "",
     message: "",
   });
-
-  const visibleGalleryItems = useMemo(
-    () =>
-      activeGalleryCategory === "Todos"
-        ? galleryItems
-        : galleryItems.filter((item) => item.category === activeGalleryCategory),
-    [activeGalleryCategory],
-  );
 
   function updateFormField(field: keyof ContactMessageFields, value: string) {
     setFormState((current) => ({ ...current, [field]: value }));
@@ -56,16 +62,16 @@ export function BrindealHomepage() {
   return (
     <main className="overflow-hidden bg-white font-[var(--font-outfit)] text-[#1F2420]">
       <LandingNav />
-      <HeroSection reduceMotion={reduceMotion} />
+      <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
       <TypesSection />
       <GallerySection
         activeCategory={activeGalleryCategory}
         onCategoryChange={setActiveGalleryCategory}
-        items={visibleGalleryItems}
+        itemsByCategory={galleryByCategory}
       />
       <ProcessSection />
       <FeaturesSection />
-      <LiveDemoSection />
+      <LiveDemoSection items={liveDemoFeatures} />
       <FaqSection openIndex={openFaqIndex} setOpenIndex={setOpenFaqIndex} />
       <ContactSection
         formState={formState}

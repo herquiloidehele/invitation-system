@@ -1,6 +1,14 @@
 "use client";
 
-export function PhoneIframePreview({ title, src }: { title: string; src: string }) {
+export function PhoneIframePreview({
+  title,
+  src,
+  showCaption = true,
+}: {
+  title: string;
+  src: string;
+  showCaption?: boolean;
+}) {
   function hideScrollbar(event: React.SyntheticEvent<HTMLIFrameElement>) {
     const iframeDocument = event.currentTarget.contentDocument;
 
@@ -8,7 +16,11 @@ export function PhoneIframePreview({ title, src }: { title: string; src: string 
 
     iframeDocument.documentElement.style.scrollbarWidth = "none";
     iframeDocument.body.style.scrollbarWidth = "none";
-    (iframeDocument.body.style as CSSStyleDeclaration & { msOverflowStyle?: string }).msOverflowStyle = "none";
+    (
+      iframeDocument.body.style as CSSStyleDeclaration & {
+        msOverflowStyle?: string;
+      }
+    ).msOverflowStyle = "none";
 
     if (!iframeDocument.getElementById("brindeal-hide-scrollbar")) {
       const style = iframeDocument.createElement("style");
@@ -20,26 +32,40 @@ export function PhoneIframePreview({ title, src }: { title: string; src: string 
 
   return (
     <article className="text-center">
-      <div className="mx-auto aspect-[9/16] w-full max-w-[20rem] overflow-hidden rounded-[2.75rem] border-[7px] border-[#3F4E3F] bg-white shadow-[0_28px_90px_rgba(31,36,32,0.16)]">
-        <iframe
-          title={`Pré-visualização do convite ${title}`}
-          src={src}
-          className="h-full w-full border-0 [scrollbar-width:none]"
-          loading="lazy"
-          onLoad={hideScrollbar}
+      <div className="relative mx-auto aspect-[9/16] w-full max-w-[20rem] rounded-[2.75rem] border-[8px] border-[#2D3A2D] bg-white shadow-[0_30px_80px_rgba(31,36,32,0.22),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
+        <span
+          aria-hidden="true"
+          className="absolute left-1/2 top-1.5 z-20 h-3.5 w-16 -translate-x-1/2 rounded-full bg-[#0D1510] shadow-[0_2px_6px_rgba(0,0,0,0.45)]"
         />
+        <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
+          <iframe
+            title={`Pré-visualização do convite ${title}`}
+            src={src}
+            className="h-full w-full border-0 [scrollbar-width:none]"
+            loading="lazy"
+            onLoad={hideScrollbar}
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.18),transparent_24%)]"
+          />
+        </div>
       </div>
-      <h3 className="mt-6 text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
-        {title}
-      </h3>
-      <a
-        href={src}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-4 inline-flex rounded-full border border-[#E5E7E4] bg-white px-6 py-3 text-sm font-semibold text-[#1F2420] transition hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
-      >
-        Abrir convite →
-      </a>
+      {showCaption ? (
+        <>
+          <h3 className="mt-6 text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
+            {title}
+          </h3>
+          <a
+            href={src}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex rounded-full border border-[#E5E7E4] bg-white px-6 py-3 text-sm font-semibold text-[#1F2420] transition hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+          >
+            Abrir convite →
+          </a>
+        </>
+      ) : null}
     </article>
   );
 }

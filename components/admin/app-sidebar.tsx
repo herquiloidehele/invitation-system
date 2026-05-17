@@ -5,21 +5,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   AudioWaveform,
-  ChevronRight,
-  ChevronsUpDown,
-  GalleryVerticalEnd,
-  LayoutDashboard,
-  Heart,
   BarChart3,
-  FolderKanban,
-  Users,
+  ChevronsUpDown,
   Database,
-  FileText,
-  PenTool,
-  MoreHorizontal,
-  Plus,
+  FolderKanban,
+  GalleryVerticalEnd,
+  Heart,
+  LayoutDashboard,
+  LayoutTemplate,
   LogOut,
+  PenTool,
+  Plus,
   Sparkles,
+  Users,
 } from "lucide-react";
 
 import {
@@ -27,22 +25,13 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,6 +77,11 @@ const navMain = [
     title: "Confirmações",
     url: "/admin/rsvps",
     icon: Users,
+  },
+  {
+    title: "Landing Page",
+    url: "/admin/landing-page",
+    icon: LayoutTemplate,
   },
 ];
 

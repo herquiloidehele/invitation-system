@@ -1,8 +1,16 @@
+import type { LiveDemoFeature } from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
-export function LiveDemoSection() {
+const FALLBACK: LiveDemoFeature[] = [
+  { id: "fallback-1", title: "Leonor & Diogo", href: "/leonor-diogo" },
+  { id: "fallback-2", title: "Sofia & Pedro", href: "/sofia-pedro" },
+];
+
+export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
+  const previews = items.length > 0 ? items.slice(0, 2) : FALLBACK;
+
   return (
     <AnimatedSection className="bg-[#F6F7F5] px-5 py-24 sm:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
@@ -19,8 +27,13 @@ export function LiveDemoSection() {
           </p>
         </div>
         <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
-          <PhoneIframePreview title="Leonor & Diogo" src="/leonor-diogo" />
-          <PhoneIframePreview title="Sofia & Pedro" src="/sofia-pedro" />
+          {previews.map((preview) => (
+            <PhoneIframePreview
+              key={preview.id}
+              title={preview.title || "Convite"}
+              src={preview.href}
+            />
+          ))}
         </div>
       </div>
     </AnimatedSection>

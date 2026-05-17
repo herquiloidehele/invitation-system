@@ -26,6 +26,11 @@ export async function POST(req: NextRequest) {
       bottomHero,
       socialPreview,
       isDemo,
+      priceFromCents,
+      currency,
+      landingImageUrl,
+      landingDescription,
+      landingSubtitle,
     } = body;
 
     if (!slug || !themeId || !couple || !date) {
@@ -49,6 +54,22 @@ export async function POST(req: NextRequest) {
         bottomHero: sanitizeJsonField(bottomHero, null),
         socialPreview: sanitizeJsonField(socialPreview, null),
         isDemo: isDemo === true,
+        priceFromCents:
+          typeof priceFromCents === "number" ? priceFromCents : null,
+        currency:
+          typeof currency === "string" && currency.length ? currency : "EUR",
+        landingImageUrl:
+          typeof landingImageUrl === "string" && landingImageUrl.length
+            ? landingImageUrl
+            : null,
+        landingDescription:
+          typeof landingDescription === "string" && landingDescription.length
+            ? landingDescription
+            : null,
+        landingSubtitle:
+          typeof landingSubtitle === "string" && landingSubtitle.length
+            ? landingSubtitle
+            : null,
       },
       include: { theme: true },
     });

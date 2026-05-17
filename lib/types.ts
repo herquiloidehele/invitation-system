@@ -503,6 +503,12 @@ export interface InvitationData {
   socialPreview?: SocialPreview;
   /** When the page was opened with `?g=<token>`, the matched guest. */
   guest?: PublicGuestData;
+  /** Landing page listing metadata. */
+  priceFromCents?: number | null;
+  currency?: string | null;
+  landingImageUrl?: string | null;
+  landingDescription?: string | null;
+  landingSubtitle?: string | null;
 }
 
 export interface TemplateTheme {
