@@ -260,11 +260,14 @@ export function LandingPageClient() {
             Escolha os convites em destaque para cada secção pública.
           </p>
         </div>
-        <Button asChild variant="outline" size="sm" className="gap-2">
-          <a href="/" target="_blank" rel="noreferrer">
-            <ExternalLink className="size-4" />
-            Ver landing
-          </a>
+        <Button
+          render={<a href="/" target="_blank" rel="noreferrer" />}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
+          <ExternalLink className="size-4" />
+          Ver landing
         </Button>
       </div>
 
@@ -529,15 +532,12 @@ function FeatureItem({
           </Button>
         ) : null}
         <Button
-          type="button"
+          render={<a href={readHref(row)} target="_blank" rel="noreferrer" />}
           variant="ghost"
           size="icon"
-          asChild
           aria-label="Abrir convite"
         >
-          <a href={readHref(row)} target="_blank" rel="noreferrer">
-            <ExternalLink className="size-4" />
-          </a>
+          <ExternalLink className="size-4" />
         </Button>
         <Button
           type="button"
