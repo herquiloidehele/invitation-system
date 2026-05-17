@@ -87,7 +87,11 @@ export function FeaturesSection() {
 }
 
 function RsvpHero() {
-  const guests = ["LS", "DM", "AP", "RJ"];
+  const guests = [
+    { name: "Luena Santos", imageUrl: landingImages.guestPortraitA },
+    { name: "Dário Monteiro", imageUrl: landingImages.guestPortraitB },
+    { name: "Ana Pereira", imageUrl: landingImages.guestPortraitC },
+  ];
   const ementa = ["Carne", "Peixe", "Vegetariano"];
 
   return (
@@ -123,23 +127,23 @@ function RsvpHero() {
         </div>
         <div className="mt-5 flex items-center justify-between gap-4">
           <div className="flex -space-x-2">
-            {guests.map((label, index) => (
+            {guests.map((guest) => (
               <span
-                key={label}
-                className="grid h-8 w-8 place-items-center rounded-full border-2 border-[#243326] bg-[#6B7E68] text-[9px] font-bold text-white"
-                style={{
-                  backgroundColor:
-                    index === 0
-                      ? "#6B7E68"
-                      : index === 3
-                        ? "#9AA795"
-                        : "#F6F7F5",
-                  color: index === 0 || index === 3 ? "#FFFFFF" : "#3F4E3F",
-                }}
+                key={guest.name}
+                className="relative block h-9 w-9 overflow-hidden rounded-full border-2 border-[#243326] bg-[#F6F7F5] shadow-[0_3px_12px_rgba(0,0,0,0.18)]"
               >
-                {index === 3 ? "+138" : label}
+                <Image
+                  src={guest.imageUrl}
+                  alt={guest.name}
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                />
               </span>
             ))}
+            <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-[#243326] bg-[#9AA795] text-[10px] font-bold text-white shadow-[0_3px_12px_rgba(0,0,0,0.18)]">
+              +138
+            </span>
           </div>
           <span className="text-xs text-[#E8EBE7]">actualizado agora</span>
         </div>

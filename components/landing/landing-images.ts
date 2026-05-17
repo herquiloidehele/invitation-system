@@ -14,4 +14,7 @@ export const landingImages = {
   personalisationA: unsplash("1519741497674-611481863552", 400),
   personalisationB: unsplash("1525772764200-be829a350797", 400),
   personalisationC: unsplash("1531058020387-3be344556be6", 400), // wedding stationery
+  guestPortraitA: unsplash("1534528741775-53994a69daeb", 240),
+  guestPortraitB: unsplash("1507003211169-0a1dd7228f2d", 240),
+  guestPortraitC: unsplash("1438761681033-6461ffad8d80", 240),
 };
