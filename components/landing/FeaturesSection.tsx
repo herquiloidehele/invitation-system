@@ -1,11 +1,22 @@
 import Image from "next/image";
+import {
+  BarChart3,
+  Languages,
+  Palette,
+  Sparkles,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { AnimatedSection } from "./AnimatedSection";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function FeaturesSection() {
   return (
-    <AnimatedSection id="recursos" className="bg-white px-5 py-24 sm:px-8 lg:py-28">
+    <AnimatedSection
+      id="recursos"
+      className="bg-white px-5 py-24 sm:px-8 lg:py-28"
+    >
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
@@ -34,17 +45,23 @@ export function FeaturesSection() {
           </div>
 
           <FeatureSmallCard
+            icon={Users}
             title="Gestão de convidados"
             text="Lista com mesa, link pessoal e acompanhantes."
           >
             <GuestTable />
           </FeatureSmallCard>
 
-          <FeatureSmallCard title="Analytics" text="Quem abriu, confirmou e respondeu.">
+          <FeatureSmallCard
+            icon={BarChart3}
+            title="Analytics"
+            text="Quem abriu, confirmou e respondeu."
+          >
             <AnalyticsChart />
           </FeatureSmallCard>
 
           <FeatureSmallCard
+            icon={Languages}
             title="Multi-idioma"
             text="PT, EN, ES para convidados internacionais."
             tinted
@@ -53,6 +70,7 @@ export function FeaturesSection() {
           </FeatureSmallCard>
 
           <FeatureSmallCard
+            icon={Palette}
             title="Personalização total"
             text="Tipografia, cores e fotografias sob medida."
           >
@@ -154,11 +172,13 @@ function FeatureWideCard({
 }
 
 function FeatureSmallCard({
+  icon: Icon = Sparkles,
   title,
   text,
   children,
   tinted,
 }: {
+  icon?: LucideIcon;
   title: string;
   text: string;
   children: React.ReactNode;
@@ -171,7 +191,7 @@ function FeatureSmallCard({
       }`}
     >
       <div className="mb-6 grid h-11 w-11 place-items-center rounded-2xl bg-[#F6F7F5] text-[#3F4E3F]">
-        ✦
+        <Icon className="size-5" aria-hidden="true" />
       </div>
       <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
         {title}
@@ -192,19 +212,8 @@ function MusicPlayer() {
         ▶
       </span>
       <div>
-        <p className="text-[11px] font-semibold text-[#1F2420]">
-          Marry Me
-        </p>
+        <p className="text-[11px] font-semibold text-[#1F2420]">Marry Me</p>
         <p className="text-[10px] text-[#5C605A]">Train · 02:46</p>
-        <div className="mt-2 flex h-5 items-end gap-0.5 text-[#6B7E68]">
-          {[40, 70, 55, 90, 35, 75, 50, 85, 45].map((height, index) => (
-            <span
-              key={index}
-              className="landing-eq-bar w-0.5 rounded-full bg-current"
-              style={{ height, animationDelay: `${index * 90}ms` }}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -218,7 +227,11 @@ function MapTile() {
     >
       <div className="absolute inset-0 bg-[linear-gradient(135deg,#EEF1EC_0%,#E0E5DC_100%)]" />
       <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent_0_10px,rgba(63,78,63,0.07)_10px_11px),repeating-linear-gradient(-45deg,transparent_0_10px,rgba(63,78,63,0.07)_10px_11px)]" />
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 128 96" fill="none">
+      <svg
+        className="absolute inset-0 h-full w-full"
+        viewBox="0 0 128 96"
+        fill="none"
+      >
         <path
           d="M8 78 Q 40 60 60 50 T 110 22"
           stroke="#3F4E3F"

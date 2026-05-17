@@ -1,15 +1,32 @@
 import Image from "next/image";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  type LucideIcon,
+  MessageSquare,
+  Palette,
+} from "lucide-react";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
 import { processSteps } from "./landing-data";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
+const STEP_ICONS: LucideIcon[] = [
+  MessageSquare,
+  Palette,
+  CheckCircle2,
+  ArrowUpRight,
+];
+
 export function ProcessSection() {
   const badges = ["No mesmo dia", "3 a 5 dias úteis", "Iterativo", "Ao vivo"];
 
   return (
-    <AnimatedSection id="processo" className="bg-[#F6F7F5] px-5 py-24 sm:px-8 lg:py-28">
+    <AnimatedSection
+      id="processo"
+      className="bg-[#F6F7F5] px-5 py-24 sm:px-8 lg:py-28"
+    >
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
@@ -37,22 +54,31 @@ export function ProcessSection() {
                 }`}
               >
                 <div className="flex items-start justify-between gap-6">
-                  <p className={`text-5xl font-semibold leading-none ${dark ? "text-white" : "text-[#3F4E3F]"}`}>
-                    <span className="text-lg">•</span> {number}
+                  <p
+                    className={`text-5xl font-semibold leading-none ${dark ? "text-white" : "text-[#3F4E3F]"}`}
+                  >
+                    {number}
                   </p>
                   <span
-                    className={`grid h-12 w-12 place-items-center rounded-2xl text-lg ${
-                      dark ? "bg-white/12 text-white" : "bg-[#F6F7F5] text-[#3F4E3F]"
+                    className={`grid h-12 w-12 place-items-center rounded-2xl ${
+                      dark
+                        ? "bg-white/12 text-white"
+                        : "bg-[#F6F7F5] text-[#3F4E3F]"
                     }`}
                     aria-hidden="true"
                   >
-                    {index === 0 ? "✉" : index === 1 ? "✦" : index === 2 ? "◐" : "↗"}
+                    {(() => {
+                      const Icon = STEP_ICONS[index] ?? MessageSquare;
+                      return <Icon className="size-5" />;
+                    })()}
                   </span>
                 </div>
                 <h3 className="mt-7 text-2xl font-semibold tracking-[-0.02em]">
                   {title}
                 </h3>
-                <p className={`mt-5 text-sm leading-7 ${dark ? "text-[#E8EBE7]" : "text-[#5C605A]"}`}>
+                <p
+                  className={`mt-5 text-sm leading-7 ${dark ? "text-[#E8EBE7]" : "text-[#5C605A]"}`}
+                >
                   {text}
                 </p>
                 <span
@@ -137,7 +163,10 @@ function ProcessPreview({ index }: { index: number }) {
             Tipografia
           </p>
           <p className="mt-1.5 text-xl font-semibold tracking-[-0.02em] text-[#1F2420]">
-            Aa <span className="text-base font-normal text-[#5C605A]">Manrope</span>
+            Aa{" "}
+            <span className="text-base font-normal text-[#5C605A]">
+              Manrope
+            </span>
           </p>
         </div>
         <div className="flex flex-col gap-2">
