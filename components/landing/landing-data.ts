@@ -79,3 +79,36 @@ export const processSteps = [
     "Convite ao vivo, link partilhável e RSVP em tempo real num painel privado.",
   ],
 ] as const;
+
+export const faqs: FaqItem[] = [
+  {
+    question: "Quanto tempo demora?",
+    answer:
+      "Tipicamente 3 a 5 dias úteis depois de recebermos fotografias e textos. Para datas próximas, fazemos versões expressas em 48h.",
+  },
+  {
+    question: "Posso usar para outros eventos além de casamento?",
+    answer:
+      "Sim. Adaptamos a experiência para save the date, baptizados, noivados, aniversários e celebrações privadas.",
+  },
+  {
+    question: "Como funciona o RSVP?",
+    answer:
+      "Os convidados confirmam directamente no convite. Acompanham tudo num painel privado, em tempo real.",
+  },
+  {
+    question: "Posso enviar a convidados individuais?",
+    answer:
+      "Sim. Cada convidado pode receber um link personalizado com nomes, mesa e detalhes específicos.",
+  },
+  {
+    question: "Posso editar depois de publicado?",
+    answer:
+      "Sim. Ajustes de texto, horários, mapas e detalhes podem ser actualizados depois da publicação.",
+  },
+  {
+    question: "Quanto custa?",
+    answer:
+      "Depende do nível de personalização, conteúdos e funcionalidades. Enviamos uma proposta clara no mesmo dia.",
+  },
+];
