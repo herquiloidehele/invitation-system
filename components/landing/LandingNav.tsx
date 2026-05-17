@@ -29,7 +29,7 @@ export function LandingNav() {
           rel="noreferrer"
           className="rounded-full bg-[#3F4E3F] px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
         >
-          Pedir orçamento →
+          Começar convite →
         </a>
       </nav>
     </header>

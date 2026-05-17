@@ -50,11 +50,11 @@ export function GallerySection({
             <SectionEyebrow>Galeria</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Histórias que inspiram
+            Exemplos com alma
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Convites reais de casais reais. Cada projecto contado com
-            sensibilidade.
+            Cada convite nasce de uma conversa: as vossas fotografias, o vosso
+            estilo, as palavras que querem que os convidados guardem.
           </p>
         </div>
         <div className="mt-12 flex flex-wrap justify-center gap-2">

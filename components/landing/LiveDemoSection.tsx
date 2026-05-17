@@ -19,11 +19,11 @@ export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
             <SectionEyebrow>Demo ao vivo</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.02em] sm:text-5xl">
-            Veja o convite a respirar.
+            Veja como os convidados vão abrir
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            A experiência final parece leve para os convidados, mas concentra
-            tudo o que o evento precisa.
+            Explore exemplos reais no telemóvel e sinta como a experiência
+            chega a quem recebe o convite.
           </p>
         </div>
         <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">

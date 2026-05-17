@@ -17,11 +17,11 @@ export function TypesSection() {
             <SectionEyebrow>Para cada celebração</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Um convite para cada momento
+            Cada celebração tem o seu tom
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Adapte o convite ao tipo de celebração. Cada modelo é refinado,
-            único e pensado para emocionar.
+            Do save the date ao casamento, adaptamos o texto, o ritmo e os
+            detalhes para que o convite pareça feito para a vossa história.
           </p>
         </div>
         <div className="mt-14 grid gap-5 lg:grid-cols-3">

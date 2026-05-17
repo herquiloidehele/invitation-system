@@ -20,12 +20,12 @@ export function ContactSection({
         <div>
           <SectionEyebrow>Vamos criar juntos</SectionEyebrow>
           <h2 className="mt-6 text-4xl font-medium leading-[1.08] tracking-[-0.03em] text-[#1F2420] sm:text-5xl">
-            O vosso convite
-            <span className="block text-[#3F4E3F]">começa hoje.</span>
+            Vamos desenhar
+            <span className="block text-[#3F4E3F]">o convite convosco.</span>
           </h2>
           <p className="mt-6 max-w-xl text-lg leading-8 text-[#5C605A]">
-            Conte-nos a data e o estilo. Enviamos uma proposta clara no mesmo
-            dia, sem compromisso.
+            Conte-nos a data, o estilo e o que já imaginam. Respondemos com uma
+            proposta clara no mesmo dia, sem compromisso.
           </p>
           <div className="mt-8 space-y-3 text-sm text-[#3F4E3F]">
             <p>WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
@@ -33,7 +33,7 @@ export function ContactSection({
           </div>
         </div>
         <form onSubmit={onSubmit} className="rounded-[1.5rem] border border-[#E5E7E4] bg-white p-6 shadow-sm sm:p-9">
-          <h3 className="text-2xl font-semibold">Pedir orçamento</h3>
+          <h3 className="text-2xl font-semibold">Começar o convite</h3>
           <p className="mt-2 text-sm text-[#5C605A]">Resposta no mesmo dia.</p>
           <div className="mt-7 grid gap-4 sm:grid-cols-2">
             <TextField label="Nome" placeholder="Maria Silva" value={formState.name} onChange={(value) => onFieldChange("name", value)} />

@@ -20,7 +20,7 @@ const STEP_ICONS: LucideIcon[] = [
 ];
 
 export function ProcessSection() {
-  const badges = ["No mesmo dia", "3 a 5 dias úteis", "Iterativo", "Ao vivo"];
+  const badges = ["No mesmo dia", "4 a 10 dias úteis", "Iterativo", "Ao vivo"];
 
   return (
     <AnimatedSection
@@ -33,11 +33,11 @@ export function ProcessSection() {
             <SectionEyebrow>Processo</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Quatro passos. Zero stress.
+            Nós guiamos. Vocês aprovam.
           </h2>
           <p className="mt-5 text-[#5C605A]">
-            Do primeiro contacto à publicação. Tratamos de tudo. Vocês
-            aproveitam.
+            Ajudamos a transformar ideias soltas num convite pronto a enviar,
+            sem vos deixar perdidos entre textos, cores e decisões técnicas.
           </p>
         </div>
         <div className="mt-16 grid gap-5 lg:grid-cols-2">
@@ -97,7 +97,7 @@ export function ProcessSection() {
         </div>
         <div className="mt-14 flex flex-col items-center justify-center gap-5 text-center sm:flex-row">
           <p className="text-2xl font-medium text-[#1F2420]">
-            Pronto para começar a vossa história?
+            Prontos para criar algo que pareça mesmo vosso?
           </p>
           <a
             href={buildWhatsappUrl()}
@@ -105,7 +105,7 @@ export function ProcessSection() {
             rel="noreferrer"
             className="rounded-full bg-[#3F4E3F] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
           >
-            Falar agora →
+            Começar conversa →
           </a>
         </div>
       </div>

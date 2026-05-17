@@ -32,18 +32,18 @@ export const navLinks = [
 export const invitationTypes = [
   {
     title: "Save The Date",
-    text: "Anuncie a data com elegância. Vídeo, contagem decrescente e partilha simples.",
+    text: "Anunciem a data com leveza, contagem decrescente e um primeiro vislumbre do que vem aí.",
     icon: "01",
   },
   {
     title: "Casamento",
-    text: "O convite completo: história, programa, RSVP, mapa e mensagens.",
+    text: "O convite completo para o grande dia: história, programa, RSVP, mapa, música e detalhes úteis num só lugar.",
     icon: "02",
     featured: true,
   },
   {
     title: "Noivado",
-    text: "Convite suave e tocante para o primeiro grande dia, com todos os detalhes essenciais.",
+    text: "Um convite íntimo para reunir as pessoas certas e marcar o início desta nova fase.",
     icon: "03",
   },
 ];
@@ -61,22 +61,22 @@ export const processSteps = [
   [
     "01",
     "Conversa inicial",
-    "Falamos sobre o vosso evento, estilo e expectativas. Recebem uma proposta clara no mesmo dia.",
+    "Falamos sobre o vosso evento, o estilo que imaginam e o que querem que os convidados sintam. Recebem uma proposta clara no mesmo dia.",
   ],
   [
     "02",
     "Design à medida",
-    "Recolhemos fotos e textos. Desenhamos o convite com o ADN do vosso evento.",
+    "Recolhemos fotografias, textos e referências. Desenhamos um convite com o vosso ritmo, as vossas cores e a vossa história.",
   ],
   [
     "03",
     "Revisão & ajustes",
-    "Comentam, ajustamos e refinamos. Pequenas alterações ficam prontas rapidamente.",
+    "Comentam, ajustamos e refinamos convosco. Pequenas alterações ficam prontas rapidamente, sem complicar o processo.",
   ],
   [
     "04",
     "Publicação & partilha",
-    "Convite ao vivo, link partilhável e RSVP em tempo real num painel privado.",
+    "Colocamos o convite ao vivo, pronto a partilhar, com RSVP em tempo real num painel privado.",
   ],
 ] as const;
 

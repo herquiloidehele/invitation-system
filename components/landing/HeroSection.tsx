@@ -2,10 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import {
-  buildWhatsappUrl,
-  DEFAULT_WHATSAPP_MESSAGE,
-} from "@/lib/landing-whatsapp";
+import { buildWhatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "@/lib/landing-whatsapp";
 import type { HeroFeature } from "@/lib/landing-features";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
@@ -47,18 +44,17 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
       transition={{ duration: 0.8 }}
       className="relative z-10 max-w-3xl lg:pt-10"
     >
-      <SectionEyebrow>Convites digitais · Lisboa</SectionEyebrow>
+      <SectionEyebrow>Convites digitais feitos com cuidado</SectionEyebrow>
       <h1 className="mt-8 text-balance text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-[#3F4E3F] sm:text-6xl lg:text-7xl">
-        <span className="block">O seu convite</span>
-        <span className="block">digital</span>
+        <span className="block">O convite digital</span>
         <span className="mt-5 block font-medium text-[#2D2D23]">
-          Já está aqui
+          ideal para vocês
         </span>
       </h1>
-      <p className="mt-7 max-w-2xl text-lg leading-8 text-[#5C605A]">
-        Convites digitais elegantes, interactivos e personalizados, feitos à
-        medida para o seu evento. RSVP em tempo real, música, mapa e gestão de
-        convidados.
+      <p className="mt-7 max-w-2xl text-md leading-8 text-[#5C605A]">
+        Desenhamos convites elegantes, pessoais e fáceis de partilhar, com RSVP,
+        mapa, música e todos os detalhes que ajudam os convidados a chegar ao
+        grande dia sem dúvidas.
       </p>
       <div className="mt-9 flex flex-col gap-3 sm:flex-row">
         <a
@@ -67,17 +63,17 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
           rel="noreferrer"
           className="rounded-full bg-[#3F4E3F] px-7 py-4 text-center text-sm font-semibold text-white shadow-[0_18px_60px_rgba(63,78,63,0.24)] transition hover:-translate-y-0.5 hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
         >
-          Pedir orçamento →
+          Começar o meu convite →
         </a>
         <a
           href="#galeria"
           className="rounded-full border border-[#E5E7E4] px-7 py-4 text-center text-sm font-semibold text-[#1F2420] transition hover:-translate-y-0.5 hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
         >
-          Ver galeria
+          Ver exemplos reais
         </a>
       </div>
       <p className="mt-8 text-sm font-medium text-[#5C605A]">
-        ★★★★★ &nbsp; 5.0 · +200 casais felizes em Portugal
+        Resposta no mesmo dia · +200 convites feitos
       </p>
     </motion.div>
   );

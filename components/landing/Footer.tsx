@@ -35,7 +35,7 @@ export function Footer() {
             brindeal
           </div>
           <p className="mt-5 max-w-xs text-sm leading-6 text-[#A3A496]">
-            Convites digitais feitos com cuidado, em Lisboa.
+            Convites digitais pessoais, elegantes e feitos com cuidado em Lisboa.
           </p>
         </div>
         {FOOTER_LINK_GROUPS.map(({ heading, links }) => (

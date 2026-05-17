@@ -23,8 +23,12 @@ export function FeaturesSection() {
             <SectionEyebrow>Recursos</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            Tudo o que precisa, num só link.
+            Bonito para ver. Simples para usar.
           </h2>
+          <p className="mt-5 text-[#5C605A]">
+            Os convidados recebem um link claro. Vocês acompanham confirmações,
+            escolhas e mensagens sem folhas soltas nem conversas perdidas.
+          </p>
         </div>
         <div className="mt-14 grid gap-5 lg:grid-cols-12">
           <RsvpHero />
@@ -33,13 +37,13 @@ export function FeaturesSection() {
             <FeatureWideCard
               icon="♫"
               title="Música ambiente"
-              text="Spotify, YouTube ou ficheiro próprio."
+              text="A banda sonora certa, no momento certo."
               visual={<MusicPlayer />}
             />
             <FeatureWideCard
               icon="◎"
               title="Mapa interactivo"
-              text="Direcções, GPS e estacionamento."
+              text="Direcções, GPS e detalhes para chegar sem stress."
               visual={<MapTile />}
             />
           </div>
@@ -47,7 +51,7 @@ export function FeaturesSection() {
           <FeatureSmallCard
             icon={Users}
             title="Gestão de convidados"
-            text="Lista com mesa, link pessoal e acompanhantes."
+            text="Mesa, link pessoal e acompanhantes sempre organizados."
           >
             <GuestTable />
           </FeatureSmallCard>
@@ -55,7 +59,7 @@ export function FeaturesSection() {
           <FeatureSmallCard
             icon={BarChart3}
             title="Analytics"
-            text="Quem abriu, confirmou e respondeu."
+            text="Saibam quem abriu, confirmou e respondeu."
           >
             <AnalyticsChart />
           </FeatureSmallCard>
@@ -63,7 +67,7 @@ export function FeaturesSection() {
           <FeatureSmallCard
             icon={Languages}
             title="Multi-idioma"
-            text="PT, EN, ES para convidados internacionais."
+            text="Português, inglês e espanhol para receber todos bem."
             tinted
           >
             <LanguageList />
@@ -72,7 +76,7 @@ export function FeaturesSection() {
           <FeatureSmallCard
             icon={Palette}
             title="Personalização total"
-            text="Tipografia, cores e fotografias sob medida."
+            text="Tipografia, cores e fotografias escolhidas para o vosso dia."
           >
             <CustomizationPanel />
           </FeatureSmallCard>
@@ -89,14 +93,14 @@ function RsvpHero() {
   return (
     <article className="min-h-[360px] rounded-[1.75rem] bg-[#3F4E3F] p-8 text-white sm:p-10 lg:col-span-7 lg:min-h-[430px]">
       <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#F6F7F5]">
-        • Favorito dos noivos
+        • Para cuidar dos convidados
       </p>
       <h3 className="mt-7 text-4xl font-semibold leading-tight tracking-[-0.02em] sm:text-5xl">
         RSVP em tempo real
       </h3>
       <p className="mt-5 max-w-3xl text-sm leading-7 text-[#E8EBE7] sm:text-base">
-        Os convidados confirmam, escolhem ementa, deixam mensagem. Acompanham
-        tudo num painel privado, sincronizado ao minuto.
+        Os convidados confirmam, escolhem ementa e deixam uma mensagem. Vocês
+        acompanham tudo num painel privado, sincronizado ao minuto.
       </p>
       <div className="mt-10 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#E8EBE7]">
         Ementa
