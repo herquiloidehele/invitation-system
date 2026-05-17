@@ -52,19 +52,14 @@ export function PhoneIframePreview({
         </div>
       </div>
       {showCaption ? (
-        <>
-          <h3 className="mt-6 text-2xl font-semibold tracking-[-0.02em] text-[#1F2420]">
-            {title}
-          </h3>
-          <a
-            href={src}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-4 inline-flex rounded-full border border-[#E5E7E4] bg-white px-6 py-3 text-sm font-semibold text-[#1F2420] transition hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
-          >
-            Abrir convite →
-          </a>
-        </>
+        <a
+          href={src}
+          target="_blank"
+          rel="noreferrer"
+          className="md:hidden mt-4 inline-flex rounded-full border border-[#E5E7E4] bg-white px-6 py-3 text-sm font-semibold text-[#1F2420] transition hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+        >
+          Abrir convite →
+        </a>
       ) : null}
     </article>
   );

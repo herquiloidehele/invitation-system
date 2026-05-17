@@ -74,6 +74,8 @@
     "body": "Cada invitación nace de una conversación: vuestras fotos, vuestro estilo, las palabras que queréis que los invitados recuerden.",
     "empty": "Todavía no hay invitaciones destacadas en esta categoría.",
     "fallbackTitle": "Invitación",
+    "previewAria": "Previsualizar invitación",
+    "openInNewTab": "Abrir en nueva pestaña →",
     "categories": {
       "all": "Todos",
       "wedding": "Bodas",

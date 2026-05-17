@@ -74,6 +74,8 @@
     "body": "Every invitation begins with a conversation: your photos, your style, the words you want guests to remember.",
     "empty": "No featured invitations in this category yet.",
     "fallbackTitle": "Invitation",
+    "previewAria": "Preview invitation",
+    "openInNewTab": "Open in new tab →",
     "categories": {
       "all": "All",
       "wedding": "Weddings",
