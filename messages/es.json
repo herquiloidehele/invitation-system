@@ -1,8 +1,8 @@
 {
   "Locale": { "pt": "Português", "en": "English", "es": "Español" },
   "Metadata": {
-    "homeTitle": "Brindeal Studio — Invitaciones Digitales",
-    "homeDescription": "Invitaciones digitales elegantes, interactivas y personalizadas para bodas y celebraciones en Portugal.",
+    "homeTitle": "Invitaciones Digitales para Bodas | Brindeal Studio",
+    "homeDescription": "Invitaciones digitales personalizadas para bodas y celebraciones en Portugal, con RSVP online, mapa, música, galería y envío fácil por WhatsApp.",
     "invitationNotFound": "Invitación no encontrada",
     "saveTheDateNotFound": "Save the Date no encontrado"
   },
@@ -27,7 +27,9 @@
     "gallery": "Galería",
     "process": "Cómo funciona",
     "features": "Recursos",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "weddingInvitations": "Invitaciones boda",
+    "saveTheDateDigital": "Save the Date"
   },
   "LandingContact": {
     "eyebrow": "Creemos juntos",
@@ -167,6 +169,8 @@
     "company": "Empresa",
     "wedding": "Boda",
     "saveTheDate": "Save the Date",
+    "digitalInvitations": "Invitaciones digitales",
+    "rsvpInvitations": "Invitaciones con RSVP",
     "baptism": "Bautizo",
     "engagement": "Compromiso",
     "gallery": "Galería",

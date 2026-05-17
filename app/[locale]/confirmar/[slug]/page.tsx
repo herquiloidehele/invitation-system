@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import type { CustomTexts, InvitationEventType } from "@/lib/types";
@@ -5,9 +6,11 @@ import {
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
 } from "@/lib/rsvp-config";
+import { createNoIndexMetadata } from "@/lib/seo";
 import RsvpPage from "./RsvpPage";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = createNoIndexMetadata();
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 

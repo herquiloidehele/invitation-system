@@ -25,20 +25,21 @@ export function FaqSection({
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em]">
             {t("title")}
           </h2>
-          <p className="mt-5 text-[#5C605A]">
-            {t("body")}
-          </p>
+          <p className="mt-5 text-[#5C605A]">{t("body")}</p>
           <div className="mt-8 rounded-2xl bg-[#F6F7F5] p-6 text-sm text-[#3F4E3F]">
             <p className="font-semibold text-[#1F2420]">{t("contactTitle")}</p>
             <p className="mt-2">WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
-            <p>E-mail · ola@brindeal.studio</p>
+            <p>E-mail · ola@convites.brindealstudio.com</p>
           </div>
         </div>
         <div className="space-y-3">
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <div key={faq.question} className="rounded-2xl border border-[#E5E7E4] bg-white p-5">
+              <div
+                key={faq.question}
+                className="rounded-2xl border border-[#E5E7E4] bg-white p-5"
+              >
                 <button
                   type="button"
                   aria-expanded={isOpen}
@@ -47,7 +48,9 @@ export function FaqSection({
                   className="flex w-full items-center justify-between gap-4 text-left font-semibold focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
                 >
                   {faq.question}
-                  <span className="text-2xl text-[#5C605A]">{isOpen ? "−" : "+"}</span>
+                  <span className="text-2xl text-[#5C605A]">
+                    {isOpen ? "−" : "+"}
+                  </span>
                 </button>
                 <AnimatePresence initial={false}>
                   {isOpen && (

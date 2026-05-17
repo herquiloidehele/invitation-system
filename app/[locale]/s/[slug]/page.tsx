@@ -9,6 +9,15 @@ import {
   OG_IMAGE_WIDTH,
   resolveSaveTheDateSocialPreview,
 } from "@/lib/social-preview";
+import { resolveLocale } from "@/i18n/locales";
+import {
+  SITE_URL,
+  buildEventJsonLd,
+  buildAbsoluteUrl,
+  buildLanguageAlternates,
+  buildLocalePath,
+  createPublicPageRobotsMetadata,
+} from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +26,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = resolveLocale(rawLocale);
   const data = await getSaveTheDate(slug);
 
   if (!data) {
@@ -25,21 +35,28 @@ export async function generateMetadata({
     return { title: t("saveTheDateNotFound") };
   }
 
-  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const { image, title, description } = resolveSaveTheDateSocialPreview(
     data,
-    siteOrigin,
+    SITE_URL,
   );
+  const path = buildLocalePath(`/s/${slug}`, locale);
+  const canonical = buildAbsoluteUrl(SITE_URL, path);
 
   return {
     title,
     description,
+    alternates: {
+      canonical,
+      languages: buildLanguageAlternates(SITE_URL, `/s/${slug}`),
+    },
+    robots: createPublicPageRobotsMetadata(data.isDemo === true),
     openGraph: {
       title,
       description,
       images: [{ url: image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
       type: "website",
-      url: `${siteOrigin}/s/${slug}`,
+      url: canonical,
+      locale,
     },
     twitter: {
       card: "summary_large_image",
@@ -115,6 +132,25 @@ export default async function SaveTheDatePage({
 
   return (
     <>
+      {data.isDemo === true && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              buildEventJsonLd({
+                name: `${data.couple.bride} & ${data.couple.groom} — Save the Date`,
+                description: `Save the date: ${data.date.display}`,
+                url: buildAbsoluteUrl(SITE_URL, buildLocalePath(`/s/${slug}`, "pt")),
+                startDate: data.date.iso,
+                image:
+                  data.bottomHero?.mediaType === "image"
+                    ? data.bottomHero.mediaUrl
+                    : undefined,
+              }),
+            ),
+          }}
+        />
+      )}
       <BrowserUiColorStyle color={browserUiColor} />
       <SaveTheDateView saveTheDate={data} />
     </>

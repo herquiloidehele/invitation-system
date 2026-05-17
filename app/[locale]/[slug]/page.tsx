@@ -12,6 +12,15 @@ import {
   OG_IMAGE_WIDTH,
   resolveInvitationSocialPreview,
 } from "@/lib/social-preview";
+import { resolveLocale } from "@/i18n/locales";
+import {
+  SITE_URL,
+  buildEventJsonLd,
+  buildAbsoluteUrl,
+  buildLanguageAlternates,
+  buildLocalePath,
+  createPublicPageRobotsMetadata,
+} from "@/lib/seo";
 
 // ---------------------------------------------------------------------------
 // Force dynamic rendering (data comes from the database)
@@ -28,7 +37,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = resolveLocale(rawLocale);
   const invitation = await getInvitation(slug);
 
   if (!invitation) {
@@ -36,21 +46,28 @@ export async function generateMetadata({
     return { title: t("invitationNotFound") };
   }
 
-  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const { image, title, description } = resolveInvitationSocialPreview(
     invitation,
-    siteOrigin,
+    SITE_URL,
   );
+  const path = buildLocalePath(`/${slug}`, locale);
+  const canonical = buildAbsoluteUrl(SITE_URL, path);
 
   return {
     title,
     description,
+    alternates: {
+      canonical,
+      languages: buildLanguageAlternates(SITE_URL, `/${slug}`),
+    },
+    robots: createPublicPageRobotsMetadata(invitation.isDemo === true),
     openGraph: {
       title,
       description,
       images: [{ url: image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
       type: "website",
-      url: `${siteOrigin}/${slug}`,
+      url: canonical,
+      locale,
     },
     twitter: {
       card: "summary_large_image",
@@ -138,6 +155,10 @@ export default async function InvitationSlugPage({
     themeEnvelopeBase: theme.envelope.base,
     pageBackground: theme.bg,
   });
+  const { image, title, description } = resolveInvitationSocialPreview(
+    invitation,
+    SITE_URL,
+  );
 
   // Look up the personal guest if a token was provided. Silently fall back
   // when the token does not exist, belongs to another invitation, or the
@@ -152,6 +173,24 @@ export default async function InvitationSlugPage({
 
   return (
     <>
+      {invitation.isDemo === true && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              buildEventJsonLd({
+                name: title,
+                description,
+                url: buildAbsoluteUrl(SITE_URL, buildLocalePath(`/${slug}`, "pt")),
+                startDate: invitation.date.iso,
+                locationName: invitation.location.name,
+                locationAddress: invitation.location.address,
+                image,
+              }),
+            ),
+          }}
+        />
+      )}
       <BrowserUiColorStyle color={browserUiColor} />
       <InvitationView invitation={{ ...invitation, guest }} theme={theme} />
     </>

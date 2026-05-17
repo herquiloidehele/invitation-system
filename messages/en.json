@@ -1,8 +1,8 @@
 {
   "Locale": { "pt": "Português", "en": "English", "es": "Español" },
   "Metadata": {
-    "homeTitle": "Brindeal Studio — Digital Invitations",
-    "homeDescription": "Elegant, interactive, personalized digital invitations for weddings and celebrations in Portugal.",
+    "homeTitle": "Digital Wedding Invitations | Brindeal Studio",
+    "homeDescription": "Personalized digital invitations for weddings and celebrations in Portugal, with online RSVP, maps, music, gallery and simple WhatsApp sharing.",
     "invitationNotFound": "Invitation not found",
     "saveTheDateNotFound": "Save the Date not found"
   },
@@ -27,7 +27,9 @@
     "gallery": "Gallery",
     "process": "How it works",
     "features": "Features",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "weddingInvitations": "Wedding invites",
+    "saveTheDateDigital": "Save the Date"
   },
   "LandingContact": {
     "eyebrow": "Let's create together",
@@ -167,6 +169,8 @@
     "company": "Company",
     "wedding": "Wedding",
     "saveTheDate": "Save the Date",
+    "digitalInvitations": "Digital invitations",
+    "rsvpInvitations": "RSVP invitations",
     "baptism": "Baptism",
     "engagement": "Engagement",
     "gallery": "Gallery",

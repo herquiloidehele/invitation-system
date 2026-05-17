@@ -2,7 +2,10 @@
 
 import { FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { DISPLAY_WHATSAPP_NUMBER, type ContactMessageFields } from "@/lib/landing-whatsapp";
+import {
+  type ContactMessageFields,
+  DISPLAY_WHATSAPP_NUMBER,
+} from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -31,17 +34,40 @@ export function ContactSection({
           </p>
           <div className="mt-8 space-y-3 text-sm text-[#3F4E3F]">
             <p>WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
-            <p>E-mail · ola@brindeal.studio</p>
+            <p>E-mail · ola@convites.brindealstudio.com</p>
           </div>
         </div>
-        <form onSubmit={onSubmit} className="rounded-[1.5rem] border border-[#E5E7E4] bg-white p-6 shadow-sm sm:p-9">
+        <form
+          onSubmit={onSubmit}
+          className="rounded-[1.5rem] border border-[#E5E7E4] bg-white p-6 shadow-sm sm:p-9"
+        >
           <h3 className="text-2xl font-semibold">{t("formTitle")}</h3>
           <p className="mt-2 text-sm text-[#5C605A]">{t("formSubtitle")}</p>
           <div className="mt-7 grid gap-4 sm:grid-cols-2">
-            <TextField label={t("name")} placeholder={t("namePlaceholder")} value={formState.name} onChange={(value) => onFieldChange("name", value)} />
-            <TextField label={t("eventType")} placeholder={t("eventTypePlaceholder")} value={formState.eventType} onChange={(value) => onFieldChange("eventType", value)} />
-            <TextField label={t("date")} placeholder={t("datePlaceholder")} value={formState.date} onChange={(value) => onFieldChange("date", value)} />
-            <TextField label={t("guests")} placeholder={t("guestsPlaceholder")} value={formState.guests} onChange={(value) => onFieldChange("guests", value)} />
+            <TextField
+              label={t("name")}
+              placeholder={t("namePlaceholder")}
+              value={formState.name}
+              onChange={(value) => onFieldChange("name", value)}
+            />
+            <TextField
+              label={t("eventType")}
+              placeholder={t("eventTypePlaceholder")}
+              value={formState.eventType}
+              onChange={(value) => onFieldChange("eventType", value)}
+            />
+            <TextField
+              label={t("date")}
+              placeholder={t("datePlaceholder")}
+              value={formState.date}
+              onChange={(value) => onFieldChange("date", value)}
+            />
+            <TextField
+              label={t("guests")}
+              placeholder={t("guestsPlaceholder")}
+              value={formState.guests}
+              onChange={(value) => onFieldChange("guests", value)}
+            />
           </div>
           <label className="mt-4 block text-sm font-semibold text-[#1F2420]">
             {t("message")}

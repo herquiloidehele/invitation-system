@@ -2,19 +2,19 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import {
-  Great_Vibes,
-  Playfair_Display,
+  Cinzel,
   Cormorant_Garamond,
+  DM_Serif_Display,
+  Fraunces,
+  Geist,
+  Great_Vibes,
   Homemade_Apple,
   Libre_Baskerville,
-  Cinzel,
   Lora,
-  Outfit,
-  DM_Serif_Display,
-  Pinyon_Script,
-  Geist,
   Manrope,
-  Fraunces,
+  Outfit,
+  Pinyon_Script,
+  Playfair_Display,
 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -106,9 +106,36 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Brindeal Studio — Convites Digitais",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://convites.brindealstudio.com",
+  ),
+  applicationName: "Brindeal Studio",
+  title: {
+    default: "Brindeal Studio | Convites Digitais",
+    template: "%s | Brindeal Studio",
+  },
   description:
-    "Convites digitais elegantes, interactivos e personalizados para casamentos e celebrações em Portugal.",
+    "Convites digitais personalizados para casamentos e celebrações, com RSVP online, mapa, música e partilha simples por WhatsApp.",
+  openGraph: {
+    type: "website",
+    siteName: "Brindeal Studio",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-default.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 // Build the S3 origin at startup for DNS preconnect (e.g. "https://bucket.s3.region.amazonaws.com")

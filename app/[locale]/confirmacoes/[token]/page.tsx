@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
@@ -19,8 +20,10 @@ import {
   resolveLocale,
   type AppLocale,
 } from "@/i18n/locales";
+import { createNoIndexMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = createNoIndexMetadata();
 
 type Props = {
   params: Promise<{ locale: string; token: string }>;

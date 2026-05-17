@@ -1,13 +1,30 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/i18n/locales";
+import { buildLocalePath } from "@/lib/seo";
 
 export function Footer() {
   const t = useTranslations("LandingFooter");
+  const locale = resolveLocale(useLocale());
   const linkGroups = [
     {
       heading: t("product"),
       links: [
-        { label: t("wedding"), href: "#galeria" },
-        { label: t("saveTheDate"), href: "#galeria" },
+        {
+          label: t("wedding"),
+          href: buildLocalePath("/convites-casamento", locale),
+        },
+        {
+          label: t("saveTheDate"),
+          href: buildLocalePath("/save-the-date-digital", locale),
+        },
+        {
+          label: t("digitalInvitations"),
+          href: buildLocalePath("/convites-digitais", locale),
+        },
+        {
+          label: t("rsvpInvitations"),
+          href: buildLocalePath("/convites-com-rsvp", locale),
+        },
         { label: t("baptism"), href: "#galeria" },
         { label: t("engagement"), href: "#galeria" },
       ],

@@ -1,8 +1,8 @@
 {
   "Locale": { "pt": "Português", "en": "English", "es": "Español" },
   "Metadata": {
-    "homeTitle": "Brindeal Studio — Convites Digitais",
-    "homeDescription": "Convites digitais elegantes, interactivos e personalizados para casamentos e celebrações em Portugal.",
+    "homeTitle": "Convites Digitais para Casamentos | Brindeal Studio",
+    "homeDescription": "Convites digitais personalizados para casamentos e celebrações em Portugal, com RSVP online, mapa, música, galeria e partilha simples por WhatsApp.",
     "invitationNotFound": "Convite não encontrado",
     "saveTheDateNotFound": "Save the Date não encontrado"
   },
@@ -27,7 +27,9 @@
     "gallery": "Galeria",
     "process": "Como funciona",
     "features": "Recursos",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "weddingInvitations": "Convites casamento",
+    "saveTheDateDigital": "Save the Date"
   },
   "LandingContact": {
     "eyebrow": "Vamos criar juntos",
@@ -167,6 +169,8 @@
     "company": "Empresa",
     "wedding": "Casamento",
     "saveTheDate": "Save the Date",
+    "digitalInvitations": "Convites digitais",
+    "rsvpInvitations": "Convites com RSVP",
     "baptism": "Baptizado",
     "engagement": "Noivado",
     "gallery": "Galeria",

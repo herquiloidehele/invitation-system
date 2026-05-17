@@ -6672,7 +6672,7 @@
                       "id": "RbLCH",
                       "name": "faqContactE",
                       "fill": "$b-primary",
-                      "content": "E-mail · ola@brindeal.studio",
+                      "content": "E-mail · ola@convites.brindealstudio.com",
                       "fontFamily": "$font-sans",
                       "fontSize": 13,
                       "fontWeight": "normal"
@@ -7217,7 +7217,7 @@
                               "id": "PjnjR",
                               "name": "ctaEmAddr",
                               "fill": "$b-text",
-                              "content": "ola@brindeal.studio",
+                              "content": "ola@convites.brindealstudio.com",
                               "fontFamily": "$font-sans",
                               "fontSize": 18,
                               "fontWeight": "600"
