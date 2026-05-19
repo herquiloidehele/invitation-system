@@ -17,7 +17,7 @@ export const DEFAULT_TEXTS: Required<CustomTexts> = {
   sectionTitle_faqs: "Perguntas Frequentes",
 
   // -- CTA / Buttons --
-  cta_confirmLabel: "Confirme sua presença",
+  cta_confirmLabel: "RSVP",
   cta_confirmButton: "Confirmar Presença",
   cta_confirmedButton: "Presença Confirmada",
   cta_giftLink: "Ver lista",
@@ -45,7 +45,7 @@ export const DEFAULT_TEXTS: Required<CustomTexts> = {
   rsvp_namePlaceholder: "Nome do(s) Convidados(s)",
   rsvp_emailLabel: "Email",
   rsvp_emailPlaceholder: "seu@email.com",
-  rsvp_attendingLabel: "Você irá comparecer? *",
+  rsvp_attendingLabel: "Irá comparecer? *",
   rsvp_attendingYes: "Sim, estarei lá!",
   rsvp_attendingNo: "Não poderei ir",
   rsvp_dietaryLabel: "Restrições alimentares",
