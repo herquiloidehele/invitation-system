@@ -277,7 +277,7 @@ export default function SaveTheDateThemeForm({ mode, initialData }: Props) {
     if (enabled) {
       setData((p) => ({
         ...p,
-        envelope: { base: "#F7F0E8", topFlap: "/images/top.png", bottomFlap: "/images/bottom.png" },
+        envelope: { base: "#FFFFFF", topFlap: "/images/top.png", bottomFlap: "/images/bottom.png" },
       }));
     } else {
       setData((p) => ({ ...p, envelope: null }));

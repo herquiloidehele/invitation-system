@@ -60,7 +60,7 @@ const THEMES = [
     label: "Modern Minimal",
     description: "Limpo & Sofisticado",
     envelope: {
-      base: "#F7F0E8",
+      base: "#FFFFFF",
       topFlap: "/images/top.png",
       bottomFlap: "/images/bottom.png",
     },
@@ -95,7 +95,7 @@ const THEMES = [
     label: "Boho Chic",
     description: "Rústico & Natural",
     envelope: {
-      base: "#F7F0E8",
+      base: "#FFFFFF",
       topFlap: "/images/top.png",
       bottomFlap: "/images/bottom.png",
     },
@@ -130,7 +130,7 @@ const THEMES = [
     label: "Midnight Elegance",
     description: "Luxuoso & Dramático",
     envelope: {
-      base: "#F7F0E8",
+      base: "#FFFFFF",
       topFlap: "/images/top.png",
       bottomFlap: "/images/bottom.png",
     },
