@@ -9,7 +9,11 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatedSection } from "./AnimatedSection";
-import { dbCategoryToTabKey, type GalleryCategoryKey, getGalleryCategories } from "./landing-data";
+import {
+  dbCategoryToTabKey,
+  type GalleryCategoryKey,
+  getVisibleGalleryCategories,
+} from "./landing-data";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -27,7 +31,7 @@ export function GallerySection({
   const t = useTranslations("LandingGallery");
   const isMobile = useIsMobile();
   const [previewItem, setPreviewItem] = useState<GalleryCard | null>(null);
-  const galleryCategories = getGalleryCategories(t);
+  const galleryCategories = getVisibleGalleryCategories(t, itemsByCategory);
   const allItems = useMemo<GalleryCard[]>(
     () =>
       Object.entries(itemsByCategory).flatMap(([key, list]) =>
@@ -39,8 +43,11 @@ export function GallerySection({
     [itemsByCategory],
   );
 
+  const hasActiveCategory = galleryCategories.some(
+    (category) => category.key === activeCategory,
+  );
   const visibleItems =
-    activeCategory === "all"
+    activeCategory === "all" || !hasActiveCategory
       ? allItems
       : allItems.filter((item) => item.tab === activeCategory);
 
@@ -84,22 +91,24 @@ export function GallerySection({
           </h2>
           <p className="mt-5 text-[#5C605A]">{t("body")}</p>
         </div>
-        <div className="mt-12 flex flex-wrap justify-center gap-2">
-          {galleryCategories.map((category) => (
-            <button
-              key={category.key}
-              type="button"
-              onClick={() => onCategoryChange(category.key)}
-              className={`rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4 ${
-                activeCategory === category.key
-                  ? "bg-[#3F4E3F] text-white"
-                  : "border border-[#E5E7E4] text-[#1F2420] hover:border-[#3F4E3F]"
-              }`}
-            >
-              {category.label}
-            </button>
-          ))}
-        </div>
+        {galleryCategories.length > 0 ? (
+          <div className="mt-12 flex flex-wrap justify-center gap-2">
+            {galleryCategories.map((category) => (
+              <button
+                key={category.key}
+                type="button"
+                onClick={() => onCategoryChange(category.key)}
+                className={`rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4 ${
+                  activeCategory === category.key
+                    ? "bg-[#3F4E3F] text-white"
+                    : "border border-[#E5E7E4] text-[#1F2420] hover:border-[#3F4E3F]"
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
         {visibleItems.length === 0 ? (
           <p className="mt-16 text-center text-sm text-[#5C605A]">
             {t("empty")}

@@ -87,7 +87,9 @@ const LIVE_DEMO_TARGET = 2;
 function readTitle(row: FeatureRow): string {
   const source = row.invitation ?? row.saveTheDate;
   if (!source) return "(sem ligação)";
-  const couple = source.couple as { bride?: string; groom?: string } | undefined;
+  const couple = source.couple as
+    | { bride?: string; groom?: string }
+    | undefined;
   return (
     [couple?.bride, couple?.groom].filter(Boolean).join(" & ") || "(sem nome)"
   );
@@ -98,8 +100,8 @@ function readSlug(row: FeatureRow): string {
 }
 
 function readHref(row: FeatureRow): string {
-  if (row.invitation) return `/${row.invitation.slug}`;
-  if (row.saveTheDate) return `/s/${row.saveTheDate.slug}`;
+  if (row.invitation) return `/admin/invitations/${row.invitationId}/edit`;
+  if (row.saveTheDate) return `/admin/save-the-dates/${row.saveTheDateId}/edit`;
   return "#";
 }
 
@@ -152,8 +154,7 @@ export function LandingPageClient() {
           section: input.section,
           galleryCategory: input.galleryCategory ?? null,
           invitationId: pickable.kind === "invitation" ? pickable.id : null,
-          saveTheDateId:
-            pickable.kind === "save_the_date" ? pickable.id : null,
+          saveTheDateId: pickable.kind === "save_the_date" ? pickable.id : null,
           position: features.filter((f) => f.section === input.section).length,
         }),
       });
@@ -390,7 +391,10 @@ export function LandingPageClient() {
 
               <div className="space-y-2">
                 {category.rows.length === 0 ? (
-                  <EmptyState text={`Sem convites em ${category.label}.`} compact />
+                  <EmptyState
+                    text={`Sem convites em ${category.label}.`}
+                    compact
+                  />
                 ) : (
                   category.rows.map((row, index) => (
                     <FeatureItem
@@ -602,10 +606,7 @@ function PickableSelect({
             </div>
           ) : (
             options.map((option) => (
-              <SelectItem
-                key={`${option.kind}-${option.id}`}
-                value={option.id}
-              >
+              <SelectItem key={`${option.kind}-${option.id}`} value={option.id}>
                 <span className="font-medium">
                   {option.title || option.slug}
                 </span>

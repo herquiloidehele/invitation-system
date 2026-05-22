@@ -1,4 +1,7 @@
-import type { GalleryCategory as DbGalleryCategory } from "@/lib/landing-features";
+import type {
+  GalleryCategory as DbGalleryCategory,
+  GalleryFeature,
+} from "@/lib/landing-features";
 
 export type GalleryCategoryKey =
   | "all"
@@ -18,6 +21,17 @@ export type FaqItem = {
 export const dbCategoryToTabKey: Record<DbGalleryCategory, GalleryCategoryKey> = {
   wedding: "wedding",
   save_the_date: "saveTheDate",
+  baptism: "baptism",
+  anniversary: "anniversary",
+  engagement: "engagement",
+};
+
+const tabKeyToDbCategory: Record<
+  Exclude<GalleryCategoryKey, "all">,
+  DbGalleryCategory
+> = {
+  wedding: "wedding",
+  saveTheDate: "save_the_date",
   baptism: "baptism",
   anniversary: "anniversary",
   engagement: "engagement",
@@ -75,6 +89,21 @@ export function getGalleryCategories(
     { key: "anniversary", label: t("categories.anniversary") },
     { key: "engagement", label: t("categories.engagement") },
   ];
+}
+
+export function getVisibleGalleryCategories(
+  t: (key: string) => string,
+  itemsByCategory: Record<DbGalleryCategory, GalleryFeature[]>,
+): GalleryCategory[] {
+  const populatedCategories = getGalleryCategories(t).filter(
+    (category) =>
+      category.key !== "all" &&
+      itemsByCategory[tabKeyToDbCategory[category.key]].length > 0,
+  );
+
+  if (populatedCategories.length <= 1) return [];
+
+  return [{ key: "all", label: t("categories.all") }, ...populatedCategories];
 }
 
 export function getProcessSteps(t: LandingTranslator) {
