@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
         location2: sanitizeJsonField(body.location2, null),
         rsvp: sanitizeJsonField(body.rsvp, { enabled: true }),
         schedule: sanitizeJsonField(body.schedule, []),
+        scheduleStyle: body.scheduleStyle ?? "default",
         dressCode: sanitizeJsonField(body.dressCode, {
           enabled: false,
           text: "",

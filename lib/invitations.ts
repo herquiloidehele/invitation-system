@@ -11,6 +11,7 @@ import type {
   OurStory,
   ParentsInfo,
   SaveDateStyle,
+  ScheduleStyle,
   SectionImages,
   TextStyleOverrides,
 } from "./types";
@@ -31,6 +32,7 @@ type InvitationWithTheme = {
   location2: unknown;
   rsvp: unknown;
   schedule: unknown;
+  scheduleStyle: string | null;
   dressCode: unknown;
   giftRegistry: unknown;
   audio: unknown;
@@ -73,6 +75,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     location2: (row.location2 as LocationInfo | null) ?? undefined,
     rsvp: row.rsvp as InvitationData["rsvp"],
     schedule: row.schedule as InvitationData["schedule"],
+    scheduleStyle: (row.scheduleStyle as ScheduleStyle | null) ?? "default",
     dressCode: row.dressCode as InvitationData["dressCode"],
     giftRegistry: row.giftRegistry as InvitationData["giftRegistry"],
     audio: row.audio as InvitationData["audio"],

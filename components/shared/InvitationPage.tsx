@@ -7,7 +7,7 @@ import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 import type { CardSectionKey, FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { t } from "@/lib/custom-texts";
-import ScheduleItem from "./ScheduleItem";
+import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
 import PersonalGuestCard from "./PersonalGuestCard";
 import LocationCard from "./LocationCard";
@@ -78,14 +78,6 @@ const ambientFade: Variants = {
   visible: {
     opacity: 1,
     transition: { duration: 1.6, ease: "easeOut" },
-  },
-};
-
-/** Stagger container for schedule items */
-const staggerContainer: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.1 },
   },
 };
 
@@ -534,80 +526,15 @@ export default function InvitationPage({
       {/* 4. Schedule                                                       */}
       {/* ================================================================= */}
       {invitation.schedule.length > 0 && (
-        <>
-          <AnimatedSection className="px-6 pb-2" isPreview={isPreview}>
-            <div className="flex flex-col items-center">
-              <span style={ts.sectionTitles}>
-                <EditableText elementKey="sectionTitles">
-                  {t(invitation.customTexts, "sectionTitle_schedule")}
-                </EditableText>
-              </span>
-
-              <motion.div
-                className="mt-3 mb-6"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: EASE }}
-                style={{
-                  width: 28,
-                  height: 1,
-                  background: ts.accent,
-                  opacity: 0.25,
-                }}
-              />
-            </div>
-          </AnimatedSection>
-
-          {/* Schedule card with staggered items */}
-          <motion.div
-            className="px-6 pb-10"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-          >
-            <EditableCard sectionKey="schedule">
-              <div
-                style={{
-                  background: cs("schedule", 20).cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: cs("schedule", 20).borderRadius,
-                  overflow: "hidden",
-                  padding: "8px 0",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                  border: `1px solid ${cs("schedule", 20).cardBorder}`,
-                }}
-              >
-                {invitation.schedule.map((event, i) => (
-                  <div key={i}>
-                    {i > 0 && (
-                      <div
-                        className="mx-6"
-                        style={{
-                          height: 1,
-                          background: cs("schedule", 20).cardBorder,
-                        }}
-                      />
-                    )}
-                    <ScheduleItem
-                      time={event.time}
-                      label={event.label}
-                      venue={event.venue}
-                      accentColor={ts.accent}
-                      timeStyle={ts.scheduleTime}
-                      labelStyle={ts.scheduleLabel}
-                      venueStyle={ts.scheduleVenue}
-                      index={i}
-                    />
-                  </div>
-                ))}
-              </div>
-            </EditableCard>
-          </motion.div>
-        </>
+        <ScheduleSection
+          schedule={invitation.schedule}
+          scheduleStyle={invitation.scheduleStyle}
+          theme={theme}
+          ts={ts}
+          cardStyle={cs("schedule", 20)}
+          customTexts={invitation.customTexts}
+          isPreview={isPreview}
+        />
       )}
 
       {/* ================================================================= */}

@@ -17,6 +17,8 @@ import type {
   LocationInfo,
   ParentsInfo,
   SaveDateStyle,
+  ScheduleIcon,
+  ScheduleStyle,
   SectionImages,
   TemplateTheme,
   TextStyle,
@@ -307,6 +309,19 @@ const EVENT_TYPE_OPTIONS: {
   { value: "other", label: "Outro" },
 ];
 
+const SCHEDULE_STYLE_OPTIONS: { value: ScheduleStyle; label: string }[] = [
+  { value: "default", label: "Padrão" },
+  { value: "illustrated", label: "Ilustrado" },
+];
+
+const SCHEDULE_ICON_OPTIONS: { value: ScheduleIcon; label: string }[] = [
+  { value: "neutral", label: "Neutro" },
+  { value: "rings", label: "Alianças" },
+  { value: "toast", label: "Brinde" },
+  { value: "dinner", label: "Jantar" },
+  { value: "dance", label: "Dança" },
+];
+
 const DEFAULT_HERO_HEIGHT = 300;
 const MIN_HERO_HEIGHT = 200;
 const MAX_HERO_HEIGHT = 700;
@@ -349,6 +364,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       showDietaryRestrictions: true,
     },
     schedule: [],
+    scheduleStyle: "default",
     dressCode: { enabled: false, text: "" },
     giftRegistry: { enabled: false, text: "", link: "" },
     audio: { enabled: false, src: "", artist: "", title: "" },
@@ -655,12 +671,19 @@ export default function InvitationForm({
   const addScheduleItem = useCallback(() => {
     setForm((prev) => ({
       ...prev,
-      schedule: [...prev.schedule, { time: "", label: "", venue: "" }],
+      schedule: [
+        ...prev.schedule,
+        { time: "", label: "", venue: "", icon: "neutral" },
+      ],
     }));
   }, []);
 
   const updateScheduleItem = useCallback(
-    (index: number, field: string, value: string) => {
+    <K extends keyof InvitationData["schedule"][number]>(
+      index: number,
+      field: K,
+      value: InvitationData["schedule"][number][K],
+    ) => {
       setForm((prev) => ({
         ...prev,
         schedule: prev.schedule.map((item, i) =>
@@ -2484,10 +2507,33 @@ export default function InvitationForm({
                   Programa ({form.schedule.length} eventos)
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Layout do programa</Label>
+                    <Select
+                      value={form.scheduleStyle ?? "default"}
+                      onValueChange={(value) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          scheduleStyle: value as ScheduleStyle,
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecionar layout" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SCHEDULE_STYLE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   {form.schedule.map((item, i) => (
                     <div
                       key={i}
-                      className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end"
+                      className="grid grid-cols-1 gap-2 md:grid-cols-[0.9fr_1fr_1fr_1fr_auto] md:items-end"
                     >
                       <div className="space-y-1">
                         <Label className="text-xs">Hora</Label>
@@ -2518,6 +2564,26 @@ export default function InvitationForm({
                           }
                           placeholder="Capela"
                         />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Ícone</Label>
+                        <Select
+                          value={item.icon ?? "neutral"}
+                          onValueChange={(value) =>
+                            updateScheduleItem(i, "icon", value as ScheduleIcon)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Ícone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {SCHEDULE_ICON_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <Button
                         variant="ghost"

@@ -47,10 +47,15 @@ export interface LocationInfo {
   mapZoom?: number;
 }
 
+export type ScheduleStyle = "default" | "illustrated";
+
+export type ScheduleIcon = "rings" | "toast" | "dinner" | "dance" | "neutral";
+
 export interface ScheduleEvent {
   time: string;
   label: string;
   venue: string;
+  icon?: ScheduleIcon;
 }
 
 export interface DressCode {
@@ -478,6 +483,8 @@ export interface InvitationData {
     showDietaryRestrictions?: boolean;
   };
   schedule: ScheduleEvent[];
+  /** Visual layout for the schedule section. Defaults to "default". */
+  scheduleStyle?: ScheduleStyle;
   dressCode: DressCode;
   giftRegistry: GiftRegistry;
   audio: AudioConfig;

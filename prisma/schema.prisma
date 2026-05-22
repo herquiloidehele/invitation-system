@@ -79,6 +79,7 @@ model Invitation {
   location2    Json?    // Optional second location — same shape as location
   rsvp         Json     // { enabled, deadline? }
   schedule     Json     // ScheduleEvent[]
+  scheduleStyle String? // "default" | "illustrated"
   dressCode    Json     // { enabled, text }
   giftRegistry Json     // { enabled, text, link? }
   audio        Json     // { enabled, src, artist, title }

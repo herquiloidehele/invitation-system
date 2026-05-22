@@ -113,6 +113,9 @@ export async function PUT(
         ...(body.schedule !== undefined && {
           schedule: sanitizeJsonField(body.schedule, existing.schedule),
         }),
+        ...(body.scheduleStyle !== undefined && {
+          scheduleStyle: body.scheduleStyle,
+        }),
         ...(body.dressCode !== undefined && {
           dressCode: sanitizeJsonField(body.dressCode, existing.dressCode),
         }),
