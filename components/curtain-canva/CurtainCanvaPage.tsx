@@ -17,6 +17,7 @@ import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveRevealContentStyle,
   resolveTextElementOverride,
+  shouldRenderScratchReveal,
 } from "@/lib/curtain-canva";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 
@@ -227,6 +228,7 @@ export default function CurtainCanvaPage({
     guestCustomExternalLink: invitation.guest?.customExternalLink,
   });
   const revealContentStyle = resolveRevealContentStyle(revealed);
+  const scratchRevealOn = shouldRenderScratchReveal(invitation.scratchReveal);
 
   return (
     <main
@@ -269,12 +271,14 @@ export default function CurtainCanvaPage({
       />
 
       <div style={revealContentStyle} aria-hidden={!revealed}>
-        <ScratchDateReveal
-          date={invitation.date}
-          theme={theme}
-          customTexts={invitation.customTexts}
-          textStyles={invitation.textStyles}
-        />
+        {scratchRevealOn && (
+          <ScratchDateReveal
+            date={invitation.date}
+            theme={theme}
+            customTexts={invitation.customTexts}
+            textStyles={invitation.textStyles}
+          />
+        )}
 
         {/* CanvaEmbed mounts immediately and starts fetching the proxied
             Canva page while the curtain video is still on screen. In

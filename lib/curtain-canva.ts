@@ -33,6 +33,12 @@ export function isCurtainCanvaLayout(
   return theme.layout === "curtain-canva";
 }
 
+export function shouldRenderScratchReveal(
+  scratchReveal: { enabled: boolean } | null | undefined,
+): boolean {
+  return scratchReveal?.enabled === true;
+}
+
 /**
  * Returns the abbreviated month name in pt-PT for an ISO date string.
  * Strips the trailing dot that pt-PT formatters often append.
