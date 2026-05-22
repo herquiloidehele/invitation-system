@@ -4,7 +4,10 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import type { GalleryCategory as DbGalleryCategory, GalleryFeature } from "@/lib/landing-features";
+import type {
+  GalleryCategory as DbGalleryCategory,
+  GalleryFeature,
+} from "@/lib/landing-features";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -149,13 +152,13 @@ export function GallerySection({
                     <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
                       {item.title || t("fallbackTitle")}
                     </h3>
-                    {item.subtitle ? (
-                      <p className="mt-1.5 text-xs text-[#5C605A]">
-                        {item.subtitle}
+                    {item.description ? (
+                      <p className="mt-2 text-sm leading-5 text-[#5C605A]">
+                        {item.description}
                       </p>
                     ) : null}
                     {item.priceLabel ? (
-                      <p className="mt-2 text-xs font-medium text-[#8A8E86]">
+                      <p className="mt-2 text-sm font-medium text-[#8A8E86]">
                         {item.priceLabel}
                       </p>
                     ) : null}

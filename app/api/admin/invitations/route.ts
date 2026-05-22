@@ -129,6 +129,11 @@ export async function POST(request: NextRequest) {
           typeof body.currency === "string" && body.currency.length
             ? body.currency
             : "EUR",
+        landingModelName:
+          typeof body.landingModelName === "string" &&
+          body.landingModelName.length
+            ? body.landingModelName
+            : null,
         landingImageUrl:
           typeof body.landingImageUrl === "string" && body.landingImageUrl.length
             ? body.landingImageUrl

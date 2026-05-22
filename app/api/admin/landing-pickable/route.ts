@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { formatLandingPrice } from "@/lib/landing-features";
+import { resolveLandingGalleryMetadata } from "@/lib/landing-gallery-metadata";
 
 type PickableItem = {
   kind: "invitation" | "save_the_date";
@@ -12,14 +13,6 @@ type PickableItem = {
   priceLabel: string | null;
 };
 
-function readCoupleString(value: unknown): string {
-  if (!value || typeof value !== "object") return "";
-  const couple = value as Record<string, unknown>;
-  const bride = typeof couple.bride === "string" ? couple.bride : "";
-  const groom = typeof couple.groom === "string" ? couple.groom : "";
-  return [bride, groom].filter(Boolean).join(" & ");
-}
-
 export async function GET() {
   const [invitations, saveTheDates] = await Promise.all([
     prisma.invitation.findMany({
@@ -30,6 +23,7 @@ export async function GET() {
         slug: true,
         couple: true,
         eventType: true,
+        landingModelName: true,
         landingImageUrl: true,
         heroImage: true,
         priceFromCents: true,
@@ -43,6 +37,7 @@ export async function GET() {
         id: true,
         slug: true,
         couple: true,
+        landingModelName: true,
         landingImageUrl: true,
         priceFromCents: true,
         currency: true,
@@ -55,7 +50,7 @@ export async function GET() {
       kind: "invitation" as const,
       id: row.id,
       slug: row.slug,
-      title: readCoupleString(row.couple),
+      title: resolveLandingGalleryMetadata(row).title,
       eventType: row.eventType ?? null,
       landingImageUrl: row.landingImageUrl ?? row.heroImage ?? null,
       priceLabel: formatLandingPrice(row.priceFromCents, row.currency),
@@ -64,7 +59,7 @@ export async function GET() {
       kind: "save_the_date" as const,
       id: row.id,
       slug: row.slug,
-      title: readCoupleString(row.couple),
+      title: resolveLandingGalleryMetadata(row).title,
       eventType: null,
       landingImageUrl: row.landingImageUrl,
       priceLabel: formatLandingPrice(row.priceFromCents, row.currency),

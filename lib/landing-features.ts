@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { resolveLandingGalleryMetadata } from "@/lib/landing-gallery-metadata";
 
 export type GalleryCategory =
   | "wedding"
@@ -59,6 +60,7 @@ export type GalleryFeature = {
   imageUrl: string | null;
   displayDate: string;
   subtitle: string | null;
+  description: string | null;
   priceLabel: string | null;
   category: GalleryCategory;
 };
@@ -160,13 +162,20 @@ export async function getGalleryFeaturesByCategory(): Promise<
       ? (target as { heroImage?: string | null }).heroImage ?? null
       : null;
 
+    const metadata = resolveLandingGalleryMetadata({
+      couple: target.couple,
+      landingModelName: target.landingModelName,
+      landingDescription: target.landingDescription,
+    });
+
     result[category].push({
       id: row.id,
-      title: readCouple(target.couple),
+      title: metadata.title,
       href: isInvitation ? invitationHref(slug) : saveTheDateHref(slug),
       imageUrl: target.landingImageUrl ?? heroImage,
       displayDate: readDateDisplay(target.date),
       subtitle: target.landingSubtitle ?? null,
+      description: metadata.description,
       priceLabel: formatLandingPrice(target.priceFromCents, target.currency),
       category,
     });

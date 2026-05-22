@@ -48,6 +48,7 @@ type AdminInvitationInitialDataRow = {
   socialPreview: unknown;
   priceFromCents: number | null;
   currency: string | null;
+  landingModelName: string | null;
   landingImageUrl: string | null;
   landingDescription: string | null;
   landingSubtitle: string | null;
@@ -96,6 +97,7 @@ export function toAdminInvitationInitialData(
       undefined,
     priceFromCents: row.priceFromCents,
     currency: row.currency,
+    landingModelName: row.landingModelName,
     landingImageUrl: row.landingImageUrl,
     landingDescription: row.landingDescription,
     landingSubtitle: row.landingSubtitle,

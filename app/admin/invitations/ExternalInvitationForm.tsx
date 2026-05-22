@@ -792,15 +792,15 @@ export default function ExternalInvitationForm({
                     value={{
                       priceFromCents: form.priceFromCents ?? null,
                       currency: form.currency ?? "EUR",
+                      landingModelName: form.landingModelName ?? null,
                       landingImageUrl: form.landingImageUrl ?? null,
-                      landingSubtitle: form.landingSubtitle ?? null,
                       landingDescription: form.landingDescription ?? null,
                     }}
                     onChange={(next) => {
                       update("priceFromCents", next.priceFromCents);
                       update("currency", next.currency);
+                      update("landingModelName", next.landingModelName);
                       update("landingImageUrl", next.landingImageUrl);
-                      update("landingSubtitle", next.landingSubtitle);
                       update("landingDescription", next.landingDescription);
                     }}
                   />

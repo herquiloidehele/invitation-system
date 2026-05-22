@@ -506,6 +506,7 @@ export interface InvitationData {
   /** Landing page listing metadata. */
   priceFromCents?: number | null;
   currency?: string | null;
+  landingModelName?: string | null;
   landingImageUrl?: string | null;
   landingDescription?: string | null;
   landingSubtitle?: string | null;

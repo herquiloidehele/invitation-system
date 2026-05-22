@@ -5,8 +5,8 @@ import MediaUpload from "@/components/admin/MediaUpload";
 export type LandingMetadata = {
   priceFromCents: number | null;
   currency: string | null;
+  landingModelName: string | null;
   landingImageUrl: string | null;
-  landingSubtitle: string | null;
   landingDescription: string | null;
 };
 
@@ -47,6 +47,19 @@ export function LandingMetadataFieldset({
         />
       </label>
 
+      <label className="block text-sm">
+        Nome do modelo (título do cartão)
+        <input
+          type="text"
+          value={value.landingModelName ?? ""}
+          onChange={(event) =>
+            update({ landingModelName: event.target.value || null })
+          }
+          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
+          placeholder="Modelo Editorial"
+        />
+      </label>
+
       <div className="block text-sm">
         <span className="mb-1 block">Imagem destaque</span>
         <MediaUpload
@@ -58,19 +71,6 @@ export function LandingMetadataFieldset({
           label="Carregar imagem destaque"
         />
       </div>
-
-      <label className="block text-sm">
-        Subtítulo (linha 2 do cartão)
-        <input
-          type="text"
-          value={value.landingSubtitle ?? ""}
-          onChange={(event) =>
-            update({ landingSubtitle: event.target.value || null })
-          }
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-          placeholder="Quinta da Aroeira"
-        />
-      </label>
 
       <label className="block text-sm">
         Descrição curta

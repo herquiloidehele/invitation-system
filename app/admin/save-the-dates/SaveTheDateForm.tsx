@@ -90,9 +90,9 @@ export interface SaveTheDateFormData {
   ownerToken?: string;
   priceFromCents?: number | null;
   currency?: string | null;
+  landingModelName?: string | null;
   landingImageUrl?: string | null;
   landingDescription?: string | null;
-  landingSubtitle?: string | null;
 }
 
 interface Props {
@@ -333,8 +333,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           isDemo: data.isDemo === true,
           priceFromCents: data.priceFromCents ?? null,
           currency: data.currency ?? "EUR",
+          landingModelName: data.landingModelName ?? null,
           landingImageUrl: data.landingImageUrl ?? null,
-          landingSubtitle: data.landingSubtitle ?? null,
           landingDescription: data.landingDescription ?? null,
         }),
       });
@@ -455,8 +455,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                   value={{
                     priceFromCents: data.priceFromCents ?? null,
                     currency: data.currency ?? "EUR",
+                    landingModelName: data.landingModelName ?? null,
                     landingImageUrl: data.landingImageUrl ?? null,
-                    landingSubtitle: data.landingSubtitle ?? null,
                     landingDescription: data.landingDescription ?? null,
                   }}
                   onChange={(next) =>
@@ -464,8 +464,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       ...p,
                       priceFromCents: next.priceFromCents,
                       currency: next.currency,
+                      landingModelName: next.landingModelName,
                       landingImageUrl: next.landingImageUrl,
-                      landingSubtitle: next.landingSubtitle,
                       landingDescription: next.landingDescription,
                     }))
                   }

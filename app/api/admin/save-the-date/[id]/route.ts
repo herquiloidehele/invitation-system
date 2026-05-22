@@ -75,6 +75,13 @@ export async function PUT(
               ? body.currency
               : "EUR",
         }),
+        ...(body.landingModelName !== undefined && {
+          landingModelName:
+            typeof body.landingModelName === "string" &&
+            body.landingModelName.length
+              ? body.landingModelName
+              : null,
+        }),
         ...(body.landingImageUrl !== undefined && {
           landingImageUrl:
             typeof body.landingImageUrl === "string" &&

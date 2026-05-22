@@ -71,6 +71,11 @@ export default async function EditSaveTheDatePage({
       (item.socialPreview as SocialPreview | null) ?? undefined,
     isDemo: item.isDemo,
     ownerToken: item.ownerToken,
+    priceFromCents: item.priceFromCents,
+    currency: item.currency,
+    landingModelName: item.landingModelName,
+    landingImageUrl: item.landingImageUrl,
+    landingDescription: item.landingDescription,
   };
 
   return (

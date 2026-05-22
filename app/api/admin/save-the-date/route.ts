@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       isDemo,
       priceFromCents,
       currency,
+      landingModelName,
       landingImageUrl,
       landingDescription,
       landingSubtitle,
@@ -58,6 +59,10 @@ export async function POST(req: NextRequest) {
           typeof priceFromCents === "number" ? priceFromCents : null,
         currency:
           typeof currency === "string" && currency.length ? currency : "EUR",
+        landingModelName:
+          typeof landingModelName === "string" && landingModelName.length
+            ? landingModelName
+            : null,
         landingImageUrl:
           typeof landingImageUrl === "string" && landingImageUrl.length
             ? landingImageUrl
