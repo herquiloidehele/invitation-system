@@ -79,7 +79,6 @@ export function LandingMetadataFieldset({
           onChange={(event) =>
             update({ landingDescription: event.target.value || null })
           }
-          maxLength={140}
           className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
           rows={2}
         />
