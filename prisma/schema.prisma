@@ -106,13 +106,21 @@ model Invitation {
   guestManagementEnabled Boolean @default(false)
   guestMessageTemplate   String?
   socialPreview Json?    // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
+
+  priceFromCents     Int?
+  currency           String  @default("EUR")
+  landingImageUrl    String?
+  landingDescription String?
+  landingSubtitle    String?
+
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  rsvpResponses RsvpResponse[]
-  events        InvitationEvent[]
-  guests        Guest[]
+  rsvpResponses   RsvpResponse[]
+  events          InvitationEvent[]
+  guests          Guest[]
+  landingFeatures LandingFeature[]
 }
 
 model InvitationEvent {
@@ -188,12 +196,19 @@ model SaveTheDate {
   socialPreview Json?   // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
   isDemo        Boolean @default(false)
 
+  priceFromCents     Int?
+  currency           String  @default("EUR")
+  landingImageUrl    String?
+  landingDescription String?
+  landingSubtitle    String?
+
   ownerToken String   @unique @default(cuid())
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  events        SaveTheDateEvent[]
-  rsvpResponses SaveTheDateRsvpResponse[]
+  events          SaveTheDateEvent[]
+  rsvpResponses   SaveTheDateRsvpResponse[]
+  landingFeatures LandingFeature[]
 }
 
 model SaveTheDateEvent {
@@ -287,4 +302,51 @@ model SaveTheDateRsvpResponse {
   saveTheDate SaveTheDate @relation(fields: [saveTheDateSlug], references: [slug], onDelete: Cascade)
 
   @@index([saveTheDateSlug])
+}
+
+// ---------------------------------------------------------------------------
+// Landing page featured invitations / save-the-dates
+// ---------------------------------------------------------------------------
+
+model LandingFeature {
+  id              String   @id @default(cuid())
+  section         String   // "hero" | "gallery" | "live_demo"
+  galleryCategory String?  // "wedding" | "save_the_date" | "baptism" | "anniversary" | "engagement"
+  position        Int      @default(0)
+  enabled         Boolean  @default(true)
+
+  invitationId    String?
+  invitation      Invitation? @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  saveTheDateId   String?
+  saveTheDate     SaveTheDate? @relation(fields: [saveTheDateId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([section, position])
+  @@index([galleryCategory])
+}
+
+// ---------------------------------------------------------------------------
+// Contact submissions — landing page WhatsApp/contact form leads
+// ---------------------------------------------------------------------------
+
+model ContactSubmission {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  eventType String
+  eventDate DateTime?
+  message   String
+  source    String    @default("landing")
+  status    String    @default("new")
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([createdAt])
+  @@index([status, createdAt])
 }

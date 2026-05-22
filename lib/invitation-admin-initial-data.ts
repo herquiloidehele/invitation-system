@@ -46,6 +46,11 @@ type AdminInvitationInitialDataRow = {
   externalLink: string | null;
   isDemo: boolean;
   socialPreview: unknown;
+  priceFromCents: number | null;
+  currency: string | null;
+  landingImageUrl: string | null;
+  landingDescription: string | null;
+  landingSubtitle: string | null;
 };
 
 export function toAdminInvitationInitialData(
@@ -89,5 +94,10 @@ export function toAdminInvitationInitialData(
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"] | null) ??
       undefined,
+    priceFromCents: row.priceFromCents,
+    currency: row.currency,
+    landingImageUrl: row.landingImageUrl,
+    landingDescription: row.landingDescription,
+    landingSubtitle: row.landingSubtitle,
   };
 }

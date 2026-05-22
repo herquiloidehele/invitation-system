@@ -1,0 +1,90 @@
+import type { GalleryCategory as DbGalleryCategory } from "@/lib/landing-features";
+
+export type GalleryCategoryKey =
+  | "all"
+  | "wedding"
+  | "saveTheDate"
+  | "baptism"
+  | "anniversary"
+  | "engagement";
+
+export type GalleryCategory = { key: GalleryCategoryKey; label: string };
+
+export type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+export const dbCategoryToTabKey: Record<DbGalleryCategory, GalleryCategoryKey> = {
+  wedding: "wedding",
+  save_the_date: "saveTheDate",
+  baptism: "baptism",
+  anniversary: "anniversary",
+  engagement: "engagement",
+};
+
+export type LandingTranslator = {
+  (key: string): string;
+  raw?(key: string): unknown;
+};
+
+export function getNavLinks(t: (key: string) => string) {
+  return [
+    { label: t("types"), href: "#tipos" },
+    { label: t("gallery"), href: "#galeria" },
+    { label: t("process"), href: "#processo" },
+    { label: t("features"), href: "#recursos" },
+    { label: t("faq"), href: "#faq" },
+  ];
+}
+
+export function getInvitationTypes(t: (key: string) => string) {
+  return [
+    {
+      key: "saveTheDate",
+      title: t("items.saveTheDate.title"),
+      text: t("items.saveTheDate.text"),
+      icon: "01",
+      featured: false,
+    },
+    {
+      key: "wedding",
+      title: t("items.wedding.title"),
+      text: t("items.wedding.text"),
+      icon: "02",
+      featured: true,
+    },
+    {
+      key: "engagement",
+      title: t("items.engagement.title"),
+      text: t("items.engagement.text"),
+      icon: "03",
+      featured: false,
+    },
+  ] as const;
+}
+
+export function getGalleryCategories(
+  t: (key: string) => string,
+): GalleryCategory[] {
+  return [
+    { key: "all", label: t("categories.all") },
+    { key: "wedding", label: t("categories.wedding") },
+    { key: "saveTheDate", label: t("categories.saveTheDate") },
+    { key: "baptism", label: t("categories.baptism") },
+    { key: "anniversary", label: t("categories.anniversary") },
+    { key: "engagement", label: t("categories.engagement") },
+  ];
+}
+
+export function getProcessSteps(t: LandingTranslator) {
+  return t.raw?.("steps") as ReadonlyArray<readonly [string, string, string]>;
+}
+
+export function getProcessBadges(t: LandingTranslator) {
+  return t.raw?.("badges") as ReadonlyArray<string>;
+}
+
+export function getFaqs(t: LandingTranslator): FaqItem[] {
+  return t.raw?.("items") as FaqItem[];
+}

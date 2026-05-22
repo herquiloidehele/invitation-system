@@ -48,6 +48,7 @@ type InvitationWithTheme = {
   scratchReveal: unknown;
   invitationType: string;
   externalLink: string | null;
+  isDemo: boolean;
   textStyles: unknown;
   cardStyles: unknown;
   imageSettings: unknown;
@@ -90,6 +91,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
       undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
+    isDemo: row.isDemo,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,

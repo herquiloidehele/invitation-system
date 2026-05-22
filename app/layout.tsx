@@ -1,16 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import {
-  Great_Vibes,
-  Playfair_Display,
+  Cinzel,
   Cormorant_Garamond,
+  DM_Serif_Display,
+  Fraunces,
+  Geist,
+  Great_Vibes,
   Homemade_Apple,
   Libre_Baskerville,
-  Cinzel,
   Lora,
+  Manrope,
   Outfit,
-  DM_Serif_Display,
   Pinyon_Script,
-  Geist,
+  Playfair_Display,
 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -81,6 +85,19 @@ const pinyonScript = Pinyon_Script({
   variable: "--font-pinyon-script",
 });
 
+const manrope = Manrope({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-manrope",
+});
+
+const fraunces = Fraunces({
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+});
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -89,8 +106,36 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Brindel Studio — Convites Digitais",
-  description: "Convites de casamento interativos e memoráveis",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://convites.brindealstudio.com",
+  ),
+  applicationName: "Brindeal Studio",
+  title: {
+    default: "Brindeal Studio | Convites Digitais",
+    template: "%s | Brindeal Studio",
+  },
+  description:
+    "Convites digitais personalizados para casamentos e celebrações, com RSVP online, mapa, música e partilha simples por WhatsApp.",
+  openGraph: {
+    type: "website",
+    siteName: "Brindeal Studio",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-default.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 // Build the S3 origin at startup for DNS preconnect (e.g. "https://bucket.s3.region.amazonaws.com")
@@ -101,14 +146,17 @@ const s3Origin =
     ? `https://${s3Bucket}.s3.${s3Region}.amazonaws.com`
     : null;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="pt"
+      lang={locale}
       className={cn("font-sans", geist.variable)}
       suppressHydrationWarning
     >
@@ -122,9 +170,11 @@ export default function RootLayout({
         )}
       </head>
       <body
-        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} ${pinyonScript.variable} antialiased`}
+        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} ${pinyonScript.variable} ${manrope.variable} ${fraunces.variable} antialiased`}
       >
-        {children}
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

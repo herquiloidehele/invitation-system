@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +14,6 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
-import { t } from "@/lib/custom-texts";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { EditableText } from "@/components/shared/EditableText";
 import {
@@ -25,15 +25,17 @@ import {
 // Schema
 // ---------------------------------------------------------------------------
 
-const rsvpSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("Email inválido").or(z.literal("")),
-  attending: z.enum(["yes", "no"], { error: "Selecione uma opção" }),
-  dietaryRestrictions: z.string(),
-  message: z.string(),
-});
+function createRsvpSchema(t: (key: string) => string) {
+  return z.object({
+    name: z.string().min(1, t("nameRequired")),
+    email: z.string().email(t("invalidEmail")).or(z.literal("")),
+    attending: z.enum(["yes", "no"], { error: t("selectOption") }),
+    dietaryRestrictions: z.string(),
+    message: z.string(),
+  });
+}
 
-type RSVPFormData = z.output<typeof rsvpSchema>;
+type RSVPFormData = z.output<ReturnType<typeof createRsvpSchema>>;
 
 // ---------------------------------------------------------------------------
 // Modal palette — always light & readable, themed only via accent / CTA
@@ -179,6 +181,9 @@ export default function RSVPForm(props: RSVPFormProps) {
     ? props.invitation.rsvp.deadline
     : undefined;
   const ct = isIntegration(props) ? props.customTexts : undefined;
+  const rsvpT = useTranslations("RSVP");
+  const resolveText = (key: keyof CustomTexts) => ct?.[key] || rsvpT(key);
+  const rsvpSchema = createRsvpSchema(rsvpT);
   const guest = isIntegration(props) ? props.guest : undefined;
   const showEmail = isIntegration(props)
     ? shouldShowRsvpEmail(props.invitation.rsvp)
@@ -310,13 +315,13 @@ export default function RSVPForm(props: RSVPFormProps) {
           }}
         >
           <EditableText elementKey="sectionTitles">
-            {t(ct, "rsvp_modalTitle")}
+            {resolveText("rsvp_modalTitle")}
           </EditableText>
         </h2>
         {!inline && (
           <button
             onClick={handleCloseInModal}
-            aria-label={t(ct, "rsvp_closeButton")}
+            aria-label={resolveText("rsvp_closeButton")}
             className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-black/5"
           >
             <X size={18} color={p.iconColor} />
@@ -346,7 +351,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               }}
             >
               <EditableText elementKey="sectionTitles">
-                {t(ct, "rsvp_alreadyTitle")}
+                {resolveText("rsvp_alreadyTitle")}
               </EditableText>
             </p>
             <p
@@ -354,7 +359,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               style={{ color: p.textSoft, ...bodyTextOverride }}
             >
               <EditableText elementKey="bodyText">
-                {t(ct, "rsvp_alreadyMessage")}
+                {resolveText("rsvp_alreadyMessage")}
               </EditableText>
             </p>
             {!inline && (
@@ -370,7 +375,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                 }}
               >
                 <EditableText elementKey="ctaLabel">
-                  {t(ct, "rsvp_closeButton")}
+                  {resolveText("rsvp_closeButton")}
                 </EditableText>
               </button>
             )}
@@ -393,7 +398,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               }}
             >
               <EditableText elementKey="sectionTitles">
-                {t(ct, "rsvp_successTitle")}
+                {resolveText("rsvp_successTitle")}
               </EditableText>
             </p>
             <p
@@ -401,7 +406,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               style={{ color: p.textSoft, ...bodyTextOverride }}
             >
               <EditableText elementKey="bodyText">
-                {t(ct, "rsvp_successMessage")}
+                {resolveText("rsvp_successMessage")}
               </EditableText>
             </p>
             {!inline && (
@@ -417,7 +422,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                 }}
               >
                 <EditableText elementKey="ctaLabel">
-                  {t(ct, "rsvp_closeButton")}
+                  {resolveText("rsvp_closeButton")}
                 </EditableText>
               </button>
             )}
@@ -440,7 +445,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               }}
             >
               <EditableText elementKey="sectionTitles">
-                {t(ct, "rsvp_errorTitle")}
+                {resolveText("rsvp_errorTitle")}
               </EditableText>
             </p>
             <p
@@ -448,7 +453,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               style={{ color: p.textSoft, ...bodyTextOverride }}
             >
               <EditableText elementKey="bodyText">
-                {t(ct, "rsvp_errorMessage")}
+                {resolveText("rsvp_errorMessage")}
               </EditableText>
             </p>
             <button
@@ -463,7 +468,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               }}
             >
               <EditableText elementKey="ctaLabel">
-                {t(ct, "rsvp_retryButton")}
+                {resolveText("rsvp_retryButton")}
               </EditableText>
             </button>
           </motion.div>
@@ -485,7 +490,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                 }}
               >
                 <EditableText elementKey="bodyText">
-                  {t(ct, "rsvp_deadlinePrefix")} {deadline}
+                  {resolveText("rsvp_deadlinePrefix")} {deadline}
                 </EditableText>
               </p>
             )}
@@ -493,12 +498,12 @@ export default function RSVPForm(props: RSVPFormProps) {
             <div className="flex flex-col gap-1.5">
               <label style={labelStyle}>
                 <EditableText elementKey="labels">
-                  {t(ct, "rsvp_nameLabel")}
+                  {resolveText("rsvp_nameLabel")}
                 </EditableText>
               </label>
               <input
                 {...register("name")}
-                placeholder={t(ct, "rsvp_namePlaceholder")}
+                placeholder={resolveText("rsvp_namePlaceholder")}
                 readOnly={!!guest}
                 aria-readonly={!!guest}
                 className={`${inputClass} ${guest ? "cursor-not-allowed opacity-80" : ""}`}
@@ -515,13 +520,13 @@ export default function RSVPForm(props: RSVPFormProps) {
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
                   <EditableText elementKey="labels">
-                    {t(ct, "rsvp_emailLabel")}
+                    {resolveText("rsvp_emailLabel")}
                   </EditableText>
                 </label>
                 <input
                   {...register("email")}
                   type="email"
-                  placeholder={t(ct, "rsvp_emailPlaceholder")}
+                  placeholder={resolveText("rsvp_emailPlaceholder")}
                   className={inputClass}
                   style={inputStyle}
                 />
@@ -536,7 +541,7 @@ export default function RSVPForm(props: RSVPFormProps) {
             <div className="flex flex-col gap-2">
               <label style={labelStyle}>
                 <EditableText elementKey="labels">
-                  {t(ct, "rsvp_attendingLabel")}
+                  {resolveText("rsvp_attendingLabel")}
                 </EditableText>
               </label>
               <div className="flex gap-3">
@@ -558,7 +563,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                     className="sr-only"
                   />
                   <EditableText elementKey="bodyText">
-                    {t(ct, "rsvp_attendingYes")}
+                    {resolveText("rsvp_attendingYes")}
                   </EditableText>
                 </label>
                 <label
@@ -579,7 +584,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                     className="sr-only"
                   />
                   <EditableText elementKey="bodyText">
-                    {t(ct, "rsvp_attendingNo")}
+                    {resolveText("rsvp_attendingNo")}
                   </EditableText>
                 </label>
               </div>
@@ -594,12 +599,12 @@ export default function RSVPForm(props: RSVPFormProps) {
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
                   <EditableText elementKey="labels">
-                    {t(ct, "rsvp_dietaryLabel")}
+                    {resolveText("rsvp_dietaryLabel")}
                   </EditableText>
                 </label>
                 <input
                   {...register("dietaryRestrictions")}
-                  placeholder={t(ct, "rsvp_dietaryPlaceholder")}
+                  placeholder={resolveText("rsvp_dietaryPlaceholder")}
                   className={inputClass}
                   style={inputStyle}
                 />
@@ -609,13 +614,13 @@ export default function RSVPForm(props: RSVPFormProps) {
             <div className="flex flex-col gap-1.5">
               <label style={labelStyle}>
                 <EditableText elementKey="labels">
-                  {t(ct, "rsvp_messageLabel")}
+                  {resolveText("rsvp_messageLabel")}
                 </EditableText>
               </label>
               <textarea
                 {...register("message")}
                 rows={3}
-                placeholder={t(ct, "rsvp_messagePlaceholder")}
+                placeholder={resolveText("rsvp_messagePlaceholder")}
                 className={`${inputClass} resize-none`}
                 style={inputStyle}
                 suppressHydrationWarning
@@ -638,12 +643,12 @@ export default function RSVPForm(props: RSVPFormProps) {
                 <>
                   <Loader2 size={16} className="animate-spin" />
                   <EditableText elementKey="ctaLabel">
-                    {t(ct, "rsvp_submitting")}
+                    {resolveText("rsvp_submitting")}
                   </EditableText>
                 </>
               ) : (
                 <EditableText elementKey="ctaLabel">
-                  {t(ct, "rsvp_submitButton")}
+                  {resolveText("rsvp_submitButton")}
                 </EditableText>
               )}
             </button>

@@ -75,6 +75,7 @@ import {
   shouldShowExternalInvitationAudioControls,
 } from "@/lib/external-invitation-form";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
+import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -786,6 +787,23 @@ export default function ExternalInvitationForm({
                       onCheckedChange={(checked) => update("isDemo", checked)}
                     />
                   </div>
+
+                  <LandingMetadataFieldset
+                    value={{
+                      priceFromCents: form.priceFromCents ?? null,
+                      currency: form.currency ?? "EUR",
+                      landingImageUrl: form.landingImageUrl ?? null,
+                      landingSubtitle: form.landingSubtitle ?? null,
+                      landingDescription: form.landingDescription ?? null,
+                    }}
+                    onChange={(next) => {
+                      update("priceFromCents", next.priceFromCents);
+                      update("currency", next.currency);
+                      update("landingImageUrl", next.landingImageUrl);
+                      update("landingSubtitle", next.landingSubtitle);
+                      update("landingDescription", next.landingDescription);
+                    }}
+                  />
                 </AccordionContent>
               </AccordionItem>
 

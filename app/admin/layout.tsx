@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,9 @@ import { AppSidebar } from "@/components/admin/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { ThemeProvider } from "@/components/admin/theme-provider";
+import { createNoIndexMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createNoIndexMetadata();
 
 export default async function AdminLayout({
   children,

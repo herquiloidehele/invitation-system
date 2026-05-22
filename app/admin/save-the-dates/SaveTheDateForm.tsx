@@ -47,6 +47,7 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
+import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import { OwnerLinkPanel } from "@/app/admin/invitations/OwnerLinkPanel";
@@ -87,6 +88,11 @@ export interface SaveTheDateFormData {
   socialPreview?: SocialPreview;
   isDemo?: boolean;
   ownerToken?: string;
+  priceFromCents?: number | null;
+  currency?: string | null;
+  landingImageUrl?: string | null;
+  landingDescription?: string | null;
+  landingSubtitle?: string | null;
 }
 
 interface Props {
@@ -325,6 +331,11 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           bottomHero: data.bottomHero || null,
           socialPreview: data.socialPreview ?? null,
           isDemo: data.isDemo === true,
+          priceFromCents: data.priceFromCents ?? null,
+          currency: data.currency ?? "EUR",
+          landingImageUrl: data.landingImageUrl ?? null,
+          landingSubtitle: data.landingSubtitle ?? null,
+          landingDescription: data.landingDescription ?? null,
         }),
       });
 
@@ -439,6 +450,26 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     }
                   />
                 </div>
+
+                <LandingMetadataFieldset
+                  value={{
+                    priceFromCents: data.priceFromCents ?? null,
+                    currency: data.currency ?? "EUR",
+                    landingImageUrl: data.landingImageUrl ?? null,
+                    landingSubtitle: data.landingSubtitle ?? null,
+                    landingDescription: data.landingDescription ?? null,
+                  }}
+                  onChange={(next) =>
+                    setData((p) => ({
+                      ...p,
+                      priceFromCents: next.priceFromCents,
+                      currency: next.currency,
+                      landingImageUrl: next.landingImageUrl,
+                      landingSubtitle: next.landingSubtitle,
+                      landingDescription: next.landingDescription,
+                    }))
+                  }
+                />
               </AccordionContent>
             </AccordionItem>
 

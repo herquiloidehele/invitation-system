@@ -85,6 +85,8 @@ export interface SaveTheDateData {
   bottomHero: BottomHeroConfig | null;
   /** Override values used only for OG/Twitter meta tags. Image is never rendered on the page. */
   socialPreview: SocialPreview | null;
+  /** Admin-only marker for public demo pages that can be indexed. */
+  isDemo?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -163,6 +165,7 @@ export async function getSaveTheDate(
     socialPreview: row.socialPreview
       ? (row.socialPreview as unknown as SocialPreview)
       : null,
+    isDemo: row.isDemo,
   };
 }
 

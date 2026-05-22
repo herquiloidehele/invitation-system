@@ -63,6 +63,39 @@ export async function PUT(
         ...(body.isDemo !== undefined && {
           isDemo: body.isDemo === true,
         }),
+        ...(body.priceFromCents !== undefined && {
+          priceFromCents:
+            typeof body.priceFromCents === "number"
+              ? body.priceFromCents
+              : null,
+        }),
+        ...(body.currency !== undefined && {
+          currency:
+            typeof body.currency === "string" && body.currency.length
+              ? body.currency
+              : "EUR",
+        }),
+        ...(body.landingImageUrl !== undefined && {
+          landingImageUrl:
+            typeof body.landingImageUrl === "string" &&
+            body.landingImageUrl.length
+              ? body.landingImageUrl
+              : null,
+        }),
+        ...(body.landingDescription !== undefined && {
+          landingDescription:
+            typeof body.landingDescription === "string" &&
+            body.landingDescription.length
+              ? body.landingDescription
+              : null,
+        }),
+        ...(body.landingSubtitle !== undefined && {
+          landingSubtitle:
+            typeof body.landingSubtitle === "string" &&
+            body.landingSubtitle.length
+              ? body.landingSubtitle
+              : null,
+        }),
       },
       include: { theme: true },
     });

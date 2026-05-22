@@ -123,6 +123,25 @@ export async function POST(request: NextRequest) {
         guestManagementEnabled: body.guestManagementEnabled === true,
         guestMessageTemplate: body.guestMessageTemplate ?? null,
         socialPreview: sanitizeJsonField(body.socialPreview, null),
+        priceFromCents:
+          typeof body.priceFromCents === "number" ? body.priceFromCents : null,
+        currency:
+          typeof body.currency === "string" && body.currency.length
+            ? body.currency
+            : "EUR",
+        landingImageUrl:
+          typeof body.landingImageUrl === "string" && body.landingImageUrl.length
+            ? body.landingImageUrl
+            : null,
+        landingDescription:
+          typeof body.landingDescription === "string" &&
+          body.landingDescription.length
+            ? body.landingDescription
+            : null,
+        landingSubtitle:
+          typeof body.landingSubtitle === "string" && body.landingSubtitle.length
+            ? body.landingSubtitle
+            : null,
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },
