@@ -1,26 +1,13 @@
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import logo from "@/design/logo.jpg";
 import { getNavLinks } from "./landing-data";
 import { LocaleSwitcher } from "./LocaleSwitcher";
-import { resolveLocale } from "@/i18n/locales";
-import { buildLocalePath } from "@/lib/seo";
 
 export function LandingNav() {
   const t = useTranslations("Landing");
   const navT = useTranslations("LandingNav");
-  const locale = resolveLocale(useLocale());
-  const navLinks = [
-    {
-      label: navT("weddingInvitations"),
-      href: buildLocalePath("/convites-casamento", locale),
-    },
-    {
-      label: navT("saveTheDateDigital"),
-      href: buildLocalePath("/save-the-date-digital", locale),
-    },
-    ...getNavLinks(navT),
-  ];
+  const navLinks = [...getNavLinks(navT)];
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-[#E5E7E4]/80 bg-white/85 backdrop-blur-xl">
