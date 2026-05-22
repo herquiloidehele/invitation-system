@@ -86,6 +86,16 @@ export interface ResolvedTextStyles {
   countdownDate: CSSProperties;
   /** Countdown weekday & time ("Segunda-feira · 16:00") */
   countdownWeekday: CSSProperties;
+  /** External invitation countdown title. */
+  externalCountdownTitle: CSSProperties;
+  /** External invitation countdown subtitle. */
+  externalCountdownSubtitle: CSSProperties;
+  /** External invitation countdown tile number. */
+  externalCountdownValue: CSSProperties;
+  /** External invitation countdown tile unit label. */
+  externalCountdownLabel: CSSProperties;
+  /** External invitation countdown arrival/celebration text. */
+  externalCountdownCelebrationTitle: CSSProperties;
   /** Celebration title ("Hoje é o grande dia!") — shown when countdown reaches zero */
   celebrationTitle: CSSProperties;
   /** Celebration couple names — shown when countdown reaches zero */
@@ -687,6 +697,61 @@ export function resolveTextStyles(
     el?.celebrationCouple,
   );
 
+  const externalCountdownTitle = applyOverride(
+    {
+      fontFamily: scriptFont,
+      fontSize: 42,
+      fontWeight: 300,
+      lineHeight: 1.05,
+      color: textPrimary,
+    },
+    el?.externalCountdownTitle,
+  );
+
+  const externalCountdownSubtitle = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 22,
+      fontWeight: 700,
+      letterSpacing: 0.2,
+      color: textPrimary,
+    },
+    el?.externalCountdownSubtitle,
+  );
+
+  const externalCountdownValue = applyOverride(
+    {
+      fontFamily: displayFont,
+      fontSize: 48,
+      fontWeight: 400,
+      lineHeight: 1,
+      color: textPrimary,
+    },
+    el?.externalCountdownValue,
+  );
+
+  const externalCountdownLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 13,
+      fontWeight: 400,
+      letterSpacing: 5,
+      textTransform: "uppercase" as const,
+      color: textSecondary,
+    },
+    el?.externalCountdownLabel,
+  );
+
+  const externalCountdownCelebrationTitle = applyOverride(
+    {
+      fontFamily: scriptFont,
+      fontSize: 38,
+      fontWeight: 300,
+      color: textPrimary,
+    },
+    el?.externalCountdownCelebrationTitle,
+  );
+
   const accentLine = applyOverride(
     {
       color: accent,
@@ -1012,6 +1077,11 @@ export function resolveTextStyles(
     countdownLabel,
     countdownDate,
     countdownWeekday,
+    externalCountdownTitle,
+    externalCountdownSubtitle,
+    externalCountdownValue,
+    externalCountdownLabel,
+    externalCountdownCelebrationTitle,
     celebrationTitle,
     celebrationCouple,
     accentLine,

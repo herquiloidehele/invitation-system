@@ -6,6 +6,7 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 
 import InvitationHero, { InvitationHeroNames } from "./InvitationHero";
+import ExternalCountdownSection from "./ExternalCountdownSection";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import RSVPForm from "./RSVPForm";
@@ -42,6 +43,7 @@ export default function RichExternalLinkPage({
   isPreview = false,
 }: RichExternalLinkPageProps) {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
+  const countdownOn = Boolean(invitation.countdown?.enabled);
   const scratchOn = Boolean(invitation.scratchReveal?.enabled);
   const rsvpOn = Boolean(invitation.rsvp?.enabled);
   const externalLink = getEffectiveExternalLink({
@@ -84,6 +86,10 @@ export default function RichExternalLinkPage({
             isPreview={isPreview}
           />
         </>
+      )}
+
+      {countdownOn && (
+        <ExternalCountdownSection invitation={invitation} theme={theme} />
       )}
 
       {scratchOn && (

@@ -18,14 +18,12 @@ export function TypesSection() {
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
-              <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
+            <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
             {t("title")}
           </h2>
-          <p className="mt-5 text-[#5C605A]">
-            {t("body")}
-          </p>
+          <p className="mt-5 text-[#5C605A]">{t("body")}</p>
         </div>
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
           {invitationTypes.map((type) => {
@@ -99,9 +97,6 @@ function TypeVisual({
         <p className="text-2xl font-semibold tracking-[-0.02em] text-white drop-shadow">
           18 · 07 · 26
         </p>
-        <span className="mt-2 inline-flex rounded-full bg-[#3F4E3F] px-3 py-1 text-[10px] font-semibold text-white">
-          {t("visualSaveTheDateDays")}
-        </span>
       </PhotoVisual>
     );
   }
@@ -111,24 +106,11 @@ function TypeVisual({
       <PhotoVisual
         src={landingImages.wedding}
         alt={t("visualWeddingAlt")}
-        overlay={`bg-[linear-gradient(180deg,rgba(31,36,32,0.2),rgba(31,36,32,${
-          featured ? "0.6" : "0.45"
-        }))]`}
+        overlay="bg-[linear-gradient(180deg,rgba(31,36,32,0.05),rgba(31,36,32,0.55))]"
       >
         <p className="text-lg font-semibold text-white drop-shadow">
           Leonor & Diogo
         </p>
-        <div className="mt-3 flex gap-2 text-[10px] font-semibold text-[#3F4E3F]">
-          <span className="rounded-full bg-white/90 px-2.5 py-1 backdrop-blur">
-            {t("visualWeddingMusic")}
-          </span>
-          <span className="rounded-full bg-white/90 px-2.5 py-1 backdrop-blur">
-            {t("visualWeddingMap")}
-          </span>
-          <span className="rounded-full bg-white/90 px-2.5 py-1 backdrop-blur">
-            {t("visualWeddingMenu")}
-          </span>
-        </div>
       </PhotoVisual>
     );
   }

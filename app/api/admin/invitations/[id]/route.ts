@@ -161,6 +161,9 @@ export async function PUT(
         ...(body.scratchReveal !== undefined && {
           scratchReveal: sanitizeJsonField(body.scratchReveal, null),
         }),
+        ...(body.countdown !== undefined && {
+          countdown: sanitizeJsonField(body.countdown, null),
+        }),
         ...(body.invitationType !== undefined && {
           invitationType: body.invitationType,
         }),

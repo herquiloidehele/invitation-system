@@ -2,6 +2,7 @@ import { prisma } from "./db";
 import type {
   CardStyleOverrides,
   CustomTexts,
+  ExternalCountdownConfig,
   ImageSettingsMap,
   InvitationData,
   InvitationEventType,
@@ -46,6 +47,7 @@ type InvitationWithTheme = {
   parents: unknown;
   ourStory: unknown;
   scratchReveal: unknown;
+  countdown: unknown;
   invitationType: string;
   externalLink: string | null;
   isDemo: boolean;
@@ -89,6 +91,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     scratchReveal:
       (row.scratchReveal as InvitationData["scratchReveal"] | null) ??
       undefined,
+    countdown: (row.countdown as ExternalCountdownConfig | null) ?? undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
     isDemo: row.isDemo,

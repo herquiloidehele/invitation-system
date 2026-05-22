@@ -37,6 +37,7 @@ export function hasRichExternalSections(invitation: InvitationData): boolean {
   if ((invitation.invitationType ?? "standard") !== "external_link")
     return false;
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
+  const countdownOn = Boolean(invitation.countdown?.enabled);
   const scratchOn = Boolean(invitation.scratchReveal?.enabled);
-  return heroOn || scratchOn;
+  return heroOn || countdownOn || scratchOn;
 }

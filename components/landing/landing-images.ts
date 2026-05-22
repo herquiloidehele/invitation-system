@@ -6,9 +6,9 @@ function unsplash(id: string, width = 900) {
 }
 
 export const landingImages = {
-  saveTheDate: unsplash("1469371670807-013ccf25f16a", 1200), // sunset couple silhouette
-  wedding: unsplash("1519741497674-611481863552", 1200), // bride and groom holding hands
-  engagement: unsplash("1606490194859-07c18c9f0968", 1200), // engagement rings macro
+  saveTheDate: "/images/1.jpg", // sunset couple silhouette
+  wedding: "/images/2.jpg", // bride and groom holding hands
+  engagement: "/images/3.jpg", // engagement rings macro
   moodboardA: unsplash("1519741497674-611481863552", 600),
   moodboardB: unsplash("1525772764200-be829a350797", 600), // wedding florals
   personalisationA: unsplash("1519741497674-611481863552", 400),

@@ -12,6 +12,11 @@ import type {
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { t } from "@/lib/custom-texts";
+import {
+  computeCountdownTimeLeft,
+  formatCountdownValue,
+  type CountdownTimeLeft,
+} from "@/lib/countdown";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import CalendarButton from "./CalendarButton";
 import { EditableText } from "./EditableText";
@@ -182,87 +187,6 @@ function SaveTheDateClassic({
 // 2. Countdown — live ticking timer to the wedding date
 // ---------------------------------------------------------------------------
 
-interface TimeLeft {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-  passed: boolean;
-}
-
-function computeTimeLeft(isoDate: string, timeStr: string): TimeLeft {
-  // Parse the wedding date in Europe/Lisbon timezone.
-  // The ISO date is stored as "YYYY-MM-DDT00:00:00.000Z" and the separate
-  // time field holds the Lisbon wall-clock time (e.g. "16:00").
-  const datePart = isoDate?.split("T")[0] ?? ""; // "YYYY-MM-DD"
-  const time = timeStr || "00:00";
-
-  const [hour, minute] = time.split(":").map(Number);
-  const [year, month, day] = datePart.split("-").map(Number);
-
-  // Guard against missing or invalid date values (e.g. empty form fields)
-  if (!datePart || isNaN(year) || isNaN(month) || isNaN(day)) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0, passed: false };
-  }
-
-  // Use Date.UTC (NOT new Date(year,...)) to avoid the JS quirk where years
-  // 0-99 are mapped to 1900-1999 in the Date constructor.
-  // We create a UTC timestamp with the wall-clock values, format it in Lisbon
-  // to see what wall-clock Lisbon would show, then derive the offset.
-  const utcGuess = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
-  const lisbonFormatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Europe/Lisbon",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-
-  const parts = lisbonFormatter.formatToParts(new Date(utcGuess));
-  const get = (type: string) =>
-    parseInt(parts.find((p) => p.type === type)?.value ?? "0");
-
-  // The Lisbon wall-clock when utcGuess is the real UTC time:
-  const lisbonFromUtc = Date.UTC(
-    get("year"),
-    get("month") - 1,
-    get("day"),
-    get("hour"),
-    get("minute"),
-    get("second"),
-  );
-  // offset = Lisbon_wall - UTC  (positive when Lisbon is ahead, i.e. summer)
-  const offsetMs = lisbonFromUtc - utcGuess;
-
-  // The target UTC ms is the desired Lisbon wall-clock minus the offset
-  const targetMs = utcGuess - offsetMs;
-
-  const now = Date.now();
-  const diff = targetMs - now;
-
-  if (diff <= 0) {
-    return {
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      passed: diff < -86400000,
-    };
-  }
-
-  const totalSeconds = Math.floor(diff / 1000);
-  return {
-    days: Math.floor(totalSeconds / 86400),
-    hours: Math.floor((totalSeconds % 86400) / 3600),
-    minutes: Math.floor((totalSeconds % 3600) / 60),
-    seconds: totalSeconds % 60,
-    passed: false,
-  };
-}
-
 function CountdownUnit({
   value,
   label,
@@ -296,7 +220,7 @@ function CountdownUnit({
           }}
         >
           <EditableText elementKey="countdownValue">
-            {String(value).padStart(2, "0")}
+            {formatCountdownValue(value)}
           </EditableText>
         </span>
       </div>
@@ -315,13 +239,15 @@ function SaveTheDateCountdown({
   onCalendarClick,
   customTexts: ct,
 }: SaveTheDateProps) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
-    computeTimeLeft(invitation.date.iso, invitation.date.time),
+  const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft>(() =>
+    computeCountdownTimeLeft(invitation.date.iso, invitation.date.time),
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(computeTimeLeft(invitation.date.iso, invitation.date.time));
+      setTimeLeft(
+        computeCountdownTimeLeft(invitation.date.iso, invitation.date.time),
+      );
     }, 1000);
     return () => clearInterval(interval);
   }, [invitation.date.iso, invitation.date.time]);

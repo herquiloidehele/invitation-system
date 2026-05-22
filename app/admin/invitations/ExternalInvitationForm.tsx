@@ -158,6 +158,7 @@ function getDefaultState(
       groomsMother: "",
     },
     scratchReveal: { enabled: false },
+    countdown: { enabled: false },
     imageSettings: {},
     guestManagementEnabled: false,
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
@@ -419,6 +420,22 @@ export default function ExternalInvitationForm({
   const updateScratchReveal = useCallback((enabled: boolean) => {
     setForm((prev) => ({ ...prev, scratchReveal: { enabled } }));
   }, []);
+
+  const updateCountdown = useCallback(
+    <K extends keyof NonNullable<InvitationData["countdown"]>>(
+      field: K,
+      value: NonNullable<InvitationData["countdown"]>[K],
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        countdown: {
+          ...(prev.countdown ?? { enabled: false }),
+          [field]: value,
+        },
+      }));
+    },
+    [],
+  );
 
   // Image position/zoom settings — used by ImagePositionEditor for the hero
   // image in rich external_link invitations.
@@ -1343,6 +1360,202 @@ export default function ExternalInvitationForm({
                           </div>
                         )}
                       </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* COUNTDOWN SUBSECTION */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Contagem decrescente</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Mostra uma secção animada com dias, horas, minutos
+                            e segundos depois do hero e antes do convite externo.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.countdown?.enabled === true}
+                          onCheckedChange={(enabled) =>
+                            updateCountdown("enabled", enabled)
+                          }
+                        />
+                      </div>
+
+                      {form.countdown?.enabled && (
+                        <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownTitle">Título</Label>
+                              <Input
+                                id="countdownTitle"
+                                value={form.countdown.title ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("title", e.target.value)
+                                }
+                                placeholder="Contagem Decrescente"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownSubtitle">
+                                Subtítulo
+                              </Label>
+                              <Input
+                                id="countdownSubtitle"
+                                value={form.countdown.subtitle ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("subtitle", e.target.value)
+                                }
+                                placeholder="Até ao nosso grande dia"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownDaysLabel">
+                                Etiqueta dias
+                              </Label>
+                              <Input
+                                id="countdownDaysLabel"
+                                value={form.countdown.daysLabel ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("daysLabel", e.target.value)
+                                }
+                                placeholder="DIAS"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownHoursLabel">
+                                Etiqueta horas
+                              </Label>
+                              <Input
+                                id="countdownHoursLabel"
+                                value={form.countdown.hoursLabel ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("hoursLabel", e.target.value)
+                                }
+                                placeholder="HORAS"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownMinutesLabel">
+                                Etiqueta minutos
+                              </Label>
+                              <Input
+                                id="countdownMinutesLabel"
+                                value={form.countdown.minutesLabel ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("minutesLabel", e.target.value)
+                                }
+                                placeholder="MINUTOS"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownSecondsLabel">
+                                Etiqueta segundos
+                              </Label>
+                              <Input
+                                id="countdownSecondsLabel"
+                                value={form.countdown.secondsLabel ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("secondsLabel", e.target.value)
+                                }
+                                placeholder="SEGUNDOS"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label>Imagem de fundo</Label>
+                            <MediaUpload
+                              kind="image"
+                              maxSizeMB={5}
+                              value={form.countdown.backgroundImage || undefined}
+                              onUpload={(url) =>
+                                updateCountdown("backgroundImage", url)
+                              }
+                              onClear={() =>
+                                updateCountdown("backgroundImage", "")
+                              }
+                            />
+                          </div>
+
+                          <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownBackgroundColor">
+                                Cor de fundo
+                              </Label>
+                              <Input
+                                id="countdownBackgroundColor"
+                                value={form.countdown.backgroundColor ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown(
+                                    "backgroundColor",
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder="#f4ecdc"
+                                className="font-mono text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownCardBg">
+                                Fundo dos cartões
+                              </Label>
+                              <Input
+                                id="countdownCardBg"
+                                value={form.countdown.cardBg ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("cardBg", e.target.value)
+                                }
+                                placeholder="rgba(255,252,244,0.72)"
+                                className="font-mono text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownCardBorder">
+                                Borda dos cartões
+                              </Label>
+                              <Input
+                                id="countdownCardBorder"
+                                value={form.countdown.cardBorder ?? ""}
+                                onChange={(e) =>
+                                  updateCountdown("cardBorder", e.target.value)
+                                }
+                                placeholder="#e7dcc9"
+                                className="font-mono text-xs"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="countdownCardRadius">
+                                Raio dos cartões
+                              </Label>
+                              <span className="text-xs tabular-nums text-muted-foreground">
+                                {form.countdown.cardBorderRadius ?? 18}px
+                              </span>
+                            </div>
+                            <input
+                              id="countdownCardRadius"
+                              type="range"
+                              min={0}
+                              max={40}
+                              step={1}
+                              value={form.countdown.cardBorderRadius ?? 18}
+                              onChange={(e) =>
+                                updateCountdown(
+                                  "cardBorderRadius",
+                                  parseInt(e.target.value, 10),
+                                )
+                              }
+                              className="w-full cursor-pointer accent-foreground"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <Separator />

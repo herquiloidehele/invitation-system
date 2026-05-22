@@ -194,6 +194,21 @@ export interface ParentsInfo {
   groomsMother: string;
 }
 
+export interface ExternalCountdownConfig {
+  enabled: boolean;
+  title?: string;
+  subtitle?: string;
+  daysLabel?: string;
+  hoursLabel?: string;
+  minutesLabel?: string;
+  secondsLabel?: string;
+  backgroundColor?: string;
+  backgroundImage?: string;
+  cardBg?: string;
+  cardBorder?: string;
+  cardBorderRadius?: number;
+}
+
 // ---------------------------------------------------------------------------
 // Per-invitation card style overrides
 // ---------------------------------------------------------------------------
@@ -298,6 +313,16 @@ export interface TextStyleOverrides {
     countdownLabel?: TextStyle;
     countdownDate?: TextStyle;
     countdownWeekday?: TextStyle;
+    /** External invitation countdown section title. */
+    externalCountdownTitle?: TextStyle;
+    /** External invitation countdown section subtitle. */
+    externalCountdownSubtitle?: TextStyle;
+    /** External invitation countdown tile number. */
+    externalCountdownValue?: TextStyle;
+    /** External invitation countdown tile unit label. */
+    externalCountdownLabel?: TextStyle;
+    /** External invitation countdown arrival/celebration text. */
+    externalCountdownCelebrationTitle?: TextStyle;
     /** Celebration title — shown when countdown reaches zero */
     celebrationTitle?: TextStyle;
     /** Celebration couple names — shown when countdown reaches zero */
@@ -479,6 +504,8 @@ export interface InvitationData {
   ourStory?: OurStory;
   /** Toggles the ScratchDateReveal section on external_link invitation pages. */
   scratchReveal?: { enabled: boolean };
+  /** Toggles and styles the countdown section on external_link invitation pages. */
+  countdown?: ExternalCountdownConfig;
   /** Per-invitation text style overrides (fonts, colors, sizes). Missing fields fall back to theme defaults. */
   textStyles?: TextStyleOverrides;
   /** Per-section card background/border overrides. Missing keys fall back to theme.cardBg / theme.cardBorder. */
