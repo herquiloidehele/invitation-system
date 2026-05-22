@@ -49,6 +49,19 @@ const namesFadeInUp: Variants = {
 
 const DEFAULT_IMAGE_HERO_HEIGHT = 300;
 
+/** Default opacity for the dark scrim shown over hero videos. */
+export const DEFAULT_HERO_SCRIM_OPACITY = 0.38;
+/**
+ * Default percent at which the bottom gradient starts fading into the theme
+ * background. Differs slightly between video and image heroes.
+ */
+export const DEFAULT_HERO_GRADIENT_START_VIDEO = 40;
+export const DEFAULT_HERO_GRADIENT_START_IMAGE = 35;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
 export function getHeroSectionHeight(
   invitation: Pick<InvitationData, "videoUrl" | "heroHeight">,
 ): "100dvh" | number {
@@ -90,6 +103,20 @@ export default function InvitationHero({
   const ts: ResolvedTextStyles = resolveTextStyles(theme, invitation.textStyles);
   const isWedding = isWeddingEventType(invitation.eventType);
 
+  const scrimOpacity = clamp(
+    invitation.heroOverlay?.scrimOpacity ?? DEFAULT_HERO_SCRIM_OPACITY,
+    0,
+    1,
+  );
+  const gradientStart = clamp(
+    invitation.heroOverlay?.gradientStart ??
+      (invitation.videoUrl
+        ? DEFAULT_HERO_GRADIENT_START_VIDEO
+        : DEFAULT_HERO_GRADIENT_START_IMAGE),
+    0,
+    100,
+  );
+
   return (
     <section
       className="relative overflow-hidden"
@@ -121,10 +148,10 @@ export default function InvitationHero({
       )}
 
       {/* Dark scrim (video only) */}
-      {invitation.videoUrl && (
+      {invitation.videoUrl && scrimOpacity > 0 && (
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: "rgba(0,0,0,0.38)" }}
+          style={{ background: `rgba(0,0,0,${scrimOpacity})` }}
         />
       )}
 
@@ -132,9 +159,7 @@ export default function InvitationHero({
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background: invitation.videoUrl
-            ? `linear-gradient(to bottom, transparent 40%, ${theme.bg} 100%)`
-            : `linear-gradient(to bottom, transparent 35%, ${theme.bg} 100%)`,
+          background: `linear-gradient(to bottom, transparent ${gradientStart}%, ${theme.bg} 100%)`,
         }}
       />
 

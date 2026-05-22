@@ -104,6 +104,10 @@ const MIN_HERO_HEIGHT = 200;
 const MAX_HERO_HEIGHT = 700;
 const HERO_HEIGHT_STEP = 10;
 
+const DEFAULT_SCRIM_OPACITY = 0.38;
+const DEFAULT_GRADIENT_START_VIDEO = 40;
+const DEFAULT_GRADIENT_START_IMAGE = 35;
+
 // ---------------------------------------------------------------------------
 // Default state
 // ---------------------------------------------------------------------------
@@ -1196,6 +1200,78 @@ export default function ExternalInvitationForm({
                             }
                             className="w-full accent-foreground cursor-pointer"
                           />
+                        </div>
+                        {/* Hero overlay controls */}
+                        <div className="space-y-3 pt-2">
+                          {form.videoUrl ? (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor="ellHeroScrimOpacity">
+                                  Escurecimento do vídeo
+                                </Label>
+                                <span className="text-xs text-muted-foreground tabular-nums">
+                                  {Math.round(
+                                    (form.heroOverlay?.scrimOpacity ??
+                                      DEFAULT_SCRIM_OPACITY) * 100,
+                                  )}
+                                  %
+                                </span>
+                              </div>
+                              <input
+                                id="ellHeroScrimOpacity"
+                                type="range"
+                                min={0}
+                                max={100}
+                                step={1}
+                                value={Math.round(
+                                  (form.heroOverlay?.scrimOpacity ??
+                                    DEFAULT_SCRIM_OPACITY) * 100,
+                                )}
+                                onChange={(e) =>
+                                  update("heroOverlay", {
+                                    ...(form.heroOverlay ?? {}),
+                                    scrimOpacity:
+                                      parseInt(e.target.value, 10) / 100,
+                                  })
+                                }
+                                className="w-full accent-foreground cursor-pointer"
+                              />
+                            </div>
+                          ) : null}
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="ellHeroGradientStart">
+                                Início do gradiente inferior
+                              </Label>
+                              <span className="text-xs text-muted-foreground tabular-nums">
+                                {form.heroOverlay?.gradientStart ??
+                                  (form.videoUrl
+                                    ? DEFAULT_GRADIENT_START_VIDEO
+                                    : DEFAULT_GRADIENT_START_IMAGE)}
+                                %
+                              </span>
+                            </div>
+                            <input
+                              id="ellHeroGradientStart"
+                              type="range"
+                              min={0}
+                              max={100}
+                              step={1}
+                              value={
+                                form.heroOverlay?.gradientStart ??
+                                (form.videoUrl
+                                  ? DEFAULT_GRADIENT_START_VIDEO
+                                  : DEFAULT_GRADIENT_START_IMAGE)
+                              }
+                              onChange={(e) =>
+                                update("heroOverlay", {
+                                  ...(form.heroOverlay ?? {}),
+                                  gradientStart: parseInt(e.target.value, 10),
+                                })
+                              }
+                              className="w-full accent-foreground cursor-pointer"
+                            />
+                          </div>
                         </div>
                       </div>
 

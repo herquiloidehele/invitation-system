@@ -85,6 +85,7 @@ model Invitation {
   audio        Json     // { enabled, src, artist, title }
   heroImage    String
   heroHeight   Int?     // Pixel height for image-based heroes. Null falls back to 300px in the renderer.
+  heroOverlay  Json?    // HeroOverlayConfig { scrimOpacity?, gradientStart? } — controls dark scrim (video only) + bottom gradient.
   videoUrl     String?
   videoPoster  String?  // Poster image shown before the curtains video plays. Optional — falls back to a static asset.
   faqs         Json?    // FAQItem[]

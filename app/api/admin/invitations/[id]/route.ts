@@ -133,6 +133,9 @@ export async function PUT(
           heroHeight:
             typeof body.heroHeight === "number" ? body.heroHeight : null,
         }),
+        ...(body.heroOverlay !== undefined && {
+          heroOverlay: sanitizeJsonField(body.heroOverlay, null),
+        }),
         ...{ videoUrl: body.videoUrl || "" },
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,

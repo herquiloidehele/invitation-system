@@ -102,6 +102,17 @@ export interface AudioConfig {
   title: string;
 }
 
+/**
+ * Visual overlay controls for the hero section.
+ * - `scrimOpacity` darkens the hero video background (0–1). Ignored for image heroes.
+ * - `gradientStart` is the percent (0–100) at which the bottom gradient
+ *   begins to fade into the theme background.
+ */
+export interface HeroOverlayConfig {
+  scrimOpacity?: number;
+  gradientStart?: number;
+}
+
 // ---------------------------------------------------------------------------
 // Social preview / Open Graph
 // ---------------------------------------------------------------------------
@@ -519,6 +530,8 @@ export interface InvitationData {
   heroImage: string;
   /** Pixel height for image-based heroes. Missing values fall back to 300px. */
   heroHeight?: number;
+  /** Optional overlay tuning for the hero (dark scrim + bottom gradient). */
+  heroOverlay?: HeroOverlayConfig;
   videoUrl?: string;
   /** Poster image displayed by the curtain video before playback / while it loads. Optional — falls back to a static bundled poster. */
   videoPoster?: string;

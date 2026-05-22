@@ -3,6 +3,7 @@ import type {
   CardStyleOverrides,
   CustomTexts,
   ExternalCountdownConfig,
+  HeroOverlayConfig,
   ImageSettingsMap,
   InvitationData,
   InvitationEventType,
@@ -38,6 +39,7 @@ type InvitationWithTheme = {
   audio: unknown;
   heroImage: string;
   heroHeight: number | null;
+  heroOverlay: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
   faqs: unknown;
@@ -81,6 +83,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     audio: row.audio as InvitationData["audio"],
     heroImage: row.heroImage,
     heroHeight: row.heroHeight ?? undefined,
+    heroOverlay: (row.heroOverlay as HeroOverlayConfig | null) ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
