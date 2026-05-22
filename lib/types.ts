@@ -49,13 +49,38 @@ export interface LocationInfo {
 
 export type ScheduleStyle = "default" | "illustrated";
 
-export type ScheduleIcon = "rings" | "toast" | "dinner" | "dance" | "neutral";
+export type ScheduleIcon =
+  | "neutral"
+  | "rings"
+  | "church"
+  | "cross"
+  | "heart"
+  | "heart-handshake"
+  | "toast"
+  | "dinner"
+  | "cake"
+  | "coffee"
+  | "dance"
+  | "music"
+  | "party"
+  | "sparkles"
+  | "gift"
+  | "flower"
+  | "bouquet"
+  | "car"
+  | "camera"
+  | "sunset"
+  | "bell"
+  | "bird"
+  | "map"
+  | "custom";
 
 export interface ScheduleEvent {
   time: string;
   label: string;
   venue: string;
   icon?: ScheduleIcon;
+  iconUrl?: string;
 }
 
 export interface DressCode {

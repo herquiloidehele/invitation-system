@@ -315,11 +315,30 @@ const SCHEDULE_STYLE_OPTIONS: { value: ScheduleStyle; label: string }[] = [
 ];
 
 const SCHEDULE_ICON_OPTIONS: { value: ScheduleIcon; label: string }[] = [
-  { value: "neutral", label: "Neutro" },
+  { value: "neutral", label: "Neutro (relógio)" },
   { value: "rings", label: "Alianças" },
+  { value: "church", label: "Igreja" },
+  { value: "cross", label: "Cruz" },
+  { value: "heart", label: "Coração" },
+  { value: "heart-handshake", label: "Aperto de mãos" },
   { value: "toast", label: "Brinde" },
   { value: "dinner", label: "Jantar" },
+  { value: "cake", label: "Bolo" },
+  { value: "coffee", label: "Café" },
   { value: "dance", label: "Dança" },
+  { value: "music", label: "Música" },
+  { value: "party", label: "Festa" },
+  { value: "sparkles", label: "Brilho" },
+  { value: "gift", label: "Presente" },
+  { value: "flower", label: "Flor" },
+  { value: "bouquet", label: "Buquê" },
+  { value: "car", label: "Carro" },
+  { value: "camera", label: "Foto" },
+  { value: "sunset", label: "Pôr do sol" },
+  { value: "bell", label: "Sino" },
+  { value: "bird", label: "Pomba" },
+  { value: "map", label: "Mapa" },
+  { value: "custom", label: "Personalizado (SVG)" },
 ];
 
 const DEFAULT_HERO_HEIGHT = 300;
@@ -2593,6 +2612,24 @@ export default function InvitationForm({
                       >
                         &times;
                       </Button>
+                      {item.icon === "custom" && (
+                        <div className="space-y-1 md:col-span-5">
+                          <Label className="text-xs">
+                            SVG personalizado (cor herdada do tema)
+                          </Label>
+                          <MediaUpload
+                            kind="svg"
+                            maxSizeMB={1}
+                            value={item.iconUrl}
+                            onUpload={(url) =>
+                              updateScheduleItem(i, "iconUrl", url)
+                            }
+                            onClear={() =>
+                              updateScheduleItem(i, "iconUrl", undefined)
+                            }
+                          />
+                        </div>
+                      )}
                     </div>
                   ))}
                   <Button variant="outline" size="sm" onClick={addScheduleItem}>
