@@ -2549,6 +2549,58 @@ export default function InvitationForm({
                       </SelectContent>
                     </Select>
                   </div>
+                  {form.scheduleStyle === "illustrated" && (
+                    <div className="space-y-1">
+                      <Label className="text-xs">
+                        Cor dos ícones e conectores
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="color"
+                          className="h-9 w-12 cursor-pointer p-1"
+                          value={colorPickerValue(
+                            form.cardStyles?.schedule?.accentColor,
+                            "#c2410c",
+                          )}
+                          onChange={(e) =>
+                            updateCardStyle(
+                              "schedule",
+                              "accentColor",
+                              e.target.value,
+                            )
+                          }
+                        />
+                        <Input
+                          type="text"
+                          placeholder="ex.: #c2410c (deixe vazio para usar o tema)"
+                          value={form.cardStyles?.schedule?.accentColor ?? ""}
+                          onChange={(e) =>
+                            updateCardStyle(
+                              "schedule",
+                              "accentColor",
+                              e.target.value,
+                            )
+                          }
+                        />
+                        {form.cardStyles?.schedule?.accentColor && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              updateCardStyle(
+                                "schedule",
+                                "accentColor",
+                                undefined,
+                              )
+                            }
+                          >
+                            Limpar
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   {form.schedule.map((item, i) => (
                     <div
                       key={i}

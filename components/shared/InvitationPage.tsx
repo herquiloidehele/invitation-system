@@ -343,6 +343,7 @@ export default function InvitationPage({
       invitation.cardStyles?.[section]?.cardBorder || theme.cardBorder,
     borderRadius:
       invitation.cardStyles?.[section]?.borderRadius ?? defaultRadius,
+    accentColor: invitation.cardStyles?.[section]?.accentColor,
   });
 
   return (

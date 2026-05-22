@@ -48,6 +48,7 @@ type ScheduleCardStyle = {
   cardBg: string;
   cardBorder: string;
   borderRadius: number;
+  accentColor?: string;
 };
 
 interface ScheduleSectionProps {
@@ -180,7 +181,7 @@ function IllustratedScheduleCard({
   theme: TemplateTheme;
   cardStyle: ScheduleCardStyle;
 }) {
-  const accent = ts.accent || theme.accent;
+  const accent = cardStyle.accentColor || ts.accent || theme.accent;
 
   return (
     <div

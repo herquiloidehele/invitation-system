@@ -251,6 +251,9 @@ export interface CardStyle {
   cardBorder?: string;
   /** Border radius in px (e.g. 20). Falls back to per-component default. */
   borderRadius?: number;
+  /** Optional accent color override used by decorations inside the card
+   *  (icons, connectors, etc.). Falls back to the resolved text-styles accent. */
+  accentColor?: string;
 }
 
 /** Identifiers for each card section whose background can be individually overridden. */
