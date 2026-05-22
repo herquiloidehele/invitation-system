@@ -412,8 +412,7 @@ export default function RsvpPage({
                 )}
               </div>
 
-              {/* Dietary restrictions — only if attending */}
-              {attending === "yes" && showDietaryRestrictions && (
+              {showDietaryRestrictions && (
                 <div className="flex flex-col gap-1.5">
                   <label style={labelStyle}>{resolveText("rsvp_dietaryLabel")}</label>
                   <input

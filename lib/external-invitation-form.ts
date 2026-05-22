@@ -38,6 +38,5 @@ export function hasRichExternalSections(invitation: InvitationData): boolean {
     return false;
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
   const scratchOn = Boolean(invitation.scratchReveal?.enabled);
-  const rsvpOn = Boolean(invitation.rsvp?.enabled);
-  return heroOn || scratchOn || rsvpOn;
+  return heroOn || scratchOn;
 }
