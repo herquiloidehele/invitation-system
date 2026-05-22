@@ -30,6 +30,7 @@ interface GuestListEditorProps {
   messageTemplate: string;
   /** Optional: shown in the header. */
   title?: string;
+  showCustomExternalLink?: boolean;
 }
 
 export default function GuestListEditor({
@@ -38,6 +39,7 @@ export default function GuestListEditor({
   invitationOrigin,
   messageTemplate,
   title = "Convidados",
+  showCustomExternalLink = false,
 }: GuestListEditorProps) {
   const [guests, setGuests] = useState<GuestData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -237,6 +239,7 @@ export default function GuestListEditor({
         guest={editing}
         onSubmit={handleSubmit}
         saving={saving}
+        showCustomExternalLink={showCustomExternalLink}
       />
 
       <AlertDialog

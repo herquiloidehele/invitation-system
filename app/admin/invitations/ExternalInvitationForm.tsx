@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -60,6 +61,7 @@ import {
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
+import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
@@ -74,6 +76,7 @@ import {
   hasRichExternalSections,
   shouldShowExternalInvitationAudioControls,
 } from "@/lib/external-invitation-form";
+import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 
@@ -156,6 +159,8 @@ function getDefaultState(
     },
     scratchReveal: { enabled: false },
     imageSettings: {},
+    guestManagementEnabled: false,
+    guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
 }
 
@@ -1612,6 +1617,90 @@ export default function ExternalInvitationForm({
                           }
                         />
                       </div>
+                    </>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem
+                value="guest-management"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Gestão de Convidados
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                    <div>
+                      <Label className="cursor-pointer">
+                        Activar gestão de convidados
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Quando activo, podes pré-registar convidados, gerar
+                        links pessoais e enviar convites por WhatsApp ou SMS.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.guestManagementEnabled === true}
+                      onCheckedChange={(value) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          guestManagementEnabled: value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {form.guestManagementEnabled && (
+                    <>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="external-guest-msg-template">
+                          Mensagem de convite (template)
+                        </Label>
+                        <Textarea
+                          id="external-guest-msg-template"
+                          rows={3}
+                          value={
+                            form.guestMessageTemplate ??
+                            DEFAULT_GUEST_MESSAGE_TEMPLATE
+                          }
+                          onChange={(e) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              guestMessageTemplate: e.target.value,
+                            }))
+                          }
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Usa <code>{"{name}"}</code> para o nome do convidado e{" "}
+                          <code>{"{link}"}</code> para o link pessoal.
+                        </p>
+                      </div>
+
+                      {initialData?.id ? (
+                        <div className="rounded-lg border p-3">
+                          <GuestListEditor
+                            apiBasePath={`/api/admin/invitations/${initialData.id}/guests`}
+                            invitationSlug={form.slug}
+                            invitationOrigin={
+                              typeof window !== "undefined"
+                                ? window.location.origin
+                                : ""
+                            }
+                            messageTemplate={
+                              form.guestMessageTemplate ??
+                              DEFAULT_GUEST_MESSAGE_TEMPLATE
+                            }
+                            title="Lista de convidados"
+                            showCustomExternalLink={subType === "external_link"}
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">
+                          Guarda o convite primeiro para gerir a lista de
+                          convidados.
+                        </p>
+                      )}
                     </>
                   )}
                 </AccordionContent>

@@ -16,6 +16,7 @@ const updateSchema = z
     tableLabel: z.string().min(1).optional(),
     canInviteOthers: z.boolean().optional(),
     note: z.string().optional(),
+    customExternalLink: z.string().optional(),
   })
   .strict();
 

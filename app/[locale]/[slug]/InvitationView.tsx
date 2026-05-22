@@ -15,6 +15,7 @@ import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { hasRichExternalSections } from "@/lib/external-invitation-form";
+import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 
 interface InvitationViewProps {
@@ -55,10 +56,16 @@ function EnvelopeInvitationView({
     (invitation.invitationType ?? "standard") === "external_link" &&
     hasRichExternalSections(invitation);
 
+  const effectiveExternalLink = getEffectiveExternalLink({
+    invitationType: invitation.invitationType,
+    externalLink: invitation.externalLink,
+    guestCustomExternalLink: invitation.guest?.customExternalLink,
+  });
+
   // Bare-iframe external_link path — only when the rich layout is NOT used.
   const isExternalLink =
     (invitation.invitationType ?? "standard") === "external_link" &&
-    !!invitation.externalLink &&
+    !!effectiveExternalLink &&
     !isRichExternalLink;
 
   // Standard invitations with a hero video need the bytes pre-buffered
@@ -191,7 +198,7 @@ function EnvelopeInvitationView({
     //  - Bare layout: the <iframe> has been pre-loading behind the envelope
     //    cover; just reveal it — no extra fetch needed.
     if (type === "external_link") {
-      if (hasRichExternalSections(invitation)) {
+      if (isRichExternalLink) {
         setShowContent(true);
         requestAnimationFrame(() => setCoverVisible(false));
         return;
@@ -205,7 +212,7 @@ function EnvelopeInvitationView({
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
-  }, [invitation.invitationType]);
+  }, [invitation.invitationType, isRichExternalLink]);
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
@@ -264,7 +271,7 @@ function EnvelopeInvitationView({
             envelope finishes opening. */}
         {isExternalLink && (
           <ExternalLinkPage
-            externalLink={invitation.externalLink!}
+            externalLink={effectiveExternalLink}
             visible={externalLinkVisible}
           />
         )}

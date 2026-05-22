@@ -60,6 +60,7 @@ const formSchema = z.object({
   tableLabel: z.string().min(1, "Mesa é obrigatória"),
   canInviteOthers: z.boolean(),
   note: z.string().optional(),
+  customExternalLink: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -71,6 +72,7 @@ interface GuestFormProps {
   guest?: GuestData;
   onSubmit: (input: GuestUpsertInput) => Promise<void>;
   saving: boolean;
+  showCustomExternalLink?: boolean;
 }
 
 export default function GuestForm({
@@ -79,6 +81,7 @@ export default function GuestForm({
   guest,
   onSubmit,
   saving,
+  showCustomExternalLink = false,
 }: GuestFormProps) {
   const isMobile = useIsMobile();
   const shellVariant = getGuestFormShellVariant(isMobile);
@@ -93,6 +96,7 @@ export default function GuestForm({
       tableLabel: "",
       canInviteOthers: false,
       note: "",
+      customExternalLink: "",
     },
   });
 
@@ -110,6 +114,7 @@ export default function GuestForm({
         tableLabel: guest.tableLabel,
         canInviteOthers: guest.canInviteOthers,
         note: guest.note ?? "",
+        customExternalLink: guest.customExternalLink ?? "",
       });
     } else {
       reset({
@@ -120,6 +125,7 @@ export default function GuestForm({
         tableLabel: "",
         canInviteOthers: false,
         note: "",
+        customExternalLink: "",
       });
     }
   }, [open, guest, reset]);
@@ -136,6 +142,9 @@ export default function GuestForm({
       tableLabel: values.tableLabel,
       canInviteOthers: values.canInviteOthers,
       note: values.note?.trim() || undefined,
+      ...(showCustomExternalLink
+        ? { customExternalLink: values.customExternalLink?.trim() || undefined }
+        : {}),
     });
   }
 
@@ -250,6 +259,24 @@ export default function GuestForm({
               {...register("note")}
             />
           </div>
+
+          {showCustomExternalLink && (
+            <div className="space-y-1.5">
+              <Label htmlFor="guest-custom-external-link">
+                Link Canva personalizado
+              </Label>
+              <Input
+                id="guest-custom-external-link"
+                type="url"
+                placeholder="https://exemplo.canva.site/convite-maria"
+                {...register("customExternalLink")}
+              />
+              <p className="text-xs text-muted-foreground">
+                Opcional. Se estiver vazio, este convidado usa o link externo
+                padrão do convite.
+              </p>
+            </div>
+          )}
         </form>
 
         <div className="sr-only" aria-live="polite">

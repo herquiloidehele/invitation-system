@@ -18,6 +18,7 @@ import {
   resolveRevealContentStyle,
   resolveTextElementOverride,
 } from "@/lib/curtain-canva";
+import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 
 interface CurtainCanvaPageProps {
   invitation: InvitationData;
@@ -220,6 +221,11 @@ export default function CurtainCanvaPage({
 
   const audioEnabled =
     invitation.audio?.enabled === true && !!invitation.audio?.src;
+  const externalLink = getEffectiveExternalLink({
+    invitationType: invitation.invitationType,
+    externalLink: invitation.externalLink,
+    guestCustomExternalLink: invitation.guest?.customExternalLink,
+  });
   const revealContentStyle = resolveRevealContentStyle(revealed);
 
   return (
@@ -281,9 +287,9 @@ export default function CurtainCanvaPage({
             scroll-anchor against. Once revealed, the same iframe (no
             remount, no refetch) snaps into the section with the
             already-measured height applied. */}
-        {invitation.externalLink && (
+        {externalLink && (
           <CanvaEmbed
-            externalLink={invitation.externalLink}
+            externalLink={externalLink}
             theme={theme}
             preloading={!revealed}
           />

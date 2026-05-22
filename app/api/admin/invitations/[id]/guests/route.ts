@@ -15,6 +15,7 @@ const upsertSchema = z.object({
   tableLabel: z.string().min(1, "Mesa é obrigatória"),
   canInviteOthers: z.boolean().optional(),
   note: z.string().optional(),
+  customExternalLink: z.string().optional(),
 });
 
 async function resolveInvitation(id: string) {

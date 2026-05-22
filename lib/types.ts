@@ -592,6 +592,8 @@ export interface PublicGuestData {
   canInviteOthers: boolean;
   /** The slug of the invitation this guest belongs to. */
   invitationSlug: string;
+  /** Optional guest-specific Canva/external link used by external-link invitations. */
+  customExternalLink?: string;
 }
 
 /** Full guest data — used by host/admin management UI and APIs. */
@@ -618,4 +620,5 @@ export interface GuestUpsertInput {
   tableLabel: string;
   canInviteOthers?: boolean;
   note?: string;
+  customExternalLink?: string;
 }

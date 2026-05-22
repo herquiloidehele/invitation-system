@@ -10,6 +10,7 @@ import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import RSVPForm from "./RSVPForm";
 import { EditableText } from "./EditableText";
+import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 
 interface RichExternalLinkPageProps {
   invitation: InvitationData;
@@ -43,7 +44,11 @@ export default function RichExternalLinkPage({
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
   const scratchOn = Boolean(invitation.scratchReveal?.enabled);
   const rsvpOn = Boolean(invitation.rsvp?.enabled);
-  const externalLink = invitation.externalLink ?? "";
+  const externalLink = getEffectiveExternalLink({
+    invitationType: invitation.invitationType,
+    externalLink: invitation.externalLink,
+    guestCustomExternalLink: invitation.guest?.customExternalLink,
+  });
 
   // The envelope cover flips this component into the DOM only after the
   // user opens the invite. Pin the viewport to the top so the user lands

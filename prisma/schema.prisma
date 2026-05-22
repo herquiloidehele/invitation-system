@@ -277,6 +277,7 @@ model Guest {
   tableLabel      String
   canInviteOthers Boolean  @default(false)
   note            String?
+  customExternalLink String?
 
   invitedById   String?
   invitedBy     Guest?  @relation("GuestInvitations", fields: [invitedById], references: [id], onDelete: SetNull)

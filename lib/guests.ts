@@ -26,6 +26,7 @@ type GuestRow = {
   tableLabel: string;
   canInviteOthers: boolean;
   note: string | null;
+  customExternalLink: string | null;
   invitedById: string | null;
   invitedBy: { name: string } | null;
   createdAt: Date;
@@ -45,6 +46,7 @@ function toGuestData(row: GuestRow): GuestData {
     tableLabel: row.tableLabel,
     canInviteOthers: row.canInviteOthers,
     note: row.note ?? undefined,
+    customExternalLink: row.customExternalLink ?? undefined,
     invitedById: row.invitedById ?? undefined,
     invitedByName: row.invitedBy?.name,
     createdAt: row.createdAt.toISOString(),
@@ -60,6 +62,7 @@ function toPublicGuestData(
     | "companion"
     | "tableLabel"
     | "note"
+    | "customExternalLink"
     | "canInviteOthers"
     | "invitationSlug"
   >,
@@ -70,6 +73,7 @@ function toPublicGuestData(
     companion: row.companion ?? undefined,
     tableLabel: row.tableLabel,
     note: row.note ?? undefined,
+    customExternalLink: row.customExternalLink ?? undefined,
     canInviteOthers: row.canInviteOthers,
     invitationSlug: row.invitationSlug,
   };
@@ -90,6 +94,11 @@ export class GuestValidationError extends Error {
     this.name = "GuestValidationError";
     this.field = field;
   }
+}
+
+function normalizeOptionalText(value: string | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
 }
 
 function validateUpsert(input: GuestUpsertInput): void {
@@ -136,6 +145,7 @@ export async function getPublicGuestByToken(
       companion: true,
       tableLabel: true,
       note: true,
+      customExternalLink: true,
       canInviteOthers: true,
       invitationSlug: true,
     },
@@ -171,6 +181,7 @@ export async function createGuest(
       tableLabel: input.tableLabel.trim(),
       canInviteOthers: input.canInviteOthers ?? false,
       note: input.note?.trim() || null,
+      customExternalLink: normalizeOptionalText(input.customExternalLink),
       invitedById: options?.invitedById ?? null,
     },
     include: includeInviter,
@@ -226,6 +237,9 @@ export async function updateGuest(
   if (input.canInviteOthers !== undefined)
     data.canInviteOthers = input.canInviteOthers;
   if (input.note !== undefined) data.note = input.note?.trim() || null;
+  if (input.customExternalLink !== undefined) {
+    data.customExternalLink = normalizeOptionalText(input.customExternalLink);
+  }
 
   const row = await prisma.guest.update({
     where: { id: guestId },
