@@ -31,6 +31,11 @@ function buildGoogleCalendarUrl(
   )}`;
 }
 
+function isValidDateIso(iso: string): boolean {
+  if (!iso) return false;
+  return !Number.isNaN(new Date(iso).getTime());
+}
+
 export default function CalendarButton({
   date,
   couple,
@@ -38,6 +43,7 @@ export default function CalendarButton({
   visible,
 }: CalendarButtonProps) {
   if (!visible) return null;
+  if (!isValidDateIso(date.iso)) return null;
 
   const url = buildGoogleCalendarUrl(date, couple);
 
