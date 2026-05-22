@@ -23,6 +23,7 @@ function readCoupleString(value: unknown): string {
 export async function GET() {
   const [invitations, saveTheDates] = await Promise.all([
     prisma.invitation.findMany({
+      where: { isDemo: true },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -36,6 +37,7 @@ export async function GET() {
       },
     }),
     prisma.saveTheDate.findMany({
+      where: { isDemo: true },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
