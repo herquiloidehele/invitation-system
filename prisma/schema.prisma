@@ -277,7 +277,7 @@ model Guest {
   phoneCountryCode String
   phoneNumber      String
 
-  tableLabel      String
+  tableLabel      String?
   canInviteOthers Boolean  @default(false)
   note            String?
   customExternalLink String?

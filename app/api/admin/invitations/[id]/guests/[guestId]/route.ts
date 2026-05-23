@@ -13,7 +13,7 @@ const updateSchema = z
     companion: z.string().optional(),
     phoneCountryCode: z.string().min(2).optional(),
     phoneNumber: z.string().min(1).optional(),
-    tableLabel: z.string().min(1).optional(),
+    tableLabel: z.string().optional(),
     canInviteOthers: z.boolean().optional(),
     note: z.string().optional(),
     customExternalLink: z.string().optional(),

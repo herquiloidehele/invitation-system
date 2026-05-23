@@ -10,6 +10,7 @@ import ExternalCountdownSection from "./ExternalCountdownSection";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import RSVPForm from "./RSVPForm";
+import PersonalGuestCard from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 
@@ -181,6 +182,10 @@ export default function RichExternalLinkPage({
 
       {countdownOn && (
         <ExternalCountdownSection invitation={invitation} theme={theme} />
+      )}
+
+      {invitation.guest && (
+        <PersonalGuestCard guest={invitation.guest} theme={theme} />
       )}
 
       {scratchOn && (

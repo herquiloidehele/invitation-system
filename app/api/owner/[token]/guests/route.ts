@@ -12,7 +12,7 @@ const upsertSchema = z.object({
   companion: z.string().optional(),
   phoneCountryCode: z.string().min(2),
   phoneNumber: z.string().min(1),
-  tableLabel: z.string().min(1, "Mesa é obrigatória"),
+  tableLabel: z.string().optional(),
   canInviteOthers: z.boolean().optional(),
   note: z.string().optional(),
 });

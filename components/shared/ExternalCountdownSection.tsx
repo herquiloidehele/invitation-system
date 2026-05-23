@@ -127,7 +127,7 @@ export default function ExternalCountdownSection({
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, delay: index * 0.06, ease: EASE }}
-                className="flex min-h-[150px] flex-col items-center justify-center px-5 py-7 shadow-[0_18px_50px_rgba(60,45,30,0.08)] backdrop-blur-md"
+                className="flex min-h-[120px] flex-col items-center justify-center px-5 py-7 shadow-[0_18px_50px_rgba(60,45,30,0.08)] backdrop-blur-md"
                 style={{
                   background: cardBg,
                   border: `1px solid ${cardBorder}`,

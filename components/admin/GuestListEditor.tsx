@@ -75,7 +75,7 @@ export default function GuestListEditor({
       (g) =>
         g.name.toLowerCase().includes(q) ||
         (g.companion ?? "").toLowerCase().includes(q) ||
-        g.tableLabel.toLowerCase().includes(q),
+        (g.tableLabel ?? "").toLowerCase().includes(q),
     );
   }, [guests, search]);
 
@@ -209,7 +209,7 @@ export default function GuestListEditor({
                   )}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                  <span>Mesa: {g.tableLabel || "—"}</span>
+                  {g.tableLabel && <span>Mesa: {g.tableLabel}</span>}
                   {g.phoneNumber && (
                     <span className="font-mono">
                       {g.phoneCountryCode} {g.phoneNumber}

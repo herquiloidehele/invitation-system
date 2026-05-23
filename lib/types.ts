@@ -659,8 +659,8 @@ export interface PublicGuestData {
   name: string;
   /** Optional companion name. */
   companion?: string;
-  /** Free-form table label, e.g. "7" or "Mesa Os Amigos". */
-  tableLabel: string;
+  /** Optional free-form table label, e.g. "7" or "Mesa Os Amigos". */
+  tableLabel?: string;
   /** Optional host note for this guest. */
   note?: string;
   /** Whether this guest can invite secondary guests. */
@@ -692,7 +692,7 @@ export interface GuestUpsertInput {
   companion?: string;
   phoneCountryCode: string;
   phoneNumber: string;
-  tableLabel: string;
+  tableLabel?: string;
   canInviteOthers?: boolean;
   note?: string;
   customExternalLink?: string;

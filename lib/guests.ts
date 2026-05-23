@@ -23,7 +23,7 @@ type GuestRow = {
   companion: string | null;
   phoneCountryCode: string;
   phoneNumber: string;
-  tableLabel: string;
+  tableLabel: string | null;
   canInviteOthers: boolean;
   note: string | null;
   customExternalLink: string | null;
@@ -43,7 +43,7 @@ function toGuestData(row: GuestRow): GuestData {
     companion: row.companion ?? undefined,
     phoneCountryCode: row.phoneCountryCode,
     phoneNumber: row.phoneNumber,
-    tableLabel: row.tableLabel,
+    tableLabel: row.tableLabel ?? undefined,
     canInviteOthers: row.canInviteOthers,
     note: row.note ?? undefined,
     customExternalLink: row.customExternalLink ?? undefined,
@@ -71,7 +71,7 @@ function toPublicGuestData(
     token: row.token,
     name: row.name,
     companion: row.companion ?? undefined,
-    tableLabel: row.tableLabel,
+    tableLabel: row.tableLabel ?? undefined,
     note: row.note ?? undefined,
     customExternalLink: row.customExternalLink ?? undefined,
     canInviteOthers: row.canInviteOthers,
@@ -114,9 +114,6 @@ function validateUpsert(input: GuestUpsertInput): void {
       "Telefone deve ter entre 6 e 15 dígitos",
       "phoneNumber",
     );
-  }
-  if (!input.tableLabel || input.tableLabel.trim().length === 0) {
-    throw new GuestValidationError("Mesa é obrigatória", "tableLabel");
   }
 }
 
@@ -172,17 +169,19 @@ export async function createGuest(
   validateUpsert(input);
   const row = await prisma.guest.create({
     data: {
-      invitationSlug,
+      invitation: { connect: { slug: invitationSlug } },
       name: input.name.trim(),
       slugifiedName: slugifyName(input.name),
       companion: input.companion?.trim() || null,
       phoneCountryCode: input.phoneCountryCode,
       phoneNumber: input.phoneNumber.replace(/\s+/g, ""),
-      tableLabel: input.tableLabel.trim(),
+      tableLabel: input.tableLabel?.trim() || "",
       canInviteOthers: input.canInviteOthers ?? false,
       note: input.note?.trim() || null,
       customExternalLink: normalizeOptionalText(input.customExternalLink),
-      invitedById: options?.invitedById ?? null,
+      ...(options?.invitedById
+        ? { invitedBy: { connect: { id: options.invitedById } } }
+        : {}),
     },
     include: includeInviter,
   });
@@ -214,13 +213,6 @@ export async function updateGuest(
       );
     }
   }
-  if (
-    input.tableLabel !== undefined &&
-    input.tableLabel.trim().length === 0
-  ) {
-    throw new GuestValidationError("Mesa é obrigatória", "tableLabel");
-  }
-
   const data: Record<string, unknown> = {};
   if (input.name !== undefined) {
     data.name = input.name.trim();
@@ -233,7 +225,8 @@ export async function updateGuest(
     data.phoneCountryCode = input.phoneCountryCode;
   if (input.phoneNumber !== undefined)
     data.phoneNumber = input.phoneNumber.replace(/\s+/g, "");
-  if (input.tableLabel !== undefined) data.tableLabel = input.tableLabel.trim();
+  if (input.tableLabel !== undefined)
+    data.tableLabel = input.tableLabel.trim() || "";
   if (input.canInviteOthers !== undefined)
     data.canInviteOthers = input.canInviteOthers;
   if (input.note !== undefined) data.note = input.note?.trim() || null;
@@ -293,7 +286,7 @@ export async function selfRegisterGuest(input: {
 
   const row = await prisma.guest.create({
     data: {
-      invitationSlug: inviter.invitationSlug,
+      invitation: { connect: { slug: inviter.invitationSlug } },
       name: input.name.trim(),
       slugifiedName: slugifyName(input.name),
       companion: input.companion?.trim() || null,
@@ -302,7 +295,7 @@ export async function selfRegisterGuest(input: {
       tableLabel: "",
       canInviteOthers: false,
       note: null,
-      invitedById: inviter.id,
+      invitedBy: { connect: { id: inviter.id } },
     },
     include: includeInviter,
   });

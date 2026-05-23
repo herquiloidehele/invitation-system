@@ -25,7 +25,7 @@ export default function PersonalGuestCard({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
-        className="relative px-6 pt-12 pb-4"
+        className="relative px-6 pt-4 pb-8"
         style={{ zIndex: 2 }}
       >
         <div
@@ -60,23 +60,27 @@ export default function PersonalGuestCard({
             )}
           </h2>
 
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InfoPill
-              icon={<Users className="size-3.5" />}
-              label="Mesa"
-              value={guest.tableLabel}
-              theme={theme}
-            />
-            {guest.note && (
-              <InfoPill
-                icon={<MessageCircle className="size-3.5" />}
-                label="Nota"
-                value={guest.note}
-                theme={theme}
-                multiline
-              />
-            )}
-          </div>
+          {(guest.tableLabel || guest.note) && (
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {guest.tableLabel && (
+                <InfoPill
+                  icon={<Users className="size-3.5" />}
+                  label="Mesa"
+                  value={guest.tableLabel}
+                  theme={theme}
+                />
+              )}
+              {guest.note && (
+                <InfoPill
+                  icon={<MessageCircle className="size-3.5" />}
+                  label="Nota"
+                  value={guest.note}
+                  theme={theme}
+                  multiline
+                />
+              )}
+            </div>
+          )}
 
           {guest.canInviteOthers && (
             <button

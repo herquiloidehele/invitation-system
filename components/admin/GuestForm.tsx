@@ -57,7 +57,7 @@ const formSchema = z.object({
       },
       { message: "Telefone deve ter entre 6 e 15 dígitos" },
     ),
-  tableLabel: z.string().min(1, "Mesa é obrigatória"),
+  tableLabel: z.string().optional(),
   canInviteOthers: z.boolean(),
   note: z.string().optional(),
   customExternalLink: z.string().optional(),
@@ -111,7 +111,7 @@ export default function GuestForm({
         companion: guest.companion ?? "",
         phoneCountryCode: guest.phoneCountryCode || DEFAULT_COUNTRY_CODE,
         phoneNumber: guest.phoneNumber,
-        tableLabel: guest.tableLabel,
+        tableLabel: guest.tableLabel ?? "",
         canInviteOthers: guest.canInviteOthers,
         note: guest.note ?? "",
         customExternalLink: guest.customExternalLink ?? "",
@@ -139,7 +139,7 @@ export default function GuestForm({
       companion: values.companion?.trim() || undefined,
       phoneCountryCode: values.phoneCountryCode,
       phoneNumber: values.phoneNumber,
-      tableLabel: values.tableLabel,
+      tableLabel: values.tableLabel?.trim() ?? "",
       canInviteOthers: values.canInviteOthers,
       note: values.note?.trim() || undefined,
       ...(showCustomExternalLink
@@ -219,17 +219,12 @@ export default function GuestForm({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="guest-table">Mesa *</Label>
+            <Label htmlFor="guest-table">Mesa</Label>
             <Input
               id="guest-table"
               placeholder="Ex: Mesa 7 ou Os Amigos do Pedro"
               {...register("tableLabel")}
             />
-            {formState.errors.tableLabel && (
-              <p className="text-xs text-destructive">
-                {formState.errors.tableLabel.message}
-              </p>
-            )}
           </div>
 
           <div className="flex items-center justify-between rounded-lg border p-3">
