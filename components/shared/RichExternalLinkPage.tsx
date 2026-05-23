@@ -1,6 +1,6 @@
 "use client";
 
-import { type MutableRefObject, type RefObject, useEffect } from "react";
+import { type MutableRefObject, type RefObject, useLayoutEffect } from "react";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
@@ -52,16 +52,102 @@ export default function RichExternalLinkPage({
     guestCustomExternalLink: invitation.guest?.customExternalLink,
   });
 
-  // The envelope cover flips this component into the DOM only after the
-  // user opens the invite. Pin the viewport to the top so the user lands
-  // on the hero, not somewhere inside the iframe. (Without this, browser
-  // scroll-anchoring on the loading iframe can yank the page down as it
-  // grows.) Skipped in the admin preview, which lives in a scroll-
-  // contained pane.
-  useEffect(() => {
+  // Defence stack:
+  //   1. history.scrollRestoration = "manual" — neutralize any restored
+  //      scroll position from a previous session.
+  //   2. overflow-anchor: none on <html>, <body>, <main> — disable the
+  //      browser's scroll-anchoring algorithm on the document scroller.
+  //   3. scroll-behavior: auto on <html> — override the global smooth
+  //      rule so any involuntary scroll attempt is INSTANT, not a visible
+  //      multi-frame animation.
+  //   4. scroll event listener — scroll events fire AFTER layout but
+  //      BEFORE paint per the HTML spec's "update the rendering" steps.
+  //      Resetting scrollTop here lands in the same frame's paint, so no
+  //      scrolled position is ever shown to the user. This is the
+  //      primary catch for the iframe-focus scroll.
+  //   5. RAF pin loop, every frame for 4 s — belt-and-suspenders for the
+  //      scroll-anchoring path (which per spec does NOT dispatch scroll
+  //      events) and for any scroll change that for some reason did not
+  //      surface as a scroll event in time.
+  //   6. wheel/touchmove/keydown — real user-input signals. Once any of
+  //      these fires we step aside completely so the user can scroll.
+  //
+  // Skipped in the admin preview, which lives in a scroll-contained pane
+  // that must not be touched by document-level overrides.
+  useLayoutEffect(() => {
     if (isPreview) return;
     if (typeof window === "undefined") return;
-    window.scrollTo(0, 0);
+
+    const previous = {
+      htmlOverflowAnchor: document.documentElement.style.overflowAnchor,
+      bodyOverflowAnchor: document.body.style.overflowAnchor,
+      htmlScrollBehavior: document.documentElement.style.scrollBehavior,
+      scrollRestoration: history.scrollRestoration,
+    };
+
+    history.scrollRestoration = "manual";
+    document.documentElement.style.overflowAnchor = "none";
+    document.body.style.overflowAnchor = "none";
+    document.documentElement.style.scrollBehavior = "auto";
+
+    const resetScroll = () => {
+      const scrollingElement = document.scrollingElement;
+      if (scrollingElement) scrollingElement.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    resetScroll();
+
+    // Track real user-input events that signal intent to scroll. We do
+    // NOT use the scroll event for this: a browser-initiated involuntary
+    // scroll fires a scroll event but does NOT fire wheel/touchmove/key,
+    // so this stays false through anything we want to suppress.
+    let userScrolled = false;
+    const onUserInput = () => {
+      userScrolled = true;
+    };
+    window.addEventListener("wheel", onUserInput, { passive: true });
+    window.addEventListener("touchmove", onUserInput, { passive: true });
+    window.addEventListener("keydown", onUserInput);
+
+    const startedAt = performance.now();
+    const PIN_DURATION_MS = 4000;
+    const withinWindow = () => performance.now() - startedAt < PIN_DURATION_MS;
+
+    // Primary defence — synchronous scroll handler. Fires after layout,
+    // before paint; resetting scrollTop here lands in the same frame's
+    // paint.
+    const onScroll = () => {
+      if (userScrolled) return;
+      if (!withinWindow()) return;
+      if (window.scrollY > 0) resetScroll();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Belt-and-suspenders RAF loop for the scroll-anchoring path, which
+    // per the CSS Scroll Anchoring spec does NOT dispatch scroll events.
+    let frame = 0;
+    const pinAtTop = () => {
+      if (userScrolled || !withinWindow()) return;
+      if (window.scrollY > 0) resetScroll();
+      frame = requestAnimationFrame(pinAtTop);
+    };
+    frame = requestAnimationFrame(pinAtTop);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("wheel", onUserInput);
+      window.removeEventListener("touchmove", onUserInput);
+      window.removeEventListener("keydown", onUserInput);
+      window.removeEventListener("scroll", onScroll);
+      document.documentElement.style.overflowAnchor =
+        previous.htmlOverflowAnchor;
+      document.body.style.overflowAnchor = previous.bodyOverflowAnchor;
+      document.documentElement.style.scrollBehavior =
+        previous.htmlScrollBehavior;
+      history.scrollRestoration = previous.scrollRestoration;
+    };
   }, [isPreview]);
 
   return (
@@ -70,6 +156,11 @@ export default function RichExternalLinkPage({
         background: theme.bg,
         color: theme.textPrimary,
         minHeight: "100dvh",
+        // Belt-and-suspenders alongside the document-level overflowAnchor
+        // override applied in the layout effect above — keeps this subtree
+        // out of the browser's scroll-anchor candidate set even if the
+        // <main> renders before the effect commits.
+        overflowAnchor: "none",
       }}
     >
       {heroOn && (
