@@ -59,7 +59,7 @@ export default function ExternalLinkPage({
           style={{
             position: "absolute",
             inset: 0,
-            width: "100%",
+            width: "calc(100% + 16px)",
             height: "100%",
             border: "none",
             display: "block",

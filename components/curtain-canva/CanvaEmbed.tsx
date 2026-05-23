@@ -190,7 +190,7 @@ export default function CanvaEmbed({
           style={{
             border: "none",
             display: "block",
-            width: "100%",
+            width: "calc(100% + 16px)",
             height: preloading
               ? contentHeight
                 ? `${contentHeight}px`
