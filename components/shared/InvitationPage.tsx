@@ -1,10 +1,21 @@
 "use client";
 
-import { type MutableRefObject, type RefObject, useCallback, useEffect, useState } from "react";
+import {
+  type MutableRefObject,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
 
-import type { CardSectionKey, FAQItem, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CardSectionKey,
+  FAQItem,
+  InvitationData,
+  TemplateTheme,
+} from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { t } from "@/lib/custom-texts";
 import ScheduleSection from "./ScheduleSection";
@@ -18,8 +29,8 @@ import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
 import InvitationHero, {
-  InvitationHeroNames,
   getHeroSectionHeight,
+  InvitationHeroNames,
 } from "./InvitationHero";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";

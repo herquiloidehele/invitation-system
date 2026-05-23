@@ -9,27 +9,6 @@ export function PhoneIframePreview({
   src: string;
   showCaption?: boolean;
 }) {
-  function hideScrollbar(event: React.SyntheticEvent<HTMLIFrameElement>) {
-    const iframeDocument = event.currentTarget.contentDocument;
-
-    if (!iframeDocument) return;
-
-    iframeDocument.documentElement.style.scrollbarWidth = "none";
-    iframeDocument.body.style.scrollbarWidth = "none";
-    (
-      iframeDocument.body.style as CSSStyleDeclaration & {
-        msOverflowStyle?: string;
-      }
-    ).msOverflowStyle = "none";
-
-    if (!iframeDocument.getElementById("brindeal-hide-scrollbar")) {
-      const style = iframeDocument.createElement("style");
-      style.id = "brindeal-hide-scrollbar";
-      style.textContent = "::-webkit-scrollbar{display:none}";
-      iframeDocument.head.appendChild(style);
-    }
-  }
-
   return (
     <article className="text-center">
       <div className="relative mx-auto aspect-9/17 w-full max-w-[20rem] rounded-[2rem] border-8 border-[#2D3A2D] bg-white shadow-[0_30px_80px_rgba(31,36,32,0.22),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
@@ -43,7 +22,6 @@ export function PhoneIframePreview({
             src={src}
             className="h-full w-full border-0 [scrollbar-width:none]"
             loading="lazy"
-            onLoad={hideScrollbar}
           />
           <span
             aria-hidden="true"
