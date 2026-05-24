@@ -253,7 +253,9 @@ async function proxyCanvaRequest(
   // For HTML responses, inject a <base> tag so relative URLs resolve correctly.
   if (contentType.toLowerCase().includes("text/html")) {
     const html = await resp.text();
-    const proxyOrigin = req.nextUrl.origin;
+    const proxyOrigin =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
+      req.nextUrl.origin;
     const baseRewritten = rewriteHtml(
       html,
       upstream.host,
