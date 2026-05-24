@@ -49,11 +49,12 @@ const formSchema = z.object({
   phoneCountryCode: z.string().min(2),
   phoneNumber: z
     .string()
-    .min(1, "Telefone é obrigatório")
+    .optional()
     .refine(
       (v) => {
-        const digits = v.replace(/[^0-9]/g, "");
-        return digits.length >= 6 && digits.length <= 15;
+        const digits = (v ?? "").replace(/[^0-9]/g, "");
+        // Empty is allowed; otherwise must be 6–15 digits
+        return digits.length === 0 || (digits.length >= 6 && digits.length <= 15);
       },
       { message: "Telefone deve ter entre 6 e 15 dígitos" },
     ),
@@ -110,7 +111,7 @@ export default function GuestForm({
         name: guest.name,
         companion: guest.companion ?? "",
         phoneCountryCode: guest.phoneCountryCode || DEFAULT_COUNTRY_CODE,
-        phoneNumber: guest.phoneNumber,
+        phoneNumber: guest.phoneNumber ?? "",
         tableLabel: guest.tableLabel ?? "",
         canInviteOthers: guest.canInviteOthers,
         note: guest.note ?? "",
@@ -138,7 +139,7 @@ export default function GuestForm({
       name: values.name,
       companion: values.companion?.trim() || undefined,
       phoneCountryCode: values.phoneCountryCode,
-      phoneNumber: values.phoneNumber,
+      phoneNumber: values.phoneNumber?.trim() ?? "",
       tableLabel: values.tableLabel?.trim() ?? "",
       canInviteOthers: values.canInviteOthers,
       note: values.note?.trim() || undefined,
@@ -204,7 +205,7 @@ export default function GuestForm({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="guest-phone">Telefone *</Label>
+              <Label htmlFor="guest-phone">Telefone</Label>
               <Input
                 id="guest-phone"
                 inputMode="tel"

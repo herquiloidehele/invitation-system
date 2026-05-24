@@ -109,7 +109,8 @@ function validateUpsert(input: GuestUpsertInput): void {
     throw new GuestValidationError("Indicativo inválido", "phoneCountryCode");
   }
   const digits = (input.phoneNumber ?? "").replace(/[^0-9]/g, "");
-  if (digits.length < 6 || digits.length > 15) {
+  // Phone is optional: allow empty string. If provided, must be 6–15 digits.
+  if (digits.length > 0 && (digits.length < 6 || digits.length > 15)) {
     throw new GuestValidationError(
       "Telefone deve ter entre 6 e 15 dígitos",
       "phoneNumber",
@@ -206,7 +207,8 @@ export async function updateGuest(
   }
   if (input.phoneNumber !== undefined) {
     const digits = input.phoneNumber.replace(/[^0-9]/g, "");
-    if (digits.length < 6 || digits.length > 15) {
+    // Phone is optional: allow empty string. If provided, must be 6–15 digits.
+    if (digits.length > 0 && (digits.length < 6 || digits.length > 15)) {
       throw new GuestValidationError(
         "Telefone deve ter entre 6 e 15 dígitos",
         "phoneNumber",
