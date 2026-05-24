@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ExternalLink, MapPin } from "lucide-react";
+import Image from "next/image";
 
 import type {
   CustomTexts,
@@ -114,10 +115,12 @@ export default function LocationCard({
           className="relative w-full overflow-hidden mb-4"
           style={{ height: 180 }}
         >
-          <img
+          <Image
             src={location.imageUrl}
             alt={location.name}
-            className="object-cover w-full h-45 rounded-xl"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 480px"
             style={
               imageKey ? getImageStyle(imageSettings, imageKey) : undefined
             }
