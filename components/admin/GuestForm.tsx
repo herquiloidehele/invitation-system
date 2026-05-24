@@ -39,8 +39,8 @@ import { Loader2 } from "lucide-react";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "@/lib/guest-links";
 import type { GuestData, GuestUpsertInput } from "@/lib/types";
 import {
-  getGuestFormShellVariant,
   getGuestFormSheetProps,
+  getGuestFormShellVariant,
 } from "./guest-form-sheet";
 
 const formSchema = z.object({
@@ -54,7 +54,9 @@ const formSchema = z.object({
       (v) => {
         const digits = (v ?? "").replace(/[^0-9]/g, "");
         // Empty is allowed; otherwise must be 6–15 digits
-        return digits.length === 0 || (digits.length >= 6 && digits.length <= 15);
+        return (
+          digits.length === 0 || (digits.length >= 6 && digits.length <= 15)
+        );
       },
       { message: "Telefone deve ter entre 6 e 15 dígitos" },
     ),
@@ -251,7 +253,7 @@ export default function GuestForm({
             <Textarea
               id="guest-note"
               rows={3}
-              placeholder="Ex: Sem glúten, alergia a marisco, etc."
+              placeholder="Ex: Sem glúten, alergia a marisco, etc"
               {...register("note")}
             />
           </div>
