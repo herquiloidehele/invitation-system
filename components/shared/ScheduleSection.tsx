@@ -25,10 +25,16 @@ import {
   Sparkles,
   Sunset,
   Utensils,
-  Wine
+  Wine,
 } from "lucide-react";
 
-import type { CustomTexts, ScheduleEvent, ScheduleIcon, ScheduleStyle, TemplateTheme } from "@/lib/types";
+import type {
+  CustomTexts,
+  ScheduleEvent,
+  ScheduleIcon,
+  ScheduleStyle,
+  TemplateTheme,
+} from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { t } from "@/lib/custom-texts";
 import { EditableCard } from "./EditableCard";
@@ -200,24 +206,15 @@ function IllustratedScheduleCard({
         {schedule.map((event, index) => (
           <div key={index} style={{ display: "contents" }}>
             {/* Icon in outlined circle */}
-            <div
-              className="flex items-center justify-center rounded-full"
-              style={{
-                width: 56,
-                height: 56,
-                border: `1.5px solid ${accent}`,
-              }}
-            >
-              <ScheduleIconGraphic
-                icon={event.icon}
-                iconUrl={event.iconUrl}
-                color={accent}
-              />
-            </div>
+            <ScheduleIconGraphic
+              icon={event.icon}
+              iconUrl={event.iconUrl}
+              color={accent}
+            />
 
             {/* Connector — stretches to fill */}
             <div
-              className="h-[3px] w-full min-w-[24px] rounded-full"
+              className="h-[1px] w-full min-w-[24px] rounded-full"
               style={{ background: accent }}
             />
 
