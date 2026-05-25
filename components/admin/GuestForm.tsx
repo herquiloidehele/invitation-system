@@ -166,7 +166,7 @@ export default function GuestForm({
         >
           <div className="space-y-1.5">
             <Label htmlFor="guest-name">Nome *</Label>
-            <Input id="guest-name" {...register("name")} autoFocus />
+            <Input id="guest-name" {...register("name")} />
             {formState.errors.name && (
               <p className="text-xs text-destructive">
                 {formState.errors.name.message}
