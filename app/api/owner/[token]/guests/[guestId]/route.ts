@@ -12,7 +12,7 @@ const updateSchema = z
     name: z.string().min(1).optional(),
     companion: z.string().optional(),
     phoneCountryCode: z.string().min(2).optional(),
-    phoneNumber: z.string().min(1).optional(),
+    phoneNumber: z.string().optional(),
     tableLabel: z.string().optional(),
     canInviteOthers: z.boolean().optional(),
     note: z.string().optional(),
