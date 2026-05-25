@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
         heroHeight:
           typeof body.heroHeight === "number" ? body.heroHeight : null,
         heroOverlay: sanitizeJsonField(body.heroOverlay, null),
+        heroScrollIndicator: sanitizeJsonField(body.heroScrollIndicator, null),
         videoUrl: body.videoUrl ?? null,
         videoPoster: body.videoPoster ?? null,
         faqs: sanitizeJsonField(body.faqs, null),

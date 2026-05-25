@@ -1612,6 +1612,93 @@ export default function InvitationForm({
                           className="w-full accent-foreground cursor-pointer"
                         />
                       </div>
+                      {/* Animated scroll-down arrow indicator */}
+                      <Separator />
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="heroScrollIndicatorEnabled">
+                              Seta animada para próxima secção
+                            </Label>
+                            <p className="text-xs text-muted-foreground">
+                              Mostra uma seta animada no fundo do hero (acima
+                              do leitor de música) que rola para a secção
+                              seguinte ao ser clicada.
+                            </p>
+                          </div>
+                          <Switch
+                            id="heroScrollIndicatorEnabled"
+                            checked={
+                              form.heroScrollIndicator?.enabled === true
+                            }
+                            onCheckedChange={(checked) =>
+                              update("heroScrollIndicator", {
+                                ...(form.heroScrollIndicator ?? {}),
+                                enabled: checked,
+                              })
+                            }
+                          />
+                        </div>
+                        {form.heroScrollIndicator?.enabled && (
+                          <div className="space-y-1.5">
+                            <Label>Cor da seta</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Deixe em branco para usar a cor principal do
+                              tema.
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={colorPickerValue(
+                                  form.heroScrollIndicator?.color,
+                                  currentTheme?.textPrimary || "#000000",
+                                )}
+                                onChange={(e) =>
+                                  update("heroScrollIndicator", {
+                                    ...(form.heroScrollIndicator ?? {
+                                      enabled: true,
+                                    }),
+                                    color: e.target.value,
+                                  })
+                                }
+                                className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                                title="Escolher cor"
+                              />
+                              <input
+                                type="text"
+                                value={form.heroScrollIndicator?.color ?? ""}
+                                onChange={(e) =>
+                                  update("heroScrollIndicator", {
+                                    ...(form.heroScrollIndicator ?? {
+                                      enabled: true,
+                                    }),
+                                    color: e.target.value,
+                                  })
+                                }
+                                placeholder={`Padrão: ${currentTheme?.textPrimary || ""}`}
+                                className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                              />
+                              {form.heroScrollIndicator?.color && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="shrink-0 text-muted-foreground"
+                                  onClick={() =>
+                                    update("heroScrollIndicator", {
+                                      ...(form.heroScrollIndicator ?? {
+                                        enabled: true,
+                                      }),
+                                      color: undefined,
+                                    })
+                                  }
+                                >
+                                  Repor
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-1.5">

@@ -113,6 +113,17 @@ export interface HeroOverlayConfig {
   gradientStart?: number;
 }
 
+/**
+ * Optional animated scroll-down indicator shown at the bottom of the hero
+ * (above the audio player). When `enabled` is true, an animated chevron
+ * arrow appears that scrolls the page to the next section on click.
+ * `color` overrides the chevron stroke color; falls back to `theme.textPrimary`.
+ */
+export interface HeroScrollIndicatorConfig {
+  enabled: boolean;
+  color?: string;
+}
+
 // ---------------------------------------------------------------------------
 // Social preview / Open Graph
 // ---------------------------------------------------------------------------
@@ -532,6 +543,8 @@ export interface InvitationData {
   heroHeight?: number;
   /** Optional overlay tuning for the hero (dark scrim + bottom gradient). */
   heroOverlay?: HeroOverlayConfig;
+  /** Optional animated scroll-down indicator at the bottom of the hero. */
+  heroScrollIndicator?: HeroScrollIndicatorConfig;
   videoUrl?: string;
   /** Poster image displayed by the curtain video before playback / while it loads. Optional — falls back to a static bundled poster. */
   videoPoster?: string;

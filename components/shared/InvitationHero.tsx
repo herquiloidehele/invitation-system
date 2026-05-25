@@ -8,6 +8,7 @@ import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { t } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
+import { scrollToNextHeroSection } from "@/lib/curtain-canva";
 import AudioPlayer from "./AudioPlayer";
 import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
 import { EditableText } from "./EditableText";
@@ -344,6 +345,47 @@ export default function InvitationHero({
             </>
           )}
         </motion.div>
+      )}
+
+      {/* Animated scroll-down indicator (above audio player) */}
+      {invitation.heroScrollIndicator?.enabled && (
+        <motion.button
+          type="button"
+          aria-label="Scroll to next section"
+          onClick={() => scrollToNextHeroSection()}
+          className="absolute left-1/2 z-20 flex h-12 w-12 -translate-x-1/2 items-center justify-center transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          style={{
+            bottom: invitation.audio.enabled
+              ? "calc(env(safe-area-inset-bottom) + 6rem)"
+              : "calc(env(safe-area-inset-bottom) + 2rem)",
+            color: invitation.heroScrollIndicator.color || theme.textPrimary,
+            cursor: "pointer",
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: [0, 9, 0] }}
+          transition={{
+            opacity: { delay: 0.8, duration: 0.35 },
+            y: {
+              delay: 1,
+              duration: 1.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            },
+          }}
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </motion.button>
       )}
 
       {/* Audio player */}

@@ -4,6 +4,7 @@ import type {
   CustomTexts,
   ExternalCountdownConfig,
   HeroOverlayConfig,
+  HeroScrollIndicatorConfig,
   ImageSettingsMap,
   InvitationData,
   InvitationEventType,
@@ -40,6 +41,7 @@ type InvitationWithTheme = {
   heroImage: string;
   heroHeight: number | null;
   heroOverlay: unknown;
+  heroScrollIndicator: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
   faqs: unknown;
@@ -84,6 +86,9 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     heroImage: row.heroImage,
     heroHeight: row.heroHeight ?? undefined,
     heroOverlay: (row.heroOverlay as HeroOverlayConfig | null) ?? undefined,
+    heroScrollIndicator:
+      (row.heroScrollIndicator as HeroScrollIndicatorConfig | null) ??
+      undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,

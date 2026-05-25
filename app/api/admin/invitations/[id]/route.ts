@@ -136,6 +136,12 @@ export async function PUT(
         ...(body.heroOverlay !== undefined && {
           heroOverlay: sanitizeJsonField(body.heroOverlay, null),
         }),
+        ...(body.heroScrollIndicator !== undefined && {
+          heroScrollIndicator: sanitizeJsonField(
+            body.heroScrollIndicator,
+            null,
+          ),
+        }),
         ...{ videoUrl: body.videoUrl || "" },
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,
