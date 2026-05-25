@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Copy, MessageSquareText, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -56,11 +57,14 @@ export default function GuestRowActions({
   });
 
   const hasPhone = !!guest.phoneNumber;
+  const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(personalUrl);
       toast.success("Link copiado!");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
     } catch {
       toast.error("Não foi possível copiar o link.");
     }
@@ -68,7 +72,7 @@ export default function GuestRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Tooltip>
+      <Tooltip open={copied || undefined}>
         <TooltipTrigger
           render={
             <Button
@@ -83,7 +87,9 @@ export default function GuestRowActions({
             </Button>
           }
         />
-        <TooltipContent>Copiar link pessoal</TooltipContent>
+        <TooltipContent>
+          {copied ? "Copiado!" : "Copiar link pessoal"}
+        </TooltipContent>
       </Tooltip>
 
       <Tooltip>
