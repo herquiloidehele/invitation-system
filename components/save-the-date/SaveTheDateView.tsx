@@ -23,7 +23,10 @@ import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import { EditableText } from "@/components/shared/EditableText";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { getSaveTheDateSparkles } from "@/lib/save-the-date-motion";
-import { getSaveTheDateLocationTheme } from "@/lib/save-the-date-location-theme";
+import {
+  getSaveTheDateLocationTextStyles,
+  getSaveTheDateLocationTheme,
+} from "@/lib/save-the-date-location-theme";
 import { getSaveTheDateRsvpButtonBackground } from "@/lib/save-the-date-rsvp-button";
 import {
   shouldShowRsvpDietaryRestrictions,
@@ -200,6 +203,9 @@ export default function SaveTheDateView({
   const dateOverride = textStyles?.elements?.stdDate;
   const dateLabelOverride = textStyles?.elements?.stdDateLabel;
   const customMessageOverride = textStyles?.elements?.stdCustomMessage;
+  const sectionTitleOverride = textStyles?.elements?.sectionTitles;
+  const locationNameOverride = textStyles?.elements?.locationName;
+  const locationAddressOverride = textStyles?.elements?.locationAddress;
 
   // Resolve fonts — element override wins, fall back to theme
   const resolvedTitleFont = titleOverride?.fontFamily ?? theme.titleFont;
@@ -218,6 +224,9 @@ export default function SaveTheDateView({
     dateOverride?.fontFamily ?? null,
     dateLabelOverride?.fontFamily ?? null,
     customMessageOverride?.fontFamily ?? null,
+    sectionTitleOverride?.fontFamily ?? null,
+    locationNameOverride?.fontFamily ?? null,
+    locationAddressOverride?.fontFamily ?? null,
   ]);
 
   // Determine if this STD has an envelope configured
@@ -377,6 +386,10 @@ export default function SaveTheDateView({
   const locationTheme = useMemo(
     () => getSaveTheDateLocationTheme(theme),
     [theme],
+  );
+  const locationTextStyles = useMemo(
+    () => getSaveTheDateLocationTextStyles(theme, textStyles),
+    [theme, textStyles],
   );
 
   return (
@@ -830,18 +843,23 @@ export default function SaveTheDateView({
             <EditableText elementKey="sectionTitles">
               <p
                 className="text-xs uppercase tracking-[0.32em]"
-                style={{ color: theme.textColor, fontFamily: theme.titleFont }}
+                style={locationTextStyles.sectionTitles}
               >
                 Localização
               </p>
             </EditableText>
           </motion.div>
-          <LocationCard location={saveTheDate.location} theme={locationTheme} />
+          <LocationCard
+            location={saveTheDate.location}
+            theme={locationTheme}
+            ts={locationTextStyles}
+          />
           {saveTheDate.location2 && (
             <div className="mt-4">
               <LocationCard
                 location={saveTheDate.location2}
                 theme={locationTheme}
+                ts={locationTextStyles}
               />
             </div>
           )}

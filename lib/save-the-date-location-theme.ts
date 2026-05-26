@@ -1,5 +1,9 @@
 import type { SaveTheDateThemeData } from "./save-the-date";
-import type { TemplateTheme } from "./types";
+import {
+  resolveTextStyles,
+  type ResolvedTextStyles,
+} from "./text-styles";
+import type { TemplateTheme, TextStyleOverrides } from "./types";
 
 function hexToRgba(hex: string, alpha: number): string {
   const match = hex.match(/^#([0-9a-fA-F]{6})$/);
@@ -48,4 +52,11 @@ export function getSaveTheDateLocationTheme(
     tapTextColor: theme.textColor,
     decorativeColor: theme.heartColor,
   };
+}
+
+export function getSaveTheDateLocationTextStyles(
+  theme: SaveTheDateThemeData,
+  textStyles?: TextStyleOverrides | null,
+): ResolvedTextStyles {
+  return resolveTextStyles(getSaveTheDateLocationTheme(theme), textStyles);
 }
