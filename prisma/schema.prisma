@@ -192,6 +192,8 @@ model SaveTheDate {
 
   couple        Json    // { bride: string, groom: string }
   date          Json    // { iso: string, display: string, day: string, month: string, year: string }
+  location      Json?   // Optional first location card — same shape as Invitation.location
+  location2     Json?   // Optional second location card — same shape as Invitation.location2
   customMessage String? // optional text shown after date reveal
   envelope      Json?   // per-STD envelope overrides { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }
   textStyles    Json?   // per-STD font/size overrides { titleFont?, coupleFont?, dateFont?, titleFontSize?, coupleFontSize?, dateFontSize? }

@@ -2,6 +2,7 @@ import { prisma } from "./db";
 import type {
   AudioConfig,
   EnvelopeConfig,
+  LocationInfo,
   SocialPreview,
   TextStyleOverrides,
 } from "./types";
@@ -71,6 +72,10 @@ export interface SaveTheDateData {
   slug: string;
   couple: SaveTheDateCouple;
   date: SaveTheDateDate;
+  /** Optional first location card. */
+  location?: LocationInfo;
+  /** Optional second location card. */
+  location2?: LocationInfo;
   customMessage: string | null;
   theme: SaveTheDateThemeData;
   /** Per-STD envelope overrides (base, coverBackground, topFlap, bottomFlap, shimmer). */
@@ -149,6 +154,12 @@ export async function getSaveTheDate(
     slug: row.slug,
     couple: row.couple as unknown as SaveTheDateCouple,
     date: row.date as unknown as SaveTheDateDate,
+    location: row.location
+      ? (row.location as unknown as LocationInfo)
+      : undefined,
+    location2: row.location2
+      ? (row.location2 as unknown as LocationInfo)
+      : undefined,
     customMessage: row.customMessage,
     theme: toSaveTheDateTheme(row.theme),
     envelope: row.envelope ? (row.envelope as unknown as EnvelopeConfig) : null,

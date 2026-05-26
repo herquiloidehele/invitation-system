@@ -39,6 +39,12 @@ export async function PUT(
         ...(body.date !== undefined && {
           date: sanitizeJsonField(body.date, existing.date),
         }),
+        ...(body.location !== undefined && {
+          location: sanitizeJsonField(body.location, null),
+        }),
+        ...(body.location2 !== undefined && {
+          location2: sanitizeJsonField(body.location2, null),
+        }),
         ...(body.customMessage !== undefined && {
           customMessage: body.customMessage || null,
         }),

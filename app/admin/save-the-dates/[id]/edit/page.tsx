@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getSaveDateThemes } from "@/lib/save-the-date";
-import type { SocialPreview, TextStyleOverrides } from "@/lib/types";
+import type {
+  LocationInfo,
+  SocialPreview,
+  TextStyleOverrides,
+} from "@/lib/types";
 import SaveTheDateForm from "../../SaveTheDateForm";
 import type { SaveTheDateFormData } from "../../SaveTheDateForm";
 
@@ -30,6 +34,8 @@ export default async function EditSaveTheDatePage({
     month: string;
     year: string;
   };
+  const location = item.location as LocationInfo | null;
+  const location2 = item.location2 as LocationInfo | null;
 
   const envelope = item.envelope as {
     base?: string;
@@ -61,6 +67,8 @@ export default async function EditSaveTheDatePage({
     themeId: item.themeId,
     couple,
     date,
+    location: location || undefined,
+    location2: location2 || undefined,
     customMessage: item.customMessage || "",
     envelope: envelope || undefined,
     textStyles: textStyles || undefined,

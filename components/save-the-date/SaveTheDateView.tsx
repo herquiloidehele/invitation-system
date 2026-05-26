@@ -13,6 +13,7 @@ import type { SaveTheDateData } from "@/lib/save-the-date";
 import type { TemplateTheme } from "@/lib/types";
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import LocationCard from "@/components/shared/LocationCard";
 import ScratchHeart from "./ScratchHeart";
 import DateReveal from "./DateReveal";
 import CalendarButton from "./CalendarButton";
@@ -22,6 +23,7 @@ import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import { EditableText } from "@/components/shared/EditableText";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { getSaveTheDateSparkles } from "@/lib/save-the-date-motion";
+import { getSaveTheDateLocationTheme } from "@/lib/save-the-date-location-theme";
 import { getSaveTheDateRsvpButtonBackground } from "@/lib/save-the-date-rsvp-button";
 import {
   shouldShowRsvpDietaryRestrictions,
@@ -372,6 +374,10 @@ export default function SaveTheDateView({
 
   const showBottomHero = bottomHero?.enabled && !!bottomHero.mediaUrl;
   const rsvpButtonBackground = getSaveTheDateRsvpButtonBackground(theme);
+  const locationTheme = useMemo(
+    () => getSaveTheDateLocationTheme(theme),
+    [theme],
+  );
 
   return (
     <div className="relative" style={{ backgroundColor: theme.bgColor }}>
@@ -811,6 +817,36 @@ export default function SaveTheDateView({
           />
         )}
       </div>
+
+      {saveTheDate.location && (hideEnvelope || envelopeDone) && (
+        <section className="mx-auto w-full max-w-md px-6 pb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.8, ease: EASE }}
+            className="mb-5 text-center"
+          >
+            <EditableText elementKey="sectionTitles">
+              <p
+                className="text-xs uppercase tracking-[0.32em]"
+                style={{ color: theme.textColor, fontFamily: theme.titleFont }}
+              >
+                Localização
+              </p>
+            </EditableText>
+          </motion.div>
+          <LocationCard location={saveTheDate.location} theme={locationTheme} />
+          {saveTheDate.location2 && (
+            <div className="mt-4">
+              <LocationCard
+                location={saveTheDate.location2}
+                theme={locationTheme}
+              />
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Bottom hero section */}
       {showBottomHero && (hideEnvelope || envelopeDone) && (

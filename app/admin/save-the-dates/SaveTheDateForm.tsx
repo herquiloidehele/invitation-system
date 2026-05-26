@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Loader2, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,12 +35,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SaveTheDateThemeData } from "@/lib/save-the-date";
 import type {
   EnvelopeConfig,
+  LocationInfo,
   SocialPreview,
   TemplateTheme,
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
+import {
+  mergeResolvedLocation,
+  type ResolvedLocation,
+} from "@/lib/location-resolver";
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import { resolveSaveTheDateSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
@@ -68,6 +73,8 @@ export interface SaveTheDateFormData {
     month: string;
     year: string;
   };
+  location?: LocationInfo;
+  location2?: LocationInfo;
   customMessage: string;
   envelope?: EnvelopeConfig;
   textStyles?: TextStyleOverrides;
@@ -150,6 +157,168 @@ function colorPickerValue(value: string | undefined, fallback: string): string {
   return /^#[0-9a-fA-F]{6}$/.test(value ?? "") ? value! : fallback;
 }
 
+function emptyLocation(): LocationInfo {
+  return {
+    name: "",
+    address: "",
+    googleMapsUrl: "",
+    wazeUrl: "",
+    latitude: undefined,
+    longitude: undefined,
+    mapZoom: 17,
+    imageUrl: "",
+  };
+}
+
+interface LocationFieldsProps {
+  label: string;
+  value: LocationInfo;
+  mapsLink: string;
+  resolving: boolean;
+  onMapsLinkChange: (value: string) => void;
+  onResolve: () => void;
+  onChange: (
+    field: keyof LocationInfo,
+    value: LocationInfo[keyof LocationInfo],
+  ) => void;
+}
+
+function LocationFields({
+  label,
+  value,
+  mapsLink,
+  resolving,
+  onMapsLinkChange,
+  onResolve,
+  onChange,
+}: LocationFieldsProps) {
+  return (
+    <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+      <h3 className="text-sm font-medium">{label}</h3>
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">
+          Preencher automaticamente via Google Maps
+        </Label>
+        <div className="flex gap-2">
+          <Input
+            value={mapsLink}
+            onChange={(e) => onMapsLinkChange(e.target.value)}
+            placeholder="Cole o link do Google Maps aqui..."
+            className="flex-1 text-sm"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                onResolve();
+              }
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={resolving || !mapsLink.trim()}
+            onClick={onResolve}
+            className="shrink-0"
+          >
+            {resolving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <MapPin className="h-4 w-4" />
+            )}
+            <span className="ml-1.5">
+              {resolving ? "A buscar..." : "Buscar"}
+            </span>
+          </Button>
+        </div>
+      </div>
+      <Separator />
+      <div className="space-y-1.5">
+        <Label>Nome do local</Label>
+        <Input
+          value={value.name}
+          onChange={(e) => onChange("name", e.target.value)}
+          placeholder="Quinta da celebração"
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label>Morada</Label>
+        <Textarea
+          value={value.address}
+          onChange={(e) => onChange("address", e.target.value)}
+          placeholder="Rua, cidade"
+          rows={2}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label>Google Maps URL</Label>
+        <Input
+          value={value.googleMapsUrl}
+          onChange={(e) => onChange("googleMapsUrl", e.target.value)}
+          placeholder="https://maps.google.com/..."
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label>Waze URL</Label>
+        <Input
+          value={value.wazeUrl ?? ""}
+          onChange={(e) => onChange("wazeUrl", e.target.value)}
+          placeholder="https://waze.com/..."
+        />
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-1.5">
+          <Label>Latitude</Label>
+          <Input
+            type="number"
+            step="any"
+            value={value.latitude ?? ""}
+            onChange={(e) =>
+              onChange(
+                "latitude",
+                e.target.value === "" ? undefined : Number(e.target.value),
+              )
+            }
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Longitude</Label>
+          <Input
+            type="number"
+            step="any"
+            value={value.longitude ?? ""}
+            onChange={(e) =>
+              onChange(
+                "longitude",
+                e.target.value === "" ? undefined : Number(e.target.value),
+              )
+            }
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Zoom</Label>
+          <Input
+            type="number"
+            min={1}
+            max={20}
+            value={value.mapZoom ?? 17}
+            onChange={(e) => onChange("mapZoom", Number(e.target.value) || 17)}
+          />
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <Label>Imagem do local</Label>
+        <MediaUpload
+          value={value.imageUrl || undefined}
+          onUpload={(url) => onChange("imageUrl", url)}
+          onClear={() => onChange("imageUrl", "")}
+          kind="image"
+          maxSizeMB={5}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -158,6 +327,10 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
   const router = useRouter();
   const [data, setData] = useState<SaveTheDateFormData>(initialData);
   const [saving, setSaving] = useState(false);
+  const [mapsLink1, setMapsLink1] = useState("");
+  const [mapsLink2, setMapsLink2] = useState("");
+  const [resolvingLoc1, setResolvingLoc1] = useState(false);
+  const [resolvingLoc2, setResolvingLoc2] = useState(false);
 
   const selectedTheme = useMemo(
     () => themes.find((t) => t.id === data.themeId) || themes[0],
@@ -196,6 +369,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       slug: data.slug || "preview",
       couple: data.couple,
       date: data.date,
+      location: data.location,
+      location2: data.location2,
       customMessage: data.customMessage || null,
       theme: selectedTheme!,
       envelope: data.envelope || null,
@@ -295,6 +470,67 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
     [],
   );
 
+  const updateLocation = useCallback(
+    (
+      target: "location" | "location2",
+      field: keyof LocationInfo,
+      value: LocationInfo[keyof LocationInfo],
+    ) => {
+      setData((prev) => ({
+        ...prev,
+        [target]: {
+          ...emptyLocation(),
+          ...prev[target],
+          [field]: value,
+        },
+      }));
+    },
+    [],
+  );
+
+  const resolveLocationFromLink = useCallback(
+    async (link: string, target: "location" | "location2") => {
+      const trimmed = link.trim();
+      if (!trimmed) {
+        toast.error("Cole um link do Google Maps primeiro.");
+        return;
+      }
+
+      const setResolving =
+        target === "location" ? setResolvingLoc1 : setResolvingLoc2;
+      setResolving(true);
+
+      try {
+        const res = await fetch("/api/admin/resolve-location", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: trimmed }),
+        });
+
+        const resolved = (await res.json()) as ResolvedLocation & {
+          error?: string;
+        };
+
+        if (!res.ok) {
+          toast.error(resolved.error || "Erro ao resolver o link.");
+          return;
+        }
+
+        setData((prev) => ({
+          ...prev,
+          [target]: mergeResolvedLocation(prev[target], resolved),
+        }));
+
+        toast.success("Localização preenchida com sucesso!");
+      } catch {
+        toast.error("Erro de rede ao resolver o link. Tente novamente.");
+      } finally {
+        setResolving(false);
+      }
+    },
+    [],
+  );
+
   const handleSubmit = async () => {
     if (
       !data.slug ||
@@ -323,6 +559,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           themeId: data.themeId,
           couple: data.couple,
           date: data.date,
+          location: data.location ?? null,
+          location2: data.location2 ?? null,
           customMessage: data.customMessage || null,
           envelope: data.envelope || null,
           textStyles: data.textStyles || null,
@@ -584,6 +822,95 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     coração.
                   </p>
                 </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* ── Localização ── */}
+            <AccordionItem value="location" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-sm font-medium">
+                Localização {data.location ? "(ativa)" : "(desativada)"}
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <Label>Ativar localização</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Mostra um card com mapa, imagem e link para abrir a
+                      localização.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={Boolean(data.location)}
+                    onCheckedChange={(checked) =>
+                      setData((p) => ({
+                        ...p,
+                        location: checked
+                          ? (p.location ?? emptyLocation())
+                          : undefined,
+                        location2: checked ? p.location2 : undefined,
+                      }))
+                    }
+                  />
+                </div>
+
+                {data.location && (
+                  <div className="space-y-4">
+                    <LocationFields
+                      label="Localização 1"
+                      value={data.location}
+                      mapsLink={mapsLink1}
+                      resolving={resolvingLoc1}
+                      onMapsLinkChange={setMapsLink1}
+                      onResolve={() =>
+                        resolveLocationFromLink(mapsLink1, "location")
+                      }
+                      onChange={(field, value) =>
+                        updateLocation("location", field, value)
+                      }
+                    />
+
+                    {data.location2 ? (
+                      <>
+                        <Separator />
+                        <LocationFields
+                          label="Localização 2"
+                          value={data.location2}
+                          mapsLink={mapsLink2}
+                          resolving={resolvingLoc2}
+                          onMapsLinkChange={setMapsLink2}
+                          onResolve={() =>
+                            resolveLocationFromLink(mapsLink2, "location2")
+                          }
+                          onChange={(field, value) =>
+                            updateLocation("location2", field, value)
+                          }
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() =>
+                            setData((p) => ({ ...p, location2: undefined }))
+                          }
+                        >
+                          Remover segunda localização
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() =>
+                          setData((p) => ({
+                            ...p,
+                            location2: emptyLocation(),
+                          }))
+                        }
+                      >
+                        Adicionar segunda localização
+                      </Button>
+                    )}
+                  </div>
+                )}
               </AccordionContent>
             </AccordionItem>
 
