@@ -34,6 +34,16 @@ import InvitationHero, {
 } from "./InvitationHero";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import {
+  breatheAnimation,
+  EASE,
+  floatAnimation,
+  liftCardProps,
+  popIn,
+  quickStagger,
+  staggerContainer,
+  WordReveal,
+} from "./animations";
 
 // Re-export so existing imports from this module keep working.
 export { getHeroSectionHeight };
@@ -41,8 +51,6 @@ export { getHeroSectionHeight };
 // ---------------------------------------------------------------------------
 // Animation variants — each section has its own entrance
 // ---------------------------------------------------------------------------
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 28 },
@@ -122,14 +130,22 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
         whileInView={{ scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.3, ease: EASE }}
-        style={{
-          width: 5,
-          height: 5,
-          borderRadius: "50%",
-          background: theme.accent,
-          opacity: 0.35,
-        }}
-      />
+      >
+        <motion.div
+          animate={{ opacity: [0.25, 0.55, 0.25] }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: theme.accent,
+          }}
+        />
+      </motion.div>
       <motion.div
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
@@ -199,14 +215,18 @@ function FAQAccordionItem({
   isLast: boolean;
 }) {
   return (
-    <div
+    <motion.div
+      variants={fadeInUp}
       style={{
         borderLeft: isOpen ? `2px solid ${ts.accent}` : "2px solid transparent",
         transition: "border-color 0.35s ease",
       }}
     >
-      <button
+      <motion.button
         onClick={onToggle}
+        whileHover={{ x: 2 }}
+        whileTap={{ scale: 0.995 }}
+        transition={{ duration: 0.2, ease: EASE }}
         className="flex w-full cursor-pointer items-center gap-3 text-left transition-colors"
         style={{
           padding: "20px 22px",
@@ -230,8 +250,23 @@ function FAQAccordionItem({
         {/* Chevron */}
         <motion.span
           className="flex-shrink-0"
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.35, ease: EASE }}
+          animate={
+            isOpen
+              ? { rotate: 180, y: 0 }
+              : { rotate: 0, y: [0, 2, 0] }
+          }
+          transition={
+            isOpen
+              ? { duration: 0.35, ease: EASE }
+              : {
+                  rotate: { duration: 0.35, ease: EASE },
+                  y: {
+                    duration: 2.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  },
+                }
+          }
         >
           <ChevronDown
             size={16}
@@ -243,7 +278,7 @@ function FAQAccordionItem({
             }}
           />
         </motion.span>
-      </button>
+      </motion.button>
 
       {/* Answer */}
       <AnimatePresence initial={false}>
@@ -282,7 +317,7 @@ function FAQAccordionItem({
           }}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -428,20 +463,25 @@ export default function InvitationPage({
         variants={scaleIn}
         isPreview={isPreview}
       >
-        <EditableCard sectionKey="saveTheDate">
-          <SaveTheDateSection
-            invitation={invitation}
-            theme={theme}
-            ts={ts}
-            cardBg={cs("saveTheDate", 20).cardBg}
-            cardBorder={cs("saveTheDate", 20).cardBorder}
-            cardBorderRadius={cs("saveTheDate", 20).borderRadius}
-            onCalendarClick={handleCalendarClick}
-            isPreview={isPreview}
-            imageSettings={invitation.imageSettings}
-            customTexts={invitation.customTexts}
-          />
-        </EditableCard>
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.3, ease: EASE }}
+        >
+          <EditableCard sectionKey="saveTheDate">
+            <SaveTheDateSection
+              invitation={invitation}
+              theme={theme}
+              ts={ts}
+              cardBg={cs("saveTheDate", 20).cardBg}
+              cardBorder={cs("saveTheDate", 20).cardBorder}
+              cardBorderRadius={cs("saveTheDate", 20).borderRadius}
+              onCalendarClick={handleCalendarClick}
+              isPreview={isPreview}
+              imageSettings={invitation.imageSettings}
+              customTexts={invitation.customTexts}
+            />
+          </EditableCard>
+        </motion.div>
       </AnimatedSection>
 
       {/* ================================================================= */}
@@ -467,8 +507,13 @@ export default function InvitationPage({
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
-                  {invitation.ourStory.title ||
-                    t(invitation.customTexts, "sectionTitle_ourStory")}
+                  <WordReveal
+                    text={
+                      invitation.ourStory.title ||
+                      t(invitation.customTexts, "sectionTitle_ourStory")
+                    }
+                    isPreview={isPreview}
+                  />
                 </EditableText>
               </span>
 
@@ -477,12 +522,13 @@ export default function InvitationPage({
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: EASE }}
+                transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
                 style={{
                   width: 28,
                   height: 1,
                   background: ts.accent,
                   opacity: 0.25,
+                  transformOrigin: "center",
                 }}
               />
             </div>
@@ -490,7 +536,8 @@ export default function InvitationPage({
 
           <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
             <EditableCard sectionKey="ourStory">
-              <div
+              <motion.div
+                {...liftCardProps}
                 style={{
                   background: cs("ourStory", 20).cardBg,
                   backdropFilter: "blur(12px)",
@@ -505,12 +552,13 @@ export default function InvitationPage({
               >
                 <div className="flex flex-col items-center gap-4">
                   {/* Decorative heart icon */}
-                  <div
+                  <motion.div
                     className="flex h-10 w-10 items-center justify-center rounded-full"
                     style={{ background: `${ts.accent}12` }}
+                    animate={breatheAnimation}
                   >
                     <Heart size={20} color={ts.accent} strokeWidth={1.5} />
-                  </div>
+                  </motion.div>
 
                   {/* Story text */}
                   <p
@@ -526,7 +574,7 @@ export default function InvitationPage({
                     </EditableText>
                   </p>
                 </div>
-              </div>
+              </motion.div>
             </EditableCard>
           </AnimatedSection>
 
@@ -570,7 +618,10 @@ export default function InvitationPage({
         <div className="flex flex-col items-center">
           <span style={ts.sectionTitles}>
             <EditableText elementKey="sectionTitles">
-              {t(invitation.customTexts, "sectionTitle_location")}
+              <WordReveal
+                text={t(invitation.customTexts, "sectionTitle_location")}
+                isPreview={isPreview}
+              />
             </EditableText>
           </span>
 
@@ -579,12 +630,13 @@ export default function InvitationPage({
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: EASE }}
+            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
             style={{
               width: 28,
               height: 1,
               background: ts.accent,
               opacity: 0.25,
+              transformOrigin: "center",
             }}
           />
         </div>
@@ -652,6 +704,7 @@ export default function InvitationPage({
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-40px" }}
+                  whileHover={{ y: -3, transition: { duration: 0.25, ease: EASE } }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
                     background: cs("dressCode", 16).cardBg,
@@ -664,14 +717,15 @@ export default function InvitationPage({
                     border: `1px solid ${cs("dressCode", 16).cardBorder}`,
                   }}
                 >
-                  <div
+                  <motion.div
                     className="flex h-10 w-10 items-center justify-center rounded-full"
                     style={{
                       background: `${ts.accent}12`,
                     }}
+                    animate={floatAnimation}
                   >
                     <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
-                  </div>
+                  </motion.div>
                   <span style={ts.labels}>
                     <EditableText elementKey="labels">
                       {t(invitation.customTexts, "sectionTitle_dressCode")}
@@ -688,20 +742,36 @@ export default function InvitationPage({
                     </span>
                   </EditableText>
                   {(invitation.dressCode.colors?.length ?? 0) > 0 && (
-                    <div className="mt-1 flex items-center justify-center gap-2.5">
+                    <motion.div
+                      className="mt-1 flex items-center justify-center gap-2.5"
+                      variants={quickStagger}
+                      initial="hidden"
+                      {...(isPreview
+                        ? { animate: "visible" }
+                        : {
+                            whileInView: "visible",
+                            viewport: { once: true, margin: "-20px" },
+                          })}
+                    >
                       {invitation.dressCode.colors!.map((color, i) => (
-                        <span
+                        <motion.span
                           key={i}
+                          variants={popIn}
+                          whileHover={{
+                            scale: 1.15,
+                            transition: { duration: 0.2, ease: EASE },
+                          }}
                           className="inline-block rounded-full"
                           style={{
                             backgroundColor: color,
                             width: 28,
                             height: 28,
                             border: "1px solid rgba(0,0,0,0.1)",
+                            cursor: "pointer",
                           }}
                         />
                       ))}
-                    </div>
+                    </motion.div>
                   )}
                 </motion.div>
               </EditableCard>
@@ -715,6 +785,7 @@ export default function InvitationPage({
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-40px" }}
+                  whileHover={{ y: -3, transition: { duration: 0.25, ease: EASE } }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
                     background: cs("giftRegistry", 16).cardBg,
@@ -727,14 +798,21 @@ export default function InvitationPage({
                     border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
                   }}
                 >
-                  <div
+                  <motion.div
                     className="flex h-10 w-10 items-center justify-center rounded-full"
                     style={{
                       background: `${ts.accent}12`,
                     }}
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{
+                      duration: 4.2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.8,
+                    }}
                   >
                     <Gift size={20} color={ts.accent} strokeWidth={1.5} />
-                  </div>
+                  </motion.div>
                   <span style={ts.labels}>
                     <EditableText elementKey="labels">
                       {t(invitation.customTexts, "sectionTitle_giftRegistry")}
@@ -783,14 +861,11 @@ export default function InvitationPage({
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles} className={"text-center"}>
                 <EditableText elementKey="sectionTitles">
-                  {t(invitation.customTexts, "sectionTitle_guestGuide")
-                    .split("\n")
-                    .map((line, i, arr) => (
-                      <span key={i}>
-                        {line}
-                        {i < arr.length - 1 && <br />}
-                      </span>
-                    ))}
+                  <WordReveal
+                    text={t(invitation.customTexts, "sectionTitle_guestGuide")}
+                    isPreview={isPreview}
+                    style={{ textAlign: "center" }}
+                  />
                 </EditableText>
               </span>
 
@@ -799,12 +874,13 @@ export default function InvitationPage({
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: EASE }}
+                transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
                 style={{
                   width: 28,
                   height: 1,
                   background: ts.accent,
                   opacity: 0.25,
+                  transformOrigin: "center",
                 }}
               />
             </div>
@@ -836,7 +912,10 @@ export default function InvitationPage({
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
-                  {t(invitation.customTexts, "sectionTitle_faqs")}
+                  <WordReveal
+                    text={t(invitation.customTexts, "sectionTitle_faqs")}
+                    isPreview={isPreview}
+                  />
                 </EditableText>
               </span>
 
@@ -845,19 +924,30 @@ export default function InvitationPage({
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: EASE }}
+                transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
                 style={{
                   width: 28,
                   height: 1,
                   background: ts.accent,
                   opacity: 0.25,
+                  transformOrigin: "center",
                 }}
               />
             </div>
 
             {/* FAQ card */}
             <EditableCard sectionKey="faqs">
-              <div
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                {...(isPreview
+                  ? { animate: "visible" }
+                  : {
+                      whileInView: "visible",
+                      viewport: { once: true, margin: "-40px" },
+                    })}
+                whileHover={{ y: -2 }}
+                transition={{ duration: 0.3, ease: EASE }}
                 style={{
                   background: cs("faqs", 20).cardBg,
                   backdropFilter: "blur(12px)",
@@ -883,7 +973,7 @@ export default function InvitationPage({
                     isLast={i === (invitation.faqs?.length ?? 0) - 1}
                   />
                 ))}
-              </div>
+              </motion.div>
             </EditableCard>
           </AnimatedSection>
         </>
@@ -898,7 +988,11 @@ export default function InvitationPage({
         <div className="flex flex-col items-center">
           <span className="mb-6 text-center" style={ts.ctaLabel}>
             <EditableText elementKey="ctaLabel">
-              {t(invitation.customTexts, "cta_confirmLabel")}
+              <WordReveal
+                text={t(invitation.customTexts, "cta_confirmLabel")}
+                isPreview={isPreview}
+                style={{ textAlign: "center" }}
+              />
             </EditableText>
           </span>
         </div>
@@ -907,7 +1001,7 @@ export default function InvitationPage({
           {/* Confirmar Presença */}
           <motion.button
             onClick={() => setRsvpOpen(true)}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 py-4 font-medium transition-all"
+            className="relative flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden px-6 py-4 font-medium transition-all"
             style={{
               fontFamily: theme.uiFont,
               fontSize: 13,
@@ -918,13 +1012,60 @@ export default function InvitationPage({
               borderRadius: theme.ctaRadius,
               cursor: rsvpSubmitted ? "default" : "pointer",
             }}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={
+              rsvpSubmitted
+                ? undefined
+                : {
+                    scale: 1.015,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  }
+            }
+            whileTap={rsvpSubmitted ? undefined : { scale: 0.98 }}
+            transition={{ duration: 0.25, ease: EASE }}
           >
-            <Heart size={17} strokeWidth={1.5} />
-            {rsvpSubmitted
-              ? t(invitation.customTexts, "cta_confirmedButton")
-              : t(invitation.customTexts, "cta_confirmButton")}
+            {/* Shimmer sweep — only when not yet submitted */}
+            {!rsvpSubmitted && (
+              <motion.span
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%)",
+                  mixBlendMode: "overlay",
+                }}
+                initial={{ x: "-120%" }}
+                animate={{ x: "120%" }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  repeatDelay: 3.4,
+                  ease: "easeInOut",
+                }}
+              />
+            )}
+
+            <motion.span
+              className="relative flex items-center"
+              animate={
+                rsvpSubmitted
+                  ? undefined
+                  : {
+                      scale: [1, 1.12, 1],
+                    }
+              }
+              transition={{
+                duration: 1.6,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <Heart size={17} strokeWidth={1.5} />
+            </motion.span>
+            <span className="relative">
+              {rsvpSubmitted
+                ? t(invitation.customTexts, "cta_confirmedButton")
+                : t(invitation.customTexts, "cta_confirmButton")}
+            </span>
           </motion.button>
         </div>
       </AnimatedSection>
@@ -950,9 +1091,11 @@ export default function InvitationPage({
           />
 
           {/* Monogram with decorative ring */}
-          <div
+          <motion.div
             className="relative flex items-center justify-center"
             style={{ width: 64, height: 64 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3, ease: EASE }}
           >
             {/* Rotating ring */}
             <div
@@ -963,12 +1106,34 @@ export default function InvitationPage({
                 opacity: 0.5,
               }}
             />
-            <span style={ts.footerMonogram}>
+            {/* Inner subtle pulsing ring */}
+            <motion.div
+              className="absolute inset-1.5 rounded-full"
+              style={{
+                border: `1px solid ${theme.accent}`,
+                opacity: 0.08,
+              }}
+              animate={{ scale: [1, 1.08, 1], opacity: [0.08, 0.18, 0.08] }}
+              transition={{
+                duration: 3.6,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            <motion.span
+              style={ts.footerMonogram}
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{
+                duration: 3.6,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
               <EditableText elementKey="footerMonogram">
                 {invitation.couple.monogram}
               </EditableText>
-            </span>
-          </div>
+            </motion.span>
+          </motion.div>
 
           {/* Date */}
           <span className="mt-4" style={ts.footerDate}>

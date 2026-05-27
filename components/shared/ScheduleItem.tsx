@@ -97,11 +97,36 @@ export default function ScheduleItem(props: ScheduleItemProps) {
 
       {/* Vertical divider */}
       <div className="relative flex shrink-0 flex-col items-center self-stretch">
-        <div className="h-full w-px" style={{ backgroundColor: accentColor }} />
-        {/* Dot accent */}
-        <div
+        <motion.div
+          className="w-px"
+          initial={{ scaleY: 0 }}
+          whileInView={{ scaleY: 1 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{
+            duration: 0.7,
+            delay: 0.2 + index * 0.08,
+            ease: "easeOut",
+          }}
+          style={{
+            backgroundColor: accentColor,
+            height: "100%",
+            transformOrigin: "top center",
+          }}
+        />
+        {/* Dot accent — pulses subtly */}
+        <motion.div
           className="absolute top-1 h-2 w-2 rounded-full"
           style={{ backgroundColor: accentColor }}
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.7, 1, 0.7],
+          }}
+          transition={{
+            duration: 2.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: index * 0.4,
+          }}
         />
       </div>
 

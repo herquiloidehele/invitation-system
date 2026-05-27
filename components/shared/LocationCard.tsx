@@ -98,7 +98,11 @@ export default function LocationCard({
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.8, ease: EASE }}
+      whileHover={{
+        y: -3,
+        boxShadow: "0 2px 4px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.06)",
+      }}
+      transition={{ duration: 0.5, ease: EASE }}
       className="flex flex-col overflow-hidden"
       style={{
         background: effectiveCardBg,

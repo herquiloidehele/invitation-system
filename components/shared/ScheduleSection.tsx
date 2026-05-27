@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { motion, type Variants } from "framer-motion";
 import {
   Bell,
@@ -40,14 +41,30 @@ import { t } from "@/lib/custom-texts";
 import { EditableCard } from "./EditableCard";
 import { EditableText } from "./EditableText";
 import ScheduleItem from "./ScheduleItem";
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+import { EASE, WordReveal } from "./animations";
 
 const staggerContainer: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.1 },
   },
+};
+
+const illustratedRow: Variants = {
+  hidden: { opacity: 0, x: -16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.55, delay: i * 0.12, ease: EASE },
+  }),
+};
+
+const illustratedRowFade: Variants = {
+  hidden: { opacity: 0 },
+  visible: (i: number) => ({
+    opacity: 1,
+    transition: { duration: 0.55, delay: 0.1 + i * 0.12, ease: EASE },
+  }),
 };
 
 type ScheduleCardStyle = {
@@ -140,7 +157,9 @@ function DefaultScheduleCard({
   cardStyle: ScheduleCardStyle;
 }) {
   return (
-    <div
+    <motion.div
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.3, ease: EASE }}
       style={{
         background: cardStyle.cardBg,
         backdropFilter: "blur(12px)",
@@ -172,7 +191,7 @@ function DefaultScheduleCard({
           />
         </div>
       ))}
-    </div>
+    </motion.div>
   );
 }
 
@@ -181,16 +200,20 @@ function IllustratedScheduleCard({
   ts,
   theme,
   cardStyle,
+  isPreview,
 }: {
   schedule: ScheduleEvent[];
   ts: ResolvedTextStyles;
   theme: TemplateTheme;
   cardStyle: ScheduleCardStyle;
+  isPreview?: boolean;
 }) {
   const accent = cardStyle.accentColor || ts.accent || theme.accent;
 
   return (
-    <div
+    <motion.div
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.3, ease: EASE }}
       style={{
         background: cardStyle.cardBg,
         borderRadius: cardStyle.borderRadius,
@@ -199,27 +222,67 @@ function IllustratedScheduleCard({
         border: `1px solid ${cardStyle.cardBorder}`,
       }}
     >
-      <div
+      <motion.div
         className="grid items-center gap-x-4 gap-y-8"
         style={{ gridTemplateColumns: "auto 1fr auto" }}
+        initial="hidden"
+        {...(isPreview
+          ? { animate: "visible" }
+          : {
+              whileInView: "visible",
+              viewport: { once: true, margin: "-40px" },
+            })}
       >
         {schedule.map((event, index) => (
-          <div key={index} style={{ display: "contents" }}>
-            {/* Icon in outlined circle */}
-            <ScheduleIconGraphic
-              icon={event.icon}
-              iconUrl={event.iconUrl}
-              color={accent}
-            />
+          <Fragment key={`row-${index}`}>
+            {/* Icon — slides in, then floats forever */}
+            <motion.div
+              custom={index}
+              variants={illustratedRow}
+              style={{ display: "inline-flex" }}
+            >
+              <motion.div
+                animate={{ y: [0, -3, 0] }}
+                transition={{
+                  duration: 4.2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.6 + index * 0.3,
+                }}
+                style={{ display: "inline-flex" }}
+              >
+                <ScheduleIconGraphic
+                  icon={event.icon}
+                  iconUrl={event.iconUrl}
+                  color={accent}
+                />
+              </motion.div>
+            </motion.div>
 
-            {/* Connector — stretches to fill */}
-            <div
+            {/* Connector — draws from left, per row */}
+            <motion.div
+              custom={index}
+              variants={{
+                hidden: { scaleX: 0 },
+                visible: (i: number) => ({
+                  scaleX: 1,
+                  transition: {
+                    duration: 0.7,
+                    delay: 0.2 + i * 0.12,
+                    ease: EASE,
+                  },
+                }),
+              }}
               className="h-[1px] w-full min-w-[24px] rounded-full"
-              style={{ background: accent }}
+              style={{ background: accent, transformOrigin: "left center" }}
             />
 
             {/* Text — width = widest text across rows */}
-            <div className="min-w-0">
+            <motion.div
+              custom={index}
+              variants={illustratedRowFade}
+              className="min-w-0"
+            >
               <EditableText elementKey="scheduleTime">
                 <div style={ts.scheduleTime}>{event.time}</div>
               </EditableText>
@@ -240,11 +303,11 @@ function IllustratedScheduleCard({
                   <div style={ts.scheduleVenue}>{event.venue}</div>
                 </EditableText>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </Fragment>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -283,7 +346,10 @@ export default function ScheduleSection({
         <div className="flex flex-col items-center">
           <span style={ts.sectionTitles}>
             <EditableText elementKey="sectionTitles">
-              {t(customTexts, "sectionTitle_schedule")}
+              <WordReveal
+                text={t(customTexts, "sectionTitle_schedule")}
+                isPreview={isPreview}
+              />
             </EditableText>
           </span>
 
@@ -292,12 +358,13 @@ export default function ScheduleSection({
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: EASE }}
+            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
             style={{
               width: 28,
               height: 1,
               background: ts.accent,
               opacity: 0.25,
+              transformOrigin: "center",
             }}
           />
         </div>
@@ -321,6 +388,7 @@ export default function ScheduleSection({
               theme={theme}
               ts={ts}
               cardStyle={cardStyle}
+              isPreview={isPreview}
             />
           ) : (
             <DefaultScheduleCard

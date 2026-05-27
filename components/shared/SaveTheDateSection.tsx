@@ -1,7 +1,7 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import type {
   CustomTexts,
   ImageSettingsMap,
@@ -20,12 +20,7 @@ import {
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import CalendarButton from "./CalendarButton";
 import { EditableText } from "./EditableText";
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+import { EASE, WordReveal } from "./animations";
 
 // ---------------------------------------------------------------------------
 // Shared props for all variants
@@ -76,14 +71,16 @@ function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
 function SaveLabel({
   ts,
   customTexts: ct,
+  isPreview,
 }: {
   ts: ResolvedTextStyles;
   customTexts?: CustomTexts;
+  isPreview?: boolean;
 }) {
   return (
     <span style={ts.saveLabel}>
       <EditableText elementKey="saveLabel">
-        {t(ct, "saveDate_label")}
+        <WordReveal text={t(ct, "saveDate_label")} isPreview={isPreview} />
       </EditableText>
     </span>
   );
@@ -129,10 +126,34 @@ function SaveTheDateClassic({
   cardBorderRadius,
   onCalendarClick,
   customTexts: ct,
+  isPreview,
 }: SaveTheDateProps) {
+  const classicCascade = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
+  };
+  const classicItem = {
+    hidden: { opacity: 0, y: 12, filter: "blur(6px)" },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: "blur(0px)",
+      transition: { duration: 0.6, ease: EASE },
+    },
+  };
   return (
-    <div
+    <motion.div
       className="relative flex flex-col items-center text-center"
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.3, ease: EASE }}
+      variants={classicCascade}
+      initial="hidden"
+      {...(isPreview
+        ? { animate: "visible" }
+        : {
+            whileInView: "visible",
+            viewport: { once: true, margin: "-60px" },
+          })}
       style={{
         background: theme.cardBg,
         backdropFilter: "blur(16px)",
@@ -143,43 +164,49 @@ function SaveTheDateClassic({
         border: `1px solid ${theme.cardBorder}`,
       }}
     >
-      <SaveLabel ts={ts} customTexts={ct} />
+      <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
 
       {/* Day — oversized */}
-      <span className="mt-3" style={ts.dateDay}>
+      <motion.span className="mt-3" style={ts.dateDay} variants={classicItem}>
         <EditableText elementKey="dateDay">{invitation.date.day}</EditableText>
-      </span>
+      </motion.span>
 
       {/* Month */}
-      <span className="mt-1" style={ts.dateMonth}>
+      <motion.span
+        className="mt-1"
+        style={ts.dateMonth}
+        variants={classicItem}
+      >
         <EditableText elementKey="dateMonth">
           {invitation.date.month}
         </EditableText>
-      </span>
+      </motion.span>
 
       {/* Year */}
-      <span className="mt-1" style={ts.dateYear}>
+      <motion.span className="mt-1" style={ts.dateYear} variants={classicItem}>
         <EditableText elementKey="dateYear">
           {invitation.date.year}
         </EditableText>
-      </span>
+      </motion.span>
 
       <AccentLine ts={ts} />
 
       {/* Day of week + time */}
-      <span style={ts.dateTime}>
+      <motion.span style={ts.dateTime} variants={classicItem}>
         <EditableText elementKey="dateTime">
           {invitation.date.dayOfWeek} &middot; {invitation.date.time}
         </EditableText>
-      </span>
+      </motion.span>
 
-      <CalendarCTA
-        invitation={invitation}
-        ts={ts}
-        onCalendarClick={onCalendarClick}
-        customTexts={ct}
-      />
-    </div>
+      <motion.div variants={classicItem}>
+        <CalendarCTA
+          invitation={invitation}
+          ts={ts}
+          onCalendarClick={onCalendarClick}
+          customTexts={ct}
+        />
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -198,9 +225,12 @@ function CountdownUnit({
   theme: TemplateTheme;
   ts: ResolvedTextStyles;
 }) {
+  const formatted = formatCountdownValue(value);
   return (
     <div className="flex flex-col items-center gap-1">
-      <div
+      <motion.div
+        whileHover={{ scale: 1.05, y: -2 }}
+        transition={{ duration: 0.25, ease: EASE }}
         style={{
           background: theme.cardBg,
           backdropFilter: "blur(12px)",
@@ -210,6 +240,8 @@ function CountdownUnit({
           padding: "14px 10px",
           minWidth: 58,
           boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
+          overflow: "hidden",
+          position: "relative",
         }}
       >
         <span
@@ -217,13 +249,25 @@ function CountdownUnit({
             ...ts.countdownValue,
             display: "block",
             textAlign: "center",
+            position: "relative",
           }}
         >
           <EditableText elementKey="countdownValue">
-            {formatCountdownValue(value)}
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.span
+                key={formatted}
+                initial={{ y: "60%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "-60%", opacity: 0 }}
+                transition={{ duration: 0.4, ease: EASE }}
+                style={{ display: "inline-block" }}
+              >
+                {formatted}
+              </motion.span>
+            </AnimatePresence>
           </EditableText>
         </span>
-      </div>
+      </motion.div>
       <span style={ts.countdownLabel}>
         <EditableText elementKey="countdownLabel">{label}</EditableText>
       </span>
@@ -238,6 +282,7 @@ function SaveTheDateCountdown({
   cardBorderRadius,
   onCalendarClick,
   customTexts: ct,
+  isPreview,
 }: SaveTheDateProps) {
   const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft>(() =>
     computeCountdownTimeLeft(invitation.date.iso, invitation.date.time),
@@ -264,8 +309,10 @@ function SaveTheDateCountdown({
   });
 
   return (
-    <div
+    <motion.div
       className="relative flex flex-col items-center text-center"
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.3, ease: EASE }}
       style={{
         background: theme.cardBg,
         backdropFilter: "blur(16px)",
@@ -276,7 +323,7 @@ function SaveTheDateCountdown({
         border: `1px solid ${theme.cardBorder}`,
       }}
     >
-      <SaveLabel ts={ts} customTexts={ct} />
+      <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
 
       {/* Date context */}
       <span className="mt-3" style={ts.countdownDate}>
@@ -321,54 +368,21 @@ function SaveTheDateCountdown({
             theme={theme}
             ts={ts}
           />
-          <span
-            style={{
-              fontFamily: ts.scriptFont,
-              fontSize: 36,
-              color: ts.accent,
-              lineHeight: 1,
-              marginTop: 10,
-              opacity: 0.5,
-            }}
-          >
-            :
-          </span>
+          <CountdownColon ts={ts} delay={0} />
           <CountdownUnit
             value={timeLeft.hours}
             label={t(ct, "saveDate_hours")}
             theme={theme}
             ts={ts}
           />
-          <span
-            style={{
-              fontFamily: ts.scriptFont,
-              fontSize: 36,
-              color: ts.accent,
-              lineHeight: 1,
-              marginTop: 10,
-              opacity: 0.5,
-            }}
-          >
-            :
-          </span>
+          <CountdownColon ts={ts} delay={0.3} />
           <CountdownUnit
             value={timeLeft.minutes}
             label={t(ct, "saveDate_minutes")}
             theme={theme}
             ts={ts}
           />
-          <span
-            style={{
-              fontFamily: ts.scriptFont,
-              fontSize: 36,
-              color: ts.accent,
-              lineHeight: 1,
-              marginTop: 10,
-              opacity: 0.5,
-            }}
-          >
-            :
-          </span>
+          <CountdownColon ts={ts} delay={0.6} />
           <CountdownUnit
             value={timeLeft.seconds}
             label={t(ct, "saveDate_seconds")}
@@ -384,7 +398,36 @@ function SaveTheDateCountdown({
         onCalendarClick={onCalendarClick}
         customTexts={ct}
       />
-    </div>
+    </motion.div>
+  );
+}
+
+function CountdownColon({
+  ts,
+  delay,
+}: {
+  ts: ResolvedTextStyles;
+  delay: number;
+}) {
+  return (
+    <motion.span
+      animate={{ opacity: [0.3, 0.7, 0.3] }}
+      transition={{
+        duration: 1.6,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay,
+      }}
+      style={{
+        fontFamily: ts.scriptFont,
+        fontSize: 36,
+        color: ts.accent,
+        lineHeight: 1,
+        marginTop: 10,
+      }}
+    >
+      :
+    </motion.span>
   );
 }
 
@@ -416,6 +459,7 @@ function QuadCard({
       initial={{ opacity: 0, scale: 0.93 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
+      whileHover={{ y: -4, scale: 1.02 }}
       transition={{ duration: 0.7, delay, ease: EASE }}
       className="flex flex-col items-center justify-center text-center"
       style={{
@@ -427,14 +471,27 @@ function QuadCard({
         border: `1px solid ${theme.cardBorder}`,
         boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
         minHeight: 100,
+        cursor: "default",
       }}
     >
-      <span style={valueStyle}>
+      <motion.span
+        style={valueStyle}
+        initial={{ opacity: 0, y: 6 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: delay + 0.15, ease: EASE }}
+      >
         <EditableText elementKey={`${elementKey}Value`}>{value}</EditableText>
-      </span>
-      <span style={labelStyle}>
+      </motion.span>
+      <motion.span
+        style={labelStyle}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: delay + 0.3, ease: EASE }}
+      >
         <EditableText elementKey={`${elementKey}Label`}>{label}</EditableText>
-      </span>
+      </motion.span>
     </motion.div>
   );
 }
@@ -443,9 +500,10 @@ function SaveTheDateQuadCards({
   invitation,
   theme,
   ts,
-  cardBorderRadius,
+  cardBorderRadius: _cardBorderRadius,
   onCalendarClick,
   customTexts: ct,
+  isPreview,
 }: SaveTheDateProps) {
   return (
     <div className="flex flex-col items-center gap-4">
@@ -456,7 +514,7 @@ function SaveTheDateQuadCards({
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        <SaveLabel ts={ts} customTexts={ct} />
+        <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
       </motion.div>
 
       {/* 2×2 grid */}
@@ -542,6 +600,7 @@ function SaveTheDateCinematic({
   onCalendarClick,
   imageSettings,
   customTexts: ct,
+  isPreview,
 }: SaveTheDateProps) {
   const bgImage =
     invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
@@ -553,8 +612,10 @@ function SaveTheDateCinematic({
   });
 
   return (
-    <div
+    <motion.div
       className="relative flex flex-col items-center overflow-hidden"
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.3, ease: EASE }}
       style={{
         borderRadius: cardBorderRadius ?? 20,
         border: `1px solid ${theme.cardBorder}`,
@@ -628,7 +689,10 @@ function SaveTheDateCinematic({
           {/* "Save the Date" label — white on dark image */}
           <span style={ts.cinematicSaveLabel}>
             <EditableText elementKey="cinematicSaveLabel">
-              {t(ct, "saveDate_label")}
+              <WordReveal
+                text={t(ct, "saveDate_label")}
+                isPreview={isPreview}
+              />
             </EditableText>
           </span>
 
@@ -736,7 +800,7 @@ function SaveTheDateCinematic({
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -744,12 +808,40 @@ function SaveTheDateCinematic({
 // 5. Minimal Line — horizontal inline, no card background
 // ---------------------------------------------------------------------------
 
+function MinimalSeparator({
+  accent,
+  delay,
+}: {
+  accent: string;
+  delay: number;
+}) {
+  return (
+    <motion.span
+      animate={{ opacity: [0.25, 0.6, 0.25] }}
+      transition={{
+        duration: 3.2,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay,
+      }}
+      style={{
+        color: accent,
+        fontSize: 28,
+        fontWeight: 200,
+      }}
+    >
+      ·
+    </motion.span>
+  );
+}
+
 function SaveTheDateMinimalLine({
   invitation,
   ts,
   cardBorderRadius: _cardBorderRadius,
   onCalendarClick,
   customTexts: ct,
+  isPreview,
 }: SaveTheDateProps) {
   return (
     <div className="flex flex-col items-center gap-5">
@@ -760,7 +852,7 @@ function SaveTheDateMinimalLine({
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        <SaveLabel ts={ts} customTexts={ct} />
+        <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
       </motion.div>
 
       {/* Main date line — large, spaced */}
@@ -776,31 +868,13 @@ function SaveTheDateMinimalLine({
             {invitation.date.day}
           </EditableText>
         </span>
-        <span
-          style={{
-            color: ts.accent,
-            opacity: 0.4,
-            fontSize: 28,
-            fontWeight: 200,
-          }}
-        >
-          ·
-        </span>
+        <MinimalSeparator accent={ts.accent} delay={0} />
         <span style={ts.minimalMonth}>
           <EditableText elementKey="minimalMonth">
             {invitation.date.month}
           </EditableText>
         </span>
-        <span
-          style={{
-            color: ts.accent,
-            opacity: 0.4,
-            fontSize: 28,
-            fontWeight: 200,
-          }}
-        >
-          ·
-        </span>
+        <MinimalSeparator accent={ts.accent} delay={0.5} />
         <span style={ts.minimalYear}>
           <EditableText elementKey="minimalYear">
             {invitation.date.year}
@@ -835,7 +909,18 @@ function SaveTheDateMinimalLine({
             {invitation.date.dayOfWeek}
           </EditableText>
         </span>
-        <span style={{ color: ts.accent, opacity: 0.4, fontSize: 16 }}>·</span>
+        <motion.span
+          animate={{ opacity: [0.25, 0.6, 0.25] }}
+          transition={{
+            duration: 3.2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          style={{ color: ts.accent, fontSize: 16 }}
+        >
+          ·
+        </motion.span>
         <span style={ts.minimalTime}>
           <EditableText elementKey="minimalTime">
             {invitation.date.time}
