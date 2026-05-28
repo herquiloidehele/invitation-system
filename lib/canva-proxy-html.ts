@@ -5,6 +5,63 @@
  * runtime, and reused by `app/canva-proxy/[...path]/route.ts`.
  */
 
+/**
+ * Rewrites the proxied Canva HTML's `<base>` tag so that the iframe's
+ * subresources continue to resolve through this proxy. We cannot point the
+ * `<base>` directly at the upstream Canva CDN because Canva's hosting does
+ * not send `Access-Control-Allow-Origin`, and Canva's published HTML tags
+ * its scripts/stylesheets with `crossorigin="anonymous"` — those loads
+ * would be blocked by CORS. Fonts (`<link rel="preload" as="font">` and
+ * CSS `@font-face`) are CORS-required by spec regardless of attributes, so
+ * they too need an origin that serves CORS headers.
+ *
+ * Routing everything through this proxy gives us a single origin that
+ * uniformly answers with `Access-Control-Allow-Origin: *` (see
+ * `buildResponseHeaders` in the route), at the cost of one round-trip per
+ * subresource. Hashed assets are CDN-cached aggressively (one-year
+ * `immutable` Cache-Control) so the per-asset cost is paid only on first
+ * uncached request per edge node.
+ *
+ * If Canva's HTML already had a `<base href="...">` it is replaced; if
+ * not, a new one is inserted into `<head>` (or prepended to the document
+ * if `<head>` is missing).
+ */
+export function rewriteCanvaHtmlBase(
+  html: string,
+  host: string,
+  proxyOrigin: string,
+  upstreamPath: string,
+): string {
+  // Try to read the upstream <base href="..."> first — Canva sets one.
+  const baseMatch = html.match(/<base\s+[^>]*href=["']([^"']+)["'][^>]*>/i);
+  let upstreamBaseDir: string;
+
+  if (baseMatch) {
+    // Resolve relative or absolute base hrefs against the upstream URL.
+    try {
+      const resolved = new URL(baseMatch[1], `https://${host}${upstreamPath}`);
+      upstreamBaseDir = resolved.pathname.endsWith("/")
+        ? resolved.pathname
+        : resolved.pathname.replace(/[^/]*$/, "");
+    } catch {
+      upstreamBaseDir = upstreamPath.replace(/[^/]*$/, "") || "/";
+    }
+  } else {
+    upstreamBaseDir = upstreamPath.replace(/[^/]*$/, "") || "/";
+  }
+
+  const newBaseHref = `${proxyOrigin}/canva-proxy/${host}${upstreamBaseDir}`;
+  const newBaseTag = `<base href="${newBaseHref}">`;
+
+  if (baseMatch) {
+    return html.replace(/<base\s+[^>]*>/i, newBaseTag);
+  }
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>${newBaseTag}`);
+  }
+  return newBaseTag + html;
+}
+
 const NO_SCROLL_MARKER = "data-canva-proxy-no-scroll";
 
 /**
@@ -59,4 +116,25 @@ export function injectIframeNoScrollStyle(html: string): string {
   }
 
   return `${NO_SCROLL_STYLE}${html}`;
+}
+
+/**
+ * Returns the upstream Canva host for an externalLink invitation, suitable
+ * for emitting `<link rel="preconnect" href="https://<host>">` from the
+ * parent document. The browser then opens the TLS connection to the Canva
+ * CDN in parallel with the HTML proxy response, overlapping ~100-300 ms of
+ * connection setup on first asset load.
+ *
+ * Returns `null` for inputs that are not http(s) URLs, which mirrors how
+ * `getExternalInvitationEmbedSrc` falls back to the raw string.
+ */
+export function getCanvaUpstreamHost(externalLink: string): string | null {
+  if (!externalLink) return null;
+  try {
+    const url = new URL(externalLink);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    return url.host;
+  } catch {
+    return null;
+  }
 }
