@@ -116,7 +116,7 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
       <motion.div
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.8, ease: EASE }}
         style={{
           width: 36,
@@ -128,7 +128,7 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
       <motion.div
         initial={{ scale: 0 }}
         whileInView={{ scale: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.5, delay: 0.3, ease: EASE }}
       >
         <motion.div
@@ -149,7 +149,7 @@ function SectionDivider({ theme }: { theme: TemplateTheme }) {
       <motion.div
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.8, ease: EASE }}
         style={{
           width: 36,
@@ -185,7 +185,7 @@ function AnimatedSection({
         ? { animate: "visible" }
         : {
             whileInView: "visible",
-            viewport: { once: true, margin: "-60px" },
+            viewport: { once: false, margin: "-60px" },
           })}
       className={className}
     >
@@ -521,7 +521,7 @@ export default function InvitationPage({
                 className="mt-3 mb-6"
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
                 transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
                 style={{
                   width: 28,
@@ -629,7 +629,7 @@ export default function InvitationPage({
             className="mt-3 mb-6"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
             style={{
               width: 28,
@@ -703,7 +703,7 @@ export default function InvitationPage({
                   variants={slideFromLeft}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, margin: "-40px" }}
+                  viewport={{ once: false, margin: "-40px" }}
                   whileHover={{ y: -3, transition: { duration: 0.25, ease: EASE } }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
@@ -750,7 +750,7 @@ export default function InvitationPage({
                         ? { animate: "visible" }
                         : {
                             whileInView: "visible",
-                            viewport: { once: true, margin: "-20px" },
+                            viewport: { once: false, margin: "-20px" },
                           })}
                     >
                       {invitation.dressCode.colors!.map((color, i) => (
@@ -784,7 +784,7 @@ export default function InvitationPage({
                   variants={slideFromRight}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, margin: "-40px" }}
+                  viewport={{ once: false, margin: "-40px" }}
                   whileHover={{ y: -3, transition: { duration: 0.25, ease: EASE } }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
@@ -873,7 +873,7 @@ export default function InvitationPage({
                 className="mt-3 mb-6"
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
                 transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
                 style={{
                   width: 28,
@@ -923,7 +923,7 @@ export default function InvitationPage({
                 className="mt-3 mb-6"
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
                 transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
                 style={{
                   width: 28,
@@ -944,7 +944,7 @@ export default function InvitationPage({
                   ? { animate: "visible" }
                   : {
                       whileInView: "visible",
-                      viewport: { once: true, margin: "-40px" },
+                      viewport: { once: false, margin: "-40px" },
                     })}
                 whileHover={{ y: -2 }}
                 transition={{ duration: 0.3, ease: EASE }}
@@ -1080,7 +1080,7 @@ export default function InvitationPage({
             className="mb-8"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 1, ease: EASE }}
             style={{
               width: 48,

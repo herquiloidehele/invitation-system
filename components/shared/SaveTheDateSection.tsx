@@ -56,7 +56,7 @@ function AccentLine({ ts }: { ts: ResolvedTextStyles }) {
       className="my-5"
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
-      viewport={{ once: true }}
+      viewport={{ once: false }}
       transition={{ duration: 1, delay: 0.3, ease: EASE }}
       style={{
         width: 80,
@@ -152,7 +152,7 @@ function SaveTheDateClassic({
         ? { animate: "visible" }
         : {
             whileInView: "visible",
-            viewport: { once: true, margin: "-60px" },
+            viewport: { once: false, margin: "-60px" },
           })}
       style={{
         background: theme.cardBg,
@@ -458,7 +458,7 @@ function QuadCard({
     <motion.div
       initial={{ opacity: 0, scale: 0.93 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
+      viewport={{ once: false }}
       whileHover={{ y: -4, scale: 1.02 }}
       transition={{ duration: 0.7, delay, ease: EASE }}
       className="flex flex-col items-center justify-center text-center"
@@ -478,7 +478,7 @@ function QuadCard({
         style={valueStyle}
         initial={{ opacity: 0, y: 6 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.5, delay: delay + 0.15, ease: EASE }}
       >
         <EditableText elementKey={`${elementKey}Value`}>{value}</EditableText>
@@ -487,7 +487,7 @@ function QuadCard({
         style={labelStyle}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.5, delay: delay + 0.3, ease: EASE }}
       >
         <EditableText elementKey={`${elementKey}Label`}>{label}</EditableText>
@@ -511,7 +511,7 @@ function SaveTheDateQuadCards({
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.6, ease: EASE }}
       >
         <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
@@ -565,7 +565,7 @@ function SaveTheDateQuadCards({
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.6, delay: 0.25, ease: EASE }}
         className="flex flex-col items-center gap-1"
       >
@@ -631,7 +631,7 @@ function SaveTheDateCinematic({
         <motion.div
           initial={{ scale: 1.06, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={{ duration: 1.4, ease: EASE }}
           style={{
             position: "absolute",
@@ -668,7 +668,7 @@ function SaveTheDateCinematic({
         <motion.div
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={{ duration: 1.2, ease: EASE }}
           style={{
             position: "absolute",
@@ -700,7 +700,7 @@ function SaveTheDateCinematic({
           <motion.span
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 1, delay: 0.25, ease: EASE }}
             className="mt-3 text-center"
             style={ts.cinematicCouple}
@@ -714,7 +714,7 @@ function SaveTheDateCinematic({
           <motion.div
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 1, delay: 0.45, ease: EASE }}
             className="mt-4"
             style={{
@@ -849,7 +849,7 @@ function SaveTheDateMinimalLine({
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.6, ease: EASE }}
       >
         <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
@@ -859,7 +859,7 @@ function SaveTheDateMinimalLine({
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.9, delay: 0.1, ease: EASE }}
         className="flex items-center justify-center flex-wrap gap-x-4 gap-y-1"
       >
@@ -886,7 +886,7 @@ function SaveTheDateMinimalLine({
       <motion.div
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 1, delay: 0.2, ease: EASE }}
         style={{
           width: 120,
@@ -900,7 +900,7 @@ function SaveTheDateMinimalLine({
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.6, delay: 0.3, ease: EASE }}
         className="flex items-center gap-3"
       >

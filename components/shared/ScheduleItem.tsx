@@ -85,7 +85,7 @@ export default function ScheduleItem(props: ScheduleItemProps) {
       className="flex items-start gap-4 px-5 py-4"
       initial={{ opacity: 0, x: -24 }}
       whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
+      viewport={{ once: false, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
     >
       {/* Time column */}
@@ -101,7 +101,7 @@ export default function ScheduleItem(props: ScheduleItemProps) {
           className="w-px"
           initial={{ scaleY: 0 }}
           whileInView={{ scaleY: 1 }}
-          viewport={{ once: true, margin: "-40px" }}
+          viewport={{ once: false, margin: "-40px" }}
           transition={{
             duration: 0.7,
             delay: 0.2 + index * 0.08,

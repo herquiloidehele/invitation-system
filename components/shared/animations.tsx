@@ -144,7 +144,7 @@ export function WordReveal({
         ? { animate: "visible" }
         : {
             whileInView: "visible",
-            viewport: { once: true, margin: "-40px" },
+            viewport: { once: false, margin: "-40px" },
           })}
       className={className}
       style={{ display: "inline-block", ...style }}

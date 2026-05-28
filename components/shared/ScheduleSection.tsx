@@ -230,7 +230,7 @@ function IllustratedScheduleCard({
           ? { animate: "visible" }
           : {
               whileInView: "visible",
-              viewport: { once: true, margin: "-40px" },
+              viewport: { once: false, margin: "-40px" },
             })}
       >
         {schedule.map((event, index) => (
@@ -339,7 +339,7 @@ export default function ScheduleSection({
           ? { animate: "visible" }
           : {
               whileInView: "visible",
-              viewport: { once: true, margin: "-60px" },
+              viewport: { once: false, margin: "-60px" },
             })}
         className="px-6 pb-2"
       >
@@ -357,7 +357,7 @@ export default function ScheduleSection({
             className="mt-3 mb-6"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
             style={{
               width: 28,
@@ -378,7 +378,7 @@ export default function ScheduleSection({
           ? { animate: "visible" }
           : {
               whileInView: "visible",
-              viewport: { once: true, margin: "-40px" },
+              viewport: { once: false, margin: "-40px" },
             })}
       >
         <EditableCard sectionKey="schedule">
