@@ -81,7 +81,14 @@ export default function DateReveal({
               className="text-lg font-bold tracking-[0.3em] uppercase"
               style={dateLabelStyle}
             >
-              <EditableText elementKey="stdDateLabel">Save the Date</EditableText>
+              <EditableText elementKey="stdDateLabel">
+                {(() => {
+                  const d = new Date(date.iso);
+                  const hh = String(d.getHours()).padStart(2, "0");
+                  const mm = String(d.getMinutes()).padStart(2, "0");
+                  return `${hh}:${mm}`;
+                })()}
+              </EditableText>
             </motion.p>
           </>
         )}
