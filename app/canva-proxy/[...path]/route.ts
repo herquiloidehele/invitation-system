@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  CANVA_PROXY_ERROR_CACHE_CONTROL,
+  pickCanvaProxyCacheControl,
+} from "@/lib/canva-proxy-cache";
+import {
   injectIframeNoScrollStyle,
   rewriteCanvaHtmlBase,
   shouldDisableProxiedScroll,
@@ -98,59 +102,6 @@ function buildRequestHeaders(req: NextRequest, host: string): Headers {
   return headers;
 }
 
-/**
- * Decide a sensible `Cache-Control` and `Vercel-CDN-Cache-Control` for the
- * proxied response.
- *
- * Two cases matter:
- *
- * 1. The framing HTML document. Canva publishes static pages and the iframe
- *    requests the same URL across every viewer of an invitation, so the HTML
- *    is highly cacheable. Canva responds with `no-store`, which is wrong for
- *    our use case. Override with a short `s-maxage` + a generous SWR so the
- *    Vercel CDN serves repeats in <50 ms while revalidating in the background.
- *    The browser still revalidates per visit because there's no client
- *    `max-age` — this lets us roll out edits quickly while still avoiding the
- *    upstream Canva fetch on cached hits.
- *
- * 2. Legacy/hashed asset requests. After the `<base>` rewrite the iframe pulls
- *    assets directly from Canva, so this branch is rarely hit. It remains as a
- *    safety net for any cached HTML still pointing at `/canva-proxy/...assets`
- *    URLs, and for any future code path that explicitly proxies an asset.
- */
-function pickCacheControl(
-  upstreamPath: string,
-  isHtml: boolean,
-  upstreamCacheControl: string | null,
-): { browser: string; cdn: string | null } {
-  if (isHtml) {
-    return {
-      // Force the browser to revalidate per visit so we can ship corrections
-      // (e.g. updated invitation links) without waiting for a TTL to expire.
-      browser: "public, max-age=0, must-revalidate",
-      // Let the Vercel edge CDN serve cached HTML for 5 minutes and keep
-      // serving stale for up to a day while it refreshes in the background.
-      cdn: "public, s-maxage=300, stale-while-revalidate=86400",
-    };
-  }
-
-  const isHashedAsset =
-    /\/_assets\//.test(upstreamPath) ||
-    /\.(?:js|css|woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico|mp4|webm|mp3|json)$/i.test(
-      upstreamPath,
-    );
-
-  if (isHashedAsset) {
-    const value = "public, max-age=31536000, immutable";
-    return { browser: value, cdn: value };
-  }
-
-  return {
-    browser: upstreamCacheControl ?? "no-store",
-    cdn: null,
-  };
-}
-
 function buildResponseHeaders(
   upstream: Response,
   upstreamPath: string,
@@ -163,15 +114,14 @@ function buildResponseHeaders(
     }
   });
 
-  const cache = pickCacheControl(
-    upstreamPath,
-    isHtml,
-    upstream.headers.get("cache-control"),
+  headers.set(
+    "cache-control",
+    pickCanvaProxyCacheControl({
+      upstreamPath,
+      isHtml,
+      upstreamCacheControl: upstream.headers.get("cache-control"),
+    }),
   );
-  headers.set("cache-control", cache.browser);
-  if (cache.cdn) {
-    headers.set("vercel-cdn-cache-control", cache.cdn);
-  }
 
   // Same-origin requests don't strictly need CORS, but Canva's <link> tags
   // include `crossorigin="anonymous"`, which causes the browser to perform a
@@ -199,7 +149,10 @@ async function proxyCanvaRequest(
   if (!upstream) {
     return NextResponse.json(
       { error: "Host not allowed" },
-      { status: 403 },
+      {
+        status: 403,
+        headers: { "cache-control": CANVA_PROXY_ERROR_CACHE_CONTROL },
+      },
     );
   }
 
@@ -212,14 +165,17 @@ async function proxyCanvaRequest(
       // Forward the client's abort signal so navigations away from the page
       // free this function's upstream connection promptly.
       signal: req.signal,
-      // Don't override caching here — the response headers we set
-      // (`vercel-cdn-cache-control`) drive CDN behaviour. Letting fetch
-      // use its default lets undici's connection pool warm across requests.
+      // Don't override caching here. The response Cache-Control we set below
+      // drives CDN behavior, while default fetch behavior keeps undici's
+      // connection pool warm across requests.
     });
   } catch {
     return NextResponse.json(
       { error: "Upstream fetch failed" },
-      { status: 502 },
+      {
+        status: 502,
+        headers: { "cache-control": CANVA_PROXY_ERROR_CACHE_CONTROL },
+      },
     );
   }
 
