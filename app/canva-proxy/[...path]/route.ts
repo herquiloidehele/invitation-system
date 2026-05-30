@@ -8,6 +8,7 @@ import {
   rewriteCanvaHtmlBase,
   shouldDisableProxiedScroll,
 } from "@/lib/canva-proxy-html";
+import { isHostAllowed } from "@/lib/canva-proxy-hosts";
 
 /* ------------------------------------------------------------------ */
 /*  Canva Reverse Proxy                                                 */
@@ -30,16 +31,6 @@ import {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-/**
- * Hosts that we are willing to proxy. Add custom Canva domains here.
- * The first path segment of the proxy URL must match one of these.
- */
-const ALLOWED_HOSTS: ReadonlyArray<string | RegExp> = [
-  /^[a-z0-9-]+\.canva\.site$/i,
-  /^[a-z0-9-]+\.my\.canva\.site$/i,
-  "brindealstudio.com",
-];
 
 /** Headers we strip from the upstream response before returning to the browser. */
 const STRIPPED_RESPONSE_HEADERS = new Set([
@@ -66,15 +57,6 @@ const FORWARDED_REQUEST_HEADERS = [
   "if-modified-since",
   "if-none-match",
 ];
-
-function isHostAllowed(host: string): boolean {
-  const normalized = host.toLowerCase();
-  return ALLOWED_HOSTS.some((entry) =>
-    typeof entry === "string"
-      ? entry === normalized
-      : entry.test(normalized),
-  );
-}
 
 function buildUpstreamUrl(
   pathSegments: string[],
