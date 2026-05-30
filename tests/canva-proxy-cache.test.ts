@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   CANVA_PROXY_ERROR_CACHE_CONTROL,
+  isImmutableAssetPath,
   pickCanvaProxyCacheControl,
+  pickCanvaProxyFetchInit,
 } from "@/lib/canva-proxy-cache";
 
 describe("pickCanvaProxyCacheControl", () => {
@@ -67,5 +69,61 @@ describe("pickCanvaProxyCacheControl", () => {
 describe("CANVA_PROXY_ERROR_CACHE_CONTROL", () => {
   it("keeps proxy-generated errors out of shared caches", () => {
     expect(CANVA_PROXY_ERROR_CACHE_CONTROL).toBe("no-store");
+  });
+});
+
+describe("isImmutableAssetPath", () => {
+  it("returns true for Canva _assets paths", () => {
+    expect(isImmutableAssetPath("/_assets/app.abc123.js")).toBe(true);
+  });
+
+  it("returns true for known static extensions", () => {
+    expect(isImmutableAssetPath("/fonts/wedding.woff2")).toBe(true);
+    expect(isImmutableAssetPath("/images/cover.avif")).toBe(true);
+  });
+
+  it("returns false for HTML / unknown paths", () => {
+    expect(isImmutableAssetPath("/")).toBe(false);
+    expect(isImmutableAssetPath("/page-1")).toBe(false);
+  });
+});
+
+describe("pickCanvaProxyFetchInit", () => {
+  it("returns 1-year revalidate plus both tags for hashed asset paths", () => {
+    expect(
+      pickCanvaProxyFetchInit({
+        upstreamPath: "/_assets/app.abc.js",
+        host: "foo.canva.site",
+      }),
+    ).toEqual({
+      next: {
+        revalidate: 31536000,
+        tags: ["canva-proxy", "canva-proxy:foo.canva.site"],
+      },
+    });
+  });
+
+  it("returns 5-minute revalidate plus both tags for HTML / unknown paths", () => {
+    expect(
+      pickCanvaProxyFetchInit({
+        upstreamPath: "/page-1",
+        host: "foo.canva.site",
+      }),
+    ).toEqual({
+      next: {
+        revalidate: 300,
+        tags: ["canva-proxy", "canva-proxy:foo.canva.site"],
+      },
+    });
+  });
+
+  it("includes the host in the per-host tag verbatim", () => {
+    const init = pickCanvaProxyFetchInit({
+      upstreamPath: "/",
+      host: "my-design.my.canva.site",
+    });
+    expect(init.next.tags).toContain(
+      "canva-proxy:my-design.my.canva.site",
+    );
   });
 });
