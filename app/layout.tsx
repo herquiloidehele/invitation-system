@@ -19,18 +19,30 @@ import {
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+// `preload: false` only disables the <link rel="preload"> header for these
+// fonts — the @font-face rules stay in the generated CSS, so the browser
+// still fetches the file when a theme actually references the family. Public
+// invitation pages otherwise eagerly download every decorative font even
+// when the current theme only uses 2-3 of them.
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  preload: false,
+});
 
 const greatVibes = Great_Vibes({
   weight: ["400"],
   subsets: ["latin"],
   variable: "--font-great-vibes",
+  preload: false,
 });
 
 const playfairDisplay = Playfair_Display({
   weight: ["400", "600"],
   subsets: ["latin"],
   variable: "--font-playfair-display",
+  preload: false,
 });
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -38,12 +50,14 @@ const cormorantGaramond = Cormorant_Garamond({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-cormorant-garamond",
+  preload: false,
 });
 
 const homemadeApple = Homemade_Apple({
   weight: ["400"],
   subsets: ["latin"],
   variable: "--font-homemade-apple",
+  preload: false,
 });
 
 const libreBaskerville = Libre_Baskerville({
@@ -51,12 +65,14 @@ const libreBaskerville = Libre_Baskerville({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-libre-baskerville",
+  preload: false,
 });
 
 const cinzel = Cinzel({
   weight: ["400", "600"],
   subsets: ["latin"],
   variable: "--font-cinzel",
+  preload: false,
 });
 
 const lora = Lora({
@@ -64,8 +80,11 @@ const lora = Lora({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-lora",
+  preload: false,
 });
 
+// Outfit is the global UI font (body uses `var(--font-outfit)` in
+// `app/globals.css`), so it is the only family we keep eagerly preloaded.
 const outfit = Outfit({
   weight: ["300", "400", "500", "600"],
   subsets: ["latin"],
@@ -77,18 +96,21 @@ const dmSerifDisplay = DM_Serif_Display({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-dm-serif-display",
+  preload: false,
 });
 
 const pinyonScript = Pinyon_Script({
   weight: ["400"],
   subsets: ["latin"],
   variable: "--font-pinyon-script",
+  preload: false,
 });
 
 const manrope = Manrope({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-manrope",
+  preload: false,
 });
 
 const fraunces = Fraunces({
@@ -96,6 +118,7 @@ const fraunces = Fraunces({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-fraunces",
+  preload: false,
 });
 
 export const viewport: Viewport = {
