@@ -15,8 +15,25 @@ import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 /*                                                                      */
 /*  Load timing strategy:                                               */
 /*                                                                      */
-/*    The iframe only mounts once it is visible. This prevents hidden   */
-/*    preloads from doubling the reverse-proxy function invocations.    */
+/*    The iframe always mounts (single load — no remount on reveal).   */
+/*    While the envelope is closed it lives at `transform:             */
+/*    translateY(200vh)`, i.e. one viewport-height below where the     */
+/*    user is looking. The iframe document keeps its natural 100vw ×   */
+/*    100vh box, so HTML + subresources download and render normally  */
+/*    in parallel with the envelope animation — the user just doesn't  */
+/*    see any of it. When the envelope finishes opening, the wrapper   */
+/*    snaps back to `inset: 0` and the iframe slides into view; if    */
+/*    Canva's entrance animations are driven by elements crossing the */
+/*    iframe's viewport, this reposition is where they fire.           */
+/*                                                                      */
+/*    Caveat: standard IntersectionObserver (v1) inside the iframe is */
+/*    scoped to the iframe document's own viewport, which doesn't      */
+/*    change when we move the iframe element around in the parent.    */
+/*    If Canva fires its entrance animations on initial paint (before */
+/*    the reposition) instead of on viewport-cross, the off-viewport  */
+/*    positioning won't defer them and the user will still see the    */
+/*    static end state. Verify in the browser; if so, fall back to    */
+/*    a remount-on-reveal pattern (changing the iframe `key`).         */
 /* ------------------------------------------------------------------ */
 
 interface ExternalLinkPageProps {
@@ -24,8 +41,13 @@ interface ExternalLinkPageProps {
   visible?: boolean;
 }
 
-export function shouldMountExternalInvitationIframe(visible: boolean): boolean {
-  return visible;
+/**
+ * Kept for backward compatibility. With the off-viewport preload
+ * strategy the iframe is always in the DOM, so this is unconditionally
+ * `true`.
+ */
+export function shouldMountExternalInvitationIframe(): boolean {
+  return true;
 }
 
 export default function ExternalLinkPage({
@@ -33,7 +55,6 @@ export default function ExternalLinkPage({
   visible = true,
 }: ExternalLinkPageProps) {
   const src = getExternalInvitationEmbedSrc(externalLink);
-  const shouldMountIframe = shouldMountExternalInvitationIframe(visible);
 
   return (
     <div
@@ -43,29 +64,36 @@ export default function ExternalLinkPage({
         inset: 0,
         width: "100%",
         height: "100%",
-        zIndex: visible ? 50 : 0,
+        // While hidden, sit behind the envelope; while visible, float on
+        // top of the rest of the page.
+        zIndex: visible ? 50 : -1,
         overflow: "hidden",
-        opacity: visible ? 1 : 0,
+        // Move the wrapper one viewport down while hidden. The iframe
+        // element still has its full 100vw × 100vh layout box, so the
+        // iframe document loads and renders as if it were on-screen —
+        // the only thing changing is where the wrapper paints in the
+        // parent. When revealed, we snap back to inset: 0 in a single
+        // step, no transition (we don't want to compete with Canva's
+        // own entrance animations).
+        transform: visible ? "none" : "translateY(200vh)",
         pointerEvents: visible ? "auto" : "none",
-        visibility: visible ? "visible" : "hidden",
+        visibility: "visible",
       }}
     >
-      {shouldMountIframe && (
-        <iframe
-          src={src}
-          title="Convite externo"
-          allowFullScreen
-          loading="eager"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "calc(100% + 16px)",
-            height: "100%",
-            border: "none",
-            display: "block",
-          }}
-        />
-      )}
+      <iframe
+        src={src}
+        title="Convite externo"
+        allowFullScreen
+        loading="eager"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "calc(100% + 16px)",
+          height: "100%",
+          border: "none",
+          display: "block",
+        }}
+      />
     </div>
   );
 }

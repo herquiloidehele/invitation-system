@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Readable } from "node:stream";
 import {
   injectIframeNoScrollStyle,
+  rewriteCanvaHtmlBase,
   shouldDisableProxiedScroll,
 } from "@/lib/canva-proxy-html";
+import {
+  isSharedCacheable,
+  pickCanvaProxyCacheControl,
+} from "@/lib/canva-proxy-cache";
+import {
+  compressBuffer,
+  createCompressionTransform,
+  isCompressibleContentType,
+  pickCompressionEncoding,
+  type SupportedEncoding,
+} from "@/lib/canva-proxy-compression";
 
 /* ------------------------------------------------------------------ */
 /*  Canva Reverse Proxy                                                 */
@@ -21,6 +34,21 @@ import {
 /*    /canva-proxy/brindealstudio.com/assets/foo.css                    */
 /*                                                                      */
 /*  Only canva-managed hosts are allowed (allowlist).                  */
+/*                                                                      */
+/*  Performance notes:                                                  */
+/*                                                                      */
+/*    * Canva's HTML is ~3 MB of inline serialized state and compresses */
+/*      ~30x with Brotli. The upstream sends `Content-Encoding: br`     */
+/*      which `undici` automatically decodes; this route RE-COMPRESSES  */
+/*      the body before responding so the iframe download stays small. */
+/*                                                                      */
+/*    * The HTML shell is identical for every guest of the same         */
+/*      invitation, so it is cached at the shared edge with a 5-minute  */
+/*      fresh window and a 24h stale-while-revalidate window. The first */
+/*      guest pays the upstream cost; the rest get sub-50ms TTFB.       */
+/*                                                                      */
+/*    * Hashed `_assets/*` paths (content-hashed) are cached forever    */
+/*      both at the browser and at the edge.                            */
 /* ------------------------------------------------------------------ */
 
 export const runtime = "nodejs";
@@ -44,18 +72,29 @@ const STRIPPED_RESPONSE_HEADERS = new Set([
   "cross-origin-opener-policy",
   "cross-origin-embedder-policy",
   "cross-origin-resource-policy",
-  // Hop-by-hop / encoding headers that would confuse Next's response stream.
+  // Hop-by-hop / encoding headers that would confuse Next's response
+  // stream. We REMOVE these because undici decodes the upstream body
+  // before handing it to us, so the original Content-Encoding/Length
+  // no longer describe what's on our wire. The proxy then sets its
+  // own Content-Encoding when re-compressing.
   "content-encoding",
   "content-length",
   "transfer-encoding",
   "connection",
   "keep-alive",
+  // We always set our own Cache-Control via pickCanvaProxyCacheControl;
+  // strip the upstream one so it can't accidentally leak through if we
+  // ever change the logic to merge headers.
+  "cache-control",
 ]);
 
 /** Headers we forward from the incoming request to the upstream. */
 const FORWARDED_REQUEST_HEADERS = [
   "accept",
   "accept-language",
+  // Explicitly advertise Brotli to upstream Canva so we get the smallest
+  // server-to-server payload. `undici` decompresses transparently before
+  // we see the body, so this is purely a bandwidth optimization.
   "user-agent",
   "range",
   "if-modified-since",
@@ -88,6 +127,10 @@ function buildRequestHeaders(req: NextRequest, host: string): Headers {
     const value = req.headers.get(name);
     if (value) headers.set(name, value);
   }
+  // Always ask upstream for the smallest payload, regardless of what the
+  // browser advertised — `undici` will decompress transparently before
+  // the body reaches us, and we re-encode ourselves below.
+  headers.set("accept-encoding", "br, gzip");
   // Pretend the request originated from the upstream host so referer-based
   // checks on the origin server keep working.
   headers.set("host", host);
@@ -95,37 +138,10 @@ function buildRequestHeaders(req: NextRequest, host: string): Headers {
   return headers;
 }
 
-/**
- * Decide a sensible `Cache-Control` for the proxied response.
- *
- * Canva sets `no-store, no-cache` on every response, which is fine for the
- * HTML document but counter-productive for content-hashed static assets:
- * we want the browser to cache them so that the iframe's "reveal reload"
- * (see ExternalLinkPage) is near-instant.
- *
- * `_assets/*` paths in Canva's output are immutable (filenames embed a
- * content hash), so they are safe to cache aggressively.
- */
-function pickCacheControl(
-  upstreamPath: string,
-  upstreamCacheControl: string | null,
-): string {
-  const isHashedAsset =
-    /\/_assets\//.test(upstreamPath) ||
-    /\.(?:js|css|woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico|mp4|webm|mp3|json)$/i.test(
-      upstreamPath,
-    );
-
-  if (isHashedAsset) {
-    return "public, max-age=31536000, immutable";
-  }
-  // Fall back to whatever the upstream said for HTML / unknown content.
-  return upstreamCacheControl ?? "no-store";
-}
-
 function buildResponseHeaders(
   upstream: Response,
   upstreamPath: string,
+  contentType: string,
 ): Headers {
   const headers = new Headers();
   upstream.headers.forEach((value, key) => {
@@ -134,14 +150,18 @@ function buildResponseHeaders(
     }
   });
 
-  // Override caching so static assets persist across the prefetch→reveal
-  // reload (see ExternalLinkPage's loadKey logic).
-  headers.set(
-    "cache-control",
-    pickCacheControl(upstreamPath, upstream.headers.get("cache-control")),
-  );
-  if (headers.get("cache-control")?.startsWith("public,")) {
-    headers.set("vercel-cdn-cache-control", headers.get("cache-control")!);
+  const cacheControl = pickCanvaProxyCacheControl({
+    upstreamPath,
+    upstreamCacheControl: upstream.headers.get("cache-control"),
+    contentType,
+  });
+  headers.set("cache-control", cacheControl);
+  if (isSharedCacheable(cacheControl)) {
+    // Mirror into platform-specific CDN cache headers so Vercel/Railway
+    // edges actually honour the shared cache window even when their
+    // default behaviour ignores the public `Cache-Control` mode.
+    headers.set("vercel-cdn-cache-control", cacheControl);
+    headers.set("cdn-cache-control", cacheControl);
   }
 
   // Same-origin requests don't strictly need CORS, but Canva's <link> tags
@@ -149,55 +169,27 @@ function buildResponseHeaders(
   // CORS check even on same-origin URLs. Granting `*` keeps those loads happy.
   headers.set("access-control-allow-origin", "*");
   headers.set("x-proxied-by", "canva-proxy");
+
+  // Critical when we re-compress: a cache MUST NOT serve a gzipped body
+  // to a br-only client (or vice versa). Set Vary unconditionally so
+  // even the "no compression negotiated" responses are bucketed
+  // correctly alongside their compressed siblings.
+  appendVaryHeader(headers, "accept-encoding");
   return headers;
 }
 
-/**
- * Rewrites HTML so that relative URLs continue to resolve through the proxy.
- *
- * Canva pages contain `<base href="/<page-slug>/">` and assets referenced as
- * `_assets/foo.css`. The browser would resolve those against our proxy URL,
- * losing the upstream path prefix. To preserve correct asset paths, we
- * replace the upstream `<base>` with one pointing at the proxied equivalent
- * of the same directory, e.g. `/canva-proxy/<host>/<page-slug>/`.
- *
- * If the upstream HTML has no `<base>` tag, we derive the base from the
- * directory portion of the request path.
- */
-function rewriteHtml(
-  html: string,
-  host: string,
-  proxyOrigin: string,
-  upstreamPath: string,
-): string {
-  // Try to read the upstream <base href="..."> first — Canva sets one.
-  const baseMatch = html.match(/<base\s+[^>]*href=["']([^"']+)["'][^>]*>/i);
-  let upstreamBaseDir: string;
-
-  if (baseMatch) {
-    // Resolve relative or absolute base hrefs against the upstream URL.
-    try {
-      const resolved = new URL(baseMatch[1], `https://${host}${upstreamPath}`);
-      upstreamBaseDir = resolved.pathname.endsWith("/")
-        ? resolved.pathname
-        : resolved.pathname.replace(/[^/]*$/, "");
-    } catch {
-      upstreamBaseDir = upstreamPath.replace(/[^/]*$/, "") || "/";
-    }
-  } else {
-    upstreamBaseDir = upstreamPath.replace(/[^/]*$/, "") || "/";
+function appendVaryHeader(headers: Headers, value: string): void {
+  const existing = headers.get("vary");
+  if (!existing) {
+    headers.set("vary", value);
+    return;
   }
-
-  const newBaseHref = `${proxyOrigin}/canva-proxy/${host}${upstreamBaseDir}`;
-  const newBaseTag = `<base href="${newBaseHref}">`;
-
-  if (baseMatch) {
-    return html.replace(/<base\s+[^>]*>/i, newBaseTag);
-  }
-  if (/<head[^>]*>/i.test(html)) {
-    return html.replace(/<head([^>]*)>/i, `<head$1>${newBaseTag}`);
-  }
-  return newBaseTag + html;
+  const tokens = existing
+    .split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+  if (tokens.includes(value.toLowerCase())) return;
+  headers.set("vary", `${existing}, ${value}`);
 }
 
 export async function GET(
@@ -235,7 +227,15 @@ async function proxyCanvaRequest(
     );
   }
 
-  const responseHeaders = buildResponseHeaders(resp, upstream.url.pathname);
+  const contentType = resp.headers.get("content-type") ?? "";
+  const responseHeaders = buildResponseHeaders(
+    resp,
+    upstream.url.pathname,
+    contentType,
+  );
+  const acceptEncoding = req.headers.get("accept-encoding");
+  const negotiatedEncoding = pickCompressionEncoding(acceptEncoding);
+
   if (method === "HEAD") {
     return new NextResponse(null, {
       status: resp.status,
@@ -243,40 +243,134 @@ async function proxyCanvaRequest(
     });
   }
 
-  const contentType = resp.headers.get("content-type") ?? "";
-
-  // For HTML responses, inject a <base> tag so relative URLs resolve correctly.
+  // For HTML responses, buffer + rewrite + (optionally) compress.
   if (contentType.toLowerCase().includes("text/html")) {
-    const html = await resp.text();
-    const proxyOrigin =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
-      req.nextUrl.origin;
-    const baseRewritten = rewriteHtml(
-      html,
-      upstream.host,
-      proxyOrigin,
-      upstream.url.pathname,
-    );
-    // Only inject the no-scroll style when the consumer explicitly asks
-    // for it (curtain-canva embed appends `?disableScroll=1`). The default
-    // ExternalLinkPage renders Canva at fixed size and relies on the
-    // iframe document's own scroll, so it must be left untouched.
-    const rewritten = shouldDisableProxiedScroll(req.nextUrl)
-      ? injectIframeNoScrollStyle(baseRewritten)
-      : baseRewritten;
-    responseHeaders.set(
-      "content-type",
-      contentType || "text/html; charset=utf-8",
-    );
-    return new NextResponse(rewritten, {
+    return await respondWithHtml({
+      upstream: resp,
+      upstreamHost: upstream.host,
+      upstreamPath: upstream.url.pathname,
+      reqUrl: req.nextUrl,
+      contentType,
+      responseHeaders,
+      negotiatedEncoding,
+    });
+  }
+
+  // Non-HTML: stream through, compressing on the fly when the content
+  // type is text-y enough to benefit and the client supports it.
+  if (
+    negotiatedEncoding &&
+    isCompressibleContentType(contentType) &&
+    resp.body !== null
+  ) {
+    return respondWithStreamingCompression({
+      upstreamBody: resp.body,
       status: resp.status,
+      responseHeaders,
+      encoding: negotiatedEncoding,
+    });
+  }
+
+  return new NextResponse(resp.body, {
+    status: resp.status,
+    headers: responseHeaders,
+  });
+}
+
+interface RespondWithHtmlArgs {
+  upstream: Response;
+  upstreamHost: string;
+  upstreamPath: string;
+  reqUrl: URL;
+  contentType: string;
+  responseHeaders: Headers;
+  negotiatedEncoding: SupportedEncoding | null;
+}
+
+async function respondWithHtml({
+  upstream,
+  upstreamHost,
+  upstreamPath,
+  reqUrl,
+  contentType,
+  responseHeaders,
+  negotiatedEncoding,
+}: RespondWithHtmlArgs): Promise<NextResponse> {
+  const html = await upstream.text();
+  const proxyOrigin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ?? reqUrl.origin;
+  const baseRewritten = rewriteCanvaHtmlBase(
+    html,
+    upstreamHost,
+    proxyOrigin,
+    upstreamPath,
+  );
+  // Only inject the no-scroll style when the consumer explicitly asks
+  // for it (curtain-canva embed appends `?disableScroll=1`). The default
+  // ExternalLinkPage renders Canva at fixed size and relies on the
+  // iframe document's own scroll, so it must be left untouched.
+  const rewritten = shouldDisableProxiedScroll(reqUrl)
+    ? injectIframeNoScrollStyle(baseRewritten)
+    : baseRewritten;
+
+  responseHeaders.set(
+    "content-type",
+    contentType || "text/html; charset=utf-8",
+  );
+
+  if (!negotiatedEncoding) {
+    return new NextResponse(rewritten, {
+      status: upstream.status,
       headers: responseHeaders,
     });
   }
 
-  // For all other content types (CSS, JS, images, fonts), stream through.
-  return new NextResponse(resp.body, {
-    status: resp.status,
+  const compressed = await compressBuffer(rewritten, negotiatedEncoding);
+  responseHeaders.set("content-encoding", negotiatedEncoding);
+  responseHeaders.set("content-length", String(compressed.length));
+  // `Buffer` is structurally a `Uint8Array`; on Node 22 the runtime
+  // type is `Uint8Array<ArrayBufferLike>`, which the DOM-flavoured TS
+  // lib in this project does not recognise as a `BodyInit`. Cast at
+  // the boundary — the bytes themselves are valid.
+  return new NextResponse(compressed as unknown as BodyInit, {
+    status: upstream.status,
+    headers: responseHeaders,
+  });
+}
+
+interface RespondWithStreamingCompressionArgs {
+  upstreamBody: ReadableStream<Uint8Array>;
+  status: number;
+  responseHeaders: Headers;
+  encoding: SupportedEncoding;
+}
+
+function respondWithStreamingCompression({
+  upstreamBody,
+  status,
+  responseHeaders,
+  encoding,
+}: RespondWithStreamingCompressionArgs): NextResponse {
+  // Bridge Web Stream → Node Transform → Web Stream so we can use Node's
+  // streaming Brotli compressor (CompressionStream only supports gzip).
+  // The Web→Node bridge spans two distinct ReadableStream typings
+  // (DOM vs node:stream/web) which is why the casts are unavoidable.
+  const nodeIn = Readable.fromWeb(
+    upstreamBody as unknown as Parameters<typeof Readable.fromWeb>[0],
+  );
+  const transform = createCompressionTransform(encoding);
+  const nodeOut = nodeIn.pipe(transform);
+  // Node's `Readable.toWeb` returns a `ReadableStream` whose chunk
+  // type doesn't line up with the DOM-flavoured `ReadableStream` that
+  // NextResponse expects. Cast at the boundary — the bytes are valid.
+  const webOut = Readable.toWeb(nodeOut);
+
+  responseHeaders.set("content-encoding", encoding);
+  // We don't know the compressed length up front; the framework will
+  // emit it via chunked transfer-encoding.
+  responseHeaders.delete("content-length");
+  return new NextResponse(webOut as unknown as BodyInit, {
+    status,
     headers: responseHeaders,
   });
 }
