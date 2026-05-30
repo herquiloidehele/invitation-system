@@ -15,8 +15,14 @@ import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 /*                                                                      */
 /*  Load timing strategy:                                               */
 /*                                                                      */
-/*    The iframe only mounts once it is visible. This prevents hidden   */
-/*    preloads from doubling the reverse-proxy function invocations.    */
+/*    The iframe ALWAYS mounts — even before `visible=true`. While     */
+/*    hidden, it lives off-screen behind the envelope cover, so the    */
+/*    upstream Canva document and its subresources are downloaded in   */
+/*    parallel with the envelope animation (~1.2 s) instead of after   */
+/*    it. When the envelope finishes opening, the same iframe element  */
+/*    is repositioned to fill the viewport — no remount, no second     */
+/*    proxy fetch (the new edge-cache SWR window in /canva-proxy keeps */
+/*    even repeated fetches near-instant).                              */
 /* ------------------------------------------------------------------ */
 
 interface ExternalLinkPageProps {
@@ -24,8 +30,15 @@ interface ExternalLinkPageProps {
   visible?: boolean;
 }
 
-export function shouldMountExternalInvitationIframe(visible: boolean): boolean {
-  return visible;
+/**
+ * Kept for backward compatibility with callers that ask whether the
+ * iframe DOM is currently mounted. With the preload-then-reveal
+ * strategy the iframe is now always mounted (so subresources start
+ * downloading behind the envelope cover), regardless of the visibility
+ * flag — hence the unconditional `true`.
+ */
+export function shouldMountExternalInvitationIframe(): boolean {
+  return true;
 }
 
 export default function ExternalLinkPage({
@@ -33,7 +46,6 @@ export default function ExternalLinkPage({
   visible = true,
 }: ExternalLinkPageProps) {
   const src = getExternalInvitationEmbedSrc(externalLink);
-  const shouldMountIframe = shouldMountExternalInvitationIframe(visible);
 
   return (
     <div
@@ -43,29 +55,35 @@ export default function ExternalLinkPage({
         inset: 0,
         width: "100%",
         height: "100%",
+        // Stay below the envelope cover (which lives at z-index 100) while
+        // hidden, then float above page content once revealed.
         zIndex: visible ? 50 : 0,
         overflow: "hidden",
         opacity: visible ? 1 : 0,
         pointerEvents: visible ? "auto" : "none",
-        visibility: visible ? "visible" : "hidden",
+        // `visibility: visible` while preloading is intentional: it keeps
+        // the iframe element painted on a real layout layer so its
+        // document parses, executes JS and downloads subresources.
+        // `opacity: 0` plus `pointerEvents: none` is what hides it from
+        // the user. The envelope cover (z-index 100) fully occludes it
+        // anyway, so there is nothing visible to flash.
+        visibility: "visible",
       }}
     >
-      {shouldMountIframe && (
-        <iframe
-          src={src}
-          title="Convite externo"
-          allowFullScreen
-          loading="eager"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "calc(100% + 16px)",
-            height: "100%",
-            border: "none",
-            display: "block",
-          }}
-        />
-      )}
+      <iframe
+        src={src}
+        title="Convite externo"
+        allowFullScreen
+        loading="eager"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "calc(100% + 16px)",
+          height: "100%",
+          border: "none",
+          display: "block",
+        }}
+      />
     </div>
   );
 }
