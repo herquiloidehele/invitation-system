@@ -238,7 +238,7 @@ export default function ScratchHeart({
     >
       {/* Bottom layer: content to reveal (clipped to heart shape) */}
       <div
-        className="absolute inset-0 flex items-center justify-center -top-8"
+        className="absolute inset-0 flex items-center justify-center"
         style={{
           width,
           height,
