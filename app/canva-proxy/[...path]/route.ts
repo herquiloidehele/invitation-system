@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   CANVA_PROXY_ERROR_CACHE_CONTROL,
   pickCanvaProxyCacheControl,
+  pickCanvaProxyFetchInit,
 } from "@/lib/canva-proxy-cache";
+import { buildStableUpstreamHeaders } from "@/lib/canva-proxy-headers";
 import {
   injectIframeNoScrollStyle,
   rewriteCanvaHtmlBase,
@@ -20,17 +22,19 @@ import { isHostAllowed } from "@/lib/canva-proxy-hosts";
 /*  This route proxies the upstream request and strips framing-related */
 /*  response headers so the content can be embedded via <iframe>.      */
 /*                                                                      */
-/*  Usage:                                                              */
-/*    /canva-proxy/<host>/<path...>                                     */
-/*  Example:                                                            */
-/*    /canva-proxy/brindealstudio.com/                                  */
-/*    /canva-proxy/brindealstudio.com/assets/foo.css                    */
+/*  Caching:                                                            */
+/*  - Upstream GET fetches participate in Next.js's data cache via     */
+/*    next.revalidate + next.tags. Tagged with `canva-proxy` and       */
+/*    `canva-proxy:<host>` so the admin revalidate endpoint can bust   */
+/*    entries on demand. See `lib/canva-proxy-cache.ts`.               */
+/*  - The route still emits CDN/browser Cache-Control headers; that    */
+/*    layer is independent and stacks on top.                          */
+/*  - HEAD is not cached — passes through with `cache: 'no-store'`.    */
 /*                                                                      */
-/*  Only canva-managed hosts are allowed (allowlist).                  */
+/*  Only canva-managed hosts are allowed (see lib/canva-proxy-hosts).  */
 /* ------------------------------------------------------------------ */
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 /** Headers we strip from the upstream response before returning to the browser. */
 const STRIPPED_RESPONSE_HEADERS = new Set([
@@ -48,16 +52,6 @@ const STRIPPED_RESPONSE_HEADERS = new Set([
   "keep-alive",
 ]);
 
-/** Headers we forward from the incoming request to the upstream. */
-const FORWARDED_REQUEST_HEADERS = [
-  "accept",
-  "accept-language",
-  "user-agent",
-  "range",
-  "if-modified-since",
-  "if-none-match",
-];
-
 function buildUpstreamUrl(
   pathSegments: string[],
   search: string,
@@ -69,19 +63,6 @@ function buildUpstreamUrl(
   const path = rest.length === 0 ? "/" : `/${rest.join("/")}`;
   const url = new URL(`https://${host}${path}${search}`);
   return { url, host };
-}
-
-function buildRequestHeaders(req: NextRequest, host: string): Headers {
-  const headers = new Headers();
-  for (const name of FORWARDED_REQUEST_HEADERS) {
-    const value = req.headers.get(name);
-    if (value) headers.set(name, value);
-  }
-  // Pretend the request originated from the upstream host so referer-based
-  // checks on the origin server keep working.
-  headers.set("host", host);
-  headers.set("referer", `https://${host}/`);
-  return headers;
 }
 
 function buildResponseHeaders(
@@ -138,18 +119,26 @@ async function proxyCanvaRequest(
     );
   }
 
+  // GET participates in the Next data cache. HEAD opts out — it's rare,
+  // body-less, and would otherwise share a cache key with the GET.
+  const cacheInit =
+    method === "GET"
+      ? pickCanvaProxyFetchInit({
+          upstreamPath: upstream.url.pathname,
+          host: upstream.host,
+        })
+      : { cache: "no-store" as const };
+
   let resp: Response;
   try {
     resp = await fetch(upstream.url, {
       method,
-      headers: buildRequestHeaders(req, upstream.host),
+      headers: buildStableUpstreamHeaders(upstream.host),
       redirect: "follow",
-      // Forward the client's abort signal so navigations away from the page
-      // free this function's upstream connection promptly.
-      signal: req.signal,
-      // Don't override caching here. The response Cache-Control we set below
-      // drives CDN behavior, while default fetch behavior keeps undici's
-      // connection pool warm across requests.
+      // Intentionally NOT forwarding `req.signal`: aborting the upstream
+      // fetch when the client navigates away would prevent the data
+      // cache entry from populating.
+      ...cacheInit,
     });
   } catch {
     return NextResponse.json(
@@ -163,7 +152,11 @@ async function proxyCanvaRequest(
 
   const contentType = resp.headers.get("content-type") ?? "";
   const isHtml = contentType.toLowerCase().includes("text/html");
-  const responseHeaders = buildResponseHeaders(resp, upstream.url.pathname, isHtml);
+  const responseHeaders = buildResponseHeaders(
+    resp,
+    upstream.url.pathname,
+    isHtml,
+  );
 
   if (method === "HEAD") {
     return new NextResponse(null, {
@@ -204,9 +197,11 @@ async function proxyCanvaRequest(
     });
   }
 
-  // For all other content types (rare path post-base-rewrite, kept as a
-  // safety net), stream through.
-  return new NextResponse(resp.body, {
+  // Non-HTML: buffer the body so the Next data cache can persist it.
+  // Streaming `resp.body` directly would consume it before the cache
+  // can read it.
+  const buffer = await resp.arrayBuffer();
+  return new NextResponse(buffer, {
     status: resp.status,
     headers: responseHeaders,
   });
