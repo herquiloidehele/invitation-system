@@ -33,6 +33,7 @@ export default async function EditSaveTheDatePage({
     day: string;
     month: string;
     year: string;
+    time?: string;
   };
   const location = item.location as LocationInfo | null;
   const location2 = item.location2 as LocationInfo | null;

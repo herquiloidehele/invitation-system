@@ -11,7 +11,7 @@ export default async function NewSaveTheDatePage() {
     slug: "",
     themeId: themes[0]?.id || "",
     couple: { bride: "", groom: "" },
-    date: { iso: "", display: "", day: "", month: "", year: "" },
+    date: { iso: "", display: "", day: "", month: "", year: "", time: "" },
     customMessage: "",
     rsvp: { enabled: false, showEmail: false, showDietaryRestrictions: true },
   };

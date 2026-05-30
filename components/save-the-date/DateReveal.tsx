@@ -83,7 +83,11 @@ export default function DateReveal({
             >
               <EditableText elementKey="stdDateLabel">
                 {(() => {
+                  if (date.time && /^\d{2}:\d{2}$/.test(date.time)) {
+                    return date.time;
+                  }
                   const d = new Date(date.iso);
+                  if (isNaN(d.getTime())) return "";
                   const hh = String(d.getHours()).padStart(2, "0");
                   const mm = String(d.getMinutes()).padStart(2, "0");
                   return `${hh}:${mm}`;

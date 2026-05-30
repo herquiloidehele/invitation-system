@@ -72,6 +72,7 @@ export interface SaveTheDateFormData {
     day: string;
     month: string;
     year: string;
+    time?: string;
   };
   location?: LocationInfo;
   location2?: LocationInfo;
@@ -780,6 +781,20 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       className="bg-muted text-muted-foreground"
                     />
                   </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="dateTime">Hora do Evento</Label>
+                  <Input
+                    id="dateTime"
+                    type="time"
+                    value={data.date.time ?? ""}
+                    onChange={(e) =>
+                      setData((p) => ({
+                        ...p,
+                        date: { ...p.date, time: e.target.value },
+                      }))
+                    }
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="dateDisplay">Texto de exibição</Label>

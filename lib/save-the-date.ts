@@ -24,6 +24,8 @@ export interface SaveTheDateDate {
   day: string;
   month: string;
   year: string;
+  /** Event time in 24h "HH:MM" format. Optional. */
+  time?: string;
 }
 
 /** Envelope config on theme level — all fields required (the theme defaults). */
