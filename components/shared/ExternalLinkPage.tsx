@@ -35,7 +35,7 @@ interface ExternalLinkPageProps {
  * iframe DOM is currently mounted. With the preload-then-reveal
  * strategy the iframe is now always mounted (so subresources start
  * downloading behind the envelope cover), regardless of the visibility
- * flag — hence the unconditional `true`
+ * flag — hence the unconditional `true`.
  */
 export function shouldMountExternalInvitationIframe(): boolean {
   return true;
