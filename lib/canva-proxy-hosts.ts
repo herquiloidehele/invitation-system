@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * Allowlist for upstream hosts that the Canva reverse proxy is willing to
  * fetch from. Shared between `app/canva-proxy/[...path]/route.ts` and
@@ -18,3 +20,21 @@ export function isHostAllowed(host: string): boolean {
       : entry.test(normalized),
   );
 }
+
+/**
+ * Request body schema for `POST /api/admin/canva-proxy/revalidate`.
+ *
+ * - Empty object → bust the global `canva-proxy` tag.
+ * - `{ host }` where `host` passes `isHostAllowed` → bust the
+ *   `canva-proxy:<host>` tag only.
+ */
+export const canvaProxyRevalidateBodySchema = z.object({
+  host: z
+    .string()
+    .refine(isHostAllowed, "Host not allowed")
+    .optional(),
+});
+
+export type CanvaProxyRevalidateBody = z.infer<
+  typeof canvaProxyRevalidateBodySchema
+>;
