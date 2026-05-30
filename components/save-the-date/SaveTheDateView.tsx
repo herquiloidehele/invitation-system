@@ -160,7 +160,7 @@ export default function SaveTheDateView({
     bottomHero,
   } = saveTheDate;
   const rsvpEnabled = rsvp?.enabled === true;
-  const [revealed, setRevealed] = useState(false);
+  const [revealed, setRevealed] = useState(hideEnvelope);
   const [envelopeDone, setEnvelopeDone] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(() => {
@@ -711,7 +711,7 @@ export default function SaveTheDateView({
             {customMessage && (
               <motion.p
                 variants={revealFadeUp}
-                className="text-sm tracking-wide"
+                className="text-sm tracking-wide text-center"
                 style={{
                   fontFamily: resolvedCustomMessageFont,
                   color: customMessageOverride?.color ?? theme.textColor,
