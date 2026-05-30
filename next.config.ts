@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "brindealstudio.up.railway.app" }],
+        destination: "https://convites.brindealstudio.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
