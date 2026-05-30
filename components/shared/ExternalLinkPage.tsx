@@ -15,14 +15,25 @@ import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 /*                                                                      */
 /*  Load timing strategy:                                               */
 /*                                                                      */
-/*    The iframe ALWAYS mounts — even before `visible=true`. While     */
-/*    hidden, it lives off-screen behind the envelope cover, so the    */
-/*    upstream Canva document and its subresources are downloaded in   */
-/*    parallel with the envelope animation (~1.2 s) instead of after   */
-/*    it. When the envelope finishes opening, the same iframe element  */
-/*    is repositioned to fill the viewport — no remount, no second     */
-/*    proxy fetch (the new edge-cache SWR window in /canva-proxy keeps */
-/*    even repeated fetches near-instant).                              */
+/*    The iframe always mounts (single load — no remount on reveal).   */
+/*    While the envelope is closed it lives at `transform:             */
+/*    translateY(200vh)`, i.e. one viewport-height below where the     */
+/*    user is looking. The iframe document keeps its natural 100vw ×   */
+/*    100vh box, so HTML + subresources download and render normally  */
+/*    in parallel with the envelope animation — the user just doesn't  */
+/*    see any of it. When the envelope finishes opening, the wrapper   */
+/*    snaps back to `inset: 0` and the iframe slides into view; if    */
+/*    Canva's entrance animations are driven by elements crossing the */
+/*    iframe's viewport, this reposition is where they fire.           */
+/*                                                                      */
+/*    Caveat: standard IntersectionObserver (v1) inside the iframe is */
+/*    scoped to the iframe document's own viewport, which doesn't      */
+/*    change when we move the iframe element around in the parent.    */
+/*    If Canva fires its entrance animations on initial paint (before */
+/*    the reposition) instead of on viewport-cross, the off-viewport  */
+/*    positioning won't defer them and the user will still see the    */
+/*    static end state. Verify in the browser; if so, fall back to    */
+/*    a remount-on-reveal pattern (changing the iframe `key`).         */
 /* ------------------------------------------------------------------ */
 
 interface ExternalLinkPageProps {
@@ -31,11 +42,9 @@ interface ExternalLinkPageProps {
 }
 
 /**
- * Kept for backward compatibility with callers that ask whether the
- * iframe DOM is currently mounted. With the preload-then-reveal
- * strategy the iframe is now always mounted (so subresources start
- * downloading behind the envelope cover), regardless of the visibility
- * flag — hence the unconditional `true`.
+ * Kept for backward compatibility. With the off-viewport preload
+ * strategy the iframe is always in the DOM, so this is unconditionally
+ * `true`.
  */
 export function shouldMountExternalInvitationIframe(): boolean {
   return true;
@@ -55,18 +64,19 @@ export default function ExternalLinkPage({
         inset: 0,
         width: "100%",
         height: "100%",
-        // Stay below the envelope cover (which lives at z-index 100) while
-        // hidden, then float above page content once revealed.
-        zIndex: visible ? 50 : 0,
+        // While hidden, sit behind the envelope; while visible, float on
+        // top of the rest of the page.
+        zIndex: visible ? 50 : -1,
         overflow: "hidden",
-        opacity: visible ? 1 : 0,
+        // Move the wrapper one viewport down while hidden. The iframe
+        // element still has its full 100vw × 100vh layout box, so the
+        // iframe document loads and renders as if it were on-screen —
+        // the only thing changing is where the wrapper paints in the
+        // parent. When revealed, we snap back to inset: 0 in a single
+        // step, no transition (we don't want to compete with Canva's
+        // own entrance animations).
+        transform: visible ? "none" : "translateY(200vh)",
         pointerEvents: visible ? "auto" : "none",
-        // `visibility: visible` while preloading is intentional: it keeps
-        // the iframe element painted on a real layout layer so its
-        // document parses, executes JS and downloads subresources.
-        // `opacity: 0` plus `pointerEvents: none` is what hides it from
-        // the user. The envelope cover (z-index 100) fully occludes it
-        // anyway, so there is nothing visible to flash.
         visibility: "visible",
       }}
     >
