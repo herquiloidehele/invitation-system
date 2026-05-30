@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveBrowserUiColor } from "../lib/browser-ui-color";
+import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 
 describe("resolveBrowserUiColor", () => {
   it("uses explicit browserUiColor before other colors", () => {

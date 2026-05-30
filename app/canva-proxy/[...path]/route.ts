@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  CANVA_PROXY_ERROR_CACHE_CONTROL,
-  pickCanvaProxyCacheControl,
-} from "@/lib/canva-proxy-cache";
-import {
   injectIframeNoScrollStyle,
-  rewriteCanvaHtmlBase,
   shouldDisableProxiedScroll,
 } from "@/lib/canva-proxy-html";
 
@@ -70,9 +65,7 @@ const FORWARDED_REQUEST_HEADERS = [
 function isHostAllowed(host: string): boolean {
   const normalized = host.toLowerCase();
   return ALLOWED_HOSTS.some((entry) =>
-    typeof entry === "string"
-      ? entry === normalized
-      : entry.test(normalized),
+    typeof entry === "string" ? entry === normalized : entry.test(normalized),
   );
 }
 
@@ -102,10 +95,37 @@ function buildRequestHeaders(req: NextRequest, host: string): Headers {
   return headers;
 }
 
+/**
+ * Decide a sensible `Cache-Control` for the proxied response.
+ *
+ * Canva sets `no-store, no-cache` on every response, which is fine for the
+ * HTML document but counter-productive for content-hashed static assets:
+ * we want the browser to cache them so that the iframe's "reveal reload"
+ * (see ExternalLinkPage) is near-instant.
+ *
+ * `_assets/*` paths in Canva's output are immutable (filenames embed a
+ * content hash), so they are safe to cache aggressively.
+ */
+function pickCacheControl(
+  upstreamPath: string,
+  upstreamCacheControl: string | null,
+): string {
+  const isHashedAsset =
+    /\/_assets\//.test(upstreamPath) ||
+    /\.(?:js|css|woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico|mp4|webm|mp3|json)$/i.test(
+      upstreamPath,
+    );
+
+  if (isHashedAsset) {
+    return "public, max-age=31536000, immutable";
+  }
+  // Fall back to whatever the upstream said for HTML / unknown content.
+  return upstreamCacheControl ?? "no-store";
+}
+
 function buildResponseHeaders(
   upstream: Response,
   upstreamPath: string,
-  isHtml: boolean,
 ): Headers {
   const headers = new Headers();
   upstream.headers.forEach((value, key) => {
@@ -114,14 +134,15 @@ function buildResponseHeaders(
     }
   });
 
+  // Override caching so static assets persist across the prefetch→reveal
+  // reload (see ExternalLinkPage's loadKey logic).
   headers.set(
     "cache-control",
-    pickCanvaProxyCacheControl({
-      upstreamPath,
-      isHtml,
-      upstreamCacheControl: upstream.headers.get("cache-control"),
-    }),
+    pickCacheControl(upstreamPath, upstream.headers.get("cache-control")),
   );
+  if (headers.get("cache-control")?.startsWith("public,")) {
+    headers.set("vercel-cdn-cache-control", headers.get("cache-control")!);
+  }
 
   // Same-origin requests don't strictly need CORS, but Canva's <link> tags
   // include `crossorigin="anonymous"`, which causes the browser to perform a
@@ -129,6 +150,54 @@ function buildResponseHeaders(
   headers.set("access-control-allow-origin", "*");
   headers.set("x-proxied-by", "canva-proxy");
   return headers;
+}
+
+/**
+ * Rewrites HTML so that relative URLs continue to resolve through the proxy.
+ *
+ * Canva pages contain `<base href="/<page-slug>/">` and assets referenced as
+ * `_assets/foo.css`. The browser would resolve those against our proxy URL,
+ * losing the upstream path prefix. To preserve correct asset paths, we
+ * replace the upstream `<base>` with one pointing at the proxied equivalent
+ * of the same directory, e.g. `/canva-proxy/<host>/<page-slug>/`.
+ *
+ * If the upstream HTML has no `<base>` tag, we derive the base from the
+ * directory portion of the request path.
+ */
+function rewriteHtml(
+  html: string,
+  host: string,
+  proxyOrigin: string,
+  upstreamPath: string,
+): string {
+  // Try to read the upstream <base href="..."> first — Canva sets one.
+  const baseMatch = html.match(/<base\s+[^>]*href=["']([^"']+)["'][^>]*>/i);
+  let upstreamBaseDir: string;
+
+  if (baseMatch) {
+    // Resolve relative or absolute base hrefs against the upstream URL.
+    try {
+      const resolved = new URL(baseMatch[1], `https://${host}${upstreamPath}`);
+      upstreamBaseDir = resolved.pathname.endsWith("/")
+        ? resolved.pathname
+        : resolved.pathname.replace(/[^/]*$/, "");
+    } catch {
+      upstreamBaseDir = upstreamPath.replace(/[^/]*$/, "") || "/";
+    }
+  } else {
+    upstreamBaseDir = upstreamPath.replace(/[^/]*$/, "") || "/";
+  }
+
+  const newBaseHref = `${proxyOrigin}/canva-proxy/${host}${upstreamBaseDir}`;
+  const newBaseTag = `<base href="${newBaseHref}">`;
+
+  if (baseMatch) {
+    return html.replace(/<base\s+[^>]*>/i, newBaseTag);
+  }
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>${newBaseTag}`);
+  }
+  return newBaseTag + html;
 }
 
 export async function GET(
@@ -147,13 +216,7 @@ async function proxyCanvaRequest(
   const upstream = buildUpstreamUrl(path ?? [], req.nextUrl.search);
 
   if (!upstream) {
-    return NextResponse.json(
-      { error: "Host not allowed" },
-      {
-        status: 403,
-        headers: { "cache-control": CANVA_PROXY_ERROR_CACHE_CONTROL },
-      },
-    );
+    return NextResponse.json({ error: "Host not allowed" }, { status: 403 });
   }
 
   let resp: Response;
@@ -162,27 +225,17 @@ async function proxyCanvaRequest(
       method,
       headers: buildRequestHeaders(req, upstream.host),
       redirect: "follow",
-      // Forward the client's abort signal so navigations away from the page
-      // free this function's upstream connection promptly.
-      signal: req.signal,
-      // Don't override caching here. The response Cache-Control we set below
-      // drives CDN behavior, while default fetch behavior keeps undici's
-      // connection pool warm across requests.
+      // Don't cache aggressively; let the browser/CDN decide via passed headers.
+      cache: "no-store",
     });
   } catch {
     return NextResponse.json(
       { error: "Upstream fetch failed" },
-      {
-        status: 502,
-        headers: { "cache-control": CANVA_PROXY_ERROR_CACHE_CONTROL },
-      },
+      { status: 502 },
     );
   }
 
-  const contentType = resp.headers.get("content-type") ?? "";
-  const isHtml = contentType.toLowerCase().includes("text/html");
-  const responseHeaders = buildResponseHeaders(resp, upstream.url.pathname, isHtml);
-
+  const responseHeaders = buildResponseHeaders(resp, upstream.url.pathname);
   if (method === "HEAD") {
     return new NextResponse(null, {
       status: resp.status,
@@ -190,16 +243,15 @@ async function proxyCanvaRequest(
     });
   }
 
-  // For HTML responses, rewrite the <base> tag so relative URLs continue
-  // to resolve through this proxy. We cannot bypass to the upstream CDN
-  // here because Canva does not send `Access-Control-Allow-Origin` and its
-  // tags use `crossorigin="anonymous"`. See `rewriteCanvaHtmlBase`.
-  if (isHtml) {
+  const contentType = resp.headers.get("content-type") ?? "";
+
+  // For HTML responses, inject a <base> tag so relative URLs resolve correctly.
+  if (contentType.toLowerCase().includes("text/html")) {
     const html = await resp.text();
     const proxyOrigin =
       process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
       req.nextUrl.origin;
-    const baseRewritten = rewriteCanvaHtmlBase(
+    const baseRewritten = rewriteHtml(
       html,
       upstream.host,
       proxyOrigin,
@@ -222,8 +274,7 @@ async function proxyCanvaRequest(
     });
   }
 
-  // For all other content types (rare path post-base-rewrite, kept as a
-  // safety net), stream through.
+  // For all other content types (CSS, JS, images, fonts), stream through.
   return new NextResponse(resp.body, {
     status: resp.status,
     headers: responseHeaders,
