@@ -1,6 +1,6 @@
 "use client";
 
-import { type MutableRefObject, type RefObject } from "react";
+import { type MutableRefObject } from "react";
 import { motion, type Variants } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
@@ -10,7 +10,6 @@ import { t } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { scrollToNextHeroSection } from "@/lib/curtain-canva";
 import AudioPlayer from "./AudioPlayer";
-import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
 import { EditableText } from "./EditableText";
 
 // ---------------------------------------------------------------------------
@@ -89,7 +88,6 @@ interface InvitationHeroProps {
   invitation: InvitationData;
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
-  prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
   /** Tracked by the consuming page (used to wire audio analytics). */
   onAudioPlay?: () => void;
 }
@@ -98,7 +96,6 @@ export default function InvitationHero({
   invitation,
   theme,
   audioRef,
-  prefetchedVideoRef,
   onAudioPlay,
 }: InvitationHeroProps) {
   const ts: ResolvedTextStyles = resolveTextStyles(theme, invitation.textStyles);
@@ -123,23 +120,26 @@ export default function InvitationHero({
       className="relative overflow-hidden"
       style={{ height: getHeroSectionHeight(invitation) }}
     >
-      {/* Background media */}
+      {/* Background media.
+          We render a single <video> element here. The parent
+          `InvitationView` already mounts a hidden prefetch <video> with
+          the same `src` during the envelope cover phase, so by the time
+          this hero mounts the browser has the bytes in cache and dedupes
+          the request — no second download. This is simpler and more
+          robust than the prior `PrefetchedVideoSlot` DOM-move pattern. */}
       {invitation.videoUrl ? (
-        prefetchedVideoRef ? (
-          <PrefetchedVideoSlot videoRef={prefetchedVideoRef} />
-        ) : (
-          <video
-            src={invitation.videoUrl}
-            muted
-            loop
-            playsInline
-            autoPlay
-            preload="auto"
-            data-invitation-video
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        )
+        <video
+          src={invitation.videoUrl}
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="auto"
+          data-invitation-video
+          className="absolute inset-0 h-full w-full object-cover"
+        />
       ) : (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={invitation.heroImage}
           alt="Hero"

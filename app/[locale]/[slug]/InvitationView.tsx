@@ -269,7 +269,6 @@ function EnvelopeInvitationView({
         invitation={invitation}
         theme={theme}
         audioRef={audioRef}
-        prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
       />
     );
   }
@@ -329,7 +328,6 @@ function EnvelopeInvitationView({
               invitation={invitation}
               theme={theme}
               audioRef={audioRef}
-              prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
             />
           </motion.div>
         )}

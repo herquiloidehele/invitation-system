@@ -44,16 +44,22 @@ const ExternalVideoPage = forwardRef<
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [rsvpOpen, setRsvpOpen] = useState(false);
-  const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
+  // `ExternalVideoPage` only renders client-side (loaded via
+  // `next/dynamic({ ssr: false })`), so the lazy state initializer is the
+  // right place to read localStorage. Avoids an extra render pass that a
+  // setState-in-effect would cost.
+  const [rsvpSubmitted, setRsvpSubmitted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const slugs: string[] = JSON.parse(
+        localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+      );
+      return slugs.includes(invitation.slug);
+    } catch {
+      return false;
+    }
+  });
   const [buttonVisible, setButtonVisible] = useState(false);
-
-  // Check localStorage on mount to update button label
-  useEffect(() => {
-    const slugs: string[] = JSON.parse(
-      localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
-    );
-    setRsvpSubmitted(slugs.includes(invitation.slug));
-  }, [invitation.slug]);
 
   // Clear timer on unmount
   useEffect(() => {

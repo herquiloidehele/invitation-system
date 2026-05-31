@@ -135,36 +135,12 @@ export default function ScratchHeart({
     };
   };
 
-  const scratch = useCallback(
-    (x: number, y: number) => {
-      const sc = scratchCanvasRef.current;
-      if (!sc || revealedRef.current) return;
-      const ctx = sc.getContext("2d")!;
-      const r = SCRATCH_RADIUS * dpr;
-
-      // Draw a soft-edged scratch circle
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
-      gradient.addColorStop(0, "rgba(255,255,255,1)");
-      gradient.addColorStop(0.7, "rgba(255,255,255,1)");
-      gradient.addColorStop(1, "rgba(255,255,255,0)");
-
-      ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-
-      redraw();
-
-      scratchCount.current++;
-      if (scratchCount.current % SAMPLE_INTERVAL === 0) {
-        checkReveal();
-      }
-    },
-    [dpr, redraw],
-  );
-
-  const checkReveal = () => {
+  // `checkReveal` is declared BEFORE `scratch` (which calls it) so the
+  // static analysis used by React Compiler / `react-hooks/refs` doesn't
+  // flag a temporal-dead-zone access. Wrapped in `useCallback` so it
+  // can be safely listed in `scratch`'s dep array without re-creating
+  // the callback on every render.
+  const checkReveal = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || revealedRef.current) return;
 
@@ -202,7 +178,36 @@ export default function ScratchHeart({
       }
       onReveal();
     }
-  };
+  }, [cw, ch, onReveal]);
+
+  const scratch = useCallback(
+    (x: number, y: number) => {
+      const sc = scratchCanvasRef.current;
+      if (!sc || revealedRef.current) return;
+      const ctx = sc.getContext("2d")!;
+      const r = SCRATCH_RADIUS * dpr;
+
+      // Draw a soft-edged scratch circle
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+      gradient.addColorStop(0, "rgba(255,255,255,1)");
+      gradient.addColorStop(0.7, "rgba(255,255,255,1)");
+      gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      redraw();
+
+      scratchCount.current++;
+      if (scratchCount.current % SAMPLE_INTERVAL === 0) {
+        checkReveal();
+      }
+    },
+    [dpr, redraw, checkReveal],
+  );
 
   const handleStart = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();

@@ -116,16 +116,20 @@ function TopFlap({
       >
         <Image
           src={image}
-          width={500}
-          height={500}
           alt=""
-          className="w-full h-full object-cover object-bottom"
+          // `fill` mode delegates sizing to the parent (which is already
+          // absolutely positioned), eliminating the aspect-ratio warning
+          // we get from passing fixed width/height props while also
+          // overriding both via CSS. The visual is identical because the
+          // parent's dimensions and the object-cover positioning are
+          // unchanged.
+          fill
+          sizes="(max-width: 500px) 100vw, 500px"
+          className="object-cover object-bottom"
           style={{
             filter: "brightness(0) blur(40px)",
             opacity: 0.8,
             transform: "translateZ(0)",
-            height: "calc(100%)",
-            width: "100vw",
             ...imgStyle,
           }}
         />
@@ -166,10 +170,10 @@ function TopFlap({
       >
         <Image
           src={image}
-          width={500}
-          height={500}
           alt={"Top Envelop Flap"}
-          className={"w-full h-full object-cover object-bottom"}
+          fill
+          sizes="(max-width: 500px) 100vw, 500px"
+          className={"object-cover object-bottom"}
           style={{
             backfaceVisibility: "hidden",
             transform: "translateZ(0)",
@@ -193,7 +197,12 @@ function BottomFlap({
   return (
     <motion.div
       className="absolute bottom-0 left-0 w-full origin-top flex items-end"
-      style={{ height: "calc(50% + 12vh)" }}
+      // Previously the parent was `calc(50% + 12vh)` and the inner image
+      // was `height: calc(100% + 10vh)` to bleed 10vh past the bottom.
+      // Switching the image to `fill` for the aspect-ratio fix means the
+      // image is bounded by the parent, so we absorb the extra 10vh of
+      // bleed into the parent itself. Net visual is identical.
+      style={{ height: "calc(50% + 22vh)" }}
       initial={{
         bottom: 0,
       }}
@@ -208,11 +217,11 @@ function BottomFlap({
     >
       <Image
         src={image}
-        width={500}
-        height={500}
         alt={"Top Envelop Flap"}
-        className={"w-full h-full object-cover object-top"}
-        style={{ height: "calc(100% + 10vh)", ...imgStyle }}
+        fill
+        sizes="(max-width: 500px) 100vw, 500px"
+        className={"object-cover object-top"}
+        style={imgStyle}
       />
     </motion.div>
   );

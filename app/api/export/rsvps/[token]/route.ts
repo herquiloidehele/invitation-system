@@ -101,7 +101,9 @@ export async function GET(
     }));
 
     const buffer = await renderToBuffer(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // `renderToBuffer` accepts `React.ReactElement` but its narrower
+      // `DocumentElement` type doesn't structurally line up with the
+      // generic element the component returns; cast at the boundary.
       React.createElement(RsvpExportDocument, {
         coupleNames,
         dateDisplay,
@@ -110,7 +112,7 @@ export async function GET(
         responses,
         theme: pdfTheme,
         documentType: "invitation",
-      }) as any,
+      }) as Parameters<typeof renderToBuffer>[0],
     );
 
     return new NextResponse(new Uint8Array(buffer), {
@@ -167,7 +169,6 @@ export async function GET(
     }));
 
     const buffer = await renderToBuffer(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       React.createElement(RsvpExportDocument, {
         coupleNames,
         dateDisplay,
@@ -175,7 +176,7 @@ export async function GET(
         responses,
         theme: pdfTheme,
         documentType: "save-the-date",
-      }) as any,
+      }) as Parameters<typeof renderToBuffer>[0],
     );
 
     return new NextResponse(new Uint8Array(buffer), {

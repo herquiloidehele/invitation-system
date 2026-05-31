@@ -2,7 +2,6 @@
 
 import {
   type MutableRefObject,
-  type RefObject,
   useCallback,
   useEffect,
   useState,
@@ -209,10 +208,6 @@ interface InvitationPageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
-  /** When provided, InvitationPage will adopt this existing <video> element
-   *  into the hero section instead of creating a new one, avoiding duplicate
-   *  network requests. */
-  prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
   /** Pass true in the admin live preview so all animations are always visible
    *  and respond to React state changes rather than scroll position. */
   isPreview?: boolean;
@@ -222,11 +217,24 @@ export default function InvitationPage({
   invitation,
   theme,
   audioRef,
-  prefetchedVideoRef,
   isPreview = false,
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
-  const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
+  // InvitationPage is loaded via `next/dynamic({ ssr: false })` so it only
+  // mounts on the client. We can read localStorage in the lazy state
+  // initializer instead of in a useEffect, which avoids the extra render
+  // pass that "setState synchronously inside an effect" would cost.
+  const [rsvpSubmitted, setRsvpSubmitted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const slugs: string[] = JSON.parse(
+        localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+      );
+      return slugs.includes(invitation.slug);
+    } catch {
+      return false;
+    }
+  });
 
   const { trackEvent } = useAnalytics(invitation.slug);
 
@@ -246,18 +254,6 @@ export default function InvitationPage({
     () => trackEvent("audio_play"),
     [trackEvent],
   );
-
-  // Check localStorage on mount (client-only)
-  useEffect(() => {
-    try {
-      const slugs: string[] = JSON.parse(
-        localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
-      );
-      setRsvpSubmitted(slugs.includes(invitation.slug));
-    } catch {
-      // ignore
-    }
-  }, [invitation.slug]);
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
 
@@ -314,7 +310,6 @@ export default function InvitationPage({
         invitation={invitation}
         theme={theme}
         audioRef={audioRef}
-        prefetchedVideoRef={prefetchedVideoRef}
         onAudioPlay={handleAudioPlay}
       />
 

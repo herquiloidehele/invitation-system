@@ -1,6 +1,6 @@
 "use client";
 
-import { type MutableRefObject, type RefObject, useLayoutEffect } from "react";
+import { type MutableRefObject, useLayoutEffect } from "react";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
@@ -22,7 +22,6 @@ interface RichExternalLinkPageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
-  prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
   isPreview?: boolean;
 }
 
@@ -44,7 +43,6 @@ export default function RichExternalLinkPage({
   invitation,
   theme,
   audioRef,
-  prefetchedVideoRef,
   isPreview = false,
 }: RichExternalLinkPageProps) {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
@@ -174,7 +172,6 @@ export default function RichExternalLinkPage({
             invitation={invitation}
             theme={theme}
             audioRef={audioRef}
-            prefetchedVideoRef={prefetchedVideoRef}
           />
           <InvitationHeroNames
             invitation={invitation}
