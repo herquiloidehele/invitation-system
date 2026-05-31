@@ -9,7 +9,11 @@ import InvitationHero, { InvitationHeroNames } from "./InvitationHero";
 import ExternalCountdownSection from "./ExternalCountdownSection";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
-import RSVPForm from "./RSVPForm";
+import dynamic from "next/dynamic";
+
+// Lazy-load RSVPForm so its react-hook-form + zod dependencies only
+// ship when a guest actually scrolls down to the RSVP section.
+const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
 import PersonalGuestCard from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";

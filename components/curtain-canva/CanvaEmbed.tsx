@@ -42,6 +42,11 @@ export default function CanvaEmbed({
 }: CanvaEmbedProps) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const measureTimerRef = useRef<number[]>([]);
+  // ResizeObserver instance created in handleLoad and disconnected
+  // on unmount. Stored at the component level (not inside the load
+  // callback) so the outer effect cleanup can disconnect it even if
+  // the component unmounts before the 60-second safety timer fires.
+  const observerRef = useRef<ResizeObserver | null>(null);
   const [contentHeight, setContentHeight] = useState<number | null>(null);
   // We size the iframe element to the proxied document's full content
   // height, so the embedded page must not scroll independently. The
@@ -79,6 +84,10 @@ export default function CanvaEmbed({
       window.removeEventListener("resize", onResize);
       measureTimerRef.current.forEach((timer) => window.clearTimeout(timer));
       measureTimerRef.current = [];
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
     };
   }, [measureIframe]);
 
@@ -95,11 +104,28 @@ export default function CanvaEmbed({
     const doc = iframeRef.current?.contentDocument;
     const target = doc?.documentElement;
     if (!doc || !target || typeof ResizeObserver === "undefined") return;
+
+    // Disconnect any prior observer (e.g. if iframe `src` changed and
+    // onLoad fires a second time) before we replace the ref.
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
     const observer = new ResizeObserver(() => measureIframe());
     observer.observe(target);
     if (doc.body) observer.observe(doc.body);
+    observerRef.current = observer;
+
+    // Safety net: stop observing after 60 s even if the component stays
+    // mounted; by then the iframe document should be fully laid out and
+    // further observations are just noise. The unmount cleanup above
+    // also covers the early-unmount case.
     measureTimerRef.current.push(
-      window.setTimeout(() => observer.disconnect(), 60_000),
+      window.setTimeout(() => {
+        if (observerRef.current === observer) {
+          observer.disconnect();
+          observerRef.current = null;
+        }
+      }, 60_000),
     );
   }, [measureIframe]);
 

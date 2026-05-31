@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "./db";
 import type {
   CardStyleOverrides,
@@ -124,16 +125,16 @@ const includeTheme = { theme: { select: { name: true } } } as const;
 // Public API
 // ---------------------------------------------------------------------------
 
-export async function getInvitation(
-  slug: string,
-): Promise<InvitationData | null> {
-  const row = await prisma.invitation.findUnique({
-    where: { slug },
-    include: includeTheme,
-  });
-  if (!row) return null;
-  return toInvitationData(row as unknown as InvitationWithTheme);
-}
+export const getInvitation = cache(
+  async (slug: string): Promise<InvitationData | null> => {
+    const row = await prisma.invitation.findUnique({
+      where: { slug },
+      include: includeTheme,
+    });
+    if (!row) return null;
+    return toInvitationData(row as unknown as InvitationWithTheme);
+  },
+);
 
 export async function getAllInvitations(): Promise<InvitationData[]> {
   const rows = await prisma.invitation.findMany({

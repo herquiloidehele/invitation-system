@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import type {
   CustomTexts,
@@ -627,7 +628,11 @@ function SaveTheDateCinematic({
         className="relative w-full flex flex-col items-center justify-end overflow-hidden"
         style={{ minHeight: 220 }}
       >
-        {/* Background image */}
+        {/* Background image — rendered via next/image so it gets WebP
+            transcoding, responsive `srcset`, and CDN-friendly optimisation
+            instead of shipping the original asset bytes. The
+            `cinematicImgStyle` admin overrides are forwarded as inline
+            CSS (objectPosition / transform) on the underlying <img>. */}
         <motion.div
           initial={{ scale: 1.06, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
@@ -636,23 +641,31 @@ function SaveTheDateCinematic({
           style={{
             position: "absolute",
             inset: 0,
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            ...(cinematicImgStyle.objectPosition
+            ...(cinematicImgStyle.transform
               ? {
-                  backgroundPosition: cinematicImgStyle.objectPosition,
-                  ...(cinematicImgStyle.transform
-                    ? {
-                        transform: cinematicImgStyle.transform,
-                        transformOrigin:
-                          cinematicImgStyle.transformOrigin as string,
-                      }
-                    : {}),
+                  transform: cinematicImgStyle.transform,
+                  transformOrigin:
+                    cinematicImgStyle.transformOrigin as string,
                 }
               : {}),
           }}
-        />
+        >
+          <Image
+            src={bgImage}
+            alt=""
+            aria-hidden
+            fill
+            // Invitation column caps at 500 px; cinematic variant fills it.
+            sizes="(max-width: 500px) 100vw, 500px"
+            priority={false}
+            style={{
+              objectFit: "cover",
+              objectPosition:
+                (cinematicImgStyle.objectPosition as string | undefined) ??
+                "center",
+            }}
+          />
+        </motion.div>
 
         {/* Dark gradient overlay — heavier at bottom for text legibility */}
         <div

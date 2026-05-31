@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { ImageSettingsMap, TemplateTheme } from "@/lib/types";
 import { getImageStyle } from "@/lib/image-settings";
@@ -230,15 +230,31 @@ export default function EnvelopeCover({
   imageSettings,
 }: EnvelopeCoverProps) {
   const [opening, setOpening] = useState(false);
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleTap = useCallback(() => {
     if (opening) return;
     setOpening(true);
     onOpen();
     if (onAnimationComplete) {
-      setTimeout(onAnimationComplete, TOTAL_MS);
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+      animationTimeoutRef.current = setTimeout(() => {
+        animationTimeoutRef.current = null;
+        onAnimationComplete();
+      }, TOTAL_MS);
     }
   }, [opening, onOpen, onAnimationComplete]);
+
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+        animationTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const topFlapStyle = getImageStyle(imageSettings, "envelopeTopFlap");
   const bottomFlapStyle = getImageStyle(imageSettings, "envelopeBottomFlap");
@@ -261,7 +277,10 @@ export default function EnvelopeCover({
     >
       <EnvelopeBody style={coverBackgroundStyle} />
 
-      {/* Shimmer highlight — diagonal sweep across envelope */}
+      {/* Shimmer highlight — diagonal sweep across envelope. Plays four
+          full sweeps then stops to avoid burning CPU on a page the user
+          may sit on for minutes. The `opening` gate also stops it the
+          instant they tap. */}
       {shimmer && !opening && (
         <motion.div
           className="absolute inset-0 z-[6] pointer-events-none"
@@ -273,7 +292,7 @@ export default function EnvelopeCover({
           animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
           transition={{
             duration: 3.5,
-            repeat: Infinity,
+            repeat: 4,
             repeatDelay: 2,
             ease: "easeInOut",
           }}

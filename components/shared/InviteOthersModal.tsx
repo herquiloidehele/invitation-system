@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Check, Copy, X } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -35,6 +35,16 @@ export default function InviteOthersModal({
     null,
   );
   const [copied, setCopied] = useState(false);
+  const copyResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current) {
+        clearTimeout(copyResetTimeoutRef.current);
+        copyResetTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const { register, handleSubmit, reset, formState } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -75,7 +85,13 @@ export default function InviteOthersModal({
       await navigator.clipboard.writeText(result.url);
       setCopied(true);
       toast.success("Link copiado!");
-      setTimeout(() => setCopied(false), 2000);
+      if (copyResetTimeoutRef.current) {
+        clearTimeout(copyResetTimeoutRef.current);
+      }
+      copyResetTimeoutRef.current = setTimeout(() => {
+        copyResetTimeoutRef.current = null;
+        setCopied(false);
+      }, 2000);
     } catch {
       toast.error("Não foi possível copiar.");
     }

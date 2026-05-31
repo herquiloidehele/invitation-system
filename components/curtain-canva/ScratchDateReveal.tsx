@@ -1,6 +1,12 @@
 "use client";
 
-import { type CSSProperties, useCallback, useMemo, useRef } from "react";
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type {
   CustomTexts,
@@ -55,6 +61,7 @@ export default function ScratchDateReveal({
   // stable across renders.
   const revealedCoinsRef = useRef<Set<string>>(new Set());
   const celebratedRef = useRef(false);
+  const followupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fireCelebration = useCallback(() => {
     if (celebratedRef.current) return;
@@ -78,8 +85,10 @@ export default function ScratchDateReveal({
       confetti({ ...baseOptions, angle: 60, origin: { x: 0.05, y: 0.85 } });
       confetti({ ...baseOptions, angle: 120, origin: { x: 0.95, y: 0.85 } });
 
-      // A small follow-up burst from the centre for emphasis.
-      window.setTimeout(() => {
+      // A small follow-up burst from the centre for emphasis. Tracked so
+      // unmount can cancel it before it fires on a torn-down section.
+      followupTimeoutRef.current = setTimeout(() => {
+        followupTimeoutRef.current = null;
         confetti({
           particleCount: 60,
           spread: 100,
@@ -92,6 +101,15 @@ export default function ScratchDateReveal({
       }, 180);
     });
   }, [theme]);
+
+  useEffect(() => {
+    return () => {
+      if (followupTimeoutRef.current) {
+        clearTimeout(followupTimeoutRef.current);
+        followupTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const handleCoinRevealed = useCallback(
     (key: "day" | "month" | "year") => {

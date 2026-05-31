@@ -12,7 +12,13 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import CurtainsHero from "./CurtainsHero";
 import ScratchDateReveal from "./ScratchDateReveal";
 import CanvaEmbed from "./CanvaEmbed";
-import RSVPForm from "@/components/shared/RSVPForm";
+import dynamic from "next/dynamic";
+
+// Lazy-load RSVPForm so its react-hook-form + zod dependencies only
+// ship when a guest actually scrolls down to the RSVP section.
+const RSVPForm = dynamic(() => import("@/components/shared/RSVPForm"), {
+  ssr: false,
+});
 import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveRevealContentStyle,

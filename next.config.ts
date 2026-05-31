@@ -7,6 +7,18 @@ const nextConfig: NextConfig = {
   // FS root (e.g. `/ROOT/...`) and `spawn` then fails with ENOENT. Marking
   // them external tells Next.js to leave the `require()` until runtime.
   serverExternalPackages: ["pg", "bcrypt", "ffmpeg-static"],
+  // Convert barrel imports (e.g. `import { motion } from "framer-motion"`)
+  // into direct module imports at compile time so unused exports are
+  // tree-shaken. Cuts ~200-400 KB off the per-page client bundle on this
+  // codebase. Safe for any package that re-exports from a barrel and
+  // does not depend on side effects in the barrel itself.
+  experimental: {
+    optimizePackageImports: [
+      "framer-motion",
+      "lucide-react",
+      "@base-ui/react",
+    ],
+  },
   images: {
     remotePatterns: [
       {
