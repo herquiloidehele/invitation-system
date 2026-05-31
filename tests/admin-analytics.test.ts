@@ -1,0 +1,92 @@
+import { describe, expect, it } from "vitest";
+
+import { composeInvitationAnalytics } from "../lib/admin-analytics";
+
+describe("composeInvitationAnalytics", () => {
+  it("builds invitation analytics from aggregate rows", () => {
+    const data = composeInvitationAnalytics({
+      invitations: [
+        {
+          slug: "ana-bruno",
+          couple: { bride: "Ana", groom: "Bruno" },
+          createdAt: new Date("2026-01-02T10:00:00.000Z"),
+          theme: { name: "classic" },
+          rsvpResponses: [
+            {
+              id: "rsvp-1",
+              guestName: "Maria",
+              attending: true,
+              submittedAt: new Date("2026-01-05T09:30:00.000Z"),
+            },
+          ],
+        },
+      ],
+      pageViewSummaries: [
+        {
+          invitationSlug: "ana-bruno",
+          totalViews: "7",
+          uniqueVisitors: "4",
+        },
+      ],
+      eventCounts: [
+        { invitationSlug: "ana-bruno", type: "envelope_open", count: 3 },
+        { invitationSlug: "ana-bruno", type: "maps_click", count: "2" },
+      ],
+      deviceCounts: [
+        { invitationSlug: "ana-bruno", device: "mobile", count: 5 },
+        { invitationSlug: "ana-bruno", device: null, count: 2 },
+      ],
+      dailyViews: [
+        { invitationSlug: "ana-bruno", date: "2026-01-04", count: 2 },
+        { invitationSlug: "ana-bruno", date: "2026-01-05", count: 5 },
+      ],
+      rsvpCounts: [{ invitationSlug: "ana-bruno", count: 12 }],
+      dailyRsvps: [
+        { invitationSlug: "ana-bruno", date: "2026-01-03", count: 1 },
+        { invitationSlug: "ana-bruno", date: "2026-01-05", count: 11 },
+      ],
+    });
+
+    expect(data).toEqual([
+      {
+        slug: "ana-bruno",
+        coupleName: "Ana & Bruno",
+        template: "classic",
+        createdAt: "2026-01-02T10:00:00.000Z",
+        totalViews: 7,
+        uniqueVisitors: 4,
+        envelopeOpens: 3,
+        openRate: "42.9",
+        rsvpCount: 12,
+        conversionRate: "171.4",
+        eventBreakdown: {
+          maps_click: 2,
+          waze_click: 0,
+          gift_click: 0,
+          audio_play: 0,
+          calendar_click: 0,
+          rsvp_submit: 0,
+        },
+        deviceBreakdown: {
+          mobile: 5,
+          tablet: 0,
+          desktop: 0,
+          unknown: 2,
+        },
+        viewsOverTime: [
+          { date: "2026-01-03", views: 0, rsvps: 1 },
+          { date: "2026-01-04", views: 2, rsvps: 0 },
+          { date: "2026-01-05", views: 5, rsvps: 11 },
+        ],
+        recentRsvps: [
+          {
+            id: "rsvp-1",
+            guestName: "Maria",
+            attending: true,
+            submittedAt: "2026-01-05T09:30:00.000Z",
+          },
+        ],
+      },
+    ]);
+  });
+});

@@ -1,40 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useTransition } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { StatsCards } from "@/components/admin/analytics/StatsCards";
 import { ViewsChart } from "@/components/admin/analytics/ViewsChart";
 import { EventBreakdownChart } from "@/components/admin/analytics/EventBreakdownChart";
 import { DeviceChart } from "@/components/admin/analytics/DeviceChart";
 import { RecentRsvpsTable } from "@/components/admin/analytics/RecentRsvpsTable";
 import { Loader2 } from "lucide-react";
+import type { InvitationAnalytics } from "@/lib/admin-analytics";
 
-export interface InvitationAnalytics {
-  slug: string;
-  coupleName: string;
-  template: string;
-  createdAt: string;
-  totalViews: number;
-  uniqueVisitors: number;
-  envelopeOpens: number;
-  openRate: string;
-  rsvpCount: number;
-  conversionRate: string;
-  eventBreakdown: Record<string, number>;
-  deviceBreakdown: {
-    mobile: number;
-    tablet: number;
-    desktop: number;
-    unknown: number;
-  };
-  viewsOverTime: { date: string; views: number; rsvps: number }[];
-  recentRsvps: {
-    id: string;
-    guestName: string;
-    attending: boolean;
-    submittedAt: string;
-  }[];
-}
+export type { InvitationAnalytics } from "@/lib/admin-analytics";
 
 const RANGES = [
   { label: "7 dias", value: "7d" },
