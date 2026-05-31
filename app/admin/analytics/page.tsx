@@ -1,4 +1,7 @@
-import { getInvitationAnalytics } from "@/lib/admin-analytics";
+import {
+  getAnalyticsInvitationOptions,
+  getInvitationAnalytics,
+} from "@/lib/admin-analytics";
 import AnalyticsClient from "./AnalyticsClient";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +12,12 @@ interface PageProps {
 
 export default async function AnalyticsPage({ searchParams }: PageProps) {
   const { range = "30d", slug = "all" } = await searchParams;
-  const data = await getInvitationAnalytics({ range, slug });
+  const invitationOptions = await getAnalyticsInvitationOptions();
+  const selectedSlug =
+    slug !== "all" && invitationOptions.some((option) => option.slug === slug)
+      ? slug
+      : "all";
+  const data = await getInvitationAnalytics({ range, slug: selectedSlug });
 
   return (
     <div className="space-y-6">
@@ -19,7 +27,12 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           Acompanhe o desempenho dos seus convites em tempo real.
         </p>
       </div>
-      <AnalyticsClient data={data} range={range} selectedSlug={slug} />
+      <AnalyticsClient
+        data={data}
+        invitationOptions={invitationOptions}
+        range={range}
+        selectedSlug={selectedSlug}
+      />
     </div>
   );
 }

@@ -8,7 +8,17 @@ import { EventBreakdownChart } from "@/components/admin/analytics/EventBreakdown
 import { DeviceChart } from "@/components/admin/analytics/DeviceChart";
 import { RecentRsvpsTable } from "@/components/admin/analytics/RecentRsvpsTable";
 import { Loader2 } from "lucide-react";
-import type { InvitationAnalytics } from "@/lib/admin-analytics";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type {
+  AnalyticsInvitationOption,
+  InvitationAnalytics,
+} from "@/lib/admin-analytics";
 
 export type { InvitationAnalytics } from "@/lib/admin-analytics";
 
@@ -21,12 +31,14 @@ const RANGES = [
 
 interface AnalyticsClientProps {
   data: InvitationAnalytics[];
+  invitationOptions: AnalyticsInvitationOption[];
   range: string;
   selectedSlug: string;
 }
 
 export default function AnalyticsClient({
   data,
+  invitationOptions,
   range,
   selectedSlug,
 }: AnalyticsClientProps) {
@@ -91,31 +103,22 @@ export default function AnalyticsClient({
       {/* Controls bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Invitation selector */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => updateParam("slug", "all")}
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-              selectedSlug === "all"
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Todos os Convites
-          </button>
-          {data.map((inv) => (
-            <button
-              key={inv.slug}
-              onClick={() => updateParam("slug", inv.slug)}
-              className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                selectedSlug === inv.slug
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {inv.coupleName}
-            </button>
-          ))}
-        </div>
+        <Select
+          value={selectedSlug}
+          onValueChange={(value) => updateParam("slug", value || "")}
+        >
+          <SelectTrigger className="w-full min-w-64 sm:w-72">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align="start">
+            <SelectItem value="all">Todos os Convites</SelectItem>
+            {invitationOptions.map((inv) => (
+              <SelectItem key={inv.slug} value={inv.slug}>
+                {inv.coupleName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {/* Range selector */}
         <div className="flex items-center gap-1 rounded-lg border bg-muted p-1">

@@ -89,4 +89,35 @@ describe("composeInvitationAnalytics", () => {
       },
     ]);
   });
+
+  it("excludes demo invitations from analytics output", () => {
+    const data = composeInvitationAnalytics({
+      invitations: [
+        {
+          slug: "real-invite",
+          couple: { bride: "Ana", groom: "Bruno" },
+          createdAt: new Date("2026-01-02T10:00:00.000Z"),
+          theme: { name: "classic" },
+          isDemo: false,
+          rsvpResponses: [],
+        },
+        {
+          slug: "demo-invite",
+          couple: { bride: "Demo", groom: "Example" },
+          createdAt: new Date("2026-01-03T10:00:00.000Z"),
+          theme: { name: "demo" },
+          isDemo: true,
+          rsvpResponses: [],
+        },
+      ],
+      pageViewSummaries: [],
+      eventCounts: [],
+      deviceCounts: [],
+      dailyViews: [],
+      rsvpCounts: [],
+      dailyRsvps: [],
+    });
+
+    expect(data.map((item) => item.slug)).toEqual(["real-invite"]);
+  });
 });

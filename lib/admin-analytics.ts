@@ -49,12 +49,18 @@ export interface AnalyticsInvitationRow {
   couple: unknown;
   createdAt: Date;
   theme: { name: string };
+  isDemo?: boolean;
   rsvpResponses: {
     id: string;
     guestName: string;
     attending: boolean;
     submittedAt: Date;
   }[];
+}
+
+export interface AnalyticsInvitationOption {
+  slug: string;
+  coupleName: string;
 }
 
 export interface PageViewSummaryRow {
@@ -201,56 +207,82 @@ export function composeInvitationAnalytics({
   const dailyRsvpsBySlug = new Map<string, Record<string, number>>();
   for (const row of dailyRsvps) incrementDailyCount(dailyRsvpsBySlug, row);
 
+  return invitations
+    .filter((invitation) => !invitation.isDemo)
+    .map((invitation) => {
+      const couple = asObj(invitation.couple);
+      const pageViews = pageViewsBySlug.get(invitation.slug);
+      const eventCount = eventCountsBySlug.get(invitation.slug) ?? {};
+      const totalViews = toCount(pageViews?.totalViews);
+      const uniqueVisitors = toCount(pageViews?.uniqueVisitors);
+      const envelopeOpens = eventCount.envelope_open ?? 0;
+      const rsvpCount = rsvpCountsBySlug.get(invitation.slug) ?? 0;
+      const eventBreakdown: Record<string, number> = {};
+
+      for (const type of INTERACTION_EVENT_TYPES) {
+        eventBreakdown[type] = eventCount[type] ?? 0;
+      }
+
+      const viewsByDay = dailyViewsBySlug.get(invitation.slug) ?? {};
+      const rsvpsByDay = dailyRsvpsBySlug.get(invitation.slug) ?? {};
+      const allDays = new Set([
+        ...Object.keys(viewsByDay),
+        ...Object.keys(rsvpsByDay),
+      ]);
+
+      return {
+        slug: invitation.slug,
+        coupleName: `${str(couple.bride, "Noiva")} & ${str(couple.groom, "Noivo")}`,
+        template: invitation.theme.name,
+        createdAt: toIsoString(invitation.createdAt),
+        totalViews,
+        uniqueVisitors,
+        envelopeOpens,
+        openRate:
+          totalViews > 0
+            ? ((envelopeOpens / totalViews) * 100).toFixed(1)
+            : "0",
+        rsvpCount,
+        conversionRate:
+          totalViews > 0 ? ((rsvpCount / totalViews) * 100).toFixed(1) : "0",
+        eventBreakdown,
+        deviceBreakdown:
+          devicesBySlug.get(invitation.slug) ?? createDeviceBreakdown(),
+        viewsOverTime: Array.from(allDays)
+          .sort()
+          .map((date) => ({
+            date,
+            views: viewsByDay[date] ?? 0,
+            rsvps: rsvpsByDay[date] ?? 0,
+          })),
+        recentRsvps: invitation.rsvpResponses.map((rsvp) => ({
+          id: rsvp.id,
+          guestName: rsvp.guestName,
+          attending: rsvp.attending,
+          submittedAt: toIsoString(rsvp.submittedAt),
+        })),
+      };
+    });
+}
+
+export async function getAnalyticsInvitationOptions(): Promise<
+  AnalyticsInvitationOption[]
+> {
+  const invitations = await prisma.invitation.findMany({
+    where: { isDemo: false },
+    orderBy: { createdAt: "desc" },
+    select: {
+      slug: true,
+      couple: true,
+    },
+  });
+
   return invitations.map((invitation) => {
     const couple = asObj(invitation.couple);
-    const pageViews = pageViewsBySlug.get(invitation.slug);
-    const eventCount = eventCountsBySlug.get(invitation.slug) ?? {};
-    const totalViews = toCount(pageViews?.totalViews);
-    const uniqueVisitors = toCount(pageViews?.uniqueVisitors);
-    const envelopeOpens = eventCount.envelope_open ?? 0;
-    const rsvpCount = rsvpCountsBySlug.get(invitation.slug) ?? 0;
-    const eventBreakdown: Record<string, number> = {};
-
-    for (const type of INTERACTION_EVENT_TYPES) {
-      eventBreakdown[type] = eventCount[type] ?? 0;
-    }
-
-    const viewsByDay = dailyViewsBySlug.get(invitation.slug) ?? {};
-    const rsvpsByDay = dailyRsvpsBySlug.get(invitation.slug) ?? {};
-    const allDays = new Set([
-      ...Object.keys(viewsByDay),
-      ...Object.keys(rsvpsByDay),
-    ]);
 
     return {
       slug: invitation.slug,
       coupleName: `${str(couple.bride, "Noiva")} & ${str(couple.groom, "Noivo")}`,
-      template: invitation.theme.name,
-      createdAt: toIsoString(invitation.createdAt),
-      totalViews,
-      uniqueVisitors,
-      envelopeOpens,
-      openRate:
-        totalViews > 0 ? ((envelopeOpens / totalViews) * 100).toFixed(1) : "0",
-      rsvpCount,
-      conversionRate:
-        totalViews > 0 ? ((rsvpCount / totalViews) * 100).toFixed(1) : "0",
-      eventBreakdown,
-      deviceBreakdown:
-        devicesBySlug.get(invitation.slug) ?? createDeviceBreakdown(),
-      viewsOverTime: Array.from(allDays)
-        .sort()
-        .map((date) => ({
-          date,
-          views: viewsByDay[date] ?? 0,
-          rsvps: rsvpsByDay[date] ?? 0,
-        })),
-      recentRsvps: invitation.rsvpResponses.map((rsvp) => ({
-        id: rsvp.id,
-        guestName: rsvp.guestName,
-        attending: rsvp.attending,
-        submittedAt: toIsoString(rsvp.submittedAt),
-      })),
     };
   });
 }
@@ -264,7 +296,9 @@ export async function getInvitationAnalytics({
 }): Promise<InvitationAnalytics[]> {
   const selectedSlug = normalizeSelectedSlug(slug);
   const rangeStart = getRangeStart(range);
-  const invitationWhere = selectedSlug ? { slug: selectedSlug } : undefined;
+  const invitationWhere = selectedSlug
+    ? { slug: selectedSlug, isDemo: false }
+    : { isDemo: false };
   const rsvpWhere = rangeStart
     ? { submittedAt: { gte: rangeStart } }
     : undefined;
@@ -276,6 +310,7 @@ export async function getInvitationAnalytics({
       slug: true,
       couple: true,
       createdAt: true,
+      isDemo: true,
       theme: { select: { name: true } },
       rsvpResponses: {
         where: rsvpWhere,
