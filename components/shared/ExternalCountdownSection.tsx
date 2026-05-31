@@ -33,16 +33,17 @@ export default function ExternalCountdownSection({
 }: ExternalCountdownSectionProps) {
   const config = invitation.countdown;
   const ts = resolveTextStyles(theme, invitation.textStyles);
-  const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft>(() =>
-    computeCountdownTimeLeft(invitation.date.iso, invitation.date.time),
-  );
+  const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const updateTimeLeft = () => {
       setTimeLeft(
         computeCountdownTimeLeft(invitation.date.iso, invitation.date.time),
       );
-    }, 1000);
+    };
+
+    updateTimeLeft();
+    const interval = setInterval(updateTimeLeft, 1000);
 
     return () => clearInterval(interval);
   }, [invitation.date.iso, invitation.date.time]);
@@ -53,17 +54,30 @@ export default function ExternalCountdownSection({
   const cardBg = config.cardBg || "rgba(255, 252, 244, 0.72)";
   const cardBorder = config.cardBorder || theme.cardBorder;
   const cardBorderRadius = config.cardBorderRadius ?? 12;
+  const displayTimeLeft = timeLeft ?? {
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  };
   const isCelebration =
+    timeLeft !== null &&
     timeLeft.days === 0 &&
     timeLeft.hours === 0 &&
     timeLeft.minutes === 0 &&
     timeLeft.seconds === 0;
 
   const units = [
-    { value: timeLeft.days, label: config.daysLabel || DEFAULT_DAYS },
-    { value: timeLeft.hours, label: config.hoursLabel || DEFAULT_HOURS },
-    { value: timeLeft.minutes, label: config.minutesLabel || DEFAULT_MINUTES },
-    { value: timeLeft.seconds, label: config.secondsLabel || DEFAULT_SECONDS },
+    { value: displayTimeLeft.days, label: config.daysLabel || DEFAULT_DAYS },
+    { value: displayTimeLeft.hours, label: config.hoursLabel || DEFAULT_HOURS },
+    {
+      value: displayTimeLeft.minutes,
+      label: config.minutesLabel || DEFAULT_MINUTES,
+    },
+    {
+      value: displayTimeLeft.seconds,
+      label: config.secondsLabel || DEFAULT_SECONDS,
+    },
   ];
 
   return (
