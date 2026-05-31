@@ -11,7 +11,6 @@ import {
   FolderKanban,
   GalleryVerticalEnd,
   Heart,
-  LayoutDashboard,
   LayoutTemplate,
   LogOut,
   PenTool,
@@ -43,15 +42,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navMain = [
   {
-    title: "Painel",
-    url: "/admin",
-    icon: LayoutDashboard,
-    isActive: true,
-  },
-  {
     title: "Convites",
     url: "/admin/invitations",
     icon: Heart,
+    isActive: true,
   },
   {
     title: "Analíticas",

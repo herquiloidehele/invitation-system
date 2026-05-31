@@ -42,7 +42,7 @@ function LoginFormFields() {
         return;
       }
 
-      const from = searchParams.get("from") || "/admin";
+      const from = searchParams.get("from") || "/admin/invitations";
       router.push(from);
       router.refresh();
     } catch {

@@ -62,7 +62,6 @@ function getBreadcrumbs(pathname: string) {
 
   if (segments[0] === "admin") {
     if (segments[1] === "invitations") {
-      crumbs.push({ label: "Admin", href: "/admin" });
       crumbs.push({ label: "Convites", href: "/admin/invitations" });
 
       if (segments[2] === "new") {
@@ -74,7 +73,6 @@ function getBreadcrumbs(pathname: string) {
         });
       }
     } else if (segments[1] === "save-the-dates") {
-      crumbs.push({ label: "Admin", href: "/admin" });
       crumbs.push({ label: "Save the Date", href: "/admin/save-the-dates" });
 
       if (segments[2] === "new") {
@@ -86,7 +84,6 @@ function getBreadcrumbs(pathname: string) {
         });
       }
     } else if (segments[1] === "save-the-date-themes") {
-      crumbs.push({ label: "Admin", href: "/admin" });
       crumbs.push({ label: "Modelos STD", href: "/admin/save-the-date-themes" });
 
       if (segments[2] === "new") {
@@ -97,10 +94,8 @@ function getBreadcrumbs(pathname: string) {
           href: `/admin/save-the-date-themes/${segments[2]}/edit`,
         });
       }
-    } else {
-      crumbs.push({ label: "Painel", href: "/admin" });
     }
   }
 
-  return crumbs.length > 0 ? crumbs : [{ label: "Painel", href: "/admin" }];
+  return crumbs.length > 0 ? crumbs : [{ label: "Convites", href: "/admin/invitations" }];
 }
