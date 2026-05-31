@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -24,6 +24,7 @@ import { ExternalLink, Pencil, Plus, Search, Trash2, Users } from "lucide-react"
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { SaveTheDateRow } from "./page";
+import { getSaveTheDateEditPath } from "@/lib/admin-row-navigation";
 
 interface Props {
   items: SaveTheDateRow[];
@@ -81,6 +82,20 @@ export function SaveTheDatesClient({ items: initial }: Props) {
       month: "short",
       year: "numeric",
     });
+
+  const openSaveTheDate = (id: string) => {
+    router.push(getSaveTheDateEditPath(id));
+  };
+
+  const handleRowKeyDown = (
+    event: KeyboardEvent<HTMLTableRowElement>,
+    id: string,
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openSaveTheDate(id);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -149,7 +164,14 @@ export function SaveTheDatesClient({ items: initial }: Props) {
               </TableRow>
             ) : (
               filtered.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow
+                  key={item.id}
+                  role="link"
+                  tabIndex={0}
+                  className="cursor-pointer"
+                  onClick={() => openSaveTheDate(item.id)}
+                  onKeyDown={(event) => handleRowKeyDown(event, item.id)}
+                >
                   <TableCell className="font-medium">
                     {item.couple.bride} & {item.couple.groom}
                   </TableCell>
@@ -162,7 +184,11 @@ export function SaveTheDatesClient({ items: initial }: Props) {
                   <TableCell>{item.date.display}</TableCell>
                   <TableCell>{fmt(item.createdAt)}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
+                    <div
+                      className="flex items-center justify-end gap-1"
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
                       <Link
                         href={`/s/${item.slug}`}
                         target="_blank"

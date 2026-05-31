@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -40,6 +40,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trash2, Users, CheckCircle2, XCircle, Heart, CalendarHeart } from "lucide-react";
 import { toast } from "sonner";
+import {
+  getInvitationRsvpPath,
+  getSaveTheDateRsvpPath,
+} from "@/lib/admin-row-navigation";
 import type {
   InvitationSummary,
   RsvpResponseWithInvitation,
@@ -209,6 +213,20 @@ function InvitationsTab({
     }
   }, []);
 
+  const openInvitationResponses = (slug: string) => {
+    router.push(getInvitationRsvpPath(slug));
+  };
+
+  const handleInvitationRowKeyDown = (
+    event: KeyboardEvent<HTMLTableRowElement>,
+    slug: string,
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openInvitationResponses(slug);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <StatsBar
@@ -272,7 +290,16 @@ function InvitationsTab({
                 </TableHeader>
                 <TableBody>
                   {responses.map((r) => (
-                    <TableRow key={r.id}>
+                    <TableRow
+                      key={r.id}
+                      role="link"
+                      tabIndex={0}
+                      className="cursor-pointer"
+                      onClick={() => openInvitationResponses(r.invitationSlug)}
+                      onKeyDown={(event) =>
+                        handleInvitationRowKeyDown(event, r.invitationSlug)
+                      }
+                    >
                       <TableCell>
                         <div className="font-medium">{r.guestName}</div>
                         {r.email && (
@@ -314,7 +341,10 @@ function InvitationsTab({
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                         {formatDate(r.submittedAt)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell
+                        onClick={(event) => event.stopPropagation()}
+                        onKeyDown={(event) => event.stopPropagation()}
+                      >
                         <DeleteButton
                           id={r.id}
                           guestName={r.guestName}
@@ -376,6 +406,20 @@ function SaveTheDateTab({
       toast.error("Erro ao eliminar confirmação. Tente novamente.");
     }
   }, []);
+
+  const openSaveTheDateResponses = (slug: string) => {
+    router.push(getSaveTheDateRsvpPath(slug));
+  };
+
+  const handleSaveTheDateRowKeyDown = (
+    event: KeyboardEvent<HTMLTableRowElement>,
+    slug: string,
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openSaveTheDateResponses(slug);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -441,7 +485,16 @@ function SaveTheDateTab({
                 </TableHeader>
                 <TableBody>
                   {responses.map((r) => (
-                    <TableRow key={r.id}>
+                    <TableRow
+                      key={r.id}
+                      role="link"
+                      tabIndex={0}
+                      className="cursor-pointer"
+                      onClick={() => openSaveTheDateResponses(r.saveTheDateSlug)}
+                      onKeyDown={(event) =>
+                        handleSaveTheDateRowKeyDown(event, r.saveTheDateSlug)
+                      }
+                    >
                       <TableCell>
                         <div className="font-medium">{r.guestName}</div>
                         {r.email && (
@@ -486,7 +539,10 @@ function SaveTheDateTab({
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                         {formatDate(r.submittedAt)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell
+                        onClick={(event) => event.stopPropagation()}
+                        onKeyDown={(event) => event.stopPropagation()}
+                      >
                         <DeleteButton
                           id={r.id}
                           guestName={r.guestName}

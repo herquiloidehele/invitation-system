@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -64,6 +64,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { InvitationRow } from "./page";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
+import { getInvitationEditPath } from "@/lib/admin-row-navigation";
 
 const TEMPLATE_LABELS: Record<string, string> = {
   "pink-floral": "Pink Floral",
@@ -160,6 +161,20 @@ export function InvitationsClient({
       month: "2-digit",
       year: "numeric",
     });
+
+  const openInvitation = (id: string) => {
+    router.push(getInvitationEditPath(id));
+  };
+
+  const handleRowKeyDown = (
+    event: KeyboardEvent<HTMLTableRowElement>,
+    id: string,
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openInvitation(id);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -361,7 +376,14 @@ export function InvitationsClient({
                       secondaryName: inv.couple.groom,
                     });
                     return (
-                      <TableRow key={inv.id}>
+                      <TableRow
+                        key={inv.id}
+                        role="link"
+                        tabIndex={0}
+                        className="cursor-pointer"
+                        onClick={() => openInvitation(inv.id)}
+                        onKeyDown={(event) => handleRowKeyDown(event, inv.id)}
+                      >
                         <TableCell className="font-medium whitespace-nowrap">
                           {coupleName}
                         </TableCell>
@@ -411,7 +433,11 @@ export function InvitationsClient({
                         </TableCell>
 
                         <TableCell>
-                          <div className="flex items-center justify-end gap-1">
+                          <div
+                            className="flex items-center justify-end gap-1"
+                            onClick={(event) => event.stopPropagation()}
+                            onKeyDown={(event) => event.stopPropagation()}
+                          >
                             <Link
                               href={`/${inv.slug}`}
                               target="_blank"

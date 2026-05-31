@@ -50,3 +50,4 @@ docs/
 
 /lib/generated/prisma
 .agents/
+.junie/
