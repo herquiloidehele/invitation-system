@@ -44,6 +44,7 @@ function EnvelopeInvitationView({
   const [showContent, setShowContent] = useState(false);
   const [videoVisible, setVideoVisible] = useState(false);
   const [externalLinkVisible, setExternalLinkVisible] = useState(false);
+  const [richExternalLinkVisible, setRichExternalLinkVisible] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<ExternalVideoPageHandle | null>(null);
@@ -199,7 +200,7 @@ function EnvelopeInvitationView({
     //    cover; just reveal it — no extra fetch needed.
     if (type === "external_link") {
       if (isRichExternalLink) {
-        setShowContent(true);
+        setRichExternalLinkVisible(true);
         requestAnimationFrame(() => setCoverVisible(false));
         return;
       }
@@ -218,19 +219,6 @@ function EnvelopeInvitationView({
   function renderContent() {
     // External link/video are rendered as persistent siblings (outside this
     // AnimatePresence) so they can prefetch behind the envelope cover.
-    // For rich external_link invitations, render the full scrollable page
-    // (composed inline, not as a sibling) so it animates in like a standard
-    // invitation when the envelope completes.
-    if (isRichExternalLink) {
-      return (
-        <RichExternalLinkPage
-          invitation={invitation}
-          theme={theme}
-          audioRef={audioRef}
-          prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
-        />
-      );
-    }
     // Default: standard full invitation page.
     return (
       <InvitationPage
@@ -274,6 +262,32 @@ function EnvelopeInvitationView({
             externalLink={effectiveExternalLink}
             visible={externalLinkVisible}
           />
+        )}
+
+        {/* Rich external link page — mounted immediately so its iframe and
+            rich sections load in parallel with the envelope cover, then
+            faded in when the envelope animation completes. */}
+        {isRichExternalLink && (
+          <motion.div
+            aria-hidden={!richExternalLinkVisible}
+            initial={false}
+            animate={{ opacity: richExternalLinkVisible ? 1 : 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            style={{
+              position: richExternalLinkVisible ? "relative" : "absolute",
+              inset: richExternalLinkVisible ? undefined : 0,
+              zIndex: richExternalLinkVisible ? 1 : -1,
+              overflow: richExternalLinkVisible ? "visible" : "hidden",
+              pointerEvents: richExternalLinkVisible ? "auto" : "none",
+            }}
+          >
+            <RichExternalLinkPage
+              invitation={invitation}
+              theme={theme}
+              audioRef={audioRef}
+              prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+            />
+          </motion.div>
         )}
 
         {/* Persistent prefetch video — mounted once and reused by InvitationPage
