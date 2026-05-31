@@ -20,8 +20,15 @@ import { EditableText } from "./EditableText";
 import { t } from "@/lib/custom-texts";
 
 // Dynamically import the map with ssr: false to prevent Leaflet from being
-// evaluated on the server (Leaflet requires `window`, which doesn't exist in SSR)
-const MinimalistMap = dynamic(() => import("./MinimalistMap"), { ssr: false });
+// evaluated on the server (Leaflet requires `window`, which doesn't exist in SSR).
+// The `loading: () => null` placeholder lets turbopack treat this as a true
+// on-demand split — without it, the Leaflet chunk (~500 KB decoded) was
+// being eagerly prefetched on every invitation page even when the current
+// card had no coordinates and would never render the map.
+const MinimalistMap = dynamic(() => import("./MinimalistMap"), {
+  ssr: false,
+  loading: () => null,
+});
 
 // ---------------------------------------------------------------------------
 // Helpers

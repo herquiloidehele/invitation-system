@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "./db";
 import type { TemplateTheme } from "./types";
 import type { Theme } from "./generated/prisma/client";
@@ -64,10 +65,12 @@ export async function getThemes(): Promise<TemplateTheme[]> {
 }
 
 /** Fetch a single theme by its slug name (e.g. "pink-floral"). Returns null if not found. */
-export async function getTheme(name: string): Promise<TemplateTheme | null> {
-  const row = await prisma.theme.findUnique({ where: { name } });
-  return row ? toTemplateTheme(row) : null;
-}
+export const getTheme = cache(
+  async (name: string): Promise<TemplateTheme | null> => {
+    const row = await prisma.theme.findUnique({ where: { name } });
+    return row ? toTemplateTheme(row) : null;
+  },
+);
 
 /** Fetch a single theme by its database id. Returns null if not found. */
 export async function getThemeById(id: string): Promise<TemplateTheme | null> {

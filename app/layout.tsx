@@ -1,48 +1,36 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import {
-  Cinzel,
-  Cormorant_Garamond,
-  DM_Serif_Display,
-  Fraunces,
-  Geist,
-  Great_Vibes,
-  Homemade_Apple,
-  Libre_Baskerville,
-  Lora,
-  Manrope,
-  Outfit,
-  Pinyon_Script,
-  Playfair_Display,
-} from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-// `preload: false` only disables the <link rel="preload"> header for these
-// fonts — the @font-face rules stay in the generated CSS, so the browser
-// still fetches the file when a theme actually references the family. Public
-// invitation pages otherwise eagerly download every decorative font even
-// when the current theme only uses 2-3 of them.
+// Static-font policy (2026-05-31):
+//
+// Previously the root layout statically loaded 13 Google Font families.
+// Even with `preload: false`, every page shipped the @font-face rules
+// and CSS variable bindings, leaving ~188 stale entries in
+// document.fonts on a cold load and adding ~70 KB of font CSS to every
+// route.
+//
+// We now ship only the two families that are used outside theme-driven
+// UI:
+//   * Outfit — the global body/UI font (referenced by `app/globals.css`).
+//     Eagerly preloaded.
+//   * Cormorant Garamond — a common decorative fallback used by base
+//     components when a theme hasn't supplied a display font yet. Loaded
+//     without preload so the bytes only ship if a theme references it.
+//
+// All other decorative families are loaded on demand by the per-theme
+// `useDynamicFonts` hook (hooks/useDynamicFont.ts), which injects a
+// <link rel="stylesheet"> only when a theme actually references the
+// family. See `lib/google-fonts.ts` for the registered builtins and the
+// canonical Google Fonts URL builder.
 
-const geist = Geist({
+const outfit = Outfit({
+  weight: ["300", "400", "500", "600"],
   subsets: ["latin"],
-  variable: "--font-sans",
-  preload: false,
-});
-
-const greatVibes = Great_Vibes({
-  weight: ["400"],
-  subsets: ["latin"],
-  variable: "--font-great-vibes",
-  preload: false,
-});
-
-const playfairDisplay = Playfair_Display({
-  weight: ["400", "600"],
-  subsets: ["latin"],
-  variable: "--font-playfair-display",
-  preload: false,
+  variable: "--font-outfit",
 });
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -50,74 +38,6 @@ const cormorantGaramond = Cormorant_Garamond({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-cormorant-garamond",
-  preload: false,
-});
-
-const homemadeApple = Homemade_Apple({
-  weight: ["400"],
-  subsets: ["latin"],
-  variable: "--font-homemade-apple",
-  preload: false,
-});
-
-const libreBaskerville = Libre_Baskerville({
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-libre-baskerville",
-  preload: false,
-});
-
-const cinzel = Cinzel({
-  weight: ["400", "600"],
-  subsets: ["latin"],
-  variable: "--font-cinzel",
-  preload: false,
-});
-
-const lora = Lora({
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-lora",
-  preload: false,
-});
-
-// Outfit is the global UI font (body uses `var(--font-outfit)` in
-// `app/globals.css`), so it is the only family we keep eagerly preloaded.
-const outfit = Outfit({
-  weight: ["300", "400", "500", "600"],
-  subsets: ["latin"],
-  variable: "--font-outfit",
-});
-
-const dmSerifDisplay = DM_Serif_Display({
-  weight: ["400"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-dm-serif-display",
-  preload: false,
-});
-
-const pinyonScript = Pinyon_Script({
-  weight: ["400"],
-  subsets: ["latin"],
-  variable: "--font-pinyon-script",
-  preload: false,
-});
-
-const manrope = Manrope({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-manrope",
-  preload: false,
-});
-
-const fraunces = Fraunces({
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-fraunces",
   preload: false,
 });
 
@@ -180,7 +100,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={cn("font-sans", geist.variable)}
+      className={cn("font-sans", outfit.variable)}
       suppressHydrationWarning
     >
       <head>
@@ -193,7 +113,7 @@ export default async function RootLayout({
         )}
       </head>
       <body
-        className={`${greatVibes.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${homemadeApple.variable} ${libreBaskerville.variable} ${cinzel.variable} ${lora.variable} ${outfit.variable} ${dmSerifDisplay.variable} ${pinyonScript.variable} ${manrope.variable} ${fraunces.variable} antialiased`}
+        className={`${cormorantGaramond.variable} ${outfit.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
           {children}

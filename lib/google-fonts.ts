@@ -37,21 +37,17 @@ interface GoogleFontsAPIResponse {
 }
 
 // ---------------------------------------------------------------------------
-// Builtin fonts — the 10 fonts loaded via next/font/google in app/layout.tsx.
-// These are self-hosted and performance-optimized; we mark them as "builtin" so
-// the font picker can prioritise them.
+// Builtin fonts — the 2 fonts loaded via next/font/google in app/layout.tsx.
+// These are self-hosted and performance-optimized; we mark them as "builtin"
+// so the font picker can prioritise them AND so `useDynamicFonts` skips
+// re-injecting a Google Fonts <link> for them.
+//
+// All other decorative families are loaded on demand at runtime, so they
+// are NOT listed here.
 // ---------------------------------------------------------------------------
 
 export const BUILTIN_FONT_FAMILIES: string[] = [
   "Cormorant Garamond",
-  "Playfair Display",
-  "Libre Baskerville",
-  "Cinzel",
-  "Lora",
-  "DM Serif Display",
-  "Great Vibes",
-  "Homemade Apple",
-  "Pinyon Script",
   "Outfit",
 ];
 

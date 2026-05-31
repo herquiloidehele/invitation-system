@@ -1,22 +1,45 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
-import InvitationPage from "@/components/shared/InvitationPage";
-import ExternalVideoPage, {
-  type ExternalVideoPageHandle,
-} from "@/components/shared/ExternalVideoPage";
-import ExternalLinkPage from "@/components/shared/ExternalLinkPage";
-import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
-import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { hasRichExternalSections } from "@/lib/external-invitation-form";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
+
+// Each invitation type renders exactly one of these pages. Splitting them
+// behind dynamic imports keeps the per-guest bundle to just the path
+// they actually see (e.g. a standard invitation no longer ships the
+// Canva embed or scratch-coin canvas code). `ssr: false` is safe — the
+// branching is purely client-state. `EnvelopeCover` stays static because
+// it's the only thing rendered before the user taps; lazy-loading it
+// would block first paint.
+const InvitationPage = dynamic(
+  () => import("@/components/shared/InvitationPage"),
+  { ssr: false },
+);
+const ExternalVideoPage = dynamic(
+  () => import("@/components/shared/ExternalVideoPage"),
+  { ssr: false },
+);
+const ExternalLinkPage = dynamic(
+  () => import("@/components/shared/ExternalLinkPage"),
+  { ssr: false },
+);
+const RichExternalLinkPage = dynamic(
+  () => import("@/components/shared/RichExternalLinkPage"),
+  { ssr: false },
+);
+const CurtainCanvaPage = dynamic(
+  () => import("@/components/curtain-canva/CurtainCanvaPage"),
+  { ssr: false },
+);
 
 interface InvitationViewProps {
   invitation: InvitationData;
@@ -111,11 +134,32 @@ function EnvelopeInvitationView({
   const handleOpen = useCallback(() => {
     trackEvent("envelope_open");
 
+    // The hidden hero video and background audio were mounted with
+    // preload="metadata" so the envelope view stays cheap on cold load.
+    // The tap is the user gesture that unlocks autoplay AND tells us
+    // they're committed to viewing the invitation, so upgrade to a full
+    // preload and kick off `load()` immediately.
+    const heroVideo = heroVideoRef.current;
+    if (heroVideo) {
+      try {
+        heroVideo.preload = "auto";
+        heroVideo.load();
+      } catch {
+        /* ignore: some browsers throw if load() is called too early */
+      }
+    }
+
     // Use the pre-buffered <audio> element so playback starts instantly
     if (hasBackgroundAudio) {
       try {
         const audio = audioRef.current;
         if (!audio) return;
+        audio.preload = "auto";
+        try {
+          audio.load();
+        } catch {
+          /* ignore */
+        }
         audio.loop = true;
         audio.volume = 0.03;
         audio
@@ -291,12 +335,15 @@ function EnvelopeInvitationView({
         )}
 
         {/* Persistent prefetch video — mounted once and reused by InvitationPage
-            via ref so the browser never re-downloads the video. */}
+            via ref so the browser never re-downloads the video. `preload`
+            stays at "metadata" until the user taps the envelope, at which
+            point `handleOpen` upgrades it to a full fetch. This saves
+            ~3 MB of mobile data for guests who never tap. */}
         {isStandardWithVideo && (
           <video
             ref={heroVideoRef}
             src={invitation.videoUrl!}
-            preload="auto"
+            preload="metadata"
             muted
             loop
             playsInline
@@ -311,14 +358,14 @@ function EnvelopeInvitationView({
           />
         )}
 
-        {/* Persistent prefetch audio — mounted once so the browser downloads
-            the audio file while the envelope animation is visible. Reused by
-            handleOpen to start playback instantly without waiting for a fetch. */}
+        {/* Persistent prefetch audio — mounted once. `preload="metadata"`
+            keeps the cold-start payload small; `handleOpen` upgrades to a
+            full fetch + `.load()` the moment the user taps the envelope. */}
         {hasBackgroundAudio && (
           <audio
             ref={audioRef}
             src={invitation.audio.src}
-            preload="auto"
+            preload="metadata"
             aria-hidden
             style={{
               position: "absolute",

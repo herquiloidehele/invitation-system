@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import type {
   ImageSettingsKey,
   ImageSettingsMap,
@@ -42,15 +43,16 @@ export default function SectionImage({
         overflow: "hidden",
       }}
     >
-      <img
+      <Image
         src={src}
         alt=""
         aria-hidden="true"
+        fill
+        // Invitation column is capped at 500 px; `sizes` lets Next.js pick
+        // the right responsive variant without overfetching on mobile.
+        sizes="(max-width: 500px) 100vw, 500px"
         style={{
-          width: "100%",
-          height: "100%",
           objectFit: "cover",
-          display: "block",
           opacity: 0.85,
           ...imgStyle,
         }}

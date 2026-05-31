@@ -123,7 +123,10 @@ export default function ScratchCoin({
       canvas.style.width = `${size}px`;
       canvas.style.height = `${size}px`;
 
-      const ctx = canvas.getContext("2d");
+      // `willReadFrequently` keeps the canvas on a CPU backing store so
+      // the frequent `getImageData` readbacks below don't trigger a
+      // GPU→CPU sync every time.
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
 
       const cx = cw / 2;
@@ -201,7 +204,7 @@ export default function ScratchCoin({
   const checkReveal = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || revealedRef.current) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
     const data = ctx.getImageData(0, 0, cw, ch).data;
 
@@ -233,7 +236,7 @@ export default function ScratchCoin({
     (x: number, y: number) => {
       const canvas = canvasRef.current;
       if (!canvas || revealedRef.current) return;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
       const r = brushRadius * dpr;
 

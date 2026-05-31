@@ -1,11 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
-import RSVPForm, {
-  type RSVPFormDirectProps,
-  type RSVPFormIntegrationProps,
+import type {
+  RSVPFormDirectProps,
+  RSVPFormIntegrationProps,
 } from "./RSVPForm";
+
+// `RSVPForm` pulls in react-hook-form + zod + @hookform/resolvers
+// (~1 MB decoded). Lazy-load it so guests who never open the RSVP
+// modal don't pay the cost. `ssr: false` is safe — the form is only
+// reachable behind a client-state-driven open flag.
+const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
 
 // ---------------------------------------------------------------------------
 // Modal-only props — accept the same union as RSVPForm plus open/onClose

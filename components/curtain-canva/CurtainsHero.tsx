@@ -88,6 +88,7 @@ export default function CurtainsHero({
   // burst from re-firing on every subsequent `timeupdate` and from
   // double-firing alongside the on-end fallback below.
   const confettiFiredRef = useRef(false);
+  const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Notify the parent the first time we reach the revealed state so it can
   // unlock the page scroll. Fires for both the natural video-end path and
@@ -114,6 +115,19 @@ export default function CurtainsHero({
     }
   }, []);
 
+  // Unmount cleanup: stop the audio fade if it is still running. The
+  // parent (`CurtainCanvaPage`) handles pausing the audio element itself,
+  // but if we leave the interval ticking it keeps mutating audio.volume
+  // on a paused element after the component is gone.
+  useEffect(() => {
+    return () => {
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+        fadeIntervalRef.current = null;
+      }
+    };
+  }, []);
+
   const tapLabel = t(customTexts, "curtain_tapToOpen");
   const videoSrc = resolveCurtainVideoSrc(videoUrl);
 
@@ -133,11 +147,21 @@ export default function CurtainsHero({
         .play()
         .then(() => {
           let vol = 0.03;
+          // Clear any prior fade (e.g. fast double-tap) before starting a new one.
+          if (fadeIntervalRef.current) {
+            clearInterval(fadeIntervalRef.current);
+          }
           const fade = setInterval(() => {
             vol = Math.min(vol + 0.02, 0.5);
             audio.volume = vol;
-            if (vol >= 0.5) clearInterval(fade);
+            if (vol >= 0.5) {
+              clearInterval(fade);
+              if (fadeIntervalRef.current === fade) {
+                fadeIntervalRef.current = null;
+              }
+            }
           }, 200);
+          fadeIntervalRef.current = fade;
         })
         .catch(() => {
           /* autoplay rejection — keep silent */
