@@ -73,6 +73,12 @@ export const DEFAULT_TEXTS: Required<CustomTexts> = {
 
   // -- Misc --
   map_unavailableOffline: "Mapa indisponível offline",
+
+  // -- Personal Guest Card --
+  guestCard_label: "— Convite Pessoal —",
+  guestCard_tableLabel: "Mesa",
+  guestCard_noteLabel: "Nota",
+  guestCard_inviteButton: "Convidar mais pessoas",
 };
 
 // ---------------------------------------------------------------------------
@@ -390,6 +396,32 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         key: "map_unavailableOffline",
         label: "Mapa indisponível",
         placeholder: DEFAULT_TEXTS.map_unavailableOffline,
+      },
+    ],
+  },
+  {
+    id: "guestCard",
+    label: "Convite Pessoal",
+    fields: [
+      {
+        key: "guestCard_label",
+        label: "Etiqueta do convite",
+        placeholder: DEFAULT_TEXTS.guestCard_label,
+      },
+      {
+        key: "guestCard_tableLabel",
+        label: "Label da mesa",
+        placeholder: DEFAULT_TEXTS.guestCard_tableLabel,
+      },
+      {
+        key: "guestCard_noteLabel",
+        label: "Label da nota",
+        placeholder: DEFAULT_TEXTS.guestCard_noteLabel,
+      },
+      {
+        key: "guestCard_inviteButton",
+        label: "Botão convidar mais",
+        placeholder: DEFAULT_TEXTS.guestCard_inviteButton,
       },
     ],
   },

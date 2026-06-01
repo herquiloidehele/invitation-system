@@ -20,7 +20,7 @@ import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { t } from "@/lib/custom-texts";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
-import PersonalGuestCard from "./PersonalGuestCard";
+import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST } from "./PersonalGuestCard";
 import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
@@ -442,8 +442,13 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* Personal guest card — shown when ?g=<token> matches a guest       */}
       {/* ================================================================= */}
-      {invitation.guest && (
-        <PersonalGuestCard guest={invitation.guest} theme={theme} />
+      {(invitation.guest || isPreview) && (
+        <PersonalGuestCard
+          guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
+          theme={theme}
+          textStyles={invitation.textStyles}
+          customTexts={invitation.customTexts}
+        />
       )}
 
       {/* ================================================================= */}

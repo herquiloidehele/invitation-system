@@ -434,6 +434,19 @@ export interface TextStyleOverrides {
     stdBottomHeroTitle?: TextStyle;
     /** Bottom hero section description overlay */
     stdBottomHeroDescription?: TextStyle;
+    // -- Personal Guest Card --
+    /** "— Convite Pessoal —" eyebrow label */
+    guestCardLabel?: TextStyle;
+    /** Guest name heading */
+    guestCardName?: TextStyle;
+    /** "&" + companion name block */
+    guestCardCompanion?: TextStyle;
+    /** Pill label (Mesa / Nota) */
+    guestCardPillLabel?: TextStyle;
+    /** Pill value (table label / note text) */
+    guestCardPillValue?: TextStyle;
+    /** "Convidar mais pessoas" button text */
+    guestCardInviteButton?: TextStyle;
   };
 }
 
@@ -512,6 +525,12 @@ export interface CustomTexts {
 
   // -- Misc --
   map_unavailableOffline?: string;
+
+  // -- Personal Guest Card --
+  guestCard_label?: string;
+  guestCard_tableLabel?: string;
+  guestCard_noteLabel?: string;
+  guestCard_inviteButton?: string;
 }
 
 export interface InvitationData {

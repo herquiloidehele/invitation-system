@@ -14,7 +14,7 @@ import dynamic from "next/dynamic";
 // Lazy-load RSVPForm so its react-hook-form + zod dependencies only
 // ship when a guest actually scrolls down to the RSVP section.
 const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
-import PersonalGuestCard from "./PersonalGuestCard";
+import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST } from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import DynamicFontLoader from "./DynamicFontLoader";
@@ -187,8 +187,13 @@ export default function RichExternalLinkPage({
         </>
       )}
 
-      {invitation.guest && (
-        <PersonalGuestCard guest={invitation.guest} theme={theme} />
+      {(invitation.guest || isPreview) && (
+        <PersonalGuestCard
+          guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
+          theme={theme}
+          textStyles={invitation.textStyles}
+          customTexts={invitation.customTexts}
+        />
       )}
 
       {scratchOn && (
