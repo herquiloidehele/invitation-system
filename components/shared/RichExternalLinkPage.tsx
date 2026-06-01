@@ -17,6 +17,7 @@ const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
 import PersonalGuestCard from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
+import DynamicFontLoader from "./DynamicFontLoader";
 
 interface RichExternalLinkPageProps {
   invitation: InvitationData;
@@ -168,6 +169,8 @@ export default function RichExternalLinkPage({
         overflowAnchor: "none",
       }}
     >
+      <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
+
       {heroOn && (
         <>
           <InvitationHero
