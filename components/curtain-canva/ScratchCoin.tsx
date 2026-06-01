@@ -382,8 +382,6 @@ export default function ScratchCoin({
             height: "100%",
             borderRadius: "50%",
             cursor: revealed ? "default" : "pointer",
-            // Soft drop-shadow so the coin reads as a 3D object on the page
-            filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.18))",
             // After the coin is scratched the canvas fades to opacity 0 but
             // stays in the DOM (so its lazy paint/teardown doesn't cause a
             // flicker). Turning off pointer events lets the revealed content
