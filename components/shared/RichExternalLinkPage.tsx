@@ -184,10 +184,6 @@ export default function RichExternalLinkPage({
         </>
       )}
 
-      {countdownOn && (
-        <ExternalCountdownSection invitation={invitation} theme={theme} />
-      )}
-
       {invitation.guest && (
         <PersonalGuestCard guest={invitation.guest} theme={theme} />
       )}
@@ -199,6 +195,10 @@ export default function RichExternalLinkPage({
           customTexts={invitation.customTexts}
           textStyles={invitation.textStyles}
         />
+      )}
+
+      {countdownOn && (
+        <ExternalCountdownSection invitation={invitation} theme={theme} />
       )}
 
       <CanvaEmbed

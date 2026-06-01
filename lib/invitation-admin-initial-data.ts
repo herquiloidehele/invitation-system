@@ -45,6 +45,7 @@ type AdminInvitationInitialDataRow = {
   sectionImages: unknown;
   parents: unknown;
   ourStory: unknown;
+  scratchReveal: unknown;
   countdown: unknown;
   textStyles: unknown;
   cardStyles: unknown;
@@ -100,6 +101,9 @@ export function toAdminInvitationInitialData(
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
+    scratchReveal:
+      (row.scratchReveal as InvitationData["scratchReveal"] | null) ??
+      undefined,
     countdown: (row.countdown as ExternalCountdownConfig | null) ?? undefined,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
