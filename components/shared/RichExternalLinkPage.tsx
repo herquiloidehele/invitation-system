@@ -188,12 +188,14 @@ export default function RichExternalLinkPage({
       )}
 
       {(invitation.guest || isPreview) && (
-        <PersonalGuestCard
-          guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
-          theme={theme}
-          textStyles={invitation.textStyles}
-          customTexts={invitation.customTexts}
-        />
+        <div className="pb-12 md:pb-16">
+          <PersonalGuestCard
+            guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
+            theme={theme}
+            textStyles={invitation.textStyles}
+            customTexts={invitation.customTexts}
+          />
+        </div>
       )}
 
       {scratchOn && (
