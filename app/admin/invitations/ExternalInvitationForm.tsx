@@ -138,6 +138,7 @@ function getDefaultState(
       enabled: false,
       showEmail: false,
       showDietaryRestrictions: true,
+      showOnExternalPage: false,
     },
     schedule: [],
     dressCode: { enabled: false, text: "" },
@@ -1903,6 +1904,22 @@ export default function ExternalInvitationForm({
                           checked={form.rsvp.showDietaryRestrictions !== false}
                           onCheckedChange={(v) =>
                             updateRsvp("showDietaryRestrictions", v)
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Mostrar RSVP no fim do convite externo</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, a página externa (link Canva sem
+                            secções extra) passa a ser rolável e mostra o
+                            formulário após o conteúdo.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.showOnExternalPage === true}
+                          onCheckedChange={(v) =>
+                            updateRsvp("showOnExternalPage", v)
                           }
                         />
                       </div>

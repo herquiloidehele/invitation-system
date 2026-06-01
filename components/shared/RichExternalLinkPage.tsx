@@ -187,7 +187,7 @@ export default function RichExternalLinkPage({
         </>
       )}
 
-      {(invitation.guest || isPreview) && (
+      {invitation.guestManagementEnabled && (
         <div className="pb-12 md:pb-16">
           <PersonalGuestCard
             guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}

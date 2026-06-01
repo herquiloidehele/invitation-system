@@ -29,9 +29,10 @@ export function getExternalInvitationEmbedSrc(externalLink: string): string {
 
 /**
  * Returns true if an external_link invitation has any optional rich section
- * enabled (hero — implicit via heroImage/videoUrl presence, scratch reveal,
- * or inline RSVP). Used by the public renderer to choose between the bare
- * fullscreen-iframe layout and the new scrollable rich-sections layout.
+ * enabled (hero — implicit via heroImage/videoUrl presence, countdown,
+ * scratch reveal, or an end-of-page RSVP form via rsvp.showOnExternalPage).
+ * Used by the public renderer to choose between the bare fullscreen-iframe
+ * layout and the scrollable rich-sections layout.
  */
 export function hasRichExternalSections(invitation: InvitationData): boolean {
   if ((invitation.invitationType ?? "standard") !== "external_link")
@@ -39,5 +40,10 @@ export function hasRichExternalSections(invitation: InvitationData): boolean {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
   const countdownOn = Boolean(invitation.countdown?.enabled);
   const scratchOn = Boolean(invitation.scratchReveal?.enabled);
-  return heroOn || countdownOn || scratchOn;
+  // Opt a bare external link into the scrollable rich layout when the RSVP
+  // form is enabled and configured to render at the end of the page.
+  const rsvpAtEndOn = Boolean(
+    invitation.rsvp?.enabled && invitation.rsvp?.showOnExternalPage,
+  );
+  return heroOn || countdownOn || scratchOn || rsvpAtEndOn;
 }

@@ -550,6 +550,7 @@ export interface InvitationData {
     deadline?: string;
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
+    showOnExternalPage?: boolean;
   };
   schedule: ScheduleEvent[];
   /** Visual layout for the schedule section. Defaults to "default". */
