@@ -4,12 +4,10 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import type { HeroFeature } from "@/lib/landing-features";
-import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function HeroSection({
   reduceMotion,
-  feature,
 }: {
   reduceMotion: boolean | null;
   feature: HeroFeature | null;
@@ -19,17 +17,19 @@ export function HeroSection({
       id="top"
       className="relative mx-auto grid min-h-screen max-w-7xl items-center gap-12 px-5 pb-20 pt-32 sm:px-8 lg:grid-cols-[0.95fr_1fr] lg:gap-16 lg:pt-24"
     >
-      <div className="absolute left-1/2 top-24 -z-0 h-72 w-72 rounded-full bg-[#E8EBE7] blur-3xl" />
       <HeroCopy reduceMotion={reduceMotion} />
-      {!!feature && (
-        <div className="relative z-10 mx-auto w-full max-w-[20rem] sm:max-w-[22rem] lg:max-w-[24rem]">
-          <PhoneIframePreview
-            title={feature.title || "Convite Brindeal"}
-            src={feature.href}
-            showCaption={false}
-          />
-        </div>
-      )}
+      <div className="relative z-10 mx-auto w-full max-w-[20rem] sm:max-w-88 lg:max-w-336">
+        <video
+          src="/videos/hero-phones-videos.mp4"
+          autoPlay
+          muted
+          // loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          className="h-auto w-full"
+        />
+      </div>
     </section>
   );
 }
