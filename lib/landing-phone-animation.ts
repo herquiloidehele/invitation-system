@@ -39,6 +39,6 @@ export function getPhoneFrameAnimation(
     wrapperClassName: "hero-phone-float",
     showAnimatedGlow: true,
     showStaticShadow: false,
-    showGlassSweep: true,
+    showGlassSweep: false,
   };
 }

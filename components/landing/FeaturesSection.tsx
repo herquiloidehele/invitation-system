@@ -1,13 +1,25 @@
+"use client";
+
 import Image from "next/image";
 import {
   BarChart3,
+  ImageIcon,
   Languages,
   Palette,
   Sparkles,
+  UserPen,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { AnimatedSection } from "./AnimatedSection";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
@@ -82,6 +94,8 @@ export function FeaturesSection() {
           >
             <CustomizationPanel />
           </FeatureSmallCard>
+
+          <PersonalizationCard />
         </div>
       </div>
     </AnimatedSection>
@@ -90,12 +104,6 @@ export function FeaturesSection() {
 
 function RsvpHero() {
   const t = useTranslations("LandingFeatures");
-  const guests = [
-    { name: "Luena Santos", imageUrl: landingImages.guestPortraitA },
-    { name: "Dário Monteiro", imageUrl: landingImages.guestPortraitB },
-    { name: "Ana Pereira", imageUrl: landingImages.guestPortraitC },
-  ];
-  const menu = [t("menuMeat"), t("menuFish"), t("menuVegetarian")];
 
   return (
     <article className="min-h-[360px] rounded-[1.75rem] bg-[#3F4E3F] p-8 text-white sm:p-10 lg:col-span-7 lg:min-h-[430px]">
@@ -108,46 +116,15 @@ function RsvpHero() {
       <p className="mt-5 max-w-3xl text-sm leading-7 text-[#E8EBE7] sm:text-base">
         {t("rsvpBody")}
       </p>
-      <div className="mt-10 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#E8EBE7]">
-        {t("menu")}
-        {menu.map((item) => (
-          <span
-            key={item}
-            className="rounded-full bg-white/12 px-3 py-1.5 text-[11px] font-semibold normal-case tracking-normal text-white"
-          >
-            {item}
-          </span>
-        ))}
-      </div>
-      <div className="mt-6 rounded-2xl bg-[#243326]/70 p-5 backdrop-blur">
-        <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-[#F6F7F5]">
-          <span>{t("received")}</span>
-          <span>142 / 150</span>
-        </div>
-        <div className="mt-5 h-2 rounded-full bg-black/20">
-          <div className="h-full w-[92%] rounded-full bg-[#6B7E68]" />
-        </div>
-        <div className="mt-5 flex items-center justify-between gap-4">
-          <div className="flex -space-x-2">
-            {guests.map((guest) => (
-              <span
-                key={guest.name}
-                className="relative block h-9 w-9 overflow-hidden rounded-full border-2 border-[#243326] bg-[#F6F7F5] shadow-[0_3px_12px_rgba(0,0,0,0.18)]"
-              >
-                <Image
-                  src={guest.imageUrl}
-                  alt={guest.name}
-                  fill
-                  sizes="36px"
-                  className="object-cover"
-                />
-              </span>
-            ))}
-            <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-[#243326] bg-[#9AA795] text-[10px] font-bold text-white shadow-[0_3px_12px_rgba(0,0,0,0.18)]">
-              +138
-            </span>
-          </div>
-          <span className="text-xs text-[#E8EBE7]">{t("updatedNow")}</span>
+      <div
+        className="mt-8 grid min-h-[180px] place-items-center rounded-2xl border border-dashed border-white/20 bg-[#243326]/60 p-8 text-center backdrop-blur"
+        aria-hidden="true"
+      >
+        <div>
+          <ImageIcon className="mx-auto size-10 text-white/40" />
+          <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/50">
+            {t("rsvpImagePlaceholder")}
+          </p>
         </div>
       </div>
     </article>
@@ -416,5 +393,70 @@ function CustomizationPanel() {
         Aa <span className="text-base font-normal text-[#5C605A]">Manrope</span>
       </p>
     </>
+  );
+}
+
+function PersonalizationCard() {
+  const t = useTranslations("LandingFeatures");
+  const tiers = t.raw("personalizationTiers") as ReadonlyArray<
+    readonly [string, string]
+  >;
+
+  return (
+    <article className="rounded-[1.5rem] border border-[#E5E7E4] bg-white p-6 shadow-[0_12px_40px_rgba(31,36,32,0.035)] sm:p-8 lg:col-span-12">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-5 sm:max-w-2xl">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#F6F7F5] text-[#3F4E3F]">
+            <UserPen className="size-5" aria-hidden="true" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
+              {t("personalizationTitle")}
+            </h3>
+            <p className="mt-3 text-sm leading-6 text-[#5C605A]">
+              {t("personalizationText")}
+            </p>
+          </div>
+        </div>
+        <Dialog>
+          <DialogTrigger
+            render={
+              <button
+                type="button"
+                className="shrink-0 self-start rounded-full bg-[#3F4E3F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+              />
+            }
+          >
+            {t("personalizationCta")}
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t("personalizationModalTitle")}</DialogTitle>
+              <DialogDescription>
+                {t("personalizationModalDescription")}
+              </DialogDescription>
+            </DialogHeader>
+            <ul className="mt-2 divide-y divide-[#E5E7E4] overflow-hidden rounded-2xl border border-[#E5E7E4] bg-[#F6F7F5]">
+              {tiers.map(([label, price]) => (
+                <li
+                  key={label}
+                  className="flex items-center justify-between gap-4 px-4 py-3"
+                >
+                  <span className="text-sm text-[#1F2420]">{label}</span>
+                  <span className="text-right">
+                    <span className="block text-lg font-semibold text-[#3F4E3F]">
+                      {price}
+                    </span>
+                    <span className="block text-[10px] uppercase tracking-[0.18em] text-[#5C605A]">
+                      {t("personalizationPerInvite")}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </article>
   );
 }
