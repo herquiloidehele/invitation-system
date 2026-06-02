@@ -156,12 +156,16 @@
     "body": "Everything you need to know before we start. Can't find the answer? We can talk on WhatsApp.",
     "contactTitle": "Talk now",
     "items": [
-      { "question": "How long does it take?", "answer": "Typically 3 to 5 business days after we receive photos and text. For close dates, we create express versions in 48h." },
-      { "question": "Can I use it for events beyond weddings?", "answer": "Yes. We adapt the experience for save the date, baptisms, engagements, birthdays and private celebrations." },
-      { "question": "How does RSVP work?", "answer": "Guests confirm directly in the invitation. You follow everything in a private dashboard, in real time." },
-      { "question": "Can I send it to individual guests?", "answer": "Yes. Each guest can receive a personalized link with names, table and specific details." },
-      { "question": "Can I edit after publishing?", "answer": "Yes. Text, schedule, map and detail adjustments can be updated after publishing." },
-      { "question": "How much does it cost?", "answer": "It depends on customization level, content and features. We send a clear proposal the same day." }
+      { "question": "What is the turnaround time?", "answer": "Turnaround ranges from 4 days to one month, depending on demand and the chosen model." },
+      { "question": "Can I personalize my invitation?", "answer": "Yes. We have fully customizable invitations as well as pre-designed templates — check each model's description." },
+      { "question": "Can I order for other events besides weddings?", "answer": "Yes, we create invitations for all kinds of events." },
+      { "question": "Can I personalize the invitation with the guest's name?", "answer": "Yes, with an additional fee per personalized invitation." },
+      { "question": "Can I receive the invitation as a PDF?", "answer": "Yes, but you risk receiving the pages split apart, and some features don't work in the PDF version." },
+      { "question": "How many changes can I make to the invitation?", "answer": "During production you can change the design once and edit texts up to 3 times at no cost. After approval, any further change carries an additional fee." },
+      { "question": "Do I need to share a WhatsApp number for confirmations?", "answer": "No. We use an integrated system that makes it easy to manage and track every confirmation." },
+      { "question": "Can I choose the music?", "answer": "Yes, music is optional." },
+      { "question": "How long does the invitation stay online?", "answer": "The domain stays live for 2 years." },
+      { "question": "Do you only make invitations in Portuguese?", "answer": "No. We make invitations in any language and for anywhere in the world." }
     ]
   },
   "LandingFooter": {

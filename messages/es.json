@@ -156,12 +156,16 @@
     "body": "Todo lo que necesitáis saber antes de empezar. ¿No encontráis la respuesta? Hablamos por WhatsApp.",
     "contactTitle": "Hablar ahora",
     "items": [
-      { "question": "¿Cuánto tiempo tarda?", "answer": "Normalmente de 3 a 5 días laborables después de recibir fotografías y textos. Para fechas cercanas, hacemos versiones exprés en 48h." },
-      { "question": "¿Puedo usarlo para otros eventos además de bodas?", "answer": "Sí. Adaptamos la experiencia para save the date, bautizos, compromisos, cumpleaños y celebraciones privadas." },
-      { "question": "¿Cómo funciona el RSVP?", "answer": "Los invitados confirman directamente en la invitación. Lo seguís todo en un panel privado, en tiempo real." },
-      { "question": "¿Puedo enviarlo a invitados individuales?", "answer": "Sí. Cada invitado puede recibir un enlace personalizado con nombres, mesa y detalles específicos." },
-      { "question": "¿Puedo editar después de publicar?", "answer": "Sí. Los ajustes de texto, horarios, mapas y detalles pueden actualizarse después de la publicación." },
-      { "question": "¿Cuánto cuesta?", "answer": "Depende del nivel de personalización, contenidos y funcionalidades. Enviamos una propuesta clara el mismo día." }
+      { "question": "¿Cuál es el plazo?", "answer": "El plazo varía de 4 días a un mes, según la demanda y el modelo elegido." },
+      { "question": "¿Puedo personalizar mi invitación?", "answer": "Sí. Tenemos invitaciones 100% personalizables y también modelos con diseño predefinido — consulta la descripción de cada modelo." },
+      { "question": "¿Puedo encargar para otro tipo de evento además de bodas?", "answer": "Sí, hacemos invitaciones para todo tipo de eventos." },
+      { "question": "¿Puedo personalizar la invitación con el nombre del invitado?", "answer": "Sí, con una tarifa adicional por cada invitación personalizada." },
+      { "question": "¿Puedo recibir la invitación en PDF?", "answer": "Sí, pero corres el riesgo de recibir las páginas separadas y algunos recursos no funcionan en la versión PDF." },
+      { "question": "¿Cuántas veces puedo hacer cambios en la invitación?", "answer": "Durante la producción puedes cambiar el diseño una vez y editar los textos hasta 3 veces, sin coste. Tras la aprobación, cualquier cambio tiene un coste adicional." },
+      { "question": "¿Necesito enviar un número de WhatsApp para las confirmaciones?", "answer": "No. Usamos un sistema integrado que facilita la gestión y el control de las confirmaciones." },
+      { "question": "¿Puedo elegir la música?", "answer": "Sí, la música es opcional." },
+      { "question": "¿Cuánto tiempo permanece la invitación online?", "answer": "El dominio permanece online durante 2 años." },
+      { "question": "¿Solo hacéis invitaciones en portugués?", "answer": "No. Hacemos invitaciones en cualquier idioma y para cualquier parte del mundo." }
     ]
   },
   "LandingFooter": {

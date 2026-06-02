@@ -173,28 +173,44 @@
     "contactTitle": "Falar agora",
     "items": [
       {
-        "question": "Quanto tempo demora?",
-        "answer": "Tipicamente 3 a 5 dias úteis depois de recebermos fotografias e textos. Para datas próximas, fazemos versões expressas em 48h."
+        "question": "Qual é o prazo?",
+        "answer": "O prazo varia de 4 dias a um mês, dependendo da procura e do modelo escolhido."
       },
       {
-        "question": "Posso usar para outros eventos além de casamento?",
-        "answer": "Sim. Adaptamos a experiência para save the date, baptizados, noivados, aniversários e celebrações privadas."
+        "question": "Posso personalizar o meu convite?",
+        "answer": "Sim. Temos convites 100% personalizáveis e também modelos com design pré-definido — consulte a descrição de cada modelo."
       },
       {
-        "question": "Como funciona o RSVP?",
-        "answer": "Os convidados confirmam directamente no convite. Acompanham tudo num painel privado, em tempo real."
+        "question": "Posso encomendar para outro tipo de evento além de casamento?",
+        "answer": "Sim, fazemos convites para todos os tipos de eventos."
       },
       {
-        "question": "Posso enviar a convidados individuais?",
-        "answer": "Sim. Cada convidado pode receber um link personalizado com nomes, mesa e detalhes específicos."
+        "question": "Posso personalizar o convite com o nome do convidado?",
+        "answer": "Sim, mediante o pagamento de uma taxa adicional por cada convite personalizado."
       },
       {
-        "question": "Posso editar depois de publicado?",
-        "answer": "Sim. Ajustes de texto, horários, mapas e detalhes podem ser actualizados depois da publicação."
+        "question": "Posso receber o convite em PDF?",
+        "answer": "Sim, mas corre o risco de receber as páginas separadas e alguns recursos não funcionam na versão PDF."
       },
       {
-        "question": "Quanto custa?",
-        "answer": "Depende do nível de personalização, conteúdos e funcionalidades. Enviamos uma proposta clara no mesmo dia."
+        "question": "Quantas vezes posso fazer alterações no convite?",
+        "answer": "Durante a produção pode alterar o design uma vez e fazer alterações de texto até 3 vezes, sem custo. Após a aprovação, qualquer alteração tem um custo adicional."
+      },
+      {
+        "question": "Preciso enviar o número de WhatsApp para confirmação?",
+        "answer": "Não. Usamos um sistema integrado que facilita a gestão e o controlo das confirmações."
+      },
+      {
+        "question": "Posso escolher a música?",
+        "answer": "Sim, a música é opcional."
+      },
+      {
+        "question": "Quanto tempo o convite fica disponível online?",
+        "answer": "O domínio fica online durante 2 anos."
+      },
+      {
+        "question": "Só fazem convites em português?",
+        "answer": "Não. Fazemos convites em qualquer língua e para qualquer parte do mundo."
       }
     ]
   },
