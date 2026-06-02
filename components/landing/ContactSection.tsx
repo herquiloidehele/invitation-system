@@ -56,18 +56,6 @@ export function ContactSection({
               value={formState.eventType}
               onChange={(value) => onFieldChange("eventType", value)}
             />
-            <TextField
-              label={t("date")}
-              placeholder={t("datePlaceholder")}
-              value={formState.date}
-              onChange={(value) => onFieldChange("date", value)}
-            />
-            <TextField
-              label={t("guests")}
-              placeholder={t("guestsPlaceholder")}
-              value={formState.guests}
-              onChange={(value) => onFieldChange("guests", value)}
-            />
           </div>
           <label className="mt-4 block text-sm font-semibold text-[#1F2420]">
             {t("message")}

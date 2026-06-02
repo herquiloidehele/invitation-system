@@ -6,16 +6,12 @@ export const DEFAULT_CONTACT_MESSAGE =
 export const DEFAULT_CONTACT_MESSAGE_LABELS = {
   name: "Nome",
   eventType: "Tipo de evento",
-  date: "Data",
-  guests: "Convidados",
   message: "Mensagem",
 } as const;
 
 export type ContactMessageFields = {
   name: string;
   eventType: string;
-  date: string;
-  guests: string;
   message: string;
 };
 
@@ -39,8 +35,6 @@ export function buildContactMessage({
     fields.name.trim() && `${labels.name}: ${fields.name.trim()}`,
     fields.eventType.trim() &&
       `${labels.eventType}: ${fields.eventType.trim()}`,
-    fields.date.trim() && `${labels.date}: ${fields.date.trim()}`,
-    fields.guests.trim() && `${labels.guests}: ${fields.guests.trim()}`,
     fields.message.trim() && `${labels.message}: ${fields.message.trim()}`,
   ]
     .filter(Boolean)

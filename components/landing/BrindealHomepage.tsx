@@ -47,8 +47,6 @@ export function BrindealHomepage({
   const [formState, setFormState] = useState<ContactMessageFields>({
     name: "",
     eventType: "",
-    date: "",
-    guests: "",
     message: "",
   });
 
@@ -66,8 +64,6 @@ export function BrindealHomepage({
           labels: {
             name: whatsappT("name"),
             eventType: whatsappT("eventType"),
-            date: whatsappT("date"),
-            guests: whatsappT("guests"),
             message: whatsappT("message"),
           },
         }),

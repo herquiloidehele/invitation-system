@@ -41,10 +41,6 @@
     "namePlaceholder": "Mary Smith",
     "eventType": "Event type",
     "eventTypePlaceholder": "Wedding",
-    "date": "Date",
-    "datePlaceholder": "12 September 2026",
-    "guests": "Guests",
-    "guestsPlaceholder": "120",
     "message": "Message",
     "messagePlaceholder": "Tell us the style, venue or any important detail.",
     "submit": "Send request via WhatsApp"
@@ -190,8 +186,6 @@
   "Whatsapp": {
     "name": "Name",
     "eventType": "Event type",
-    "date": "Date",
-    "guests": "Guests",
     "message": "Message",
     "typeQuestion": "Hello! I would like to know more about {type}."
   },

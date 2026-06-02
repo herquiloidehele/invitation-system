@@ -41,10 +41,6 @@
     "namePlaceholder": "María Silva",
     "eventType": "Tipo de evento",
     "eventTypePlaceholder": "Boda",
-    "date": "Fecha",
-    "datePlaceholder": "12 septiembre 2026",
-    "guests": "Invitados",
-    "guestsPlaceholder": "120",
     "message": "Mensaje",
     "messagePlaceholder": "Contadnos el estilo, lugar o cualquier detalle importante.",
     "submit": "Enviar solicitud por WhatsApp"
@@ -190,8 +186,6 @@
   "Whatsapp": {
     "name": "Nombre",
     "eventType": "Tipo de evento",
-    "date": "Fecha",
-    "guests": "Invitados",
     "message": "Mensaje",
     "typeQuestion": "¡Hola! Me gustaría saber más sobre {type}."
   },
