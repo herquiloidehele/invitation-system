@@ -22,7 +22,7 @@
     "footerCopyright": "© 2026 Brindeal Studio · Made with care in Lisbon"
   },
   "LandingNav": {
-    "types": "Types",
+    "bestSellers": "Best sellers",
     "gallery": "Gallery",
     "process": "How it works",
     "features": "Features",
@@ -49,25 +49,14 @@
     "messagePlaceholder": "Tell us the style, venue or any important detail.",
     "submit": "Send request via WhatsApp"
   },
-  "LandingTypes": {
-    "eyebrow": "For every celebration",
-    "title": "Every celebration has its tone",
-    "body": "From save the date to the wedding, we adapt the text, rhythm and details so the invitation feels made for your story.",
-    "learnMore": "Learn more",
-    "typeQuestion": "Hello! I would like to know more about {type}.",
-    "visualSaveTheDateAlt": "Couple at sunset",
-    "visualSaveTheDateDays": "142 days",
-    "visualWeddingAlt": "Couple on their wedding day",
-    "visualWeddingMusic": "♫ Music",
-    "visualWeddingMap": "◎ Map",
-    "visualWeddingMenu": "✦ Menu",
-    "visualEngagementAlt": "Ring detail",
-    "visualEngagementText": "The first big day",
-    "items": {
-      "saveTheDate": { "title": "Save The Date", "text": "Announce the date with lightness, a countdown and a first glimpse of what is coming." },
-      "wedding": { "title": "Wedding", "text": "The complete invitation for the big day: story, schedule, RSVP, map, music and useful details in one place." },
-      "engagement": { "title": "Engagement", "text": "An intimate invitation to gather the right people and mark the start of this new chapter." }
-    }
+  "LandingBestSellers": {
+    "eyebrow": "Best sellers",
+    "title": "Our most-loved invitations",
+    "body": "The models couples reach for the most. Tap one to preview.",
+    "empty": "Coming soon.",
+    "fallbackTitle": "Invitation",
+    "previewAria": "Preview invitation",
+    "badge": "BEST SELLER"
   },
   "LandingGallery": {
     "eyebrow": "Gallery",
@@ -88,24 +77,30 @@
   },
   "LandingProcess": {
     "eyebrow": "Process",
-    "title": "We guide. You approve.",
-    "body": "We help turn loose ideas into an invitation ready to send, without leaving you lost between text, colors and technical decisions.",
-    "closing": "Ready to create something that truly feels yours?",
-    "cta": "Start conversation →",
-    "badges": ["Same day", "4 to 10 business days", "Iterative", "Live"],
+    "title": "From the first chat to the final share.",
+    "body": "We walk you through every step, from the initial conversation to publishing the invitation. No surprises, with clear timelines and transparent payment.",
+    "closing": "Ready to begin?",
+    "cta": "Talk to us →",
+    "badges": ["No commitment", "50% or 100%", "Up to 3 edits", "Link or QR Code"],
     "steps": [
-      ["01", "Initial conversation", "We talk about your event, the style you imagine and what you want guests to feel. You receive a clear proposal the same day."],
-      ["02", "Tailored design", "We collect photos, texts and references. We design an invitation with your rhythm, colors and story."],
-      ["03", "Review & refinements", "You comment, we adjust and refine with you. Small changes are ready quickly, without complicating the process."],
-      ["04", "Publishing & sharing", "We put the invitation live, ready to share, with real-time RSVP in a private dashboard."]
+      ["01", "Initial conversation", "We talk about your event's style, the colors and the details you'd like to see in the invitation."],
+      ["02", "Payment", "Once you choose a model, you settle 50% or 100% of the value. The project starts as soon as the payment is confirmed."],
+      ["03", "Review & adjustments", "We send a preview for approval, with one full design change included (when available) and up to 3 text edits at no extra cost."],
+      ["04", "Publishing & sharing", "After approval, we share the invitation as a link or QR code, with a private dashboard to track RSVPs in real time."]
     ],
     "previewMessageA": "Hello! Wedding in July 🌿",
     "previewMessageB": "Perfect! I'll send a proposal today ✦",
     "typing": "Typing…",
     "palette": "Palette",
     "typography": "Typography",
-    "revisionA": "Move title 8px lower",
-    "revisionB": "Change main photo",
+    "paymentTitle": "Project payment",
+    "paymentOptionA": "Partial",
+    "paymentOptionB": "Full",
+    "paymentConfirmed": "Payment confirmed",
+    "revisionA": "Replace 'dinner' with 'cocktail'",
+    "revisionB": "Update ceremony address",
+    "versionApproved": "v3 · approved",
+    "revisionFees": "Once these edits are used or the design is finally approved, additional design changes cost €5 each and text or info changes €2.50 each.",
     "confirmed": "Confirmed",
     "messages": "Messages",
     "realTime": "● Real time",

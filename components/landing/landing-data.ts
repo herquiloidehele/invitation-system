@@ -44,38 +44,12 @@ export type LandingTranslator = {
 
 export function getNavLinks(t: (key: string) => string) {
   return [
-    { label: t("types"), href: "#tipos" },
+    { label: t("bestSellers"), href: "#destaques" },
     { label: t("gallery"), href: "#galeria" },
     { label: t("process"), href: "#processo" },
     { label: t("features"), href: "#recursos" },
     { label: t("faq"), href: "#faq" },
   ];
-}
-
-export function getInvitationTypes(t: (key: string) => string) {
-  return [
-    {
-      key: "saveTheDate",
-      title: t("items.saveTheDate.title"),
-      text: t("items.saveTheDate.text"),
-      icon: "01",
-      featured: false,
-    },
-    {
-      key: "wedding",
-      title: t("items.wedding.title"),
-      text: t("items.wedding.text"),
-      icon: "02",
-      featured: true,
-    },
-    {
-      key: "engagement",
-      title: t("items.engagement.title"),
-      text: t("items.engagement.text"),
-      icon: "03",
-      featured: false,
-    },
-  ] as const;
 }
 
 export function getGalleryCategories(

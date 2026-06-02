@@ -22,7 +22,7 @@
     "footerCopyright": "© 2026 Brindeal Studio · Feito com cuidado em Lisboa"
   },
   "LandingNav": {
-    "types": "Tipos",
+    "bestSellers": "Mais vendidos",
     "gallery": "Galeria",
     "process": "Como funciona",
     "features": "Recursos",
@@ -49,34 +49,14 @@
     "messagePlaceholder": "Conte-nos o estilo, local ou qualquer detalhe importante.",
     "submit": "Enviar pedido pelo WhatsApp"
   },
-  "LandingTypes": {
-    "eyebrow": "Para cada celebração",
-    "title": "Cada celebração tem o seu tom",
-    "body": "Do save the date ao casamento, adaptamos o texto, o ritmo e os detalhes para que o convite pareça feito para a vossa história.",
-    "learnMore": "Saber mais",
-    "typeQuestion": "Olá! Gostava de saber mais sobre {type}.",
-    "visualSaveTheDateAlt": "Casal ao pôr do sol",
-    "visualSaveTheDateDays": "142 dias",
-    "visualWeddingAlt": "Noivos no dia do casamento",
-    "visualWeddingMusic": "♫ Música",
-    "visualWeddingMap": "◎ Mapa",
-    "visualWeddingMenu": "✦ Ementa",
-    "visualEngagementAlt": "Detalhe de alianças",
-    "visualEngagementText": "O primeiro grande dia",
-    "items": {
-      "saveTheDate": {
-        "title": "Save The Date",
-        "text": "Anunciem a data com leveza, contagem decrescente e um primeiro vislumbre do que vem aí."
-      },
-      "wedding": {
-        "title": "Casamento",
-        "text": "O convite completo para o grande dia: história, programa, RSVP, mapa, música e detalhes úteis num só lugar."
-      },
-      "engagement": {
-        "title": "Noivado",
-        "text": "Um convite íntimo para reunir as pessoas certas e marcar o início desta nova fase."
-      }
-    }
+  "LandingBestSellers": {
+    "eyebrow": "Mais vendidos",
+    "title": "Os convites mais escolhidos",
+    "body": "Os modelos que mais entusiasmam os nossos casais. Toquem num para pré-visualizar.",
+    "empty": "Em breve.",
+    "fallbackTitle": "Convite",
+    "previewAria": "Pré-visualizar convite",
+    "badge": "BEST SELLER"
   },
   "LandingGallery": {
     "eyebrow": "Galeria",
@@ -97,31 +77,31 @@
   },
   "LandingProcess": {
     "eyebrow": "Processo",
-    "title": "Nós guiamos. Vocês aprovam.",
-    "body": "Ajudamos a transformar ideias soltas num convite pronto a enviar, sem vos deixar perdidos entre textos, cores e decisões técnicas.",
-    "closing": "Prontos para criar algo que pareça mesmo vosso?",
-    "cta": "Começar conversa →",
-    "badges": ["No mesmo dia", "4 a 10 dias úteis", "Iterativo", "Ao vivo"],
+    "title": "Do primeiro contacto à partilha.",
+    "body": "Acompanhamos cada etapa, da conversa inicial até à publicação do convite. Sem surpresas, com prazos claros e o pagamento bem definido.",
+    "closing": "Prontos para começar?",
+    "cta": "Falar connosco →",
+    "badges": ["Sem compromisso", "50% ou 100%", "Até 3 alterações", "Link ou QR Code"],
     "steps": [
       [
         "01",
         "Conversa inicial",
-        "Falamos sobre o vosso evento, o estilo que imaginam e o que querem que os convidados sintam. Recebem uma proposta clara no mesmo dia."
+        "Conversamos sobre o estilo do evento, as cores e as características que gostariam de ver no convite."
       ],
       [
         "02",
-        "Design à medida",
-        "Recolhemos fotografias, textos e referências. Desenhamos um convite com o vosso ritmo, as vossas cores e a vossa história."
+        "Pagamento",
+        "Escolhido o modelo, segue-se o pagamento de 50% ou 100% do valor. O projeto começa após a confirmação do pagamento."
       ],
       [
         "03",
         "Revisão & ajustes",
-        "Comentam, ajustamos e refinamos convosco. Pequenas alterações ficam prontas rapidamente, sem complicar o processo."
+        "Enviamos uma prévia para aprovação, com direito a uma alteração completa do design (quando aplicável) e até 3 alterações de texto sem custos adicionais."
       ],
       [
         "04",
         "Publicação & partilha",
-        "Colocamos o convite ao vivo, pronto a partilhar, com RSVP em tempo real num painel privado."
+        "Após aprovação, partilhamos o convite por link ou QR Code, com painel privado para acompanhar as confirmações em tempo real."
       ]
     ],
     "previewMessageA": "Olá! Casamento em Julho 🌿",
@@ -129,8 +109,14 @@
     "typing": "A escrever…",
     "palette": "Paleta",
     "typography": "Tipografia",
-    "revisionA": "Mover título 8px abaixo",
-    "revisionB": "Trocar fotografia principal",
+    "paymentTitle": "Pagamento do projeto",
+    "paymentOptionA": "Parcial",
+    "paymentOptionB": "Total",
+    "paymentConfirmed": "Pagamento confirmado",
+    "revisionA": "Trocar 'jantar' por 'cocktail'",
+    "revisionB": "Atualizar morada da cerimónia",
+    "versionApproved": "v3 · aprovado",
+    "revisionFees": "Esgotadas estas alterações ou após a aprovação final do design, novas alterações ao design têm um custo de 5€ e alterações de texto ou informações 2,50€ cada.",
     "confirmed": "Confirmados",
     "messages": "Mensagens",
     "realTime": "● Em tempo real",

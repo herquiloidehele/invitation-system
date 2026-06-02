@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-const SECTIONS = new Set(["hero", "gallery", "live_demo"]);
+const SECTIONS = new Set(["hero", "gallery", "live_demo", "best_seller"]);
 const CATEGORIES = new Set([
   "wedding",
   "save_the_date",

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { BrindealHomepage } from "@/components/landing/BrindealHomepage";
 import { getFaqs } from "@/components/landing/landing-data";
 import {
+  getBestSellerFeatures,
   getGalleryFeaturesByCategory,
   getHeroFeature,
   getLiveDemoFeatures,
@@ -52,13 +53,19 @@ export async function generateMetadata({
 }
 
 export default async function Home() {
-  const [heroFeature, galleryByCategory, liveDemoFeatures, faqT] =
-    await Promise.all([
-      getHeroFeature(),
-      getGalleryFeaturesByCategory(),
-      getLiveDemoFeatures(),
-      getTranslations("LandingFaq"),
-    ]);
+  const [
+    heroFeature,
+    galleryByCategory,
+    liveDemoFeatures,
+    bestSellerFeatures,
+    faqT,
+  ] = await Promise.all([
+    getHeroFeature(),
+    getGalleryFeaturesByCategory(),
+    getLiveDemoFeatures(),
+    getBestSellerFeatures(),
+    getTranslations("LandingFaq"),
+  ]);
   const jsonLd = [
     buildOrganizationJsonLd(SITE_URL),
     buildWebSiteJsonLd(SITE_URL),
@@ -79,6 +86,7 @@ export default async function Home() {
         heroFeature={heroFeature}
         galleryByCategory={galleryByCategory}
         liveDemoFeatures={liveDemoFeatures}
+        bestSellerFeatures={bestSellerFeatures}
       />
     </>
   );

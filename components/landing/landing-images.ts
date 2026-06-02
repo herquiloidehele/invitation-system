@@ -9,8 +9,6 @@ export const landingImages = {
   saveTheDate: "/images/1.jpg", // sunset couple silhouette
   wedding: "/images/2.jpg", // bride and groom holding hands
   engagement: "/images/3.jpg", // engagement rings macro
-  moodboardA: unsplash("1519741497674-611481863552", 600),
-  moodboardB: unsplash("1525772764200-be829a350797", 600), // wedding florals
   personalisationA: unsplash("1519741497674-611481863552", 400),
   personalisationB: unsplash("1525772764200-be829a350797", 400),
   personalisationC: unsplash("1531058020387-3be344556be6", 400), // wedding stationery

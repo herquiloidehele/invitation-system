@@ -8,8 +8,6 @@ export type GalleryCategory =
   | "anniversary"
   | "engagement";
 
-export type LandingSection = "hero" | "gallery" | "live_demo";
-
 export type GalleryCategoryInput =
   | { kind: "invitation"; eventType: string }
   | { kind: "save_the_date" };
@@ -159,7 +157,7 @@ export async function getGalleryFeaturesByCategory(): Promise<
 
     const slug = (target as { slug: string }).slug;
     const heroImage = isInvitation
-      ? (target as { heroImage?: string | null }).heroImage ?? null
+      ? ((target as { heroImage?: string | null }).heroImage ?? null)
       : null;
 
     const metadata = resolveLandingGalleryMetadata({
@@ -182,6 +180,82 @@ export async function getGalleryFeaturesByCategory(): Promise<
   }
 
   return result;
+}
+
+export type BestSellerFeature = {
+  id: string;
+  title: string;
+  href: string;
+  imageUrl: string | null;
+  subtitle: string | null;
+  description: string | null;
+  priceLabel: string | null;
+};
+
+type BestSellerSourceRow = {
+  id: string;
+  invitation: {
+    slug: string;
+    couple: unknown;
+    landingImageUrl: string | null;
+    heroImage: string | null;
+    landingModelName: string | null;
+    landingDescription: string | null;
+    landingSubtitle: string | null;
+    date: unknown;
+    priceFromCents: number | null;
+    currency: string;
+  } | null;
+  saveTheDate: {
+    slug: string;
+    couple: unknown;
+    landingImageUrl: string | null;
+    landingModelName: string | null;
+    landingDescription: string | null;
+    landingSubtitle: string | null;
+    date: unknown;
+    priceFromCents: number | null;
+    currency: string;
+  } | null;
+};
+
+export function mapBestSellerRowToFeature(
+  row: BestSellerSourceRow,
+): BestSellerFeature | null {
+  const isInvitation = Boolean(row.invitation);
+  const target = row.invitation ?? row.saveTheDate;
+  if (!target) return null;
+
+  const slug = target.slug;
+  const heroImage = isInvitation ? (row.invitation?.heroImage ?? null) : null;
+
+  const metadata = resolveLandingGalleryMetadata({
+    couple: target.couple,
+    landingModelName: target.landingModelName,
+    landingDescription: target.landingDescription,
+  });
+
+  return {
+    id: row.id,
+    title: metadata.title,
+    href: isInvitation ? invitationHref(slug) : saveTheDateHref(slug),
+    imageUrl: target.landingImageUrl ?? heroImage,
+    subtitle: target.landingSubtitle ?? null,
+    description: metadata.description,
+    priceLabel: formatLandingPrice(target.priceFromCents, target.currency),
+  };
+}
+
+export async function getBestSellerFeatures(): Promise<BestSellerFeature[]> {
+  const rows = await prisma.landingFeature.findMany({
+    where: { section: "best_seller", enabled: true },
+    orderBy: { position: "asc" },
+    include: { invitation: true, saveTheDate: true },
+  });
+
+  return rows
+    .map((row) => mapBestSellerRowToFeature(row))
+    .filter((feature): feature is BestSellerFeature => feature !== null);
 }
 
 export async function getLiveDemoFeatures(): Promise<LiveDemoFeature[]> {

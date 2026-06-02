@@ -47,7 +47,7 @@ type Pickable = {
 
 type FeatureRow = {
   id: string;
-  section: "hero" | "gallery" | "live_demo";
+  section: "hero" | "gallery" | "live_demo" | "best_seller";
   galleryCategory: string | null;
   position: number;
   enabled: boolean;
@@ -83,6 +83,7 @@ const CATEGORIES: Array<{ value: GalleryCategoryKey; label: string }> = [
 ];
 
 const LIVE_DEMO_TARGET = 2;
+const BEST_SELLER_TARGET = 3;
 
 function readTitle(row: FeatureRow): string {
   const source = row.invitation ?? row.saveTheDate;
@@ -214,6 +215,13 @@ export function LandingPageClient() {
         .sort((a, b) => a.position - b.position),
     [features],
   );
+  const bestSellers = useMemo(
+    () =>
+      features
+        .filter((row) => row.section === "best_seller")
+        .sort((a, b) => a.position - b.position),
+    [features],
+  );
   const gallery = useMemo(
     () =>
       CATEGORIES.map((category) => ({
@@ -232,10 +240,11 @@ export function LandingPageClient() {
   const stats = useMemo(
     () => ({
       hero: heroFeature ? 1 : 0,
+      bestSellers: bestSellers.length,
       gallery: features.filter((row) => row.section === "gallery").length,
       liveDemo: liveDemo.length,
     }),
-    [heroFeature, features, liveDemo],
+    [heroFeature, features, bestSellers, liveDemo],
   );
 
   if (loading) {
@@ -272,12 +281,18 @@ export function LandingPageClient() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <StatCard
           icon={Sparkles}
           label="Hero"
           value={stats.hero}
           hint="Convite em destaque no topo"
+        />
+        <StatCard
+          icon={Sparkles}
+          label="Best Sellers"
+          value={stats.bestSellers}
+          hint={`${BEST_SELLER_TARGET} recomendados`}
         />
         <StatCard
           icon={GalleryHorizontalEnd}
@@ -319,6 +334,52 @@ export function LandingPageClient() {
             disabled={busy}
             options={pickables}
             onPick={(pickableId) => addFeature({ section: "hero", pickableId })}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="size-4" />
+            Best Sellers
+          </CardTitle>
+          <CardDescription>
+            Três convites em destaque na secção “Mais vendidos” da landing
+            page.
+            {bestSellers.length !== BEST_SELLER_TARGET ? (
+              <span className="ml-1 text-amber-600">
+                Recomendamos {BEST_SELLER_TARGET} — actualmente:{" "}
+                {bestSellers.length}.
+              </span>
+            ) : null}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {bestSellers.length === 0 ? (
+            <EmptyState text="Sem best sellers seleccionados." />
+          ) : (
+            bestSellers.map((row, index) => (
+              <FeatureItem
+                key={row.id}
+                row={row}
+                busy={busy}
+                canMoveUp={index > 0}
+                canMoveDown={index < bestSellers.length - 1}
+                onMoveUp={() => move(row.id, -1)}
+                onMoveDown={() => move(row.id, 1)}
+                onRemove={() => deleteFeature(row.id)}
+              />
+            ))
+          )}
+
+          <PickableSelect
+            label="Adicionar best seller"
+            disabled={busy}
+            options={pickables}
+            onPick={(pickableId) =>
+              addFeature({ section: "best_seller", pickableId })
+            }
           />
         </CardContent>
       </Card>

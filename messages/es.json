@@ -22,7 +22,7 @@
     "footerCopyright": "© 2026 Brindeal Studio · Hecho con cuidado en Lisboa"
   },
   "LandingNav": {
-    "types": "Tipos",
+    "bestSellers": "Más vendidos",
     "gallery": "Galería",
     "process": "Cómo funciona",
     "features": "Recursos",
@@ -49,25 +49,14 @@
     "messagePlaceholder": "Contadnos el estilo, lugar o cualquier detalle importante.",
     "submit": "Enviar solicitud por WhatsApp"
   },
-  "LandingTypes": {
-    "eyebrow": "Para cada celebración",
-    "title": "Cada celebración tiene su tono",
-    "body": "Del save the date a la boda, adaptamos el texto, el ritmo y los detalles para que la invitación parezca hecha para vuestra historia.",
-    "learnMore": "Saber más",
-    "typeQuestion": "¡Hola! Me gustaría saber más sobre {type}.",
-    "visualSaveTheDateAlt": "Pareja al atardecer",
-    "visualSaveTheDateDays": "142 días",
-    "visualWeddingAlt": "Novios el día de la boda",
-    "visualWeddingMusic": "♫ Música",
-    "visualWeddingMap": "◎ Mapa",
-    "visualWeddingMenu": "✦ Menú",
-    "visualEngagementAlt": "Detalle de anillos",
-    "visualEngagementText": "El primer gran día",
-    "items": {
-      "saveTheDate": { "title": "Save The Date", "text": "Anunciad la fecha con ligereza, cuenta atrás y un primer vistazo de lo que viene." },
-      "wedding": { "title": "Boda", "text": "La invitación completa para el gran día: historia, programa, RSVP, mapa, música y detalles útiles en un solo lugar." },
-      "engagement": { "title": "Compromiso", "text": "Una invitación íntima para reunir a las personas adecuadas y marcar el inicio de esta nueva etapa." }
-    }
+  "LandingBestSellers": {
+    "eyebrow": "Más vendidos",
+    "title": "Las invitaciones más elegidas",
+    "body": "Los modelos que más entusiasman a nuestras parejas. Toca uno para previsualizar.",
+    "empty": "Próximamente.",
+    "fallbackTitle": "Invitación",
+    "previewAria": "Previsualizar invitación",
+    "badge": "BEST SELLER"
   },
   "LandingGallery": {
     "eyebrow": "Galería",
@@ -88,24 +77,30 @@
   },
   "LandingProcess": {
     "eyebrow": "Proceso",
-    "title": "Nosotros guiamos. Vosotros aprobáis.",
-    "body": "Ayudamos a transformar ideas sueltas en una invitación lista para enviar, sin dejaros perdidos entre textos, colores y decisiones técnicas.",
-    "closing": "¿Listos para crear algo que se sienta realmente vuestro?",
-    "cta": "Empezar conversación →",
-    "badges": ["El mismo día", "4 a 10 días laborables", "Iterativo", "En vivo"],
+    "title": "Del primer contacto al envío final.",
+    "body": "Os acompañamos en cada etapa, desde la conversación inicial hasta publicar la invitación. Sin sorpresas, con plazos claros y un pago transparente.",
+    "closing": "¿Listos para empezar?",
+    "cta": "Hablar con nosotros →",
+    "badges": ["Sin compromiso", "50% o 100%", "Hasta 3 cambios", "Enlace o QR"],
     "steps": [
-      ["01", "Conversación inicial", "Hablamos sobre vuestro evento, el estilo que imagináis y lo que queréis que sientan los invitados. Recibís una propuesta clara el mismo día."],
-      ["02", "Diseño a medida", "Recogemos fotografías, textos y referencias. Diseñamos una invitación con vuestro ritmo, vuestros colores y vuestra historia."],
-      ["03", "Revisión y ajustes", "Comentáis, ajustamos y refinamos con vosotros. Los pequeños cambios quedan listos rápidamente, sin complicar el proceso."],
-      ["04", "Publicación y envío", "Ponemos la invitación en vivo, lista para compartir, con RSVP en tiempo real en un panel privado."]
+      ["01", "Conversación inicial", "Hablamos sobre el estilo del evento, los colores y las características que os gustaría ver en la invitación."],
+      ["02", "Pago", "Elegido el modelo, se realiza el pago del 50% o del 100% del valor. El proyecto comienza tras la confirmación del pago."],
+      ["03", "Revisión y ajustes", "Enviamos una vista previa para aprobación, con derecho a un cambio completo del diseño (cuando esté disponible) y hasta 3 cambios de texto sin coste adicional."],
+      ["04", "Publicación y envío", "Tras la aprobación, compartimos la invitación como enlace o código QR, con un panel privado para seguir las confirmaciones en tiempo real."]
     ],
     "previewMessageA": "¡Hola! Boda en julio 🌿",
     "previewMessageB": "¡Perfecto! Envío propuesta hoy ✦",
     "typing": "Escribiendo…",
     "palette": "Paleta",
     "typography": "Tipografía",
-    "revisionA": "Mover título 8px abajo",
-    "revisionB": "Cambiar foto principal",
+    "paymentTitle": "Pago del proyecto",
+    "paymentOptionA": "Parcial",
+    "paymentOptionB": "Total",
+    "paymentConfirmed": "Pago confirmado",
+    "revisionA": "Cambiar 'cena' por 'cóctel'",
+    "revisionB": "Actualizar dirección de la ceremonia",
+    "versionApproved": "v3 · aprobado",
+    "revisionFees": "Una vez agotados estos cambios o tras la aprobación final del diseño, cada nuevo cambio de diseño tiene un coste de 5€ y los cambios de texto o información de 2,50€ cada uno.",
     "confirmed": "Confirmados",
     "messages": "Mensajes",
     "realTime": "● En tiempo real",
