@@ -250,11 +250,7 @@ function FAQAccordionItem({
         {/* Chevron */}
         <motion.span
           className="flex-shrink-0"
-          animate={
-            isOpen
-              ? { rotate: 180, y: 0 }
-              : { rotate: 0, y: [0, 2, 0] }
-          }
+          animate={isOpen ? { rotate: 180, y: 0 } : { rotate: 0, y: [0, 2, 0] }}
           transition={
             isOpen
               ? { duration: 0.35, ease: EASE }
@@ -440,18 +436,6 @@ export default function InvitationPage({
       />
 
       {/* ================================================================= */}
-      {/* Personal guest card — shown when ?g=<token> matches a guest       */}
-      {/* ================================================================= */}
-      {(invitation.guest || isPreview) && (
-        <PersonalGuestCard
-          guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
-          theme={theme}
-          textStyles={invitation.textStyles}
-          customTexts={invitation.customTexts}
-        />
-      )}
-
-      {/* ================================================================= */}
       {/* 2. Names (no-video fallback)                                      */}
       {/* ================================================================= */}
       <InvitationHeroNames
@@ -459,6 +443,20 @@ export default function InvitationPage({
         theme={theme}
         isPreview={isPreview}
       />
+
+      {/* ================================================================= */}
+      {/* Personal guest card — shown when ?g=<token> matches a guest       */}
+      {/* ================================================================= */}
+      {(invitation.guest || isPreview) && (
+        <div className={"py-8"}>
+          <PersonalGuestCard
+            guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
+            theme={theme}
+            textStyles={invitation.textStyles}
+            customTexts={invitation.customTexts}
+          />
+        </div>
+      )}
 
       {/* ================================================================= */}
       {/* 3. Date Card — Save the Date (style varies per invitation)        */}
@@ -709,7 +707,10 @@ export default function InvitationPage({
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false, margin: "-40px" }}
-                  whileHover={{ y: -3, transition: { duration: 0.25, ease: EASE } }}
+                  whileHover={{
+                    y: -3,
+                    transition: { duration: 0.25, ease: EASE },
+                  }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
                     background: cs("dressCode", 16).cardBg,
@@ -790,7 +791,10 @@ export default function InvitationPage({
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false, margin: "-40px" }}
-                  whileHover={{ y: -3, transition: { duration: 0.25, ease: EASE } }}
+                  whileHover={{
+                    y: -3,
+                    transition: { duration: 0.25, ease: EASE },
+                  }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
                     background: cs("giftRegistry", 16).cardBg,
