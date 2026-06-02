@@ -1,21 +1,19 @@
-import Image from "next/image";
 import {
   ArrowUpRight,
   CheckCircle2,
+  CreditCard,
   type LucideIcon,
   MessageSquare,
-  Palette,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
 import { getProcessBadges, getProcessSteps } from "./landing-data";
-import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 const STEP_ICONS: LucideIcon[] = [
   MessageSquare,
-  Palette,
+  CreditCard,
   CheckCircle2,
   ArrowUpRight,
 ];
@@ -150,49 +148,27 @@ function ProcessPreview({ index }: { index: number }) {
 
   if (index === 1) {
     return (
-      <div className="mt-6 grid grid-cols-[1fr_auto] gap-3 rounded-2xl bg-[#F6F7F5] p-4">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#5C605A]">
-            {t("palette")}
-          </p>
-          <div className="mt-3 flex gap-2">
-            {["#3F4E3F", "#6B7E68", "#E8EBE7", "#DEE1DC"].map((color) => (
-              <span
-                key={color}
-                className="h-8 w-8 rounded-lg border border-white/60 shadow-sm"
-                style={{ backgroundColor: color }}
-              />
-            ))}
+      <div className="mt-6 rounded-2xl bg-[#F6F7F5] p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#5C605A]">
+          {t("paymentTitle")}
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="rounded-xl border border-[#E5E7E4] bg-white px-3 py-2">
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#5C605A]">
+              {t("paymentOptionA")}
+            </p>
+            <p className="mt-1 text-xl font-semibold text-[#1F2420]">50%</p>
           </div>
-          <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#5C605A]">
-            {t("typography")}
-          </p>
-          <p className="mt-1.5 text-xl font-semibold tracking-[-0.02em] text-[#1F2420]">
-            Aa{" "}
-            <span className="text-base font-normal text-[#5C605A]">
-              Manrope
-            </span>
-          </p>
+          <div className="rounded-xl border border-[#3F4E3F] bg-[#3F4E3F] px-3 py-2 text-white">
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">
+              {t("paymentOptionB")}
+            </p>
+            <p className="mt-1 text-xl font-semibold">100%</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <span className="relative block h-12 w-14 overflow-hidden rounded-lg">
-            <Image
-              src={landingImages.moodboardA}
-              alt="Inspiração editorial"
-              fill
-              sizes="60px"
-              className="object-cover"
-            />
-          </span>
-          <span className="relative block h-12 w-14 overflow-hidden rounded-lg">
-            <Image
-              src={landingImages.moodboardB}
-              alt="Detalhes florais"
-              fill
-              sizes="60px"
-              className="object-cover"
-            />
-          </span>
+        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[10px] font-semibold text-[#3F4E3F] shadow-sm">
+          <CheckCircle2 className="size-3.5" />
+          <span>{t("paymentConfirmed")}</span>
         </div>
       </div>
     );
@@ -200,7 +176,8 @@ function ProcessPreview({ index }: { index: number }) {
 
   if (index === 2) {
     return (
-      <div className="mt-6 grid grid-cols-[auto_1fr] gap-3 rounded-2xl bg-[#F6F7F5] p-4">
+      <>
+        <div className="mt-6 grid grid-cols-[auto_1fr] gap-3 rounded-2xl bg-[#F6F7F5] p-4">
         <div className="relative h-24 w-16 overflow-hidden rounded-lg bg-white shadow-sm">
           <div className="absolute inset-x-2 top-2 h-2 rounded-full bg-[#DEE1DC]" />
           <div className="absolute inset-x-2 top-5 h-2 w-8 rounded-full bg-[#DEE1DC]" />
@@ -226,10 +203,14 @@ function ProcessPreview({ index }: { index: number }) {
             {t("revisionB")}
           </div>
           <span className="inline-flex rounded-full bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#3F4E3F]">
-            v3 · aprovado
+            {t("versionApproved")}
           </span>
         </div>
-      </div>
+        </div>
+        <p className="mt-4 text-[11px] leading-5 text-[#7A7E78]">
+          {t("revisionFees")}
+        </p>
+      </>
     );
   }
 

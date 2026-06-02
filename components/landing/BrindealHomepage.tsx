@@ -9,11 +9,13 @@ import {
   type ContactMessageFields,
 } from "@/lib/landing-whatsapp";
 import type {
+  BestSellerFeature,
   GalleryCategory as DbGalleryCategory,
   GalleryFeature,
   HeroFeature,
   LiveDemoFeature,
 } from "@/lib/landing-features";
+import { BestSellersSection } from "./BestSellersSection";
 import { ContactSection } from "./ContactSection";
 import { FaqSection } from "./FaqSection";
 import { FeaturesSection } from "./FeaturesSection";
@@ -23,17 +25,18 @@ import { HeroSection } from "./HeroSection";
 import { LandingNav } from "./LandingNav";
 import { LiveDemoSection } from "./LiveDemoSection";
 import { ProcessSection } from "./ProcessSection";
-import { TypesSection } from "./TypesSection";
 import { type GalleryCategoryKey } from "./landing-data";
 
 export function BrindealHomepage({
   heroFeature,
   galleryByCategory,
   liveDemoFeatures,
+  bestSellerFeatures,
 }: {
   heroFeature: HeroFeature | null;
   galleryByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
   liveDemoFeatures: LiveDemoFeature[];
+  bestSellerFeatures: BestSellerFeature[];
 }) {
   const reduceMotion = useReducedMotion();
   const landingT = useTranslations("Landing");
@@ -78,7 +81,7 @@ export function BrindealHomepage({
     <main className="overflow-hidden bg-white font-[var(--font-outfit)] text-[#1F2420]">
       <LandingNav />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
-      <TypesSection />
+      <BestSellersSection items={bestSellerFeatures} />
       <GallerySection
         activeCategory={activeGalleryCategory}
         onCategoryChange={setActiveGalleryCategory}

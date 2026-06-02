@@ -9,10 +9,9 @@
   "Landing": {
     "navAriaLabel": "Página inicial Brindeal",
     "navCta": "Começar convite →",
-    "heroEyebrow": "Convites digitais feitos com cuidado",
-    "heroTitleLine1": "O convite digital",
-    "heroTitleLine2": "ideal para vocês",
-    "heroBody": "Desenhamos convites elegantes, pessoais e fáceis de partilhar, com RSVP, mapa, música e todos os detalhes que ajudam os convidados a chegar ao grande dia sem dúvidas.",
+    "heroEyebrow": "Para eventos únicos e especiais",
+    "heroTitleLine1": "Convites digitais Premium",
+    "heroBody": "Os nossos convites foram criados para surpreender, emocionar e transformar cada detalhe num momento inesquecível. Mais do que um simples convite, é uma experiência digital única.",
     "heroPrimaryCta": "Começar o meu convite →",
     "heroSecondaryCta": "Ver exemplos reais",
     "heroProof": "Resposta no mesmo dia · +200 convites feitos",
@@ -23,7 +22,7 @@
     "footerCopyright": "© 2026 Brindeal Studio · Feito com cuidado em Lisboa"
   },
   "LandingNav": {
-    "types": "Tipos",
+    "bestSellers": "Mais vendidos",
     "gallery": "Galeria",
     "process": "Como funciona",
     "features": "Recursos",
@@ -50,34 +49,14 @@
     "messagePlaceholder": "Conte-nos o estilo, local ou qualquer detalhe importante.",
     "submit": "Enviar pedido pelo WhatsApp"
   },
-  "LandingTypes": {
-    "eyebrow": "Para cada celebração",
-    "title": "Cada celebração tem o seu tom",
-    "body": "Do save the date ao casamento, adaptamos o texto, o ritmo e os detalhes para que o convite pareça feito para a vossa história.",
-    "learnMore": "Saber mais",
-    "typeQuestion": "Olá! Gostava de saber mais sobre {type}.",
-    "visualSaveTheDateAlt": "Casal ao pôr do sol",
-    "visualSaveTheDateDays": "142 dias",
-    "visualWeddingAlt": "Noivos no dia do casamento",
-    "visualWeddingMusic": "♫ Música",
-    "visualWeddingMap": "◎ Mapa",
-    "visualWeddingMenu": "✦ Ementa",
-    "visualEngagementAlt": "Detalhe de alianças",
-    "visualEngagementText": "O primeiro grande dia",
-    "items": {
-      "saveTheDate": {
-        "title": "Save The Date",
-        "text": "Anunciem a data com leveza, contagem decrescente e um primeiro vislumbre do que vem aí."
-      },
-      "wedding": {
-        "title": "Casamento",
-        "text": "O convite completo para o grande dia: história, programa, RSVP, mapa, música e detalhes úteis num só lugar."
-      },
-      "engagement": {
-        "title": "Noivado",
-        "text": "Um convite íntimo para reunir as pessoas certas e marcar o início desta nova fase."
-      }
-    }
+  "LandingBestSellers": {
+    "eyebrow": "Mais vendidos",
+    "title": "Os convites mais escolhidos",
+    "body": "Os modelos que mais entusiasmam os nossos casais. Toquem num para pré-visualizar.",
+    "empty": "Em breve.",
+    "fallbackTitle": "Convite",
+    "previewAria": "Pré-visualizar convite",
+    "badge": "BEST SELLER"
   },
   "LandingGallery": {
     "eyebrow": "Galeria",
@@ -98,31 +77,31 @@
   },
   "LandingProcess": {
     "eyebrow": "Processo",
-    "title": "Nós guiamos. Vocês aprovam.",
-    "body": "Ajudamos a transformar ideias soltas num convite pronto a enviar, sem vos deixar perdidos entre textos, cores e decisões técnicas.",
-    "closing": "Prontos para criar algo que pareça mesmo vosso?",
-    "cta": "Começar conversa →",
-    "badges": ["No mesmo dia", "4 a 10 dias úteis", "Iterativo", "Ao vivo"],
+    "title": "Do primeiro contacto à partilha.",
+    "body": "Acompanhamos cada etapa, da conversa inicial até à publicação do convite. Sem surpresas, com prazos claros e o pagamento bem definido.",
+    "closing": "Prontos para começar?",
+    "cta": "Falar connosco →",
+    "badges": ["Sem compromisso", "50% ou 100%", "Até 3 alterações", "Link ou QR Code"],
     "steps": [
       [
         "01",
         "Conversa inicial",
-        "Falamos sobre o vosso evento, o estilo que imaginam e o que querem que os convidados sintam. Recebem uma proposta clara no mesmo dia."
+        "Conversamos sobre o estilo do evento, as cores e as características que gostariam de ver no convite."
       ],
       [
         "02",
-        "Design à medida",
-        "Recolhemos fotografias, textos e referências. Desenhamos um convite com o vosso ritmo, as vossas cores e a vossa história."
+        "Pagamento",
+        "Escolhido o modelo, segue-se o pagamento de 50% ou 100% do valor. O projeto começa após a confirmação do pagamento."
       ],
       [
         "03",
         "Revisão & ajustes",
-        "Comentam, ajustamos e refinamos convosco. Pequenas alterações ficam prontas rapidamente, sem complicar o processo."
+        "Enviamos uma prévia para aprovação, com direito a uma alteração completa do design (quando aplicável) e até 3 alterações de texto sem custos adicionais."
       ],
       [
         "04",
         "Publicação & partilha",
-        "Colocamos o convite ao vivo, pronto a partilhar, com RSVP em tempo real num painel privado."
+        "Após aprovação, partilhamos o convite por link ou QR Code, com painel privado para acompanhar as confirmações em tempo real."
       ]
     ],
     "previewMessageA": "Olá! Casamento em Julho 🌿",
@@ -130,8 +109,14 @@
     "typing": "A escrever…",
     "palette": "Paleta",
     "typography": "Tipografia",
-    "revisionA": "Mover título 8px abaixo",
-    "revisionB": "Trocar fotografia principal",
+    "paymentTitle": "Pagamento do projeto",
+    "paymentOptionA": "Parcial",
+    "paymentOptionB": "Total",
+    "paymentConfirmed": "Pagamento confirmado",
+    "revisionA": "Trocar 'jantar' por 'cocktail'",
+    "revisionB": "Atualizar morada da cerimónia",
+    "versionApproved": "v3 · aprovado",
+    "revisionFees": "Esgotadas estas alterações ou após a aprovação final do design, novas alterações ao design têm um custo de 5€ e alterações de texto ou informações 2,50€ cada.",
     "confirmed": "Confirmados",
     "messages": "Mensagens",
     "realTime": "● Em tempo real",
@@ -139,19 +124,15 @@
   },
   "LandingFeatures": {
     "eyebrow": "Recursos",
-    "title": "Bonito para ver. Simples para usar.",
+    "title": "O que pode encontrar nos nossos convites",
     "body": "Os convidados recebem um link claro. Vocês acompanham confirmações, escolhas e mensagens sem folhas soltas nem conversas perdidas.",
     "rsvpEyebrow": "• Para cuidar dos convidados",
-    "rsvpTitle": "RSVP em tempo real",
-    "rsvpBody": "Os convidados confirmam, escolhem ementa e deixam uma mensagem. Vocês acompanham tudo num painel privado, sincronizado ao minuto.",
-    "menu": "Ementa",
-    "menuMeat": "Carne",
-    "menuFish": "Peixe",
-    "menuVegetarian": "Vegetariano",
-    "received": "Confirmações recebidas",
+    "rsvpTitle": "RSVP",
+    "rsvpBody": "Todos os convites incluem acesso ao nosso sistema de confirmações inteligente. Não utilizamos o WhatsApp para receber confirmações. O processo é totalmente automatizado: os convidados confirmam a presença diretamente através de um formulário integrado no convite, e todas as confirmações ficam organizadas e armazenadas no mesmo painel de controlo.",
+    "rsvpImagePlaceholder": "Imagem ilustrativa",
     "updatedNow": "actualizado agora",
-    "musicTitle": "Música ambiente",
-    "musicText": "A banda sonora certa, no momento certo.",
+    "musicTitle": "Música",
+    "musicText": "Todos os convites têm música com reprodução automática. A música é opcional e pode ser uma escolha especial do casal.",
     "mapTitle": "Mapa interactivo",
     "mapText": "Direcções, GPS e detalhes para chegar sem stress.",
     "guestsTitle": "Gestão de convidados",
@@ -162,6 +143,17 @@
     "languagesText": "Português, inglês e espanhol para receber todos bem.",
     "customTitle": "Personalização total",
     "customText": "Tipografia, cores e fotografias escolhidas para o vosso dia.",
+    "personalizationTitle": "Personalização do nome do convidado",
+    "personalizationText": "A personalização dos nomes é opcional. Para incluir o nome do convidado, o número da mesa e o número do convidado no convite, é cobrada uma taxa por unidade que varia consoante a quantidade de convites.",
+    "personalizationCta": "Ver taxas",
+    "personalizationModalTitle": "Taxas de personalização",
+    "personalizationModalDescription": "A taxa é cobrada por convite personalizado e varia consoante a quantidade.",
+    "personalizationPerInvite": "por convite",
+    "personalizationTiers": [
+      ["Até 50 convites", "1,50€"],
+      ["50 a 100 convites", "1€"],
+      ["Mais de 100 convites", "0,75€"]
+    ],
     "guest": "Convidado",
     "table": "Mesa",
     "visits": "Visitas",
@@ -181,28 +173,44 @@
     "contactTitle": "Falar agora",
     "items": [
       {
-        "question": "Quanto tempo demora?",
-        "answer": "Tipicamente 3 a 5 dias úteis depois de recebermos fotografias e textos. Para datas próximas, fazemos versões expressas em 48h."
+        "question": "Qual é o prazo?",
+        "answer": "O prazo varia de 4 dias a um mês, dependendo da procura e do modelo escolhido."
       },
       {
-        "question": "Posso usar para outros eventos além de casamento?",
-        "answer": "Sim. Adaptamos a experiência para save the date, baptizados, noivados, aniversários e celebrações privadas."
+        "question": "Posso personalizar o meu convite?",
+        "answer": "Sim. Temos convites 100% personalizáveis e também modelos com design pré-definido — consulte a descrição de cada modelo."
       },
       {
-        "question": "Como funciona o RSVP?",
-        "answer": "Os convidados confirmam directamente no convite. Acompanham tudo num painel privado, em tempo real."
+        "question": "Posso encomendar para outro tipo de evento além de casamento?",
+        "answer": "Sim, fazemos convites para todos os tipos de eventos."
       },
       {
-        "question": "Posso enviar a convidados individuais?",
-        "answer": "Sim. Cada convidado pode receber um link personalizado com nomes, mesa e detalhes específicos."
+        "question": "Posso personalizar o convite com o nome do convidado?",
+        "answer": "Sim, mediante o pagamento de uma taxa adicional por cada convite personalizado."
       },
       {
-        "question": "Posso editar depois de publicado?",
-        "answer": "Sim. Ajustes de texto, horários, mapas e detalhes podem ser actualizados depois da publicação."
+        "question": "Posso receber o convite em PDF?",
+        "answer": "Sim, mas corre o risco de receber as páginas separadas e alguns recursos não funcionam na versão PDF."
       },
       {
-        "question": "Quanto custa?",
-        "answer": "Depende do nível de personalização, conteúdos e funcionalidades. Enviamos uma proposta clara no mesmo dia."
+        "question": "Quantas vezes posso fazer alterações no convite?",
+        "answer": "Durante a produção pode alterar o design uma vez e fazer alterações de texto até 3 vezes, sem custo. Após a aprovação, qualquer alteração tem um custo adicional."
+      },
+      {
+        "question": "Preciso enviar o número de WhatsApp para confirmação?",
+        "answer": "Não. Usamos um sistema integrado que facilita a gestão e o controlo das confirmações."
+      },
+      {
+        "question": "Posso escolher a música?",
+        "answer": "Sim, a música é opcional."
+      },
+      {
+        "question": "Quanto tempo o convite fica disponível online?",
+        "answer": "O domínio fica online durante 2 anos."
+      },
+      {
+        "question": "Só fazem convites em português?",
+        "answer": "Não. Fazemos convites em qualquer língua e para qualquer parte do mundo."
       }
     ]
   },
