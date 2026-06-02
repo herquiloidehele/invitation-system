@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import type { HeroFeature } from "@/lib/landing-features";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -15,8 +14,6 @@ export function HeroSection({
   reduceMotion: boolean | null;
   feature: HeroFeature | null;
 }) {
-  const isMobile = useIsMobile();
-
   return (
     <section
       id="top"
@@ -30,9 +27,6 @@ export function HeroSection({
             title={feature.title || "Convite Brindeal"}
             src={feature.href}
             showCaption={false}
-            animation="hero-float"
-            reduceMotion={reduceMotion}
-            isMobile={isMobile}
           />
         </div>
       )}
