@@ -50,9 +50,6 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
       <SectionEyebrow>{t("heroEyebrow")}</SectionEyebrow>
       <h1 className="mt-8 text-balance text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-[#3F4E3F] sm:text-6xl lg:text-7xl">
         <span className="block">{t("heroTitleLine1")}</span>
-        <span className="mt-5 block font-medium text-[#2D2D23]">
-          {t("heroTitleLine2")}
-        </span>
       </h1>
       <p className="mt-7 max-w-2xl text-md leading-8 text-[#5C605A]">
         {t("heroBody")}
