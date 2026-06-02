@@ -494,49 +494,55 @@ body {
 }
 
 /* ===================================================================
-   Landing Hero — phone preview infinite float, glow and glass sweep
+   Landing Hero — phone preview 3D orbit, glow drift and sparkle dust
    =================================================================== */
 
-@keyframes hero-phone-float {
+@keyframes hero-phone-orbit {
   0%,
   100% {
-    transform: translateY(0) rotate(-1deg);
+    transform: rotateY(-18deg) rotateX(6deg);
   }
   50% {
-    transform: translateY(-12px) rotate(1deg);
+    transform: rotateY(18deg) rotateX(-6deg);
   }
 }
 
-@keyframes hero-phone-glow-pulse {
+@keyframes hero-phone-glow-drift {
   0%,
   100% {
-    transform: scale(0.96);
+    transform: translate(10px, 4px) scale(0.96);
     opacity: 0.55;
   }
   50% {
-    transform: scale(1.04);
+    transform: translate(-10px, -4px) scale(1.06);
     opacity: 0.85;
   }
 }
 
-@keyframes hero-phone-glass-sweep {
-  0%,
-  35% {
-    transform: translateX(-140%) rotate(8deg);
+@keyframes hero-phone-sparkle-orbit {
+  0% {
+    transform: rotateY(0deg) translateZ(150px) rotateY(0deg);
     opacity: 0;
   }
-  45% {
+  10% {
     opacity: 1;
   }
-  65%,
+  90% {
+    opacity: 1;
+  }
   100% {
-    transform: translateX(140%) rotate(8deg);
+    transform: rotateY(360deg) translateZ(150px) rotateY(-360deg);
     opacity: 0;
   }
 }
 
-.hero-phone-float {
-  animation: hero-phone-float 5s ease-in-out infinite;
+.hero-phone-stage {
+  perspective: 1100px;
+  transform-style: preserve-3d;
+}
+
+.hero-phone-orbit {
+  animation: hero-phone-orbit 9s ease-in-out infinite;
   transform-origin: center center;
   will-change: transform;
 }
@@ -554,7 +560,7 @@ body {
   );
   filter: blur(34px);
   pointer-events: none;
-  animation: hero-phone-glow-pulse 5s ease-in-out infinite;
+  animation: hero-phone-glow-drift 9s ease-in-out infinite;
 }
 
 .hero-phone-static-shadow {
@@ -572,37 +578,42 @@ body {
   pointer-events: none;
 }
 
-.hero-phone-glass-sweep {
-  overflow: hidden;
+.hero-phone-sparkle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.85);
   pointer-events: none;
+  animation: hero-phone-sparkle-orbit 9s linear infinite;
 }
 
-.hero-phone-glass-sweep::after {
-  content: "";
-  position: absolute;
-  top: -25%;
-  bottom: -25%;
-  left: 0;
-  width: 38%;
-  background: linear-gradient(
-    115deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.32) 50%,
-    transparent 70%
-  );
-  transform: translateX(-140%) rotate(8deg);
-  animation: hero-phone-glass-sweep 5s ease-in-out infinite;
-  pointer-events: none;
+.hero-phone-sparkle--2 {
+  animation-delay: -3s;
+}
+
+.hero-phone-sparkle--3 {
+  animation-delay: -6s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-phone-float,
+  .hero-phone-orbit,
   .hero-phone-glow,
-  .hero-phone-glass-sweep::after {
+  .hero-phone-sparkle {
     animation: none;
   }
+  .hero-phone-orbit {
+    transform: none;
+  }
   .hero-phone-glow {
+    transform: translate(0, 0) scale(1);
     opacity: 0.7;
-    transform: scale(1);
+  }
+  .hero-phone-sparkle {
+    opacity: 0;
   }
 }
