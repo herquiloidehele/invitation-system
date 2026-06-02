@@ -28,6 +28,8 @@ export function HeroSection({
             title={feature.title || "Convite Brindeal"}
             src={feature.href}
             showCaption={false}
+            animation="hero-float"
+            reduceMotion={reduceMotion}
           />
         </div>
       )}
