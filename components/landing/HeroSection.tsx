@@ -22,7 +22,7 @@ export function HeroSection({
     >
       <div className="absolute left-1/2 top-24 -z-0 h-72 w-72 rounded-full bg-[#E8EBE7] blur-3xl" />
       <HeroCopy reduceMotion={reduceMotion} />
-      {feature ? (
+      {!!feature && (
         <div className="relative z-10 mx-auto w-full max-w-[20rem] sm:max-w-[22rem] lg:max-w-[24rem]">
           <PhoneIframePreview
             title={feature.title || "Convite Brindeal"}
@@ -30,8 +30,6 @@ export function HeroSection({
             showCaption={false}
           />
         </div>
-      ) : (
-        <HeroPhone reduceMotion={reduceMotion} />
       )}
     </section>
   );
@@ -73,27 +71,6 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
       <p className="mt-8 text-sm font-medium text-[#5C605A]">
         {t("heroProof")}
       </p>
-    </motion.div>
-  );
-}
-
-function HeroPhone({ reduceMotion }: { reduceMotion: boolean | null }) {
-  const t = useTranslations("LandingLiveDemo");
-
-  return (
-    <motion.div
-      animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
-      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      className="relative z-10 mx-auto aspect-[9/16] w-full max-w-[17rem] overflow-hidden rounded-[2.75rem] border-[6px] border-[#3F4E3F] bg-[#FAFBF9] shadow-[0_35px_100px_rgba(31,36,32,0.16)] sm:max-w-[19rem] lg:max-w-[21rem]"
-    >
-      <Image
-        src="/images/demo-invite.jpg"
-        alt={t("fallbackInvitation")}
-        fill
-        priority
-        sizes="(min-width: 1024px) 360px, 80vw"
-        className="object-cover"
-      />
     </motion.div>
   );
 }
