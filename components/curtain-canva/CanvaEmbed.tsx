@@ -6,6 +6,8 @@ import { measureIframeBodyHeight } from "@/lib/canva-embed-measurement";
 import {
   appendCanvaProxyDisableScrollFlag,
   getExternalInvitationEmbedSrc,
+  isInitialCanvaEmbedPage,
+  resolveCanvaEmbedPageState,
 } from "@/lib/external-invitation-form";
 
 interface CanvaEmbedProps {
@@ -15,6 +17,7 @@ interface CanvaEmbedProps {
   aspectRatio?: number;
   /** iframe accessibility title. Defaults to "Convite". */
   title?: string;
+  onInitialPageChange?: (isInitialPage: boolean) => void;
   /**
    * When true, the iframe mounts and starts fetching but is positioned
    * off-screen (fixed, far below the viewport) so it never participates
@@ -32,6 +35,7 @@ export default function CanvaEmbed({
   theme,
   aspectRatio,
   title,
+  onInitialPageChange,
   preloading = false,
 }: CanvaEmbedProps) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -61,6 +65,32 @@ export default function CanvaEmbed({
     navigatedProxiedUrl?.externalLink === externalLink
       ? navigatedProxiedUrl.src
       : defaultProxiedUrl;
+
+  const syncPageStateFromIframe = useCallback(() => {
+    let actualSrc = proxiedUrl;
+
+    try {
+      actualSrc = iframeRef.current?.contentDocument?.location.href ?? actualSrc;
+    } catch {
+      /* Cross-origin iframes are not expected here, but keep the fallback. */
+    }
+
+    const pageState = resolveCanvaEmbedPageState({
+      actualSrc,
+      currentNavigatedProxiedUrl: navigatedProxiedUrl,
+      externalLink,
+      initialSrc: defaultProxiedUrl,
+    });
+
+    setNavigatedProxiedUrl(pageState.navigatedProxiedUrl);
+    onInitialPageChange?.(pageState.isInitialPage);
+  }, [
+    defaultProxiedUrl,
+    externalLink,
+    navigatedProxiedUrl,
+    onInitialPageChange,
+    proxiedUrl,
+  ]);
 
   const measureIframe = useCallback(() => {
     const doc = iframeRef.current?.contentDocument;
@@ -155,19 +185,24 @@ export default function CanvaEmbed({
       const nextSrc = appendCanvaProxyDisableScrollFlag(
         `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`,
       );
+      const isInitialPage = isInitialCanvaEmbedPage(nextSrc, defaultProxiedUrl);
 
       setContentHeight(null);
-      setNavigatedProxiedUrl({ externalLink, src: nextSrc });
+      setNavigatedProxiedUrl(
+        isInitialPage ? null : { externalLink, src: nextSrc },
+      );
+      onInitialPageChange?.(isInitialPage);
     };
 
     doc.addEventListener("click", onClick, true);
     detachNavigationInterceptorRef.current = () => {
       doc.removeEventListener("click", onClick, true);
     };
-  }, [externalLink]);
+  }, [defaultProxiedUrl, externalLink, onInitialPageChange]);
 
   const handleLoad = useCallback(() => {
     attachNavigationInterceptor();
+    syncPageStateFromIframe();
     measureIframe();
     measureTimerRef.current.forEach((timer) => window.clearTimeout(timer));
     measureTimerRef.current = [100, 500, 1000, 2500].map((delay) =>
@@ -203,7 +238,7 @@ export default function CanvaEmbed({
         }
       }, 60_000),
     );
-  }, [attachNavigationInterceptor, measureIframe]);
+  }, [attachNavigationInterceptor, measureIframe, syncPageStateFromIframe]);
 
   if (!externalLink) return null;
 

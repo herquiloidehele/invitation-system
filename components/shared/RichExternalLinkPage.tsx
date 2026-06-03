@@ -1,6 +1,11 @@
 "use client";
 
-import { type MutableRefObject, type RefObject, useLayoutEffect } from "react";
+import {
+  type MutableRefObject,
+  type RefObject,
+  useLayoutEffect,
+  useState,
+} from "react";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
@@ -17,6 +22,7 @@ const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
 import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST } from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
+import { shouldShowRichExternalRsvp } from "@/lib/external-invitation-form";
 import DynamicFontLoader from "./DynamicFontLoader";
 
 interface RichExternalLinkPageProps {
@@ -25,6 +31,7 @@ interface RichExternalLinkPageProps {
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
   prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
   isPreview?: boolean;
+  canvaPreloading?: boolean;
 }
 
 /**
@@ -47,6 +54,7 @@ export default function RichExternalLinkPage({
   audioRef,
   prefetchedVideoRef,
   isPreview = false,
+  canvaPreloading = false,
 }: RichExternalLinkPageProps) {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
   const countdownOn = Boolean(invitation.countdown?.enabled);
@@ -56,6 +64,18 @@ export default function RichExternalLinkPage({
     invitationType: invitation.invitationType,
     externalLink: invitation.externalLink,
     guestCustomExternalLink: invitation.guest?.customExternalLink,
+  });
+  const [canvaPageState, setCanvaPageState] = useState<{
+    externalLink: string;
+    isInitialPage: boolean;
+  } | null>(null);
+  const isInitialCanvaPage =
+    canvaPageState?.externalLink === externalLink
+      ? canvaPageState.isInitialPage
+      : true;
+  const showRsvp = shouldShowRichExternalRsvp({
+    rsvpOn,
+    isInitialCanvaPage,
   });
 
   // Defence stack:
@@ -215,10 +235,13 @@ export default function RichExternalLinkPage({
         externalLink={externalLink}
         theme={theme}
         title="Convite"
-        preloading={false}
+        onInitialPageChange={(isInitialPage) =>
+          setCanvaPageState({ externalLink, isInitialPage })
+        }
+        preloading={canvaPreloading}
       />
 
-      {rsvpOn && (
+      {showRsvp && (
         <>
           <SectionOrnament theme={theme} />
           <section

@@ -9,7 +9,10 @@ import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoP
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
-import { hasRichExternalSections } from "@/lib/external-invitation-form";
+import {
+  hasRichExternalSections,
+  shouldPreloadRichExternalCanva,
+} from "@/lib/external-invitation-form";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 
@@ -330,6 +333,10 @@ function EnvelopeInvitationView({
               theme={theme}
               audioRef={audioRef}
               prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+              canvaPreloading={shouldPreloadRichExternalCanva({
+                isPreview: false,
+                isVisible: richExternalLinkVisible,
+              })}
             />
           </motion.div>
         )}
