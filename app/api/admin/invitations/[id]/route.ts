@@ -179,6 +179,9 @@ export async function PUT(
         ...(body.scratchReveal !== undefined && {
           scratchReveal: sanitizeJsonField(body.scratchReveal, null),
         }),
+        ...(body.heroConfetti !== undefined && {
+          heroConfetti: sanitizeJsonField(body.heroConfetti, null),
+        }),
         ...(body.countdown !== undefined && {
           countdown: sanitizeJsonField(body.countdown, null),
         }),

@@ -56,6 +56,11 @@ interface CurtainsHeroProps {
    * curtain-specific typography defaults (clamp sizing, etc.).
    */
   textStyles?: TextStyleOverrides;
+  /**
+   * Whether the celebration confetti fires when the curtains finish opening.
+   * Defaults to true; the admin form sets this to false to disable the burst.
+   */
+  confettiEnabled?: boolean;
   onTapped?: () => void;
   /**
    * Fires when the curtain reveal completes (video ended or reduced-motion
@@ -80,6 +85,7 @@ export default function CurtainsHero({
   heroOverlay,
   customTexts,
   textStyles,
+  confettiEnabled = true,
   onTapped,
   onRevealed,
   eventType,
@@ -201,6 +207,7 @@ export default function CurtainsHero({
   }, [state, onTapped, audioRef]);
 
   const fireConfetti = useCallback(() => {
+    if (!confettiEnabled) return;
     if (confettiFiredRef.current) return;
     confettiFiredRef.current = true;
 
@@ -242,7 +249,7 @@ export default function CurtainsHero({
       zIndex: 50,
     });
     requestAnimationFrame(frame);
-  }, [theme.accent, theme.monogramColor, theme.textPrimary]);
+  }, [confettiEnabled, theme.accent, theme.monogramColor, theme.textPrimary]);
 
   const handleVideoEnded = useCallback(() => {
     const video = videoRef.current;

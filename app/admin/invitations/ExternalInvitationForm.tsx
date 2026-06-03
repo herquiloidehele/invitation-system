@@ -165,6 +165,7 @@ function getDefaultState(
       groomsMother: "",
     },
     scratchReveal: { enabled: false },
+    heroConfetti: { enabled: true },
     countdown: { enabled: false },
     imageSettings: {},
     guestManagementEnabled: false,
@@ -426,6 +427,10 @@ export default function ExternalInvitationForm({
 
   const updateScratchReveal = useCallback((enabled: boolean) => {
     setForm((prev) => ({ ...prev, scratchReveal: { enabled } }));
+  }, []);
+
+  const updateHeroConfetti = useCallback((enabled: boolean) => {
+    setForm((prev) => ({ ...prev, heroConfetti: { enabled } }));
   }, []);
 
   const updateCountdown = useCallback(
@@ -1798,6 +1803,23 @@ export default function ExternalInvitationForm({
                           update("curtainVideoUrl", "");
                           update("curtainVideoPoster", "");
                         }}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* HERO CONFETTI TOGGLE */}
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Confetti no hero</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Dispara um efeito de confetti quando as cortinas
+                          terminam de abrir. Desliga para um hero mais sóbrio.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.heroConfetti?.enabled !== false}
+                        onCheckedChange={updateHeroConfetti}
                       />
                     </div>
                   </AccordionContent>

@@ -23,6 +23,7 @@ import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveRevealContentStyle,
   resolveTextElementOverride,
+  shouldFireHeroConfetti,
   shouldRenderScratchReveal,
 } from "@/lib/curtain-canva";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
@@ -275,6 +276,7 @@ export default function CurtainCanvaPage({
         heroOverlay={invitation.heroOverlay}
         customTexts={invitation.customTexts}
         textStyles={invitation.textStyles}
+        confettiEnabled={shouldFireHeroConfetti(invitation.heroConfetti)}
         onTapped={handleTapped}
         onRevealed={handleRevealed}
         eventType={invitation.eventType}

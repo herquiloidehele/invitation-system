@@ -590,6 +590,8 @@ export interface InvitationData {
   ourStory?: OurStory;
   /** Toggles the ScratchDateReveal section on external_link invitation pages. */
   scratchReveal?: { enabled: boolean };
+  /** Toggles the curtain-canva hero celebration confetti. Unset → fires (default on); only `{ enabled: false }` disables it. */
+  heroConfetti?: { enabled: boolean };
   /** Toggles and styles the countdown section on external_link invitation pages. */
   countdown?: ExternalCountdownConfig;
   /** Per-invitation text style overrides (fonts, colors, sizes). Missing fields fall back to theme defaults. */

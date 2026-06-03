@@ -142,6 +142,17 @@ export function shouldFireConfettiAtProgress(
 }
 
 /**
+ * Admin toggle for the curtain hero's celebration confetti. Confetti fires by
+ * default (config unset → existing invitations keep their burst); only an
+ * explicit `{ enabled: false }` from the admin form turns it off.
+ */
+export function shouldFireHeroConfetti(
+  config: { enabled: boolean } | null | undefined,
+): boolean {
+  return config?.enabled !== false;
+}
+
+/**
  * Builds a small celebratory color palette derived from the theme's accent
  * and decorative colors. Used by the confetti burst that fires after the
  * user scratches the last save-the-date coin. Falls back to a warm gold

@@ -48,6 +48,7 @@ type AdminInvitationInitialDataRow = {
   parents: unknown;
   ourStory: unknown;
   scratchReveal: unknown;
+  heroConfetti: unknown;
   countdown: unknown;
   textStyles: unknown;
   cardStyles: unknown;
@@ -108,6 +109,8 @@ export function toAdminInvitationInitialData(
     scratchReveal:
       (row.scratchReveal as InvitationData["scratchReveal"] | null) ??
       undefined,
+    heroConfetti:
+      (row.heroConfetti as InvitationData["heroConfetti"] | null) ?? undefined,
     countdown: (row.countdown as ExternalCountdownConfig | null) ?? undefined,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
