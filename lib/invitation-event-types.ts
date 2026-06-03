@@ -22,6 +22,10 @@ export function isWeddingEventType(value: InvitationEventType): boolean {
   return value === "wedding";
 }
 
+export function isEngagementEventType(value: InvitationEventType): boolean {
+  return value === "engagement";
+}
+
 function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -54,7 +58,9 @@ export function buildInvitationSlug({
   secondaryName = "",
 }: InvitationNameInput): string {
   return slugify(
-    isWeddingEventType(eventType) ? `${primaryName}-${secondaryName}` : primaryName,
+    isWeddingEventType(eventType)
+      ? `${primaryName}-${secondaryName}`
+      : primaryName,
   );
 }
 

@@ -277,6 +277,7 @@ export default function CurtainCanvaPage({
         textStyles={invitation.textStyles}
         onTapped={handleTapped}
         onRevealed={handleRevealed}
+        eventType={invitation.eventType}
       />
 
       <div style={revealContentStyle} aria-hidden={!revealed}>

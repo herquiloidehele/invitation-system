@@ -13,6 +13,7 @@ import type {
   CustomTexts,
   HeroOverlayConfig,
   InvitationData,
+  InvitationEventType,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
@@ -27,6 +28,10 @@ import {
   shouldRenderCurtainHeroVideo,
   shouldShowHeroInfoAtProgress,
 } from "@/lib/curtain-canva";
+import {
+  isEngagementEventType,
+  isWeddingEventType,
+} from "@/lib/invitation-event-types";
 
 interface CurtainsHeroProps {
   couple: InvitationData["couple"];
@@ -43,6 +48,7 @@ interface CurtainsHeroProps {
   /** Admin-tunable scrim + bottom gradient for the hero video (invitation.heroOverlay). */
   heroOverlay?: HeroOverlayConfig;
   customTexts?: CustomTexts;
+  eventType: InvitationEventType;
   /**
    * Per-invitation text style overrides. Applied on top of the hero's
    * default inline styles so admin element-level customizations (couple
@@ -76,6 +82,7 @@ export default function CurtainsHero({
   textStyles,
   onTapped,
   onRevealed,
+  eventType,
 }: CurtainsHeroProps) {
   // Per-element overrides applied to inline styles below. Resolved once
   // per render so we keep the existing curtain typography defaults and
@@ -433,23 +440,28 @@ export default function CurtainsHero({
                   {couple.bride}
                 </EditableText>
               </span>
-              <span
-                aria-hidden
-                className="my-1"
-                style={{
-                  opacity: 0.55,
-                  fontStyle: "italic",
-                  fontSize: "0.85em",
-                  ...ampersandOverride,
-                }}
-              >
-                <EditableText elementKey="ampersand">&amp;</EditableText>
-              </span>
-              <span>
-                <EditableText elementKey="coupleNames">
-                  {couple.groom}
-                </EditableText>
-              </span>
+              {(isWeddingEventType(eventType) ||
+                isEngagementEventType(eventType)) && (
+                <>
+                  <span
+                    aria-hidden
+                    className="my-1"
+                    style={{
+                      opacity: 0.55,
+                      fontStyle: "italic",
+                      fontSize: "0.85em",
+                      ...ampersandOverride,
+                    }}
+                  >
+                    <EditableText elementKey="ampersand">&amp;</EditableText>
+                  </span>
+                  <span>
+                    <EditableText elementKey="coupleNames">
+                      {couple.groom}
+                    </EditableText>
+                  </span>
+                </>
+              )}
             </motion.h1>
 
             {inviteMessage && (
