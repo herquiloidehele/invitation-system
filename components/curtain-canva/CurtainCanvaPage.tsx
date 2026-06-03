@@ -268,8 +268,11 @@ export default function CurtainCanvaPage({
         inviteMessage={invitation.parents?.inviteMessage}
         theme={theme}
         audioRef={audioRef}
-        videoUrl={invitation.videoUrl}
-        videoPoster={invitation.videoPoster}
+        curtainVideoUrl={invitation.curtainVideoUrl}
+        curtainVideoPoster={invitation.curtainVideoPoster}
+        heroVideoUrl={invitation.videoUrl}
+        heroVideoPoster={invitation.videoPoster}
+        heroOverlay={invitation.heroOverlay}
         customTexts={invitation.customTexts}
         textStyles={invitation.textStyles}
         onTapped={handleTapped}

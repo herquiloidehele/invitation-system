@@ -148,6 +148,8 @@ function getDefaultState(
     heroHeight: DEFAULT_HERO_HEIGHT,
     videoUrl: "",
     videoPoster: "",
+    curtainVideoUrl: "",
+    curtainVideoPoster: "",
     invitationType: invType,
     externalLink: "",
     isDemo: false,
@@ -513,6 +515,10 @@ export default function ExternalInvitationForm({
           invitationType: t,
           videoUrl:
             t === "external_video" || preserveVideo ? prev.videoUrl : "",
+          // Curtain video only applies to curtain-canva; keep it when the
+          // selected theme is curtain-canva, otherwise clear it.
+          curtainVideoUrl: preserveVideo ? prev.curtainVideoUrl : "",
+          curtainVideoPoster: preserveVideo ? prev.curtainVideoPoster : "",
           externalLink: t === "external_link" ? prev.externalLink : "",
         };
       });
@@ -1779,18 +1785,18 @@ export default function ExternalInvitationForm({
                       <MediaUpload
                         kind="video"
                         maxSizeMB={500}
-                        value={form.videoUrl}
+                        value={form.curtainVideoUrl || undefined}
                         onUpload={(url, meta) => {
-                          update("videoUrl", url);
+                          update("curtainVideoUrl", url);
                           // First-frame poster auto-extracted by the
                           // server. Used by CurtainsHero so iOS shows
                           // the closed-curtain still while the video
                           // loads, instead of a blank rectangle.
-                          update("videoPoster", meta?.posterUrl ?? "");
+                          update("curtainVideoPoster", meta?.posterUrl ?? "");
                         }}
                         onClear={() => {
-                          update("videoUrl", "");
-                          update("videoPoster", "");
+                          update("curtainVideoUrl", "");
+                          update("curtainVideoPoster", "");
                         }}
                       />
                     </div>

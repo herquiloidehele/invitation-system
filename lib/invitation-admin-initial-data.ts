@@ -37,6 +37,8 @@ type AdminInvitationInitialDataRow = {
   heroScrollIndicator: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
+  curtainVideoUrl: string | null;
+  curtainVideoPoster: string | null;
   faqs: unknown;
   envelope: unknown;
   guestGuide: unknown;
@@ -92,6 +94,8 @@ export function toAdminInvitationInitialData(
       undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
+    curtainVideoUrl: row.curtainVideoUrl ?? undefined,
+    curtainVideoPoster: row.curtainVideoPoster ?? undefined,
     faqs: (row.faqs as InvitationData["faqs"] | null) ?? undefined,
     envelope: (row.envelope as InvitationData["envelope"] | null) ?? undefined,
     guestGuide:

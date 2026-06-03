@@ -87,8 +87,10 @@ model Invitation {
   heroHeight   Int?     // Pixel height for image-based heroes. Null falls back to 300px in the renderer.
   heroOverlay  Json?    // HeroOverlayConfig { scrimOpacity?, gradientStart? } — controls dark scrim (video only) + bottom gradient.
   heroScrollIndicator Json? // HeroScrollIndicatorConfig { enabled, color? } — toggles the animated scroll-down arrow shown above the audio player.
-  videoUrl     String?
-  videoPoster  String?  // Poster image shown before the curtains video plays. Optional — falls back to a static asset.
+  videoUrl     String?  // Hero background video (InvitationHero on standard invitations; the looping full-screen hero on curtain-canva).
+  videoPoster  String?  // Poster for videoUrl (the hero video). Optional.
+  curtainVideoUrl String?  // Curtain-canva only: the curtain animation video played on tap. Empty → bundled default.
+  curtainVideoPoster String? // Poster for curtainVideoUrl — the closed-curtain still shown (esp. on iOS) while the curtain video loads.
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
   envelope     Json?    // EnvelopeConfig { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }

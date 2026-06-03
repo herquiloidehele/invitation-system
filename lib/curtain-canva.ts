@@ -61,11 +61,26 @@ export function shortMonthName(iso: string, fallback = ""): string {
 
 
 /**
- * Curtain-canva uses invitation.videoUrl as the optional curtain animation.
- * If not set, the bundled default keeps existing invitations working.
+ * Curtain-canva uses invitation.curtainVideoUrl as the optional curtain
+ * animation. If not set, the bundled default keeps existing invitations
+ * working. (invitation.videoUrl is the hero background video, not the curtain.)
  */
 export function resolveCurtainVideoSrc(videoUrl?: string | null): string {
   return videoUrl || DEFAULT_CURTAIN_VIDEO_SRC;
+}
+
+/**
+ * The curtain-canva hero video section renders only when a hero video
+ * (`invitation.videoUrl`) has been uploaded. Whitespace-only values count as
+ * empty so a stray space in the admin field doesn't mount an empty <video>.
+ *
+ * Distinct from `resolveCurtainVideoSrc`, which resolves the *curtain*
+ * animation (`invitation.curtainVideoUrl`) and applies the bundled default.
+ */
+export function shouldRenderCurtainHeroVideo(
+  videoUrl: string | null | undefined,
+): boolean {
+  return typeof videoUrl === "string" && videoUrl.trim().length > 0;
 }
 
 export function resolveRevealContentStyle(revealed: boolean): CSSProperties {

@@ -106,6 +106,8 @@ export async function POST(request: NextRequest) {
         heroScrollIndicator: sanitizeJsonField(body.heroScrollIndicator, null),
         videoUrl: body.videoUrl ?? null,
         videoPoster: body.videoPoster ?? null,
+        curtainVideoUrl: body.curtainVideoUrl ?? null,
+        curtainVideoPoster: body.curtainVideoPoster ?? null,
         faqs: sanitizeJsonField(body.faqs, null),
         guestGuide: sanitizeJsonField(body.guestGuide, null),
         envelope: sanitizeJsonField(body.envelope, null),

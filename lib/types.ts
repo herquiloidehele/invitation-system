@@ -565,9 +565,14 @@ export interface InvitationData {
   heroOverlay?: HeroOverlayConfig;
   /** Optional animated scroll-down indicator at the bottom of the hero. */
   heroScrollIndicator?: HeroScrollIndicatorConfig;
+  /** Hero background video. On standard invitations this is the InvitationHero video; on curtain-canva it's the looping full-screen hero shown after the curtain opens. */
   videoUrl?: string;
-  /** Poster image displayed by the curtain video before playback / while it loads. Optional — falls back to a static bundled poster. */
+  /** Poster for `videoUrl` (the hero video). Optional. */
   videoPoster?: string;
+  /** Curtain-canva only: the curtain animation video played on tap. Falls back to the bundled default when empty. */
+  curtainVideoUrl?: string;
+  /** Poster for `curtainVideoUrl` — the closed-curtain still shown (esp. on iOS) while the curtain video loads. */
+  curtainVideoPoster?: string;
   faqs?: FAQItem[];
   /** "Manual do bom convidado" section — optional list of icon + label tips for guests. */
   guestGuide?: GuestGuide;

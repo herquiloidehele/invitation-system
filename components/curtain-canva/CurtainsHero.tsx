@@ -11,17 +11,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import type {
   CustomTexts,
+  HeroOverlayConfig,
   InvitationData,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
 import { t } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
+import CurtainHeroVideo from "./CurtainHeroVideo";
 import {
   resolveCurtainVideoSrc,
   resolveTextElementOverride,
   scrollToNextHeroSection,
   shouldFireConfettiAtProgress,
+  shouldRenderCurtainHeroVideo,
   shouldShowHeroInfoAtProgress,
 } from "@/lib/curtain-canva";
 
@@ -31,8 +34,14 @@ interface CurtainsHeroProps {
   inviteMessage?: string;
   theme: TemplateTheme;
   audioRef: RefObject<HTMLAudioElement | null>;
-  videoUrl?: string;
-  videoPoster?: string;
+  curtainVideoUrl?: string;
+  curtainVideoPoster?: string;
+  /** Hero background video shown after the curtain opens (invitation.videoUrl). */
+  heroVideoUrl?: string;
+  /** Poster for the hero background video (invitation.videoPoster). */
+  heroVideoPoster?: string;
+  /** Admin-tunable scrim + bottom gradient for the hero video (invitation.heroOverlay). */
+  heroOverlay?: HeroOverlayConfig;
   customTexts?: CustomTexts;
   /**
    * Per-invitation text style overrides. Applied on top of the hero's
@@ -58,8 +67,11 @@ export default function CurtainsHero({
   inviteMessage,
   theme,
   audioRef,
-  videoUrl,
-  videoPoster,
+  curtainVideoUrl,
+  curtainVideoPoster,
+  heroVideoUrl,
+  heroVideoPoster,
+  heroOverlay,
   customTexts,
   textStyles,
   onTapped,
@@ -129,7 +141,8 @@ export default function CurtainsHero({
   }, []);
 
   const tapLabel = t(customTexts, "curtain_tapToOpen");
-  const videoSrc = resolveCurtainVideoSrc(videoUrl);
+  const videoSrc = resolveCurtainVideoSrc(curtainVideoUrl);
+  const heroVideoOn = shouldRenderCurtainHeroVideo(heroVideoUrl);
 
   const handleTap = useCallback(() => {
     if (state !== "idle") return;
@@ -316,10 +329,13 @@ export default function CurtainsHero({
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `url(${videoPoster})`,
+          backgroundImage: `url(${curtainVideoPoster})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: videoReady ? 0 : 1,
+          // Hide once the curtain video has painted, or once the curtain has
+          // opened with a hero video present — so the hero video behind is
+          // revealed even if the curtain video failed to play.
+          opacity: videoReady || (heroVideoOn && state === "revealed") ? 0 : 1,
           transition: "opacity 200ms ease-out",
           zIndex: 1,
         }}
@@ -328,7 +344,7 @@ export default function CurtainsHero({
       <video
         ref={videoRef}
         src={videoSrc}
-        poster={videoPoster}
+        poster={curtainVideoPoster}
         muted
         playsInline
         preload="auto"
@@ -337,8 +353,30 @@ export default function CurtainsHero({
         onPlaying={handleVideoPlaying}
         onTimeUpdate={handleVideoTimeUpdate}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        style={{ cursor: isInteractive ? "pointer" : "default", zIndex: 2 }}
+        style={{
+          cursor: isInteractive ? "pointer" : "default",
+          zIndex: 2,
+          // When a hero video is present, fade the curtain video out once it
+          // has opened so the hero video already playing behind it (zIndex 0)
+          // is revealed.
+          opacity: heroVideoOn && state === "revealed" ? 0 : 1,
+          transition: "opacity 600ms ease-out",
+        }}
       />
+
+      {/* Hero background video. Mounted behind the curtain video (zIndex 0)
+          and always playing, so the moment the curtain video fades out (the
+          curtain "opens") the looping hero video is already there underneath.
+          Rendered only when a hero video is available; the hero info sits
+          above it. */}
+      {heroVideoOn && heroVideoUrl && (
+        <CurtainHeroVideo
+          videoUrl={heroVideoUrl}
+          videoPoster={heroVideoPoster}
+          backgroundColor={theme.bg}
+          heroOverlay={heroOverlay}
+        />
+      )}
 
       {/* Hero info (monogram, names, quote). Fades in when the curtain video
           reaches the configured progress threshold (default 80%) so it is

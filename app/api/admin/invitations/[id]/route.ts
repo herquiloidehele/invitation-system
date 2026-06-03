@@ -146,6 +146,12 @@ export async function PUT(
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,
         }),
+        ...(body.curtainVideoUrl !== undefined && {
+          curtainVideoUrl: body.curtainVideoUrl || null,
+        }),
+        ...(body.curtainVideoPoster !== undefined && {
+          curtainVideoPoster: body.curtainVideoPoster || null,
+        }),
         ...(body.faqs !== undefined && {
           faqs: sanitizeJsonField(body.faqs, null),
         }),
