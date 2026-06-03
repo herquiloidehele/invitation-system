@@ -3,16 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TemplateTheme } from "@/lib/types";
 import { measureIframeBodyHeight } from "@/lib/canva-embed-measurement";
-import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
-
-/**
- * Appends the proxy's no-scroll opt-in flag to a same-origin URL string.
- * Preserves any existing query parameters the upstream Canva URL carried.
- */
-function appendDisableScrollFlag(src: string): string {
-  if (!src) return src;
-  return src + (src.includes("?") ? "&" : "?") + "disableScroll=1";
-}
+import {
+  appendCanvaProxyDisableScrollFlag,
+  getExternalInvitationEmbedSrc,
+} from "@/lib/external-invitation-form";
 
 interface CanvaEmbedProps {
   externalLink: string;
@@ -47,15 +41,26 @@ export default function CanvaEmbed({
   // callback) so the outer effect cleanup can disconnect it even if
   // the component unmounts before the 60-second safety timer fires.
   const observerRef = useRef<ResizeObserver | null>(null);
+  const detachNavigationInterceptorRef = useRef<(() => void) | null>(null);
   const [contentHeight, setContentHeight] = useState<number | null>(null);
+  const [navigatedProxiedUrl, setNavigatedProxiedUrl] = useState<{
+    externalLink: string;
+    src: string;
+  } | null>(null);
   // We size the iframe element to the proxied document's full content
   // height, so the embedded page must not scroll independently. The
   // proxy honours `?disableScroll=1` to inject the no-scroll style block;
   // ExternalLinkPage omits the flag and gets the Canva page rendered as-is.
-  const proxiedUrl = externalLink
-    ? appendDisableScrollFlag(getExternalInvitationEmbedSrc(externalLink))
-    : "";
   const ar = aspectRatio ?? 9 / 16;
+  const defaultProxiedUrl = externalLink
+    ? appendCanvaProxyDisableScrollFlag(
+        getExternalInvitationEmbedSrc(externalLink),
+      )
+    : "";
+  const proxiedUrl =
+    navigatedProxiedUrl?.externalLink === externalLink
+      ? navigatedProxiedUrl.src
+      : defaultProxiedUrl;
 
   const measureIframe = useCallback(() => {
     const doc = iframeRef.current?.contentDocument;
@@ -88,10 +93,81 @@ export default function CanvaEmbed({
         observerRef.current.disconnect();
         observerRef.current = null;
       }
+      if (detachNavigationInterceptorRef.current) {
+        detachNavigationInterceptorRef.current();
+        detachNavigationInterceptorRef.current = null;
+      }
     };
   }, [measureIframe]);
 
+  const attachNavigationInterceptor = useCallback(() => {
+    if (detachNavigationInterceptorRef.current) {
+      detachNavigationInterceptorRef.current();
+      detachNavigationInterceptorRef.current = null;
+    }
+
+    let doc: Document | null | undefined;
+    try {
+      doc = iframeRef.current?.contentDocument;
+    } catch {
+      return;
+    }
+    if (!doc) return;
+
+    const onClick = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const anchor = (event.target as Element | null)?.closest?.(
+        "a[href]",
+      ) as HTMLAnchorElement | null;
+      if (!anchor) return;
+
+      const target = anchor.getAttribute("target")?.toLowerCase();
+      if (target && target !== "_self") return;
+
+      let nextUrl: URL;
+      try {
+        nextUrl = new URL(anchor.href, window.location.href);
+      } catch {
+        return;
+      }
+
+      if (
+        nextUrl.origin !== window.location.origin ||
+        !nextUrl.pathname.startsWith("/canva-proxy/")
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      const nextSrc = appendCanvaProxyDisableScrollFlag(
+        `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`,
+      );
+
+      setContentHeight(null);
+      setNavigatedProxiedUrl({ externalLink, src: nextSrc });
+    };
+
+    doc.addEventListener("click", onClick, true);
+    detachNavigationInterceptorRef.current = () => {
+      doc.removeEventListener("click", onClick, true);
+    };
+  }, [externalLink]);
+
   const handleLoad = useCallback(() => {
+    attachNavigationInterceptor();
     measureIframe();
     measureTimerRef.current.forEach((timer) => window.clearTimeout(timer));
     measureTimerRef.current = [100, 500, 1000, 2500].map((delay) =>
@@ -127,7 +203,7 @@ export default function CanvaEmbed({
         }
       }, 60_000),
     );
-  }, [measureIframe]);
+  }, [attachNavigationInterceptor, measureIframe]);
 
   if (!externalLink) return null;
 

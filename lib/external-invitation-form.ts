@@ -27,6 +27,22 @@ export function getExternalInvitationEmbedSrc(externalLink: string): string {
   }
 }
 
+export function appendCanvaProxyDisableScrollFlag(src: string): string {
+  if (!src) return src;
+
+  const hashIndex = src.indexOf("#");
+  const beforeHash = hashIndex === -1 ? src : src.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : src.slice(hashIndex);
+  const queryIndex = beforeHash.indexOf("?");
+  const path = queryIndex === -1 ? beforeHash : beforeHash.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : beforeHash.slice(queryIndex + 1);
+  const params = new URLSearchParams(query);
+
+  params.set("disableScroll", "1");
+
+  return `${path}?${params.toString()}${hash}`;
+}
+
 /**
  * Returns true if an external_link invitation has any optional rich section
  * enabled (hero — implicit via heroImage/videoUrl presence, countdown,
