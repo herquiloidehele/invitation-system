@@ -18,8 +18,8 @@
     "defaultWhatsappMessage": "¡Hola! Me gustaría pedir un presupuesto para una invitación digital Brindeal.",
     "galleryFallbackTitle": "Invitación",
     "galleryEmpty": "Todavía no hay invitaciones destacadas en esta categoría.",
-    "footerDescription": "Invitaciones digitales personales, elegantes y hechas con cuidado en Lisboa.",
-    "footerCopyright": "© 2026 Brindeal Studio · Hecho con cuidado en Lisboa"
+    "footerDescription": "Invitaciones digitales personales, elegantes y hechas con cuidado.",
+    "footerCopyright": "© 2026 Brindeal Studio · Hecho con cuidado"
   },
   "LandingNav": {
     "bestSellers": "Más vendidos",
@@ -77,12 +77,33 @@
     "body": "Os acompañamos en cada etapa, desde la conversación inicial hasta publicar la invitación. Sin sorpresas, con plazos claros y un pago transparente.",
     "closing": "¿Listos para empezar?",
     "cta": "Hablar con nosotros →",
-    "badges": ["Sin compromiso", "50% o 100%", "Hasta 3 cambios", "Enlace o QR"],
+    "badges": [
+      "Sin compromiso",
+      "50% o 100%",
+      "Hasta 3 cambios",
+      "Enlace o QR"
+    ],
     "steps": [
-      ["01", "Conversación inicial", "Hablamos sobre el estilo del evento, los colores y las características que os gustaría ver en la invitación."],
-      ["02", "Pago", "Elegido el modelo, se realiza el pago del 50% o del 100% del valor. El proyecto comienza tras la confirmación del pago."],
-      ["03", "Revisión y ajustes", "Enviamos una vista previa para aprobación, con derecho a un cambio completo del diseño (cuando esté disponible) y hasta 3 cambios de texto sin coste adicional."],
-      ["04", "Publicación y envío", "Tras la aprobación, compartimos la invitación como enlace o código QR, con un panel privado para seguir las confirmaciones en tiempo real."]
+      [
+        "01",
+        "Conversación inicial",
+        "Hablamos sobre el estilo del evento, los colores y las características que os gustaría ver en la invitación."
+      ],
+      [
+        "02",
+        "Pago",
+        "Elegido el modelo, se realiza el pago del 50% o del 100% del valor. El proyecto comienza tras la confirmación del pago."
+      ],
+      [
+        "03",
+        "Revisión y ajustes",
+        "Enviamos una vista previa para aprobación, con derecho a un cambio completo del diseño (cuando esté disponible) y hasta 3 cambios de texto sin coste adicional."
+      ],
+      [
+        "04",
+        "Publicación y envío",
+        "Tras la aprobación, compartimos la invitación como enlace o código QR, con un panel privado para seguir las confirmaciones en tiempo real."
+      ]
     ],
     "previewMessageA": "¡Hola! Boda en julio 🌿",
     "previewMessageB": "¡Perfecto! Envío propuesta hoy ✦",
@@ -152,16 +173,46 @@
     "body": "Todo lo que necesitáis saber antes de empezar. ¿No encontráis la respuesta? Hablamos por WhatsApp.",
     "contactTitle": "Hablar ahora",
     "items": [
-      { "question": "¿Cuál es el plazo?", "answer": "El plazo varía de 4 días a un mes, según la demanda y el modelo elegido." },
-      { "question": "¿Puedo personalizar mi invitación?", "answer": "Sí. Tenemos invitaciones 100% personalizables y también modelos con diseño predefinido — consulta la descripción de cada modelo." },
-      { "question": "¿Puedo encargar para otro tipo de evento además de bodas?", "answer": "Sí, hacemos invitaciones para todo tipo de eventos." },
-      { "question": "¿Puedo personalizar la invitación con el nombre del invitado?", "answer": "Sí, con una tarifa adicional por cada invitación personalizada." },
-      { "question": "¿Puedo recibir la invitación en PDF?", "answer": "Sí, pero corres el riesgo de recibir las páginas separadas y algunos recursos no funcionan en la versión PDF." },
-      { "question": "¿Cuántas veces puedo hacer cambios en la invitación?", "answer": "Durante la producción puedes cambiar el diseño una vez y editar los textos hasta 3 veces, sin coste. Tras la aprobación, cualquier cambio tiene un coste adicional." },
-      { "question": "¿Necesito enviar un número de WhatsApp para las confirmaciones?", "answer": "No. Usamos un sistema integrado que facilita la gestión y el control de las confirmaciones." },
-      { "question": "¿Puedo elegir la música?", "answer": "Sí, la música es opcional." },
-      { "question": "¿Cuánto tiempo permanece la invitación online?", "answer": "El dominio permanece online durante 2 años." },
-      { "question": "¿Solo hacéis invitaciones en portugués?", "answer": "No. Hacemos invitaciones en cualquier idioma y para cualquier parte del mundo." }
+      {
+        "question": "¿Cuál es el plazo?",
+        "answer": "El plazo varía de 4 días a un mes, según la demanda y el modelo elegido."
+      },
+      {
+        "question": "¿Puedo personalizar mi invitación?",
+        "answer": "Sí. Tenemos invitaciones 100% personalizables y también modelos con diseño predefinido — consulta la descripción de cada modelo."
+      },
+      {
+        "question": "¿Puedo encargar para otro tipo de evento además de bodas?",
+        "answer": "Sí, hacemos invitaciones para todo tipo de eventos."
+      },
+      {
+        "question": "¿Puedo personalizar la invitación con el nombre del invitado?",
+        "answer": "Sí, con una tarifa adicional por cada invitación personalizada."
+      },
+      {
+        "question": "¿Puedo recibir la invitación en PDF?",
+        "answer": "Sí, pero corres el riesgo de recibir las páginas separadas y algunos recursos no funcionan en la versión PDF."
+      },
+      {
+        "question": "¿Cuántas veces puedo hacer cambios en la invitación?",
+        "answer": "Durante la producción puedes cambiar el diseño una vez y editar los textos hasta 3 veces, sin coste. Tras la aprobación, cualquier cambio tiene un coste adicional."
+      },
+      {
+        "question": "¿Necesito enviar un número de WhatsApp para las confirmaciones?",
+        "answer": "No. Usamos un sistema integrado que facilita la gestión y el control de las confirmaciones."
+      },
+      {
+        "question": "¿Puedo elegir la música?",
+        "answer": "Sí, la música es opcional."
+      },
+      {
+        "question": "¿Cuánto tiempo permanece la invitación online?",
+        "answer": "El dominio permanece online durante 2 años."
+      },
+      {
+        "question": "¿Solo hacéis invitaciones en portugués?",
+        "answer": "No. Hacemos invitaciones en cualquier idioma y para cualquier parte del mundo."
+      }
     ]
   },
   "LandingFooter": {
@@ -179,8 +230,8 @@
     "faq": "FAQ",
     "about": "Sobre",
     "contact": "Contacto",
-    "description": "Invitaciones digitales personales, elegantes y hechas con cuidado en Lisboa.",
-    "copyright": "© 2026 Brindeal Studio · Hecho con cuidado en Lisboa",
+    "description": "Invitaciones digitales personales, elegantes y hechas con cuidado.",
+    "copyright": "© 2026 Brindeal Studio · Hecho con cuidado",
     "languages": "Português · English · Español"
   },
   "Whatsapp": {
@@ -218,8 +269,8 @@
     "rsvp_errorTitle": "Error al enviar",
     "rsvp_errorMessage": "Inténtalo de nuevo en unos instantes.",
     "rsvp_retryButton": "Intentar de nuevo",
-    "rsvp_closeButton": "Cerrar"
-    ,"cta_confirmLabel": "Confirma tu asistencia"
+    "rsvp_closeButton": "Cerrar",
+    "cta_confirmLabel": "Confirma tu asistencia"
   },
   "OwnerConfirmations": {
     "rsvpsTab": "Confirmaciones",

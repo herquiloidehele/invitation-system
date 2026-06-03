@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DISPLAY_WHATSAPP_NUMBER } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
@@ -36,8 +37,10 @@ export function FaqSection({
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <div
+              <motion.div
                 key={faq.question}
+                layout
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                 className="rounded-2xl border border-[#E5E7E4] bg-white p-5"
               >
                 <button
@@ -48,24 +51,31 @@ export function FaqSection({
                   className="flex w-full items-center justify-between gap-4 text-left font-semibold focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
                 >
                   {faq.question}
-                  <span className="text-2xl text-[#5C605A]">
-                    {isOpen ? "−" : "+"}
+                  <span className="text-[#5C605A]">
+                    {isOpen ? (
+                      <ChevronUpIcon className="size-5" />
+                    ) : (
+                      <ChevronDownIcon className="size-5" />
+                    )}
                   </span>
                 </button>
                 <AnimatePresence initial={false}>
                   {isOpen && (
-                    <motion.p
+                    <motion.div
                       id={`faq-answer-${index}`}
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden pt-4 text-sm leading-6 text-[#5C605A]"
+                      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden"
                     >
-                      {faq.answer}
-                    </motion.p>
+                      <p className="pt-4 text-sm leading-6 text-[#5C605A]">
+                        {faq.answer}
+                      </p>
+                    </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             );
           })}
         </div>

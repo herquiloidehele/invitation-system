@@ -18,8 +18,8 @@
     "defaultWhatsappMessage": "Olá! Gostava de pedir um orçamento para um convite digital Brindeal.",
     "galleryFallbackTitle": "Convite",
     "galleryEmpty": "Ainda sem convites em destaque nesta categoria.",
-    "footerDescription": "Convites digitais pessoais, elegantes e feitos com cuidado em Lisboa.",
-    "footerCopyright": "© 2026 Brindeal Studio · Feito com cuidado em Lisboa"
+    "footerDescription": "Convites digitais pessoais, elegantes e feitos com cuidado.",
+    "footerCopyright": "© 2026 Brindeal Studio · Feito com cuidado"
   },
   "LandingNav": {
     "bestSellers": "Mais vendidos",
@@ -77,7 +77,12 @@
     "body": "Acompanhamos cada etapa, da conversa inicial até à publicação do convite. Sem surpresas, com prazos claros e o pagamento bem definido.",
     "closing": "Prontos para começar?",
     "cta": "Falar connosco →",
-    "badges": ["Sem compromisso", "50% ou 100%", "Até 3 alterações", "Link ou QR Code"],
+    "badges": [
+      "Sem compromisso",
+      "50% ou 100%",
+      "Até 3 alterações",
+      "Link ou QR Code"
+    ],
     "steps": [
       [
         "01",
@@ -225,8 +230,8 @@
     "faq": "FAQ",
     "about": "Sobre",
     "contact": "Contacto",
-    "description": "Convites digitais pessoais, elegantes e feitos com cuidado em Lisboa.",
-    "copyright": "© 2026 Brindeal Studio · Feito com cuidado em Lisboa",
+    "description": "Convites digitais pessoais, elegantes e feitos com cuidado.",
+    "copyright": "© 2026 Brindeal Studio · Feito com cuidado",
     "languages": "Português · English · Español"
   },
   "Whatsapp": {

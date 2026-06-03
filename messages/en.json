@@ -18,8 +18,8 @@
     "defaultWhatsappMessage": "Hello! I would like to request a quote for a Brindeal digital invitation.",
     "galleryFallbackTitle": "Invitation",
     "galleryEmpty": "No featured invitations in this category yet.",
-    "footerDescription": "Personal, elegant digital invitations made with care in Lisbon.",
-    "footerCopyright": "© 2026 Brindeal Studio · Made with care in Lisbon"
+    "footerDescription": "Personal, elegant digital invitations made with care.",
+    "footerCopyright": "© 2026 Brindeal Studio · Made with care"
   },
   "LandingNav": {
     "bestSellers": "Best sellers",
@@ -77,12 +77,33 @@
     "body": "We walk you through every step, from the initial conversation to publishing the invitation. No surprises, with clear timelines and transparent payment.",
     "closing": "Ready to begin?",
     "cta": "Talk to us →",
-    "badges": ["No commitment", "50% or 100%", "Up to 3 edits", "Link or QR Code"],
+    "badges": [
+      "No commitment",
+      "50% or 100%",
+      "Up to 3 edits",
+      "Link or QR Code"
+    ],
     "steps": [
-      ["01", "Initial conversation", "We talk about your event's style, the colors and the details you'd like to see in the invitation."],
-      ["02", "Payment", "Once you choose a model, you settle 50% or 100% of the value. The project starts as soon as the payment is confirmed."],
-      ["03", "Review & adjustments", "We send a preview for approval, with one full design change included (when available) and up to 3 text edits at no extra cost."],
-      ["04", "Publishing & sharing", "After approval, we share the invitation as a link or QR code, with a private dashboard to track RSVPs in real time."]
+      [
+        "01",
+        "Initial conversation",
+        "We talk about your event's style, the colors and the details you'd like to see in the invitation."
+      ],
+      [
+        "02",
+        "Payment",
+        "Once you choose a model, you settle 50% or 100% of the value. The project starts as soon as the payment is confirmed."
+      ],
+      [
+        "03",
+        "Review & adjustments",
+        "We send a preview for approval, with one full design change included (when available) and up to 3 text edits at no extra cost."
+      ],
+      [
+        "04",
+        "Publishing & sharing",
+        "After approval, we share the invitation as a link or QR code, with a private dashboard to track RSVPs in real time."
+      ]
     ],
     "previewMessageA": "Hello! Wedding in July 🌿",
     "previewMessageB": "Perfect! I'll send a proposal today ✦",
@@ -152,16 +173,46 @@
     "body": "Everything you need to know before we start. Can't find the answer? We can talk on WhatsApp.",
     "contactTitle": "Talk now",
     "items": [
-      { "question": "What is the turnaround time?", "answer": "Turnaround ranges from 4 days to one month, depending on demand and the chosen model." },
-      { "question": "Can I personalize my invitation?", "answer": "Yes. We have fully customizable invitations as well as pre-designed templates — check each model's description." },
-      { "question": "Can I order for other events besides weddings?", "answer": "Yes, we create invitations for all kinds of events." },
-      { "question": "Can I personalize the invitation with the guest's name?", "answer": "Yes, with an additional fee per personalized invitation." },
-      { "question": "Can I receive the invitation as a PDF?", "answer": "Yes, but you risk receiving the pages split apart, and some features don't work in the PDF version." },
-      { "question": "How many changes can I make to the invitation?", "answer": "During production you can change the design once and edit texts up to 3 times at no cost. After approval, any further change carries an additional fee." },
-      { "question": "Do I need to share a WhatsApp number for confirmations?", "answer": "No. We use an integrated system that makes it easy to manage and track every confirmation." },
-      { "question": "Can I choose the music?", "answer": "Yes, music is optional." },
-      { "question": "How long does the invitation stay online?", "answer": "The domain stays live for 2 years." },
-      { "question": "Do you only make invitations in Portuguese?", "answer": "No. We make invitations in any language and for anywhere in the world." }
+      {
+        "question": "What is the turnaround time?",
+        "answer": "Turnaround ranges from 4 days to one month, depending on demand and the chosen model."
+      },
+      {
+        "question": "Can I personalize my invitation?",
+        "answer": "Yes. We have fully customizable invitations as well as pre-designed templates — check each model's description."
+      },
+      {
+        "question": "Can I order for other events besides weddings?",
+        "answer": "Yes, we create invitations for all kinds of events."
+      },
+      {
+        "question": "Can I personalize the invitation with the guest's name?",
+        "answer": "Yes, with an additional fee per personalized invitation."
+      },
+      {
+        "question": "Can I receive the invitation as a PDF?",
+        "answer": "Yes, but you risk receiving the pages split apart, and some features don't work in the PDF version."
+      },
+      {
+        "question": "How many changes can I make to the invitation?",
+        "answer": "During production you can change the design once and edit texts up to 3 times at no cost. After approval, any further change carries an additional fee."
+      },
+      {
+        "question": "Do I need to share a WhatsApp number for confirmations?",
+        "answer": "No. We use an integrated system that makes it easy to manage and track every confirmation."
+      },
+      {
+        "question": "Can I choose the music?",
+        "answer": "Yes, music is optional."
+      },
+      {
+        "question": "How long does the invitation stay online?",
+        "answer": "The domain stays live for 2 years."
+      },
+      {
+        "question": "Do you only make invitations in Portuguese?",
+        "answer": "No. We make invitations in any language and for anywhere in the world."
+      }
     ]
   },
   "LandingFooter": {
@@ -179,8 +230,8 @@
     "faq": "FAQ",
     "about": "About",
     "contact": "Contact",
-    "description": "Personal, elegant digital invitations made with care in Lisbon.",
-    "copyright": "© 2026 Brindeal Studio · Made with care in Lisbon",
+    "description": "Personal, elegant digital invitations made with care.",
+    "copyright": "© 2026 Brindeal Studio · Made with care",
     "languages": "Português · English · Español"
   },
   "Whatsapp": {
@@ -218,8 +269,8 @@
     "rsvp_errorTitle": "Error sending",
     "rsvp_errorMessage": "Please try again in a few moments.",
     "rsvp_retryButton": "Try again",
-    "rsvp_closeButton": "Close"
-    ,"cta_confirmLabel": "Confirm your attendance"
+    "rsvp_closeButton": "Close",
+    "cta_confirmLabel": "Confirm your attendance"
   },
   "OwnerConfirmations": {
     "rsvpsTab": "Confirmations",
