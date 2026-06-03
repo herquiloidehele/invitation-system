@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TemplateTheme } from "@/lib/types";
-import { measureIframeBodyHeight } from "@/lib/canva-embed-measurement";
+import {
+  measureIframeBodyHeight,
+  shouldRestoreParentScrollForNavigation,
+  shouldResetIframeHeightForNavigation,
+} from "@/lib/canva-embed-measurement";
 import {
   appendCanvaProxyDisableScrollFlag,
   getExternalInvitationEmbedSrc,
@@ -46,6 +50,8 @@ export default function CanvaEmbed({
   // the component unmounts before the 60-second safety timer fires.
   const observerRef = useRef<ResizeObserver | null>(null);
   const detachNavigationInterceptorRef = useRef<(() => void) | null>(null);
+  const contentHeightRef = useRef<number | null>(null);
+  const scrollRestoreFrameRef = useRef<number | null>(null);
   const [contentHeight, setContentHeight] = useState<number | null>(null);
   const [navigatedProxiedUrl, setNavigatedProxiedUrl] = useState<{
     externalLink: string;
@@ -66,11 +72,52 @@ export default function CanvaEmbed({
       ? navigatedProxiedUrl.src
       : defaultProxiedUrl;
 
+  useEffect(() => {
+    contentHeightRef.current = contentHeight;
+  }, [contentHeight]);
+
+  const stopParentScrollRestore = useCallback(() => {
+    if (scrollRestoreFrameRef.current !== null) {
+      cancelAnimationFrame(scrollRestoreFrameRef.current);
+      scrollRestoreFrameRef.current = null;
+    }
+  }, []);
+
+  const keepParentScrollUntilLoad = useCallback(
+    (scrollYBeforeNavigation: number) => {
+      stopParentScrollRestore();
+
+      const startedAt = performance.now();
+      const tick = () => {
+        if (performance.now() - startedAt > 500) {
+          scrollRestoreFrameRef.current = null;
+          return;
+        }
+
+        if (
+          shouldRestoreParentScrollForNavigation({
+            beforeScrollY: scrollYBeforeNavigation,
+            currentScrollY: window.scrollY,
+            isInternalCanvaNavigation: true,
+          })
+        ) {
+          window.scrollTo(0, scrollYBeforeNavigation);
+        }
+
+        scrollRestoreFrameRef.current = requestAnimationFrame(tick);
+      };
+
+      scrollRestoreFrameRef.current = requestAnimationFrame(tick);
+    },
+    [stopParentScrollRestore],
+  );
+
   const syncPageStateFromIframe = useCallback(() => {
     let actualSrc = proxiedUrl;
 
     try {
-      actualSrc = iframeRef.current?.contentDocument?.location.href ?? actualSrc;
+      actualSrc =
+        iframeRef.current?.contentDocument?.location.href ?? actualSrc;
     } catch {
       /* Cross-origin iframes are not expected here, but keep the fallback. */
     }
@@ -127,8 +174,9 @@ export default function CanvaEmbed({
         detachNavigationInterceptorRef.current();
         detachNavigationInterceptorRef.current = null;
       }
+      stopParentScrollRestore();
     };
-  }, [measureIframe]);
+  }, [measureIframe, stopParentScrollRestore]);
 
   const attachNavigationInterceptor = useCallback(() => {
     if (detachNavigationInterceptorRef.current) {
@@ -182,12 +230,21 @@ export default function CanvaEmbed({
       event.stopPropagation();
       event.stopImmediatePropagation();
 
+      keepParentScrollUntilLoad(window.scrollY);
+
       const nextSrc = appendCanvaProxyDisableScrollFlag(
         `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`,
       );
       const isInitialPage = isInitialCanvaEmbedPage(nextSrc, defaultProxiedUrl);
 
-      setContentHeight(null);
+      if (
+        shouldResetIframeHeightForNavigation({
+          currentHeight: contentHeightRef.current,
+          isInternalCanvaNavigation: true,
+        })
+      ) {
+        setContentHeight(null);
+      }
       setNavigatedProxiedUrl(
         isInitialPage ? null : { externalLink, src: nextSrc },
       );
@@ -198,9 +255,15 @@ export default function CanvaEmbed({
     detachNavigationInterceptorRef.current = () => {
       doc.removeEventListener("click", onClick, true);
     };
-  }, [defaultProxiedUrl, externalLink, onInitialPageChange]);
+  }, [
+    defaultProxiedUrl,
+    externalLink,
+    keepParentScrollUntilLoad,
+    onInitialPageChange,
+  ]);
 
   const handleLoad = useCallback(() => {
+    stopParentScrollRestore();
     attachNavigationInterceptor();
     syncPageStateFromIframe();
     measureIframe();
@@ -238,7 +301,12 @@ export default function CanvaEmbed({
         }
       }, 60_000),
     );
-  }, [attachNavigationInterceptor, measureIframe, syncPageStateFromIframe]);
+  }, [
+    attachNavigationInterceptor,
+    measureIframe,
+    stopParentScrollRestore,
+    syncPageStateFromIframe,
+  ]);
 
   if (!externalLink) return null;
 

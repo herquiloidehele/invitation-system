@@ -35,3 +35,25 @@ export function measureIframeBodyHeight(
   if (candidates.length === 0) return null;
   return Math.max(...candidates);
 }
+
+export function shouldResetIframeHeightForNavigation({
+  currentHeight,
+  isInternalCanvaNavigation,
+}: {
+  currentHeight: number | null;
+  isInternalCanvaNavigation: boolean;
+}): boolean {
+  return !isInternalCanvaNavigation || currentHeight === null;
+}
+
+export function shouldRestoreParentScrollForNavigation({
+  beforeScrollY,
+  currentScrollY,
+  isInternalCanvaNavigation,
+}: {
+  beforeScrollY: number;
+  currentScrollY: number;
+  isInternalCanvaNavigation: boolean;
+}): boolean {
+  return isInternalCanvaNavigation && currentScrollY !== beforeScrollY;
+}

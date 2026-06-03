@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { measureIframeBodyHeight } from "../lib/canva-embed-measurement";
+import {
+  measureIframeBodyHeight,
+  shouldRestoreParentScrollForNavigation,
+  shouldResetIframeHeightForNavigation,
+} from "../lib/canva-embed-measurement";
 
 describe("measureIframeBodyHeight", () => {
   it("returns the body's content height, ignoring an oversized iframe viewport", () => {
@@ -37,5 +41,47 @@ describe("measureIframeBodyHeight", () => {
         bodyOffsetHeight: -10,
       }),
     ).toBeNull();
+  });
+});
+
+describe("shouldResetIframeHeightForNavigation", () => {
+  it("keeps the measured height during internal Canva navigation", () => {
+    expect(
+      shouldResetIframeHeightForNavigation({
+        currentHeight: 5326,
+        isInternalCanvaNavigation: true,
+      }),
+    ).toBe(false);
+  });
+
+  it("resets the measured height when there is no current measurement to preserve", () => {
+    expect(
+      shouldResetIframeHeightForNavigation({
+        currentHeight: null,
+        isInternalCanvaNavigation: true,
+      }),
+    ).toBe(true);
+  });
+});
+
+describe("shouldRestoreParentScrollForNavigation", () => {
+  it("restores parent scroll when internal Canva navigation moves it", () => {
+    expect(
+      shouldRestoreParentScrollForNavigation({
+        beforeScrollY: 3774,
+        currentScrollY: 0,
+        isInternalCanvaNavigation: true,
+      }),
+    ).toBe(true);
+  });
+
+  it("does not restore when scroll did not change", () => {
+    expect(
+      shouldRestoreParentScrollForNavigation({
+        beforeScrollY: 3774,
+        currentScrollY: 3774,
+        isInternalCanvaNavigation: true,
+      }),
+    ).toBe(false);
   });
 });
