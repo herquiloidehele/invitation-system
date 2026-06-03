@@ -3,7 +3,6 @@
 import Image from "next/image";
 import {
   BarChart3,
-  ImageIcon,
   Languages,
   Palette,
   Sparkles,
@@ -106,26 +105,21 @@ function RsvpHero() {
   const t = useTranslations("LandingFeatures");
 
   return (
-    <article className="min-h-[360px] rounded-[1.75rem] bg-[#3F4E3F] p-8 text-white sm:p-10 lg:col-span-7 lg:min-h-[430px]">
-      <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#F6F7F5]">
-        {t("rsvpEyebrow")}
-      </p>
-      <h3 className="mt-7 text-4xl font-semibold leading-tight tracking-[-0.02em] sm:text-5xl">
+    <article className="flex min-h-[360px] flex-col rounded-[1.75rem] bg-[#3F4E3F] p-8 text-white sm:p-10 lg:col-span-7 lg:min-h-[430px]">
+      <h3 className="text-4xl font-semibold leading-tight tracking-[-0.02em] sm:text-5xl">
         {t("rsvpTitle")}
       </h3>
-      <p className="mt-5 max-w-3xl text-sm leading-7 text-[#E8EBE7] sm:text-base">
+      <p className="mt-4 max-w-xl text-sm leading-7 text-[#E8EBE7] sm:text-base">
         {t("rsvpBody")}
       </p>
-      <div
-        className="mt-8 grid min-h-[180px] place-items-center rounded-2xl border border-dashed border-white/20 bg-[#243326]/60 p-8 text-center backdrop-blur"
-        aria-hidden="true"
-      >
-        <div>
-          <ImageIcon className="mx-auto size-10 text-white/40" />
-          <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/50">
-            {t("rsvpImagePlaceholder")}
-          </p>
-        </div>
+      <div className="relative mt-7 min-h-[220px] flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+        <Image
+          src="/images/rsvp-confirmation-page.png"
+          alt={t("rsvpImageAlt")}
+          fill
+          sizes="(min-width: 1024px) 55vw, 100vw"
+          className="object-cover object-top"
+        />
       </div>
     </article>
   );
