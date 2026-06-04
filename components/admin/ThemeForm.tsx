@@ -414,6 +414,9 @@ export default function ThemeForm({
                   <option value="curtain-canva">
                     Cortina + Canva (curtain-canva)
                   </option>
+                  <option value="video-entrance">
+                    Vídeo de entrada (video-entrance)
+                  </option>
                 </select>
               </div>
             </AccordionContent>

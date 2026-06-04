@@ -339,6 +339,8 @@ export interface TextStyleOverrides {
     coupleNames?: TextStyle;
     ampersand?: TextStyle;
     quote?: TextStyle;
+    /** Video-entrance hero top text (above the couple names). */
+    heroTopText?: TextStyle;
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
     dressCodeText?: TextStyle;
@@ -573,6 +575,10 @@ export interface InvitationData {
   curtainVideoUrl?: string;
   /** Poster for `curtainVideoUrl` — the closed-curtain still shown (esp. on iOS) while the curtain video loads. */
   curtainVideoPoster?: string;
+  /** Video-entrance only: seconds into the entrance video at which the hero text reveals. Unset → default (5s). */
+  heroRevealSeconds?: number;
+  /** Video-entrance only: the top text line shown above the couple names in the hero. */
+  heroTopText?: string;
   faqs?: FAQItem[];
   /** "Manual do bom convidado" section — optional list of icon + label tips for guests. */
   guestGuide?: GuestGuide;
@@ -681,10 +687,12 @@ export interface TemplateTheme {
   /**
    * Selects the rendering pipeline:
    * - "default" (or undefined): standard envelope + InvitationPage flow
-   * - "curtain-canva": new CurtainCanvaPage flow (skips envelope, plays curtains
+   * - "curtain-canva": CurtainCanvaPage flow (skips envelope, plays curtains
    *   video, scratch date reveal, Canva iframe, inline RSVP)
+   * - "video-entrance": VideoEntrancePage flow (single tap-to-play video as
+   *   cover + hero, timed text reveal, then the same external sections)
    */
-  layout?: "default" | "curtain-canva";
+  layout?: "default" | "curtain-canva" | "video-entrance";
 }
 
 // ---------------------------------------------------------------------------

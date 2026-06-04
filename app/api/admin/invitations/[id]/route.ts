@@ -152,6 +152,15 @@ export async function PUT(
         ...(body.curtainVideoPoster !== undefined && {
           curtainVideoPoster: body.curtainVideoPoster || null,
         }),
+        ...(body.heroRevealSeconds !== undefined && {
+          heroRevealSeconds:
+            typeof body.heroRevealSeconds === "number"
+              ? body.heroRevealSeconds
+              : null,
+        }),
+        ...(body.heroTopText !== undefined && {
+          heroTopText: body.heroTopText || null,
+        }),
         ...(body.faqs !== undefined && {
           faqs: sanitizeJsonField(body.faqs, null),
         }),

@@ -68,8 +68,13 @@ import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
+import VideoEntrancePage from "@/components/video-entrance/VideoEntrancePage";
 import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
+import {
+  DEFAULT_HERO_REVEAL_SECONDS,
+  isVideoEntranceLayout,
+} from "@/lib/video-entrance";
 import {
   getExternalInvitationEmbedSrc,
   getExternalInvitationPublicHref,
@@ -513,7 +518,9 @@ export default function ExternalInvitationForm({
           themes.find((theme) => theme.id === prev.themeId) ??
           themes.find((theme) => theme.name === prev.template) ??
           themes[0];
-        const preserveVideo = isCurtainCanvaLayout(selectedTheme);
+        const preserveVideo =
+          isCurtainCanvaLayout(selectedTheme) ||
+          isVideoEntranceLayout(selectedTheme);
 
         return {
           ...prev,
@@ -552,6 +559,11 @@ export default function ExternalInvitationForm({
   // Drives the conditional fields accordion and the preview swap.
   const isCurtainCanva = useMemo(
     () => isCurtainCanvaLayout(currentTheme),
+    [currentTheme],
+  );
+
+  const isVideoEntrance = useMemo(
+    () => isVideoEntranceLayout(currentTheme),
     [currentTheme],
   );
 
@@ -1826,6 +1838,259 @@ export default function ExternalInvitationForm({
                 </AccordionItem>
               )}
 
+              {/* ── Video-Entrance extra fields ── */}
+              {/* Visible only when the chosen theme uses the video-entrance
+                  layout. Configures the single entrance video, the timed text
+                  reveal, the hero text, and the shared external sections. */}
+              {isVideoEntrance && (
+                <AccordionItem
+                  value="videoEntrance"
+                  className="border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="text-sm font-medium">
+                    Detalhes do convite (Vídeo de entrada)
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-5 pb-4">
+                    {/* Entrance video */}
+                    <div className="space-y-1.5">
+                      <Label className="text-sm font-medium">
+                        Vídeo de entrada
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Vídeo único que serve de capa e hero. O convidado toca
+                        para reproduzir.
+                      </p>
+                      <MediaUpload
+                        kind="video"
+                        maxSizeMB={500}
+                        value={form.videoUrl || undefined}
+                        onUpload={(url, meta) => {
+                          update("videoUrl", url);
+                          update("videoPoster", meta?.posterUrl ?? "");
+                        }}
+                        onClear={() => {
+                          update("videoUrl", "");
+                          update("videoPoster", "");
+                        }}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* Reveal timing */}
+                    <div className="space-y-1.5">
+                      <Label
+                        htmlFor="veRevealSeconds"
+                        className="text-sm font-medium"
+                      >
+                        Tempo de revelação do texto (segundos)
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Segundos após o início do vídeo em que o texto superior,
+                        os nomes e a frase aparecem.
+                      </p>
+                      <Input
+                        id="veRevealSeconds"
+                        type="number"
+                        min={0}
+                        step={0.5}
+                        value={form.heroRevealSeconds ?? ""}
+                        placeholder={String(DEFAULT_HERO_REVEAL_SECONDS)}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          const n = parseFloat(v);
+                          update(
+                            "heroRevealSeconds",
+                            v === "" || Number.isNaN(n) ? undefined : n,
+                          );
+                        }}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* Top text */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="veTopText" className="text-sm font-medium">
+                        Texto superior
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Aparece acima dos nomes do casal no hero.
+                      </p>
+                      <Input
+                        id="veTopText"
+                        value={form.heroTopText ?? ""}
+                        onChange={(e) => update("heroTopText", e.target.value)}
+                        placeholder="ex: Vão casar-se"
+                      />
+                    </div>
+
+                    {/* Quote */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="veQuote" className="text-sm font-medium">
+                        Frase / citação
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Aparece sob os nomes do casal no hero.
+                      </p>
+                      <Input
+                        id="veQuote"
+                        value={form.quote}
+                        onChange={(e) => update("quote", e.target.value)}
+                        placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* Date (used by the scratch reveal) */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Data</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label
+                            htmlFor="veDateIso"
+                            className="text-xs text-muted-foreground"
+                          >
+                            Data
+                          </Label>
+                          <Input
+                            id="veDateIso"
+                            type="date"
+                            value={
+                              form.date.iso ? form.date.iso.split("T")[0] : ""
+                            }
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              updateDate(
+                                "iso",
+                                val ? `${val}T00:00:00.000Z` : "",
+                              );
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label
+                            htmlFor="veTime"
+                            className="text-xs text-muted-foreground"
+                          >
+                            Hora
+                          </Label>
+                          <Input
+                            id="veTime"
+                            value={form.date.time}
+                            onChange={(e) => updateDate("time", e.target.value)}
+                            placeholder="16:00"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Hero overlay (scrim + gradient) */}
+                    <div className="space-y-3">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="veScrimOpacity">
+                            Escurecimento do vídeo
+                          </Label>
+                          <span className="text-xs text-muted-foreground tabular-nums">
+                            {Math.round(
+                              (form.heroOverlay?.scrimOpacity ??
+                                DEFAULT_SCRIM_OPACITY) * 100,
+                            )}
+                            %
+                          </span>
+                        </div>
+                        <input
+                          id="veScrimOpacity"
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={1}
+                          value={Math.round(
+                            (form.heroOverlay?.scrimOpacity ??
+                              DEFAULT_SCRIM_OPACITY) * 100,
+                          )}
+                          onChange={(e) =>
+                            update("heroOverlay", {
+                              ...(form.heroOverlay ?? {}),
+                              scrimOpacity: parseInt(e.target.value, 10) / 100,
+                            })
+                          }
+                          className="w-full accent-foreground cursor-pointer"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="veGradientStart">
+                            Início do gradiente inferior
+                          </Label>
+                          <span className="text-xs text-muted-foreground tabular-nums">
+                            {form.heroOverlay?.gradientStart ??
+                              DEFAULT_GRADIENT_START_VIDEO}
+                            %
+                          </span>
+                        </div>
+                        <input
+                          id="veGradientStart"
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={1}
+                          value={
+                            form.heroOverlay?.gradientStart ??
+                            DEFAULT_GRADIENT_START_VIDEO
+                          }
+                          onChange={(e) =>
+                            update("heroOverlay", {
+                              ...(form.heroOverlay ?? {}),
+                              gradientStart: parseInt(e.target.value, 10),
+                            })
+                          }
+                          className="w-full accent-foreground cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Confetti (opt-in / off by default) */}
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Confetti no hero</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Dispara confetti quando o texto é revelado. Desligado
+                          por defeito.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.heroConfetti?.enabled === true}
+                        onCheckedChange={updateHeroConfetti}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* Scratch reveal toggle */}
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Revelação da data (raspadinha)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Mostra moedas raspadinhas com dia / mês / ano entre o
+                          hero e o convite externo.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.scratchReveal?.enabled === true}
+                        onCheckedChange={updateScratchReveal}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
               {/* ── Audio ── */}
               {showAudioControls && (
                 <AccordionItem value="audio" className="border rounded-lg px-4">
@@ -2115,7 +2380,23 @@ export default function ExternalInvitationForm({
 
           <TabsContent value="invite" className="flex-1 overflow-hidden m-0">
             <div className="relative h-full max-h-165 overflow-hidden bg-black">
-              {isCurtainCanva ? (
+              {isVideoEntrance ? (
+                /* Video-entrance layout: render the actual public-facing page
+                   so admins see the entrance video, timed text reveal, and the
+                   external sections exactly as guests will. */
+                <InlineTextEditProvider
+                  updateTextStyleElement={updateTextStyleElement}
+                  textStyles={form.textStyles}
+                >
+                  <TextStyleToolbar />
+                  <div className="absolute inset-0 overflow-y-auto bg-background">
+                    <VideoEntrancePage
+                      invitation={form}
+                      theme={currentTheme as TemplateTheme}
+                    />
+                  </div>
+                </InlineTextEditProvider>
+              ) : isCurtainCanva ? (
                 /* Curtain-Canva layout: render the actual public-facing page
                    so admins see exactly what guests will see (curtains hero,
                    scratch reveal, Canva iframe section, inline RSVP). The

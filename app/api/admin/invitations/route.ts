@@ -108,6 +108,11 @@ export async function POST(request: NextRequest) {
         videoPoster: body.videoPoster ?? null,
         curtainVideoUrl: body.curtainVideoUrl ?? null,
         curtainVideoPoster: body.curtainVideoPoster ?? null,
+        heroRevealSeconds:
+          typeof body.heroRevealSeconds === "number"
+            ? body.heroRevealSeconds
+            : null,
+        heroTopText: body.heroTopText ?? null,
         faqs: sanitizeJsonField(body.faqs, null),
         guestGuide: sanitizeJsonField(body.guestGuide, null),
         envelope: sanitizeJsonField(body.envelope, null),

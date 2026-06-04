@@ -91,6 +91,8 @@ model Invitation {
   videoPoster  String?  // Poster for videoUrl (the hero video). Optional.
   curtainVideoUrl String?  // Curtain-canva only: the curtain animation video played on tap. Empty → bundled default.
   curtainVideoPoster String? // Poster for curtainVideoUrl — the closed-curtain still shown (esp. on iOS) while the curtain video loads.
+  heroRevealSeconds Float?  // Video-entrance: seconds into the entrance video at which the hero text reveals. Null → default (5s).
+  heroTopText  String?  // Video-entrance: top text line shown above the couple names in the hero.
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
   envelope     Json?    // EnvelopeConfig { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }
