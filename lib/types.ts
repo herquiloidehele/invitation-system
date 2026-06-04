@@ -304,7 +304,8 @@ export type CardSectionKey =
   | "giftRegistry"
   | "location"
   | "guestGuide"
-  | "faqs";
+  | "faqs"
+  | "countdown";
 
 /** Per-section card styling overrides stored on each invitation.
  *  Missing keys or undefined fields fall back to theme defaults.

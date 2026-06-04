@@ -13,6 +13,7 @@ import { resolveTextStyles } from "@/lib/text-styles";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 
 import { EditableText } from "./EditableText";
+import { EditableCard } from "./EditableCard";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -153,30 +154,35 @@ export default function ExternalCountdownSection({
         ) : (
           <div className="mt-12 grid w-full grid-cols-2 gap-3">
             {units.map((unit, index) => (
-              <motion.div
-                key={unit.label}
-                initial={{ opacity: 0, scale: 0.96, y: 16 }}
-                whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: index * 0.06, ease: EASE }}
-                className="flex min-h-[120px] flex-col items-center justify-center px-5 py-7 shadow-[0_18px_50px_rgba(60,45,30,0.08)] backdrop-blur-md"
-                style={{
-                  background: cardBg,
-                  border: `1px solid ${cardBorder}`,
-                  borderRadius: cardBorderRadius,
-                }}
-              >
-                <span style={ts.externalCountdownValue}>
-                  <EditableText elementKey="externalCountdownValue">
-                    {formatCountdownValue(unit.value)}
-                  </EditableText>
-                </span>
-                <span className="mt-4" style={ts.externalCountdownLabel}>
-                  <EditableText elementKey="externalCountdownLabel">
-                    {unit.label}
-                  </EditableText>
-                </span>
-              </motion.div>
+              <EditableCard key={unit.label} sectionKey="countdown">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.7,
+                    delay: index * 0.06,
+                    ease: EASE,
+                  }}
+                  className="flex min-h-[120px] flex-col items-center justify-center px-5 py-7 shadow-[0_18px_50px_rgba(60,45,30,0.08)] backdrop-blur-md"
+                  style={{
+                    background: cardBg,
+                    border: `1px solid ${cardBorder}`,
+                    borderRadius: cardBorderRadius,
+                  }}
+                >
+                  <span style={ts.externalCountdownValue}>
+                    <EditableText elementKey="externalCountdownValue">
+                      {formatCountdownValue(unit.value)}
+                    </EditableText>
+                  </span>
+                  <span className="mt-4" style={ts.externalCountdownLabel}>
+                    <EditableText elementKey="externalCountdownLabel">
+                      {unit.label}
+                    </EditableText>
+                  </span>
+                </motion.div>
+              </EditableCard>
             ))}
           </div>
         )}

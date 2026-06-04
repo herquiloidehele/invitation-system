@@ -22,6 +22,8 @@ import type {
   TextStyleOverrides,
   ImageSettings,
   ImageSettingsKey,
+  CardSectionKey,
+  CardStyle,
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import {
@@ -66,7 +68,9 @@ import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
+import { InlineCardEditProvider } from "@/components/shared/EditableCard";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
+import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import VideoEntrancePage from "@/components/video-entrance/VideoEntrancePage";
 import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
@@ -472,6 +476,41 @@ export default function ExternalInvitationForm({
       }));
     },
     [],
+  );
+
+  const countdownCardStyles = useMemo(
+    () => ({
+      countdown: {
+        cardBg: form.countdown?.cardBg,
+        cardBorder: form.countdown?.cardBorder,
+        borderRadius: form.countdown?.cardBorderRadius,
+      },
+    }),
+    [
+      form.countdown?.cardBg,
+      form.countdown?.cardBorder,
+      form.countdown?.cardBorderRadius,
+    ],
+  );
+
+  const updateCountdownCardStyle = useCallback(
+    (
+      section: CardSectionKey,
+      field: keyof CardStyle,
+      value: string | number | undefined,
+    ) => {
+      if (section !== "countdown") return;
+      if (field === "cardBg") {
+        updateCountdown("cardBg", value as string | undefined);
+      }
+      if (field === "cardBorder") {
+        updateCountdown("cardBorder", value as string | undefined);
+      }
+      if (field === "borderRadius") {
+        updateCountdown("cardBorderRadius", value as number | undefined);
+      }
+    },
+    [updateCountdown],
   );
 
   // Image position/zoom settings — used by ImagePositionEditor for the hero
@@ -1632,20 +1671,6 @@ export default function ExternalInvitationForm({
                               />
                             </div>
                             <div className="space-y-1.5">
-                              <Label htmlFor="countdownCardBg">
-                                Fundo dos cartões
-                              </Label>
-                              <Input
-                                id="countdownCardBg"
-                                value={form.countdown.cardBg ?? ""}
-                                onChange={(e) =>
-                                  updateCountdown("cardBg", e.target.value)
-                                }
-                                placeholder="rgba(255,252,244,0.72)"
-                                className="font-mono text-xs"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
                               <Label htmlFor="countdownCardBorder">
                                 Borda dos cartões
                               </Label>
@@ -2529,13 +2554,19 @@ export default function ExternalInvitationForm({
                   updateTextStyleElement={updateTextStyleElement}
                   textStyles={form.textStyles}
                 >
-                  <TextStyleToolbar />
-                  <div className="absolute inset-0 overflow-y-auto bg-background">
-                    <VideoEntrancePage
-                      invitation={form}
-                      theme={currentTheme as TemplateTheme}
-                    />
-                  </div>
+                  <InlineCardEditProvider
+                    updateCardStyle={updateCountdownCardStyle}
+                    cardStyles={countdownCardStyles}
+                  >
+                    <TextStyleToolbar />
+                    <CardStyleToolbar />
+                    <div className="absolute inset-0 overflow-y-auto bg-background">
+                      <VideoEntrancePage
+                        invitation={form}
+                        theme={currentTheme as TemplateTheme}
+                      />
+                    </div>
+                  </InlineCardEditProvider>
                 </InlineTextEditProvider>
               ) : isCurtainCanva ? (
                 /* Curtain-Canva layout: render the actual public-facing page
@@ -2553,13 +2584,19 @@ export default function ExternalInvitationForm({
                   updateTextStyleElement={updateTextStyleElement}
                   textStyles={form.textStyles}
                 >
-                  <TextStyleToolbar />
-                  <div className="absolute inset-0 overflow-y-auto bg-background">
-                    <CurtainCanvaPage
-                      invitation={form}
-                      theme={currentTheme as TemplateTheme}
-                    />
-                  </div>
+                  <InlineCardEditProvider
+                    updateCardStyle={updateCountdownCardStyle}
+                    cardStyles={countdownCardStyles}
+                  >
+                    <TextStyleToolbar />
+                    <CardStyleToolbar />
+                    <div className="absolute inset-0 overflow-y-auto bg-background">
+                      <CurtainCanvaPage
+                        invitation={form}
+                        theme={currentTheme as TemplateTheme}
+                      />
+                    </div>
+                  </InlineCardEditProvider>
                 </InlineTextEditProvider>
               ) : subType === "external_video" ? (
                 form.videoUrl ? (
@@ -2584,14 +2621,20 @@ export default function ExternalInvitationForm({
                   updateTextStyleElement={updateTextStyleElement}
                   textStyles={form.textStyles}
                 >
-                  <TextStyleToolbar />
-                  <div className="absolute inset-0 overflow-y-auto bg-background">
-                    <RichExternalLinkPage
-                      invitation={form}
-                      theme={currentTheme as TemplateTheme}
-                      isPreview
-                    />
-                  </div>
+                  <InlineCardEditProvider
+                    updateCardStyle={updateCountdownCardStyle}
+                    cardStyles={countdownCardStyles}
+                  >
+                    <TextStyleToolbar />
+                    <CardStyleToolbar />
+                    <div className="absolute inset-0 overflow-y-auto bg-background">
+                      <RichExternalLinkPage
+                        invitation={form}
+                        theme={currentTheme as TemplateTheme}
+                        isPreview
+                      />
+                    </div>
+                  </InlineCardEditProvider>
                 </InlineTextEditProvider>
               ) : form.externalLink ? (
                 <iframe
