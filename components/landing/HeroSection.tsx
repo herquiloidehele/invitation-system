@@ -45,10 +45,10 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
       className="relative z-10 max-w-3xl lg:pt-10"
     >
       <SectionEyebrow>{t("heroEyebrow")}</SectionEyebrow>
-      <h1 className="mt-8 text-balance text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-[#3F4E3F] sm:text-6xl lg:text-7xl">
+      <h1 className="mt-8 text-balance text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-primary sm:text-6xl lg:text-7xl">
         <span className="block">{t("heroTitleLine1")}</span>
       </h1>
-      <p className="mt-7 max-w-2xl text-md leading-8 text-[#5C605A]">
+      <p className="mt-7 max-w-2xl text-md leading-8 text-muted-foreground">
         {t("heroBody")}
       </p>
       <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -56,18 +56,18 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
           href={buildWhatsappUrl(t("defaultWhatsappMessage"))}
           target="_blank"
           rel="noreferrer"
-          className="rounded-full bg-[#3F4E3F] px-7 py-4 text-center text-sm font-semibold text-white shadow-[0_18px_60px_rgba(63,78,63,0.24)] transition hover:-translate-y-0.5 hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+          className="rounded-full bg-primary px-7 py-4 text-center text-sm font-semibold text-primary-foreground shadow-[0_18px_60px_color-mix(in_srgb,var(--primary)_24%,transparent)] transition hover:-translate-y-0.5 hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
         >
           {t("heroPrimaryCta")}
         </a>
         <a
           href="#galeria"
-          className="rounded-full border border-[#E5E7E4] px-7 py-4 text-center text-sm font-semibold text-[#1F2420] transition hover:-translate-y-0.5 hover:border-[#3F4E3F] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+          className="rounded-full border border-border px-7 py-4 text-center text-sm font-semibold text-foreground transition hover:-translate-y-0.5 hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
         >
           {t("heroSecondaryCta")}
         </a>
       </div>
-      <p className="mt-8 text-sm font-medium text-[#5C605A]">
+      <p className="mt-8 text-sm font-medium text-muted-foreground">
         {t("heroProof")}
       </p>
     </motion.div>

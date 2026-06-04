@@ -74,7 +74,7 @@ export function BrindealHomepage({
   }
 
   return (
-    <main className="overflow-hidden bg-white font-[var(--font-outfit)] text-[#1F2420]">
+    <main className="overflow-hidden bg-background font-[var(--font-outfit)] text-foreground">
       <LandingNav />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
       <BestSellersSection items={bestSellerFeatures} />

@@ -82,7 +82,7 @@ export function GallerySection({
   return (
     <AnimatedSection
       id="galeria"
-      className="bg-white px-5 py-24 sm:px-8 lg:py-28"
+      className="bg-background px-5 py-24 sm:px-8 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
@@ -92,7 +92,7 @@ export function GallerySection({
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
             {t("title")}
           </h2>
-          <p className="mt-5 text-[#5C605A]">{t("body")}</p>
+          <p className="mt-5 text-muted-foreground">{t("body")}</p>
         </div>
         {galleryCategories.length > 0 ? (
           <div className="mt-12 flex flex-wrap justify-center gap-2">
@@ -101,10 +101,10 @@ export function GallerySection({
                 key={category.key}
                 type="button"
                 onClick={() => onCategoryChange(category.key)}
-                className={`rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4 ${
+                className={`rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4 ${
                   activeCategory === category.key
-                    ? "bg-[#3F4E3F] text-white"
-                    : "border border-[#E5E7E4] text-[#1F2420] hover:border-[#3F4E3F]"
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border text-foreground hover:border-primary"
                 }`}
               >
                 {category.label}
@@ -113,7 +113,7 @@ export function GallerySection({
           </div>
         ) : null}
         {visibleItems.length === 0 ? (
-          <p className="mt-16 text-center text-sm text-[#5C605A]">
+          <p className="mt-16 text-center text-sm text-muted-foreground">
             {t("empty")}
           </p>
         ) : (
@@ -134,9 +134,9 @@ export function GallerySection({
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-[#E5E7E4] bg-white shadow-[0_12px_40px_rgba(31,36,32,0.045)] transition hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(31,36,32,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3F4E3F] focus-visible:ring-offset-4"
+                  className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_4.5%,transparent)] transition hover:-translate-y-1 hover:shadow-[0_20px_60px_color-mix(in_srgb,var(--foreground)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
                 >
-                  <div className="relative h-72 overflow-hidden bg-[linear-gradient(135deg,#E5E7E4,#C9D0C6)]">
+                  <div className="relative h-72 overflow-hidden bg-[linear-gradient(135deg,var(--border),var(--primary-soft))]">
                     {item.imageUrl ? (
                       <Image
                         src={item.imageUrl}
@@ -146,19 +146,19 @@ export function GallerySection({
                         className="object-cover transition duration-500 group-hover:scale-[1.03]"
                       />
                     ) : null}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,rgba(31,36,32,0.16))]" />
+                    <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,color-mix(in_srgb,var(--foreground)_16%,transparent))]" />
                   </div>
                   <div className="flex flex-1 flex-col p-5">
-                    <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
+                    <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
                       {item.title || t("fallbackTitle")}
                     </h3>
                     {item.description ? (
-                      <p className="mt-2 text-sm leading-5 text-[#5C605A]">
+                      <p className="mt-2 text-sm leading-5 text-muted-foreground">
                         {item.description}
                       </p>
                     ) : null}
                     {item.priceLabel ? (
-                      <p className="mt-auto pt-2 text-sm font-medium text-[#8A8E86]">
+                      <p className="mt-auto pt-2 text-sm font-medium text-subtle-foreground">
                         {item.priceLabel}
                       </p>
                     ) : null}
@@ -177,14 +177,14 @@ export function GallerySection({
         }}
       >
         <DialogPrimitive.Portal>
-          <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-[#0D1510]/70 backdrop-blur-md duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
+          <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-ink/70 backdrop-blur-md duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
           <DialogPrimitive.Popup className="fixed top-1/2 left-1/2 z-50 w-[min(22rem,calc(100vw-2.5rem))] max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-visible outline-none duration-200 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
             <DialogPrimitive.Title className="sr-only">
               {previewTitle}
             </DialogPrimitive.Title>
             <DialogPrimitive.Close
               aria-label="Close"
-              className="absolute -top-10 -right-10 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1F2420] shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className="absolute -top-10 -right-10 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/95 text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition hover:bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
               <XIcon className="h-5 w-5" />
             </DialogPrimitive.Close>
