@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
+import ExternalCountdownSection from "@/components/shared/ExternalCountdownSection";
 import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveRevealContentStyle,
@@ -117,6 +118,10 @@ export default function RevealableExternalSections({
           />
         )}
 
+        {showInitialPageSections && invitation.countdown?.enabled && (
+          <ExternalCountdownSection invitation={invitation} theme={theme} />
+        )}
+
         {externalLink && (
           <CanvaEmbed
             externalLink={externalLink}
@@ -182,36 +187,5 @@ export default function RevealableExternalSections({
         )}
       </div>
     </>
-  );
-}
-
-/**
- * Subtle decorative break between page sections — a thin gold rule with a
- * small diamond glyph at the center.
- */
-function SectionOrnament({ theme }: { theme: TemplateTheme }) {
-  const accent = theme.accent || "#C9A961";
-  return (
-    <div
-      aria-hidden
-      className="flex items-center justify-center gap-3 my-2"
-      style={{ color: accent }}
-    >
-      <span
-        style={{ height: 1, width: 60, background: accent, opacity: 0.55 }}
-      />
-      <span
-        style={{
-          width: 6,
-          height: 6,
-          background: accent,
-          transform: "rotate(45deg)",
-          opacity: 0.85,
-        }}
-      />
-      <span
-        style={{ height: 1, width: 60, background: accent, opacity: 0.55 }}
-      />
-    </div>
   );
 }
