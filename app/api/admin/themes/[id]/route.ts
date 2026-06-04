@@ -105,6 +105,7 @@ export async function PUT(
             : existing.bgGradient,
         decorativeColor: body.decorativeColor ?? existing.decorativeColor,
         ctaGlow: "ctaGlow" in body ? (body.ctaGlow ?? null) : existing.ctaGlow,
+        layout: body.layout ?? existing.layout,
       },
     });
 

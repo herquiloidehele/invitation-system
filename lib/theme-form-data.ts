@@ -43,6 +43,8 @@ export interface ThemeFormData {
   bgGradient: string;
   decorativeColor: string;
   ctaGlow: string;
+  // Layout
+  layout: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -86,6 +88,7 @@ export function themeToFormData(theme: TemplateTheme): ThemeFormData {
     bgGradient: theme.bgGradient ?? "",
     decorativeColor: theme.decorativeColor,
     ctaGlow: theme.ctaGlow ?? "",
+    layout: theme.layout ?? "default",
   };
 }
 
@@ -132,6 +135,7 @@ export function formDataToTheme(form: ThemeFormData): TemplateTheme {
     bgGradient: form.bgGradient || undefined,
     decorativeColor: form.decorativeColor,
     ctaGlow: form.ctaGlow || undefined,
+    layout: (form.layout as TemplateTheme["layout"]) || "default",
   };
 }
 
@@ -168,4 +172,5 @@ export const EMPTY_FORM_DATA: ThemeFormData = {
   bgGradient: "",
   decorativeColor: "#d4a0a0",
   ctaGlow: "",
+  layout: "default",
 };

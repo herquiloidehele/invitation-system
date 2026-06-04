@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
         bgGradient: body.bgGradient ?? null,
         decorativeColor: body.decorativeColor,
         ctaGlow: body.ctaGlow ?? null,
+        layout: body.layout ?? "default",
       },
     });
 

@@ -58,8 +58,6 @@ export function shortMonthName(iso: string, fallback = ""): string {
   }
 }
 
-
-
 /**
  * Curtain-canva uses invitation.curtainVideoUrl as the optional curtain
  * animation. If not set, the bundled default keeps existing invitations
@@ -159,10 +157,12 @@ export function shouldFireHeroConfetti(
  * + ivory palette so the burst still feels on-brand for unset themes.
  */
 export function resolveCelebrationPalette(
-  theme: Pick<TemplateTheme, "accent" | "decorativeColor"> | {
-    accent?: string;
-    decorativeColor?: string;
-  },
+  theme:
+    | Pick<TemplateTheme, "accent" | "decorativeColor">
+    | {
+        accent?: string;
+        decorativeColor?: string;
+      },
 ): string[] {
   const accent = theme.accent?.trim();
   const decorative = theme.decorativeColor?.trim();
@@ -186,7 +186,9 @@ export function resolveCelebrationPalette(
  * for any input that isn't a well-formed hex color so callers can fall back
  * to a safe default instead of generating NaN-filled colors.
  */
-function parseHexColor(input: string): { r: number; g: number; b: number } | null {
+function parseHexColor(
+  input: string,
+): { r: number; g: number; b: number } | null {
   const m = input.trim().match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
   if (!m) return null;
   let hex = m[1];
@@ -255,7 +257,7 @@ export function resolveCoinGlitterPalette(
   const pale =
     decorative && parseHexColor(decorative)
       ? decorative.toUpperCase()
-      : shiftHexColor(base, 0.55) ?? base;
+      : (shiftHexColor(base, 0.55) ?? base);
 
   const palette = [base, dark, light, pale, "#FFFFFF"];
   // Dedupe (case-insensitive) so the texture generator doesn't waste

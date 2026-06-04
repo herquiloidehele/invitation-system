@@ -275,6 +275,7 @@ export default function ThemeForm({
       bgGradient: form.bgGradient || null,
       decorativeColor: form.decorativeColor,
       ctaGlow: form.ctaGlow || null,
+      layout: form.layout || "default",
     };
 
     setSaving(true);
@@ -398,6 +399,22 @@ export default function ThemeForm({
                   rows={2}
                   placeholder="Elegante e romântico com tons rosados..."
                 />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="layout" className="text-xs">
+                  Layout
+                </Label>
+                <select
+                  id="layout"
+                  value={form.layout}
+                  onChange={(e) => set("layout", e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="default">Padrão (envelope + página)</option>
+                  <option value="curtain-canva">
+                    Cortina + Canva (curtain-canva)
+                  </option>
+                </select>
               </div>
             </AccordionContent>
           </AccordionItem>
