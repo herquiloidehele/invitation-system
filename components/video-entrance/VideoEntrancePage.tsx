@@ -3,30 +3,28 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import CurtainsHero from "./CurtainsHero";
+import VideoEntranceHero from "./VideoEntranceHero";
 import RevealableExternalSections from "@/components/shared/RevealableExternalSections";
 import { useRevealScrollLock } from "@/hooks/useRevealScrollLock";
-import { shouldFireHeroConfetti } from "@/lib/curtain-canva";
+import { shouldFireVideoEntranceConfetti } from "@/lib/video-entrance";
 
-interface CurtainCanvaPageProps {
+interface VideoEntrancePageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
 }
 
-export default function CurtainCanvaPage({
+export default function VideoEntrancePage({
   invitation,
   theme,
-}: CurtainCanvaPageProps) {
+}: VideoEntrancePageProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { trackEvent } = useAnalytics(invitation.slug);
 
-  // Curtain-reveal gating: the page is locked to the hero viewport until the
-  // curtain video finishes (or a reduced-motion/error skip).
+  // The page is locked to the hero viewport until the text reveals.
   const [revealed, setRevealed] = useState(false);
   const handleRevealed = useCallback(() => setRevealed(true), []);
   useRevealScrollLock(revealed);
 
-  // Track page_view on mount, mirroring InvitationView's behavior.
   useEffect(() => {
     trackEvent("page_view");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,20 +43,19 @@ export default function CurtainCanvaPage({
         overflowAnchor: "none",
       }}
     >
-      <CurtainsHero
+      <VideoEntranceHero
         couple={invitation.couple}
+        topText={invitation.heroTopText}
         quote={invitation.quote}
-        inviteMessage={invitation.parents?.inviteMessage}
         theme={theme}
         audioRef={audioRef}
-        curtainVideoUrl={invitation.curtainVideoUrl}
-        curtainVideoPoster={invitation.curtainVideoPoster}
-        heroVideoUrl={invitation.videoUrl}
-        heroVideoPoster={invitation.videoPoster}
+        videoUrl={invitation.videoUrl}
+        videoPoster={invitation.videoPoster}
         heroOverlay={invitation.heroOverlay}
+        revealSeconds={invitation.heroRevealSeconds}
         customTexts={invitation.customTexts}
         textStyles={invitation.textStyles}
-        confettiEnabled={shouldFireHeroConfetti(invitation.heroConfetti)}
+        confettiEnabled={shouldFireVideoEntranceConfetti(invitation.heroConfetti)}
         onTapped={handleTapped}
         onRevealed={handleRevealed}
         eventType={invitation.eventType}

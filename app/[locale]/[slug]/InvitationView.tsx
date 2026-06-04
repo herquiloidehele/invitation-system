@@ -9,6 +9,7 @@ import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoP
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
+import { isVideoEntranceLayout } from "@/lib/video-entrance";
 import {
   hasRichExternalSections,
   shouldPreloadRichExternalCanva,
@@ -43,6 +44,10 @@ const CurtainCanvaPage = dynamic(
   () => import("@/components/curtain-canva/CurtainCanvaPage"),
   { ssr: false },
 );
+const VideoEntrancePage = dynamic(
+  () => import("@/components/video-entrance/VideoEntrancePage"),
+  { ssr: false },
+);
 
 interface InvitationViewProps {
   invitation: InvitationData;
@@ -56,6 +61,9 @@ export default function InvitationView({
   // Curtain-Canva templates skip the entire envelope flow and render
   // their own self-contained page. Branch at the top so the
   // envelope-specific hook tree is never instantiated for these themes.
+  if (isVideoEntranceLayout(theme)) {
+    return <VideoEntrancePage invitation={invitation} theme={theme} />;
+  }
   if (isCurtainCanvaLayout(theme)) {
     return <CurtainCanvaPage invitation={invitation} theme={theme} />;
   }
