@@ -8,6 +8,7 @@ import {
   type CountdownTimeLeft,
   formatCountdownValue,
 } from "@/lib/countdown";
+import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { resolveTextStyles } from "@/lib/text-styles";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 
@@ -54,6 +55,16 @@ export default function ExternalCountdownSection({
   const cardBg = config.cardBg || "rgba(255, 252, 244, 0.72)";
   const cardBorder = config.cardBorder || theme.cardBorder;
   const cardBorderRadius = config.cardBorderRadius ?? 12;
+  const hasBackgroundImage =
+    typeof config.backgroundImage === "string" &&
+    config.backgroundImage.trim() !== "";
+  const backgroundImageStyle = hasBackgroundImage
+    ? getBackgroundImageStyle(invitation.imageSettings, "countdownBackground")
+    : {};
+  const backgroundScrimOpacity = Math.min(
+    1,
+    Math.max(0, config.backgroundScrimOpacity ?? 0.45),
+  );
   const displayTimeLeft = timeLeft ?? {
     days: 0,
     hours: 0,
@@ -85,22 +96,29 @@ export default function ExternalCountdownSection({
       className="relative overflow-hidden px-6 py-16 sm:py-20"
       style={{
         backgroundColor,
-        backgroundImage: config.backgroundImage
-          ? `linear-gradient(rgba(255,255,255,0.12), rgba(255,255,255,0.12)), url(${config.backgroundImage})`
-          : undefined,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
         color: theme.textPrimary,
       }}
     >
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at 20% 15%, rgba(255,255,255,0.42), transparent 28%), radial-gradient(circle at 75% 75%, rgba(80,60,30,0.10), transparent 30%)",
-        }}
-      />
+      {hasBackgroundImage && (
+        <>
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${config.backgroundImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              ...backgroundImageStyle,
+            }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{ background: `rgba(0,0,0,${backgroundScrimOpacity})` }}
+          />
+        </>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}

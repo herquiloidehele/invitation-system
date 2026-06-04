@@ -205,7 +205,8 @@ export type ImageSettingsKey =
   | "locationImage2"
   | "envelopeTopFlap"
   | "envelopeBottomFlap"
-  | "scratchRevealBackground";
+  | "scratchRevealBackground"
+  | "countdownBackground";
 
 /** Map of image-slot key → position/zoom settings. */
 export type ImageSettingsMap = Partial<Record<ImageSettingsKey, ImageSettings>>;
@@ -257,6 +258,7 @@ export interface ExternalCountdownConfig {
   secondsLabel?: string;
   backgroundColor?: string;
   backgroundImage?: string;
+  backgroundScrimOpacity?: number;
   cardBg?: string;
   cardBorder?: string;
   cardBorderRadius?: number;

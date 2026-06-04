@@ -1586,20 +1586,32 @@ export default function ExternalInvitationForm({
                             </div>
                           </div>
 
-                          <div className="space-y-1.5">
-                            <Label>Imagem de fundo</Label>
-                            <MediaUpload
-                              kind="image"
-                              maxSizeMB={5}
-                              value={form.countdown.backgroundImage || undefined}
-                              onUpload={(url) =>
-                                updateCountdown("backgroundImage", url)
-                              }
-                              onClear={() =>
-                                updateCountdown("backgroundImage", "")
-                              }
-                            />
-                          </div>
+                          <SectionBackgroundImageEditor
+                            value={form.countdown.backgroundImage ?? ""}
+                            label="Imagem de fundo"
+                            description="Fotografia de fundo opcional atrás da contagem decrescente. Sem imagem, a secção usa a cor de fundo configurada."
+                            scrimLabel="Escurecimento da imagem"
+                            maxSizeMB={8}
+                            scrimOpacity={form.countdown.backgroundScrimOpacity}
+                            onUpload={(url) =>
+                              updateCountdown("backgroundImage", url)
+                            }
+                            onClear={() => {
+                              updateCountdown("backgroundImage", "");
+                              updateImageSettings(
+                                "countdownBackground",
+                                DEFAULT_IMAGE_SETTINGS,
+                              );
+                            }}
+                            onScrimChange={(opacity) =>
+                              updateCountdown("backgroundScrimOpacity", opacity)
+                            }
+                            positionSettings={imgSettings("countdownBackground")}
+                            onPositionChange={(settings) =>
+                              updateImageSettings("countdownBackground", settings)
+                            }
+                            idPrefix="countdownBackground"
+                          />
 
                           <div className="grid gap-3 sm:grid-cols-3">
                             <div className="space-y-1.5">
@@ -1696,8 +1708,12 @@ export default function ExternalInvitationForm({
                     </div>
 
                     {form.scratchReveal?.enabled === true && (
-                      <ScratchRevealBackgroundEditor
+                      <SectionBackgroundImageEditor
                         value={form.scratchReveal?.backgroundImageUrl ?? ""}
+                        label="Imagem de fundo"
+                        description="Fotografia de fundo opcional atrás das moedas raspadinhas. Sem imagem, a secção usa a cor de fundo do tema."
+                        scrimLabel="Escurecimento da imagem"
+                        maxSizeMB={8}
                         scrimOpacity={form.scratchReveal?.scrimOpacity}
                         onUpload={(url) =>
                           updateScratchRevealField("backgroundImageUrl", url)
@@ -2160,8 +2176,12 @@ export default function ExternalInvitationForm({
                     </div>
 
                     {form.scratchReveal?.enabled === true && (
-                      <ScratchRevealBackgroundEditor
+                      <SectionBackgroundImageEditor
                         value={form.scratchReveal?.backgroundImageUrl ?? ""}
+                        label="Imagem de fundo"
+                        description="Fotografia de fundo opcional atrás das moedas raspadinhas. Sem imagem, a secção usa a cor de fundo do tema."
+                        scrimLabel="Escurecimento da imagem"
+                        maxSizeMB={8}
                         scrimOpacity={form.scratchReveal?.scrimOpacity}
                         onUpload={(url) =>
                           updateScratchRevealField("backgroundImageUrl", url)
@@ -2595,19 +2615,21 @@ export default function ExternalInvitationForm({
 }
 
 // ---------------------------------------------------------------------------
-// ScratchRevealBackgroundEditor
+// SectionBackgroundImageEditor
 //
-// Inline editor block rendered under the scratchReveal toggle. Lets the admin
-// upload (or clear) a full-bleed background image, fine-tune its position &
-// zoom via ImagePositionEditor, and tune the dark scrim opacity used for
-// legibility. Identical UI in the curtain-canva and video-entrance accordions
-// — extracted to keep both call sites trivial.
+// Inline editor block rendered under section toggles. Lets the admin upload (or
+// clear) a full-bleed background image, fine-tune its position & zoom via
+// ImagePositionEditor, and tune the dark scrim opacity used for legibility.
 // ---------------------------------------------------------------------------
 
 const DEFAULT_SCRATCH_SCRIM_OPACITY = 0.45;
 
-function ScratchRevealBackgroundEditor({
+function SectionBackgroundImageEditor({
   value,
+  label,
+  description,
+  scrimLabel,
+  maxSizeMB,
   scrimOpacity,
   onUpload,
   onClear,
@@ -2617,6 +2639,10 @@ function ScratchRevealBackgroundEditor({
   idPrefix,
 }: {
   value: string;
+  label: string;
+  description: string;
+  scrimLabel: string;
+  maxSizeMB: number;
   scrimOpacity: number | undefined;
   onUpload: (url: string) => void;
   onClear: () => void;
@@ -2629,15 +2655,12 @@ function ScratchRevealBackgroundEditor({
   return (
     <div className="space-y-3 rounded-lg border border-dashed border-border p-3">
       <div className="space-y-1">
-        <Label className="text-sm font-medium">Imagem de fundo</Label>
-        <p className="text-xs text-muted-foreground">
-          Fotografia de fundo opcional atrás das moedas raspadinhas. Sem
-          imagem, a secção usa a cor de fundo do tema.
-        </p>
+        <Label className="text-sm font-medium">{label}</Label>
+        <p className="text-xs text-muted-foreground">{description}</p>
       </div>
       <MediaUpload
         kind="image"
-        maxSizeMB={8}
+        maxSizeMB={maxSizeMB}
         value={value || undefined}
         onUpload={onUpload}
         onClear={onClear}
@@ -2651,9 +2674,7 @@ function ScratchRevealBackgroundEditor({
           />
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor={`${idPrefix}ScrimOpacity`}>
-                Escurecimento da imagem
-              </Label>
+              <Label htmlFor={`${idPrefix}ScrimOpacity`}>{scrimLabel}</Label>
               <span className="text-xs text-muted-foreground tabular-nums">
                 {Math.round(resolvedScrim * 100)}%
               </span>
