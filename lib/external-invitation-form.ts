@@ -126,6 +126,14 @@ export function shouldShowRichExternalRsvp({
   return rsvpOn && isInitialCanvaPage;
 }
 
+export function shouldShowVideoEntranceInitialSections({
+  isInitialCanvaPage,
+}: {
+  isInitialCanvaPage: boolean;
+}): boolean {
+  return isInitialCanvaPage;
+}
+
 export function shouldPreloadRichExternalCanva({
   isPreview,
   isVisible,

@@ -26,6 +26,10 @@ interface RevealableExternalSectionsProps {
   revealed: boolean;
   /** Background-audio element ref, owned by the parent page and started by the hero on tap. */
   audioRef: RefObject<HTMLAudioElement | null>;
+  /** Initial-page-only sections hide while the Canva iframe is on another page. */
+  showInitialPageSections?: boolean;
+  /** Mirrors CanvaEmbed's current initial-page state. */
+  onCanvaInitialPageChange?: (isInitialPage: boolean) => void;
 }
 
 /**
@@ -40,6 +44,8 @@ export default function RevealableExternalSections({
   theme,
   revealed,
   audioRef,
+  showInitialPageSections = true,
+  onCanvaInitialPageChange,
 }: RevealableExternalSectionsProps) {
   // Pause audio when the tab is hidden; resume on return.
   useEffect(() => {
@@ -99,7 +105,7 @@ export default function RevealableExternalSections({
       )}
 
       <div style={revealContentStyle} aria-hidden={!revealed}>
-        {scratchRevealOn && (
+        {showInitialPageSections && scratchRevealOn && (
           <ScratchDateReveal
             date={invitation.date}
             theme={theme}
@@ -116,10 +122,11 @@ export default function RevealableExternalSections({
             externalLink={externalLink}
             theme={theme}
             preloading={!revealed}
+            onInitialPageChange={onCanvaInitialPageChange}
           />
         )}
 
-        {invitation.rsvp.enabled && (
+        {showInitialPageSections && invitation.rsvp.enabled && (
           <>
             <SectionOrnament theme={theme} />
             <section

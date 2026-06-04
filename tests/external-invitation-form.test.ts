@@ -8,6 +8,7 @@ import {
   resolveCanvaEmbedPageState,
   shouldPreloadRichExternalCanva,
   shouldShowRichExternalRsvp,
+  shouldShowVideoEntranceInitialSections,
 } from "../lib/external-invitation-form";
 
 describe("isInitialCanvaEmbedPage", () => {
@@ -46,6 +47,20 @@ describe("shouldShowRichExternalRsvp", () => {
     ).toBe(false);
     expect(
       shouldShowRichExternalRsvp({ rsvpOn: false, isInitialCanvaPage: true }),
+    ).toBe(false);
+  });
+});
+
+describe("shouldShowVideoEntranceInitialSections", () => {
+  it("shows initial-only sections before iframe navigation", () => {
+    expect(
+      shouldShowVideoEntranceInitialSections({ isInitialCanvaPage: true }),
+    ).toBe(true);
+  });
+
+  it("hides initial-only sections while iframe is on a non-initial page", () => {
+    expect(
+      shouldShowVideoEntranceInitialSections({ isInitialCanvaPage: false }),
     ).toBe(false);
   });
 });

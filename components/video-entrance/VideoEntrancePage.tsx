@@ -6,6 +6,8 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import VideoEntranceHero from "./VideoEntranceHero";
 import RevealableExternalSections from "@/components/shared/RevealableExternalSections";
 import { useRevealScrollLock } from "@/hooks/useRevealScrollLock";
+import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
+import { shouldShowVideoEntranceInitialSections } from "@/lib/external-invitation-form";
 import {
   shouldFireVideoEntranceConfetti,
   shouldShowTapPrompt,
@@ -22,6 +24,22 @@ export default function VideoEntrancePage({
 }: VideoEntrancePageProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { trackEvent } = useAnalytics(invitation.slug);
+  const externalLink = getEffectiveExternalLink({
+    invitationType: invitation.invitationType,
+    externalLink: invitation.externalLink,
+    guestCustomExternalLink: invitation.guest?.customExternalLink,
+  });
+  const [canvaPageState, setCanvaPageState] = useState<{
+    externalLink: string;
+    isInitialPage: boolean;
+  } | null>(null);
+  const isInitialCanvaPage =
+    canvaPageState?.externalLink === externalLink
+      ? canvaPageState.isInitialPage
+      : true;
+  const showInitialPageSections = shouldShowVideoEntranceInitialSections({
+    isInitialCanvaPage,
+  });
 
   // The page is locked to the hero viewport until the text reveals.
   const [revealed, setRevealed] = useState(false);
@@ -46,30 +64,38 @@ export default function VideoEntrancePage({
         overflowAnchor: "none",
       }}
     >
-      <VideoEntranceHero
-        couple={invitation.couple}
-        topText={invitation.heroTopText}
-        quote={invitation.quote}
-        theme={theme}
-        audioRef={audioRef}
-        videoUrl={invitation.videoUrl}
-        videoPoster={invitation.videoPoster}
-        heroOverlay={invitation.heroOverlay}
-        revealSeconds={invitation.heroRevealSeconds}
-        customTexts={invitation.customTexts}
-        textStyles={invitation.textStyles}
-        confettiEnabled={shouldFireVideoEntranceConfetti(invitation.heroConfetti)}
-        showTapPrompt={shouldShowTapPrompt(invitation.heroTapPrompt)}
-        onTapped={handleTapped}
-        onRevealed={handleRevealed}
-        eventType={invitation.eventType}
-      />
+      <div style={{ display: showInitialPageSections ? undefined : "none" }}>
+        <VideoEntranceHero
+          couple={invitation.couple}
+          topText={invitation.heroTopText}
+          quote={invitation.quote}
+          theme={theme}
+          audioRef={audioRef}
+          videoUrl={invitation.videoUrl}
+          videoPoster={invitation.videoPoster}
+          heroOverlay={invitation.heroOverlay}
+          revealSeconds={invitation.heroRevealSeconds}
+          customTexts={invitation.customTexts}
+          textStyles={invitation.textStyles}
+          confettiEnabled={shouldFireVideoEntranceConfetti(
+            invitation.heroConfetti,
+          )}
+          showTapPrompt={shouldShowTapPrompt(invitation.heroTapPrompt)}
+          onTapped={handleTapped}
+          onRevealed={handleRevealed}
+          eventType={invitation.eventType}
+        />
+      </div>
 
       <RevealableExternalSections
         invitation={invitation}
         theme={theme}
         revealed={revealed}
         audioRef={audioRef}
+        showInitialPageSections={showInitialPageSections}
+        onCanvaInitialPageChange={(isInitialPage) =>
+          setCanvaPageState({ externalLink, isInitialPage })
+        }
       />
     </main>
   );
