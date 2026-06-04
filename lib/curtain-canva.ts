@@ -1,4 +1,9 @@
-import type { TemplateTheme, TextStyle, TextStyleOverrides } from "./types";
+import type {
+  ScratchRevealConfig,
+  TemplateTheme,
+  TextStyle,
+  TextStyleOverrides,
+} from "./types";
 import type { CSSProperties } from "react";
 import { GOLDEN_GLITTER_PALETTE } from "./scratch-texture";
 
@@ -34,7 +39,7 @@ export function isCurtainCanvaLayout(
 }
 
 export function shouldRenderScratchReveal(
-  scratchReveal: { enabled: boolean } | null | undefined,
+  scratchReveal: ScratchRevealConfig | null | undefined,
 ): boolean {
   return scratchReveal?.enabled === true;
 }

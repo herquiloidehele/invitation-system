@@ -431,8 +431,27 @@ export default function ExternalInvitationForm({
   );
 
   const updateScratchReveal = useCallback((enabled: boolean) => {
-    setForm((prev) => ({ ...prev, scratchReveal: { enabled } }));
+    setForm((prev) => ({
+      ...prev,
+      scratchReveal: { ...(prev.scratchReveal ?? {}), enabled },
+    }));
   }, []);
+
+  const updateScratchRevealField = useCallback(
+    <K extends keyof NonNullable<InvitationData["scratchReveal"]>>(
+      field: K,
+      value: NonNullable<InvitationData["scratchReveal"]>[K],
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        scratchReveal: {
+          ...(prev.scratchReveal ?? { enabled: false }),
+          [field]: value,
+        },
+      }));
+    },
+    [],
+  );
 
   const updateHeroConfetti = useCallback((enabled: boolean) => {
     setForm((prev) => ({ ...prev, heroConfetti: { enabled } }));
@@ -1675,6 +1694,39 @@ export default function ExternalInvitationForm({
                       />
                     </div>
 
+                    {form.scratchReveal?.enabled === true && (
+                      <ScratchRevealBackgroundEditor
+                        value={form.scratchReveal?.backgroundImageUrl ?? ""}
+                        scrimOpacity={form.scratchReveal?.scrimOpacity}
+                        onUpload={(url) =>
+                          updateScratchRevealField("backgroundImageUrl", url)
+                        }
+                        onClear={() => {
+                          updateScratchRevealField(
+                            "backgroundImageUrl",
+                            null,
+                          );
+                          updateImageSettings(
+                            "scratchRevealBackground",
+                            DEFAULT_IMAGE_SETTINGS,
+                          );
+                        }}
+                        onScrimChange={(o) =>
+                          updateScratchRevealField("scrimOpacity", o)
+                        }
+                        positionSettings={imgSettings(
+                          "scratchRevealBackground",
+                        )}
+                        onPositionChange={(s) =>
+                          updateImageSettings(
+                            "scratchRevealBackground",
+                            s,
+                          )
+                        }
+                        idPrefix="ccScratch"
+                      />
+                    )}
+
                     <Separator />
 
                     {/* RSVP NOTE */}
@@ -2105,6 +2157,39 @@ export default function ExternalInvitationForm({
                         onCheckedChange={updateScratchReveal}
                       />
                     </div>
+
+                    {form.scratchReveal?.enabled === true && (
+                      <ScratchRevealBackgroundEditor
+                        value={form.scratchReveal?.backgroundImageUrl ?? ""}
+                        scrimOpacity={form.scratchReveal?.scrimOpacity}
+                        onUpload={(url) =>
+                          updateScratchRevealField("backgroundImageUrl", url)
+                        }
+                        onClear={() => {
+                          updateScratchRevealField(
+                            "backgroundImageUrl",
+                            null,
+                          );
+                          updateImageSettings(
+                            "scratchRevealBackground",
+                            DEFAULT_IMAGE_SETTINGS,
+                          );
+                        }}
+                        onScrimChange={(o) =>
+                          updateScratchRevealField("scrimOpacity", o)
+                        }
+                        positionSettings={imgSettings(
+                          "scratchRevealBackground",
+                        )}
+                        onPositionChange={(s) =>
+                          updateImageSettings(
+                            "scratchRevealBackground",
+                            s,
+                          )
+                        }
+                        idPrefix="veScratch"
+                      />
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               )}
@@ -2487,6 +2572,89 @@ export default function ExternalInvitationForm({
           </TabsContent>
         </Tabs>
       </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ScratchRevealBackgroundEditor
+//
+// Inline editor block rendered under the scratchReveal toggle. Lets the admin
+// upload (or clear) a full-bleed background image, fine-tune its position &
+// zoom via ImagePositionEditor, and tune the dark scrim opacity used for
+// legibility. Identical UI in the curtain-canva and video-entrance accordions
+// — extracted to keep both call sites trivial.
+// ---------------------------------------------------------------------------
+
+const DEFAULT_SCRATCH_SCRIM_OPACITY = 0.45;
+
+function ScratchRevealBackgroundEditor({
+  value,
+  scrimOpacity,
+  onUpload,
+  onClear,
+  onScrimChange,
+  positionSettings,
+  onPositionChange,
+  idPrefix,
+}: {
+  value: string;
+  scrimOpacity: number | undefined;
+  onUpload: (url: string) => void;
+  onClear: () => void;
+  onScrimChange: (opacity: number) => void;
+  positionSettings: ImageSettings;
+  onPositionChange: (settings: ImageSettings) => void;
+  idPrefix: string;
+}) {
+  const resolvedScrim = scrimOpacity ?? DEFAULT_SCRATCH_SCRIM_OPACITY;
+  return (
+    <div className="space-y-3 rounded-lg border border-dashed border-border p-3">
+      <div className="space-y-1">
+        <Label className="text-sm font-medium">Imagem de fundo</Label>
+        <p className="text-xs text-muted-foreground">
+          Fotografia de fundo opcional atrás das moedas raspadinhas. Sem
+          imagem, a secção usa a cor de fundo do tema.
+        </p>
+      </div>
+      <MediaUpload
+        kind="image"
+        maxSizeMB={8}
+        value={value || undefined}
+        onUpload={onUpload}
+        onClear={onClear}
+      />
+      {value && (
+        <>
+          <ImagePositionEditor
+            src={value}
+            settings={positionSettings}
+            onChange={onPositionChange}
+          />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label htmlFor={`${idPrefix}ScrimOpacity`}>
+                Escurecimento da imagem
+              </Label>
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {Math.round(resolvedScrim * 100)}%
+              </span>
+            </div>
+            <input
+              id={`${idPrefix}ScrimOpacity`}
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={Math.round(resolvedScrim * 100)}
+              onChange={(e) =>
+                onScrimChange(parseInt(e.target.value, 10) / 100)
+              }
+              className="w-full cursor-pointer accent-foreground"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

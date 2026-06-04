@@ -204,7 +204,8 @@ export type ImageSettingsKey =
   | "locationImage1"
   | "locationImage2"
   | "envelopeTopFlap"
-  | "envelopeBottomFlap";
+  | "envelopeBottomFlap"
+  | "scratchRevealBackground";
 
 /** Map of image-slot key → position/zoom settings. */
 export type ImageSettingsMap = Partial<Record<ImageSettingsKey, ImageSettings>>;
@@ -259,6 +260,20 @@ export interface ExternalCountdownConfig {
   cardBg?: string;
   cardBorder?: string;
   cardBorderRadius?: number;
+}
+
+/**
+ * Toggles and styles the ScratchDateReveal section. Position/zoom for
+ * `backgroundImageUrl` are stored in `InvitationData.imageSettings` under the
+ * `scratchRevealBackground` key (mirrors the cinematic image pattern).
+ */
+export interface ScratchRevealConfig {
+  /** Whether the section renders at all. */
+  enabled: boolean;
+  /** Optional full-bleed background image URL behind the coins. */
+  backgroundImageUrl?: string | null;
+  /** Opacity of the dark scrim overlay (0–1). Defaults to 0.45 when an image is set. */
+  scrimOpacity?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -596,8 +611,8 @@ export interface InvitationData {
   parents?: ParentsInfo;
   /** Optional "Nossa História" section — the couple's story. */
   ourStory?: OurStory;
-  /** Toggles the ScratchDateReveal section on external_link invitation pages. */
-  scratchReveal?: { enabled: boolean };
+  /** Toggles and styles the ScratchDateReveal section on external_link invitation pages. */
+  scratchReveal?: ScratchRevealConfig;
   /** Toggles the curtain-canva hero celebration confetti. Unset → fires (default on); only `{ enabled: false }` disables it. */
   heroConfetti?: { enabled: boolean };
   /** Toggles and styles the countdown section on external_link invitation pages. */

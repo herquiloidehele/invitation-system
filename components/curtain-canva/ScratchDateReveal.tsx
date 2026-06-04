@@ -10,6 +10,7 @@ import {
 import { motion, useReducedMotion } from "framer-motion";
 import type {
   CustomTexts,
+  ImageSettingsMap,
   TemplateTheme,
   TextStyle,
   TextStyleOverrides,
@@ -21,8 +22,11 @@ import {
   resolveTextElementOverride,
   shortMonthName,
 } from "@/lib/curtain-canva";
+import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { EditableText } from "@/components/shared/EditableText";
 import ScratchCoin from "./ScratchCoin";
+
+const DEFAULT_SCRATCH_SCRIM_OPACITY = 0.45;
 
 interface ScratchDateRevealProps {
   date: {
@@ -40,6 +44,22 @@ interface ScratchDateRevealProps {
    * specific typography defaults.
    */
   textStyles?: TextStyleOverrides;
+  /**
+   * Optional full-bleed background image rendered behind the coins. When
+   * unset (default) the section renders on the page background as before.
+   */
+  backgroundImageUrl?: string | null;
+  /**
+   * Dark scrim opacity (0–1) overlaid on top of `backgroundImageUrl` for
+   * legibility of the title and coin labels. Falls back to
+   * `DEFAULT_SCRATCH_SCRIM_OPACITY`. Ignored when no image is set.
+   */
+  scrimOpacity?: number;
+  /**
+   * Position/zoom overrides — same map used by the rest of the invitation.
+   * Only the `scratchRevealBackground` key is read.
+   */
+  imageSettings?: ImageSettingsMap;
 }
 
 export default function ScratchDateReveal({
@@ -47,6 +67,9 @@ export default function ScratchDateReveal({
   theme,
   customTexts,
   textStyles,
+  backgroundImageUrl,
+  scrimOpacity,
+  imageSettings,
 }: ScratchDateRevealProps) {
   const titleOverride = resolveTextElementOverride(textStyles, "sectionTitles");
   const labelsOverride = resolveTextElementOverride(textStyles, "labels");
@@ -142,10 +165,20 @@ export default function ScratchDateReveal({
     [theme],
   );
 
+  const hasBackgroundImage =
+    typeof backgroundImageUrl === "string" && backgroundImageUrl.trim() !== "";
+  const resolvedScrimOpacity = Math.min(
+    1,
+    Math.max(0, scrimOpacity ?? DEFAULT_SCRATCH_SCRIM_OPACITY),
+  );
+  const backgroundPositionStyle = hasBackgroundImage
+    ? getBackgroundImageStyle(imageSettings, "scratchRevealBackground")
+    : {};
+
   return (
     <motion.section
       id="date"
-      className="py-20 md:py-28 px-6 max-w-[640px] mx-auto text-center"
+      className="relative py-20 md:py-28 px-6 text-center overflow-hidden"
       // Subtle fade-in-up the first time the section enters the viewport.
       // Reduced-motion users skip the offset and animation duration.
       initial={reduceMotion ? false : { opacity: 0, y: 30 }}
@@ -153,6 +186,33 @@ export default function ScratchDateReveal({
       viewport={{ once: true, amount: 0.4 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
+      {hasBackgroundImage && (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage: `url(${backgroundImageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              ...backgroundPositionStyle,
+              zIndex: 0,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: `rgba(0,0,0,${resolvedScrimOpacity})`,
+              zIndex: 0,
+            }}
+          />
+        </>
+      )}
+      <div className="relative max-w-[640px] mx-auto" style={{ zIndex: 1 }}>
       <h2
         style={{
           fontFamily: theme.displayFont,
@@ -232,6 +292,7 @@ export default function ScratchDateReveal({
           glitterColors={glitterColors}
           onRevealed={() => handleCoinRevealed("year")}
         />
+      </div>
       </div>
     </motion.section>
   );
