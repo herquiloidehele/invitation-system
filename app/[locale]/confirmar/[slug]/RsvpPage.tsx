@@ -67,6 +67,7 @@ interface RsvpPageProps {
   deadlinePassed: boolean;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
+  backgroundImageUrl?: string;
   customTexts?: CustomTexts;
 }
 
@@ -109,6 +110,7 @@ export default function RsvpPage({
   deadlinePassed,
   showEmail = false,
   showDietaryRestrictions = true,
+  backgroundImageUrl,
   customTexts: ct,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
@@ -196,6 +198,12 @@ export default function RsvpPage({
       className="min-h-dvh flex flex-col"
       style={{
         backgroundColor: palette.bg,
+        backgroundImage: backgroundImageUrl
+          ? `url(${backgroundImageUrl})`
+          : undefined,
+        backgroundSize: backgroundImageUrl ? "cover" : undefined,
+        backgroundPosition: backgroundImageUrl ? "center" : undefined,
+        backgroundAttachment: backgroundImageUrl ? "fixed" : undefined,
         fontFamily: "'Inter', system-ui, sans-serif",
       }}
     >

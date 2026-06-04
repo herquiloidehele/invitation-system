@@ -49,6 +49,8 @@ interface MediaUploadProps {
   kind: MediaKind;
   /** Max file size in MB */
   maxSizeMB: number;
+  /** Optional server-side upload profile for stricter validation */
+  uploadProfile?: string;
   /** Optional label override for the drop zone */
   label?: string;
   className?: string;
@@ -97,6 +99,7 @@ export default function MediaUpload({
   onClear,
   kind,
   maxSizeMB,
+  uploadProfile,
   label,
   className,
 }: MediaUploadProps) {
@@ -147,6 +150,7 @@ export default function MediaUpload({
             fileName: file.name,
             fileType: fileToUpload.type || file.type,
             fileSize: fileToUpload.size,
+            profile: uploadProfile,
           }),
         });
 
@@ -210,7 +214,7 @@ export default function MediaUpload({
         });
       }
     },
-    [kind, maxSizeMB, onUpload],
+    [kind, maxSizeMB, onUpload, uploadProfile],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

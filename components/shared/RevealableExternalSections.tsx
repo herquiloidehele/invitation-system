@@ -128,45 +128,55 @@ export default function RevealableExternalSections({
 
         {showInitialPageSections && invitation.rsvp.enabled && (
           <>
-            <SectionOrnament theme={theme} />
             <section
               id="rsvp"
-              className="pt-12 pb-24 md:pt-16 md:pb-28 max-w-[600px] mx-auto px-6"
+              className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
+              style={
+                invitation.rsvp.backgroundImageUrl
+                  ? {
+                      backgroundImage: `url(${invitation.rsvp.backgroundImageUrl})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }
+                  : undefined
+              }
             >
-              <div className="text-center mb-8">
-                <span
-                  className="uppercase"
-                  style={{
-                    fontFamily: theme.uiFont,
-                    color: theme.textSecondary,
-                    fontSize: 11,
-                    letterSpacing: "0.3em",
-                    ...resolveTextElementOverride(
-                      invitation.textStyles,
-                      "inviteLabel",
-                    ),
-                  }}
-                >
-                  <EditableText elementKey="inviteLabel">RSVP</EditableText>
-                </span>
-                <div
-                  aria-hidden
-                  className="mx-auto mt-3"
-                  style={{
-                    width: 40,
-                    height: 1,
-                    background: theme.accent || "#C9A961",
-                    opacity: 0.7,
-                  }}
+              <div className="max-w-[600px] mx-auto">
+                <div className="text-center mb-8">
+                  <span
+                    className="uppercase"
+                    style={{
+                      fontFamily: theme.uiFont,
+                      color: theme.textSecondary,
+                      fontSize: 11,
+                      letterSpacing: "0.3em",
+                      ...resolveTextElementOverride(
+                        invitation.textStyles,
+                        "inviteLabel",
+                      ),
+                    }}
+                  >
+                    <EditableText elementKey="inviteLabel">RSVP</EditableText>
+                  </span>
+                  <div
+                    aria-hidden
+                    className="mx-auto mt-3"
+                    style={{
+                      width: 40,
+                      height: 1,
+                      background: theme.accent || "#C9A961",
+                      opacity: 0.7,
+                    }}
+                  />
+                </div>
+                <RSVPForm
+                  inline
+                  invitation={invitation}
+                  theme={theme}
+                  customTexts={invitation.customTexts}
+                  guest={invitation.guest}
                 />
               </div>
-              <RSVPForm
-                inline
-                invitation={invitation}
-                theme={theme}
-                customTexts={invitation.customTexts}
-                guest={invitation.guest}
-              />
             </section>
           </>
         )}
@@ -187,7 +197,9 @@ function SectionOrnament({ theme }: { theme: TemplateTheme }) {
       className="flex items-center justify-center gap-3 my-2"
       style={{ color: accent }}
     >
-      <span style={{ height: 1, width: 60, background: accent, opacity: 0.55 }} />
+      <span
+        style={{ height: 1, width: 60, background: accent, opacity: 0.55 }}
+      />
       <span
         style={{
           width: 6,
@@ -197,7 +209,9 @@ function SectionOrnament({ theme }: { theme: TemplateTheme }) {
           opacity: 0.85,
         }}
       />
-      <span style={{ height: 1, width: 60, background: accent, opacity: 0.55 }} />
+      <span
+        style={{ height: 1, width: 60, background: accent, opacity: 0.55 }}
+      />
     </div>
   );
 }

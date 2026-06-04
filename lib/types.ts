@@ -568,6 +568,7 @@ export interface InvitationData {
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
     showOnExternalPage?: boolean;
+    backgroundImageUrl?: string;
   };
   schedule: ScheduleEvent[];
   /** Visual layout for the schedule section. Defaults to "default". */

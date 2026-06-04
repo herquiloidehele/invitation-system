@@ -54,6 +54,7 @@ export default async function ConfirmarPage({ params }: Props) {
     deadline?: string;
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
+    backgroundImageUrl?: string;
   };
   const customTexts =
     (invitation.customTexts as CustomTexts | null) ?? undefined;
@@ -71,6 +72,7 @@ export default async function ConfirmarPage({ params }: Props) {
       deadlinePassed={deadlinePassed}
       showEmail={shouldShowRsvpEmail(rsvp)}
       showDietaryRestrictions={shouldShowRsvpDietaryRestrictions(rsvp)}
+      backgroundImageUrl={rsvp.backgroundImageUrl}
       customTexts={customTexts}
     />
   );

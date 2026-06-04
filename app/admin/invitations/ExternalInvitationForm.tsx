@@ -144,6 +144,7 @@ function getDefaultState(
       showEmail: false,
       showDietaryRestrictions: true,
       showOnExternalPage: false,
+      backgroundImageUrl: "",
     },
     schedule: [],
     dressCode: { enabled: false, text: "" },
@@ -2317,6 +2318,23 @@ export default function ExternalInvitationForm({
                           onCheckedChange={(v) =>
                             updateRsvp("showOnExternalPage", v)
                           }
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>Imagem de fundo do RSVP</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Usada no RSVP dentro do convite e na página de
+                          confirmação. Máximo 500 KB.
+                        </p>
+                        <MediaUpload
+                          kind="image"
+                          maxSizeMB={0.5}
+                          uploadProfile="rsvp-background"
+                          value={form.rsvp.backgroundImageUrl || undefined}
+                          onUpload={(url) =>
+                            updateRsvp("backgroundImageUrl", url)
+                          }
+                          onClear={() => updateRsvp("backgroundImageUrl", "")}
                         />
                       </div>
                     </>

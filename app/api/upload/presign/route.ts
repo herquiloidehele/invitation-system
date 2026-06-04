@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generatePresignedUploadUrl } from "@/lib/s3";
+import {
+  formatUploadLimit,
+  getUploadMaxSizeBytes,
+  type UploadFolder,
+} from "@/lib/upload-limits";
 
 // Allowed MIME types grouped by media kind
-const ALLOWED_TYPES: Record<string, "images" | "videos" | "audio"> = {
+const ALLOWED_TYPES: Record<string, UploadFolder> = {
   // Images
   "image/jpeg": "images",
   "image/jpg": "images",
@@ -27,13 +32,6 @@ const ALLOWED_TYPES: Record<string, "images" | "videos" | "audio"> = {
   "audio/flac": "audio",
 };
 
-// Max file sizes in bytes
-const MAX_SIZES: Record<"images" | "videos" | "audio", number> = {
-  images: 5 * 1024 * 1024, //   5 MB
-  videos: 100 * 1024 * 1024, // 100 MB
-  audio: 20 * 1024 * 1024, //  20 MB
-};
-
 export async function POST(req: NextRequest) {
   try {
     // Validate AWS environment variables are configured
@@ -53,10 +51,11 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { fileName, fileType, fileSize } = body as {
+    const { fileName, fileType, fileSize, profile } = body as {
       fileName?: string;
       fileType?: string;
       fileSize?: number;
+      profile?: string;
     };
 
     // Validate presence
@@ -77,11 +76,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate file size
-    const maxSize = MAX_SIZES[folder];
+    const maxSize = getUploadMaxSizeBytes(folder, profile);
     if (fileSize > maxSize) {
-      const mb = Math.round(maxSize / 1024 / 1024);
       return NextResponse.json(
-        { error: `File exceeds the ${mb} MB limit for ${folder}.` },
+        {
+          error: `File exceeds the ${formatUploadLimit(maxSize)} limit for ${folder}.`,
+        },
         { status: 413 },
       );
     }
