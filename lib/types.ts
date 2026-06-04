@@ -579,6 +579,8 @@ export interface InvitationData {
   heroRevealSeconds?: number;
   /** Video-entrance only: the top text line shown above the couple names in the hero. */
   heroTopText?: string;
+  /** Video-entrance only: whether the cover prompt (play button + tap hint) is shown before tapping. Shown by default; only `false` hides it. */
+  heroTapPrompt?: boolean;
   faqs?: FAQItem[];
   /** "Manual do bom convidado" section — optional list of icon + label tips for guests. */
   guestGuide?: GuestGuide;

@@ -54,3 +54,14 @@ export function shouldFireVideoEntranceConfetti(
 ): boolean {
   return config?.enabled === true;
 }
+
+/**
+ * Admin toggle for the video-entrance cover prompt (the play button + the
+ * "tap to open" hint shown before the guest taps). Shown by default — only an
+ * explicit `false` hides it. The cover stays tappable either way.
+ */
+export function shouldShowTapPrompt(
+  value: boolean | null | undefined,
+): boolean {
+  return value !== false;
+}

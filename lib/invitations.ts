@@ -49,6 +49,7 @@ type InvitationWithTheme = {
   curtainVideoPoster: string | null;
   heroRevealSeconds: number | null;
   heroTopText: string | null;
+  heroTapPrompt: boolean;
   faqs: unknown;
   guestGuide: unknown;
   envelope: unknown;
@@ -101,6 +102,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     curtainVideoPoster: row.curtainVideoPoster ?? undefined,
     heroRevealSeconds: row.heroRevealSeconds ?? undefined,
     heroTopText: row.heroTopText ?? undefined,
+    heroTapPrompt: row.heroTapPrompt,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
     guestGuide: (row.guestGuide as InvitationData["guestGuide"]) ?? undefined,
     envelope: row.envelope as InvitationData["envelope"],

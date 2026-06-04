@@ -6,6 +6,7 @@ import {
   resolveHeroRevealSeconds,
   shouldFireVideoEntranceConfetti,
   shouldRevealHeroAtTime,
+  shouldShowTapPrompt,
 } from "../lib/video-entrance";
 
 describe("isVideoEntranceLayout", () => {
@@ -54,5 +55,17 @@ describe("shouldFireVideoEntranceConfetti", () => {
     expect(shouldFireVideoEntranceConfetti({ enabled: false })).toBe(false);
     expect(shouldFireVideoEntranceConfetti(null)).toBe(false);
     expect(shouldFireVideoEntranceConfetti(undefined)).toBe(false);
+  });
+});
+
+describe("shouldShowTapPrompt", () => {
+  it("shows the prompt by default (unset/true)", () => {
+    expect(shouldShowTapPrompt(undefined)).toBe(true);
+    expect(shouldShowTapPrompt(null)).toBe(true);
+    expect(shouldShowTapPrompt(true)).toBe(true);
+  });
+
+  it("hides the prompt only when explicitly false", () => {
+    expect(shouldShowTapPrompt(false)).toBe(false);
   });
 });

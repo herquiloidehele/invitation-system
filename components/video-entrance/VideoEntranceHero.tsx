@@ -55,6 +55,8 @@ interface VideoEntranceHeroProps {
   textStyles?: TextStyleOverrides;
   /** Whether the celebration confetti fires when the text reveals. */
   confettiEnabled?: boolean;
+  /** Whether the cover prompt (play button + tap hint) is shown before tapping. */
+  showTapPrompt?: boolean;
   onTapped?: () => void;
   /** Fires once when the reveal completes so the parent can unlock scroll. */
   onRevealed?: () => void;
@@ -80,6 +82,7 @@ export default function VideoEntranceHero({
   customTexts,
   textStyles,
   confettiEnabled = false,
+  showTapPrompt = true,
   onTapped,
   onRevealed,
   eventType,
@@ -353,9 +356,10 @@ export default function VideoEntranceHero({
         }}
       />
 
-      {/* Idle: play affordance + tap hint. */}
+      {/* Idle: play affordance + tap hint. Hidden when the admin disables the
+          prompt — the cover stays tappable either way. */}
       <AnimatePresence>
-        {isInteractive && (
+        {isInteractive && showTapPrompt && (
           <motion.div
             className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 text-center px-6"
             initial={{ opacity: 0 }}

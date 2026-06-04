@@ -113,6 +113,8 @@ export async function POST(request: NextRequest) {
             ? body.heroRevealSeconds
             : null,
         heroTopText: body.heroTopText ?? null,
+        heroTapPrompt:
+          typeof body.heroTapPrompt === "boolean" ? body.heroTapPrompt : true,
         faqs: sanitizeJsonField(body.faqs, null),
         guestGuide: sanitizeJsonField(body.guestGuide, null),
         envelope: sanitizeJsonField(body.envelope, null),

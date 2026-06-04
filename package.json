@@ -14,7 +14,7 @@
     "db:migrate:dev": "cross-env NODE_ENV=development prisma migrate dev",
     "db:push:dev": "cross-env NODE_ENV=development prisma db push",
     "db:generate": "npx prisma generate",
-    "db:migrate:prod": "cross-env NODE_ENV=production prisma migrate dev",
+    "db:migrate:prod": "cross-env NODE_ENV=production prisma migrate deploy",
     "db:studio": "prisma studio",
     "test": "vitest run",
     "test:watch": "vitest"

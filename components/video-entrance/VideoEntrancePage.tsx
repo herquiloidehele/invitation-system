@@ -6,7 +6,10 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import VideoEntranceHero from "./VideoEntranceHero";
 import RevealableExternalSections from "@/components/shared/RevealableExternalSections";
 import { useRevealScrollLock } from "@/hooks/useRevealScrollLock";
-import { shouldFireVideoEntranceConfetti } from "@/lib/video-entrance";
+import {
+  shouldFireVideoEntranceConfetti,
+  shouldShowTapPrompt,
+} from "@/lib/video-entrance";
 
 interface VideoEntrancePageProps {
   invitation: InvitationData;
@@ -56,6 +59,7 @@ export default function VideoEntrancePage({
         customTexts={invitation.customTexts}
         textStyles={invitation.textStyles}
         confettiEnabled={shouldFireVideoEntranceConfetti(invitation.heroConfetti)}
+        showTapPrompt={shouldShowTapPrompt(invitation.heroTapPrompt)}
         onTapped={handleTapped}
         onRevealed={handleRevealed}
         eventType={invitation.eventType}

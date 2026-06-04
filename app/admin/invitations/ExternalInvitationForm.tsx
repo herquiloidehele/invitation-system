@@ -2056,6 +2056,24 @@ export default function ExternalInvitationForm({
 
                     <Separator />
 
+                    {/* Cover prompt (play button + tap hint) */}
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Botão de reprodução na capa</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Mostra o botão de play e o texto &ldquo;Toque para
+                          abrir&rdquo; sobre a capa. A capa continua a ser
+                          tocável mesmo quando desligado.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.heroTapPrompt !== false}
+                        onCheckedChange={(v) => update("heroTapPrompt", v)}
+                      />
+                    </div>
+
+                    <Separator />
+
                     {/* Confetti (opt-in / off by default) */}
                     <div className="flex items-center justify-between gap-4">
                       <div className="space-y-0.5">

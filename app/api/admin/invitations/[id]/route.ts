@@ -161,6 +161,9 @@ export async function PUT(
         ...(body.heroTopText !== undefined && {
           heroTopText: body.heroTopText || null,
         }),
+        ...(body.heroTapPrompt !== undefined && {
+          heroTapPrompt: body.heroTapPrompt === true,
+        }),
         ...(body.faqs !== undefined && {
           faqs: sanitizeJsonField(body.faqs, null),
         }),
