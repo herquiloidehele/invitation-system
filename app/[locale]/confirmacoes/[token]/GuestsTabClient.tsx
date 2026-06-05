@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
+import { useTranslations } from "next-intl";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
 
@@ -32,6 +33,7 @@ export default function GuestsTabClient({
   messageTemplate,
 }: GuestsTabClientProps) {
   const origin = useWindowOrigin();
+  const t = useTranslations("OwnerConfirmations");
   const apiBasePath = useMemo(
     () => `/api/owner/${ownerToken}/guests`,
     [ownerToken],
@@ -43,7 +45,7 @@ export default function GuestsTabClient({
       invitationSlug={invitationSlug}
       invitationOrigin={origin}
       messageTemplate={messageTemplate || DEFAULT_GUEST_MESSAGE_TEMPLATE}
-      title="Lista de convidados"
+      title={t("guestsListTitle")}
     />
   );
 }

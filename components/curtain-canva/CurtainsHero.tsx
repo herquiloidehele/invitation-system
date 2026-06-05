@@ -17,7 +17,7 @@ import type {
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import CurtainHeroVideo from "./CurtainHeroVideo";
 import {
@@ -153,7 +153,8 @@ export default function CurtainsHero({
     };
   }, []);
 
-  const tapLabel = t(customTexts, "curtain_tapToOpen");
+  const t = useCustomText(customTexts);
+  const tapLabel = t("curtain_tapToOpen");
   const videoSrc = resolveCurtainVideoSrc(curtainVideoUrl);
   const heroVideoOn = shouldRenderCurtainHeroVideo(heroVideoUrl);
 

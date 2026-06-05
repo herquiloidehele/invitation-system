@@ -12,7 +12,7 @@ import type {
 } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import {
   computeCountdownTimeLeft,
   formatCountdownValue,
@@ -78,10 +78,11 @@ function SaveLabel({
   customTexts?: CustomTexts;
   isPreview?: boolean;
 }) {
+  const t = useCustomText(ct);
   return (
     <span style={ts.saveLabel}>
       <EditableText elementKey="saveLabel">
-        <WordReveal text={t(ct, "saveDate_label")} isPreview={isPreview} />
+        <WordReveal text={t("saveDate_label")} isPreview={isPreview} />
       </EditableText>
     </span>
   );
@@ -98,6 +99,7 @@ function CalendarCTA({
   onCalendarClick?: () => void;
   customTexts?: CustomTexts;
 }) {
+  const t = useCustomText(ct);
   return (
     <CalendarButton
       date={invitation.date}
@@ -109,7 +111,7 @@ function CalendarCTA({
     >
       <span style={ts.calendarCta}>
         <EditableText elementKey="calendarCta">
-          {t(ct, "cta_addToCalendar")}
+          {t("cta_addToCalendar")}
         </EditableText>
       </span>
     </CalendarButton>
@@ -285,6 +287,7 @@ function SaveTheDateCountdown({
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
+  const t = useCustomText(ct);
   const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft>(() =>
     computeCountdownTimeLeft(invitation.date.iso, invitation.date.time),
   );
@@ -352,7 +355,7 @@ function SaveTheDateCountdown({
         <div className="flex flex-col items-center gap-2 py-3">
           <span style={ts.celebrationTitle}>
             <EditableText elementKey="celebrationTitle">
-              {t(ct, "saveDate_celebrationTitle")}
+              {t("saveDate_celebrationTitle")}
             </EditableText>
           </span>
           <span style={ts.celebrationCouple}>
@@ -365,28 +368,28 @@ function SaveTheDateCountdown({
         <div className="flex items-start justify-center gap-1">
           <CountdownUnit
             value={timeLeft.days}
-            label={t(ct, "saveDate_days")}
+            label={t("saveDate_days")}
             theme={theme}
             ts={ts}
           />
           <CountdownColon ts={ts} delay={0} />
           <CountdownUnit
             value={timeLeft.hours}
-            label={t(ct, "saveDate_hours")}
+            label={t("saveDate_hours")}
             theme={theme}
             ts={ts}
           />
           <CountdownColon ts={ts} delay={0.3} />
           <CountdownUnit
             value={timeLeft.minutes}
-            label={t(ct, "saveDate_minutes")}
+            label={t("saveDate_minutes")}
             theme={theme}
             ts={ts}
           />
           <CountdownColon ts={ts} delay={0.6} />
           <CountdownUnit
             value={timeLeft.seconds}
-            label={t(ct, "saveDate_seconds")}
+            label={t("saveDate_seconds")}
             theme={theme}
             ts={ts}
           />
@@ -506,6 +509,7 @@ function SaveTheDateQuadCards({
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
+  const t = useCustomText(ct);
   return (
     <div className="flex flex-col items-center gap-4">
       {/* Header label */}
@@ -521,7 +525,7 @@ function SaveTheDateQuadCards({
       {/* 2×2 grid */}
       <div className="grid grid-cols-2 gap-3 w-full">
         <QuadCard
-          label={t(ct, "saveDate_dayLabel")}
+          label={t("saveDate_dayLabel")}
           value={invitation.date.day}
           theme={theme}
           ts={ts}
@@ -531,7 +535,7 @@ function SaveTheDateQuadCards({
           labelStyle={ts.quadDayLabel}
         />
         <QuadCard
-          label={t(ct, "saveDate_monthLabel")}
+          label={t("saveDate_monthLabel")}
           value={invitation.date.month}
           theme={theme}
           ts={ts}
@@ -541,7 +545,7 @@ function SaveTheDateQuadCards({
           labelStyle={ts.quadMonthLabel}
         />
         <QuadCard
-          label={t(ct, "saveDate_yearLabel")}
+          label={t("saveDate_yearLabel")}
           value={invitation.date.year}
           theme={theme}
           ts={ts}
@@ -551,7 +555,7 @@ function SaveTheDateQuadCards({
           labelStyle={ts.quadYearLabel}
         />
         <QuadCard
-          label={t(ct, "saveDate_dayOfWeekLabel")}
+          label={t("saveDate_dayOfWeekLabel")}
           value={invitation.date.dayOfWeek}
           theme={theme}
           ts={ts}
@@ -603,6 +607,7 @@ function SaveTheDateCinematic({
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
+  const t = useCustomText(ct);
   const bgImage =
     invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
   const cinematicImgStyle = getImageStyle(imageSettings, "cinematicImage");
@@ -703,7 +708,7 @@ function SaveTheDateCinematic({
           <span style={ts.cinematicSaveLabel}>
             <EditableText elementKey="cinematicSaveLabel">
               <WordReveal
-                text={t(ct, "saveDate_label")}
+                text={t("saveDate_label")}
                 isPreview={isPreview}
               />
             </EditableText>

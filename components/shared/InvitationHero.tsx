@@ -6,7 +6,7 @@ import { motion, type Variants } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { scrollToNextHeroSection } from "@/lib/curtain-canva";
 import AudioPlayer from "./AudioPlayer";
@@ -103,6 +103,7 @@ export default function InvitationHero({
 }: InvitationHeroProps) {
   const ts: ResolvedTextStyles = resolveTextStyles(theme, invitation.textStyles);
   const isWedding = isWeddingEventType(invitation.eventType);
+  const t = useCustomText(invitation.customTexts);
 
   const scrimOpacity = clamp(
     invitation.heroOverlay?.scrimOpacity ?? DEFAULT_HERO_SCRIM_OPACITY,
@@ -324,7 +325,7 @@ export default function InvitationHero({
                 className="mt-7"
               >
                 <EditableText elementKey="inviteLabel">
-                  {t(invitation.customTexts, "hero_inviteLabel")}
+                  {t("hero_inviteLabel")}
                 </EditableText>
               </motion.span>
 
@@ -427,6 +428,7 @@ export function InvitationHeroNames({
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
   const isWedding = isWeddingEventType(invitation.eventType);
+  const t = useCustomText(invitation.customTexts);
 
   return (
     <motion.section
@@ -621,7 +623,7 @@ export function InvitationHeroNames({
 
             <span style={ts.inviteLabel}>
               <EditableText elementKey="inviteLabel">
-                {t(invitation.customTexts, "hero_inviteLabel")}
+                {t("hero_inviteLabel")}
               </EditableText>
             </span>
           </>

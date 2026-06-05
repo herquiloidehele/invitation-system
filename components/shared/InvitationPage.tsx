@@ -17,7 +17,7 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
 import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST } from "./PersonalGuestCard";
@@ -344,6 +344,7 @@ export default function InvitationPage({
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const t = useCustomText(invitation.customTexts);
 
   const { trackEvent } = useAnalytics(invitation.slug);
 
@@ -513,7 +514,7 @@ export default function InvitationPage({
                   <WordReveal
                     text={
                       invitation.ourStory.title ||
-                      t(invitation.customTexts, "sectionTitle_ourStory")
+                      t("sectionTitle_ourStory")
                     }
                     isPreview={isPreview}
                   />
@@ -622,7 +623,7 @@ export default function InvitationPage({
           <span style={ts.sectionTitles}>
             <EditableText elementKey="sectionTitles">
               <WordReveal
-                text={t(invitation.customTexts, "sectionTitle_location")}
+                text={t("sectionTitle_location")}
                 isPreview={isPreview}
               />
             </EditableText>
@@ -734,7 +735,7 @@ export default function InvitationPage({
                   </motion.div>
                   <span style={ts.labels}>
                     <EditableText elementKey="labels">
-                      {t(invitation.customTexts, "sectionTitle_dressCode")}
+                      {t("sectionTitle_dressCode")}
                     </EditableText>
                   </span>
                   <EditableText elementKey="dressCodeText">
@@ -824,7 +825,7 @@ export default function InvitationPage({
                   </motion.div>
                   <span style={ts.labels}>
                     <EditableText elementKey="labels">
-                      {t(invitation.customTexts, "sectionTitle_giftRegistry")}
+                      {t("sectionTitle_giftRegistry")}
                     </EditableText>
                   </span>
                   <span
@@ -849,7 +850,7 @@ export default function InvitationPage({
                     >
                       <ExternalLink size={10} strokeWidth={1.5} />
                       <EditableText elementKey="giftLink">
-                        {t(invitation.customTexts, "cta_giftLink")}
+                        {t("cta_giftLink")}
                       </EditableText>
                     </motion.a>
                   )}
@@ -871,7 +872,7 @@ export default function InvitationPage({
               <span style={ts.sectionTitles} className={"text-center"}>
                 <EditableText elementKey="sectionTitles">
                   <WordReveal
-                    text={t(invitation.customTexts, "sectionTitle_guestGuide")}
+                    text={t("sectionTitle_guestGuide")}
                     isPreview={isPreview}
                     style={{ textAlign: "center" }}
                   />
@@ -922,7 +923,7 @@ export default function InvitationPage({
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
                   <WordReveal
-                    text={t(invitation.customTexts, "sectionTitle_faqs")}
+                    text={t("sectionTitle_faqs")}
                     isPreview={isPreview}
                   />
                 </EditableText>
@@ -998,7 +999,7 @@ export default function InvitationPage({
           <span className="mb-6 text-center" style={ts.ctaLabel}>
             <EditableText elementKey="ctaLabel">
               <WordReveal
-                text={t(invitation.customTexts, "cta_confirmLabel")}
+                text={t("cta_confirmLabel")}
                 isPreview={isPreview}
                 style={{ textAlign: "center" }}
               />
@@ -1072,8 +1073,8 @@ export default function InvitationPage({
             </motion.span>
             <span className="relative">
               {rsvpSubmitted
-                ? t(invitation.customTexts, "cta_confirmedButton")
-                : t(invitation.customTexts, "cta_confirmButton")}
+                ? t("cta_confirmedButton")
+                : t("cta_confirmButton")}
             </span>
           </motion.button>
         </div>

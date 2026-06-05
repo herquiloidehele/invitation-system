@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +13,7 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { useCustomText } from "@/lib/custom-texts";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { EditableText } from "@/components/shared/EditableText";
 import {
@@ -25,11 +25,11 @@ import {
 // Schema
 // ---------------------------------------------------------------------------
 
-function createRsvpSchema(t: (key: string) => string) {
+function createRsvpSchema(t: (key: keyof CustomTexts) => string) {
   return z.object({
-    name: z.string().min(1, t("nameRequired")),
-    email: z.string().email(t("invalidEmail")).or(z.literal("")),
-    attending: z.enum(["yes", "no"], { error: t("selectOption") }),
+    name: z.string().min(1, t("rsvp_nameRequired")),
+    email: z.string().email(t("rsvp_invalidEmail")).or(z.literal("")),
+    attending: z.enum(["yes", "no"], { error: t("rsvp_selectOption") }),
     dietaryRestrictions: z.string(),
     message: z.string(),
   });
@@ -181,9 +181,8 @@ export default function RSVPForm(props: RSVPFormProps) {
     ? props.invitation.rsvp.deadline
     : undefined;
   const ct = isIntegration(props) ? props.customTexts : undefined;
-  const rsvpT = useTranslations("RSVP");
-  const resolveText = (key: keyof CustomTexts) => ct?.[key] || rsvpT(key);
-  const rsvpSchema = createRsvpSchema(rsvpT);
+  const resolveText = useCustomText(ct);
+  const rsvpSchema = createRsvpSchema(resolveText);
   const guest = isIntegration(props) ? props.guest : undefined;
   const showEmail = isIntegration(props)
     ? shouldShowRsvpEmail(props.invitation.rsvp)
