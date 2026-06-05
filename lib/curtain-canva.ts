@@ -44,24 +44,8 @@ export function shouldRenderScratchReveal(
   return scratchReveal?.enabled === true;
 }
 
-/**
- * Returns the abbreviated month name in pt-PT for an ISO date string.
- * Strips the trailing dot that pt-PT formatters often append.
- *
- * If `iso` is invalid, returns the optional `fallback` (e.g. invitation.date.month)
- * or an empty string.
- */
-export function shortMonthName(iso: string, fallback = ""): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return fallback;
-  try {
-    return new Intl.DateTimeFormat("pt-PT", { month: "short" })
-      .format(d)
-      .replace(".", "");
-  } catch {
-    return fallback;
-  }
-}
+// `shortMonthName` moved to `lib/date-format.ts` (`formatLocalizedMonthShort`)
+// so it can vary with the URL locale instead of being hardcoded to pt-PT.
 
 /**
  * Curtain-canva uses invitation.curtainVideoUrl as the optional curtain

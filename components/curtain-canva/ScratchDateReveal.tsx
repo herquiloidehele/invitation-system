@@ -15,13 +15,15 @@ import type {
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
+import { useLocale } from "next-intl";
+
 import { useCustomText } from "@/lib/custom-texts";
 import {
   resolveCelebrationPalette,
   resolveCoinGlitterPalette,
   resolveTextElementOverride,
-  shortMonthName,
 } from "@/lib/curtain-canva";
+import { formatLocalizedMonthShort } from "@/lib/date-format";
 import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { EditableText } from "@/components/shared/EditableText";
 import ScratchCoin from "./ScratchCoin";
@@ -72,12 +74,13 @@ export default function ScratchDateReveal({
   imageSettings,
 }: ScratchDateRevealProps) {
   const t = useCustomText(customTexts);
+  const locale = useLocale();
   const titleOverride = resolveTextElementOverride(textStyles, "sectionTitles");
   const labelsOverride = resolveTextElementOverride(textStyles, "labels");
   const dateDayOverride = resolveTextElementOverride(textStyles, "dateDay");
   const dateMonthOverride = resolveTextElementOverride(textStyles, "dateMonth");
   const dateYearOverride = resolveTextElementOverride(textStyles, "dateYear");
-  const monthShort = shortMonthName(date.iso, date.month);
+  const monthShort = formatLocalizedMonthShort(date.iso, locale, date.month);
   const reduceMotion = useReducedMotion();
 
   // Track which coins have been revealed so we can fire confetti exactly

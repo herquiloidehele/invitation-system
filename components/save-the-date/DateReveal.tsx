@@ -1,11 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useLocale } from "next-intl";
 import type {
   SaveTheDateDate,
   SaveTheDateThemeData,
 } from "@/lib/save-the-date";
 import type { TextStyle } from "@/lib/types";
+import { formatLocalizedMonthLong } from "@/lib/date-format";
 import { EditableText } from "@/components/shared/EditableText";
 
 interface DateRevealProps {
@@ -30,6 +32,12 @@ export default function DateReveal({
   forceReveal = false,
 }: DateRevealProps) {
   const show = revealed || forceReveal;
+  const locale = useLocale();
+  const monthDisplay = formatLocalizedMonthLong(
+    date.iso,
+    locale,
+    date.month,
+  );
   const dateStyle = {
     fontFamily: resolvedDateFont,
     color: dateOverride?.color ?? theme.textColor,
@@ -70,7 +78,7 @@ export default function DateReveal({
               style={dateStyle}
             >
               <EditableText elementKey="stdDate">
-                {date.day}.{date.month}.{date.year}
+                {date.day}.{monthDisplay}.{date.year}
               </EditableText>
             </motion.p>
 
@@ -101,7 +109,7 @@ export default function DateReveal({
       {/* Placeholder when not revealed — keeps the heart centered */}
       {!show && (
         <div className="text-transparent select-none text-3xl">
-          {date.day}.{date.month}.{date.year}
+          {date.day}.{monthDisplay}.{date.year}
         </div>
       )}
     </div>

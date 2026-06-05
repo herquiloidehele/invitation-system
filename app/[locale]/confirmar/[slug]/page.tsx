@@ -7,6 +7,7 @@ import {
   shouldShowRsvpEmail,
 } from "@/lib/rsvp-config";
 import { createNoIndexMetadata } from "@/lib/seo";
+import { formatLocalizedLongDate } from "@/lib/date-format";
 import RsvpPage from "./RsvpPage";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,7 @@ function isDeadlinePassed(deadline: string | undefined): boolean {
 // ---------------------------------------------------------------------------
 
 export default async function ConfirmarPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
 
   const invitation = await prisma.invitation.findUnique({
     where: { slug },
@@ -48,7 +49,7 @@ export default async function ConfirmarPage({ params }: Props) {
   if (!invitation) notFound();
 
   const couple = invitation.couple as { bride: string; groom: string };
-  const date = invitation.date as { display: string };
+  const date = invitation.date as { display: string; iso?: string };
   const rsvp = invitation.rsvp as {
     enabled?: boolean;
     deadline?: string;
@@ -60,6 +61,9 @@ export default async function ConfirmarPage({ params }: Props) {
     (invitation.customTexts as CustomTexts | null) ?? undefined;
 
   const deadlinePassed = isDeadlinePassed(rsvp.deadline);
+  const dateDisplay = date.iso
+    ? formatLocalizedLongDate(date.iso, locale, date.display)
+    : date.display;
 
   return (
     <RsvpPage
@@ -67,7 +71,7 @@ export default async function ConfirmarPage({ params }: Props) {
       eventType={(invitation.eventType as InvitationEventType) ?? "wedding"}
       bride={couple.bride}
       groom={couple.groom}
-      dateDisplay={date.display}
+      dateDisplay={dateDisplay}
       deadline={rsvp.deadline}
       deadlinePassed={deadlinePassed}
       showEmail={shouldShowRsvpEmail(rsvp)}
