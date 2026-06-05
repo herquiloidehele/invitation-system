@@ -15,7 +15,7 @@ import type {
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import {
   resolveCelebrationPalette,
   resolveCoinGlitterPalette,
@@ -71,6 +71,7 @@ export default function ScratchDateReveal({
   scrimOpacity,
   imageSettings,
 }: ScratchDateRevealProps) {
+  const t = useCustomText(customTexts);
   const titleOverride = resolveTextElementOverride(textStyles, "sectionTitles");
   const labelsOverride = resolveTextElementOverride(textStyles, "labels");
   const dateDayOverride = resolveTextElementOverride(textStyles, "dateDay");
@@ -223,7 +224,7 @@ export default function ScratchDateReveal({
         }}
       >
         <EditableText elementKey="sectionTitles">
-          {t(customTexts, "scratch_title")}
+          {t("scratch_title")}
         </EditableText>
       </h2>
       {/* Decorative gold rule */}
@@ -248,7 +249,7 @@ export default function ScratchDateReveal({
         }}
       >
         <EditableText elementKey="labels">
-          {t(customTexts, "scratch_subtitle")}
+          {t("scratch_subtitle")}
         </EditableText>
       </p>
 
@@ -260,7 +261,7 @@ export default function ScratchDateReveal({
           contentOverride={dateDayOverride}
           content={date.day || "—"}
           contentElementKey="dateDay"
-          subLabel={t(customTexts, "saveDate_dayLabel")}
+          subLabel={t("saveDate_dayLabel")}
           subLabelOverride={labelsOverride}
           theme={theme}
           glitterColors={glitterColors}
@@ -273,7 +274,7 @@ export default function ScratchDateReveal({
           contentOverride={dateMonthOverride}
           content={monthShort || "—"}
           contentElementKey="dateMonth"
-          subLabel={t(customTexts, "saveDate_monthLabel")}
+          subLabel={t("saveDate_monthLabel")}
           subLabelOverride={labelsOverride}
           theme={theme}
           glitterColors={glitterColors}
@@ -286,7 +287,7 @@ export default function ScratchDateReveal({
           contentOverride={dateYearOverride}
           content={date.year || "—"}
           contentElementKey="dateYear"
-          subLabel={t(customTexts, "saveDate_yearLabel")}
+          subLabel={t("saveDate_yearLabel")}
           subLabelOverride={labelsOverride}
           theme={theme}
           glitterColors={glitterColors}

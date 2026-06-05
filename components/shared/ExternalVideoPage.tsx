@@ -20,7 +20,7 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import RSVPModal from "@/components/shared/RSVPModal";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 
 export interface ExternalVideoPageHandle {
   play: () => void;
@@ -46,6 +46,7 @@ const ExternalVideoPage = forwardRef<
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
+  const t = useCustomText(invitation.customTexts);
 
   // Check localStorage on mount to update button label
   useEffect(() => {
@@ -157,8 +158,8 @@ const ExternalVideoPage = forwardRef<
               >
                 <Heart size={17} strokeWidth={1.5} />
                 {rsvpSubmitted
-                  ? t(invitation.customTexts, "cta_confirmedButton")
-                  : t(invitation.customTexts, "cta_confirmButton")}
+                  ? t("cta_confirmedButton")
+                  : t("cta_confirmButton")}
               </button>
             </motion.div>
           )}

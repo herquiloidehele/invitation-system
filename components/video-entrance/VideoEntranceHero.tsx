@@ -17,7 +17,7 @@ import type {
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveTextElementOverride,
@@ -105,7 +105,8 @@ export default function VideoEntranceHero({
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const revealThreshold = resolveHeroRevealSeconds(revealSeconds);
-  const tapLabel = t(customTexts, "curtain_tapToOpen");
+  const t = useCustomText(customTexts);
+  const tapLabel = t("curtain_tapToOpen");
   const heroVideoOn =
     typeof videoUrl === "string" && videoUrl.trim().length > 0;
 

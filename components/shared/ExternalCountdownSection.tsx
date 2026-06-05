@@ -8,6 +8,7 @@ import {
   type CountdownTimeLeft,
   formatCountdownValue,
 } from "@/lib/countdown";
+import { useCustomText } from "@/lib/custom-texts";
 import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { resolveTextStyles } from "@/lib/text-styles";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
@@ -16,13 +17,6 @@ import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-const DEFAULT_TITLE = "Contagem Decrescente";
-const DEFAULT_SUBTITLE = "Até ao nosso grande dia";
-const DEFAULT_DAYS = "DIAS";
-const DEFAULT_HOURS = "HORAS";
-const DEFAULT_MINUTES = "MINUTOS";
-const DEFAULT_SECONDS = "SEGUNDOS";
 
 interface ExternalCountdownSectionProps {
   invitation: InvitationData;
@@ -35,6 +29,7 @@ export default function ExternalCountdownSection({
 }: ExternalCountdownSectionProps) {
   const config = invitation.countdown;
   const ts = resolveTextStyles(theme, invitation.textStyles);
+  const t = useCustomText(invitation.customTexts);
   const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft | null>(null);
 
   useEffect(() => {
@@ -80,15 +75,21 @@ export default function ExternalCountdownSection({
     timeLeft.seconds === 0;
 
   const units = [
-    { value: displayTimeLeft.days, label: config.daysLabel || DEFAULT_DAYS },
-    { value: displayTimeLeft.hours, label: config.hoursLabel || DEFAULT_HOURS },
+    {
+      value: displayTimeLeft.days,
+      label: config.daysLabel || t("saveDate_days").toUpperCase(),
+    },
+    {
+      value: displayTimeLeft.hours,
+      label: config.hoursLabel || t("saveDate_hours").toUpperCase(),
+    },
     {
       value: displayTimeLeft.minutes,
-      label: config.minutesLabel || DEFAULT_MINUTES,
+      label: config.minutesLabel || t("saveDate_minutes").toUpperCase(),
     },
     {
       value: displayTimeLeft.seconds,
-      label: config.secondsLabel || DEFAULT_SECONDS,
+      label: config.secondsLabel || t("saveDate_seconds").toUpperCase(),
     },
   ];
 
@@ -130,13 +131,13 @@ export default function ExternalCountdownSection({
       >
         <h2 style={ts.externalCountdownTitle}>
           <EditableText elementKey="externalCountdownTitle">
-            {config.title || DEFAULT_TITLE}
+            {config.title || t("countdown_defaultTitle")}
           </EditableText>
         </h2>
 
         <p className="mt-2" style={ts.externalCountdownSubtitle}>
           <EditableText elementKey="externalCountdownSubtitle">
-            {config.subtitle || DEFAULT_SUBTITLE}
+            {config.subtitle || t("countdown_defaultSubtitle")}
           </EditableText>
         </p>
 
@@ -147,7 +148,7 @@ export default function ExternalCountdownSection({
           >
             <p style={ts.externalCountdownCelebrationTitle}>
               <EditableText elementKey="externalCountdownCelebrationTitle">
-                Hoje é o grande dia!
+                {t("saveDate_celebrationTitle")}
               </EditableText>
             </p>
           </div>

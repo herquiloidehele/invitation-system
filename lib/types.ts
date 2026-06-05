@@ -551,6 +551,45 @@ export interface CustomTexts {
   guestCard_tableLabel?: string;
   guestCard_noteLabel?: string;
   guestCard_inviteButton?: string;
+
+  // -- Calendar event copy --
+  calendar_weddingTitle?: string;
+  calendar_genericTitle?: string;
+  calendar_weddingDetails?: string;
+  calendar_genericDetails?: string;
+
+  // -- InviteOthers modal --
+  invite_modalTitle?: string;
+  invite_modalSubtitle?: string;
+  invite_nameLabel?: string;
+  invite_companionLabel?: string;
+  invite_submitButton?: string;
+  invite_successTitle?: string;
+  invite_shareLinkPrefix?: string;
+  invite_addAnother?: string;
+  invite_nameRequired?: string;
+  invite_genericError?: string;
+  invite_unknownError?: string;
+  invite_linkCopied?: string;
+  invite_copyFailed?: string;
+
+  // -- Countdown defaults --
+  countdown_defaultTitle?: string;
+  countdown_defaultSubtitle?: string;
+
+  // -- Envelope --
+  envelope_topFlapAlt?: string;
+
+  // -- RSVP validation --
+  rsvp_nameRequired?: string;
+  rsvp_invalidEmail?: string;
+  rsvp_selectOption?: string;
+  rsvp_deadlineClosedTitle?: string;
+  rsvp_deadlineClosedMessage?: string;
+  rsvp_deadlineDatePrefix?: string;
+
+  // -- Common --
+  common_close?: string;
 }
 
 export interface InvitationData {

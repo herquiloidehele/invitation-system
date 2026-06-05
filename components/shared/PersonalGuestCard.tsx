@@ -11,7 +11,7 @@ import type {
   TextStyleOverrides,
 } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import InviteOthersModal from "./InviteOthersModal";
 import { EditableText } from "./EditableText";
 
@@ -43,6 +43,7 @@ export default function PersonalGuestCard({
   customTexts,
 }: PersonalGuestCardProps) {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const t = useCustomText(customTexts);
 
   return (
     <>
@@ -70,7 +71,7 @@ export default function PersonalGuestCard({
             }}
           >
             <EditableText elementKey="guestCardLabel">
-              {t(customTexts, "guestCard_label")}
+              {t("guestCard_label")}
             </EditableText>
           </p>
 
@@ -121,7 +122,7 @@ export default function PersonalGuestCard({
               {guest.tableLabel && (
                 <InfoPill
                   icon={<Users className="size-3.5" />}
-                  label={t(customTexts, "guestCard_tableLabel")}
+                  label={t("guestCard_tableLabel")}
                   value={guest.tableLabel}
                   theme={theme}
                   textStyles={textStyles}
@@ -130,7 +131,7 @@ export default function PersonalGuestCard({
               {guest.note && (
                 <InfoPill
                   icon={<MessageCircle className="size-3.5" />}
-                  label={t(customTexts, "guestCard_noteLabel")}
+                  label={t("guestCard_noteLabel")}
                   value={guest.note}
                   theme={theme}
                   textStyles={textStyles}
@@ -158,7 +159,7 @@ export default function PersonalGuestCard({
             >
               <UserPlus className="size-3.5" />
               <EditableText elementKey="guestCardInviteButton">
-                {t(customTexts, "guestCard_inviteButton")}
+                {t("guestCard_inviteButton")}
               </EditableText>
             </button>
           )}
@@ -170,6 +171,7 @@ export default function PersonalGuestCard({
         onClose={() => setInviteModalOpen(false)}
         inviterToken={guest.token}
         theme={theme}
+        customTexts={customTexts}
       />
     </>
   );

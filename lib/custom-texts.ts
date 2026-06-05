@@ -1,106 +1,51 @@
+import { useTranslations } from "next-intl";
+
 import type { CustomTexts } from "./types";
 
 // ---------------------------------------------------------------------------
-// Default Portuguese texts for every customisable UI string.
-// These are the built-in fallbacks used when an invitation does not override
-// a given key in its `customTexts` JSON column.
+// Locale-aware resolvers.
+//
+// The Invitation chrome strings live in `messages/{pt,en,es}.json` under
+// the `Invitation` namespace. A per-invitation `customTexts` JSON column
+// can override any key. Resolution order:
+//   1. customTexts[key]  (per-invitation override; truthy)
+//   2. messages[locale].Invitation[key]  (locale default)
+//   3. key  (next-intl loud-fail; surfaces missing keys in dev)
 // ---------------------------------------------------------------------------
 
-export const DEFAULT_TEXTS: Required<CustomTexts> = {
-  // -- Section Titles --
-  sectionTitle_ourStory: "Nossa História",
-  sectionTitle_schedule: "Programação",
-  sectionTitle_location: "Localização",
-  sectionTitle_dressCode: "Dress Code",
-  sectionTitle_giftRegistry: "Presentes",
-  sectionTitle_guestGuide: "Manual do \n Bom Convidado",
-  sectionTitle_faqs: "Perguntas Frequentes",
+type IntlT = (key: string, values?: Record<string, string>) => string;
 
-  // -- CTA / Buttons --
-  cta_confirmLabel: "RSVP",
-  cta_confirmButton: "Confirmar Presença",
-  cta_confirmedButton: "Presença Confirmada",
-  cta_giftLink: "Ver lista",
-  cta_openMap: "Abrir no Mapa",
-  cta_addToCalendar: "+ Adicionar ao Calendário",
-
-  // -- Save the Date --
-  saveDate_label: "Save the Date",
-  saveDate_celebrationTitle: "Hoje é o grande dia!",
-  saveDate_days: "Dias",
-  saveDate_hours: "Horas",
-  saveDate_minutes: "Minutos",
-  saveDate_seconds: "Segundos",
-  saveDate_dayLabel: "Dia",
-  saveDate_monthLabel: "Mês",
-  saveDate_yearLabel: "Ano",
-  saveDate_dayOfWeekLabel: "Dia da Semana",
-
-  // -- Hero --
-  hero_inviteLabel: "Convidam para o seu casamento",
-
-  // -- RSVP Modal: Form --
-  rsvp_modalTitle: "Confirmar Presença",
-  rsvp_nameLabel: "Nome(s) *",
-  rsvp_namePlaceholder: "Nome do(s) Convidados(s)",
-  rsvp_emailLabel: "Email",
-  rsvp_emailPlaceholder: "seu@email.com",
-  rsvp_attendingLabel: "Irá comparecer? *",
-  rsvp_attendingYes: "Sim, estarei lá!",
-  rsvp_attendingNo: "Não poderei ir",
-  rsvp_dietaryLabel: "Restrições alimentares",
-  rsvp_dietaryPlaceholder: "Vegetariano, sem glúten…",
-  rsvp_messageLabel: "Mensagem",
-  rsvp_messagePlaceholder: "Deixe uma mensagem especial…",
-
-  // -- RSVP Modal: States & Actions --
-  rsvp_deadlinePrefix: "Confirme até",
-  rsvp_submitButton: "Confirmar",
-  rsvp_submitting: "Enviando…",
-  rsvp_successTitle: "Obrigado!",
-  rsvp_successMessage: "Sua confirmação foi registrada com sucesso.",
-  rsvp_alreadyTitle: "Presença já confirmada!",
-  rsvp_alreadyMessage: "Você já enviou sua confirmação para este evento.",
-  rsvp_errorTitle: "Erro ao enviar",
-  rsvp_errorMessage: "Tente novamente em alguns instantes.",
-  rsvp_retryButton: "Tentar novamente",
-  rsvp_closeButton: "Fechar",
-
-  // -- Curtain-Canva Template --
-  curtain_tapToOpen: "Toque para abrir",
-  scratch_title: "Revele",
-  scratch_subtitle: "Raspe para descobrir a data",
-
-  // -- Misc --
-  map_unavailableOffline: "Mapa indisponível offline",
-
-  // -- Personal Guest Card --
-  guestCard_label: "— Convite Pessoal —",
-  guestCard_tableLabel: "Mesa",
-  guestCard_noteLabel: "Nota",
-  guestCard_inviteButton: "Convidar mais pessoas",
-};
-
-// ---------------------------------------------------------------------------
-// Helper — resolve a single text key with fallback to default.
-// ---------------------------------------------------------------------------
+/** Client hook — returns a resolver bound to the current request locale. */
+export function useCustomText(
+  customTexts: CustomTexts | undefined | null,
+): (key: keyof CustomTexts, values?: Record<string, string>) => string {
+  const tn = useTranslations("Invitation");
+  return (key, values) => {
+    const override = customTexts?.[key];
+    if (override) return override;
+    return tn(key, values);
+  };
+}
 
 /**
- * Resolve a customisable text string.
- *
- * @param customTexts  The per-invitation overrides (may be undefined/null).
- * @param key          The key to look up.
- * @returns            The custom value if set, otherwise the built-in default.
+ * Server-side equivalent. Caller resolves the `t` function once via
+ * `getTranslations("Invitation")` and passes it in.
  */
-export function t(
+export function getCustomText(
   customTexts: CustomTexts | undefined | null,
   key: keyof CustomTexts,
+  tn: IntlT,
+  values?: Record<string, string>,
 ): string {
-  return customTexts?.[key] || DEFAULT_TEXTS[key];
+  const override = customTexts?.[key];
+  if (override) return override;
+  return tn(key, values);
 }
 
 // ---------------------------------------------------------------------------
 // Metadata — human-readable labels & grouping for the admin form.
+// The admin form is Portuguese-only; placeholders carry the PT default
+// text the system would render if the field is left empty.
 // ---------------------------------------------------------------------------
 
 export interface CustomTextFieldMeta {
@@ -124,27 +69,27 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "sectionTitle_ourStory",
         label: "Nossa História",
-        placeholder: DEFAULT_TEXTS.sectionTitle_ourStory,
+        placeholder: "Nossa História",
       },
       {
         key: "sectionTitle_schedule",
         label: "Programação",
-        placeholder: DEFAULT_TEXTS.sectionTitle_schedule,
+        placeholder: "Programação",
       },
       {
         key: "sectionTitle_location",
         label: "Localização",
-        placeholder: DEFAULT_TEXTS.sectionTitle_location,
+        placeholder: "Localização",
       },
       {
         key: "sectionTitle_dressCode",
         label: "Dress Code",
-        placeholder: DEFAULT_TEXTS.sectionTitle_dressCode,
+        placeholder: "Dress Code",
       },
       {
         key: "sectionTitle_giftRegistry",
         label: "Presentes",
-        placeholder: DEFAULT_TEXTS.sectionTitle_giftRegistry,
+        placeholder: "Presentes",
       },
       {
         key: "sectionTitle_guestGuide",
@@ -154,7 +99,7 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "sectionTitle_faqs",
         label: "Perguntas Frequentes",
-        placeholder: DEFAULT_TEXTS.sectionTitle_faqs,
+        placeholder: "Perguntas Frequentes",
       },
     ],
   },
@@ -165,7 +110,7 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "hero_inviteLabel",
         label: "Frase de convite",
-        placeholder: DEFAULT_TEXTS.hero_inviteLabel,
+        placeholder: "Convidam para o seu casamento",
       },
     ],
   },
@@ -176,32 +121,32 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "cta_confirmLabel",
         label: "Label de confirmação",
-        placeholder: DEFAULT_TEXTS.cta_confirmLabel,
+        placeholder: "RSVP",
       },
       {
         key: "cta_confirmButton",
         label: "Botão confirmar",
-        placeholder: DEFAULT_TEXTS.cta_confirmButton,
+        placeholder: "Confirmar Presença",
       },
       {
         key: "cta_confirmedButton",
         label: "Botão já confirmado",
-        placeholder: DEFAULT_TEXTS.cta_confirmedButton,
+        placeholder: "Presença Confirmada",
       },
       {
         key: "cta_giftLink",
         label: "Link presentes",
-        placeholder: DEFAULT_TEXTS.cta_giftLink,
+        placeholder: "Ver lista",
       },
       {
         key: "cta_openMap",
         label: "Abrir mapa",
-        placeholder: DEFAULT_TEXTS.cta_openMap,
+        placeholder: "Abrir no Mapa",
       },
       {
         key: "cta_addToCalendar",
         label: "Adicionar ao calendário",
-        placeholder: DEFAULT_TEXTS.cta_addToCalendar,
+        placeholder: "+ Adicionar ao Calendário",
       },
     ],
   },
@@ -212,52 +157,52 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "saveDate_label",
         label: "Título Save the Date",
-        placeholder: DEFAULT_TEXTS.saveDate_label,
+        placeholder: "Save the Date",
       },
       {
         key: "saveDate_celebrationTitle",
         label: "Título do grande dia",
-        placeholder: DEFAULT_TEXTS.saveDate_celebrationTitle,
+        placeholder: "Hoje é o grande dia!",
       },
       {
         key: "saveDate_days",
         label: "Dias",
-        placeholder: DEFAULT_TEXTS.saveDate_days,
+        placeholder: "Dias",
       },
       {
         key: "saveDate_hours",
         label: "Horas",
-        placeholder: DEFAULT_TEXTS.saveDate_hours,
+        placeholder: "Horas",
       },
       {
         key: "saveDate_minutes",
         label: "Minutos",
-        placeholder: DEFAULT_TEXTS.saveDate_minutes,
+        placeholder: "Minutos",
       },
       {
         key: "saveDate_seconds",
         label: "Segundos",
-        placeholder: DEFAULT_TEXTS.saveDate_seconds,
+        placeholder: "Segundos",
       },
       {
         key: "saveDate_dayLabel",
         label: "Label dia",
-        placeholder: DEFAULT_TEXTS.saveDate_dayLabel,
+        placeholder: "Dia",
       },
       {
         key: "saveDate_monthLabel",
         label: "Label mês",
-        placeholder: DEFAULT_TEXTS.saveDate_monthLabel,
+        placeholder: "Mês",
       },
       {
         key: "saveDate_yearLabel",
         label: "Label ano",
-        placeholder: DEFAULT_TEXTS.saveDate_yearLabel,
+        placeholder: "Ano",
       },
       {
         key: "saveDate_dayOfWeekLabel",
         label: "Label dia da semana",
-        placeholder: DEFAULT_TEXTS.saveDate_dayOfWeekLabel,
+        placeholder: "Dia da Semana",
       },
     ],
   },
@@ -268,62 +213,62 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "rsvp_modalTitle",
         label: "Título do modal",
-        placeholder: DEFAULT_TEXTS.rsvp_modalTitle,
+        placeholder: "Confirmar Presença",
       },
       {
         key: "rsvp_nameLabel",
         label: "Label nome",
-        placeholder: DEFAULT_TEXTS.rsvp_nameLabel,
+        placeholder: "Nome(s) *",
       },
       {
         key: "rsvp_namePlaceholder",
         label: "Placeholder nome",
-        placeholder: DEFAULT_TEXTS.rsvp_namePlaceholder,
+        placeholder: "Nome do(s) Convidados(s)",
       },
       {
         key: "rsvp_emailLabel",
         label: "Label email",
-        placeholder: DEFAULT_TEXTS.rsvp_emailLabel,
+        placeholder: "Email",
       },
       {
         key: "rsvp_emailPlaceholder",
         label: "Placeholder email",
-        placeholder: DEFAULT_TEXTS.rsvp_emailPlaceholder,
+        placeholder: "seu@email.com",
       },
       {
         key: "rsvp_attendingLabel",
         label: "Pergunta de comparecimento",
-        placeholder: DEFAULT_TEXTS.rsvp_attendingLabel,
+        placeholder: "Irá comparecer? *",
       },
       {
         key: "rsvp_attendingYes",
         label: "Opção sim",
-        placeholder: DEFAULT_TEXTS.rsvp_attendingYes,
+        placeholder: "Sim, estarei lá!",
       },
       {
         key: "rsvp_attendingNo",
         label: "Opção não",
-        placeholder: DEFAULT_TEXTS.rsvp_attendingNo,
+        placeholder: "Não poderei ir",
       },
       {
         key: "rsvp_dietaryLabel",
         label: "Label restrições",
-        placeholder: DEFAULT_TEXTS.rsvp_dietaryLabel,
+        placeholder: "Restrições alimentares",
       },
       {
         key: "rsvp_dietaryPlaceholder",
         label: "Placeholder restrições",
-        placeholder: DEFAULT_TEXTS.rsvp_dietaryPlaceholder,
+        placeholder: "Vegetariano, sem glúten…",
       },
       {
         key: "rsvp_messageLabel",
         label: "Label mensagem",
-        placeholder: DEFAULT_TEXTS.rsvp_messageLabel,
+        placeholder: "Mensagem",
       },
       {
         key: "rsvp_messagePlaceholder",
         label: "Placeholder mensagem",
-        placeholder: DEFAULT_TEXTS.rsvp_messagePlaceholder,
+        placeholder: "Deixe uma mensagem especial…",
       },
     ],
   },
@@ -334,57 +279,57 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "rsvp_deadlinePrefix",
         label: "Prefixo do prazo",
-        placeholder: DEFAULT_TEXTS.rsvp_deadlinePrefix,
+        placeholder: "Confirme até",
       },
       {
         key: "rsvp_submitButton",
         label: "Botão enviar",
-        placeholder: DEFAULT_TEXTS.rsvp_submitButton,
+        placeholder: "Confirmar",
       },
       {
         key: "rsvp_submitting",
         label: "Texto enviando",
-        placeholder: DEFAULT_TEXTS.rsvp_submitting,
+        placeholder: "Enviando…",
       },
       {
         key: "rsvp_successTitle",
         label: "Título sucesso",
-        placeholder: DEFAULT_TEXTS.rsvp_successTitle,
+        placeholder: "Obrigado!",
       },
       {
         key: "rsvp_successMessage",
         label: "Mensagem sucesso",
-        placeholder: DEFAULT_TEXTS.rsvp_successMessage,
+        placeholder: "Sua confirmação foi registrada com sucesso.",
       },
       {
         key: "rsvp_alreadyTitle",
         label: "Título já confirmado",
-        placeholder: DEFAULT_TEXTS.rsvp_alreadyTitle,
+        placeholder: "Presença já confirmada!",
       },
       {
         key: "rsvp_alreadyMessage",
         label: "Mensagem já confirmado",
-        placeholder: DEFAULT_TEXTS.rsvp_alreadyMessage,
+        placeholder: "Você já enviou sua confirmação para este evento.",
       },
       {
         key: "rsvp_errorTitle",
         label: "Título erro",
-        placeholder: DEFAULT_TEXTS.rsvp_errorTitle,
+        placeholder: "Erro ao enviar",
       },
       {
         key: "rsvp_errorMessage",
         label: "Mensagem erro",
-        placeholder: DEFAULT_TEXTS.rsvp_errorMessage,
+        placeholder: "Tente novamente em alguns instantes.",
       },
       {
         key: "rsvp_retryButton",
         label: "Botão tentar novamente",
-        placeholder: DEFAULT_TEXTS.rsvp_retryButton,
+        placeholder: "Tentar novamente",
       },
       {
         key: "rsvp_closeButton",
         label: "Botão fechar",
-        placeholder: DEFAULT_TEXTS.rsvp_closeButton,
+        placeholder: "Fechar",
       },
     ],
   },
@@ -395,7 +340,7 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "map_unavailableOffline",
         label: "Mapa indisponível",
-        placeholder: DEFAULT_TEXTS.map_unavailableOffline,
+        placeholder: "Mapa indisponível offline",
       },
     ],
   },
@@ -406,22 +351,22 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "guestCard_label",
         label: "Etiqueta do convite",
-        placeholder: DEFAULT_TEXTS.guestCard_label,
+        placeholder: "— Convite Pessoal —",
       },
       {
         key: "guestCard_tableLabel",
         label: "Label da mesa",
-        placeholder: DEFAULT_TEXTS.guestCard_tableLabel,
+        placeholder: "Mesa",
       },
       {
         key: "guestCard_noteLabel",
         label: "Label da nota",
-        placeholder: DEFAULT_TEXTS.guestCard_noteLabel,
+        placeholder: "Nota",
       },
       {
         key: "guestCard_inviteButton",
         label: "Botão convidar mais",
-        placeholder: DEFAULT_TEXTS.guestCard_inviteButton,
+        placeholder: "Convidar mais pessoas",
       },
     ],
   },

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ExportButtonProps {
   token: string;
@@ -11,6 +12,7 @@ interface ExportButtonProps {
 export function ExportButton({ token, filename }: ExportButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("OwnerConfirmations");
 
   async function handleExport() {
     setLoading(true);
@@ -18,7 +20,9 @@ export function ExportButton({ token, filename }: ExportButtonProps) {
     try {
       const res = await fetch(`/api/export/rsvps/${token}`);
       if (!res.ok) {
-        throw new Error(`Erro ao gerar PDF (${res.status})`);
+        throw new Error(
+          t("exportErrorStatus", { status: String(res.status) }),
+        );
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -30,7 +34,7 @@ export function ExportButton({ token, filename }: ExportButtonProps) {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro desconhecido");
+      setError(err instanceof Error ? err.message : t("exportErrorUnknown"));
     } finally {
       setLoading(false);
     }
@@ -48,7 +52,7 @@ export function ExportButton({ token, filename }: ExportButtonProps) {
         ) : (
           <Download className="size-4 text-stone-500" />
         )}
-        {loading ? "A gerar PDF…" : "Exportar"}
+        {loading ? t("exportLoading") : t("exportButton")}
       </button>
       {error && <p className="text-xs text-rose-600">{error}</p>}
     </div>

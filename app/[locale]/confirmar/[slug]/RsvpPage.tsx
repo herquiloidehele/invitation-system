@@ -5,20 +5,20 @@ import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
 import type { CustomTexts, InvitationEventType } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { useCustomText } from "@/lib/custom-texts";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 
 // ---------------------------------------------------------------------------
 // Schema — identical to RSVPModal
 // ---------------------------------------------------------------------------
 
-function createRsvpSchema(t: (key: string) => string) {
+function createRsvpSchema(t: (key: keyof CustomTexts) => string) {
   return z.object({
-    name: z.string().min(1, t("nameRequired")),
-    email: z.string().email(t("invalidEmail")).or(z.literal("")),
-    attending: z.enum(["yes", "no"], { error: t("selectOption") }),
+    name: z.string().min(1, t("rsvp_nameRequired")),
+    email: z.string().email(t("rsvp_invalidEmail")).or(z.literal("")),
+    attending: z.enum(["yes", "no"], { error: t("rsvp_selectOption") }),
     dietaryRestrictions: z.string(),
     message: z.string(),
   });
@@ -114,9 +114,8 @@ export default function RsvpPage({
   customTexts: ct,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
-  const rsvpT = useTranslations("RSVP");
-  const resolveText = (key: keyof CustomTexts) => ct?.[key] || rsvpT(key);
-  const rsvpSchema = createRsvpSchema(rsvpT);
+  const resolveText = useCustomText(ct);
+  const rsvpSchema = createRsvpSchema(resolveText);
 
   // Check localStorage on mount
   useEffect(() => {
@@ -252,12 +251,12 @@ export default function RsvpPage({
                 className="text-lg font-medium"
                 style={{ color: palette.text }}
               >
-                {rsvpT("deadlineClosedTitle")}
+                {resolveText("rsvp_deadlineClosedTitle")}
               </p>
               <p className="text-sm" style={{ color: palette.textSoft }}>
-                {rsvpT("deadlineClosedMessage", {
+                {resolveText("rsvp_deadlineClosedMessage", {
                   deadline: deadline
-                    ? rsvpT("deadlineDatePrefix", { deadline })
+                    ? resolveText("rsvp_deadlineDatePrefix", { deadline })
                     : "",
                 })}
               </p>

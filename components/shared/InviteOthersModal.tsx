@@ -8,20 +8,24 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import type { TemplateTheme } from "@/lib/types";
+import type { CustomTexts, TemplateTheme } from "@/lib/types";
+import { useCustomText } from "@/lib/custom-texts";
 
-const schema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  companion: z.string().optional(),
-});
+function createSchema(t: (key: keyof CustomTexts) => string) {
+  return z.object({
+    name: z.string().min(1, t("invite_nameRequired")),
+    companion: z.string().optional(),
+  });
+}
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = { name: string; companion?: string };
 
 interface InviteOthersModalProps {
   open: boolean;
   onClose: () => void;
   inviterToken: string;
   theme: TemplateTheme;
+  customTexts?: CustomTexts;
 }
 
 export default function InviteOthersModal({
@@ -29,7 +33,9 @@ export default function InviteOthersModal({
   onClose,
   inviterToken,
   theme,
+  customTexts,
 }: InviteOthersModalProps) {
+  const t = useCustomText(customTexts);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ name: string; url: string } | null>(
     null,
@@ -46,6 +52,7 @@ export default function InviteOthersModal({
     };
   }, []);
 
+  const schema = createSchema(t);
   const { register, handleSubmit, reset, formState } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { name: "", companion: "" },
@@ -65,14 +72,14 @@ export default function InviteOthersModal({
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Falha ao registar convidado");
+        throw new Error(err.error || t("invite_genericError"));
       }
       const data = await res.json();
       setResult({ name: data.guest.name, url: data.personalUrl });
       reset();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Erro desconhecido";
+        error instanceof Error ? error.message : t("invite_unknownError");
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -84,7 +91,7 @@ export default function InviteOthersModal({
     try {
       await navigator.clipboard.writeText(result.url);
       setCopied(true);
-      toast.success("Link copiado!");
+      toast.success(t("invite_linkCopied"));
       if (copyResetTimeoutRef.current) {
         clearTimeout(copyResetTimeoutRef.current);
       }
@@ -93,7 +100,7 @@ export default function InviteOthersModal({
         setCopied(false);
       }, 2000);
     } catch {
-      toast.error("Não foi possível copiar.");
+      toast.error(t("invite_copyFailed"));
     }
   }
 
@@ -130,7 +137,7 @@ export default function InviteOthersModal({
             <button
               type="button"
               onClick={handleClose}
-              aria-label="Fechar"
+              aria-label={t("common_close")}
               className="absolute right-4 top-4 text-stone-400 hover:text-stone-600"
             >
               <X className="size-5" />
@@ -142,11 +149,10 @@ export default function InviteOthersModal({
                   className="text-xl font-semibold text-stone-800"
                   style={{ fontFamily: theme.displayFont }}
                 >
-                  Convidar mais pessoas
+                  {t("invite_modalTitle")}
                 </h3>
                 <p className="mt-1 text-sm text-stone-500">
-                  Adiciona o nome dos convidados extra. Receberás um link
-                  pessoal para partilhar com cada um.
+                  {t("invite_modalSubtitle")}
                 </p>
 
                 <form
@@ -155,7 +161,7 @@ export default function InviteOthersModal({
                 >
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold uppercase tracking-widest text-stone-600">
-                      Nome *
+                      {t("invite_nameLabel")}
                     </label>
                     <input
                       {...register("name")}
@@ -171,7 +177,7 @@ export default function InviteOthersModal({
 
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold uppercase tracking-widest text-stone-600">
-                      Acompanhante
+                      {t("invite_companionLabel")}
                     </label>
                     <input
                       {...register("companion")}
@@ -190,7 +196,7 @@ export default function InviteOthersModal({
                     }}
                   >
                     {submitting && <Loader2 className="size-4 animate-spin" />}
-                    Adicionar convidado
+                    {t("invite_submitButton")}
                   </button>
                 </form>
               </>
@@ -201,11 +207,11 @@ export default function InviteOthersModal({
                     <Check className="size-5" />
                   </div>
                   <h3 className="text-xl font-semibold text-stone-800">
-                    Convidado adicionado!
+                    {t("invite_successTitle")}
                   </h3>
                 </div>
                 <p className="mt-3 text-sm text-stone-500">
-                  Partilha este link pessoal com{" "}
+                  {t("invite_shareLinkPrefix")}{" "}
                   <strong>{result.name}</strong>:
                 </p>
 
@@ -236,7 +242,7 @@ export default function InviteOthersModal({
                   onClick={() => setResult(null)}
                   className="mt-5 w-full rounded-full border px-4 py-2.5 text-sm hover:bg-stone-50"
                 >
-                  Adicionar outro convidado
+                  {t("invite_addAnother")}
                 </button>
               </>
             )}

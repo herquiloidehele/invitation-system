@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import type { ImageSettingsMap, TemplateTheme } from "@/lib/types";
 import { getImageStyle } from "@/lib/image-settings";
 import { getCoverBackgroundStyle } from "@/lib/envelope-cover-background";
@@ -81,6 +82,7 @@ function TopFlap({
   image: string;
   imgStyle?: React.CSSProperties;
 }) {
+  const t = useTranslations("Invitation");
   return (
     <>
       <motion.div
@@ -168,7 +170,7 @@ function TopFlap({
           src={image}
           width={500}
           height={500}
-          alt={"Top Envelop Flap"}
+          alt={t("envelope_topFlapAlt")}
           className={"w-full h-full object-cover object-bottom"}
           style={{
             backfaceVisibility: "hidden",
@@ -190,6 +192,7 @@ function BottomFlap({
   image: string;
   imgStyle?: React.CSSProperties;
 }) {
+  const t = useTranslations("Invitation");
   return (
     <motion.div
       className="absolute bottom-0 left-0 w-full origin-top flex items-end"
@@ -210,7 +213,7 @@ function BottomFlap({
         src={image}
         width={500}
         height={500}
-        alt={"Top Envelop Flap"}
+        alt={t("envelope_topFlapAlt")}
         className={"w-full h-full object-cover object-top"}
         style={{ height: "calc(100% + 10vh)", ...imgStyle }}
       />

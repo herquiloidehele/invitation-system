@@ -37,7 +37,7 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
-import { t } from "@/lib/custom-texts";
+import { useCustomText } from "@/lib/custom-texts";
 import { EditableCard } from "./EditableCard";
 import { EditableText } from "./EditableText";
 import ScheduleItem from "./ScheduleItem";
@@ -322,6 +322,7 @@ export default function ScheduleSection({
 }: ScheduleSectionProps) {
   const resolvedStyle =
     scheduleStyle === "illustrated" ? "illustrated" : "default";
+  const t = useCustomText(customTexts);
 
   return (
     <>
@@ -347,7 +348,7 @@ export default function ScheduleSection({
           <span style={ts.sectionTitles}>
             <EditableText elementKey="sectionTitles">
               <WordReveal
-                text={t(customTexts, "sectionTitle_schedule")}
+                text={t("sectionTitle_schedule")}
                 isPreview={isPreview}
               />
             </EditableText>
