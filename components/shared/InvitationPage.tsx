@@ -17,7 +17,10 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
+import { useLocale } from "next-intl";
+
 import { useCustomText } from "@/lib/custom-texts";
+import { formatLocalizedMonthLong } from "@/lib/date-format";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
 import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST } from "./PersonalGuestCard";
@@ -345,6 +348,12 @@ export default function InvitationPage({
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const t = useCustomText(invitation.customTexts);
+  const locale = useLocale();
+  const footerMonthDisplay = formatLocalizedMonthLong(
+    invitation.date.iso,
+    locale,
+    invitation.date.month,
+  );
 
   const { trackEvent } = useAnalytics(invitation.slug);
 
@@ -1148,7 +1157,7 @@ export default function InvitationPage({
           {/* Date */}
           <span className="mt-4" style={ts.footerDate}>
             <EditableText elementKey="footerDate">
-              {invitation.date.day} &middot; {invitation.date.month} &middot;{" "}
+              {invitation.date.day} &middot; {footerMonthDisplay} &middot;{" "}
               {invitation.date.year}
             </EditableText>
           </span>

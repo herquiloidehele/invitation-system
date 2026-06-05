@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import type {
   CustomTexts,
   ImageSettingsMap,
@@ -18,6 +19,10 @@ import {
   formatCountdownValue,
   type CountdownTimeLeft,
 } from "@/lib/countdown";
+import {
+  formatLocalizedDayOfWeek,
+  formatLocalizedMonthLong,
+} from "@/lib/date-format";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import CalendarButton from "./CalendarButton";
 import { EditableText } from "./EditableText";
@@ -131,6 +136,17 @@ function SaveTheDateClassic({
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
+  const locale = useLocale();
+  const monthDisplay = formatLocalizedMonthLong(
+    invitation.date.iso,
+    locale,
+    invitation.date.month,
+  );
+  const dayOfWeekDisplay = formatLocalizedDayOfWeek(
+    invitation.date.iso,
+    locale,
+    invitation.date.dayOfWeek,
+  );
   const classicCascade = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
@@ -181,7 +197,7 @@ function SaveTheDateClassic({
         variants={classicItem}
       >
         <EditableText elementKey="dateMonth">
-          {invitation.date.month}
+          {monthDisplay}
         </EditableText>
       </motion.span>
 
@@ -197,7 +213,7 @@ function SaveTheDateClassic({
       {/* Day of week + time */}
       <motion.span style={ts.dateTime} variants={classicItem}>
         <EditableText elementKey="dateTime">
-          {invitation.date.dayOfWeek} &middot; {invitation.date.time}
+          {dayOfWeekDisplay} &middot; {invitation.date.time}
         </EditableText>
       </motion.span>
 
@@ -288,6 +304,17 @@ function SaveTheDateCountdown({
   isPreview,
 }: SaveTheDateProps) {
   const t = useCustomText(ct);
+  const locale = useLocale();
+  const monthDisplay = formatLocalizedMonthLong(
+    invitation.date.iso,
+    locale,
+    invitation.date.month,
+  );
+  const dayOfWeekDisplay = formatLocalizedDayOfWeek(
+    invitation.date.iso,
+    locale,
+    invitation.date.dayOfWeek,
+  );
   const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft>(() =>
     computeCountdownTimeLeft(invitation.date.iso, invitation.date.time),
   );
@@ -332,7 +359,7 @@ function SaveTheDateCountdown({
       {/* Date context */}
       <span className="mt-3" style={ts.countdownDate}>
         <EditableText elementKey="countdownDate">
-          {invitation.date.day} · {invitation.date.month} ·{" "}
+          {invitation.date.day} · {monthDisplay} ·{" "}
           {invitation.date.year}
         </EditableText>
       </span>
@@ -344,7 +371,7 @@ function SaveTheDateCountdown({
         }}
       >
         <EditableText elementKey="countdownWeekday">
-          {invitation.date.dayOfWeek} &middot; {invitation.date.time}
+          {dayOfWeekDisplay} &middot; {invitation.date.time}
         </EditableText>
       </span>
 
@@ -510,6 +537,17 @@ function SaveTheDateQuadCards({
   isPreview,
 }: SaveTheDateProps) {
   const t = useCustomText(ct);
+  const locale = useLocale();
+  const monthDisplay = formatLocalizedMonthLong(
+    invitation.date.iso,
+    locale,
+    invitation.date.month,
+  );
+  const dayOfWeekDisplay = formatLocalizedDayOfWeek(
+    invitation.date.iso,
+    locale,
+    invitation.date.dayOfWeek,
+  );
   return (
     <div className="flex flex-col items-center gap-4">
       {/* Header label */}
@@ -536,7 +574,7 @@ function SaveTheDateQuadCards({
         />
         <QuadCard
           label={t("saveDate_monthLabel")}
-          value={invitation.date.month}
+          value={monthDisplay}
           theme={theme}
           ts={ts}
           delay={0.1}
@@ -556,7 +594,7 @@ function SaveTheDateQuadCards({
         />
         <QuadCard
           label={t("saveDate_dayOfWeekLabel")}
-          value={invitation.date.dayOfWeek}
+          value={dayOfWeekDisplay}
           theme={theme}
           ts={ts}
           delay={0.2}
@@ -608,6 +646,17 @@ function SaveTheDateCinematic({
   isPreview,
 }: SaveTheDateProps) {
   const t = useCustomText(ct);
+  const locale = useLocale();
+  const monthDisplay = formatLocalizedMonthLong(
+    invitation.date.iso,
+    locale,
+    invitation.date.month,
+  );
+  const dayOfWeekDisplay = formatLocalizedDayOfWeek(
+    invitation.date.iso,
+    locale,
+    invitation.date.dayOfWeek,
+  );
   const bgImage =
     invitation.cinematicImageUrl?.trim() || CINEMATIC_DEFAULT_IMAGE;
   const cinematicImgStyle = getImageStyle(imageSettings, "cinematicImage");
@@ -776,7 +825,7 @@ function SaveTheDateCinematic({
           <div className="flex flex-col items-center gap-0.5">
             <span style={ts.cinematicMonth}>
               <EditableText elementKey="cinematicMonth">
-                {invitation.date.month}
+                {monthDisplay}
               </EditableText>
             </span>
             <span style={ts.cinematicYear}>
@@ -798,7 +847,7 @@ function SaveTheDateCinematic({
           <div className="flex flex-col items-center gap-0.5">
             <span style={ts.cinematicDayOfWeek}>
               <EditableText elementKey="cinematicDayOfWeek">
-                {invitation.date.dayOfWeek}
+                {dayOfWeekDisplay}
               </EditableText>
             </span>
             <span style={ts.cinematicTime}>
@@ -861,6 +910,17 @@ function SaveTheDateMinimalLine({
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
+  const locale = useLocale();
+  const monthDisplay = formatLocalizedMonthLong(
+    invitation.date.iso,
+    locale,
+    invitation.date.month,
+  );
+  const dayOfWeekDisplay = formatLocalizedDayOfWeek(
+    invitation.date.iso,
+    locale,
+    invitation.date.dayOfWeek,
+  );
   return (
     <div className="flex flex-col items-center gap-5">
       {/* Top label */}
@@ -889,7 +949,7 @@ function SaveTheDateMinimalLine({
         <MinimalSeparator accent={ts.accent} delay={0} />
         <span style={ts.minimalMonth}>
           <EditableText elementKey="minimalMonth">
-            {invitation.date.month}
+            {monthDisplay}
           </EditableText>
         </span>
         <MinimalSeparator accent={ts.accent} delay={0.5} />
@@ -924,7 +984,7 @@ function SaveTheDateMinimalLine({
       >
         <span style={ts.minimalDayOfWeek}>
           <EditableText elementKey="minimalDayOfWeek">
-            {invitation.date.dayOfWeek}
+            {dayOfWeekDisplay}
           </EditableText>
         </span>
         <motion.span
