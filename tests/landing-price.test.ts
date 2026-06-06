@@ -18,7 +18,7 @@ describe("formatLandingPrice", () => {
 
 describe("resolveLandingPrice", () => {
   it("returns base-only price when there is no discount", () => {
-    expect(resolveLandingPrice(14900, null, "EUR")).toEqual({
+    expect(resolveLandingPrice(14900, null, "EUR")).toMatchObject({
       amountLabel: "Desde 149 €",
       originalLabel: null,
       discountPercent: null,
@@ -26,7 +26,7 @@ describe("resolveLandingPrice", () => {
   });
 
   it("returns struck original + sale price + percent for a valid discount", () => {
-    expect(resolveLandingPrice(20000, 15000, "EUR")).toEqual({
+    expect(resolveLandingPrice(20000, 15000, "EUR")).toMatchObject({
       amountLabel: "Desde 150 €",
       originalLabel: "200 €",
       discountPercent: 25,
@@ -41,12 +41,12 @@ describe("resolveLandingPrice", () => {
   });
 
   it("ignores a discount greater than or equal to the base", () => {
-    expect(resolveLandingPrice(10000, 10000, "EUR")).toEqual({
+    expect(resolveLandingPrice(10000, 10000, "EUR")).toMatchObject({
       amountLabel: "Desde 100 €",
       originalLabel: null,
       discountPercent: null,
     });
-    expect(resolveLandingPrice(10000, 12000, "EUR")).toEqual({
+    expect(resolveLandingPrice(10000, 12000, "EUR")).toMatchObject({
       amountLabel: "Desde 100 €",
       originalLabel: null,
       discountPercent: null,
@@ -65,6 +65,19 @@ describe("resolveLandingPrice", () => {
 
   it("returns null when both are absent", () => {
     expect(resolveLandingPrice(null, null, "EUR")).toBeNull();
+  });
+
+  it("exposes the prefix and bare amount for typographic styling", () => {
+    const discounted = resolveLandingPrice(20000, 15000, "EUR");
+    expect(discounted?.prefix).toBe("Desde");
+    expect(discounted?.amount).toBe(
+      discounted?.amountLabel.replace("Desde ", ""),
+    );
+    expect(discounted?.amountLabel).toBe(`Desde ${discounted?.amount}`);
+
+    const base = resolveLandingPrice(14900, null, "EUR");
+    expect(base?.prefix).toBe("Desde");
+    expect(base?.amount).toBe(base?.amountLabel.replace("Desde ", ""));
   });
 
   it("keeps two decimals for fractional amounts", () => {
