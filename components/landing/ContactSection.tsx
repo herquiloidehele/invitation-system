@@ -1,12 +1,21 @@
 "use client";
 
 import { FormEvent } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import {
   type ContactMessageFields,
   DISPLAY_WHATSAPP_NUMBER,
 } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
+import {
+  getMotionProps,
+  landingCardTap,
+  landingCardVariants,
+  landingItemVariants,
+  landingStaggerVariants,
+  shouldReduceMotion,
+} from "./landing-motion";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function ContactSection({
@@ -19,11 +28,16 @@ export function ContactSection({
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   const t = useTranslations("LandingContact");
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
 
   return (
     <AnimatedSection id="orcamento" className="bg-muted px-5 py-24 sm:px-8">
-      <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
-        <div>
+      <motion.div
+        {...getMotionProps(reduceMotion, landingStaggerVariants)}
+        className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2"
+      >
+        <motion.div variants={landingItemVariants}>
           <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           <h2 className="mt-6 text-4xl font-medium leading-[1.08] tracking-[-0.03em] text-foreground sm:text-5xl">
             {t("titleLine1")}
@@ -36,8 +50,9 @@ export function ContactSection({
             <p>WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
             <p>E-mail · ola@convites.brindealstudio.com</p>
           </div>
-        </div>
-        <form
+        </motion.div>
+        <motion.form
+          variants={landingCardVariants}
           onSubmit={onSubmit}
           className="rounded-[1.5rem] border border-border bg-card p-6 shadow-sm sm:p-9"
         >
@@ -66,14 +81,16 @@ export function ContactSection({
               placeholder={t("messagePlaceholder")}
             />
           </label>
-          <button
+          <motion.button
             type="submit"
+            whileHover={reduced ? undefined : { y: -2 }}
+            whileTap={reduced ? undefined : landingCardTap}
             className="mt-6 w-full rounded-full bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
           >
             {t("submit")}
-          </button>
-        </form>
-      </div>
+          </motion.button>
+        </motion.form>
+      </motion.div>
     </AnimatedSection>
   );
 }

@@ -1,3 +1,6 @@
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowUpRight,
   CheckCircle2,
@@ -8,6 +11,16 @@ import {
 import { useTranslations } from "next-intl";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
+import {
+  getMotionProps,
+  landingCardHover,
+  landingCardTap,
+  landingCardVariants,
+  landingFastTransition,
+  landingItemVariants,
+  landingStaggerVariants,
+  shouldReduceMotion,
+} from "./landing-motion";
 import { getProcessBadges, getProcessSteps } from "./landing-data";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -21,6 +34,8 @@ const STEP_ICONS: LucideIcon[] = [
 export function ProcessSection() {
   const t = useTranslations("LandingProcess");
   const landingT = useTranslations("Landing");
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
   const badges = getProcessBadges(t);
   const processSteps = getProcessSteps(t);
 
@@ -41,13 +56,19 @@ export function ProcessSection() {
             {t("body")}
           </p>
         </div>
-        <div className="mt-16 grid gap-5 lg:grid-cols-2">
+        <motion.div
+          {...getMotionProps(reduceMotion, landingStaggerVariants)}
+          className="mt-16 grid gap-5 lg:grid-cols-2"
+        >
           {processSteps.map(([number, title, text], index) => {
             const dark = index === 0;
 
             return (
-              <article
+              <motion.article
                 key={number}
+                variants={landingCardVariants}
+                whileHover={reduced ? undefined : landingCardHover}
+                whileTap={reduced ? undefined : landingCardTap}
                 className={`min-h-[320px] rounded-[1.5rem] p-7 shadow-[0_18px_55px_color-mix(in_srgb,var(--foreground)_5%,transparent)] sm:p-8 ${
                   dark
                     ? "bg-primary text-primary-foreground"
@@ -91,11 +112,11 @@ export function ProcessSection() {
                 >
                   • {badges[index]}
                 </span>
-                <ProcessPreview index={index} />
-              </article>
+                <ProcessPreview index={index} reduceMotion={reduceMotion} />
+              </motion.article>
             );
           })}
-        </div>
+        </motion.div>
         <div className="mt-14 flex flex-col items-center justify-center gap-5 text-center sm:flex-row">
           <p className="text-2xl font-medium text-foreground">
             {t("closing")}
@@ -114,35 +135,57 @@ export function ProcessSection() {
   );
 }
 
-function ProcessPreview({ index }: { index: number }) {
+function ProcessPreview({
+  index,
+  reduceMotion,
+}: {
+  index: number;
+  reduceMotion: boolean | null;
+}) {
   const t = useTranslations("LandingProcess");
+  const reduced = shouldReduceMotion(reduceMotion);
 
   if (index === 0) {
     return (
-      <div className="mt-6 space-y-2 rounded-2xl bg-primary-deep/85 p-4 text-xs text-primary-foreground">
-        <div className="flex items-end gap-2">
+      <motion.div
+        variants={landingItemVariants}
+        className="mt-6 space-y-2 rounded-2xl bg-primary-deep/85 p-4 text-xs text-primary-foreground"
+      >
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 8 }}
+          whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...landingFastTransition, delay: 0.1 }}
+          className="flex items-end gap-2"
+        >
           <div className="rounded-2xl rounded-bl-sm bg-background px-3 py-2 text-foreground shadow-sm">
             {t("previewMessageA")}
           </div>
           <span className="text-[9px] uppercase tracking-[0.18em] text-white/45">
             10:24
           </span>
-        </div>
-        <div className="flex items-end justify-end gap-2">
+        </motion.div>
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 8 }}
+          whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...landingFastTransition, delay: 0.22 }}
+          className="flex items-end justify-end gap-2"
+        >
           <span className="text-[9px] uppercase tracking-[0.18em] text-white/45">
             10:26
           </span>
           <div className="rounded-2xl rounded-br-sm bg-primary-muted px-3 py-2 text-primary-foreground shadow-sm">
             {t("previewMessageB")}
           </div>
-        </div>
+        </motion.div>
         <div className="flex items-center gap-1.5 pt-1 text-[10px] text-white/60">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white [animation-delay:120ms]" />
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white [animation-delay:240ms]" />
           {t("typing")}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -166,10 +209,18 @@ function ProcessPreview({ index }: { index: number }) {
             <p className="mt-1 text-xl font-semibold">100%</p>
           </div>
         </div>
-        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-background px-3 py-1.5 text-[10px] font-semibold text-primary shadow-sm">
+        <motion.div
+          animate={reduced ? undefined : { scale: [1, 1.03, 1] }}
+          transition={
+            reduced
+              ? undefined
+              : { duration: 2.4, repeat: Infinity, ease: landingFastTransition.ease }
+          }
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-background px-3 py-1.5 text-[10px] font-semibold text-primary shadow-sm"
+        >
           <CheckCircle2 className="size-3.5" />
           <span>{t("paymentConfirmed")}</span>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -191,13 +242,13 @@ function ProcessPreview({ index }: { index: number }) {
         </div>
         <div className="space-y-2 text-[11px] text-foreground">
           <div className="flex items-center gap-2">
-            <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground">
+            <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground motion-safe:animate-pulse">
               1
             </span>
             {t("revisionA")}
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground">
+            <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground motion-safe:animate-pulse">
               2
             </span>
             {t("revisionB")}
@@ -232,10 +283,18 @@ function ProcessPreview({ index }: { index: number }) {
           <span>{t("messages")}</span>
           <span className="font-semibold text-primary">18</span>
         </div>
-        <div className="flex items-center justify-between rounded-full bg-primary px-3 py-1.5 text-[11px] text-primary-foreground">
+        <motion.div
+          animate={reduced ? undefined : { opacity: [0.82, 1, 0.82] }}
+          transition={
+            reduced
+              ? undefined
+              : { duration: 2.2, repeat: Infinity, ease: landingFastTransition.ease }
+          }
+          className="flex items-center justify-between rounded-full bg-primary px-3 py-1.5 text-[11px] text-primary-foreground"
+        >
           <span>{t("realTime")}</span>
           <span className="font-semibold">{t("live")}</span>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

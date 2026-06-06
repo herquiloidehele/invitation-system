@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   BarChart3,
   Languages,
@@ -20,11 +21,23 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AnimatedSection } from "./AnimatedSection";
+import {
+  getMotionProps,
+  landingCardHover,
+  landingCardTap,
+  landingCardVariants,
+  landingFastTransition,
+  landingItemVariants,
+  landingStaggerVariants,
+  landingTransition,
+  shouldReduceMotion,
+} from "./landing-motion";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function FeaturesSection() {
   const t = useTranslations("LandingFeatures");
+  const reduceMotion = useReducedMotion();
 
   return (
     <AnimatedSection
@@ -43,7 +56,10 @@ export function FeaturesSection() {
             {t("body")}
           </p>
         </div>
-        <div className="mt-14 grid gap-5 lg:grid-cols-12">
+        <motion.div
+          {...getMotionProps(reduceMotion, landingStaggerVariants)}
+          className="mt-14 grid gap-5 lg:grid-cols-12"
+        >
           <RsvpHero />
 
           <div className="grid gap-5 lg:col-span-5">
@@ -95,7 +111,7 @@ export function FeaturesSection() {
           </FeatureSmallCard>
 
           <PersonalizationCard />
-        </div>
+        </motion.div>
       </div>
     </AnimatedSection>
   );
@@ -103,9 +119,16 @@ export function FeaturesSection() {
 
 function RsvpHero() {
   const t = useTranslations("LandingFeatures");
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
 
   return (
-    <article className="flex min-h-[360px] flex-col rounded-[1.75rem] bg-primary p-8 text-primary-foreground sm:p-10 lg:col-span-7 lg:min-h-[430px]">
+    <motion.article
+      variants={landingCardVariants}
+      whileHover={reduced ? undefined : landingCardHover}
+      whileTap={reduced ? undefined : landingCardTap}
+      className="flex min-h-[360px] flex-col rounded-[1.75rem] bg-primary p-8 text-primary-foreground sm:p-10 lg:col-span-7 lg:min-h-[430px]"
+    >
       <h3 className="text-4xl font-semibold leading-tight tracking-[-0.02em] sm:text-5xl">
         {t("rsvpTitle")}
       </h3>
@@ -121,7 +144,7 @@ function RsvpHero() {
           className="object-cover object-top"
         />
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -136,8 +159,16 @@ function FeatureWideCard({
   text: string;
   visual: React.ReactNode;
 }) {
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
+
   return (
-    <article className="grid min-h-[205px] grid-cols-[1fr_auto] items-center gap-6 rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] sm:p-8">
+    <motion.article
+      variants={landingCardVariants}
+      whileHover={reduced ? undefined : landingCardHover}
+      whileTap={reduced ? undefined : landingCardTap}
+      className="grid min-h-[205px] grid-cols-[1fr_auto] items-center gap-6 rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] sm:p-8"
+    >
       <div>
         <div className="mb-5 grid h-11 w-11 place-items-center rounded-2xl bg-muted text-xl text-primary">
           {icon}
@@ -148,7 +179,7 @@ function FeatureWideCard({
         <p className="mt-3 text-sm leading-6 text-muted-foreground">{text}</p>
       </div>
       {visual}
-    </article>
+    </motion.article>
   );
 }
 
@@ -165,8 +196,14 @@ function FeatureSmallCard({
   children: React.ReactNode;
   tinted?: boolean;
 }) {
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
+
   return (
-    <article
+    <motion.article
+      variants={landingCardVariants}
+      whileHover={reduced ? undefined : landingCardHover}
+      whileTap={reduced ? undefined : landingCardTap}
       className={`rounded-[1.5rem] border border-border p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] lg:col-span-3 ${
         tinted ? "bg-primary-soft" : "bg-card"
       }`}
@@ -179,19 +216,30 @@ function FeatureSmallCard({
       </h3>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">{text}</p>
       {children}
-    </article>
+    </motion.article>
   );
 }
 
 function MusicPlayer() {
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
+
   return (
     <div
       className="grid w-40 grid-cols-[auto_1fr] items-center gap-3 rounded-2xl bg-muted p-3 shadow-inner"
       aria-hidden="true"
     >
-      <span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground">
+      <motion.span
+        animate={reduced ? undefined : { scale: [1, 1.06, 1] }}
+        transition={
+          reduced
+            ? undefined
+            : { duration: 2.4, repeat: Infinity, ease: landingTransition.ease }
+        }
+        className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground"
+      >
         ▶
-      </span>
+      </motion.span>
       <div>
         <p className="text-[11px] font-semibold text-foreground">Marry Me</p>
         <p className="text-[10px] text-muted-foreground">Train · 02:46</p>
@@ -202,6 +250,8 @@ function MusicPlayer() {
 
 function MapTile() {
   const t = useTranslations("LandingFeatures");
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
 
   return (
     <div
@@ -215,18 +265,32 @@ function MapTile() {
         viewBox="0 0 128 96"
         fill="none"
       >
-        <path
+        <motion.path
           d="M8 78 Q 40 60 60 50 T 110 22"
           className="stroke-primary"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeDasharray="4 4"
           fill="none"
+          animate={reduced ? undefined : { pathLength: [0.45, 1, 0.45] }}
+          transition={
+            reduced
+              ? undefined
+              : { duration: 3, repeat: Infinity, ease: landingTransition.ease }
+          }
         />
       </svg>
-      <span className="absolute right-3 top-3 grid h-6 w-6 place-items-center rounded-full bg-white shadow">
+      <motion.span
+        animate={reduced ? undefined : { scale: [1, 1.08, 1] }}
+        transition={
+          reduced
+            ? undefined
+            : { duration: 2.6, repeat: Infinity, ease: landingTransition.ease }
+        }
+        className="absolute right-3 top-3 grid h-6 w-6 place-items-center rounded-full bg-white shadow"
+      >
         <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-      </span>
+      </motion.span>
       <span className="absolute bottom-2 left-2 rounded-full bg-background px-2 py-0.5 text-[9px] font-semibold text-primary shadow">
         {t("mapVenue")}
       </span>
@@ -251,8 +315,9 @@ function GuestTable() {
       </div>
       <div className="space-y-1 px-2 pb-2">
         {rows.map((row, index) => (
-          <div
+          <motion.div
             key={row.name}
+            variants={landingItemVariants}
             className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-card px-2 py-1.5 text-xs"
           >
             <span className="flex items-center gap-2 truncate">
@@ -271,7 +336,7 @@ function GuestTable() {
             >
               {row.state}
             </span>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -280,6 +345,7 @@ function GuestTable() {
 
 function AnalyticsChart() {
   const t = useTranslations("LandingFeatures");
+  const reduceMotion = useReducedMotion();
   const bars = [22, 40, 30, 48, 63, 54, 78];
 
   return (
@@ -291,9 +357,13 @@ function AnalyticsChart() {
         </div>
         <div className="mt-3 flex h-20 items-end justify-between gap-3">
           {bars.map((height, index) => (
-            <span
+            <motion.span
               key={index}
-              className={`w-4 rounded-sm ${
+              initial={reduceMotion ? false : { scaleY: 0.35, opacity: 0.65 }}
+              whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ ...landingFastTransition, delay: index * 0.05 }}
+              className={`w-4 origin-bottom rounded-sm ${
                 index === bars.length - 1 ? "bg-primary" : "bg-primary-muted"
               }`}
               style={{ height: `${height}%` }}
@@ -324,8 +394,9 @@ function LanguageList() {
   return (
     <div className="mt-5 space-y-2">
       {languages.map((language) => (
-        <div
+        <motion.div
           key={language.label}
+          variants={landingItemVariants}
           className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm"
         >
           <span className="flex items-center gap-2">
@@ -333,7 +404,7 @@ function LanguageList() {
             {language.label}
           </span>
           <span className="text-primary">✓</span>
-        </div>
+        </motion.div>
       ))}
     </div>
   );
@@ -351,8 +422,9 @@ function CustomizationPanel() {
     <>
       <div className="mt-5 flex gap-2">
         {tiles.map((tile) => (
-          <span
+          <motion.span
             key={tile.src}
+            variants={landingItemVariants}
             className="relative block h-12 w-12 overflow-hidden rounded-lg"
           >
             <Image
@@ -362,7 +434,7 @@ function CustomizationPanel() {
               sizes="48px"
               className="object-cover"
             />
-          </span>
+          </motion.span>
         ))}
       </div>
       <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
@@ -375,7 +447,11 @@ function CustomizationPanel() {
           "bg-primary-soft",
           "bg-muted-strong",
         ].map((className) => (
-          <span key={className} className={`h-7 w-7 rounded-lg ${className}`} />
+          <motion.span
+            key={className}
+            variants={landingItemVariants}
+            className={`h-7 w-7 rounded-lg ${className}`}
+          />
         ))}
       </div>
       <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
@@ -390,12 +466,19 @@ function CustomizationPanel() {
 
 function PersonalizationCard() {
   const t = useTranslations("LandingFeatures");
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
   const tiers = t.raw("personalizationTiers") as ReadonlyArray<
     readonly [string, string]
   >;
 
   return (
-    <article className="rounded-[1.5rem] border border-border bg-card p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] sm:p-8 lg:col-span-12">
+    <motion.article
+      variants={landingCardVariants}
+      whileHover={reduced ? undefined : landingCardHover}
+      whileTap={reduced ? undefined : landingCardTap}
+      className="rounded-[1.5rem] border border-border bg-card p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] sm:p-8 lg:col-span-12"
+    >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-5 sm:max-w-2xl">
           <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-muted text-primary">
@@ -411,12 +494,14 @@ function PersonalizationCard() {
           </div>
         </div>
         <Dialog>
-          <DialogTrigger
-            render={
-              <button
-                type="button"
-                className="shrink-0 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
-              />
+            <DialogTrigger
+              render={
+                <motion.button
+                  type="button"
+                  whileHover={reduced ? undefined : { y: -2 }}
+                  whileTap={reduced ? undefined : landingCardTap}
+                  className="shrink-0 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
+                />
             }
           >
             {t("personalizationCta")}
@@ -447,8 +532,8 @@ function PersonalizationCard() {
               ))}
             </ul>
           </DialogContent>
-        </Dialog>
-      </div>
-    </article>
+          </Dialog>
+        </div>
+    </motion.article>
   );
 }

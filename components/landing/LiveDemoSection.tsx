@@ -1,6 +1,14 @@
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { LiveDemoFeature } from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
+import {
+  getMotionProps,
+  landingCardVariants,
+  landingStaggerVariants,
+} from "./landing-motion";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -11,6 +19,7 @@ const FALLBACK: LiveDemoFeature[] = [
 
 export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
   const t = useTranslations("LandingLiveDemo");
+  const reduceMotion = useReducedMotion();
   const previews = items.length > 0 ? items.slice(0, 2) : FALLBACK;
 
   return (
@@ -27,15 +36,19 @@ export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
             {t("body")}
           </p>
         </div>
-        <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <motion.div
+          {...getMotionProps(reduceMotion, landingStaggerVariants)}
+          className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16"
+        >
           {previews.map((preview) => (
-            <PhoneIframePreview
-              key={preview.id}
-              title={preview.title || t("fallbackInvitation")}
-              src={preview.href}
-            />
+            <motion.div key={preview.id} variants={landingCardVariants}>
+              <PhoneIframePreview
+                title={preview.title || t("fallbackInvitation")}
+                src={preview.href}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </AnimatedSection>
   );
