@@ -158,14 +158,21 @@ export function GallerySection({
                       </p>
                     ) : null}
                     {item.price ? (
-                      <p className="mt-auto pt-2 text-sm font-medium text-subtle-foreground">
+                      <div className="mt-auto flex items-baseline gap-2 pt-2">
                         {item.price.originalLabel ? (
-                          <span className="mr-2 line-through opacity-60">
+                          <span className="text-xs text-subtle-foreground/60 line-through">
                             {item.price.originalLabel}
                           </span>
                         ) : null}
-                        {item.price.amountLabel}
-                      </p>
+                        <span className="flex items-baseline gap-1.5">
+                          <span className="text-xs text-muted-foreground">
+                            {item.price.prefix}
+                          </span>
+                          <span className="text-base font-semibold text-foreground">
+                            {item.price.amount}
+                          </span>
+                        </span>
+                      </div>
                     ) : null}
                   </div>
                 </motion.a>
