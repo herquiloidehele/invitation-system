@@ -21,28 +21,28 @@ export function ContactSection({
   const t = useTranslations("LandingContact");
 
   return (
-    <AnimatedSection id="orcamento" className="bg-[#F6F7F5] px-5 py-24 sm:px-8">
+    <AnimatedSection id="orcamento" className="bg-muted px-5 py-24 sm:px-8">
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
         <div>
           <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
-          <h2 className="mt-6 text-4xl font-medium leading-[1.08] tracking-[-0.03em] text-[#1F2420] sm:text-5xl">
+          <h2 className="mt-6 text-4xl font-medium leading-[1.08] tracking-[-0.03em] text-foreground sm:text-5xl">
             {t("titleLine1")}
-            <span className="block text-[#3F4E3F]">{t("titleLine2")}</span>
+            <span className="block text-primary">{t("titleLine2")}</span>
           </h2>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-[#5C605A]">
+          <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
             {t("body")}
           </p>
-          <div className="mt-8 space-y-3 text-sm text-[#3F4E3F]">
+          <div className="mt-8 space-y-3 text-sm text-primary">
             <p>WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
             <p>E-mail · ola@convites.brindealstudio.com</p>
           </div>
         </div>
         <form
           onSubmit={onSubmit}
-          className="rounded-[1.5rem] border border-[#E5E7E4] bg-white p-6 shadow-sm sm:p-9"
+          className="rounded-[1.5rem] border border-border bg-card p-6 shadow-sm sm:p-9"
         >
           <h3 className="text-2xl font-semibold">{t("formTitle")}</h3>
-          <p className="mt-2 text-sm text-[#5C605A]">{t("formSubtitle")}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("formSubtitle")}</p>
           <div className="mt-7 grid gap-4 sm:grid-cols-2">
             <TextField
               label={t("name")}
@@ -57,18 +57,18 @@ export function ContactSection({
               onChange={(value) => onFieldChange("eventType", value)}
             />
           </div>
-          <label className="mt-4 block text-sm font-semibold text-[#1F2420]">
+          <label className="mt-4 block text-sm font-semibold text-foreground">
             {t("message")}
             <textarea
               value={formState.message}
               onChange={(event) => onFieldChange("message", event.target.value)}
-              className="mt-2 min-h-28 w-full rounded-2xl border border-[#E5E7E4] bg-[#F6F7F5] px-4 py-3 text-sm font-normal outline-none transition focus:border-[#3F4E3F] focus:ring-2 focus:ring-[#3F4E3F]/20"
+              className="mt-2 min-h-28 w-full rounded-2xl border border-border bg-muted px-4 py-3 text-sm font-normal outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               placeholder={t("messagePlaceholder")}
             />
           </label>
           <button
             type="submit"
-            className="mt-6 w-full rounded-full bg-[#3F4E3F] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+            className="mt-6 w-full rounded-full bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
           >
             {t("submit")}
           </button>
@@ -90,13 +90,13 @@ function TextField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="block text-sm font-semibold text-[#1F2420]">
+    <label className="block text-sm font-semibold text-foreground">
       {label}
       <input
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 h-12 w-full rounded-2xl border border-[#E5E7E4] bg-[#F6F7F5] px-4 text-sm font-normal outline-none transition focus:border-[#3F4E3F] focus:ring-2 focus:ring-[#3F4E3F]/20"
+        className="mt-2 h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-normal outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
       />
     </label>
   );

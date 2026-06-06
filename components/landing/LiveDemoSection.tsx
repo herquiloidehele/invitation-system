@@ -14,7 +14,7 @@ export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
   const previews = items.length > 0 ? items.slice(0, 2) : FALLBACK;
 
   return (
-    <AnimatedSection className="bg-[#F6F7F5] px-5 py-24 sm:px-8 lg:py-28">
+    <AnimatedSection className="bg-muted px-5 py-24 sm:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
@@ -23,7 +23,7 @@ export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.02em] sm:text-5xl">
             {t("title")}
           </h2>
-          <p className="mt-5 text-[#5C605A]">
+          <p className="mt-5 text-muted-foreground">
             {t("body")}
           </p>
         </div>

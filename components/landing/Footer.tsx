@@ -47,27 +47,27 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-[#1F2420] px-5 py-16 text-[#E8EBE7] sm:px-8">
+    <footer className="bg-foreground px-5 py-16 text-primary-soft sm:px-8">
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div>
-          <div className="flex items-center gap-2 text-xl font-semibold text-white">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#E8EBE7]" />
+          <div className="flex items-center gap-2 text-xl font-semibold text-primary-foreground">
+            <span className="h-2.5 w-2.5 rounded-full bg-primary-soft" />
             brindeal
           </div>
-          <p className="mt-5 max-w-xs text-sm leading-6 text-[#A3A496]">
+          <p className="mt-5 max-w-xs text-sm leading-6 text-faint-foreground">
             {t("description")}
           </p>
         </div>
         {linkGroups.map(({ heading, links }) => (
           <div key={heading} className="space-y-3 text-sm">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-white">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary-foreground">
               {heading}
             </p>
             {links.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="block text-[#A3A496] transition hover:text-white"
+                className="block text-faint-foreground transition hover:text-primary-foreground"
               >
                 {link.label}
               </a>
@@ -75,7 +75,7 @@ export function Footer() {
           </div>
         ))}
       </div>
-      <div className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-4 border-t border-white/10 pt-8 text-xs text-[#A3A496] sm:flex-row">
+      <div className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-4 border-t border-primary-foreground/10 pt-8 text-xs text-faint-foreground sm:flex-row">
         <p>{t("copyright")}</p>
         <p>{t("languages")}</p>
       </div>

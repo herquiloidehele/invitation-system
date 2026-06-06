@@ -15,7 +15,7 @@ export function LocaleSwitcher() {
   const t = useTranslations("Locale");
 
   return (
-    <div className="flex items-center gap-1 rounded-full border border-[#E5E7E4] bg-white/80 p-1 text-xs font-semibold text-[#5C605A]">
+    <div className="flex items-center gap-1 rounded-full border border-border bg-background/80 p-1 text-xs font-semibold text-muted-foreground">
       {SUPPORTED_LOCALES.map((nextLocale) => (
         <a
           key={nextLocale}
@@ -24,8 +24,8 @@ export function LocaleSwitcher() {
           aria-label={t(nextLocale)}
           className={`rounded-full px-2 py-1 transition sm:px-2.5 ${
             locale === nextLocale
-              ? "bg-[#3F4E3F] text-white"
-              : "hover:bg-[#F6F7F5] hover:text-[#1F2420]"
+              ? "bg-primary text-primary-foreground"
+              : "hover:bg-muted hover:text-foreground"
           }`}
         >
           {nextLocale.toUpperCase()}

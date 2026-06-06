@@ -29,7 +29,7 @@ export function FeaturesSection() {
   return (
     <AnimatedSection
       id="recursos"
-      className="bg-white px-5 py-24 sm:px-8 lg:py-28"
+      className="bg-background px-5 py-24 sm:px-8 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
@@ -39,7 +39,7 @@ export function FeaturesSection() {
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
             {t("title")}
           </h2>
-          <p className="mt-5 text-[#5C605A]">
+          <p className="mt-5 text-muted-foreground">
             {t("body")}
           </p>
         </div>
@@ -105,14 +105,14 @@ function RsvpHero() {
   const t = useTranslations("LandingFeatures");
 
   return (
-    <article className="flex min-h-[360px] flex-col rounded-[1.75rem] bg-[#3F4E3F] p-8 text-white sm:p-10 lg:col-span-7 lg:min-h-[430px]">
+    <article className="flex min-h-[360px] flex-col rounded-[1.75rem] bg-primary p-8 text-primary-foreground sm:p-10 lg:col-span-7 lg:min-h-[430px]">
       <h3 className="text-4xl font-semibold leading-tight tracking-[-0.02em] sm:text-5xl">
         {t("rsvpTitle")}
       </h3>
-      <p className="mt-4 max-w-xl text-sm leading-7 text-[#E8EBE7] sm:text-base">
+      <p className="mt-4 max-w-xl text-sm leading-7 text-primary-soft sm:text-base">
         {t("rsvpBody")}
       </p>
-      <div className="relative mt-7 min-h-[220px] flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+      <div className="relative mt-7 min-h-[220px] flex-1 overflow-hidden rounded-2xl border border-primary-foreground/10 bg-card shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
         <Image
           src="/images/rsvp-confirmation-page.png"
           alt={t("rsvpImageAlt")}
@@ -137,15 +137,15 @@ function FeatureWideCard({
   visual: React.ReactNode;
 }) {
   return (
-    <article className="grid min-h-[205px] grid-cols-[1fr_auto] items-center gap-6 rounded-[1.75rem] border border-[#E5E7E4] bg-white p-7 shadow-[0_12px_40px_rgba(31,36,32,0.035)] sm:p-8">
+    <article className="grid min-h-[205px] grid-cols-[1fr_auto] items-center gap-6 rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] sm:p-8">
       <div>
-        <div className="mb-5 grid h-11 w-11 place-items-center rounded-2xl bg-[#F6F7F5] text-xl text-[#3F4E3F]">
+        <div className="mb-5 grid h-11 w-11 place-items-center rounded-2xl bg-muted text-xl text-primary">
           {icon}
         </div>
-        <h3 className="text-xl font-semibold tracking-[-0.02em] text-[#1F2420]">
+        <h3 className="text-xl font-semibold tracking-[-0.02em] text-foreground">
           {title}
         </h3>
-        <p className="mt-3 text-sm leading-6 text-[#5C605A]">{text}</p>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">{text}</p>
       </div>
       {visual}
     </article>
@@ -167,17 +167,17 @@ function FeatureSmallCard({
 }) {
   return (
     <article
-      className={`rounded-[1.5rem] border border-[#E5E7E4] p-6 shadow-[0_12px_40px_rgba(31,36,32,0.035)] lg:col-span-3 ${
-        tinted ? "bg-[#E8EBE7]" : "bg-white"
+      className={`rounded-[1.5rem] border border-border p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] lg:col-span-3 ${
+        tinted ? "bg-primary-soft" : "bg-card"
       }`}
     >
-      <div className="mb-6 grid h-11 w-11 place-items-center rounded-2xl bg-[#F6F7F5] text-[#3F4E3F]">
+      <div className="mb-6 grid h-11 w-11 place-items-center rounded-2xl bg-muted text-primary">
         <Icon className="size-5" aria-hidden="true" />
       </div>
-      <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
+      <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
         {title}
       </h3>
-      <p className="mt-3 text-sm leading-6 text-[#5C605A]">{text}</p>
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">{text}</p>
       {children}
     </article>
   );
@@ -186,15 +186,15 @@ function FeatureSmallCard({
 function MusicPlayer() {
   return (
     <div
-      className="grid w-40 grid-cols-[auto_1fr] items-center gap-3 rounded-2xl bg-[#F6F7F5] p-3 shadow-inner"
+      className="grid w-40 grid-cols-[auto_1fr] items-center gap-3 rounded-2xl bg-muted p-3 shadow-inner"
       aria-hidden="true"
     >
-      <span className="grid h-10 w-10 place-items-center rounded-full bg-[#3F4E3F] text-white">
+      <span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground">
         ▶
       </span>
       <div>
-        <p className="text-[11px] font-semibold text-[#1F2420]">Marry Me</p>
-        <p className="text-[10px] text-[#5C605A]">Train · 02:46</p>
+        <p className="text-[11px] font-semibold text-foreground">Marry Me</p>
+        <p className="text-[10px] text-muted-foreground">Train · 02:46</p>
       </div>
     </div>
   );
@@ -205,11 +205,11 @@ function MapTile() {
 
   return (
     <div
-      className="relative h-24 w-32 overflow-hidden rounded-2xl border border-[#E5E7E4] bg-[#F6F7F5]"
+      className="relative h-24 w-32 overflow-hidden rounded-2xl border border-border bg-muted"
       aria-hidden="true"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,#EEF1EC_0%,#E0E5DC_100%)]" />
-      <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent_0_10px,rgba(63,78,63,0.07)_10px_11px),repeating-linear-gradient(-45deg,transparent_0_10px,rgba(63,78,63,0.07)_10px_11px)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--map-from)_0%,var(--map-to)_100%)]" />
+      <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent_0_10px,color-mix(in_srgb,var(--primary)_7%,transparent)_10px_11px),repeating-linear-gradient(-45deg,transparent_0_10px,color-mix(in_srgb,var(--primary)_7%,transparent)_10px_11px)]" />
       <svg
         className="absolute inset-0 h-full w-full"
         viewBox="0 0 128 96"
@@ -217,7 +217,7 @@ function MapTile() {
       >
         <path
           d="M8 78 Q 40 60 60 50 T 110 22"
-          stroke="#3F4E3F"
+          className="stroke-primary"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeDasharray="4 4"
@@ -225,9 +225,9 @@ function MapTile() {
         />
       </svg>
       <span className="absolute right-3 top-3 grid h-6 w-6 place-items-center rounded-full bg-white shadow">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#3F4E3F]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-primary" />
       </span>
-      <span className="absolute bottom-2 left-2 rounded-full bg-white px-2 py-0.5 text-[9px] font-semibold text-[#3F4E3F] shadow">
+      <span className="absolute bottom-2 left-2 rounded-full bg-background px-2 py-0.5 text-[9px] font-semibold text-primary shadow">
         {t("mapVenue")}
       </span>
     </div>
@@ -243,8 +243,8 @@ function GuestTable() {
   ];
 
   return (
-    <div className="mt-5 overflow-hidden rounded-xl bg-[#F6F7F5]">
-      <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#5C605A]">
+    <div className="mt-5 overflow-hidden rounded-xl bg-muted">
+      <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
         <span>{t("guest")}</span>
         <span>{t("table")}</span>
         <span>RSVP</span>
@@ -253,20 +253,20 @@ function GuestTable() {
         {rows.map((row, index) => (
           <div
             key={row.name}
-            className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-white px-2 py-1.5 text-xs"
+            className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-card px-2 py-1.5 text-xs"
           >
             <span className="flex items-center gap-2 truncate">
               <span
-                className={`h-4 w-4 rounded-full ${index === 2 ? "bg-[#E5E7E4]" : "bg-[#3F4E3F]"}`}
+                className={`h-4 w-4 rounded-full ${index === 2 ? "bg-border" : "bg-primary"}`}
               />
               {row.name}
             </span>
-            <span className="rounded-full bg-[#3F4E3F] px-2 py-0.5 text-[10px] font-semibold text-white">
+            <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
               {row.table}
             </span>
             <span
               className={`text-[11px] font-bold ${
-                row.state === "✓" ? "text-[#3F4E3F]" : "text-[#A3A496]"
+                row.state === "✓" ? "text-primary" : "text-faint-foreground"
               }`}
             >
               {row.state}
@@ -284,8 +284,8 @@ function AnalyticsChart() {
 
   return (
     <>
-      <div className="mt-5 rounded-xl bg-[#F6F7F5] p-4">
-        <div className="flex items-end justify-between text-[9px] font-semibold uppercase tracking-[0.18em] text-[#5C605A]">
+      <div className="mt-5 rounded-xl bg-muted p-4">
+        <div className="flex items-end justify-between text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           <span>{t("visits")}</span>
           <span>RSVPs</span>
         </div>
@@ -294,21 +294,21 @@ function AnalyticsChart() {
             <span
               key={index}
               className={`w-4 rounded-sm ${
-                index === bars.length - 1 ? "bg-[#3F4E3F]" : "bg-[#657661]"
+                index === bars.length - 1 ? "bg-primary" : "bg-primary-muted"
               }`}
               style={{ height: `${height}%` }}
             />
           ))}
         </div>
-        <div className="mt-2 flex justify-between text-[9px] text-[#A3A496]">
+        <div className="mt-2 flex justify-between text-[9px] text-faint-foreground">
           {["S", "T", "Q", "Q", "S", "S", "D"].map((day, index) => (
             <span key={`${day}-${index}`}>{day}</span>
           ))}
         </div>
       </div>
-      <p className="mt-3 text-3xl font-semibold text-[#3F4E3F]">
+      <p className="mt-3 text-3xl font-semibold text-primary">
         +38%{" "}
-        <span className="text-xs font-normal text-[#5C605A]">{t("updatedNow")}</span>
+        <span className="text-xs font-normal text-muted-foreground">{t("updatedNow")}</span>
       </p>
     </>
   );
@@ -316,9 +316,9 @@ function AnalyticsChart() {
 
 function LanguageList() {
   const languages = [
-    { label: "Português", flag: "#3F4E3F" },
-    { label: "English", flag: "#6B7E68" },
-    { label: "Español", flag: "#9AA795" },
+    { label: "Português", flagClassName: "bg-primary" },
+    { label: "English", flagClassName: "bg-primary-muted" },
+    { label: "Español", flagClassName: "bg-primary-pale" },
   ];
 
   return (
@@ -329,13 +329,10 @@ function LanguageList() {
           className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm"
         >
           <span className="flex items-center gap-2">
-            <span
-              className="h-4 w-4 rounded-sm"
-              style={{ backgroundColor: language.flag }}
-            />
+            <span className={`h-4 w-4 rounded-sm ${language.flagClassName}`} />
             {language.label}
           </span>
-          <span className="text-[#3F4E3F]">✓</span>
+          <span className="text-primary">✓</span>
         </div>
       ))}
     </div>
@@ -368,23 +365,24 @@ function CustomizationPanel() {
           </span>
         ))}
       </div>
-      <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.28em] text-[#5C605A]">
+      <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
         {t("palette")}
       </p>
       <div className="mt-2 flex gap-2">
-        {["#3F4E3F", "#2D3A2D", "#E8EBE7", "#DEE1DC"].map((color) => (
-          <span
-            key={color}
-            className="h-7 w-7 rounded-lg"
-            style={{ backgroundColor: color }}
-          />
+        {[
+          "bg-primary",
+          "bg-primary-hover",
+          "bg-primary-soft",
+          "bg-muted-strong",
+        ].map((className) => (
+          <span key={className} className={`h-7 w-7 rounded-lg ${className}`} />
         ))}
       </div>
-      <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#5C605A]">
+      <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
         {t("typography")}
       </p>
-      <p className="mt-1.5 text-2xl font-semibold text-[#1F2420]">
-        Aa <span className="text-base font-normal text-[#5C605A]">Manrope</span>
+      <p className="mt-1.5 text-2xl font-semibold text-foreground">
+        Aa <span className="text-base font-normal text-muted-foreground">Manrope</span>
       </p>
     </>
   );
@@ -397,17 +395,17 @@ function PersonalizationCard() {
   >;
 
   return (
-    <article className="rounded-[1.5rem] border border-[#E5E7E4] bg-white p-6 shadow-[0_12px_40px_rgba(31,36,32,0.035)] sm:p-8 lg:col-span-12">
+    <article className="rounded-[1.5rem] border border-border bg-card p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] sm:p-8 lg:col-span-12">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-5 sm:max-w-2xl">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#F6F7F5] text-[#3F4E3F]">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-muted text-primary">
             <UserPen className="size-5" aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1F2420]">
+            <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
               {t("personalizationTitle")}
             </h3>
-            <p className="mt-3 text-sm leading-6 text-[#5C605A]">
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               {t("personalizationText")}
             </p>
           </div>
@@ -417,7 +415,7 @@ function PersonalizationCard() {
             render={
               <button
                 type="button"
-                className="shrink-0 self-start rounded-full bg-[#3F4E3F] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2D3A2D] focus:outline-none focus:ring-2 focus:ring-[#3F4E3F] focus:ring-offset-4"
+                className="shrink-0 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
               />
             }
           >
@@ -430,18 +428,18 @@ function PersonalizationCard() {
                 {t("personalizationModalDescription")}
               </DialogDescription>
             </DialogHeader>
-            <ul className="mt-2 divide-y divide-[#E5E7E4] overflow-hidden rounded-2xl border border-[#E5E7E4] bg-[#F6F7F5]">
+            <ul className="mt-2 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-muted">
               {tiers.map(([label, price]) => (
                 <li
                   key={label}
                   className="flex items-center justify-between gap-4 px-4 py-3"
                 >
-                  <span className="text-sm text-[#1F2420]">{label}</span>
+                  <span className="text-sm text-foreground">{label}</span>
                   <span className="text-right">
-                    <span className="block text-lg font-semibold text-[#3F4E3F]">
+                    <span className="block text-lg font-semibold text-primary">
                       {price}
                     </span>
-                    <span className="block text-[10px] uppercase tracking-[0.18em] text-[#5C605A]">
+                    <span className="block text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                       {t("personalizationPerInvite")}
                     </span>
                   </span>
