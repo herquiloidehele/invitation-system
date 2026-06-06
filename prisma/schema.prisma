@@ -118,6 +118,7 @@ model Invitation {
   socialPreview Json?    // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
 
   priceFromCents     Int?
+  discountPriceFromCents Int? // sale price in cents; valid only when 0 < discount < priceFromCents
   currency           String  @default("EUR")
   landingModelName   String?
   landingImageUrl    String?
@@ -210,6 +211,7 @@ model SaveTheDate {
   isDemo        Boolean @default(false)
 
   priceFromCents     Int?
+  discountPriceFromCents Int? // sale price in cents; valid only when 0 < discount < priceFromCents
   currency           String  @default("EUR")
   landingModelName   String?
   landingImageUrl    String?

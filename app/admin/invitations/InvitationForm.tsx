@@ -1171,6 +1171,8 @@ export default function InvitationForm({
                   <LandingMetadataFieldset
                     value={{
                       priceFromCents: form.priceFromCents ?? null,
+                      discountPriceFromCents:
+                        form.discountPriceFromCents ?? null,
                       currency: form.currency ?? "EUR",
                       landingModelName: form.landingModelName ?? null,
                       landingImageUrl: form.landingImageUrl ?? null,
@@ -1178,6 +1180,10 @@ export default function InvitationForm({
                     }}
                     onChange={(next) => {
                       update("priceFromCents", next.priceFromCents);
+                      update(
+                        "discountPriceFromCents",
+                        next.discountPriceFromCents,
+                      );
                       update("currency", next.currency);
                       update("landingModelName", next.landingModelName);
                       update("landingImageUrl", next.landingImageUrl);
@@ -1621,16 +1627,14 @@ export default function InvitationForm({
                               Seta animada para próxima secção
                             </Label>
                             <p className="text-xs text-muted-foreground">
-                              Mostra uma seta animada no fundo do hero (acima
-                              do leitor de música) que rola para a secção
-                              seguinte ao ser clicada.
+                              Mostra uma seta animada no fundo do hero (acima do
+                              leitor de música) que rola para a secção seguinte
+                              ao ser clicada.
                             </p>
                           </div>
                           <Switch
                             id="heroScrollIndicatorEnabled"
-                            checked={
-                              form.heroScrollIndicator?.enabled === true
-                            }
+                            checked={form.heroScrollIndicator?.enabled === true}
                             onCheckedChange={(checked) =>
                               update("heroScrollIndicator", {
                                 ...(form.heroScrollIndicator ?? {}),
@@ -1643,8 +1647,7 @@ export default function InvitationForm({
                           <div className="space-y-1.5">
                             <Label>Cor da seta</Label>
                             <p className="text-xs text-muted-foreground">
-                              Deixe em branco para usar a cor principal do
-                              tema.
+                              Deixe em branco para usar a cor principal do tema.
                             </p>
                             <div className="flex items-center gap-2">
                               <input
@@ -2812,7 +2815,10 @@ export default function InvitationForm({
                           </SelectTrigger>
                           <SelectContent>
                             {SCHEDULE_ICON_OPTIONS.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
                                 {option.label}
                               </SelectItem>
                             ))}

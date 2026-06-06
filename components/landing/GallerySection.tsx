@@ -157,9 +157,14 @@ export function GallerySection({
                         {item.description}
                       </p>
                     ) : null}
-                    {item.priceLabel ? (
+                    {item.price ? (
                       <p className="mt-auto pt-2 text-sm font-medium text-subtle-foreground">
-                        {item.priceLabel}
+                        {item.price.originalLabel ? (
+                          <span className="mr-2 line-through opacity-60">
+                            {item.price.originalLabel}
+                          </span>
+                        ) : null}
+                        {item.price.amountLabel}
                       </p>
                     ) : null}
                   </div>

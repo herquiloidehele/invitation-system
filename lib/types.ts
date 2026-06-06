@@ -686,6 +686,7 @@ export interface InvitationData {
   guest?: PublicGuestData;
   /** Landing page listing metadata. */
   priceFromCents?: number | null;
+  discountPriceFromCents?: number | null;
   currency?: string | null;
   landingModelName?: string | null;
   landingImageUrl?: string | null;

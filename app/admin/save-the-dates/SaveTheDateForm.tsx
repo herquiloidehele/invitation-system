@@ -97,6 +97,7 @@ export interface SaveTheDateFormData {
   isDemo?: boolean;
   ownerToken?: string;
   priceFromCents?: number | null;
+  discountPriceFromCents?: number | null;
   currency?: string | null;
   landingModelName?: string | null;
   landingImageUrl?: string | null;
@@ -571,6 +572,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           socialPreview: data.socialPreview ?? null,
           isDemo: data.isDemo === true,
           priceFromCents: data.priceFromCents ?? null,
+          discountPriceFromCents: data.discountPriceFromCents ?? null,
           currency: data.currency ?? "EUR",
           landingModelName: data.landingModelName ?? null,
           landingImageUrl: data.landingImageUrl ?? null,
@@ -693,6 +695,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                 <LandingMetadataFieldset
                   value={{
                     priceFromCents: data.priceFromCents ?? null,
+                    discountPriceFromCents: data.discountPriceFromCents ?? null,
                     currency: data.currency ?? "EUR",
                     landingModelName: data.landingModelName ?? null,
                     landingImageUrl: data.landingImageUrl ?? null,
@@ -702,6 +705,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     setData((p) => ({
                       ...p,
                       priceFromCents: next.priceFromCents,
+                      discountPriceFromCents: next.discountPriceFromCents,
                       currency: next.currency,
                       landingModelName: next.landingModelName,
                       landingImageUrl: next.landingImageUrl,
@@ -1205,9 +1209,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                   <div className="space-y-1.5">
                     <Label>Cor do browser</Label>
                     <p className="text-xs text-muted-foreground">
-                      Cor usada pela barra do browser em mobile. Deixe em
-                      branco para combinar automaticamente com a capa do
-                      envelope.
+                      Cor usada pela barra do browser em mobile. Deixe em branco
+                      para combinar automaticamente com a capa do envelope.
                     </p>
                     <div className="flex items-center gap-2">
                       <input

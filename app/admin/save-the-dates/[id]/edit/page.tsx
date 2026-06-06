@@ -76,11 +76,11 @@ export default async function EditSaveTheDatePage({
     rsvp: rsvp || undefined,
     audio: audio || undefined,
     bottomHero: bottomHero || undefined,
-    socialPreview:
-      (item.socialPreview as SocialPreview | null) ?? undefined,
+    socialPreview: (item.socialPreview as SocialPreview | null) ?? undefined,
     isDemo: item.isDemo,
     ownerToken: item.ownerToken,
     priceFromCents: item.priceFromCents,
+    discountPriceFromCents: item.discountPriceFromCents,
     currency: item.currency,
     landingModelName: item.landingModelName,
     landingImageUrl: item.landingImageUrl,

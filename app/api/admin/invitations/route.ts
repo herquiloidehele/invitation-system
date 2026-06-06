@@ -139,6 +139,10 @@ export async function POST(request: NextRequest) {
         socialPreview: sanitizeJsonField(body.socialPreview, null),
         priceFromCents:
           typeof body.priceFromCents === "number" ? body.priceFromCents : null,
+        discountPriceFromCents:
+          typeof body.discountPriceFromCents === "number"
+            ? body.discountPriceFromCents
+            : null,
         currency:
           typeof body.currency === "string" && body.currency.length
             ? body.currency
@@ -149,7 +153,8 @@ export async function POST(request: NextRequest) {
             ? body.landingModelName
             : null,
         landingImageUrl:
-          typeof body.landingImageUrl === "string" && body.landingImageUrl.length
+          typeof body.landingImageUrl === "string" &&
+          body.landingImageUrl.length
             ? body.landingImageUrl
             : null,
         landingDescription:
@@ -158,7 +163,8 @@ export async function POST(request: NextRequest) {
             ? body.landingDescription
             : null,
         landingSubtitle:
-          typeof body.landingSubtitle === "string" && body.landingSubtitle.length
+          typeof body.landingSubtitle === "string" &&
+          body.landingSubtitle.length
             ? body.landingSubtitle
             : null,
       },

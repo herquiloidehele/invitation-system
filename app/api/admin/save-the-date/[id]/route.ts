@@ -75,6 +75,12 @@ export async function PUT(
               ? body.priceFromCents
               : null,
         }),
+        ...(body.discountPriceFromCents !== undefined && {
+          discountPriceFromCents:
+            typeof body.discountPriceFromCents === "number"
+              ? body.discountPriceFromCents
+              : null,
+        }),
         ...(body.currency !== undefined && {
           currency:
             typeof body.currency === "string" && body.currency.length

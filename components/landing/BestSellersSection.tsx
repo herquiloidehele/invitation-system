@@ -41,10 +41,7 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
   const previewTitle = previewItem?.title || t("fallbackTitle");
 
   return (
-    <AnimatedSection
-      id="destaques"
-      className="bg-muted px-5 py-24 sm:px-8"
-    >
+    <AnimatedSection id="destaques" className="bg-muted px-5 py-24 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <div className="flex justify-center">
@@ -113,19 +110,28 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                       {item.description ? (
                         <p
                           className={`mt-3 text-sm leading-6 ${
-                            featured ? "text-primary-soft" : "text-muted-foreground"
+                            featured
+                              ? "text-primary-soft"
+                              : "text-muted-foreground"
                           }`}
                         >
                           {item.description}
                         </p>
                       ) : null}
-                      {item.priceLabel ? (
+                      {item.price ? (
                         <p
                           className={`mt-3 text-sm font-medium ${
-                            featured ? "text-primary-foreground/80" : "text-subtle-foreground"
+                            featured
+                              ? "text-primary-foreground/80"
+                              : "text-subtle-foreground"
                           }`}
                         >
-                          {item.priceLabel}
+                          {item.price.originalLabel ? (
+                            <span className="mr-2 line-through opacity-60">
+                              {item.price.originalLabel}
+                            </span>
+                          ) : null}
+                          {item.price.amountLabel}
                         </p>
                       ) : null}
                     </div>

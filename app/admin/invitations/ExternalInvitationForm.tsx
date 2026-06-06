@@ -900,6 +900,8 @@ export default function ExternalInvitationForm({
                   <LandingMetadataFieldset
                     value={{
                       priceFromCents: form.priceFromCents ?? null,
+                      discountPriceFromCents:
+                        form.discountPriceFromCents ?? null,
                       currency: form.currency ?? "EUR",
                       landingModelName: form.landingModelName ?? null,
                       landingImageUrl: form.landingImageUrl ?? null,
@@ -907,6 +909,10 @@ export default function ExternalInvitationForm({
                     }}
                     onChange={(next) => {
                       update("priceFromCents", next.priceFromCents);
+                      update(
+                        "discountPriceFromCents",
+                        next.discountPriceFromCents,
+                      );
                       update("currency", next.currency);
                       update("landingModelName", next.landingModelName);
                       update("landingImageUrl", next.landingImageUrl);
@@ -1529,8 +1535,8 @@ export default function ExternalInvitationForm({
                         <div className="space-y-0.5">
                           <Label>Contagem decrescente</Label>
                           <p className="text-xs text-muted-foreground">
-                            Mostra uma secção animada com dias, horas, minutos
-                            e segundos depois do hero e antes do convite externo.
+                            Mostra uma secção animada com dias, horas, minutos e
+                            segundos depois do hero e antes do convite externo.
                           </p>
                         </div>
                         <Switch
@@ -1605,7 +1611,10 @@ export default function ExternalInvitationForm({
                                 id="countdownMinutesLabel"
                                 value={form.countdown.minutesLabel ?? ""}
                                 onChange={(e) =>
-                                  updateCountdown("minutesLabel", e.target.value)
+                                  updateCountdown(
+                                    "minutesLabel",
+                                    e.target.value,
+                                  )
                                 }
                                 placeholder="MINUTOS"
                               />
@@ -1618,7 +1627,10 @@ export default function ExternalInvitationForm({
                                 id="countdownSecondsLabel"
                                 value={form.countdown.secondsLabel ?? ""}
                                 onChange={(e) =>
-                                  updateCountdown("secondsLabel", e.target.value)
+                                  updateCountdown(
+                                    "secondsLabel",
+                                    e.target.value,
+                                  )
                                 }
                                 placeholder="SEGUNDOS"
                               />
@@ -1645,9 +1657,14 @@ export default function ExternalInvitationForm({
                             onScrimChange={(opacity) =>
                               updateCountdown("backgroundScrimOpacity", opacity)
                             }
-                            positionSettings={imgSettings("countdownBackground")}
+                            positionSettings={imgSettings(
+                              "countdownBackground",
+                            )}
                             onPositionChange={(settings) =>
-                              updateImageSettings("countdownBackground", settings)
+                              updateImageSettings(
+                                "countdownBackground",
+                                settings,
+                              )
                             }
                             idPrefix="countdownBackground"
                           />
@@ -1744,10 +1761,7 @@ export default function ExternalInvitationForm({
                           updateScratchRevealField("backgroundImageUrl", url)
                         }
                         onClear={() => {
-                          updateScratchRevealField(
-                            "backgroundImageUrl",
-                            null,
-                          );
+                          updateScratchRevealField("backgroundImageUrl", null);
                           updateImageSettings(
                             "scratchRevealBackground",
                             DEFAULT_IMAGE_SETTINGS,
@@ -1760,10 +1774,7 @@ export default function ExternalInvitationForm({
                           "scratchRevealBackground",
                         )}
                         onPositionChange={(s) =>
-                          updateImageSettings(
-                            "scratchRevealBackground",
-                            s,
-                          )
+                          updateImageSettings("scratchRevealBackground", s)
                         }
                         idPrefix="ccScratch"
                       />
@@ -2005,7 +2016,10 @@ export default function ExternalInvitationForm({
 
                     {/* Top text */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="veTopText" className="text-sm font-medium">
+                      <Label
+                        htmlFor="veTopText"
+                        className="text-sm font-medium"
+                      >
                         Texto superior
                       </Label>
                       <p className="text-xs text-muted-foreground">
@@ -2212,10 +2226,7 @@ export default function ExternalInvitationForm({
                           updateScratchRevealField("backgroundImageUrl", url)
                         }
                         onClear={() => {
-                          updateScratchRevealField(
-                            "backgroundImageUrl",
-                            null,
-                          );
+                          updateScratchRevealField("backgroundImageUrl", null);
                           updateImageSettings(
                             "scratchRevealBackground",
                             DEFAULT_IMAGE_SETTINGS,
@@ -2228,10 +2239,7 @@ export default function ExternalInvitationForm({
                           "scratchRevealBackground",
                         )}
                         onPositionChange={(s) =>
-                          updateImageSettings(
-                            "scratchRevealBackground",
-                            s,
-                          )
+                          updateImageSettings("scratchRevealBackground", s)
                         }
                         idPrefix="veScratch"
                       />
