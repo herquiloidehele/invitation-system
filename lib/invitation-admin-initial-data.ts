@@ -64,6 +64,7 @@ type AdminInvitationInitialDataRow = {
   guestMessageTemplate: string | null;
   socialPreview: unknown;
   priceFromCents: number | null;
+  discountPriceFromCents: number | null;
   currency: string | null;
   landingModelName: string | null;
   landingImageUrl: string | null;
@@ -83,7 +84,8 @@ export function toAdminInvitationInitialData(
     date: row.date as InvitationData["date"],
     quote: row.quote,
     location: row.location as InvitationData["location"],
-    location2: (row.location2 as InvitationData["location2"] | null) ?? undefined,
+    location2:
+      (row.location2 as InvitationData["location2"] | null) ?? undefined,
     rsvp: row.rsvp as InvitationData["rsvp"],
     schedule: row.schedule as InvitationData["schedule"],
     scheduleStyle: (row.scheduleStyle as ScheduleStyle | null) ?? "default",
@@ -131,6 +133,7 @@ export function toAdminInvitationInitialData(
       (row.socialPreview as InvitationData["socialPreview"] | null) ??
       undefined,
     priceFromCents: row.priceFromCents,
+    discountPriceFromCents: row.discountPriceFromCents,
     currency: row.currency,
     landingModelName: row.landingModelName,
     landingImageUrl: row.landingImageUrl,

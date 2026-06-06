@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/db";
 import { resolveLandingGalleryMetadata } from "@/lib/landing-gallery-metadata";
+import { resolveLandingPrice, type LandingPrice } from "@/lib/landing-price";
+
+// Re-exported so existing importers (e.g. the landing-pickable route) keep working.
+export { formatLandingPrice } from "@/lib/landing-price";
+export type { LandingPrice } from "@/lib/landing-price";
 
 export type GalleryCategory =
   | "wedding"
@@ -26,21 +31,6 @@ export function resolveGalleryCategory(
   return INVITATION_EVENT_CATEGORY[input.eventType] ?? null;
 }
 
-export function formatLandingPrice(
-  cents: number | null | undefined,
-  currency: string,
-  locale = "pt-PT",
-): string | null {
-  if (cents == null || cents <= 0) return null;
-  const amount = cents / 100;
-  const formatted = new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-    maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
-  }).format(amount);
-  return `Desde ${formatted}`;
-}
-
 // ---------------------------------------------------------------------------
 // Server-side data accessors
 // ---------------------------------------------------------------------------
@@ -59,7 +49,7 @@ export type GalleryFeature = {
   displayDate: string;
   subtitle: string | null;
   description: string | null;
-  priceLabel: string | null;
+  price: LandingPrice | null;
   category: GalleryCategory;
 };
 
@@ -174,7 +164,11 @@ export async function getGalleryFeaturesByCategory(): Promise<
       displayDate: readDateDisplay(target.date),
       subtitle: target.landingSubtitle ?? null,
       description: metadata.description,
-      priceLabel: formatLandingPrice(target.priceFromCents, target.currency),
+      price: resolveLandingPrice(
+        target.priceFromCents,
+        target.discountPriceFromCents,
+        target.currency,
+      ),
       category,
     });
   }
@@ -189,7 +183,7 @@ export type BestSellerFeature = {
   imageUrl: string | null;
   subtitle: string | null;
   description: string | null;
-  priceLabel: string | null;
+  price: LandingPrice | null;
 };
 
 type BestSellerSourceRow = {
@@ -204,6 +198,7 @@ type BestSellerSourceRow = {
     landingSubtitle: string | null;
     date: unknown;
     priceFromCents: number | null;
+    discountPriceFromCents: number | null;
     currency: string;
   } | null;
   saveTheDate: {
@@ -215,6 +210,7 @@ type BestSellerSourceRow = {
     landingSubtitle: string | null;
     date: unknown;
     priceFromCents: number | null;
+    discountPriceFromCents: number | null;
     currency: string;
   } | null;
 };
@@ -242,7 +238,11 @@ export function mapBestSellerRowToFeature(
     imageUrl: target.landingImageUrl ?? heroImage,
     subtitle: target.landingSubtitle ?? null,
     description: metadata.description,
-    priceLabel: formatLandingPrice(target.priceFromCents, target.currency),
+    price: resolveLandingPrice(
+      target.priceFromCents,
+      target.discountPriceFromCents,
+      target.currency,
+    ),
   };
 }
 

@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       socialPreview,
       isDemo,
       priceFromCents,
+      discountPriceFromCents,
       currency,
       landingModelName,
       landingImageUrl,
@@ -61,6 +62,10 @@ export async function POST(req: NextRequest) {
         isDemo: isDemo === true,
         priceFromCents:
           typeof priceFromCents === "number" ? priceFromCents : null,
+        discountPriceFromCents:
+          typeof discountPriceFromCents === "number"
+            ? discountPriceFromCents
+            : null,
         currency:
           typeof currency === "string" && currency.length ? currency : "EUR",
         landingModelName:
