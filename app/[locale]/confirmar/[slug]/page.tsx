@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import type { CustomTexts, InvitationEventType } from "@/lib/types";
+import type {
+  CustomTexts,
+  InvitationEventType,
+  TemplateTheme,
+} from "@/lib/types";
 import {
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
@@ -15,21 +19,12 @@ export const metadata: Metadata = createNoIndexMetadata();
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
-// ---------------------------------------------------------------------------
-// Deadline helper — tries to parse the deadline string and compare to now.
-// Returns false (not passed) if the string cannot be parsed as a date.
-// ---------------------------------------------------------------------------
-
 function isDeadlinePassed(deadline: string | undefined): boolean {
   if (!deadline) return false;
   const d = new Date(deadline);
   if (isNaN(d.getTime())) return false;
   return d < new Date();
 }
-
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
 
 export default async function ConfirmarPage({ params }: Props) {
   const { slug, locale } = await params;
@@ -43,13 +38,27 @@ export default async function ConfirmarPage({ params }: Props) {
       rsvp: true,
       customTexts: true,
       eventType: true,
+      cinematicImageUrl: true,
+      videoUrl: true,
+      videoPoster: true,
+      heroImage: true,
+      envelope: true,
+      theme: true,
     },
   });
 
   if (!invitation) notFound();
 
-  const couple = invitation.couple as { bride: string; groom: string };
-  const date = invitation.date as { display: string; iso?: string };
+  const couple = invitation.couple as {
+    bride: string;
+    groom: string;
+    monogram?: string;
+  };
+  const date = invitation.date as {
+    display: string;
+    iso?: string;
+    time?: string;
+  };
   const rsvp = invitation.rsvp as {
     enabled?: boolean;
     deadline?: string;
@@ -59,6 +68,7 @@ export default async function ConfirmarPage({ params }: Props) {
   };
   const customTexts =
     (invitation.customTexts as CustomTexts | null) ?? undefined;
+  const theme = invitation.theme as unknown as TemplateTheme;
 
   const deadlinePassed = isDeadlinePassed(rsvp.deadline);
   const dateDisplay = date.iso
@@ -71,12 +81,20 @@ export default async function ConfirmarPage({ params }: Props) {
       eventType={(invitation.eventType as InvitationEventType) ?? "wedding"}
       bride={couple.bride}
       groom={couple.groom}
+      monogram={couple.monogram}
       dateDisplay={dateDisplay}
+      dateIso={date.iso}
+      dateTime={date.time}
       deadline={rsvp.deadline}
       deadlinePassed={deadlinePassed}
       showEmail={shouldShowRsvpEmail(rsvp)}
       showDietaryRestrictions={shouldShowRsvpDietaryRestrictions(rsvp)}
-      backgroundImageUrl={rsvp.backgroundImageUrl}
+      adminBackgroundOverride={rsvp.backgroundImageUrl}
+      cinematicImageUrl={invitation.cinematicImageUrl ?? undefined}
+      videoUrl={invitation.videoUrl ?? undefined}
+      videoPoster={invitation.videoPoster ?? undefined}
+      heroImage={invitation.heroImage}
+      theme={theme}
       customTexts={customTexts}
     />
   );

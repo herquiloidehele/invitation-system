@@ -342,6 +342,7 @@
     "rsvp_deadlineClosedTitle": "Plazo cerrado",
     "rsvp_deadlineClosedMessage": "El plazo para confirmar asistencia ha finalizado{deadline}.",
     "rsvp_deadlineDatePrefix": " el {deadline}",
+    "rsvp_countdownPrefix": "Faltan {count} días",
     "common_close": "Cerrar"
   }
 }
