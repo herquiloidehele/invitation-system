@@ -587,6 +587,7 @@ export interface CustomTexts {
   rsvp_deadlineClosedTitle?: string;
   rsvp_deadlineClosedMessage?: string;
   rsvp_deadlineDatePrefix?: string;
+  rsvp_countdownPrefix?: string;
 
   // -- Common --
   common_close?: string;
