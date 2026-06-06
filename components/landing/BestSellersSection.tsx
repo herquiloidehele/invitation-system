@@ -119,20 +119,39 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                         </p>
                       ) : null}
                       {item.price ? (
-                        <p
-                          className={`mt-3 text-sm font-medium ${
-                            featured
-                              ? "text-primary-foreground/80"
-                              : "text-subtle-foreground"
-                          }`}
-                        >
+                        <div className="mt-3 flex items-baseline gap-2">
                           {item.price.originalLabel ? (
-                            <span className="mr-2 line-through opacity-60">
+                            <span
+                              className={`text-xs line-through ${
+                                featured
+                                  ? "text-primary-foreground/50"
+                                  : "text-subtle-foreground/60"
+                              }`}
+                            >
                               {item.price.originalLabel}
                             </span>
                           ) : null}
-                          {item.price.amountLabel}
-                        </p>
+                          <span className="flex items-baseline gap-1.5">
+                            <span
+                              className={`text-xs ${
+                                featured
+                                  ? "text-primary-foreground/70"
+                                  : "text-muted-foreground"
+                              }`}
+                            >
+                              {item.price.prefix}
+                            </span>
+                            <span
+                              className={`text-base font-semibold ${
+                                featured
+                                  ? "text-primary-foreground"
+                                  : "text-foreground"
+                              }`}
+                            >
+                              {item.price.amount}
+                            </span>
+                          </span>
+                        </div>
                       ) : null}
                     </div>
                   </motion.a>
