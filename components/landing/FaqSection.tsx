@@ -1,11 +1,18 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ChevronDownIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DISPLAY_WHATSAPP_NUMBER } from "@/lib/landing-whatsapp";
 import { AnimatedSection } from "./AnimatedSection";
 import { getFaqs } from "./landing-data";
+import {
+  getMotionProps,
+  landingFastTransition,
+  landingItemVariants,
+  landingStaggerVariants,
+  shouldReduceMotion,
+} from "./landing-motion";
 import { SectionEyebrow } from "./SectionEyebrow";
 
 export function FaqSection({
@@ -16,6 +23,8 @@ export function FaqSection({
   setOpenIndex: (index: number) => void;
 }) {
   const t = useTranslations("LandingFaq");
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
   const faqs = getFaqs(t);
 
   return (
@@ -33,13 +42,17 @@ export function FaqSection({
             <p>E-mail · ola@convites.brindealstudio.com</p>
           </div>
         </div>
-        <div className="space-y-3">
+        <motion.div
+          {...getMotionProps(reduceMotion, landingStaggerVariants)}
+          className="space-y-3"
+        >
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
               <motion.div
                 key={faq.question}
                 layout
+                variants={landingItemVariants}
                 transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                 className="rounded-2xl border border-border bg-card p-5"
               >
@@ -51,13 +64,13 @@ export function FaqSection({
                   className="flex w-full items-center justify-between gap-4 text-left font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
                 >
                   {faq.question}
-                  <span className="text-muted-foreground">
-                    {isOpen ? (
-                      <ChevronUpIcon className="size-5" />
-                    ) : (
-                      <ChevronDownIcon className="size-5" />
-                    )}
-                  </span>
+                  <motion.span
+                    animate={reduced ? undefined : { rotate: isOpen ? 180 : 0 }}
+                    transition={landingFastTransition}
+                    className="text-muted-foreground"
+                  >
+                    <ChevronDownIcon className="size-5" />
+                  </motion.span>
                 </button>
                 <AnimatePresence initial={false}>
                   {isOpen && (
@@ -78,7 +91,7 @@ export function FaqSection({
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </AnimatedSection>
   );

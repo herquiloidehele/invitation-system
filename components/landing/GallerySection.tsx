@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type {
   GalleryCategory as DbGalleryCategory,
@@ -17,6 +17,15 @@ import {
   type GalleryCategoryKey,
   getVisibleGalleryCategories,
 } from "./landing-data";
+import {
+  getMotionProps,
+  landingCardHover,
+  landingCardTap,
+  landingCardVariants,
+  landingFastTransition,
+  landingStaggerVariants,
+  shouldReduceMotion,
+} from "./landing-motion";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -33,6 +42,8 @@ export function GallerySection({
 }) {
   const t = useTranslations("LandingGallery");
   const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotion();
+  const reduced = shouldReduceMotion(reduceMotion);
   const [previewItem, setPreviewItem] = useState<GalleryCard | null>(null);
   const galleryCategories = getVisibleGalleryCategories(t, itemsByCategory);
   const allItems = useMemo<GalleryCard[]>(
@@ -97,10 +108,18 @@ export function GallerySection({
         {galleryCategories.length > 0 ? (
           <div className="mt-12 flex flex-wrap justify-center gap-2">
             {galleryCategories.map((category) => (
-              <button
+              <motion.button
                 key={category.key}
                 type="button"
                 onClick={() => onCategoryChange(category.key)}
+                animate={
+                  reduced
+                    ? undefined
+                    : { scale: activeCategory === category.key ? 1.03 : 1 }
+                }
+                whileHover={reduced ? undefined : { y: -1 }}
+                whileTap={reduced ? undefined : landingCardTap}
+                transition={landingFastTransition}
                 className={`rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4 ${
                   activeCategory === category.key
                     ? "bg-primary text-primary-foreground"
@@ -108,7 +127,7 @@ export function GallerySection({
                 }`}
               >
                 {category.label}
-              </button>
+              </motion.button>
             ))}
           </div>
         ) : null}
@@ -119,9 +138,10 @@ export function GallerySection({
         ) : (
           <motion.div
             layout
+            {...getMotionProps(reduceMotion, landingStaggerVariants)}
             className="mt-12 grid gap-3 md:grid-cols-2 lg:grid-cols-3"
           >
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence mode="popLayout" initial={false}>
               {visibleItems.map((item) => (
                 <motion.a
                   key={item.id}
@@ -131,10 +151,13 @@ export function GallerySection({
                   aria-label={`${t("previewAria")}: ${item.title || t("fallbackTitle")}`}
                   onClick={(event) => handleCardClick(event, item)}
                   layout
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_4.5%,transparent)] transition hover:-translate-y-1 hover:shadow-[0_20px_60px_color-mix(in_srgb,var(--foreground)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
+                  variants={landingCardVariants}
+                  initial={reduced ? false : "hidden"}
+                  animate={reduced ? undefined : "visible"}
+                  exit={reduced ? undefined : "exit"}
+                  whileHover={reduced ? undefined : landingCardHover}
+                  whileTap={reduced ? undefined : landingCardTap}
+                  className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_4.5%,transparent)] transition hover:shadow-[0_20px_60px_color-mix(in_srgb,var(--foreground)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
                 >
                   <div className="relative h-72 overflow-hidden bg-[linear-gradient(135deg,var(--border),var(--primary-soft))]">
                     {item.imageUrl ? (
