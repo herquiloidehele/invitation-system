@@ -43,6 +43,7 @@ type Pickable = {
   eventType: string | null;
   landingImageUrl: string | null;
   priceLabel: string | null;
+  couple: string;
 };
 
 type FeatureRow = {
@@ -133,6 +134,8 @@ export function LandingPageClient() {
     ]);
     setFeatures(featuresRes);
     setPickables(pickRes);
+
+    console.log({ pickRes, featuresRes });
   }
 
   useEffect(() => {
@@ -345,8 +348,7 @@ export function LandingPageClient() {
             Best Sellers
           </CardTitle>
           <CardDescription>
-            Três convites em destaque na secção “Mais vendidos” da landing
-            page.
+            Três convites em destaque na secção “Mais vendidos” da landing page.
             {bestSellers.length !== BEST_SELLER_TARGET ? (
               <span className="ml-1 text-amber-600">
                 Recomendamos {BEST_SELLER_TARGET} — actualmente:{" "}
@@ -669,7 +671,7 @@ function PickableSelect({
             options.map((option) => (
               <SelectItem key={`${option.kind}-${option.id}`} value={option.id}>
                 <span className="font-medium">
-                  {option.title || option.slug}
+                  {option.couple || option.title || option.slug}
                 </span>
                 <span className="ml-2 text-xs text-muted-foreground">
                   {option.kind === "invitation" ? "Convite" : "Save the Date"}

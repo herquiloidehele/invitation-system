@@ -23,5 +23,6 @@ export function resolveLandingGalleryMetadata(
   return {
     title: normalizeText(input.landingModelName) ?? readCouple(input.couple),
     description: normalizeText(input.landingDescription),
+    couple: readCouple(input.couple) || "",
   };
 }
