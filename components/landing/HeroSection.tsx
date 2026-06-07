@@ -42,10 +42,10 @@ export function HeroSection({
         className="relative z-10 mx-auto w-full max-w-[20rem] sm:max-w-88 lg:max-w-336"
       >
         <video
-          src="/videos/hero-phones-videos.mp4"
+          src="https://invitation-system-media.s3.us-east-1.amazonaws.com/uploads/videos/1780761037157-hero-phones-videos.mp4"
+          poster={"/images/hero-placeholder.jpg"}
           autoPlay
           muted
-          // loop
           playsInline
           preload="metadata"
           aria-hidden="true"

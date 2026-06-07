@@ -22,10 +22,6 @@ export function Footer() {
           label: t("saveTheDate"),
           href: buildLocalePath("/save-the-date-digital", locale),
         },
-        {
-          label: t("digitalInvitations"),
-          href: buildLocalePath("/convites-digitais", locale),
-        },
         { label: t("baptism"), href: "#galeria" },
         { label: t("engagement"), href: "#galeria" },
       ],
