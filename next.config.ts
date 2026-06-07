@@ -43,6 +43,22 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Static videos in /public are versioned by filename (e.g. `-v1`), so the
+  // bytes at a given path never change — cache them forever. Ship a new clip
+  // by bumping the filename (and its reference) rather than overwriting.
+  async headers() {
+    return [
+      {
+        source: "/videos/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
