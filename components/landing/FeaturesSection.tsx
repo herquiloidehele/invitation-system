@@ -52,9 +52,7 @@ export function FeaturesSection() {
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
             {t("title")}
           </h2>
-          <p className="mt-5 text-muted-foreground">
-            {t("body")}
-          </p>
+          <p className="mt-5 text-muted-foreground">{t("body")}</p>
         </div>
         <motion.div
           {...getMotionProps(reduceMotion, landingStaggerVariants)}
@@ -376,10 +374,6 @@ function AnalyticsChart() {
           ))}
         </div>
       </div>
-      <p className="mt-3 text-3xl font-semibold text-primary">
-        +38%{" "}
-        <span className="text-xs font-normal text-muted-foreground">{t("updatedNow")}</span>
-      </p>
     </>
   );
 }
@@ -458,7 +452,10 @@ function CustomizationPanel() {
         {t("typography")}
       </p>
       <p className="mt-1.5 text-2xl font-semibold text-foreground">
-        Aa <span className="text-base font-normal text-muted-foreground">Manrope</span>
+        Aa{" "}
+        <span className="text-base font-normal text-muted-foreground">
+          Manrope
+        </span>
       </p>
     </>
   );
@@ -494,14 +491,14 @@ function PersonalizationCard() {
           </div>
         </div>
         <Dialog>
-            <DialogTrigger
-              render={
-                <motion.button
-                  type="button"
-                  whileHover={reduced ? undefined : { y: -2 }}
-                  whileTap={reduced ? undefined : landingCardTap}
-                  className="shrink-0 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
-                />
+          <DialogTrigger
+            render={
+              <motion.button
+                type="button"
+                whileHover={reduced ? undefined : { y: -2 }}
+                whileTap={reduced ? undefined : landingCardTap}
+                className="shrink-0 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
+              />
             }
           >
             {t("personalizationCta")}
@@ -524,7 +521,7 @@ function PersonalizationCard() {
                     <span className="block text-lg font-semibold text-primary">
                       {price}
                     </span>
-                    <span className="block text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    <span className="block text-[8px] uppercase tracking-[0.18em] text-muted-foreground">
                       {t("personalizationPerInvite")}
                     </span>
                   </span>
@@ -532,8 +529,8 @@ function PersonalizationCard() {
               ))}
             </ul>
           </DialogContent>
-          </Dialog>
-        </div>
+        </Dialog>
+      </div>
     </motion.article>
   );
 }

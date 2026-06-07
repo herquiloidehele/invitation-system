@@ -52,9 +52,7 @@ export function ProcessSection() {
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
             {t("title")}
           </h2>
-          <p className="mt-5 text-muted-foreground">
-            {t("body")}
-          </p>
+          <p className="mt-5 text-muted-foreground">{t("body")}</p>
         </div>
         <motion.div
           {...getMotionProps(reduceMotion, landingStaggerVariants)}
@@ -118,9 +116,7 @@ export function ProcessSection() {
           })}
         </motion.div>
         <div className="mt-14 flex flex-col items-center justify-center gap-5 text-center sm:flex-row">
-          <p className="text-2xl font-medium text-foreground">
-            {t("closing")}
-          </p>
+          <p className="text-2xl font-medium text-foreground">{t("closing")}</p>
           <a
             href={buildWhatsappUrl(landingT("defaultWhatsappMessage"))}
             target="_blank"
@@ -149,7 +145,7 @@ function ProcessPreview({
     return (
       <motion.div
         variants={landingItemVariants}
-        className="mt-6 space-y-2 rounded-2xl bg-primary-deep/85 p-4 text-xs text-primary-foreground"
+        className="mt-6 space-y-2 rounded-2xl bg-primary-deep/85 p-4 text-xs text-primary-foreground/10"
       >
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 8 }}
@@ -214,7 +210,11 @@ function ProcessPreview({
           transition={
             reduced
               ? undefined
-              : { duration: 2.4, repeat: Infinity, ease: landingFastTransition.ease }
+              : {
+                  duration: 2.4,
+                  repeat: Infinity,
+                  ease: landingFastTransition.ease,
+                }
           }
           className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-background px-3 py-1.5 text-[10px] font-semibold text-primary shadow-sm"
         >
@@ -229,34 +229,34 @@ function ProcessPreview({
     return (
       <>
         <div className="mt-6 grid grid-cols-[auto_1fr] gap-3 rounded-2xl bg-muted p-4">
-        <div className="relative h-24 w-16 overflow-hidden rounded-lg bg-background shadow-sm">
-          <div className="absolute inset-x-2 top-2 h-2 rounded-full bg-muted-strong" />
-          <div className="absolute inset-x-2 top-5 h-2 w-8 rounded-full bg-muted-strong" />
-          <div className="absolute inset-x-2 top-9 h-8 rounded-md bg-primary-soft" />
-          <span className="absolute -right-1 top-3 grid h-5 w-5 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-            1
-          </span>
-          <span className="absolute -left-1 bottom-3 grid h-5 w-5 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-            2
-          </span>
-        </div>
-        <div className="space-y-2 text-[11px] text-foreground">
-          <div className="flex items-center gap-2">
-            <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground motion-safe:animate-pulse">
+          <div className="relative h-24 w-16 overflow-hidden rounded-lg bg-background shadow-sm">
+            <div className="absolute inset-x-2 top-2 h-2 rounded-full bg-muted-strong" />
+            <div className="absolute inset-x-2 top-5 h-2 w-8 rounded-full bg-muted-strong" />
+            <div className="absolute inset-x-2 top-9 h-8 rounded-md bg-primary-soft" />
+            <span className="absolute -right-1 top-3 grid h-5 w-5 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
               1
             </span>
-            {t("revisionA")}
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground motion-safe:animate-pulse">
+            <span className="absolute -left-1 bottom-3 grid h-5 w-5 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
               2
             </span>
-            {t("revisionB")}
           </div>
-          <span className="inline-flex rounded-full bg-background px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
-            {t("versionApproved")}
-          </span>
-        </div>
+          <div className="space-y-2 text-[11px] text-foreground">
+            <div className="flex items-center gap-2">
+              <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground motion-safe:animate-pulse">
+                1
+              </span>
+              {t("revisionA")}
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground motion-safe:animate-pulse">
+                2
+              </span>
+              {t("revisionB")}
+            </div>
+            <span className="inline-flex rounded-full bg-background px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
+              {t("versionApproved")}
+            </span>
+          </div>
         </div>
         <p className="mt-4 text-[11px] leading-5 text-muted-foreground">
           {t("revisionFees")}
@@ -288,7 +288,11 @@ function ProcessPreview({
           transition={
             reduced
               ? undefined
-              : { duration: 2.2, repeat: Infinity, ease: landingFastTransition.ease }
+              : {
+                  duration: 2.2,
+                  repeat: Infinity,
+                  ease: landingFastTransition.ease,
+                }
           }
           className="flex items-center justify-between rounded-full bg-primary px-3 py-1.5 text-[11px] text-primary-foreground"
         >
