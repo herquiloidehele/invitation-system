@@ -42,6 +42,7 @@ export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
               <PhoneIframePreview
                 title={preview.title || t("fallbackInvitation")}
                 src={preview.href}
+                loading={undefined}
               />
             </motion.div>
           ))}
