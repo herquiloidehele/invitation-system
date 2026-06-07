@@ -1,9 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { useLocale, useTranslations } from "next-intl";
-import { resolveLocale } from "@/i18n/locales";
-import { buildLocalePath } from "@/lib/seo";
+import { useTranslations } from "next-intl";
 import {
   getMotionProps,
   landingItemVariants,
@@ -13,15 +11,10 @@ import {
 export function Footer() {
   const t = useTranslations("LandingFooter");
   const reduceMotion = useReducedMotion();
-  const locale = resolveLocale(useLocale());
   const linkGroups = [
     {
       heading: t("product"),
       links: [
-        {
-          label: t("saveTheDate"),
-          href: buildLocalePath("/save-the-date-digital", locale),
-        },
         { label: t("baptism"), href: "#galeria" },
         { label: t("engagement"), href: "#galeria" },
       ],
@@ -52,7 +45,7 @@ export function Footer() {
         <motion.div variants={landingItemVariants}>
           <div className="flex items-center gap-2 text-xl font-semibold text-primary-foreground">
             <span className="h-2.5 w-2.5 rounded-full bg-primary-soft" />
-            brindeal
+            Brindeal Studio
           </div>
           <p className="mt-5 max-w-xs text-sm leading-6 text-faint-foreground">
             {t("description")}
