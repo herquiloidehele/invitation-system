@@ -16,9 +16,7 @@ import {
 
 export const SERVICE_PAGE_SLUGS = [
   "convites-digitais",
-  "convites-casamento",
   "save-the-date-digital",
-  "convites-com-rsvp",
 ] as const;
 
 export type ServicePageSlug = (typeof SERVICE_PAGE_SLUGS)[number];
@@ -135,104 +133,6 @@ const CONTENT: Record<ServicePageSlug, Record<AppLocale, ServicePageContent>> = 
       ctaBody: "Enviadnos la fecha, tipo de evento y estilo que imagináis. Responderemos con una propuesta clara.",
     },
   },
-  "convites-casamento": {
-    pt: {
-      title: "Convites de Casamento Digitais | Brindeal Studio",
-      description:
-        "Convites de casamento digitais personalizados em Portugal, com RSVP online, mapa, música, programa do dia, galeria e acompanhamento até à publicação.",
-      eyebrow: "Casamentos",
-      h1: "Convites de casamento digitais elegantes, pessoais e prontos a partilhar",
-      intro:
-        "Criamos convites de casamento digitais para casais que querem uma experiência bonita e prática. O convite reúne a história, os horários, as localizações, o RSVP e os detalhes importantes num link simples para enviar aos convidados.",
-      proof: "Design à medida, resposta no mesmo dia e publicação acompanhada.",
-      sections: [
-        {
-          title: "Pensado para convidados reais",
-          body: "Os convidados encontram rapidamente a data, morada, mapa, opções de navegação, programa e perguntas frequentes. Se ativarem RSVP, as confirmações ficam organizadas num painel privado.",
-        },
-        {
-          title: "Um convite com o vosso tom",
-          body: "Podemos criar uma estética editorial, romântica, minimalista, floral, clássica ou mais cinematográfica. O objetivo é que o convite pareça vosso, não apenas um modelo preenchido.",
-        },
-      ],
-      faqs: [
-        {
-          question: "Quanto tempo demora um convite de casamento digital?",
-          answer: "Normalmente entre 4 e 10 dias úteis, dependendo dos materiais e revisões.",
-        },
-        {
-          question: "Podemos acompanhar as confirmações?",
-          answer: "Sim. O RSVP online permite ver respostas, mensagens e informação dos convidados.",
-        },
-      ],
-      ctaTitle: "Vamos desenhar o vosso convite de casamento?",
-      ctaBody: "Partilhem a data, local e referências. Preparamos uma proposta para o vosso convite digital.",
-    },
-    en: {
-      title: "Digital Wedding Invitations | Brindeal Studio",
-      description:
-        "Personalized digital wedding invitations in Portugal, with online RSVP, maps, music, schedule, gallery and guided publishing.",
-      eyebrow: "Weddings",
-      h1: "Elegant digital wedding invitations ready to share",
-      intro:
-        "We create digital wedding invitations for couples who want a beautiful and practical guest experience. The invitation gathers your story, schedule, locations, RSVP and key details in one simple link.",
-      proof: "Tailored design, same-day reply and guided publishing.",
-      sections: [
-        {
-          title: "Made for real guests",
-          body: "Guests quickly find the date, address, map, navigation options, schedule and FAQs. If RSVP is enabled, confirmations are organized in a private dashboard.",
-        },
-        {
-          title: "An invitation with your tone",
-          body: "We can create an editorial, romantic, minimal, floral, classic or cinematic direction. The goal is a page that feels personal, not like a filled template.",
-        },
-      ],
-      faqs: [
-        {
-          question: "How long does a digital wedding invitation take?",
-          answer: "Usually 4 to 10 business days, depending on materials and revisions.",
-        },
-        {
-          question: "Can we track confirmations?",
-          answer: "Yes. Online RSVP lets you view responses, messages and guest information.",
-        },
-      ],
-      ctaTitle: "Shall we design your wedding invitation?",
-      ctaBody: "Share your date, venue and references. We will prepare a proposal for your digital invitation.",
-    },
-    es: {
-      title: "Invitaciones de Boda Digitales | Brindeal Studio",
-      description:
-        "Invitaciones de boda digitales personalizadas en Portugal, con RSVP online, mapa, música, programa, galería y publicación acompañada.",
-      eyebrow: "Bodas",
-      h1: "Invitaciones de boda digitales elegantes y listas para enviar",
-      intro:
-        "Creamos invitaciones de boda digitales para parejas que quieren una experiencia bonita y práctica. La invitación reúne historia, horarios, ubicaciones, RSVP y detalles clave en un enlace simple.",
-      proof: "Diseño a medida, respuesta el mismo día y publicación acompañada.",
-      sections: [
-        {
-          title: "Pensada para invitados reales",
-          body: "Los invitados encuentran fecha, dirección, mapa, navegación, programa y preguntas frecuentes. Con RSVP, las confirmaciones quedan organizadas en un panel privado.",
-        },
-        {
-          title: "Una invitación con vuestro tono",
-          body: "Podemos crear una estética editorial, romántica, minimalista, floral, clásica o cinematográfica. El objetivo es que se sienta personal, no como una plantilla rellenada.",
-        },
-      ],
-      faqs: [
-        {
-          question: "Cuánto tarda una invitación de boda digital?",
-          answer: "Normalmente entre 4 y 10 días laborables, según materiales y revisiones.",
-        },
-        {
-          question: "Podemos seguir las confirmaciones?",
-          answer: "Sí. El RSVP online permite ver respuestas, mensajes e información de invitados.",
-        },
-      ],
-      ctaTitle: "Diseñamos vuestra invitación de boda?",
-      ctaBody: "Compartid fecha, lugar y referencias. Prepararemos una propuesta para vuestra invitación digital.",
-    },
-  },
   "save-the-date-digital": {
     pt: {
       title: "Save the Date Digital | Brindeal Studio",
@@ -329,104 +229,6 @@ const CONTENT: Record<ServicePageSlug, Record<AppLocale, ServicePageContent>> = 
       ],
       ctaTitle: "Anunciamos la fecha?",
       ctaBody: "Enviadnos la fecha y el estilo. Crearemos un Save the Date digital listo para compartir.",
-    },
-  },
-  "convites-com-rsvp": {
-    pt: {
-      title: "Convites com RSVP Online | Brindeal Studio",
-      description:
-        "Convites digitais com RSVP online para casamentos e eventos, com confirmações em tempo real, mensagens dos convidados e painel privado.",
-      eyebrow: "RSVP online",
-      h1: "Convites com RSVP online para organizar respostas sem folhas soltas",
-      intro:
-        "Um convite com RSVP online ajuda a transformar respostas dispersas em informação organizada. Os convidados confirmam no link, deixam mensagem e indicam detalhes úteis quando necessário.",
-      proof: "Confirmações centralizadas, painel privado e experiência simples para convidados.",
-      sections: [
-        {
-          title: "Menos conversas perdidas",
-          body: "Em vez de recolher respostas por várias mensagens, recebem confirmações estruturadas. Isto facilita contagens, listas finais, restrições alimentares e acompanhamento dos convidados.",
-        },
-        {
-          title: "RSVP integrado no design do convite",
-          body: "O formulário não parece um anexo técnico. Faz parte da experiência visual do convite e mantém o tom do evento até ao momento da confirmação.",
-        },
-      ],
-      faqs: [
-        {
-          question: "O RSVP pode pedir restrições alimentares?",
-          answer: "Sim. Também pode pedir email, mensagem ou outros detalhes definidos no convite.",
-        },
-        {
-          question: "Os noivos têm acesso às respostas?",
-          answer: "Sim. As respostas ficam disponíveis num painel privado.",
-        },
-      ],
-      ctaTitle: "Querem simplificar as confirmações?",
-      ctaBody: "Criamos um convite digital com RSVP alinhado com o vosso evento.",
-    },
-    en: {
-      title: "Invitations with Online RSVP | Brindeal Studio",
-      description:
-        "Digital invitations with online RSVP for weddings and events, with real-time confirmations, guest messages and a private dashboard.",
-      eyebrow: "Online RSVP",
-      h1: "Invitations with online RSVP to organize replies clearly",
-      intro:
-        "An invitation with online RSVP turns scattered replies into organized information. Guests confirm through the link, leave messages and share useful details when needed.",
-      proof: "Centralized confirmations, private dashboard and a simple guest experience.",
-      sections: [
-        {
-          title: "Fewer lost conversations",
-          body: "Instead of collecting replies across many messages, you receive structured confirmations. This makes headcounts, final lists and dietary restrictions easier to manage.",
-        },
-        {
-          title: "RSVP integrated into the invitation design",
-          body: "The form does not feel like a technical add-on. It belongs to the visual experience and keeps the event tone through confirmation.",
-        },
-      ],
-      faqs: [
-        {
-          question: "Can RSVP ask for dietary restrictions?",
-          answer: "Yes. It can also ask for email, message or other details configured for the invitation.",
-        },
-        {
-          question: "Do hosts access the replies?",
-          answer: "Yes. Replies are available in a private dashboard.",
-        },
-      ],
-      ctaTitle: "Want to simplify confirmations?",
-      ctaBody: "We create a digital invitation with RSVP aligned with your event.",
-    },
-    es: {
-      title: "Invitaciones con RSVP Online | Brindeal Studio",
-      description:
-        "Invitaciones digitales con RSVP online para bodas y eventos, con confirmaciones en tiempo real, mensajes de invitados y panel privado.",
-      eyebrow: "RSVP online",
-      h1: "Invitaciones con RSVP online para organizar respuestas sin caos",
-      intro:
-        "Una invitación con RSVP online convierte respuestas dispersas en información organizada. Los invitados confirman en el enlace, dejan mensaje e indican detalles útiles si hace falta.",
-      proof: "Confirmaciones centralizadas, panel privado y experiencia simple para invitados.",
-      sections: [
-        {
-          title: "Menos conversaciones perdidas",
-          body: "En lugar de recoger respuestas en muchos mensajes, recibís confirmaciones estructuradas. Esto facilita recuentos, listas finales y restricciones alimentarias.",
-        },
-        {
-          title: "RSVP integrado en el diseño",
-          body: "El formulario no parece un añadido técnico. Forma parte de la experiencia visual y mantiene el tono del evento hasta la confirmación.",
-        },
-      ],
-      faqs: [
-        {
-          question: "El RSVP puede pedir restricciones alimentarias?",
-          answer: "Sí. También puede pedir email, mensaje u otros detalles configurados.",
-        },
-        {
-          question: "Los anfitriones acceden a las respuestas?",
-          answer: "Sí. Las respuestas están disponibles en un panel privado.",
-        },
-      ],
-      ctaTitle: "Queréis simplificar las confirmaciones?",
-      ctaBody: "Creamos una invitación digital con RSVP alineado con vuestro evento.",
     },
   },
 };

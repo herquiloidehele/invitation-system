@@ -10,20 +10,12 @@ export function Footer() {
       heading: t("product"),
       links: [
         {
-          label: t("wedding"),
-          href: buildLocalePath("/convites-casamento", locale),
-        },
-        {
           label: t("saveTheDate"),
           href: buildLocalePath("/save-the-date-digital", locale),
         },
         {
           label: t("digitalInvitations"),
           href: buildLocalePath("/convites-digitais", locale),
-        },
-        {
-          label: t("rsvpInvitations"),
-          href: buildLocalePath("/convites-com-rsvp", locale),
         },
         { label: t("baptism"), href: "#galeria" },
         { label: t("engagement"), href: "#galeria" },
