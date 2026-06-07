@@ -4,10 +4,12 @@ export function PhoneIframePreview({
   title,
   src,
   showCaption = true,
+  loading,
 }: {
   title: string;
   src: string;
   showCaption?: boolean;
+  loading?: "eager" | "lazy";
 }) {
   return (
     <article className="text-center">
@@ -21,7 +23,7 @@ export function PhoneIframePreview({
             title={`Pré-visualização do convite ${title}`}
             src={src}
             className="h-full w-full border-0 [scrollbar-width:none]"
-            loading="lazy"
+            loading={loading}
           />
           <span
             aria-hidden="true"

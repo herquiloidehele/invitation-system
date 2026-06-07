@@ -1,25 +1,27 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import type { Variants } from "framer-motion";
+import { getMotionProps, landingContainerVariants } from "./landing-motion";
 
 export function AnimatedSection({
   children,
   className,
   id,
+  variants = landingContainerVariants,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   id?: string;
+  variants?: Variants;
 }) {
   const reduceMotion = useReducedMotion();
 
   return (
     <motion.section
       id={id}
-      initial={reduceMotion ? false : { opacity: 0, y: 36 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-120px" }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      {...getMotionProps(reduceMotion, variants)}
       className={className}
     >
       {children}
