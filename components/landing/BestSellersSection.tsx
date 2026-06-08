@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { XIcon } from "lucide-react";
+import { MousePointerClickIcon, XIcon } from "lucide-react";
 import type { BestSellerFeature } from "@/lib/landing-features";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatedSection } from "./AnimatedSection";
@@ -94,6 +94,14 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                         />
                       ) : null}
                       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,color-mix(in_srgb,var(--foreground)_16%,transparent))]" />
+                      <div className="pointer-events-none absolute top-3 right-3 z-10 hidden opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
+                        <div className="relative flex items-center justify-center">
+                          <span className="absolute h-full w-full motion-safe:animate-ping rounded-full bg-foreground/20" />
+                          <div className="relative motion-safe:animate-pulso rounded-full bg-background/90 p-2.5 shadow-lg backdrop-blur-sm">
+                            <MousePointerClickIcon className="h-4 w-4 text-foreground" />
+                          </div>
+                        </div>
+                      </div>
                       <span
                         className={`absolute left-4 top-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${
                           featured
