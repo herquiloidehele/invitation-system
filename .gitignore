@@ -51,3 +51,6 @@ docs/
 /lib/generated/prisma
 .agents/
 .junie/
+
+# one-shot db migration data dump (contains PII)
+neon_data.sql
