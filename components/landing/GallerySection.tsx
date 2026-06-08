@@ -171,12 +171,12 @@ export function GallerySection({
                       />
                     ) : null}
                     <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,color-mix(in_srgb,var(--foreground)_16%,transparent))]" />
-                    <div className="pointer-events-none absolute top-3 right-3 z-10 hidden opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
-                      <div className="relative flex items-center justify-center">
-                        <span className="absolute h-full w-full motion-safe:animate-ping rounded-full bg-foreground/20" />
-                        <div className="relative motion-safe:animate-pulso rounded-full bg-background/90 p-2.5 shadow-lg backdrop-blur-sm">
-                          <MousePointerClickIcon className="h-4 w-4 text-foreground" />
-                        </div>
+                    <div className="pointer-events-none absolute top-3 right-3 z-10 hidden opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:flex">
+                      <div className="flex items-center gap-2 rounded-full bg-background/90 py-2 pr-4 pl-3 shadow-lg backdrop-blur-sm">
+                        <MousePointerClickIcon className="h-4 w-4 text-foreground" />
+                        <span className="text-xs font-medium text-foreground">
+                          {t("clickToPreview")}
+                        </span>
                       </div>
                     </div>
                   </div>

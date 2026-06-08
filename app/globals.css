@@ -522,16 +522,4 @@ body {
     animation: shimmer 3s ease-in-out infinite;
 }
 
-/* Landing cards — click-to-preview hint */
-@keyframes pulso {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.18);
-    }
-}
 
-.animate-pulso {
-    animation: pulso 1.6s ease-in-out infinite;
-}

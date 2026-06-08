@@ -54,7 +54,8 @@
     "previewAria": "Previsualizar invitación",
     "badge": "BEST SELLER",
     "showMore": "Ver más",
-    "showLess": "Ver menos"
+    "showLess": "Ver menos",
+    "clickToPreview": "Haz clic para visualizar"
   },
   "LandingGallery": {
     "eyebrow": "Modelos",
@@ -66,6 +67,7 @@
     "openInNewTab": "Abrir en nueva pestaña →",
     "showMore": "Ver más",
     "showLess": "Ver menos",
+    "clickToPreview": "Haz clic para visualizar",
     "categories": {
       "all": "Todos",
       "wedding": "Invitación",

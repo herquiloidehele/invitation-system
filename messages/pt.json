@@ -54,7 +54,8 @@
     "previewAria": "Pré-visualizar convite",
     "badge": "BEST SELLER",
     "showMore": "Ver mais",
-    "showLess": "Ver menos"
+    "showLess": "Ver menos",
+    "clickToPreview": "Clica para visualizar"
   },
   "LandingGallery": {
     "eyebrow": "Modelos",
@@ -66,6 +67,7 @@
     "openInNewTab": "Abrir em nova página →",
     "showMore": "Ver mais",
     "showLess": "Ver menos",
+    "clickToPreview": "Clica para visualizar",
     "categories": {
       "all": "Todos",
       "wedding": "Convites",
