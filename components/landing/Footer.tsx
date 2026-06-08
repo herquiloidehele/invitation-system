@@ -15,14 +15,14 @@ export function Footer() {
     {
       heading: t("product"),
       links: [
-        { label: t("baptism"), href: "#galeria" },
-        { label: t("engagement"), href: "#galeria" },
+        { label: t("baptism"), href: "#modelos" },
+        { label: t("engagement"), href: "#modelos" },
       ],
     },
     {
       heading: t("resources"),
       links: [
-        { label: t("gallery"), href: "#galeria" },
+        { label: t("gallery"), href: "#modelos" },
         { label: t("process"), href: "#processo" },
         { label: t("faq"), href: "#faq" },
       ],

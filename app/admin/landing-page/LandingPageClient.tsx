@@ -299,7 +299,7 @@ export function LandingPageClient() {
         />
         <StatCard
           icon={GalleryHorizontalEnd}
-          label="Galeria"
+          label="Modelos"
           value={stats.gallery}
           hint={`${CATEGORIES.length} categorias disponíveis`}
         />
@@ -435,10 +435,10 @@ export function LandingPageClient() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <GalleryHorizontalEnd className="size-4" />
-            Galeria
+            Modelos
           </CardTitle>
           <CardDescription>
-            Cada categoria aparece como um separador na galeria pública.
+            Cada categoria aparece como um separador nos modelos públicos.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

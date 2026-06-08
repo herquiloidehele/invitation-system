@@ -93,7 +93,7 @@ export function GallerySection({
 
   return (
     <AnimatedSection
-      id="galeria"
+      id="modelos"
       className="bg-background px-5 py-24 sm:px-8 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">

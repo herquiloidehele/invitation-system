@@ -95,7 +95,7 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
           {t("heroPrimaryCta")}
         </motion.a>
         <motion.a
-          href="#galeria"
+          href="#modelos"
           whileHover={reduced ? undefined : { y: -2 }}
           whileTap={reduced ? undefined : landingCardTap}
           className="rounded-full border border-border px-7 py-4 text-center text-sm font-semibold text-foreground transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"

@@ -45,7 +45,7 @@ export type LandingTranslator = {
 export function getNavLinks(t: (key: string) => string) {
   return [
     { label: t("bestSellers"), href: "#destaques" },
-    { label: t("gallery"), href: "#galeria" },
+    { label: t("gallery"), href: "#modelos" },
     { label: t("process"), href: "#processo" },
     { label: t("features"), href: "#recursos" },
     { label: t("faq"), href: "#faq" },
