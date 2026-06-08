@@ -61,6 +61,7 @@ type InvitationWithTheme = {
   scratchReveal: unknown;
   heroConfetti: unknown;
   countdown: unknown;
+  personalGuestCard: unknown;
   invitationType: string;
   externalLink: string | null;
   isDemo: boolean;
@@ -117,6 +118,9 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     heroConfetti:
       (row.heroConfetti as InvitationData["heroConfetti"] | null) ?? undefined,
     countdown: (row.countdown as ExternalCountdownConfig | null) ?? undefined,
+    personalGuestCard:
+      (row.personalGuestCard as InvitationData["personalGuestCard"] | null) ??
+      undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,
     isDemo: row.isDemo,

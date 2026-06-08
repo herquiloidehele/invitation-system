@@ -16,6 +16,7 @@
     "db:generate": "npx prisma generate",
     "db:migrate:prod": "cross-env NODE_ENV=production prisma migrate deploy",
     "db:studio": "prisma studio",
+    "db:migrate:neon-to-railway": "tsx --env-file=.env.migrate scripts/migrate-neon-to-railway.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

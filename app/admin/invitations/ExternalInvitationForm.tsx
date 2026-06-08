@@ -458,6 +458,22 @@ export default function ExternalInvitationForm({
     [],
   );
 
+  const updatePersonalGuestCard = useCallback(
+    <K extends keyof NonNullable<InvitationData["personalGuestCard"]>>(
+      field: K,
+      value: NonNullable<InvitationData["personalGuestCard"]>[K],
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        personalGuestCard: {
+          ...(prev.personalGuestCard ?? {}),
+          [field]: value,
+        },
+      }));
+    },
+    [],
+  );
+
   const updateHeroConfetti = useCallback((enabled: boolean) => {
     setForm((prev) => ({ ...prev, heroConfetti: { enabled } }));
   }, []);
@@ -2473,6 +2489,39 @@ export default function ExternalInvitationForm({
                           Guarda o convite primeiro para gerir a lista de
                           convidados.
                         </p>
+                      )}
+
+                      {(isVideoEntrance || isCurtainCanva) && (
+                        <SectionBackgroundImageEditor
+                          value={
+                            form.personalGuestCard?.backgroundImageUrl ?? ""
+                          }
+                          label="Imagem de fundo do cartão do convidado"
+                          description="Fotografia de fundo opcional atrás do cartão pessoal do convidado. Sem imagem, a secção usa a cor de fundo do tema."
+                          scrimLabel="Escurecimento da imagem"
+                          maxSizeMB={8}
+                          scrimOpacity={form.personalGuestCard?.scrimOpacity}
+                          onUpload={(url) =>
+                            updatePersonalGuestCard("backgroundImageUrl", url)
+                          }
+                          onClear={() => {
+                            updatePersonalGuestCard("backgroundImageUrl", null);
+                            updateImageSettings(
+                              "personalGuestCardBackground",
+                              DEFAULT_IMAGE_SETTINGS,
+                            );
+                          }}
+                          onScrimChange={(o) =>
+                            updatePersonalGuestCard("scrimOpacity", o)
+                          }
+                          positionSettings={imgSettings(
+                            "personalGuestCardBackground",
+                          )}
+                          onPositionChange={(s) =>
+                            updateImageSettings("personalGuestCardBackground", s)
+                          }
+                          idPrefix="pgcBg"
+                        />
                       )}
                     </>
                   )}

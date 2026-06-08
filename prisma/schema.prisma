@@ -105,6 +105,7 @@ model Invitation {
   scratchReveal  Json?   // { enabled: boolean } — toggles ScratchDateReveal section on external_link pages
   heroConfetti   Json?   // { enabled: boolean } — toggles the curtain-canva hero celebration confetti. Unset → fires (default on)
   countdown      Json?   // ExternalCountdownConfig — toggles and styles the external_link countdown section
+  personalGuestCard Json? // PersonalGuestCardConfig — optional background image + scrim behind the personal guest card (video-entrance / curtain-canva)
   textStyles     Json?   // TextStyleOverrides — per-invitation text styling overrides (fonts, colors, sizes)
   cardStyles     Json?   // CardStyleOverrides — per-section card background/border overrides
   imageSettings  Json?   // ImageSettingsMap — per-image position & zoom overrides
