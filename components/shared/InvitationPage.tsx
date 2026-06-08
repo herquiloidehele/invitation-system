@@ -23,7 +23,10 @@ import { useCustomText } from "@/lib/custom-texts";
 import { formatLocalizedMonthLong } from "@/lib/date-format";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
-import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST } from "./PersonalGuestCard";
+import PersonalGuestCard, {
+  PREVIEW_SAMPLE_GUEST,
+  PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
+} from "./PersonalGuestCard";
 import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
@@ -335,6 +338,11 @@ interface InvitationPageProps {
   /** Pass true in the admin live preview so all animations are always visible
    *  and respond to React state changes rather than scroll position. */
   isPreview?: boolean;
+  /** True when shown inside the public landing-page phone preview iframe.
+   *  Forces the sample personal guest card to render for display purposes,
+   *  even when the invitation has no real guest. Unlike `isPreview`, it does
+   *  not change scroll-triggered animation behavior. */
+  isLandingPreview?: boolean;
 }
 
 export default function InvitationPage({
@@ -343,6 +351,7 @@ export default function InvitationPage({
   audioRef,
   prefetchedVideoRef,
   isPreview = false,
+  isLandingPreview = false,
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
@@ -455,12 +464,19 @@ export default function InvitationPage({
       />
 
       {/* ================================================================= */}
-      {/* Personal guest card — shown when ?g=<token> matches a guest       */}
+      {/* Personal guest card — shown when ?g=<token> matches a guest, in   */}
+      {/* the admin live preview, or in the landing showcase iframe         */}
+      {/* (sample guest, for display only)                                  */}
       {/* ================================================================= */}
-      {(invitation.guest || isPreview) && (
+      {(invitation.guest || isPreview || isLandingPreview) && (
         <div className={"py-8"}>
           <PersonalGuestCard
-            guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
+            guest={
+              invitation.guest ??
+              (isLandingPreview
+                ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
+                : PREVIEW_SAMPLE_GUEST)
+            }
             theme={theme}
             textStyles={invitation.textStyles}
             customTexts={invitation.customTexts}
@@ -472,7 +488,7 @@ export default function InvitationPage({
       {/* 3. Date Card — Save the Date (style varies per invitation)        */}
       {/* ================================================================= */}
       <AnimatedSection
-        className={`px-6 pb-10 ${invitation.videoUrl ? "pt-16" : ""}`}
+        className={`px-4 pb-10 ${invitation.videoUrl ? "pt-16" : ""}`}
         variants={scaleIn}
         isPreview={isPreview}
       >
@@ -516,14 +532,13 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {invitation.ourStory?.enabled && invitation.ourStory.description && (
         <>
-          <AnimatedSection className="px-6 pb-2" isPreview={isPreview}>
+          <AnimatedSection className="px-4 pb-2" isPreview={isPreview}>
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
                   <WordReveal
                     text={
-                      invitation.ourStory.title ||
-                      t("sectionTitle_ourStory")
+                      invitation.ourStory.title || t("sectionTitle_ourStory")
                     }
                     isPreview={isPreview}
                   />
@@ -547,7 +562,7 @@ export default function InvitationPage({
             </div>
           </AnimatedSection>
 
-          <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+          <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
             <EditableCard sectionKey="ourStory">
               <motion.div
                 {...liftCardProps}
@@ -627,7 +642,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 5b. Location Card Section                                         */}
       {/* ================================================================= */}
-      <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+      <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
           <span style={ts.sectionTitles}>
             <EditableText elementKey="sectionTitles">
@@ -706,7 +721,7 @@ export default function InvitationPage({
       {/* 5. Info Cards — glassmorphism, opposing slide-ins                  */}
       {/* ================================================================= */}
       {(invitation.dressCode.enabled || invitation.giftRegistry.enabled) && (
-        <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+        <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
           <SectionDivider theme={theme} />
           <div className={`flex flex-col gap-6`}>
             {/* Dress Code — slides from left */}
@@ -904,7 +919,7 @@ export default function InvitationPage({
               />
             </div>
 
-            <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+            <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
               <EditableCard sectionKey="guestGuide">
                 <GuestGuideSection
                   guestGuide={invitation.guestGuide}
@@ -927,7 +942,7 @@ export default function InvitationPage({
         <>
           <SectionDivider theme={theme} />
 
-          <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+          <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
@@ -1003,7 +1018,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 6. CTA Section                                                    */}
       {/* ================================================================= */}
-      <AnimatedSection className="px-6 pb-10" isPreview={isPreview}>
+      <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
           <span className="mb-6 text-center" style={ts.ctaLabel}>
             <EditableText elementKey="ctaLabel">
@@ -1020,7 +1035,7 @@ export default function InvitationPage({
           {/* Confirmar Presença */}
           <motion.button
             onClick={() => setRsvpOpen(true)}
-            className="relative flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden px-6 py-4 font-medium transition-all"
+            className="relative flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden px-4 py-4 font-medium transition-all"
             style={{
               fontFamily: theme.uiFont,
               fontSize: 13,

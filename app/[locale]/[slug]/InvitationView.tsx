@@ -52,11 +52,15 @@ const VideoEntrancePage = dynamic(
 interface InvitationViewProps {
   invitation: InvitationData;
   theme: TemplateTheme;
+  /** True when rendered inside the public landing-page phone preview iframe.
+   *  Forces the sample personal guest card to show for display purposes. */
+  isLandingPreview?: boolean;
 }
 
 export default function InvitationView({
   invitation,
   theme,
+  isLandingPreview = false,
 }: InvitationViewProps) {
   // Curtain-Canva templates skip the entire envelope flow and render
   // their own self-contained page. Branch at the top so the
@@ -67,12 +71,19 @@ export default function InvitationView({
   if (isCurtainCanvaLayout(theme)) {
     return <CurtainCanvaPage invitation={invitation} theme={theme} />;
   }
-  return <EnvelopeInvitationView invitation={invitation} theme={theme} />;
+  return (
+    <EnvelopeInvitationView
+      invitation={invitation}
+      theme={theme}
+      isLandingPreview={isLandingPreview}
+    />
+  );
 }
 
 function EnvelopeInvitationView({
   invitation,
   theme,
+  isLandingPreview = false,
 }: InvitationViewProps) {
   const [coverVisible, setCoverVisible] = useState(true);
   const [showContent, setShowContent] = useState(false);
@@ -281,6 +292,7 @@ function EnvelopeInvitationView({
         theme={theme}
         audioRef={audioRef}
         prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+        isLandingPreview={isLandingPreview}
       />
     );
   }

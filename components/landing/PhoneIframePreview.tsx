@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * Flag appended to the embedded invitation URL so it knows it is being shown
+ * inside the public landing showcase. The invitation reads this to render the
+ * sample personal guest card for display, even when no real guest is attached.
+ * Only the iframe URL carries the flag — the "open invite" caption link keeps
+ * the clean URL so visitors get the normal, un-flagged experience.
+ */
+function withLandingPreviewFlag(src: string): string {
+  const separator = src.includes("?") ? "&" : "?";
+  return `${src}${separator}landingPreview=1`;
+}
+
 export function PhoneIframePreview({
   title,
   src,
@@ -13,7 +25,7 @@ export function PhoneIframePreview({
 }) {
   return (
     <article className="text-center">
-      <div className="relative mx-auto aspect-9/17 w-full max-w-[20rem] rounded-[2rem] border-8 border-primary-hover bg-background shadow-[0_30px_80px_color-mix(in_srgb,var(--foreground)_22%,transparent),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
+      <div className="relative mx-auto aspect-9/17 w-full max-w-88 rounded-[2rem] border-8 border-primary-hover bg-background shadow-[0_30px_80px_color-mix(in_srgb,var(--foreground)_22%,transparent),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
         <span
           aria-hidden="true"
           className="absolute left-1/2 top-3 z-20 h-3.5 w-16 -translate-x-1/2 rounded-full bg-ink shadow-[0_2px_6px_rgba(0,0,0,0.45)]"
@@ -21,7 +33,7 @@ export function PhoneIframePreview({
         <div className="absolute inset-0 overflow-hidden rounded-[1.4rem]">
           <iframe
             title={`Pré-visualização do convite ${title}`}
-            src={src}
+            src={withLandingPreviewFlag(src)}
             className="h-full w-full border-0 [scrollbar-width:none]"
             loading={loading}
           />

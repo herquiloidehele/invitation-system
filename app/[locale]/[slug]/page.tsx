@@ -133,10 +133,10 @@ export default async function InvitationSlugPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ g?: string; n?: string }>;
+  searchParams: Promise<{ g?: string; n?: string; landingPreview?: string }>;
 }) {
   const { slug } = await params;
-  const { g: guestToken } = await searchParams;
+  const { g: guestToken, landingPreview } = await searchParams;
 
   const invitation = await getInvitation(slug);
 
@@ -192,7 +192,11 @@ export default async function InvitationSlugPage({
         />
       )}
       <BrowserUiColorStyle color={browserUiColor} />
-      <InvitationView invitation={{ ...invitation, guest }} theme={theme} />
+      <InvitationView
+        invitation={{ ...invitation, guest }}
+        theme={theme}
+        isLandingPreview={landingPreview === "1"}
+      />
     </>
   );
 }

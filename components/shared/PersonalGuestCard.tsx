@@ -48,6 +48,17 @@ export const PREVIEW_SAMPLE_GUEST: PublicGuestData = {
   invitationSlug: "preview",
 };
 
+/**
+ * Display-only variant of the sample guest for the public landing showcase.
+ * Keeps the personalized greeting and table label, but drops the private host
+ * note and the "invite others" action — neither is meaningful in a demo embed.
+ */
+export const PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY: PublicGuestData = {
+  ...PREVIEW_SAMPLE_GUEST,
+  note: undefined,
+  canInviteOthers: false,
+};
+
 export default function PersonalGuestCard({
   guest,
   theme,
@@ -78,7 +89,7 @@ export default function PersonalGuestCard({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.3 }}
         transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
-        className={`relative px-6 pt-12 ${
+        className={`relative px-4 pt-12 ${
           hasBackgroundImage ? " overflow-hidden" : ""
         } ${className ?? ""}`}
         style={{ zIndex: 2 }}
@@ -111,7 +122,7 @@ export default function PersonalGuestCard({
         )}
 
         <div
-          className="mx-auto max-w-md rounded-3xl border px-6 py-8 text-center backdrop-blur-sm"
+          className="mx-auto max-w-md rounded-3xl border px-4 py-8 text-center backdrop-blur-sm"
           style={{
             position: "relative",
             zIndex: 1,
