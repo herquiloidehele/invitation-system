@@ -80,7 +80,7 @@ export default function PersonalGuestCard({
         transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
         className={`relative px-6 pt-12 ${
           hasBackgroundImage ? " overflow-hidden" : ""
-        } ${className}`}
+        } ${className ?? ""}`}
         style={{ zIndex: 2 }}
       >
         {hasBackgroundImage && (

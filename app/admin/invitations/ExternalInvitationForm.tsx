@@ -73,6 +73,7 @@ import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import VideoEntrancePage from "@/components/video-entrance/VideoEntrancePage";
+import { PREVIEW_SAMPLE_GUEST } from "@/components/shared/PersonalGuestCard";
 import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import {
@@ -640,6 +641,17 @@ export default function ExternalInvitationForm({
   const isVideoEntrance = useMemo(
     () => isVideoEntranceLayout(currentTheme),
     [currentTheme],
+  );
+
+  // Inject a sample guest so the personal guest card (and its background image)
+  // renders in the live preview for guest-managed video-entrance / curtain-canva
+  // invitations — the editor itself has no real per-recipient guest.
+  const previewInvitation = useMemo(
+    () =>
+      form.guestManagementEnabled
+        ? { ...form, guest: form.guest ?? PREVIEW_SAMPLE_GUEST }
+        : form,
+    [form],
   );
 
   // Submit
@@ -2619,7 +2631,7 @@ export default function ExternalInvitationForm({
                     <CardStyleToolbar />
                     <div className="absolute inset-0 overflow-y-auto bg-background">
                       <VideoEntrancePage
-                        invitation={form}
+                        invitation={previewInvitation}
                         theme={currentTheme as TemplateTheme}
                       />
                     </div>
@@ -2649,7 +2661,7 @@ export default function ExternalInvitationForm({
                     <CardStyleToolbar />
                     <div className="absolute inset-0 overflow-y-auto bg-background">
                       <CurtainCanvaPage
-                        invitation={form}
+                        invitation={previewInvitation}
                         theme={currentTheme as TemplateTheme}
                       />
                     </div>
