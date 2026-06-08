@@ -6,6 +6,7 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import ExternalCountdownSection from "@/components/shared/ExternalCountdownSection";
+import PersonalGuestCard from "@/components/shared/PersonalGuestCard";
 import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveRevealContentStyle,
@@ -120,6 +121,22 @@ export default function RevealableExternalSections({
 
         {showInitialPageSections && invitation.countdown?.enabled && (
           <ExternalCountdownSection invitation={invitation} theme={theme} />
+        )}
+
+        {showInitialPageSections && invitation.guest && (
+          <div className="pb-12 md:pb-16">
+            <PersonalGuestCard
+              guest={invitation.guest}
+              theme={theme}
+              textStyles={invitation.textStyles}
+              customTexts={invitation.customTexts}
+              backgroundImageUrl={
+                invitation.personalGuestCard?.backgroundImageUrl
+              }
+              scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
+              imageSettings={invitation.imageSettings}
+            />
+          </div>
         )}
 
         {externalLink && (

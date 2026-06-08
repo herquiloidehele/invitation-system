@@ -197,6 +197,9 @@ export async function PUT(
         ...(body.countdown !== undefined && {
           countdown: sanitizeJsonField(body.countdown, null),
         }),
+        ...(body.personalGuestCard !== undefined && {
+          personalGuestCard: sanitizeJsonField(body.personalGuestCard, null),
+        }),
         ...(body.invitationType !== undefined && {
           invitationType: body.invitationType,
         }),

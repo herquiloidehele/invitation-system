@@ -206,7 +206,8 @@ export type ImageSettingsKey =
   | "envelopeTopFlap"
   | "envelopeBottomFlap"
   | "scratchRevealBackground"
-  | "countdownBackground";
+  | "countdownBackground"
+  | "personalGuestCardBackground";
 
 /** Map of image-slot key → position/zoom settings. */
 export type ImageSettingsMap = Partial<Record<ImageSettingsKey, ImageSettings>>;
@@ -273,6 +274,19 @@ export interface ScratchRevealConfig {
   /** Whether the section renders at all. */
   enabled: boolean;
   /** Optional full-bleed background image URL behind the coins. */
+  backgroundImageUrl?: string | null;
+  /** Opacity of the dark scrim overlay (0–1). Defaults to 0.45 when an image is set. */
+  scrimOpacity?: number;
+}
+
+/**
+ * Optional background image (+ scrim) shown behind the PersonalGuestCard on the
+ * video-entrance and curtain-canva layouts. Position/zoom for
+ * `backgroundImageUrl` are stored in `InvitationData.imageSettings` under the
+ * `personalGuestCardBackground` key (mirrors the scratch-reveal pattern).
+ */
+export interface PersonalGuestCardConfig {
+  /** Optional full-bleed background image URL behind the card. */
   backgroundImageUrl?: string | null;
   /** Opacity of the dark scrim overlay (0–1). Defaults to 0.45 when an image is set. */
   scrimOpacity?: number;
@@ -660,6 +674,8 @@ export interface InvitationData {
   heroConfetti?: { enabled: boolean };
   /** Toggles and styles the countdown section on external_link invitation pages. */
   countdown?: ExternalCountdownConfig;
+  /** Optional background image + scrim shown behind the personal guest card (video-entrance & curtain-canva layouts). */
+  personalGuestCard?: PersonalGuestCardConfig;
   /** Per-invitation text style overrides (fonts, colors, sizes). Missing fields fall back to theme defaults. */
   textStyles?: TextStyleOverrides;
   /** Per-section card background/border overrides. Missing keys fall back to theme.cardBg / theme.cardBorder. */

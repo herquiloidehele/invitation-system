@@ -6,11 +6,13 @@ import { MessageCircle, UserPlus, Users } from "lucide-react";
 
 import type {
   CustomTexts,
+  ImageSettingsMap,
   PublicGuestData,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
+import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { useCustomText } from "@/lib/custom-texts";
 import InviteOthersModal from "./InviteOthersModal";
 import { EditableText } from "./EditableText";
@@ -20,7 +22,16 @@ interface PersonalGuestCardProps {
   theme: TemplateTheme;
   textStyles?: TextStyleOverrides;
   customTexts?: CustomTexts;
+  /** Optional full-bleed background image URL shown behind the card. */
+  backgroundImageUrl?: string | null;
+  /** Opacity (0–1) of the dark scrim over the background image. Defaults to 0.45. */
+  scrimOpacity?: number;
+  /** Position/zoom overrides; reads the `personalGuestCardBackground` key. */
+  imageSettings?: ImageSettingsMap;
 }
+
+/** Default scrim opacity applied over the background image when one is set. */
+const DEFAULT_GUEST_CARD_SCRIM_OPACITY = 0.45;
 
 /**
  * Preview-only sample guest so the card renders in the admin editor, where
@@ -41,9 +52,22 @@ export default function PersonalGuestCard({
   theme,
   textStyles,
   customTexts,
+  backgroundImageUrl,
+  scrimOpacity,
+  imageSettings,
 }: PersonalGuestCardProps) {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const t = useCustomText(customTexts);
+
+  const hasBackgroundImage =
+    typeof backgroundImageUrl === "string" && backgroundImageUrl.trim() !== "";
+  const resolvedScrimOpacity = Math.min(
+    1,
+    Math.max(0, scrimOpacity ?? DEFAULT_GUEST_CARD_SCRIM_OPACITY),
+  );
+  const backgroundPositionStyle = hasBackgroundImage
+    ? getBackgroundImageStyle(imageSettings, "personalGuestCardBackground")
+    : {};
 
   return (
     <>
@@ -52,12 +76,43 @@ export default function PersonalGuestCard({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.3 }}
         transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
-        className="relative px-6 pt-12 pb-0"
+        className={`relative px-6 pt-12 pb-0${
+          hasBackgroundImage ? " overflow-hidden" : ""
+        }`}
         style={{ zIndex: 2 }}
       >
+        {hasBackgroundImage && (
+          <>
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                backgroundImage: `url(${backgroundImageUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                ...backgroundPositionStyle,
+                zIndex: 0,
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: `rgba(0,0,0,${resolvedScrimOpacity})`,
+                zIndex: 0,
+              }}
+            />
+          </>
+        )}
+
         <div
           className="mx-auto max-w-md rounded-3xl border px-6 py-8 text-center backdrop-blur-sm"
           style={{
+            position: "relative",
+            zIndex: 1,
             background: theme.cardBg,
             borderColor: theme.cardBorder,
           }}

@@ -53,6 +53,7 @@ type AdminInvitationInitialDataRow = {
   scratchReveal: unknown;
   heroConfetti: unknown;
   countdown: unknown;
+  personalGuestCard: unknown;
   textStyles: unknown;
   cardStyles: unknown;
   imageSettings: unknown;
@@ -120,6 +121,9 @@ export function toAdminInvitationInitialData(
     heroConfetti:
       (row.heroConfetti as InvitationData["heroConfetti"] | null) ?? undefined,
     countdown: (row.countdown as ExternalCountdownConfig | null) ?? undefined,
+    personalGuestCard:
+      (row.personalGuestCard as InvitationData["personalGuestCard"] | null) ??
+      undefined,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
