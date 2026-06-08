@@ -76,7 +76,7 @@ type GalleryCategoryKey =
   | "engagement";
 
 const CATEGORIES: Array<{ value: GalleryCategoryKey; label: string }> = [
-  { value: "wedding", label: "Casamento" },
+  { value: "wedding", label: "Convite" },
   { value: "save_the_date", label: "Save the Date" },
   { value: "baptism", label: "Baptizado" },
   { value: "anniversary", label: "Aniversário" },
