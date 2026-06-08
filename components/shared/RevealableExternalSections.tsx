@@ -124,19 +124,18 @@ export default function RevealableExternalSections({
         )}
 
         {showInitialPageSections && invitation.guest && (
-          <div className="pb-12 md:pb-16">
-            <PersonalGuestCard
-              guest={invitation.guest}
-              theme={theme}
-              textStyles={invitation.textStyles}
-              customTexts={invitation.customTexts}
-              backgroundImageUrl={
-                invitation.personalGuestCard?.backgroundImageUrl
-              }
-              scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
-              imageSettings={invitation.imageSettings}
-            />
-          </div>
+          <PersonalGuestCard
+            guest={invitation.guest}
+            theme={theme}
+            textStyles={invitation.textStyles}
+            customTexts={invitation.customTexts}
+            backgroundImageUrl={
+              invitation.personalGuestCard?.backgroundImageUrl
+            }
+            scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
+            imageSettings={invitation.imageSettings}
+            className={"pb-12 md:pb-16"}
+          />
         )}
 
         {externalLink && (

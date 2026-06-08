@@ -28,6 +28,7 @@ interface PersonalGuestCardProps {
   scrimOpacity?: number;
   /** Position/zoom overrides; reads the `personalGuestCardBackground` key. */
   imageSettings?: ImageSettingsMap;
+  className?: string;
 }
 
 /** Default scrim opacity applied over the background image when one is set. */
@@ -55,6 +56,7 @@ export default function PersonalGuestCard({
   backgroundImageUrl,
   scrimOpacity,
   imageSettings,
+  className,
 }: PersonalGuestCardProps) {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const t = useCustomText(customTexts);
@@ -76,9 +78,9 @@ export default function PersonalGuestCard({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.3 }}
         transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
-        className={`relative px-6 pt-12 pb-0${
+        className={`relative px-6 pt-12 ${
           hasBackgroundImage ? " overflow-hidden" : ""
-        }`}
+        } ${className}`}
         style={{ zIndex: 2 }}
       >
         {hasBackgroundImage && (
