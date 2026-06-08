@@ -52,7 +52,9 @@
     "empty": "Próximamente.",
     "fallbackTitle": "Invitación",
     "previewAria": "Previsualizar invitación",
-    "badge": "BEST SELLER"
+    "badge": "BEST SELLER",
+    "showMore": "Ver más",
+    "showLess": "Ver menos"
   },
   "LandingGallery": {
     "eyebrow": "Galería",
@@ -62,6 +64,8 @@
     "fallbackTitle": "Invitación",
     "previewAria": "Previsualizar invitación",
     "openInNewTab": "Abrir en nueva pestaña →",
+    "showMore": "Ver más",
+    "showLess": "Ver menos",
     "categories": {
       "all": "Todos",
       "wedding": "Invitación",

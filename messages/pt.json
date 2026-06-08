@@ -52,7 +52,9 @@
     "empty": "Em breve.",
     "fallbackTitle": "Convite",
     "previewAria": "Pré-visualizar convite",
-    "badge": "BEST SELLER"
+    "badge": "BEST SELLER",
+    "showMore": "Ver mais",
+    "showLess": "Ver menos"
   },
   "LandingGallery": {
     "eyebrow": "Galeria",
@@ -62,6 +64,8 @@
     "fallbackTitle": "Convite",
     "previewAria": "Pré-visualizar convite",
     "openInNewTab": "Abrir em nova página →",
+    "showMore": "Ver mais",
+    "showLess": "Ver menos",
     "categories": {
       "all": "Todos",
       "wedding": "Convites",

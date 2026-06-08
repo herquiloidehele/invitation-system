@@ -12,6 +12,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatedSection } from "./AnimatedSection";
+import { ExpandableDescription } from "./ExpandableDescription";
 import {
   dbCategoryToTabKey,
   type GalleryCategoryKey,
@@ -176,9 +177,13 @@ export function GallerySection({
                       {item.title || t("fallbackTitle")}
                     </h3>
                     {item.description ? (
-                      <p className="mt-2 text-sm leading-5 text-muted-foreground">
-                        {item.description}
-                      </p>
+                      <ExpandableDescription
+                        text={item.description}
+                        className="mt-2 text-sm leading-5 text-muted-foreground"
+                        toggleClassName="text-foreground"
+                        moreLabel={t("showMore")}
+                        lessLabel={t("showLess")}
+                      />
                     ) : null}
                     {item.price ? (
                       <div className="mt-auto flex items-baseline gap-2 pt-2">

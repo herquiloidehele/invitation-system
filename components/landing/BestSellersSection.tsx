@@ -9,6 +9,7 @@ import { XIcon } from "lucide-react";
 import type { BestSellerFeature } from "@/lib/landing-features";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatedSection } from "./AnimatedSection";
+import { ExpandableDescription } from "./ExpandableDescription";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 
@@ -108,15 +109,21 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                         {item.title || t("fallbackTitle")}
                       </h3>
                       {item.description ? (
-                        <p
+                        <ExpandableDescription
+                          text={item.description}
                           className={`mt-3 text-sm leading-6 ${
                             featured
                               ? "text-primary-soft"
                               : "text-muted-foreground"
                           }`}
-                        >
-                          {item.description}
-                        </p>
+                          toggleClassName={
+                            featured
+                              ? "text-primary-foreground"
+                              : "text-foreground"
+                          }
+                          moreLabel={t("showMore")}
+                          lessLabel={t("showLess")}
+                        />
                       ) : null}
                       {item.price ? (
                         <div className="mt-3 flex items-baseline gap-2">
