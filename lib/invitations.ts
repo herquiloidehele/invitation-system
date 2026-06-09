@@ -2,6 +2,7 @@ import { cache } from "react";
 import { prisma } from "./db";
 import type {
   CardStyleOverrides,
+  CoupleGallery,
   CustomTexts,
   ExternalCountdownConfig,
   HeroOverlayConfig,
@@ -56,6 +57,7 @@ type InvitationWithTheme = {
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
   sectionImages: unknown;
+  coupleGallery: unknown;
   parents: unknown;
   ourStory: unknown;
   scratchReveal: unknown;
@@ -110,6 +112,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
+    coupleGallery: (row.coupleGallery as CoupleGallery | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
     scratchReveal:

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type {
   CardSectionKey,
   CardStyle,
+  CoupleGallery,
   CustomTexts,
   EnvelopeConfig,
   GuestGuideItem,
@@ -67,6 +68,7 @@ import InvitationPage from "@/components/shared/InvitationPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
+import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
@@ -853,6 +855,11 @@ export default function InvitationForm({
     },
     [],
   );
+
+  // Couple gallery
+  const updateCoupleGallery = useCallback((next: CoupleGallery) => {
+    setForm((prev) => ({ ...prev, coupleGallery: next }));
+  }, []);
 
   // Image position/zoom settings
   const updateImageSettings = useCallback(
@@ -2603,6 +2610,22 @@ export default function InvitationForm({
               </AccordionItem>
 
               {/* ── Nossa História ── */}
+              <AccordionItem
+                value="coupleGallery"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Galeria de Fotos{" "}
+                  {form.coupleGallery?.enabled ? "(ativo)" : "(desativado)"}
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <CoupleGalleryEditor
+                    value={form.coupleGallery}
+                    onChange={updateCoupleGallery}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+
               <AccordionItem
                 value="ourStory"
                 className="border rounded-lg px-4"

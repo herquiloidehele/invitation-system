@@ -101,6 +101,11 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         label: "Perguntas Frequentes",
         placeholder: "Perguntas Frequentes",
       },
+      {
+        key: "sectionTitle_gallery",
+        label: "Galeria de Fotos",
+        placeholder: "Nossos Momentos",
+      },
     ],
   },
   {

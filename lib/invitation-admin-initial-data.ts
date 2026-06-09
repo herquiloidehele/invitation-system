@@ -1,5 +1,6 @@
 import type {
   CardStyleOverrides,
+  CoupleGallery,
   ExternalCountdownConfig,
   HeroOverlayConfig,
   HeroScrollIndicatorConfig,
@@ -48,6 +49,7 @@ type AdminInvitationInitialDataRow = {
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
   sectionImages: unknown;
+  coupleGallery: unknown;
   parents: unknown;
   ourStory: unknown;
   scratchReveal: unknown;
@@ -113,6 +115,7 @@ export function toAdminInvitationInitialData(
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
+    coupleGallery: (row.coupleGallery as CoupleGallery | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
     scratchReveal:
