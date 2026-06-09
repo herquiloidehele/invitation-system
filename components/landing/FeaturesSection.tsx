@@ -20,6 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { type Currency } from "@/lib/currency/config";
+import { personalizationTierPrices } from "@/lib/landing-price";
 import { AnimatedSection } from "./AnimatedSection";
 import {
   getMotionProps,
@@ -35,7 +37,7 @@ import {
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
-export function FeaturesSection() {
+export function FeaturesSection({ currentCurrency }: { currentCurrency: Currency }) {
   const t = useTranslations("LandingFeatures");
   const reduceMotion = useReducedMotion();
 
@@ -108,7 +110,7 @@ export function FeaturesSection() {
             <CustomizationPanel />
           </FeatureSmallCard>
 
-          <PersonalizationCard />
+          <PersonalizationCard currentCurrency={currentCurrency} />
         </motion.div>
       </div>
     </AnimatedSection>
@@ -461,13 +463,12 @@ function CustomizationPanel() {
   );
 }
 
-function PersonalizationCard() {
+function PersonalizationCard({ currentCurrency }: { currentCurrency: Currency }) {
   const t = useTranslations("LandingFeatures");
   const reduceMotion = useReducedMotion();
   const reduced = shouldReduceMotion(reduceMotion);
-  const tiers = t.raw("personalizationTiers") as ReadonlyArray<
-    readonly [string, string]
-  >;
+  const labels = t.raw("personalizationTierLabels") as readonly string[];
+  const prices = personalizationTierPrices(currentCurrency);
 
   return (
     <motion.article
@@ -511,7 +512,7 @@ function PersonalizationCard() {
               </DialogDescription>
             </DialogHeader>
             <ul className="mt-2 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-muted">
-              {tiers.map(([label, price]) => (
+              {labels.map((label, i) => (
                 <li
                   key={label}
                   className="flex items-center justify-between gap-4 px-4 py-3"
@@ -519,7 +520,7 @@ function PersonalizationCard() {
                   <span className="text-sm text-foreground">{label}</span>
                   <span className="text-right">
                     <span className="block text-lg font-semibold text-primary">
-                      {price}
+                      {prices[i]}
                     </span>
                     <span className="block text-[8px] uppercase tracking-[0.18em] text-muted-foreground">
                       {t("personalizationPerInvite")}

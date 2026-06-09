@@ -175,10 +175,10 @@
     "personalizationModalTitle": "Taxas de personalização",
     "personalizationModalDescription": "A taxa é cobrada por convite personalizado e varia consoante a quantidade.",
     "personalizationPerInvite": "por convite",
-    "personalizationTiers": [
-      ["Até 50 convites", "1,50€"],
-      ["50 a 100 convites", "1€"],
-      ["Mais de 100 convites", "0,75€"]
+    "personalizationTierLabels": [
+      "Até 50 convites",
+      "50 a 100 convites",
+      "Mais de 100 convites"
     ],
     "guest": "Convidado",
     "table": "Mesa",

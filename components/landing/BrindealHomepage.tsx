@@ -87,7 +87,7 @@ export function BrindealHomepage({
         itemsByCategory={galleryByCategory}
       />
       <ProcessSection />
-      <FeaturesSection />
+      <FeaturesSection currentCurrency={currentCurrency} />
       <LiveDemoSection items={liveDemoFeatures} />
       <FaqSection
         openIndex={openFaqIndex}

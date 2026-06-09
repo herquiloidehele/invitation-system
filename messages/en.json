@@ -175,10 +175,10 @@
     "personalizationModalTitle": "Personalization pricing",
     "personalizationModalDescription": "The fee is charged per personalized invitation and varies with the order size.",
     "personalizationPerInvite": "per invitation",
-    "personalizationTiers": [
-      ["Up to 50 invitations", "€1.50"],
-      ["50 to 100 invitations", "€1"],
-      ["More than 100 invitations", "€0.75"]
+    "personalizationTierLabels": [
+      "Up to 50 invitations",
+      "50 to 100 invitations",
+      "More than 100 invitations"
     ],
     "guest": "Guest",
     "table": "Table",

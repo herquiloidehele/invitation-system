@@ -175,10 +175,10 @@
     "personalizationModalTitle": "Precios de personalización",
     "personalizationModalDescription": "La tarifa se cobra por invitación personalizada y varía según la cantidad.",
     "personalizationPerInvite": "por invitación",
-    "personalizationTiers": [
-      ["Hasta 50 invitaciones", "1,50€"],
-      ["50 a 100 invitaciones", "1€"],
-      ["Más de 100 invitaciones", "0,75€"]
+    "personalizationTierLabels": [
+      "Hasta 50 invitaciones",
+      "50 a 100 invitaciones",
+      "Más de 100 invitaciones"
     ],
     "guest": "Invitado",
     "table": "Mesa",
