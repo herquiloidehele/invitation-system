@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
+import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 
 export async function GET() {
   const items = await prisma.saveTheDate.findMany({
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
       priceFromCents,
       discountPriceFromCents,
       currency,
+      priceOverrides,
       landingModelName,
       landingImageUrl,
       landingDescription,
@@ -68,6 +70,7 @@ export async function POST(req: NextRequest) {
             : null,
         currency:
           typeof currency === "string" && currency.length ? currency : "EUR",
+        priceOverrides: readPriceOverridesInput(priceOverrides),
         landingModelName:
           typeof landingModelName === "string" && landingModelName.length
             ? landingModelName

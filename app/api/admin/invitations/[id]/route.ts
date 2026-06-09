@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
+import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations/[id] — Get a single invitation
@@ -253,6 +254,9 @@ export async function PUT(
             typeof body.currency === "string" && body.currency.length
               ? body.currency
               : "EUR",
+        }),
+        ...(body.priceOverrides !== undefined && {
+          priceOverrides: readPriceOverridesInput(body.priceOverrides),
         }),
         ...(body.landingModelName !== undefined && {
           landingModelName:
