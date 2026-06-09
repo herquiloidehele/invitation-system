@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import AO from "country-flag-icons/react/3x2/AO";
 import BR from "country-flag-icons/react/3x2/BR";
+import ES from "country-flag-icons/react/3x2/ES";
 import MZ from "country-flag-icons/react/3x2/MZ";
 import PT from "country-flag-icons/react/3x2/PT";
 import US from "country-flag-icons/react/3x2/US";
@@ -21,6 +22,7 @@ import { landingItemVariants } from "./landing-motion";
 // key the map by the library's own component type via `typeof PT`.
 const FLAGS: Record<ServedCountryCode, typeof PT> = {
   PT,
+  ES,
   BR,
   AO,
   MZ,

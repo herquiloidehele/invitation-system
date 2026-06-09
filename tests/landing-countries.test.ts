@@ -8,7 +8,7 @@ import {
 
 describe("served countries", () => {
   it("lists exactly the served markets in display order", () => {
-    expect(SERVED_COUNTRY_CODES).toEqual(["PT", "BR", "AO", "MZ", "US"]);
+    expect(SERVED_COUNTRY_CODES).toEqual(["PT", "ES", "BR", "AO", "MZ", "US"]);
   });
 
   it("maps every served country to a supported currency", () => {
