@@ -8,6 +8,13 @@
     {
       "files": ["components/ui/**"],
       "rules": { "unused-exports": "off" }
+    },
+    {
+      // Consumed only via dynamic import() destructuring in
+      // app/api/export/rsvps/[token]/route.ts, which static analysis
+      // doesn't track — these exports are used at runtime.
+      "files": ["components/pdf/RsvpExportDocument.tsx"],
+      "rules": { "unused-exports": "off" }
     }
   ]
 }
