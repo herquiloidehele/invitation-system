@@ -14,7 +14,15 @@
     "heroBody": "Os nossos convites foram criados para surpreender, emocionar e transformar cada detalhe num momento inesquecível. Mais do que um simples convite, é uma experiência digital única.",
     "heroPrimaryCta": "Começar o meu convite →",
     "heroSecondaryCta": "Ver exemplos reais",
-    "heroProof": "Resposta no mesmo dia · +200 convites feitos",
+    "heroCountriesLabel": "Disponível para",
+    "countries": {
+      "PT": "Portugal",
+      "BR": "Brasil",
+      "AO": "Angola",
+      "MZ": "Moçambique",
+      "US": "Estados Unidos"
+    },
+    "heroCountriesMore": "e outros países",
     "defaultWhatsappMessage": "Olá! Gostava de pedir um orçamento para um convite digital Brindeal.",
     "galleryFallbackTitle": "Convite",
     "galleryEmpty": "Ainda sem convites em destaque nesta categoria.",

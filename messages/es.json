@@ -14,7 +14,15 @@
     "heroBody": "Nuestras invitaciones fueron creadas para sorprender, emocionar y transformar cada detalle en un momento inolvidable. Más que una simple invitación, es una experiencia digital única.",
     "heroPrimaryCta": "Empezar mi invitación →",
     "heroSecondaryCta": "Ver ejemplos reales",
-    "heroProof": "Respuesta el mismo día · más de 200 invitaciones creadas",
+    "heroCountriesLabel": "Disponible en",
+    "countries": {
+      "PT": "Portugal",
+      "BR": "Brasil",
+      "AO": "Angola",
+      "MZ": "Mozambique",
+      "US": "Estados Unidos"
+    },
+    "heroCountriesMore": "y otros países",
     "defaultWhatsappMessage": "¡Hola! Me gustaría pedir un presupuesto para una invitación digital Brindeal.",
     "galleryFallbackTitle": "Invitación",
     "galleryEmpty": "Todavía no hay invitaciones destacadas en esta categoría.",

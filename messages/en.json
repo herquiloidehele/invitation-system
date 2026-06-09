@@ -14,7 +14,15 @@
     "heroBody": "Our invitations were created to surprise, move and transform every detail into an unforgettable moment. More than a simple invitation, it's a unique digital experience.",
     "heroPrimaryCta": "Start my invitation →",
     "heroSecondaryCta": "See real examples",
-    "heroProof": "Same-day reply · 200+ invitations made",
+    "heroCountriesLabel": "Available in",
+    "countries": {
+      "PT": "Portugal",
+      "BR": "Brazil",
+      "AO": "Angola",
+      "MZ": "Mozambique",
+      "US": "United States"
+    },
+    "heroCountriesMore": "and other countries",
     "defaultWhatsappMessage": "Hello! I would like to request a quote for a Brindeal digital invitation.",
     "galleryFallbackTitle": "Invitation",
     "galleryEmpty": "No featured invitations in this category yet.",
