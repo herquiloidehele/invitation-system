@@ -30,7 +30,7 @@ type MediaKind = "image" | "svg" | "video" | "audio";
  * URL here so callers can persist it without the admin having to upload a
  * second image. Optional — callers that don't care can ignore it.
  */
-export interface MediaUploadMeta {
+interface MediaUploadMeta {
   posterUrl?: string;
 }
 

@@ -1,5 +1,4 @@
 export type UploadFolder = "images" | "videos" | "audio";
-export type UploadProfile = "rsvp-background";
 
 const DEFAULT_MAX_SIZES: Record<UploadFolder, number> = {
   images: 5 * 1024 * 1024,

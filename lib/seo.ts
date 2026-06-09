@@ -46,9 +46,7 @@ export function createNoIndexMetadata(): Metadata {
   };
 }
 
-function createIndexableRobotsMetadata(): NonNullable<
-  Metadata["robots"]
-> {
+function createIndexableRobotsMetadata(): NonNullable<Metadata["robots"]> {
   return {
     index: true,
     follow: true,
@@ -101,7 +99,7 @@ export function buildOrganizationJsonLd(origin = SITE_URL) {
     "@type": "LocalBusiness",
     name: "Brindeal Studio",
     url: origin,
-    email: "ola@convites.brindealstudio.com",
+    email: "brindeal.studio@gmail.com",
     areaServed: "Portugal",
     sameAs: [],
   };

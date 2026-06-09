@@ -11,7 +11,7 @@ export type GalleryCategoryKey =
   | "anniversary"
   | "engagement";
 
-export type GalleryCategory = { key: GalleryCategoryKey; label: string };
+export type GalleryCategoryTab = { key: GalleryCategoryKey; label: string };
 
 export type FaqItem = {
   question: string;
@@ -54,7 +54,7 @@ export function getNavLinks(t: (key: string) => string) {
 
 function getGalleryCategories(
   t: (key: string) => string,
-): GalleryCategory[] {
+): GalleryCategoryTab[] {
   return [
     { key: "all", label: t("categories.all") },
     { key: "wedding", label: t("categories.wedding") },
@@ -68,7 +68,7 @@ function getGalleryCategories(
 export function getVisibleGalleryCategories(
   t: (key: string) => string,
   itemsByCategory: Record<DbGalleryCategory, GalleryFeature[]>,
-): GalleryCategory[] {
+): GalleryCategoryTab[] {
   const populatedCategories = getGalleryCategories(t).filter(
     (category) =>
       category.key !== "all" &&

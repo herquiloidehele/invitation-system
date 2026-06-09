@@ -11,8 +11,6 @@ import type {
 // Types
 // ---------------------------------------------------------------------------
 
-export type { TextStyleOverrides as STDTextStyleOverrides };
-
 export interface SaveTheDateCouple {
   bride: string;
   groom: string;

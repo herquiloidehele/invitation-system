@@ -48,7 +48,7 @@ export function ContactSection({
           </p>
           <div className="mt-8 space-y-3 text-sm text-primary">
             <p>WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
-            <p>E-mail · ola@convites.brindealstudio.com</p>
+            <p>E-mail · brindeal.studio@gmail.com</p>
           </div>
         </motion.div>
         <motion.form
@@ -57,7 +57,9 @@ export function ContactSection({
           className="rounded-[1.5rem] border border-border bg-card p-6 shadow-sm sm:p-9"
         >
           <h3 className="text-2xl font-semibold">{t("formTitle")}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{t("formSubtitle")}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t("formSubtitle")}
+          </p>
           <div className="mt-7 grid gap-4 sm:grid-cols-2">
             <TextField
               label={t("name")}

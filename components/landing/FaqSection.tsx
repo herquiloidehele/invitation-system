@@ -43,7 +43,7 @@ export function FaqSection({
           <div className="mt-8 rounded-2xl bg-muted p-6 text-sm text-primary">
             <p className="font-semibold text-foreground">{t("contactTitle")}</p>
             <p className="mt-2">WhatsApp · {DISPLAY_WHATSAPP_NUMBER}</p>
-            <p>E-mail · ola@convites.brindealstudio.com</p>
+            <p>E-mail · brindeal.studio@gmail.com</p>
           </div>
         </div>
         <motion.div

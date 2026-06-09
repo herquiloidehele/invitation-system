@@ -44,7 +44,7 @@ export type GalleryCategory =
   | "anniversary"
   | "engagement";
 
-export type GalleryCategoryInput =
+type GalleryCategoryInput =
   | { kind: "invitation"; eventType: string }
   | { kind: "save_the_date" };
 

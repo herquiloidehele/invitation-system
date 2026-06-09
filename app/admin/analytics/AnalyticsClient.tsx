@@ -20,8 +20,6 @@ import type {
   InvitationAnalytics,
 } from "@/lib/admin-analytics";
 
-export type { InvitationAnalytics } from "@/lib/admin-analytics";
-
 const RANGES = [
   { label: "7 dias", value: "7d" },
   { label: "30 dias", value: "30d" },

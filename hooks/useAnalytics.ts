@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-export type AnalyticsEventType =
+type AnalyticsEventType =
   | "page_view"
   | "envelope_open"
   | "maps_click"

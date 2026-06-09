@@ -9,6 +9,8 @@ import {
   shouldIncludePublicSitemapPage,
 } from "@/lib/seo";
 
+// Next.js route segment config — read by the framework, never imported.
+// fallow-ignore-next-line unused-export
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

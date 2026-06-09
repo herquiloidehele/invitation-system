@@ -17,7 +17,7 @@ import { EditableText } from "./EditableText";
 // Theme helpers
 // ---------------------------------------------------------------------------
 
-export interface AudioPlayerTheme {
+interface AudioPlayerTheme {
   bgColor: string;
   playBtnColor: string;
   playIconColor: string;
