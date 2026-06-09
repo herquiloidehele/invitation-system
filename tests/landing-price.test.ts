@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { formatLandingPrice, resolveLandingPrice } from "../lib/landing-price";
+import { CURRENCY_LOCALE } from "@/lib/currency/config";
 
-// Intl pt-PT currency formatting separates the amount and the € symbol with a
-// non-breaking space (U+00A0), written explicitly as   in the literals below.
+// Intl currency formatting separates groups and the symbol with a non-breaking
+// space (U+00A0), written explicitly as   in the literals below. Note the
+// CLDR rule minimumGroupingDigits=2: amounts under 10 000 are NOT grouped
+// (6900 -> "6900"), while 10 400 is.
 
 describe("formatLandingPrice", () => {
   it("formats a whole-euro amount with the Desde prefix and no decimals", () => {
@@ -84,5 +87,31 @@ describe("resolveLandingPrice", () => {
     expect(resolveLandingPrice(14950, null, "EUR")?.amountLabel).toBe(
       "Desde 149,50 €",
     );
+  });
+});
+
+describe("resolveLandingPrice currency-native formatting", () => {
+  it("formats each currency with its native symbol/grouping", () => {
+    expect(resolveLandingPrice(14900, null, "EUR", CURRENCY_LOCALE.EUR)?.amount).toBe(
+      "149 €",
+    );
+    expect(resolveLandingPrice(16100, null, "USD", CURRENCY_LOCALE.USD)?.amount).toBe(
+      "$161",
+    );
+    expect(resolveLandingPrice(92500, null, "BRL", CURRENCY_LOCALE.BRL)?.amount).toBe(
+      "R$ 925",
+    );
+    expect(resolveLandingPrice(1040000, null, "MZN", CURRENCY_LOCALE.MZN)?.amount).toBe(
+      "10 400 MTn",
+    );
+    expect(resolveLandingPrice(14150000, null, "AOA", CURRENCY_LOCALE.AOA)?.amount).toBe(
+      "141 500 Kz",
+    );
+  });
+
+  it("keeps the discount strikethrough valid after currency formatting", () => {
+    const p = resolveLandingPrice(1040000, 690000, "MZN", CURRENCY_LOCALE.MZN);
+    expect(p?.originalLabel).toBe("10 400 MTn");
+    expect(p?.amount).toBe("6900 MTn");
   });
 });
