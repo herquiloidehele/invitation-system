@@ -74,7 +74,7 @@ export function deriveCents(baseEurCents: number, target: Currency): number {
 // and the currency rows of the merged language/currency menu.
 export const CURRENCY_SYMBOL: Record<Currency, string> = {
   EUR: "€",
-  MZN: "MTn",
+  MZN: "MZN",
   AOA: "Kz",
   BRL: "R$",
   USD: "$",

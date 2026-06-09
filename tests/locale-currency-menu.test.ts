@@ -17,7 +17,7 @@ describe("CURRENCY_SYMBOL", () => {
   it("uses the expected native glyphs", () => {
     expect(CURRENCY_SYMBOL).toEqual({
       EUR: "€",
-      MZN: "MTn",
+      MZN: "MZN",
       AOA: "Kz",
       BRL: "R$",
       USD: "$",
@@ -28,7 +28,7 @@ describe("CURRENCY_SYMBOL", () => {
 describe("formatSelectorTrigger", () => {
   it("renders 'LOCALE · symbol', uppercasing the locale", () => {
     expect(formatSelectorTrigger("en", "EUR")).toBe("EN · €");
-    expect(formatSelectorTrigger("pt", "MZN")).toBe("PT · MTn");
+    expect(formatSelectorTrigger("pt", "MZN")).toBe("PT · MZN");
     expect(formatSelectorTrigger("es", "USD")).toBe("ES · $");
   });
 });
