@@ -54,7 +54,6 @@ export default function CoverflowGallery({
                 height: 290,
                 borderRadius: 14,
                 overflow: "hidden",
-                boxShadow: "0 12px 30px rgba(0,0,0,0.35)",
                 cursor: "pointer",
               }}
             >
