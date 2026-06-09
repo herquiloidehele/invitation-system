@@ -26,17 +26,20 @@ import { LandingNav } from "./LandingNav";
 import { LiveDemoSection } from "./LiveDemoSection";
 import { ProcessSection } from "./ProcessSection";
 import { type GalleryCategoryKey } from "./landing-data";
+import { type Currency } from "@/lib/currency/config";
 
 export function BrindealHomepage({
   heroFeature,
   galleryByCategory,
   liveDemoFeatures,
   bestSellerFeatures,
+  currentCurrency,
 }: {
   heroFeature: HeroFeature | null;
   galleryByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
   liveDemoFeatures: LiveDemoFeature[];
   bestSellerFeatures: BestSellerFeature[];
+  currentCurrency: Currency;
 }) {
   const reduceMotion = useReducedMotion();
   const landingT = useTranslations("Landing");
@@ -75,7 +78,7 @@ export function BrindealHomepage({
 
   return (
     <main className="overflow-hidden bg-background font-[var(--font-outfit)] text-foreground">
-      <LandingNav />
+      <LandingNav currentCurrency={currentCurrency} />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
       <BestSellersSection items={bestSellerFeatures} />
       <GallerySection

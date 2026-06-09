@@ -13,8 +13,10 @@ import {
 } from "./landing-motion";
 import { getNavLinks } from "./landing-data";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { CurrencySwitcher } from "./CurrencySwitcher";
+import { type Currency } from "@/lib/currency/config";
 
-export function LandingNav() {
+export function LandingNav({ currentCurrency }: { currentCurrency: Currency }) {
   const reduceMotion = useReducedMotion();
   const reduced = shouldReduceMotion(reduceMotion);
   const t = useTranslations("Landing");
@@ -62,7 +64,11 @@ export function LandingNav() {
             </motion.a>
           ))}
         </motion.div>
-        <motion.div variants={landingItemVariants}>
+        <motion.div
+          variants={landingItemVariants}
+          className="flex items-center gap-2"
+        >
+          <CurrencySwitcher current={currentCurrency} />
           <LocaleSwitcher />
         </motion.div>
       </motion.nav>
