@@ -102,7 +102,7 @@ describe("resolveLandingPrice currency-native formatting", () => {
       "R$ 925",
     );
     expect(resolveLandingPrice(1040000, null, "MZN", CURRENCY_LOCALE.MZN)?.amount).toBe(
-      "10 400 MTn",
+      "10 400 MZN",
     );
     expect(resolveLandingPrice(14150000, null, "AOA", CURRENCY_LOCALE.AOA)?.amount).toBe(
       "141 500 Kz",
@@ -111,7 +111,7 @@ describe("resolveLandingPrice currency-native formatting", () => {
 
   it("keeps the discount strikethrough valid after currency formatting", () => {
     const p = resolveLandingPrice(1040000, 690000, "MZN", CURRENCY_LOCALE.MZN);
-    expect(p?.originalLabel).toBe("10 400 MTn");
-    expect(p?.amount).toBe("6900 MTn");
+    expect(p?.originalLabel).toBe("10 400 MZN");
+    expect(p?.amount).toBe("6900 MZN");
   });
 });
