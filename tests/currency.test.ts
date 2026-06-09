@@ -6,6 +6,10 @@ import {
   BASE_CURRENCY,
   FALLBACK_CURRENCY,
 } from "@/lib/currency/config";
+import {
+  getTemplatePriceCents,
+  priceOverridesSchema,
+} from "@/lib/currency/template-price";
 
 describe("currencyForCountry", () => {
   it("maps the four explicit markets", () => {
@@ -54,5 +58,80 @@ describe("isSupportedCurrency", () => {
     expect(isSupportedCurrency("eur")).toBe(false);
     expect(isSupportedCurrency(undefined)).toBe(false);
     expect(isSupportedCurrency(123)).toBe(false);
+  });
+});
+
+describe("getTemplatePriceCents", () => {
+  const base = { priceFromCents: 14900, discountPriceFromCents: null };
+
+  it("returns the base unchanged for EUR", () => {
+    expect(getTemplatePriceCents(base, null, "EUR")).toEqual({
+      fromCents: 14900,
+      discountCents: null,
+    });
+  });
+
+  it("derives non-base currencies when there is no override", () => {
+    expect(getTemplatePriceCents(base, null, "MZN")).toEqual({
+      fromCents: 1040000,
+      discountCents: null,
+    });
+    expect(getTemplatePriceCents(base, null, "USD")).toEqual({
+      fromCents: 16100,
+      discountCents: null,
+    });
+  });
+
+  it("uses an explicit override instead of deriving", () => {
+    const overrides = { MZN: { fromCents: 999900 } };
+    expect(getTemplatePriceCents(base, overrides, "MZN")).toEqual({
+      fromCents: 999900,
+      discountCents: null,
+    });
+    // a currency without an override still derives
+    expect(getTemplatePriceCents(base, overrides, "BRL")).toEqual({
+      fromCents: 92500,
+      discountCents: null,
+    });
+  });
+
+  it("derives the discount proportionally when present", () => {
+    const withDiscount = { priceFromCents: 14900, discountPriceFromCents: 9900 };
+    expect(getTemplatePriceCents(withDiscount, null, "MZN")).toEqual({
+      fromCents: 1040000,
+      discountCents: 690000, // 99*70=6930 -> step 100 -> 6900 -> minor 690000
+    });
+  });
+
+  it("returns nulls when there is no base price", () => {
+    expect(
+      getTemplatePriceCents(
+        { priceFromCents: null, discountPriceFromCents: null },
+        null,
+        "MZN",
+      ),
+    ).toEqual({ fromCents: null, discountCents: null });
+  });
+});
+
+describe("priceOverridesSchema", () => {
+  it("accepts a valid override map", () => {
+    const parsed = priceOverridesSchema.safeParse({
+      MZN: { fromCents: 650000 },
+      BRL: { fromCents: 54000, discountCents: 49000 },
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("accepts null and undefined", () => {
+    expect(priceOverridesSchema.safeParse(null).success).toBe(true);
+    expect(priceOverridesSchema.safeParse(undefined).success).toBe(true);
+  });
+
+  it("rejects the EUR (base) key and non-positive / non-integer amounts", () => {
+    expect(priceOverridesSchema.safeParse({ EUR: { fromCents: 100 } }).success).toBe(false);
+    expect(priceOverridesSchema.safeParse({ MZN: { fromCents: -1 } }).success).toBe(false);
+    expect(priceOverridesSchema.safeParse({ MZN: { fromCents: 1.5 } }).success).toBe(false);
+    expect(priceOverridesSchema.safeParse({ MZN: {} }).success).toBe(false);
   });
 });
