@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  // components/ui/** holds vendored shadcn/ui primitives. They intentionally
+  // expose the full upstream component surface, so unused sub-component
+  // exports there are expected — silence them while keeping the files in the
+  // graph (so their imports/dependencies still resolve as "used").
+  "overrides": [
+    {
+      "files": ["components/ui/**"],
+      "rules": { "unused-exports": "off" }
+    }
+  ]
+}
