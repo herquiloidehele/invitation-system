@@ -6,6 +6,7 @@ import type {
   SocialPreview,
   TextStyleOverrides,
 } from "@/lib/types";
+import type { PriceOverrides } from "@/lib/currency/template-price";
 import SaveTheDateForm from "../../SaveTheDateForm";
 import type { SaveTheDateFormData } from "../../SaveTheDateForm";
 
@@ -82,6 +83,7 @@ export default async function EditSaveTheDatePage({
     priceFromCents: item.priceFromCents,
     discountPriceFromCents: item.discountPriceFromCents,
     currency: item.currency,
+    priceOverrides: (item.priceOverrides as unknown as PriceOverrides | null) ?? null,
     landingModelName: item.landingModelName,
     landingImageUrl: item.landingImageUrl,
     landingDescription: item.landingDescription,
