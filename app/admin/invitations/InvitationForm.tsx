@@ -1181,6 +1181,7 @@ export default function InvitationForm({
                       discountPriceFromCents:
                         form.discountPriceFromCents ?? null,
                       currency: form.currency ?? "EUR",
+                      priceOverrides: form.priceOverrides ?? null,
                       landingModelName: form.landingModelName ?? null,
                       landingImageUrl: form.landingImageUrl ?? null,
                       landingDescription: form.landingDescription ?? null,
@@ -1192,6 +1193,7 @@ export default function InvitationForm({
                         next.discountPriceFromCents,
                       );
                       update("currency", next.currency);
+                      update("priceOverrides", next.priceOverrides);
                       update("landingModelName", next.landingModelName);
                       update("landingImageUrl", next.landingImageUrl);
                       update("landingDescription", next.landingDescription);

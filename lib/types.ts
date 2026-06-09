@@ -1,3 +1,5 @@
+import type { PriceOverrides } from "@/lib/currency/template-price";
+
 /** Theme name / slug identifier (e.g. "pink-floral"). Open-ended — themes are stored in the database. */
 export type TemplateName = string;
 
@@ -741,6 +743,7 @@ export interface InvitationData {
   priceFromCents?: number | null;
   discountPriceFromCents?: number | null;
   currency?: string | null;
+  priceOverrides?: PriceOverrides | null;
   landingModelName?: string | null;
   landingImageUrl?: string | null;
   landingDescription?: string | null;
