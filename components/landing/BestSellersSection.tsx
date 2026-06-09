@@ -76,7 +76,6 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                     initial={{ opacity: 0, scale: 0.96 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.96 }}
-                    whileHover={{ y: -8 }}
                     className={`group block cursor-pointer overflow-hidden rounded-[1.5rem] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 ${
                       featured
                         ? "bg-primary text-primary-foreground shadow-[0_24px_80px_color-mix(in_srgb,var(--primary)_24%,transparent)]"

@@ -156,7 +156,6 @@ export function GallerySection({
                   initial={reduced ? false : "hidden"}
                   animate={reduced ? undefined : "visible"}
                   exit={reduced ? undefined : "exit"}
-                  whileHover={reduced ? undefined : landingCardHover}
                   whileTap={reduced ? undefined : landingCardTap}
                   className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_4.5%,transparent)] transition hover:shadow-[0_20px_60px_color-mix(in_srgb,var(--foreground)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
                 >
