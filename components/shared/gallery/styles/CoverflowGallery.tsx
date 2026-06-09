@@ -10,7 +10,7 @@ export default function CoverflowGallery({
   theme,
   accent,
 }: GalleryStyleProps) {
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(Math.floor(images?.length / 2));
   const go = (dir: number) =>
     setIndex((i) => Math.min(images.length - 1, Math.max(0, i + dir)));
 
