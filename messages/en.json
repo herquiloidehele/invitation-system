@@ -1,5 +1,17 @@
 {
   "Locale": { "pt": "Português", "en": "English", "es": "Español" },
+  "LocaleCurrencyMenu": {
+    "menuAriaLabel": "Language and currency",
+    "language": "Language",
+    "currency": "Currency",
+    "currencyNames": {
+      "EUR": "Euro",
+      "MZN": "Metical",
+      "AOA": "Kwanza",
+      "BRL": "Real",
+      "USD": "Dollar"
+    }
+  },
   "Metadata": {
     "homeTitle": "Digital Wedding Invitations | Brindeal Studio",
     "homeDescription": "Personalized digital invitations for weddings and celebrations in Portugal, with online RSVP, maps, music, models and simple WhatsApp sharing.",

@@ -1,5 +1,17 @@
 {
   "Locale": { "pt": "Português", "en": "English", "es": "Español" },
+  "LocaleCurrencyMenu": {
+    "menuAriaLabel": "Idioma e moeda",
+    "language": "Idioma",
+    "currency": "Moeda",
+    "currencyNames": {
+      "EUR": "Euro",
+      "MZN": "Metical",
+      "AOA": "Kwanza",
+      "BRL": "Real",
+      "USD": "Dólar"
+    }
+  },
   "Metadata": {
     "homeTitle": "Convites Digitais para Casamentos | Brindeal Studio",
     "homeDescription": "Convites digitais personalizados para casamentos e celebrações em Portugal, com RSVP online, mapa, música, modelos e partilha simples por WhatsApp.",
