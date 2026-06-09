@@ -3,6 +3,34 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { routing } from "./i18n/routing";
 import { verifyJwt, AUTH_COOKIE_NAME } from "@/lib/auth";
+import {
+  CURRENCY_COOKIE,
+  GEO_CURRENCY_COOKIE,
+  currencyForCountry,
+} from "@/lib/currency/config";
+import { clientIpFromForwardedFor, lookupCountry } from "@/lib/currency/geo-lookup";
+
+const GEO_COOKIE_MAX_AGE = 60 * 60 * 24 * 180; // 180 days
+
+async function maybeSetGeoCurrencyCookie(
+  request: NextRequest,
+  response: NextResponse,
+): Promise<void> {
+  // Once per visitor: skip if they already chose, or we already guessed.
+  if (
+    request.cookies.has(CURRENCY_COOKIE) ||
+    request.cookies.has(GEO_CURRENCY_COOKIE)
+  ) {
+    return;
+  }
+  const ip = clientIpFromForwardedFor(request.headers.get("x-forwarded-for"));
+  const country = await lookupCountry(ip);
+  response.cookies.set(GEO_CURRENCY_COOKIE, currencyForCountry(country), {
+    path: "/",
+    maxAge: GEO_COOKIE_MAX_AGE,
+    sameSite: "lax",
+  });
+}
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -48,7 +76,9 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (shouldRunI18n(pathname)) {
-    return intlMiddleware(request);
+    const response = intlMiddleware(request);
+    await maybeSetGeoCurrencyCookie(request, response);
+    return response;
   }
 
   return NextResponse.next();
