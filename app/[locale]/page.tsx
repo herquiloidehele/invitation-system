@@ -9,6 +9,7 @@ import {
   getLiveDemoFeatures,
 } from "@/lib/landing-features";
 import { resolveLocale } from "@/i18n/locales";
+import { getViewerCurrency } from "@/lib/currency/viewer-currency";
 import {
   SITE_URL,
   buildFaqJsonLd,
@@ -53,6 +54,7 @@ export async function generateMetadata({
 }
 
 export default async function Home() {
+  const viewerCurrency = await getViewerCurrency();
   const [
     heroFeature,
     galleryByCategory,
@@ -61,9 +63,9 @@ export default async function Home() {
     faqT,
   ] = await Promise.all([
     getHeroFeature(),
-    getGalleryFeaturesByCategory(),
+    getGalleryFeaturesByCategory(viewerCurrency),
     getLiveDemoFeatures(),
-    getBestSellerFeatures(),
+    getBestSellerFeatures(viewerCurrency),
     getTranslations("LandingFaq"),
   ]);
   const jsonLd = [
@@ -87,6 +89,7 @@ export default async function Home() {
         galleryByCategory={galleryByCategory}
         liveDemoFeatures={liveDemoFeatures}
         bestSellerFeatures={bestSellerFeatures}
+        currentCurrency={viewerCurrency}
       />
     </>
   );

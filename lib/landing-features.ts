@@ -1,6 +1,37 @@
 import { prisma } from "@/lib/db";
+import { CURRENCY_LOCALE, type Currency } from "@/lib/currency/config";
+import {
+  getTemplatePriceCents,
+  type PriceOverrides,
+} from "@/lib/currency/template-price";
 import { resolveLandingGalleryMetadata } from "@/lib/landing-gallery-metadata";
 import { resolveLandingPrice, type LandingPrice } from "@/lib/landing-price";
+
+/** Format a template's price for a viewer currency from its base + overrides. */
+function templateLandingPrice(
+  target: {
+    priceFromCents: number | null;
+    discountPriceFromCents: number | null;
+    priceOverrides?: unknown;
+  },
+  viewerCurrency: Currency,
+): LandingPrice | null {
+  const overrides = (target.priceOverrides ?? null) as unknown as PriceOverrides | null;
+  const { fromCents, discountCents } = getTemplatePriceCents(
+    {
+      priceFromCents: target.priceFromCents,
+      discountPriceFromCents: target.discountPriceFromCents,
+    },
+    overrides,
+    viewerCurrency,
+  );
+  return resolveLandingPrice(
+    fromCents,
+    discountCents,
+    viewerCurrency,
+    CURRENCY_LOCALE[viewerCurrency],
+  );
+}
 
 // Re-exported so existing importers (e.g. the landing-pickable route) keep working.
 export { formatLandingPrice } from "@/lib/landing-price";
@@ -112,9 +143,9 @@ export async function getHeroFeature(): Promise<HeroFeature | null> {
   return null;
 }
 
-export async function getGalleryFeaturesByCategory(): Promise<
-  Record<GalleryCategory, GalleryFeature[]>
-> {
+export async function getGalleryFeaturesByCategory(
+  viewerCurrency: Currency,
+): Promise<Record<GalleryCategory, GalleryFeature[]>> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "gallery", enabled: true },
     orderBy: { position: "asc" },
@@ -164,11 +195,7 @@ export async function getGalleryFeaturesByCategory(): Promise<
       displayDate: readDateDisplay(target.date),
       subtitle: target.landingSubtitle ?? null,
       description: metadata.description,
-      price: resolveLandingPrice(
-        target.priceFromCents,
-        target.discountPriceFromCents,
-        target.currency,
-      ),
+      price: templateLandingPrice(target, viewerCurrency),
       category,
     });
   }
@@ -200,6 +227,7 @@ type BestSellerSourceRow = {
     priceFromCents: number | null;
     discountPriceFromCents: number | null;
     currency: string;
+    priceOverrides: unknown;
   } | null;
   saveTheDate: {
     slug: string;
@@ -212,11 +240,13 @@ type BestSellerSourceRow = {
     priceFromCents: number | null;
     discountPriceFromCents: number | null;
     currency: string;
+    priceOverrides: unknown;
   } | null;
 };
 
 export function mapBestSellerRowToFeature(
   row: BestSellerSourceRow,
+  viewerCurrency: Currency,
 ): BestSellerFeature | null {
   const isInvitation = Boolean(row.invitation);
   const target = row.invitation ?? row.saveTheDate;
@@ -238,15 +268,13 @@ export function mapBestSellerRowToFeature(
     imageUrl: target.landingImageUrl ?? heroImage,
     subtitle: target.landingSubtitle ?? null,
     description: metadata.description,
-    price: resolveLandingPrice(
-      target.priceFromCents,
-      target.discountPriceFromCents,
-      target.currency,
-    ),
+    price: templateLandingPrice(target, viewerCurrency),
   };
 }
 
-export async function getBestSellerFeatures(): Promise<BestSellerFeature[]> {
+export async function getBestSellerFeatures(
+  viewerCurrency: Currency,
+): Promise<BestSellerFeature[]> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "best_seller", enabled: true },
     orderBy: { position: "asc" },
@@ -254,7 +282,7 @@ export async function getBestSellerFeatures(): Promise<BestSellerFeature[]> {
   });
 
   return rows
-    .map((row) => mapBestSellerRowToFeature(row))
+    .map((row) => mapBestSellerRowToFeature(row, viewerCurrency))
     .filter((feature): feature is BestSellerFeature => feature !== null);
 }
 
