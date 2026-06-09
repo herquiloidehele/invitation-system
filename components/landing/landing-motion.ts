@@ -1,10 +1,10 @@
 import type { MotionProps, Variants } from "framer-motion";
 
-export const landingEase: [number, number, number, number] = [
+const landingEase: [number, number, number, number] = [
   0.22, 1, 0.36, 1,
 ];
 
-export const landingViewport: MotionProps["viewport"] = {
+const landingViewport: MotionProps["viewport"] = {
   once: true,
   margin: "-120px",
 };
@@ -51,7 +51,7 @@ export const landingItemVariants: Variants = {
   },
 };
 
-export const landingSoftItemVariants: Variants = {
+const landingSoftItemVariants: Variants = {
   hidden: { opacity: 0, y: 14 },
   visible: {
     opacity: 1,

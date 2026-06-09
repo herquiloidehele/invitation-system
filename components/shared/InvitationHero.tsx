@@ -57,7 +57,7 @@ export const DEFAULT_HERO_SCRIM_OPACITY = 0.38;
  * background. Differs slightly between video and image heroes.
  */
 export const DEFAULT_HERO_GRADIENT_START_VIDEO = 40;
-export const DEFAULT_HERO_GRADIENT_START_IMAGE = 35;
+const DEFAULT_HERO_GRADIENT_START_IMAGE = 35;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));

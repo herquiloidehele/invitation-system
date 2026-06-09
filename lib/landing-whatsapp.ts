@@ -1,9 +1,9 @@
-export const WHATSAPP_NUMBER = "351910671757";
+const WHATSAPP_NUMBER = "351910671757";
 export const DISPLAY_WHATSAPP_NUMBER = "+351 910 671 757";
-export const DEFAULT_CONTACT_MESSAGE =
+const DEFAULT_CONTACT_MESSAGE =
   "Olá! Gostava de pedir um orçamento para um convite digital Brindeal.";
 
-export const DEFAULT_CONTACT_MESSAGE_LABELS = {
+const DEFAULT_CONTACT_MESSAGE_LABELS = {
   name: "Nome",
   eventType: "Tipo de evento",
   message: "Mensagem",

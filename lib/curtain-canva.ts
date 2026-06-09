@@ -26,7 +26,7 @@ export function resolveTextElementOverride(
   return overrides?.elements?.[element] ?? {};
 }
 
-export const DEFAULT_CURTAIN_VIDEO_SRC = "/videos/curtains.mp4";
+const DEFAULT_CURTAIN_VIDEO_SRC = "/videos/curtains.mp4";
 
 /**
  * Returns true when the theme should render via the CurtainCanvaPage
@@ -89,7 +89,7 @@ export function scrollToNextHeroSection(win: ScrollWindow = window): void {
  * fraction of playback so the text is in place before the curtain is fully
  * open.
  */
-export const HERO_INFO_REVEAL_PROGRESS = 0.5;
+const HERO_INFO_REVEAL_PROGRESS = 0.5;
 
 /**
  * Returns true when the curtain video has played far enough that the hero
@@ -112,7 +112,7 @@ export function shouldShowHeroInfoAtProgress(
  * Fires near the end of the curtain animation so the burst lands as the
  * curtain finishes opening, not at the visual end (which would feel late).
  */
-export const CONFETTI_REVEAL_PROGRESS = 0.8;
+const CONFETTI_REVEAL_PROGRESS = 0.8;
 
 /**
  * Returns true when the curtain video has crossed the configured confetti

@@ -52,7 +52,7 @@ export function getNavLinks(t: (key: string) => string) {
   ];
 }
 
-export function getGalleryCategories(
+function getGalleryCategories(
   t: (key: string) => string,
 ): GalleryCategory[] {
   return [

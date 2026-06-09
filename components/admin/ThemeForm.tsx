@@ -23,7 +23,6 @@ import { EMPTY_FORM_DATA, formDataToTheme } from "@/lib/theme-form-data";
 // ThemeFormData, themeToFormData, formDataToTheme and EMPTY_FORM_DATA live in a plain .ts file
 // so that server components can import them without hitting the "use client" boundary.
 export type { ThemeFormData } from "@/lib/theme-form-data";
-export { EMPTY_FORM_DATA } from "@/lib/theme-form-data";
 
 // ---------------------------------------------------------------------------
 // Phone frame preview (same shell used in ThemeViewClient)

@@ -46,7 +46,7 @@ export function createNoIndexMetadata(): Metadata {
   };
 }
 
-export function createIndexableRobotsMetadata(): NonNullable<
+function createIndexableRobotsMetadata(): NonNullable<
   Metadata["robots"]
 > {
   return {

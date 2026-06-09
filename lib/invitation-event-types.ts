@@ -1,6 +1,6 @@
 import type { InvitationEventType } from "./types";
 
-export const INVITATION_EVENT_TYPES = [
+const INVITATION_EVENT_TYPES = [
   "wedding",
   "anniversary",
   "baptism",

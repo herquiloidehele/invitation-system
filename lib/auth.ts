@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 
 export const AUTH_COOKIE_NAME = "auth-token";
-export const JWT_EXPIRY = "7d";
+const JWT_EXPIRY = "7d";
 
 function getJwtSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;

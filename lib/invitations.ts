@@ -156,7 +156,7 @@ export const getInvitation = cache(
   },
 );
 
-export async function getAllInvitations(): Promise<InvitationData[]> {
+async function getAllInvitations(): Promise<InvitationData[]> {
   const rows = await prisma.invitation.findMany({
     orderBy: { createdAt: "desc" },
     include: includeTheme,
@@ -167,14 +167,14 @@ export async function getAllInvitations(): Promise<InvitationData[]> {
 /**
  * Get raw Prisma rows (useful for admin pages that need id, createdAt, etc.)
  */
-export async function getAllInvitationRows() {
+async function getAllInvitationRows() {
   return prisma.invitation.findMany({
     orderBy: { createdAt: "desc" },
     include: includeTheme,
   });
 }
 
-export async function getInvitationById(id: string) {
+async function getInvitationById(id: string) {
   return prisma.invitation.findUnique({
     where: { id },
     include: includeTheme,

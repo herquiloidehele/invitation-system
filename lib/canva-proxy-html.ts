@@ -128,7 +128,7 @@ export function injectIframeNoScrollStyle(html: string): string {
  * Returns `null` for inputs that are not http(s) URLs, which mirrors how
  * `getExternalInvitationEmbedSrc` falls back to the raw string.
  */
-export function getCanvaUpstreamHost(externalLink: string): string | null {
+function getCanvaUpstreamHost(externalLink: string): string | null {
   if (!externalLink) return null;
   try {
     const url = new URL(externalLink);

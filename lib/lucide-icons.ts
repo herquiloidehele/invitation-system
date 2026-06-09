@@ -13,7 +13,7 @@ const LEGACY_ICON_ALIASES: Record<string, string> = {
 
 const rawLucideIconNames = Object.keys(dynamicIconImports) as LucideIconName[];
 
-export const LUCIDE_ICON_NAMES = [...rawLucideIconNames].sort((a, b) =>
+const LUCIDE_ICON_NAMES = [...rawLucideIconNames].sort((a, b) =>
   a.localeCompare(b),
 );
 
@@ -54,7 +54,7 @@ export function getLucideIconComponent(
   return DYNAMIC_LUCIDE_ICONS[resolvedName];
 }
 
-export function formatLucideIconNameForInput(iconName: string): string {
+function formatLucideIconNameForInput(iconName: string): string {
   return iconName
     .split("-")
     .filter(Boolean)

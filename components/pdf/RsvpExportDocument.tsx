@@ -56,7 +56,7 @@ const registeredFonts = new Set<string>();
  * parses out the first font file URL, and registers it.
  * Silently fails if the font cannot be loaded.
  */
-export async function tryRegisterGoogleFont(
+async function tryRegisterGoogleFont(
   familyName: string
 ): Promise<void> {
   if (!familyName || registeredFonts.has(familyName)) return;
@@ -524,7 +524,7 @@ function Footer({
 // Main document component
 // ---------------------------------------------------------------------------
 
-export function RsvpExportDocument({
+function RsvpExportDocument({
   coupleNames,
   dateDisplay,
   locationName,

@@ -189,7 +189,7 @@ export async function getSaveDateThemes(): Promise<SaveTheDateThemeData[]> {
   return rows.map(toSaveTheDateTheme);
 }
 
-export async function getSaveDateTheme(
+async function getSaveDateTheme(
   name: string,
 ): Promise<SaveTheDateThemeData | null> {
   const row = await prisma.saveTheDateTheme.findUnique({

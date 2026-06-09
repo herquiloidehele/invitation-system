@@ -99,7 +99,7 @@ function isCacheValid(): boolean {
 
 const API_BASE = "https://www.googleapis.com/webfonts/v1/webfonts";
 
-export async function fetchGoogleFonts(): Promise<GoogleFontEntry[]> {
+async function fetchGoogleFonts(): Promise<GoogleFontEntry[]> {
   if (isCacheValid()) return cachedFonts!;
 
   const apiKey = process.env.GOOGLE_FONTS_API_KEY;
@@ -200,7 +200,7 @@ export function buildGoogleFontUrl(
  * Build a Google Fonts CSS URL for a minimal preview (just weight 400).
  * Used in the font picker to keep network usage low.
  */
-export function buildGoogleFontPreviewUrl(families: string[]): string {
+function buildGoogleFontPreviewUrl(families: string[]): string {
   const params = families
     .map((f) => `family=${f.replace(/ /g, "+")}:wght@400`)
     .join("&");

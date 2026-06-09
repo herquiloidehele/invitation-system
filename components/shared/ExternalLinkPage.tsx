@@ -46,7 +46,7 @@ interface ExternalLinkPageProps {
  * strategy the iframe is always in the DOM, so this is unconditionally
  * `true`.
  */
-export function shouldMountExternalInvitationIframe(): boolean {
+function shouldMountExternalInvitationIframe(): boolean {
   return true;
 }
 

@@ -16,7 +16,7 @@ export {
  * Standard heart SVG path, normalized to a 100x100 viewBox.
  * This produces a symmetric, well-proportioned heart.
  */
-export const HEART_PATH =
+const HEART_PATH =
   "M50 88 C25 70, 0 50, 0 30 C0 12, 12 0, 27 0 C37 0, 43 4, 47 14 Q50 24, 53 14 C57 4, 63 0, 73 0 C88 0, 100 12, 100 30 C100 50, 75 70, 50 88Z";
 
 /**

@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 
 import { SUPPORTED_LOCALES } from "@/i18n/locales";
 import { prisma } from "@/lib/db";
-import { getServicePageSitemapPaths } from "@/lib/seo-service-pages";
 import {
   SITE_URL,
   buildAbsoluteUrl,
@@ -33,13 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: locale === "pt" ? 1 : 0.8,
   }));
 
-  const serviceEntries = getServicePageSitemapPaths().map((path) => ({
-    url: buildAbsoluteUrl(SITE_URL, path),
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.85,
-  }));
-
   const invitationEntries = invitations
     .filter(shouldIncludePublicSitemapPage)
     .flatMap((item) =>
@@ -68,10 +60,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })),
     );
 
-  return [
-    ...staticEntries,
-    ...serviceEntries,
-    ...invitationEntries,
-    ...saveTheDateEntries,
-  ];
+  return [...staticEntries, ...invitationEntries, ...saveTheDateEntries];
 }

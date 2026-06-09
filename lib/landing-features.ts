@@ -55,7 +55,7 @@ const INVITATION_EVENT_CATEGORY: Record<string, GalleryCategory> = {
   engagement: "engagement",
 };
 
-export function resolveGalleryCategory(
+function resolveGalleryCategory(
   input: GalleryCategoryInput,
 ): GalleryCategory | null {
   if (input.kind === "save_the_date") return "save_the_date";
@@ -244,7 +244,7 @@ type BestSellerSourceRow = {
   } | null;
 };
 
-export function mapBestSellerRowToFeature(
+function mapBestSellerRowToFeature(
   row: BestSellerSourceRow,
   viewerCurrency: Currency,
 ): BestSellerFeature | null {

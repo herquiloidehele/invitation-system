@@ -38,14 +38,14 @@ export const quickStagger: Variants = {
 // Word reveal — for section titles & key labels
 // ---------------------------------------------------------------------------
 
-export const wordContainer: Variants = {
+const wordContainer: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.05, delayChildren: 0.05 },
   },
 };
 
-export const wordChild: Variants = {
+const wordChild: Variants = {
   hidden: { opacity: 0, y: 10, filter: "blur(4px)" },
   visible: {
     opacity: 1,
@@ -59,7 +59,7 @@ export const wordChild: Variants = {
 // Entrance variants
 // ---------------------------------------------------------------------------
 
-export const fadeInUp: Variants = {
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
@@ -99,7 +99,7 @@ export const floatAnimation = {
   },
 };
 
-export const pulseDot = {
+const pulseDot = {
   scale: [1, 1.4, 1],
   opacity: [0.6, 1, 0.6],
   transition: {

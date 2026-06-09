@@ -10,7 +10,7 @@ import {
 // Resolve image settings for a given key, falling back to defaults.
 // ---------------------------------------------------------------------------
 
-export function resolveImageSettings(
+function resolveImageSettings(
   map: ImageSettingsMap | undefined,
   key: ImageSettingsKey,
 ): ImageSettings {

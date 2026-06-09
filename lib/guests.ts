@@ -122,7 +122,7 @@ function validateUpsert(input: GuestUpsertInput): void {
 // Public API
 // ---------------------------------------------------------------------------
 
-export async function getGuestByToken(
+async function getGuestByToken(
   token: string,
 ): Promise<GuestData | null> {
   const row = await prisma.guest.findUnique({
@@ -305,4 +305,3 @@ export async function selfRegisterGuest(input: {
 }
 
 // Re-export the default template so callers don't need to import from two modules
-export { DEFAULT_GUEST_MESSAGE_TEMPLATE };

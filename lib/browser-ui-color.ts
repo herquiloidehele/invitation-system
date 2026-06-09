@@ -8,7 +8,7 @@ export interface BrowserUiColorInput {
   pageBackground?: string | null;
 }
 
-export function isBrowserUiHexColor(
+function isBrowserUiHexColor(
   value: string | null | undefined,
 ): value is string {
   return HEX_COLOR_RE.test(value ?? "");

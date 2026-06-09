@@ -20,7 +20,7 @@ import ffmpegStatic from "ffmpeg-static";
 
 const ffmpegPath = ffmpegStatic;
 
-export class PosterExtractionError extends Error {
+class PosterExtractionError extends Error {
   constructor(
     message: string,
     public readonly cause?: unknown,

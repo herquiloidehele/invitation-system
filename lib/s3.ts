@@ -68,7 +68,7 @@ export async function generatePresignedUploadUrl(
  * upload server-side and want to expose the same `https://…amazonaws.com/key`
  * shape that `generatePresignedUploadUrl` produces.
  */
-export function publicUrlForKey(key: string): string {
+function publicUrlForKey(key: string): string {
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
 

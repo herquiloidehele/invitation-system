@@ -13,7 +13,7 @@ export interface ResolvedGalleryImage {
   zoom: number;
 }
 
-export const DEFAULT_GALLERY_STYLE: CoupleGalleryStyle = "kenburns";
+const DEFAULT_GALLERY_STYLE: CoupleGalleryStyle = "kenburns";
 
 function clampPct(v: number | undefined, fallback: number): number {
   if (typeof v !== "number" || Number.isNaN(v)) return fallback;

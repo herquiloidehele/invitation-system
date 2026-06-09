@@ -73,7 +73,7 @@ export const getTheme = cache(
 );
 
 /** Fetch a single theme by its database id. Returns null if not found. */
-export async function getThemeById(id: string): Promise<TemplateTheme | null> {
+async function getThemeById(id: string): Promise<TemplateTheme | null> {
   const row = await prisma.theme.findUnique({ where: { id } });
   return row ? toTemplateTheme(row) : null;
 }
