@@ -1,7 +1,11 @@
 // Pure landing-page price formatting. No data-access imports so this stays a
 // fast unit and so the "is this discount valid?" rule lives in exactly one place.
 
-import { CURRENCY_SYMBOL, type Currency } from "@/lib/currency/config";
+import {
+  CURRENCY_LOCALE,
+  CURRENCY_SYMBOL,
+  type Currency,
+} from "@/lib/currency/config";
 
 export type LandingPrice = {
   /** Effective price WITH the "Desde" prefix, e.g. "Desde 99 €". */
@@ -19,7 +23,16 @@ export type LandingPrice = {
 /** Locale "from" prefix shown before every landing price. */
 const LANDING_PRICE_PREFIX = "Desde";
 
-function formatMoney(cents: number, currency: string, locale: string): string {
+/**
+ * Format a minor-unit `cents` amount in `currency`. Public so the urgency
+ * surcharge (and any other one-off price) reuses the exact same symbol and
+ * grouping rules as the landing prices.
+ */
+export function formatCurrencyAmount(
+  cents: number,
+  currency: string,
+  locale: string,
+): string {
   const amount = cents / 100;
   const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
@@ -43,7 +56,7 @@ export function formatLandingPrice(
   locale = "pt-PT",
 ): string | null {
   if (cents == null || cents <= 0) return null;
-  return `${LANDING_PRICE_PREFIX} ${formatMoney(cents, currency, locale)}`;
+  return `${LANDING_PRICE_PREFIX} ${formatCurrencyAmount(cents, currency, locale)}`;
 }
 
 export function resolveLandingPrice(
@@ -58,17 +71,17 @@ export function resolveLandingPrice(
   const prefix = LANDING_PRICE_PREFIX;
 
   if (discountCents != null && discountCents > 0 && discountCents < base) {
-    const amount = formatMoney(discountCents, currency, locale);
+    const amount = formatCurrencyAmount(discountCents, currency, locale);
     return {
       amountLabel: `${prefix} ${amount}`,
       prefix,
       amount,
-      originalLabel: formatMoney(base, currency, locale),
+      originalLabel: formatCurrencyAmount(base, currency, locale),
       discountPercent: Math.round((1 - discountCents / base) * 100),
     };
   }
 
-  const amount = formatMoney(base, currency, locale);
+  const amount = formatCurrencyAmount(base, currency, locale);
   return {
     amountLabel: `${prefix} ${amount}`,
     prefix,
@@ -76,4 +89,23 @@ export function resolveLandingPrice(
     originalLabel: null,
     discountPercent: null,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Personalization tier pricing — curated per-currency, minor units
+// Tier order: [≤50, 50–100, >100]
+// ---------------------------------------------------------------------------
+
+const PERSONALIZATION_TIER_CENTS: Record<Currency, [number, number, number]> = {
+  EUR: [150, 100, 75],
+  USD: [150, 100, 75],
+  MZN: [10000, 7500, 5000],
+  AOA: [150000, 100000, 75000],
+  BRL: [1000, 700, 500],
+};
+
+export function personalizationTierPrices(currency: Currency): [string, string, string] {
+  const cents = PERSONALIZATION_TIER_CENTS[currency];
+  const locale = CURRENCY_LOCALE[currency];
+  return cents.map((c) => formatCurrencyAmount(c, currency, locale)) as [string, string, string];
 }

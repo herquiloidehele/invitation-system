@@ -87,9 +87,13 @@ export function BrindealHomepage({
         itemsByCategory={galleryByCategory}
       />
       <ProcessSection />
-      <FeaturesSection />
+      <FeaturesSection currentCurrency={currentCurrency} />
       <LiveDemoSection items={liveDemoFeatures} />
-      <FaqSection openIndex={openFaqIndex} setOpenIndex={setOpenFaqIndex} />
+      <FaqSection
+        openIndex={openFaqIndex}
+        setOpenIndex={setOpenFaqIndex}
+        currentCurrency={currentCurrency}
+      />
       <ContactSection
         formState={formState}
         onFieldChange={updateFormField}

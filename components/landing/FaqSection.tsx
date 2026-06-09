@@ -4,6 +4,8 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronDownIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DISPLAY_WHATSAPP_NUMBER } from "@/lib/landing-whatsapp";
+import { type Currency } from "@/lib/currency/config";
+import { formatUrgencySurcharge } from "@/lib/currency/urgency";
 import { AnimatedSection } from "./AnimatedSection";
 import { getFaqs } from "./landing-data";
 import {
@@ -18,14 +20,16 @@ import { SectionEyebrow } from "./SectionEyebrow";
 export function FaqSection({
   openIndex,
   setOpenIndex,
+  currentCurrency,
 }: {
   openIndex: number;
   setOpenIndex: (index: number) => void;
+  currentCurrency: Currency;
 }) {
   const t = useTranslations("LandingFaq");
   const reduceMotion = useReducedMotion();
   const reduced = shouldReduceMotion(reduceMotion);
-  const faqs = getFaqs(t);
+  const faqs = getFaqs(t, formatUrgencySurcharge(currentCurrency));
 
   return (
     <AnimatedSection id="faq" className="bg-background px-5 py-24 sm:px-8">

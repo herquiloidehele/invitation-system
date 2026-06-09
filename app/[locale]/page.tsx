@@ -10,6 +10,7 @@ import {
 } from "@/lib/landing-features";
 import { resolveLocale } from "@/i18n/locales";
 import { getViewerCurrency } from "@/lib/currency/viewer-currency";
+import { formatUrgencySurcharge } from "@/lib/currency/urgency";
 import {
   SITE_URL,
   buildFaqJsonLd,
@@ -72,7 +73,7 @@ export default async function Home() {
     buildOrganizationJsonLd(SITE_URL),
     buildWebSiteJsonLd(SITE_URL),
     buildServiceJsonLd(SITE_URL),
-    buildFaqJsonLd(getFaqs(faqT)),
+    buildFaqJsonLd(getFaqs(faqT, formatUrgencySurcharge(viewerCurrency))),
   ];
 
   return (

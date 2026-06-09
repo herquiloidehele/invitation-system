@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatLandingPrice, resolveLandingPrice } from "../lib/landing-price";
-import { CURRENCY_LOCALE } from "@/lib/currency/config";
+import { formatLandingPrice, personalizationTierPrices, resolveLandingPrice } from "../lib/landing-price";
+import { CURRENCY_LOCALE, SUPPORTED_CURRENCIES } from "@/lib/currency/config";
 
 // Intl currency formatting separates groups and the symbol with a non-breaking
 // space (U+00A0), written explicitly as   in the literals below. Note the
@@ -113,5 +113,50 @@ describe("resolveLandingPrice currency-native formatting", () => {
     const p = resolveLandingPrice(1040000, 690000, "MZN", CURRENCY_LOCALE.MZN);
     expect(p?.originalLabel).toBe("10 400 MZN");
     expect(p?.amount).toBe("6900 MZN");
+  });
+});
+
+describe("personalizationTierPrices", () => {
+  it("returns 3 formatted prices for every supported currency", () => {
+    for (const currency of SUPPORTED_CURRENCIES) {
+      const prices = personalizationTierPrices(currency);
+      expect(prices).toHaveLength(3);
+      prices.forEach((p) => expect(typeof p).toBe("string"));
+    }
+  });
+
+  it("formats EUR tiers as 1,50 € / 1 € / 0,75 €", () => {
+    const [a, b, c] = personalizationTierPrices("EUR");
+    expect(a).toBe("1,50 €");
+    expect(b).toBe("1 €");
+    expect(c).toBe("0,75 €");
+  });
+
+  it("formats USD tiers as $1.50 / $1 / $0.75", () => {
+    const [a, b, c] = personalizationTierPrices("USD");
+    expect(a).toBe("$1.50");
+    expect(b).toBe("$1");
+    expect(c).toBe("$0.75");
+  });
+
+  it("formats MZN tiers as 100 MZN / 75 MZN / 50 MZN", () => {
+    const [a, b, c] = personalizationTierPrices("MZN");
+    expect(a).toBe("100 MZN");
+    expect(b).toBe("75 MZN");
+    expect(c).toBe("50 MZN");
+  });
+
+  it("formats BRL tiers as R$ 10 / R$ 7 / R$ 5", () => {
+    const [a, b, c] = personalizationTierPrices("BRL");
+    expect(a).toBe("R$ 10");
+    expect(b).toBe("R$ 7");
+    expect(c).toBe("R$ 5");
+  });
+
+  it("tiers descend in value (most expensive first)", () => {
+    for (const currency of SUPPORTED_CURRENCIES) {
+      const prices = personalizationTierPrices(currency);
+      expect(prices[0]).not.toBe(prices[2]);
+    }
   });
 });
