@@ -13,6 +13,7 @@ import {
   shouldReduceMotion,
 } from "./landing-motion";
 import { SectionEyebrow } from "./SectionEyebrow";
+import { HeroCountries } from "./HeroCountries";
 
 const heroPhoneVariants = {
   hidden: { opacity: 0, y: 32, scale: 0.96 },
@@ -103,12 +104,7 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
           {t("heroSecondaryCta")}
         </motion.a>
       </motion.div>
-      <motion.p
-        variants={landingItemVariants}
-        className="mt-8 text-sm font-medium text-muted-foreground"
-      >
-        {t("heroProof")}
-      </motion.p>
+      <HeroCountries />
     </motion.div>
   );
 }

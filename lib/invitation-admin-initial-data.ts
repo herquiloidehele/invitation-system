@@ -1,3 +1,4 @@
+import type { PriceOverrides } from "@/lib/currency/template-price";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -69,6 +70,7 @@ type AdminInvitationInitialDataRow = {
   priceFromCents: number | null;
   discountPriceFromCents: number | null;
   currency: string | null;
+  priceOverrides: unknown;
   landingModelName: string | null;
   landingImageUrl: string | null;
   landingDescription: string | null;
@@ -142,6 +144,7 @@ export function toAdminInvitationInitialData(
     priceFromCents: row.priceFromCents,
     discountPriceFromCents: row.discountPriceFromCents,
     currency: row.currency,
+    priceOverrides: (row.priceOverrides as PriceOverrides | null) ?? null,
     landingModelName: row.landingModelName,
     landingImageUrl: row.landingImageUrl,
     landingDescription: row.landingDescription,

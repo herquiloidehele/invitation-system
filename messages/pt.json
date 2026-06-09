@@ -1,5 +1,17 @@
 {
   "Locale": { "pt": "Português", "en": "English", "es": "Español" },
+  "LocaleCurrencyMenu": {
+    "menuAriaLabel": "Idioma e moeda",
+    "language": "Idioma",
+    "currency": "Moeda",
+    "currencyNames": {
+      "EUR": "Euro",
+      "MZN": "Metical",
+      "AOA": "Kwanza",
+      "BRL": "Real",
+      "USD": "Dólar"
+    }
+  },
   "Metadata": {
     "homeTitle": "Convites Digitais para Casamentos | Brindeal Studio",
     "homeDescription": "Convites digitais personalizados para casamentos e celebrações em Portugal, com RSVP online, mapa, música, modelos e partilha simples por WhatsApp.",
@@ -14,7 +26,15 @@
     "heroBody": "Os nossos convites foram criados para surpreender, emocionar e transformar cada detalhe num momento inesquecível. Mais do que um simples convite, é uma experiência digital única.",
     "heroPrimaryCta": "Começar o meu convite →",
     "heroSecondaryCta": "Ver exemplos reais",
-    "heroProof": "Resposta no mesmo dia · +200 convites feitos",
+    "heroCountriesLabel": "Disponível para",
+    "countries": {
+      "PT": "Portugal",
+      "BR": "Brasil",
+      "AO": "Angola",
+      "MZ": "Moçambique",
+      "US": "Estados Unidos"
+    },
+    "heroCountriesMore": "e outros países",
     "defaultWhatsappMessage": "Olá! Gostava de pedir um orçamento para um convite digital Brindeal.",
     "galleryFallbackTitle": "Convite",
     "galleryEmpty": "Ainda sem convites em destaque nesta categoria.",
@@ -180,7 +200,7 @@
     "items": [
       {
         "question": "Qual é o prazo?",
-        "answer": "O prazo varia de 4 dias a um mês, dependendo da procura e do modelo escolhido."
+        "answer": "O prazo varia de 7 dias a um mês, dependendo da procura e do modelo escolhido."
       },
       {
         "question": "Posso personalizar o meu convite?",

@@ -1,6 +1,8 @@
 // Pure landing-page price formatting. No data-access imports so this stays a
 // fast unit and so the "is this discount valid?" rule lives in exactly one place.
 
+import { CURRENCY_SYMBOL, type Currency } from "@/lib/currency/config";
+
 export type LandingPrice = {
   /** Effective price WITH the "Desde" prefix, e.g. "Desde 99 €". */
   amountLabel: string;
@@ -19,11 +21,20 @@ const LANDING_PRICE_PREFIX = "Desde";
 
 function formatMoney(cents: number, currency: string, locale: string): string {
   const amount = cents / 100;
-  return new Intl.NumberFormat(locale, {
+  const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
-  }).format(amount);
+  });
+  // Source the symbol from CURRENCY_SYMBOL so prices match the selector (e.g.
+  // MZN renders "MZN", not Intl's native "MTn"); Intl still owns the number
+  // grouping and symbol placement. Falls back to Intl's own symbol for any
+  // currency without an override.
+  const symbol = CURRENCY_SYMBOL[currency as Currency];
+  return formatter
+    .formatToParts(amount)
+    .map((part) => (part.type === "currency" && symbol ? symbol : part.value))
+    .join("");
 }
 
 export function formatLandingPrice(

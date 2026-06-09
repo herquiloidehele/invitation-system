@@ -53,6 +53,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
+import type { PriceOverrides } from "@/lib/currency/template-price";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import { OwnerLinkPanel } from "@/app/admin/invitations/OwnerLinkPanel";
@@ -99,6 +100,7 @@ export interface SaveTheDateFormData {
   priceFromCents?: number | null;
   discountPriceFromCents?: number | null;
   currency?: string | null;
+  priceOverrides?: PriceOverrides | null;
   landingModelName?: string | null;
   landingImageUrl?: string | null;
   landingDescription?: string | null;
@@ -574,6 +576,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           priceFromCents: data.priceFromCents ?? null,
           discountPriceFromCents: data.discountPriceFromCents ?? null,
           currency: data.currency ?? "EUR",
+          priceOverrides: data.priceOverrides ?? null,
           landingModelName: data.landingModelName ?? null,
           landingImageUrl: data.landingImageUrl ?? null,
           landingDescription: data.landingDescription ?? null,
@@ -697,6 +700,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     priceFromCents: data.priceFromCents ?? null,
                     discountPriceFromCents: data.discountPriceFromCents ?? null,
                     currency: data.currency ?? "EUR",
+                    priceOverrides: data.priceOverrides ?? null,
                     landingModelName: data.landingModelName ?? null,
                     landingImageUrl: data.landingImageUrl ?? null,
                     landingDescription: data.landingDescription ?? null,
@@ -707,6 +711,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       priceFromCents: next.priceFromCents,
                       discountPriceFromCents: next.discountPriceFromCents,
                       currency: next.currency,
+                      priceOverrides: next.priceOverrides,
                       landingModelName: next.landingModelName,
                       landingImageUrl: next.landingImageUrl,
                       landingDescription: next.landingDescription,

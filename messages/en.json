@@ -1,5 +1,17 @@
 {
   "Locale": { "pt": "Português", "en": "English", "es": "Español" },
+  "LocaleCurrencyMenu": {
+    "menuAriaLabel": "Language and currency",
+    "language": "Language",
+    "currency": "Currency",
+    "currencyNames": {
+      "EUR": "Euro",
+      "MZN": "Metical",
+      "AOA": "Kwanza",
+      "BRL": "Real",
+      "USD": "Dollar"
+    }
+  },
   "Metadata": {
     "homeTitle": "Digital Wedding Invitations | Brindeal Studio",
     "homeDescription": "Personalized digital invitations for weddings and celebrations in Portugal, with online RSVP, maps, music, models and simple WhatsApp sharing.",
@@ -14,7 +26,15 @@
     "heroBody": "Our invitations were created to surprise, move and transform every detail into an unforgettable moment. More than a simple invitation, it's a unique digital experience.",
     "heroPrimaryCta": "Start my invitation →",
     "heroSecondaryCta": "See real examples",
-    "heroProof": "Same-day reply · 200+ invitations made",
+    "heroCountriesLabel": "Available in",
+    "countries": {
+      "PT": "Portugal",
+      "BR": "Brazil",
+      "AO": "Angola",
+      "MZ": "Mozambique",
+      "US": "United States"
+    },
+    "heroCountriesMore": "and other countries",
     "defaultWhatsappMessage": "Hello! I would like to request a quote for a Brindeal digital invitation.",
     "galleryFallbackTitle": "Invitation",
     "galleryEmpty": "No featured invitations in this category yet.",
@@ -180,7 +200,7 @@
     "items": [
       {
         "question": "What is the turnaround time?",
-        "answer": "Turnaround ranges from 4 days to one month, depending on demand and the chosen model."
+        "answer": "Turnaround ranges from 7 days to one month, depending on demand and the chosen model."
       },
       {
         "question": "Can I personalize my invitation?",
