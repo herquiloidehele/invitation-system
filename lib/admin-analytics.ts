@@ -265,6 +265,14 @@ export function composeInvitationAnalytics({
     });
 }
 
+export function resolveAnalyticsSlug(
+  slug: string | null | undefined,
+  options: AnalyticsInvitationOption[],
+): string | null {
+  if (slug && options.some((option) => option.slug === slug)) return slug;
+  return options[0]?.slug ?? null;
+}
+
 export async function getAnalyticsInvitationOptions(): Promise<
   AnalyticsInvitationOption[]
 > {

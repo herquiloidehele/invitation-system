@@ -1,6 +1,7 @@
 import {
   getAnalyticsInvitationOptions,
   getInvitationAnalytics,
+  resolveAnalyticsSlug,
 } from "@/lib/admin-analytics";
 import AnalyticsClient from "./AnalyticsClient";
 
@@ -11,13 +12,12 @@ interface PageProps {
 }
 
 export default async function AnalyticsPage({ searchParams }: PageProps) {
-  const { range = "30d", slug = "all" } = await searchParams;
+  const { range = "30d", slug } = await searchParams;
   const invitationOptions = await getAnalyticsInvitationOptions();
-  const selectedSlug =
-    slug !== "all" && invitationOptions.some((option) => option.slug === slug)
-      ? slug
-      : "all";
-  const data = await getInvitationAnalytics({ range, slug: selectedSlug });
+  const selectedSlug = resolveAnalyticsSlug(slug, invitationOptions);
+  const data = selectedSlug
+    ? await getInvitationAnalytics({ range, slug: selectedSlug })
+    : [];
 
   return (
     <div className="space-y-6">
@@ -31,7 +31,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
         data={data}
         invitationOptions={invitationOptions}
         range={range}
-        selectedSlug={selectedSlug}
+        selectedSlug={selectedSlug ?? ""}
       />
     </div>
   );

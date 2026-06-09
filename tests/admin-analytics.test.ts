@@ -1,6 +1,33 @@
 import { describe, expect, it } from "vitest";
 
-import { composeInvitationAnalytics } from "../lib/admin-analytics";
+import {
+  composeInvitationAnalytics,
+  resolveAnalyticsSlug,
+} from "../lib/admin-analytics";
+
+describe("resolveAnalyticsSlug", () => {
+  const options = [
+    { slug: "ana-bruno", coupleName: "Ana & Bruno" },
+    { slug: "carla-david", coupleName: "Carla & David" },
+  ];
+
+  it("keeps the slug when it matches an invitation", () => {
+    expect(resolveAnalyticsSlug("carla-david", options)).toBe("carla-david");
+  });
+
+  it("falls back to the first invitation when no slug is given", () => {
+    expect(resolveAnalyticsSlug(undefined, options)).toBe("ana-bruno");
+  });
+
+  it("falls back to the first invitation for unknown or legacy 'all' slugs", () => {
+    expect(resolveAnalyticsSlug("all", options)).toBe("ana-bruno");
+    expect(resolveAnalyticsSlug("missing", options)).toBe("ana-bruno");
+  });
+
+  it("returns null when there are no invitations", () => {
+    expect(resolveAnalyticsSlug("ana-bruno", [])).toBeNull();
+  });
+});
 
 describe("composeInvitationAnalytics", () => {
   it("builds invitation analytics from aggregate rows", () => {
