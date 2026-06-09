@@ -69,3 +69,18 @@ export function deriveCents(baseEurCents: number, target: Currency): number {
   const roundedMajor = Math.round(major / step) * step;
   return Math.round(roundedMajor * 100);
 }
+
+// Native currency symbol per code — client-safe, used by the selector trigger
+// and the currency rows of the merged language/currency menu.
+export const CURRENCY_SYMBOL: Record<Currency, string> = {
+  EUR: "€",
+  MZN: "MTn",
+  AOA: "Kz",
+  BRL: "R$",
+  USD: "$",
+};
+
+/** Compact label for the merged selector trigger, e.g. "EN · €". */
+export function formatSelectorTrigger(locale: string, currency: Currency): string {
+  return `${locale.toUpperCase()} · ${CURRENCY_SYMBOL[currency]}`;
+}
