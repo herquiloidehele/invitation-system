@@ -10,6 +10,7 @@ import PersonalGuestCard, {
   PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
 } from "@/components/shared/PersonalGuestCard";
 import { EditableText } from "@/components/shared/EditableText";
+import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
 import {
   resolveRevealContentStyle,
   resolveTextElementOverride,
@@ -142,6 +143,10 @@ export default function RevealableExternalSections({
             imageSettings={invitation.imageSettings}
             className={"pb-12 md:pb-16"}
           />
+        )}
+
+        {showInitialPageSections && (
+          <CoupleGallery invitation={invitation} theme={theme} />
         )}
 
         {externalLink && (

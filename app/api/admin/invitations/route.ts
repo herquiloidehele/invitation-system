@@ -121,6 +121,7 @@ export async function POST(request: NextRequest) {
         saveDateStyle: body.saveDateStyle ?? null,
         cinematicImageUrl: body.cinematicImageUrl ?? null,
         sectionImages: sanitizeJsonField(body.sectionImages, null),
+        coupleGallery: sanitizeJsonField(body.coupleGallery, null),
         parents: sanitizeJsonField(body.parents, null),
         ourStory: sanitizeJsonField(body.ourStory, null),
         scratchReveal: sanitizeJsonField(body.scratchReveal, null),

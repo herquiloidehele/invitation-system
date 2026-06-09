@@ -173,6 +173,40 @@ export interface SectionImages {
 }
 
 // ---------------------------------------------------------------------------
+// Couple gallery — opt-in photo carousel section
+// ---------------------------------------------------------------------------
+
+export type CoupleGalleryStyle =
+  | "kenburns"
+  | "coverflow"
+  | "polaroid"
+  | "filmstrip"
+  | "grid";
+
+export interface CoupleGalleryImage {
+  /** Image URL (same S3 upload pipeline as section images). */
+  src: string;
+  /** Optional caption — shown by `kenburns` & `polaroid`; ignored by others. */
+  caption?: string;
+  /** Horizontal focal point 0–100 (default 50). */
+  positionX?: number;
+  /** Vertical focal point 0–100 (default 50). */
+  positionY?: number;
+  /** Zoom / scale 1–2.5 (default 1). */
+  zoom?: number;
+}
+
+export interface CoupleGallery {
+  enabled: boolean;
+  style: CoupleGalleryStyle;
+  images: CoupleGalleryImage[];
+  /** Overrides the default localized section title. */
+  title?: string;
+  /** Autoplay for `kenburns` / `coverflow`. Defaults true for kenburns. */
+  autoplay?: boolean;
+}
+
+// ---------------------------------------------------------------------------
 // Image position & zoom settings
 // ---------------------------------------------------------------------------
 
@@ -501,6 +535,7 @@ export interface CustomTexts {
   sectionTitle_giftRegistry?: string;
   sectionTitle_guestGuide?: string;
   sectionTitle_faqs?: string;
+  sectionTitle_gallery?: string;
 
   // -- CTA / Buttons --
   cta_confirmLabel?: string;
@@ -664,6 +699,8 @@ export interface InvitationData {
   cinematicImageUrl?: string;
   /** Optional decorative images placed between sections and in the footer. Each falls back to a default Unsplash photo if not provided. */
   sectionImages?: SectionImages;
+  /** Optional couple-photos gallery section (opt-in carousel). */
+  coupleGallery?: CoupleGallery;
   /** Optional parents info for the "parents mode" hero section. */
   parents?: ParentsInfo;
   /** Optional "Nossa História" section — the couple's story. */

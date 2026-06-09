@@ -25,12 +25,8 @@ export function resolveImageSettings(
 // The image element should use `object-fit: cover` (already applied).
 // ---------------------------------------------------------------------------
 
-export function getImageStyle(
-  map: ImageSettingsMap | undefined,
-  key: ImageSettingsKey,
-): CSSProperties {
-  const s = resolveImageSettings(map, key);
-
+/** Build inline CSS for an `object-fit: cover` <img> from raw settings. */
+export function getImageStyleFor(s: ImageSettings): CSSProperties {
   // Nothing customised — skip extra style to avoid unnecessary work.
   if (s.positionX === 50 && s.positionY === 50 && s.zoom === 1) {
     return {};
@@ -41,6 +37,13 @@ export function getImageStyle(
     transform: s.zoom !== 1 ? `scale(${s.zoom})` : undefined,
     transformOrigin: `${s.positionX}% ${s.positionY}%`,
   };
+}
+
+export function getImageStyle(
+  map: ImageSettingsMap | undefined,
+  key: ImageSettingsKey,
+): CSSProperties {
+  return getImageStyleFor(resolveImageSettings(map, key));
 }
 
 // ---------------------------------------------------------------------------

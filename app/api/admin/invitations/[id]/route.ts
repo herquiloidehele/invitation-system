@@ -182,6 +182,9 @@ export async function PUT(
         ...(body.sectionImages !== undefined && {
           sectionImages: sanitizeJsonField(body.sectionImages, null),
         }),
+        ...(body.coupleGallery !== undefined && {
+          coupleGallery: sanitizeJsonField(body.coupleGallery, null),
+        }),
         ...(body.parents !== undefined && {
           parents: sanitizeJsonField(body.parents, null),
         }),

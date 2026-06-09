@@ -30,6 +30,7 @@ import PersonalGuestCard, {
 import LocationCard from "./LocationCard";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
+import CoupleGallery from "./gallery/CoupleGallery";
 import SectionImage from "./SectionImage";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
@@ -609,6 +610,15 @@ export default function InvitationPage({
           <SectionDivider theme={theme} />
         </>
       )}
+
+      {/* ================================================================= */}
+      {/* Couple Gallery — opt-in photo carousel                            */}
+      {/* ================================================================= */}
+      <CoupleGallery
+        invitation={invitation}
+        theme={theme}
+        isPreview={isPreview}
+      />
 
       {/* ================================================================= */}
       {/* 4. Schedule                                                       */}
