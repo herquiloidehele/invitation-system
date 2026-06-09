@@ -6,7 +6,9 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import ExternalCountdownSection from "@/components/shared/ExternalCountdownSection";
-import PersonalGuestCard from "@/components/shared/PersonalGuestCard";
+import PersonalGuestCard, {
+  PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
+} from "@/components/shared/PersonalGuestCard";
 import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveRevealContentStyle,
@@ -32,6 +34,9 @@ interface RevealableExternalSectionsProps {
   showInitialPageSections?: boolean;
   /** Mirrors CanvaEmbed's current initial-page state. */
   onCanvaInitialPageChange?: (isInitialPage: boolean) => void;
+  /** True when shown inside the public landing-page phone preview iframe.
+   *  Forces the sample personal guest card to render for display purposes. */
+  isLandingPreview?: boolean;
 }
 
 /**
@@ -48,6 +53,7 @@ export default function RevealableExternalSections({
   audioRef,
   showInitialPageSections = true,
   onCanvaInitialPageChange,
+  isLandingPreview = false,
 }: RevealableExternalSectionsProps) {
   // Pause audio when the tab is hidden; resume on return.
   useEffect(() => {
@@ -123,9 +129,9 @@ export default function RevealableExternalSections({
           <ExternalCountdownSection invitation={invitation} theme={theme} />
         )}
 
-        {showInitialPageSections && invitation.guest && (
+        {showInitialPageSections && (invitation.guest || isLandingPreview) && (
           <PersonalGuestCard
-            guest={invitation.guest}
+            guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY}
             theme={theme}
             textStyles={invitation.textStyles}
             customTexts={invitation.customTexts}

@@ -11,11 +11,15 @@ import { shouldFireHeroConfetti } from "@/lib/curtain-canva";
 interface CurtainCanvaPageProps {
   invitation: InvitationData;
   theme: TemplateTheme;
+  /** True when shown inside the public landing-page phone preview iframe.
+   *  Forces the sample personal guest card to render for display purposes. */
+  isLandingPreview?: boolean;
 }
 
 export default function CurtainCanvaPage({
   invitation,
   theme,
+  isLandingPreview = false,
 }: CurtainCanvaPageProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { trackEvent } = useAnalytics(invitation.slug);
@@ -69,6 +73,7 @@ export default function CurtainCanvaPage({
         theme={theme}
         revealed={revealed}
         audioRef={audioRef}
+        isLandingPreview={isLandingPreview}
       />
     </main>
   );

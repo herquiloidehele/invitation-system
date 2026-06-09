@@ -19,7 +19,10 @@ import dynamic from "next/dynamic";
 // Lazy-load RSVPForm so its react-hook-form + zod dependencies only
 // ship when a guest actually scrolls down to the RSVP section.
 const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
-import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST } from "./PersonalGuestCard";
+import PersonalGuestCard, {
+  PREVIEW_SAMPLE_GUEST,
+  PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
+} from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowRichExternalRsvp } from "@/lib/external-invitation-form";
@@ -31,6 +34,9 @@ interface RichExternalLinkPageProps {
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
   prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
   isPreview?: boolean;
+  /** True when shown inside the public landing-page phone preview iframe.
+   *  Forces the sample personal guest card to render for display purposes. */
+  isLandingPreview?: boolean;
   canvaPreloading?: boolean;
 }
 
@@ -54,6 +60,7 @@ export default function RichExternalLinkPage({
   audioRef,
   prefetchedVideoRef,
   isPreview = false,
+  isLandingPreview = false,
   canvaPreloading = false,
 }: RichExternalLinkPageProps) {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
@@ -207,10 +214,15 @@ export default function RichExternalLinkPage({
         </>
       )}
 
-      {invitation.guestManagementEnabled && (
+      {(invitation.guestManagementEnabled || isLandingPreview) && (
         <div className="pb-12 md:pb-16">
           <PersonalGuestCard
-            guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST}
+            guest={
+              invitation.guest ??
+              (isLandingPreview
+                ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
+                : PREVIEW_SAMPLE_GUEST)
+            }
             theme={theme}
             textStyles={invitation.textStyles}
             customTexts={invitation.customTexts}

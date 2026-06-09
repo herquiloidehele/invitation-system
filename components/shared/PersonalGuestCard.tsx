@@ -122,7 +122,7 @@ export default function PersonalGuestCard({
         )}
 
         <div
-          className="mx-auto max-w-md rounded-3xl border px-4 py-8 text-center backdrop-blur-sm"
+          className="mx-auto max-w-md rounded-3xl border px-4 py-8 text-center backdrop-blur-sm shadow"
           style={{
             position: "relative",
             zIndex: 1,

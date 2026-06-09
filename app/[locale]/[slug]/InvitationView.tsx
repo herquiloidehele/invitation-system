@@ -69,7 +69,13 @@ export default function InvitationView({
     return <VideoEntrancePage invitation={invitation} theme={theme} />;
   }
   if (isCurtainCanvaLayout(theme)) {
-    return <CurtainCanvaPage invitation={invitation} theme={theme} />;
+    return (
+      <CurtainCanvaPage
+        invitation={invitation}
+        theme={theme}
+        isLandingPreview={isLandingPreview}
+      />
+    );
   }
   return (
     <EnvelopeInvitationView
@@ -353,6 +359,7 @@ function EnvelopeInvitationView({
               theme={theme}
               audioRef={audioRef}
               prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+              isLandingPreview={isLandingPreview}
               canvaPreloading={shouldPreloadRichExternalCanva({
                 isPreview: false,
                 isVisible: richExternalLinkVisible,
