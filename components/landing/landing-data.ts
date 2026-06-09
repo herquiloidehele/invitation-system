@@ -38,7 +38,7 @@ const tabKeyToDbCategory: Record<
 };
 
 export type LandingTranslator = {
-  (key: string): string;
+  (key: string, values?: Record<string, string | number>): string;
   raw?(key: string): unknown;
 };
 
@@ -88,6 +88,12 @@ export function getProcessBadges(t: LandingTranslator) {
   return t.raw?.("badges") as ReadonlyArray<string>;
 }
 
-export function getFaqs(t: LandingTranslator): FaqItem[] {
-  return t.raw?.("items") as FaqItem[];
+export function getFaqs(t: LandingTranslator, urgencyPrice: string): FaqItem[] {
+  const items = (t.raw?.("items") as FaqItem[]) ?? [];
+  const urgency: FaqItem = {
+    question: t("urgency.question"),
+    answer: t("urgency.answer", { price: urgencyPrice }),
+  };
+  // Insert right after the turnaround FAQ (index 0); empty list -> just urgency.
+  return [...items.slice(0, 1), urgency, ...items.slice(1)];
 }

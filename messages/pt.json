@@ -197,6 +197,10 @@
     "title": "Perguntas frequentes",
     "body": "Tudo o que precisa de saber antes de começarmos. Não encontra a resposta? Falamos no WhatsApp.",
     "contactTitle": "Falar agora",
+    "urgency": {
+      "question": "Posso pedir o convite com urgência?",
+      "answer": "Sim. Por mais {price} entregamos o seu convite em 2 dias úteis."
+    },
     "items": [
       {
         "question": "Qual é o prazo?",

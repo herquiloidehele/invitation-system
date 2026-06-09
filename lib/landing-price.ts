@@ -19,7 +19,16 @@ export type LandingPrice = {
 /** Locale "from" prefix shown before every landing price. */
 const LANDING_PRICE_PREFIX = "Desde";
 
-function formatMoney(cents: number, currency: string, locale: string): string {
+/**
+ * Format a minor-unit `cents` amount in `currency`. Public so the urgency
+ * surcharge (and any other one-off price) reuses the exact same symbol and
+ * grouping rules as the landing prices.
+ */
+export function formatCurrencyAmount(
+  cents: number,
+  currency: string,
+  locale: string,
+): string {
   const amount = cents / 100;
   const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
@@ -43,7 +52,7 @@ export function formatLandingPrice(
   locale = "pt-PT",
 ): string | null {
   if (cents == null || cents <= 0) return null;
-  return `${LANDING_PRICE_PREFIX} ${formatMoney(cents, currency, locale)}`;
+  return `${LANDING_PRICE_PREFIX} ${formatCurrencyAmount(cents, currency, locale)}`;
 }
 
 export function resolveLandingPrice(
@@ -58,17 +67,17 @@ export function resolveLandingPrice(
   const prefix = LANDING_PRICE_PREFIX;
 
   if (discountCents != null && discountCents > 0 && discountCents < base) {
-    const amount = formatMoney(discountCents, currency, locale);
+    const amount = formatCurrencyAmount(discountCents, currency, locale);
     return {
       amountLabel: `${prefix} ${amount}`,
       prefix,
       amount,
-      originalLabel: formatMoney(base, currency, locale),
+      originalLabel: formatCurrencyAmount(base, currency, locale),
       discountPercent: Math.round((1 - discountCents / base) * 100),
     };
   }
 
-  const amount = formatMoney(base, currency, locale);
+  const amount = formatCurrencyAmount(base, currency, locale);
   return {
     amountLabel: `${prefix} ${amount}`,
     prefix,

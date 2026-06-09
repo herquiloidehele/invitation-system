@@ -197,6 +197,10 @@
     "title": "Frequently asked questions",
     "body": "Everything you need to know before we start. Can't find the answer? We can talk on WhatsApp.",
     "contactTitle": "Talk now",
+    "urgency": {
+      "question": "Can I order my invitation with urgency?",
+      "answer": "Yes. For an extra {price} we deliver your invitation within 2 working days."
+    },
     "items": [
       {
         "question": "What is the turnaround time?",
