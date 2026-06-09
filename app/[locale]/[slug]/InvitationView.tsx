@@ -165,29 +165,28 @@ function EnvelopeInvitationView({
     // The hidden hero video and background audio were mounted with
     // preload="metadata" so the envelope view stays cheap on cold load.
     // The tap is the user gesture that unlocks autoplay AND tells us
-    // they're committed to viewing the invitation, so upgrade to a full
-    // preload and kick off `load()` immediately.
+    // they're committed to viewing the invitation, so upgrade the preload
+    // hint to "auto" — the browser then fetches the rest of the file,
+    // continuing from the bytes it already buffered.
+    //
+    // Do NOT call `.load()` here: that runs the media element load
+    // algorithm, which aborts the in-flight fetch and re-downloads the
+    // resource from scratch, throwing away everything preload="metadata"
+    // already pulled. That produced a duplicate network request *and*
+    // delayed audio playback (play() had to wait for the fresh buffer).
     const heroVideo = heroVideoRef.current;
     if (heroVideo) {
-      try {
-        heroVideo.preload = "auto";
-        heroVideo.load();
-      } catch {
-        /* ignore: some browsers throw if load() is called too early */
-      }
+      heroVideo.preload = "auto";
     }
 
-    // Use the pre-buffered <audio> element so playback starts instantly
+    // Use the pre-buffered <audio> element so playback starts instantly.
+    // play() continues the download from the buffered metadata and starts
+    // as soon as it has enough — no `.load()` reset needed.
     if (hasBackgroundAudio) {
       try {
         const audio = audioRef.current;
         if (!audio) return;
         audio.preload = "auto";
-        try {
-          audio.load();
-        } catch {
-          /* ignore */
-        }
         audio.loop = true;
         audio.volume = 0.03;
         audio
@@ -393,8 +392,10 @@ function EnvelopeInvitationView({
         )}
 
         {/* Persistent prefetch audio — mounted once. `preload="metadata"`
-            keeps the cold-start payload small; `handleOpen` upgrades to a
-            full fetch + `.load()` the moment the user taps the envelope. */}
+            keeps the cold-start payload small; `handleOpen` upgrades the
+            preload hint to "auto" the moment the user taps, so the browser
+            fetches the rest of the file (continuing from the buffered
+            metadata) rather than re-downloading it. */}
         {hasBackgroundAudio && (
           <audio
             ref={audioRef}

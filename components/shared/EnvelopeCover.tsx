@@ -7,6 +7,7 @@ import type { ImageSettingsMap, TemplateTheme } from "@/lib/types";
 import { getImageStyle } from "@/lib/image-settings";
 import { getCoverBackgroundStyle } from "@/lib/envelope-cover-background";
 import Image from "next/image";
+import { sleep } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -233,10 +234,14 @@ export default function EnvelopeCover({
   imageSettings,
 }: EnvelopeCoverProps) {
   const [opening, setOpening] = useState(false);
-  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
-  const handleTap = useCallback(() => {
+  const handleTap = useCallback(async () => {
     if (opening) return;
+
+    await sleep(300);
     setOpening(true);
     onOpen();
     if (onAnimationComplete) {
