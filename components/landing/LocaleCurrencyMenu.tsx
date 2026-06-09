@@ -21,7 +21,7 @@ import {
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 // Module scope so the cookie write isn't re-created each render — keeps the
-// react-hooks lint happy (same reason CurrencySwitcher hoisted it).
+// react-hooks lint happy.
 function persistCurrency(next: Currency) {
   document.cookie = `${CURRENCY_COOKIE}=${next}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
 }
