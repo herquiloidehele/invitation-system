@@ -54,3 +54,6 @@ docs/
 
 # one-shot db migration data dump (contains PII)
 neon_data.sql
+
+# fallow cache
+.fallow/

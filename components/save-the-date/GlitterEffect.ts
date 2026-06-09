@@ -9,7 +9,6 @@
 export {
   generateGlitterTexture,
   loadImage,
-  GOLDEN_GLITTER_PALETTE,
 } from "@/lib/scratch-texture";
 
 /**
