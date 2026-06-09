@@ -10,11 +10,15 @@ import {
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
+function persistCurrency(next: Currency) {
+  document.cookie = `${CURRENCY_COOKIE}=${next}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
+}
+
 export function CurrencySwitcher({ current }: { current: Currency }) {
   const router = useRouter();
 
   function choose(next: Currency) {
-    document.cookie = `${CURRENCY_COOKIE}=${next}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
+    persistCurrency(next);
     router.refresh();
   }
 
