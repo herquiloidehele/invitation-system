@@ -28,7 +28,6 @@ import {
   landingCardHover,
   landingCardTap,
   landingCardVariants,
-  landingFastTransition,
   landingItemVariants,
   landingStaggerVariants,
   landingTransition,
@@ -37,7 +36,11 @@ import {
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
-export function FeaturesSection({ currentCurrency }: { currentCurrency: Currency }) {
+export function FeaturesSection({
+  currentCurrency,
+}: {
+  currentCurrency: Currency;
+}) {
   const t = useTranslations("LandingFeatures");
   const reduceMotion = useReducedMotion();
 
@@ -83,14 +86,6 @@ export function FeaturesSection({ currentCurrency }: { currentCurrency: Currency
             text={t("guestsText")}
           >
             <GuestTable />
-          </FeatureSmallCard>
-
-          <FeatureSmallCard
-            icon={BarChart3}
-            title={t("analyticsTitle")}
-            text={t("analyticsText")}
-          >
-            <AnalyticsChart />
           </FeatureSmallCard>
 
           <FeatureSmallCard
@@ -204,7 +199,7 @@ function FeatureSmallCard({
       variants={landingCardVariants}
       whileHover={reduced ? undefined : landingCardHover}
       whileTap={reduced ? undefined : landingCardTap}
-      className={`rounded-[1.5rem] border border-border p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] lg:col-span-3 ${
+      className={`rounded-[1.5rem] border border-border p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] lg:col-span-4 ${
         tinted ? "bg-primary-soft" : "bg-card"
       }`}
     >
@@ -343,43 +338,6 @@ function GuestTable() {
   );
 }
 
-function AnalyticsChart() {
-  const t = useTranslations("LandingFeatures");
-  const reduceMotion = useReducedMotion();
-  const bars = [22, 40, 30, 48, 63, 54, 78];
-
-  return (
-    <>
-      <div className="mt-5 rounded-xl bg-muted p-4">
-        <div className="flex items-end justify-between text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          <span>{t("visits")}</span>
-          <span>RSVPs</span>
-        </div>
-        <div className="mt-3 flex h-20 items-end justify-between gap-3">
-          {bars.map((height, index) => (
-            <motion.span
-              key={index}
-              initial={reduceMotion ? false : { scaleY: 0.35, opacity: 0.65 }}
-              whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ ...landingFastTransition, delay: index * 0.05 }}
-              className={`w-4 origin-bottom rounded-sm ${
-                index === bars.length - 1 ? "bg-primary" : "bg-primary-muted"
-              }`}
-              style={{ height: `${height}%` }}
-            />
-          ))}
-        </div>
-        <div className="mt-2 flex justify-between text-[9px] text-faint-foreground">
-          {["S", "T", "Q", "Q", "S", "S", "D"].map((day, index) => (
-            <span key={`${day}-${index}`}>{day}</span>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
-
 function LanguageList() {
   const languages = [
     { label: "Português", flagClassName: "bg-primary" },
@@ -463,7 +421,11 @@ function CustomizationPanel() {
   );
 }
 
-function PersonalizationCard({ currentCurrency }: { currentCurrency: Currency }) {
+function PersonalizationCard({
+  currentCurrency,
+}: {
+  currentCurrency: Currency;
+}) {
   const t = useTranslations("LandingFeatures");
   const reduceMotion = useReducedMotion();
   const reduced = shouldReduceMotion(reduceMotion);
