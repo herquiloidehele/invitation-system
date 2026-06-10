@@ -12,12 +12,26 @@ const nextConfig: NextConfig = {
   // tree-shaken. Cuts ~200-400 KB off the per-page client bundle on this
   // codebase. Safe for any package that re-exports from a barrel and
   // does not depend on side effects in the barrel itself.
+  // Disable Next's in-process ISR/fetch LRU (default 50 MB). The on-disk
+  // cache under .next/cache still works; this just stops duplicating it in
+  // RSS, which is pure overhead on the memory-tight 1 GB Railway tier.
+  cacheMaxMemorySize: 0,
   experimental: {
     optimizePackageImports: [
       "framer-motion",
       "lucide-react",
       "@base-ui/react",
     ],
+    // Don't eagerly load every one of the ~60 app routes into memory at
+    // boot (Next 16 defaults this to true). Public traffic only ever hits a
+    // handful; each route now loads lazily on first request instead, trading
+    // a one-off sub-second latency on a cold route for a lower baseline RSS.
+    preloadEntriesOnStart: false,
+    // Cap the image optimizer's sharp parallelism. Each concurrent
+    // optimization decodes a full-resolution original into off-heap RGBA, so
+    // unbounded concurrency on a large host multiplies peak memory. Image
+    // traffic is ~1% of requests here, so capping throughput is harmless.
+    imgOptConcurrency: 2,
   },
   images: {
     remotePatterns: [
