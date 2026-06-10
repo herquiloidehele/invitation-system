@@ -43,6 +43,7 @@ export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
                 title={preview.title || t("fallbackInvitation")}
                 src={preview.href}
                 loading={undefined}
+                lazyExternalIframe
               />
             </motion.div>
           ))}

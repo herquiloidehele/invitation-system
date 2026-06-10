@@ -133,10 +133,16 @@ export default async function InvitationSlugPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ g?: string; n?: string; landingPreview?: string }>;
+  searchParams: Promise<{
+    g?: string;
+    n?: string;
+    landingPreview?: string;
+    lazyExternalIframe?: string;
+  }>;
 }) {
   const { slug } = await params;
-  const { g: guestToken, landingPreview } = await searchParams;
+  const { g: guestToken, landingPreview, lazyExternalIframe } =
+    await searchParams;
 
   const invitation = await getInvitation(slug);
 
@@ -196,6 +202,7 @@ export default async function InvitationSlugPage({
         invitation={{ ...invitation, guest }}
         theme={theme}
         isLandingPreview={landingPreview === "1"}
+        lazyExternalIframe={lazyExternalIframe === "1"}
       />
     </>
   );

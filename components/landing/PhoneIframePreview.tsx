@@ -7,9 +7,14 @@
  * Only the iframe URL carries the flag — the "open invite" caption link keeps
  * the clean URL so visitors get the normal, un-flagged experience.
  */
-function withLandingPreviewFlag(src: string): string {
+function withLandingPreviewFlag(
+  src: string,
+  { lazyExternalIframe = false }: { lazyExternalIframe?: boolean } = {},
+): string {
   const separator = src.includes("?") ? "&" : "?";
-  return `${src}${separator}landingPreview=1`;
+  const externalIframeFlag = lazyExternalIframe ? "&lazyExternalIframe=1" : "";
+
+  return `${src}${separator}landingPreview=1${externalIframeFlag}`;
 }
 
 export function PhoneIframePreview({
@@ -17,11 +22,13 @@ export function PhoneIframePreview({
   src,
   showCaption = true,
   loading,
+  lazyExternalIframe = false,
 }: {
   title: string;
   src: string;
   showCaption?: boolean;
   loading?: "eager" | "lazy";
+  lazyExternalIframe?: boolean;
 }) {
   return (
     <article className="text-center">
@@ -33,7 +40,7 @@ export function PhoneIframePreview({
         <div className="absolute inset-0 overflow-hidden rounded-[1.4rem]">
           <iframe
             title={`Pré-visualização do convite ${title}`}
-            src={withLandingPreviewFlag(src)}
+            src={withLandingPreviewFlag(src, { lazyExternalIframe })}
             className="h-full w-full border-0 [scrollbar-width:none]"
             loading={loading}
           />

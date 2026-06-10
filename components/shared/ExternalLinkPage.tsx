@@ -39,17 +39,15 @@ import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 interface ExternalLinkPageProps {
   externalLink: string;
   visible?: boolean;
-  isLandingPreview?: boolean;
+  lazyLoadIframe?: boolean;
 }
 
 export default function ExternalLinkPage({
   externalLink,
   visible = true,
-  isLandingPreview = false,
+  lazyLoadIframe = false,
 }: ExternalLinkPageProps) {
   const src = getExternalInvitationEmbedSrc(externalLink);
-
-  console.log({ isLandingPreview });
 
   return (
     <div
@@ -79,7 +77,7 @@ export default function ExternalLinkPage({
         src={src}
         title="Convite externo"
         allowFullScreen
-        loading={isLandingPreview ? "lazy" : "eager"}
+        loading={lazyLoadIframe ? "lazy" : "eager"}
         style={{
           position: "absolute",
           inset: 0,

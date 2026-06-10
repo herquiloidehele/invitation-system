@@ -55,12 +55,15 @@ interface InvitationViewProps {
   /** True when rendered inside the public landing-page phone preview iframe.
    *  Forces the sample personal guest card to show for display purposes. */
   isLandingPreview?: boolean;
+  /** Allows landing showcase iframes to lazy-load nested external-link iframes. */
+  lazyExternalIframe?: boolean;
 }
 
 export default function InvitationView({
   invitation,
   theme,
   isLandingPreview = false,
+  lazyExternalIframe = false,
 }: InvitationViewProps) {
   // Curtain-Canva templates skip the entire envelope flow and render
   // their own self-contained page. Branch at the top so the
@@ -82,6 +85,7 @@ export default function InvitationView({
       invitation={invitation}
       theme={theme}
       isLandingPreview={isLandingPreview}
+      lazyExternalIframe={lazyExternalIframe}
     />
   );
 }
@@ -90,6 +94,7 @@ function EnvelopeInvitationView({
   invitation,
   theme,
   isLandingPreview = false,
+  lazyExternalIframe = false,
 }: InvitationViewProps) {
   const [coverVisible, setCoverVisible] = useState(true);
   const [showContent, setShowContent] = useState(false);
@@ -333,7 +338,7 @@ function EnvelopeInvitationView({
           <ExternalLinkPage
             externalLink={effectiveExternalLink}
             visible={externalLinkVisible}
-            isLandingPreview={isLandingPreview}
+            lazyLoadIframe={lazyExternalIframe}
           />
         )}
 
