@@ -264,6 +264,7 @@ model RsvpResponse {
   attending           Boolean
   dietaryRestrictions String?
   message             String?
+  customAnswers       Json?
   submittedAt         DateTime @default(now())
 
   invitation Invitation @relation(fields: [invitationSlug], references: [slug], onDelete: Cascade)
@@ -319,6 +320,7 @@ model SaveTheDateRsvpResponse {
   attending           Boolean
   dietaryRestrictions String?
   message             String?
+  customAnswers       Json?
   submittedAt         DateTime @default(now())
 
   saveTheDate SaveTheDate @relation(fields: [saveTheDateSlug], references: [slug], onDelete: Cascade)

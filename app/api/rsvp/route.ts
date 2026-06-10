@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
+import {
+  normalizeRsvpCustomFields,
+  validateRsvpCustomAnswers,
+} from "@/lib/rsvp-custom-fields";
 
 // ---------------------------------------------------------------------------
 // Validation schema
@@ -13,6 +18,9 @@ const rsvpSchema = z.object({
   attending: z.boolean({ error: "Confirmação de presença é obrigatória" }),
   dietaryRestrictions: z.string().optional(),
   message: z.string().optional(),
+  customAnswers: z
+    .array(z.object({ fieldId: z.string(), value: z.unknown() }))
+    .optional(),
   /** Optional guest token from `?g=<token>` link — links the RSVP to a Guest. */
   guestToken: z.string().optional(),
 });
@@ -45,7 +53,7 @@ export async function POST(request: NextRequest) {
     // Verify that the invitation exists
     const invitation = await prisma.invitation.findUnique({
       where: { slug: data.invitationSlug },
-      select: { slug: true },
+      select: { slug: true, rsvp: true },
     });
 
     if (!invitation) {
@@ -77,6 +85,29 @@ export async function POST(request: NextRequest) {
       guestId = guest.id;
     }
 
+    const customFields = normalizeRsvpCustomFields(invitation.rsvp);
+    const customValidation = validateRsvpCustomAnswers({
+      fields: customFields,
+      submittedAnswers: data.customAnswers ?? [],
+      attending: data.attending,
+    });
+
+    if (!customValidation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Dados inválidos",
+          errors: customValidation.errors,
+        },
+        { status: 400 },
+      );
+    }
+
+    const customAnswersJson =
+      customValidation.answers.length > 0
+        ? (customValidation.answers as unknown as Prisma.InputJsonValue)
+        : Prisma.JsonNull;
+
     // Persist to database
     await prisma.rsvpResponse.create({
       data: {
@@ -86,6 +117,7 @@ export async function POST(request: NextRequest) {
         attending: data.attending,
         dietaryRestrictions: data.dietaryRestrictions ?? null,
         message: data.message ?? null,
+        customAnswers: customAnswersJson,
         guestId,
       },
     });

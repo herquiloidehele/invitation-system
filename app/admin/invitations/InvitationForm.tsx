@@ -75,6 +75,7 @@ import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import PlacesFormSection from "@/components/admin/PlacesFormSection";
+import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
@@ -398,6 +399,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       deadline: "",
       showEmail: false,
       showDietaryRestrictions: true,
+      customFields: [],
     },
     schedule: [],
     scheduleStyle: "default",
@@ -662,7 +664,10 @@ export default function InvitationForm({
   }, []);
 
   const updateRsvp = useCallback(
-    (field: keyof InvitationData["rsvp"], value: boolean | string) => {
+    (
+      field: keyof InvitationData["rsvp"],
+      value: boolean | string | InvitationData["rsvp"]["customFields"],
+    ) => {
       setForm((prev) => ({
         ...prev,
         rsvp: { ...prev.rsvp, [field]: value },
@@ -1191,6 +1196,23 @@ export default function InvitationForm({
         isWedding
           ? "Os nomes da noiva e do noivo são obrigatórios"
           : "O nome é obrigatório",
+      );
+      return;
+    }
+
+    const invalidCustomField = (form.rsvp.customFields ?? []).find((field) => {
+      if (!field.label.trim()) return true;
+      if (
+        (field.type === "radio" || field.type === "select") &&
+        !(field.options ?? []).some((option) => option.label.trim())
+      ) {
+        return true;
+      }
+      return false;
+    });
+    if (invalidCustomField) {
+      toast.error(
+        "Preencha as perguntas e opções dos campos personalizados do RSVP.",
       );
       return;
     }
@@ -2685,6 +2707,12 @@ export default function InvitationForm({
                             }
                           />
                         </div>
+                        <RsvpCustomFieldsBuilder
+                          fields={form.rsvp.customFields ?? []}
+                          onChange={(customFields) =>
+                            updateRsvp("customFields", customFields)
+                          }
+                        />
                       </>
                     )}
                   </div>

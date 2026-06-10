@@ -5,10 +5,20 @@ import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
-import type { CustomTexts, InvitationEventType } from "@/lib/types";
+import type {
+  CustomTexts,
+  InvitationEventType,
+  RsvpCustomField,
+} from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { useCustomText } from "@/lib/custom-texts";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
+import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import {
+  RSVPCustomFields,
+  type RsvpCustomErrors,
+  type RsvpCustomValues,
+} from "@/components/shared/RSVPCustomFields";
 
 // ---------------------------------------------------------------------------
 // Schema — identical to RSVPModal
@@ -67,6 +77,7 @@ interface RsvpPageProps {
   deadlinePassed: boolean;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
+  customFields?: RsvpCustomField[];
   backgroundImageUrl?: string;
   customTexts?: CustomTexts;
 }
@@ -110,10 +121,13 @@ export default function RsvpPage({
   deadlinePassed,
   showEmail = false,
   showDietaryRestrictions = true,
+  customFields = [],
   backgroundImageUrl,
   customTexts: ct,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [customValues, setCustomValues] = useState<RsvpCustomValues>({});
+  const [customErrors, setCustomErrors] = useState<RsvpCustomErrors>({});
   const resolveText = useCustomText(ct);
   const rsvpSchema = createRsvpSchema(resolveText);
 
@@ -151,6 +165,31 @@ export default function RsvpPage({
   const onSubmit = async (data: RSVPFormData) => {
     setSubmitState("loading");
     try {
+      const customValidation = validateRsvpCustomAnswers({
+        fields: customFields,
+        submittedAnswers: customFields.map((field) => ({
+          fieldId: field.id,
+          value:
+            field.type === "switch"
+              ? customValues[field.id] === true
+              : customValues[field.id],
+        })),
+        attending: data.attending === "yes",
+      });
+      if (!customValidation.success) {
+        setCustomErrors(
+          Object.fromEntries(
+            customValidation.errors.map((error) => [
+              error.field.replace("customAnswers.", ""),
+              error.message,
+            ]),
+          ),
+        );
+        setSubmitState("idle");
+        return;
+      }
+      setCustomErrors({});
+
       const res = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -161,12 +200,17 @@ export default function RsvpPage({
           attending: data.attending === "yes",
           dietaryRestrictions: data.dietaryRestrictions || undefined,
           message: data.message || undefined,
+          customAnswers: customValidation.answers.map((answer) => ({
+            fieldId: answer.fieldId,
+            value: answer.value,
+          })),
         }),
       });
       if (!res.ok) throw new Error("Failed to submit");
       markRsvpSubmitted(slug);
       setSubmitState("success");
       reset();
+      setCustomValues({});
     } catch {
       setSubmitState("error");
     }
@@ -430,6 +474,19 @@ export default function RsvpPage({
                   />
                 </div>
               )}
+
+              <RSVPCustomFields
+                fields={customFields}
+                attending={attending === "yes"}
+                values={customValues}
+                errors={customErrors}
+                onChange={(fieldId, value) =>
+                  setCustomValues((prev) => ({ ...prev, [fieldId]: value }))
+                }
+                labelStyle={labelStyle}
+                inputClassName={inputBase}
+                inputStyle={inputStyle}
+              />
 
               {/* Message */}
               <div className="flex flex-col gap-1.5">

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -18,6 +19,7 @@ export type RsvpEntry = {
   attending: boolean;
   dietaryRestrictions: string | null;
   message: string | null;
+  customAnswers?: unknown;
   submittedAt: Date | string;
 };
 
@@ -259,6 +261,12 @@ function makeStyles(theme: PdfTheme) {
       paddingVertical: 5,
       borderRadius: 3,
     },
+    responseBlock: {
+      borderRadius: 3,
+    },
+    responseBlockAlt: {
+      backgroundColor: theme.cardBg,
+    },
     tableRowAlt: {
       backgroundColor: theme.cardBg,
     },
@@ -304,6 +312,15 @@ function makeStyles(theme: PdfTheme) {
       fontSize: 7,
       fontWeight: 700,
     },
+    customAnswersBlock: {
+      paddingHorizontal: 6,
+      paddingBottom: 5,
+      gap: 2,
+    },
+    customAnswerText: {
+      fontSize: 7,
+      color: theme.textSecondary,
+    },
 
     // ── Footer ───────────────────────────────────────────────────────────────
     footer: {
@@ -347,14 +364,12 @@ function Header({
   dateDisplay,
   locationName,
   documentType,
-  theme,
 }: {
   styles: ReturnType<typeof makeStyles>;
   coupleNames: string;
   dateDisplay: string;
   locationName?: string;
   documentType: "invitation" | "save-the-date";
-  theme: PdfTheme;
 }) {
   const label =
     documentType === "save-the-date"
@@ -451,43 +466,58 @@ function GuestTable({
       {/* Rows */}
       {responses.map((r, i) => {
         const isAlt = i % 2 === 1;
-        const rowStyle = isAlt
-          ? [styles.tableRow, styles.tableRowAlt]
-          : [styles.tableRow];
+        const blockStyle = isAlt
+          ? [styles.responseBlock, styles.responseBlockAlt]
+          : [styles.responseBlock];
+        const customAnswers = formatRsvpCustomAnswers(r.customAnswers);
 
         return (
-          <View key={r.id} style={rowStyle} wrap={false}>
-            <Text style={[styles.tableCellMuted, styles.colNum]}>{i + 1}</Text>
-            <Text style={[styles.tableCell, styles.colName]}>
-              {truncate(r.guestName, 28)}
-            </Text>
-            <View style={styles.colResponse}>
-              <View
-                style={
-                  r.attending ? styles.attendingBadge : styles.declinedBadge
-                }
-              >
-                <Text
+          <View key={r.id} style={blockStyle} wrap={false}>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCellMuted, styles.colNum]}>{i + 1}</Text>
+              <Text style={[styles.tableCell, styles.colName]}>
+                {truncate(r.guestName, 28)}
+              </Text>
+              <View style={styles.colResponse}>
+                <View
                   style={
-                    r.attending ? styles.attendingText : styles.declinedText
+                    r.attending ? styles.attendingBadge : styles.declinedBadge
                   }
                 >
-                  {r.attending ? "Sim" : "Não"}
-                </Text>
+                  <Text
+                    style={
+                      r.attending ? styles.attendingText : styles.declinedText
+                    }
+                  >
+                    {r.attending ? "Sim" : "Não"}
+                  </Text>
+                </View>
               </View>
+              <Text style={[styles.tableCellMuted, styles.colEmail]}>
+                {truncate(r.email, 28)}
+              </Text>
+              <Text style={[styles.tableCell, styles.colRestrictions]}>
+                {truncate(r.dietaryRestrictions, 22)}
+              </Text>
+              <Text style={[styles.tableCellMuted, styles.colMessage]}>
+                {r.message ? "✓" : "—"}
+              </Text>
+              <Text style={[styles.tableCellMuted, styles.colDate]}>
+                {formatDate(r.submittedAt)}
+              </Text>
             </View>
-            <Text style={[styles.tableCellMuted, styles.colEmail]}>
-              {truncate(r.email, 28)}
-            </Text>
-            <Text style={[styles.tableCell, styles.colRestrictions]}>
-              {truncate(r.dietaryRestrictions, 22)}
-            </Text>
-            <Text style={[styles.tableCellMuted, styles.colMessage]}>
-              {r.message ? "✓" : "—"}
-            </Text>
-            <Text style={[styles.tableCellMuted, styles.colDate]}>
-              {formatDate(r.submittedAt)}
-            </Text>
+            {customAnswers.length > 0 && (
+              <View style={styles.customAnswersBlock}>
+                {customAnswers.map((answer) => (
+                  <Text
+                    key={`${r.id}-${answer.label}`}
+                    style={styles.customAnswerText}
+                  >
+                    {answer.label}: {answer.value}
+                  </Text>
+                ))}
+              </View>
+            )}
           </View>
         );
       })}
@@ -552,7 +582,6 @@ export function RsvpExportDocument({
           dateDisplay={dateDisplay}
           locationName={locationName}
           documentType={documentType}
-          theme={theme}
         />
         <StatsBar
           styles={styles}

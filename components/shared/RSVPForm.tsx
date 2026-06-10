@@ -10,6 +10,7 @@ import type {
   CustomTexts,
   InvitationData,
   PublicGuestData,
+  RsvpCustomField,
   TemplateTheme,
 } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
@@ -17,9 +18,16 @@ import { useCustomText } from "@/lib/custom-texts";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { EditableText } from "@/components/shared/EditableText";
 import {
+  getRsvpCustomFields,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
 } from "@/lib/rsvp-config";
+import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import {
+  RSVPCustomFields,
+  type RsvpCustomErrors,
+  type RsvpCustomValues,
+} from "@/components/shared/RSVPCustomFields";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -110,6 +118,7 @@ export interface RSVPFormDirectProps {
   theme: RSVPThemeLegacy;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
+  customFields?: RsvpCustomField[];
   apiEndpoint?: string;
   slugKey?: string;
   /** When true: render without the modal-style header X close button. */
@@ -190,6 +199,9 @@ export default function RSVPForm(props: RSVPFormProps) {
   const showDietaryRestrictions = isIntegration(props)
     ? shouldShowRsvpDietaryRestrictions(props.invitation.rsvp)
     : props.showDietaryRestrictions !== false;
+  const customFields = isIntegration(props)
+    ? getRsvpCustomFields(props.invitation.rsvp)
+    : (props.customFields ?? []);
   const apiEndpoint = props.apiEndpoint ?? "/api/rsvp";
   const slugKey = props.slugKey ?? "invitationSlug";
 
@@ -210,6 +222,8 @@ export default function RSVPForm(props: RSVPFormProps) {
   const [submitState, setSubmitState] = useState<SubmitState>(() =>
     hasSubmittedRsvp(slug) ? "already_submitted" : "idle",
   );
+  const [customValues, setCustomValues] = useState<RsvpCustomValues>({});
+  const [customErrors, setCustomErrors] = useState<RsvpCustomErrors>({});
 
   const {
     register,
@@ -241,6 +255,31 @@ export default function RSVPForm(props: RSVPFormProps) {
   const onSubmit = async (data: RSVPFormData) => {
     setSubmitState("loading");
     try {
+      const customValidation = validateRsvpCustomAnswers({
+        fields: customFields,
+        submittedAnswers: customFields.map((field) => ({
+          fieldId: field.id,
+          value:
+            field.type === "switch"
+              ? customValues[field.id] === true
+              : customValues[field.id],
+        })),
+        attending: data.attending === "yes",
+      });
+      if (!customValidation.success) {
+        setCustomErrors(
+          Object.fromEntries(
+            customValidation.errors.map((error) => [
+              error.field.replace("customAnswers.", ""),
+              error.message,
+            ]),
+          ),
+        );
+        setSubmitState("idle");
+        return;
+      }
+      setCustomErrors({});
+
       const res = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -251,6 +290,10 @@ export default function RSVPForm(props: RSVPFormProps) {
           attending: data.attending === "yes",
           dietaryRestrictions: data.dietaryRestrictions || undefined,
           message: data.message || undefined,
+          customAnswers: customValidation.answers.map((answer) => ({
+            fieldId: answer.fieldId,
+            value: answer.value,
+          })),
           guestToken: guest?.token,
         }),
       });
@@ -258,6 +301,7 @@ export default function RSVPForm(props: RSVPFormProps) {
       markRsvpSubmitted(slug);
       setSubmitState("success");
       reset();
+      setCustomValues({});
     } catch {
       setSubmitState("error");
     }
@@ -266,6 +310,8 @@ export default function RSVPForm(props: RSVPFormProps) {
   const handleCloseInModal = () => {
     if (submitState !== "already_submitted") setSubmitState("idle");
     reset();
+    setCustomValues({});
+    setCustomErrors({});
     props.onClose?.();
   };
 
@@ -609,6 +655,19 @@ export default function RSVPForm(props: RSVPFormProps) {
                 />
               </div>
             )}
+
+            <RSVPCustomFields
+              fields={customFields}
+              attending={attending === "yes"}
+              values={customValues}
+              errors={customErrors}
+              onChange={(fieldId, value) =>
+                setCustomValues((prev) => ({ ...prev, [fieldId]: value }))
+              }
+              labelStyle={labelStyle}
+              inputClassName={inputClass}
+              inputStyle={inputStyle}
+            />
 
             <div className="flex flex-col gap-1.5">
               <label style={labelStyle}>

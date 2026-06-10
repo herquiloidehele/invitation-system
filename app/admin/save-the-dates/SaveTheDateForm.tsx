@@ -36,6 +36,7 @@ import type { SaveTheDateThemeData } from "@/lib/save-the-date";
 import type {
   EnvelopeConfig,
   LocationInfo,
+  RsvpCustomField,
   SocialPreview,
   TemplateTheme,
   TextStyle,
@@ -50,6 +51,7 @@ import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envel
 import { resolveSaveTheDateSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
+import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
@@ -85,6 +87,7 @@ export interface SaveTheDateFormData {
     deadline?: string;
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
+    customFields?: RsvpCustomField[];
   };
   audio?: { enabled: boolean; src: string; artist: string; title: string };
   bottomHero?: {
@@ -544,6 +547,23 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       !data.date.iso
     ) {
       toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+
+    const invalidCustomField = (data.rsvp?.customFields ?? []).find((field) => {
+      if (!field.label.trim()) return true;
+      if (
+        (field.type === "radio" || field.type === "select") &&
+        !(field.options ?? []).some((option) => option.label.trim())
+      ) {
+        return true;
+      }
+      return false;
+    });
+    if (invalidCustomField) {
+      toast.error(
+        "Preencha as perguntas e opções dos campos personalizados do RSVP.",
+      );
       return;
     }
 
@@ -1100,6 +1120,19 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                         }
                       />
                     </div>
+                    <RsvpCustomFieldsBuilder
+                      fields={data.rsvp?.customFields ?? []}
+                      onChange={(customFields) =>
+                        setData((p) => ({
+                          ...p,
+                          rsvp: {
+                            ...p.rsvp,
+                            enabled: p.rsvp?.enabled ?? true,
+                            customFields,
+                          },
+                        }))
+                      }
+                    />
                   </>
                 )}
               </AccordionContent>

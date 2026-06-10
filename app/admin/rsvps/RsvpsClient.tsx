@@ -44,6 +44,7 @@ import {
   getInvitationRsvpPath,
   getSaveTheDateRsvpPath,
 } from "@/lib/admin-row-navigation";
+import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import type {
   InvitationSummary,
   RsvpResponseWithInvitation,
@@ -165,6 +166,23 @@ function EmptyState({ message }: { message: string }) {
       <Users className="size-10 mx-auto mb-3 opacity-30" />
       <p className="text-lg font-medium">Sem confirmações ainda</p>
       <p className="text-sm mt-1">{message}</p>
+    </div>
+  );
+}
+
+function CustomAnswersBlock({ answers }: { answers: unknown }) {
+  const formatted = formatRsvpCustomAnswers(answers);
+  if (formatted.length === 0) return null;
+  return (
+    <div className="mt-2 space-y-1 rounded-md bg-muted/40 p-2 text-xs">
+      <div className="font-medium text-muted-foreground">
+        Respostas personalizadas
+      </div>
+      {formatted.map((answer) => (
+        <div key={`${answer.label}-${answer.value}`}>
+          <span className="font-medium">{answer.label}:</span> {answer.value}
+        </div>
+      ))}
     </div>
   );
 }
@@ -336,6 +354,7 @@ function InvitationsTab({
                         ) : (
                           <span className="text-muted-foreground text-sm">—</span>
                         )}
+                        <CustomAnswersBlock answers={r.customAnswers} />
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                         {formatDate(r.submittedAt)}
@@ -533,6 +552,7 @@ function SaveTheDateTab({
                         ) : (
                           <span className="text-muted-foreground text-sm">—</span>
                         )}
+                        <CustomAnswersBlock answers={r.customAnswers} />
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                         {formatDate(r.submittedAt)}

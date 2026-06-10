@@ -566,6 +566,42 @@ export interface TextStyleOverrides {
 // Per-invitation customizable UI text overrides
 // ---------------------------------------------------------------------------
 
+export type RsvpCustomFieldType =
+  | "text"
+  | "textarea"
+  | "switch"
+  | "radio"
+  | "select";
+
+export type RsvpCustomFieldVisibility = "always" | "attending";
+
+export interface RsvpCustomFieldOption {
+  id: string;
+  label: string;
+}
+
+export interface RsvpCustomField {
+  id: string;
+  label: string;
+  type: RsvpCustomFieldType;
+  required: boolean;
+  visibility: RsvpCustomFieldVisibility;
+  options?: RsvpCustomFieldOption[];
+}
+
+export interface RsvpCustomAnswer {
+  fieldId: string;
+  label: string;
+  type: RsvpCustomFieldType;
+  value: string | boolean | null;
+  displayValue: string;
+}
+
+export interface RsvpCustomAnswerInput {
+  fieldId: string;
+  value: unknown;
+}
+
 /** Every guest-visible UI string that can be overridden per invitation.
  *  All fields are optional — missing keys fall back to the built-in defaults
  *  defined in `lib/custom-texts.ts`.
@@ -708,6 +744,7 @@ export interface InvitationData {
     showDietaryRestrictions?: boolean;
     showOnExternalPage?: boolean;
     backgroundImageUrl?: string;
+    customFields?: RsvpCustomField[];
   };
   schedule: ScheduleEvent[];
   /** Visual layout for the schedule section. Defaults to "default". */

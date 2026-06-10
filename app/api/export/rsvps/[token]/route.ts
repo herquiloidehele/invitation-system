@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { DocumentProps } from "@react-pdf/renderer";
+import type { ReactElement } from "react";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -97,21 +99,20 @@ export async function GET(
       attending: r.attending,
       dietaryRestrictions: r.dietaryRestrictions,
       message: r.message,
+      customAnswers: r.customAnswers,
       submittedAt: r.submittedAt,
     }));
 
-    const buffer = await renderToBuffer(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      React.createElement(RsvpExportDocument, {
-        coupleNames,
-        dateDisplay,
-        locationName,
-        slug: invitation.slug,
-        responses,
-        theme: pdfTheme,
-        documentType: "invitation",
-      }) as any,
-    );
+    const document = React.createElement(RsvpExportDocument, {
+      coupleNames,
+      dateDisplay,
+      locationName,
+      slug: invitation.slug,
+      responses,
+      theme: pdfTheme,
+      documentType: "invitation",
+    }) as ReactElement<DocumentProps>;
+    const buffer = await renderToBuffer(document);
 
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
@@ -163,20 +164,19 @@ export async function GET(
       attending: r.attending,
       dietaryRestrictions: r.dietaryRestrictions,
       message: r.message,
+      customAnswers: r.customAnswers,
       submittedAt: r.submittedAt,
     }));
 
-    const buffer = await renderToBuffer(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      React.createElement(RsvpExportDocument, {
-        coupleNames,
-        dateDisplay,
-        slug: std.slug,
-        responses,
-        theme: pdfTheme,
-        documentType: "save-the-date",
-      }) as any,
-    );
+    const document = React.createElement(RsvpExportDocument, {
+      coupleNames,
+      dateDisplay,
+      slug: std.slug,
+      responses,
+      theme: pdfTheme,
+      documentType: "save-the-date",
+    }) as ReactElement<DocumentProps>;
+    const buffer = await renderToBuffer(document);
 
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,

@@ -3,6 +3,7 @@ import type {
   AudioConfig,
   EnvelopeConfig,
   LocationInfo,
+  RsvpCustomField,
   SocialPreview,
   TextStyleOverrides,
 } from "./types";
@@ -57,6 +58,7 @@ export interface SaveTheDateRsvpConfig {
   deadline?: string;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
+  customFields?: RsvpCustomField[];
 }
 
 export interface BottomHeroConfig {

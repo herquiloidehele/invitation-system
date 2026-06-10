@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { resolveSelectedRsvpSlug } from "@/lib/admin-rsvp-defaults";
+import type { RsvpCustomAnswer } from "@/lib/types";
 import { RsvpsClient } from "./RsvpsClient";
 
 export const dynamic = "force-dynamic";
@@ -148,6 +149,7 @@ export type RsvpResponseWithInvitation = {
   attending: boolean;
   dietaryRestrictions: string | null;
   message: string | null;
+  customAnswers: RsvpCustomAnswer[] | null;
   submittedAt: Date | string;
   invitation: {
     id: string;
@@ -173,6 +175,7 @@ export type StdRsvpResponseWithSaveDate = {
   attending: boolean;
   dietaryRestrictions: string | null;
   message: string | null;
+  customAnswers: RsvpCustomAnswer[] | null;
   submittedAt: Date | string;
   saveTheDate: {
     id: string;
