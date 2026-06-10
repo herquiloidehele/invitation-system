@@ -6,7 +6,7 @@
     "dev": "next dev",
     "dev:prod": "env-cmd -f .env.production next dev",
     "build": "prisma generate && prisma migrate deploy && next build",
-    "start": "next start",
+    "start": "NODE_OPTIONS='--max-old-space-size=512 --max-semi-space-size=16' next start",
     "lint": "eslint",
     "db:seed:dev": "tsx --env-file=.env.development prisma/seed.ts",
     "db:seed:prod": "tsx --env-file=.env.production prisma/seed.ts",
