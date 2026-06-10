@@ -9,9 +9,16 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const saveTheDateSlug = searchParams.get("saveTheDate") ?? undefined;
 
+  if (!saveTheDateSlug) {
+    return NextResponse.json(
+      { error: "Missing required saveTheDate filter" },
+      { status: 400 },
+    );
+  }
+
   try {
     const responses = await prisma.saveTheDateRsvpResponse.findMany({
-      where: saveTheDateSlug ? { saveTheDateSlug } : undefined,
+      where: { saveTheDateSlug },
       orderBy: { submittedAt: "desc" },
       include: {
         saveTheDate: {

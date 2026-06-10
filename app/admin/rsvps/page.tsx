@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { resolveSelectedRsvpSlug } from "@/lib/admin-rsvp-defaults";
 import { RsvpsClient } from "./RsvpsClient";
 
 export const dynamic = "force-dynamic";
@@ -24,16 +25,6 @@ export default async function AdminRsvpsPage({
     },
   });
 
-  const responses = await prisma.rsvpResponse.findMany({
-    where: selectedSlug ? { invitationSlug: selectedSlug } : undefined,
-    orderBy: { submittedAt: "desc" },
-    include: {
-      invitation: {
-        select: { id: true, slug: true, couple: true, theme: { select: { name: true } } },
-      },
-    },
-  });
-
   // ---------------------------------------------------------------------------
   // Save the Dates (only those with RSVP enabled)
   // ---------------------------------------------------------------------------
@@ -54,15 +45,48 @@ export default async function AdminRsvpsPage({
     (s) => (s.rsvp as { enabled?: boolean } | null)?.enabled === true,
   );
 
-  const stdResponses = await prisma.saveTheDateRsvpResponse.findMany({
-    where: selectedStdSlug ? { saveTheDateSlug: selectedStdSlug } : undefined,
-    orderBy: { submittedAt: "desc" },
-    include: {
-      saveTheDate: {
-        select: { id: true, slug: true, couple: true, theme: { select: { name: true } } },
-      },
-    },
-  });
+  const resolvedSelectedSlug = resolveSelectedRsvpSlug(
+    selectedSlug,
+    invitations,
+  );
+  const resolvedSelectedStdSlug = resolveSelectedRsvpSlug(
+    selectedStdSlug,
+    saveDatesWithRsvp,
+  );
+
+  const responses = resolvedSelectedSlug
+    ? await prisma.rsvpResponse.findMany({
+        where: { invitationSlug: resolvedSelectedSlug },
+        orderBy: { submittedAt: "desc" },
+        include: {
+          invitation: {
+            select: {
+              id: true,
+              slug: true,
+              couple: true,
+              theme: { select: { name: true } },
+            },
+          },
+        },
+      })
+    : [];
+
+  const stdResponses = resolvedSelectedStdSlug
+    ? await prisma.saveTheDateRsvpResponse.findMany({
+        where: { saveTheDateSlug: resolvedSelectedStdSlug },
+        orderBy: { submittedAt: "desc" },
+        include: {
+          saveTheDate: {
+            select: {
+              id: true,
+              slug: true,
+              couple: true,
+              theme: { select: { name: true } },
+            },
+          },
+        },
+      })
+    : [];
 
   // ---------------------------------------------------------------------------
   // Shape for client
@@ -95,10 +119,10 @@ export default async function AdminRsvpsPage({
     <RsvpsClient
       invitations={invitationRows as unknown as InvitationSummary[]}
       responses={responseRows as unknown as RsvpResponseWithInvitation[]}
-      selectedSlug={selectedSlug ?? null}
+      selectedSlug={resolvedSelectedSlug}
       saveDates={saveDateRows as unknown as SaveDateSummary[]}
       stdResponses={stdResponseRows as unknown as StdRsvpResponseWithSaveDate[]}
-      selectedStdSlug={selectedStdSlug ?? null}
+      selectedStdSlug={resolvedSelectedStdSlug}
       activeTab={(tab === "std" ? "std" : "invitations") as "invitations" | "std"}
     />
   );

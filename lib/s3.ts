@@ -1,9 +1,13 @@
 import {
   GetObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { createWriteStream } from "node:fs";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 
 const region = process.env.AWS_REGION!;
 const bucket = process.env.S3_BUCKET_NAME!;
@@ -88,6 +92,16 @@ export function s3KeyFromUrl(url: string): string | null {
   }
 }
 
+export async function getObjectContentLength(
+  key: string,
+): Promise<number | null> {
+  const client = getS3Client();
+  const res = await client.send(
+    new HeadObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  return typeof res.ContentLength === "number" ? res.ContentLength : null;
+}
+
 /**
  * Downloads an S3 object's bytes into a Buffer. Used for short-lived
  * server-side processing (e.g. ffmpeg poster extraction). Avoid for very
@@ -104,6 +118,51 @@ export async function getObjectBuffer(key: string): Promise<Buffer> {
   // The AWS SDK v3 returns the body as a web ReadableStream in Node 18+.
   const arrayBuffer = await res.Body.transformToByteArray();
   return Buffer.from(arrayBuffer);
+}
+
+export function createByteLimitTransform(maxBytes: number): {
+  stream: TransformStream<Uint8Array, Uint8Array>;
+  getBytesRead: () => number;
+} {
+  let bytesRead = 0;
+  return {
+    stream: new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        bytesRead += chunk.byteLength;
+        if (bytesRead > maxBytes) {
+          throw new Error("S3 object exceeded the download byte limit");
+        }
+        controller.enqueue(chunk);
+      },
+    }),
+    getBytesRead: () => bytesRead,
+  };
+}
+
+export async function downloadObjectToFile(
+  key: string,
+  destinationPath: string,
+  maxBytes: number,
+): Promise<number> {
+  const client = getS3Client();
+  const res = await client.send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  if (!res.Body) {
+    throw new Error(`S3 object ${key} returned no body`);
+  }
+
+  const limiter = createByteLimitTransform(maxBytes);
+  const webStream = res.Body.transformToWebStream();
+  await pipeline(
+    Readable.fromWeb(
+      webStream.pipeThrough(
+        limiter.stream,
+      ) as Parameters<typeof Readable.fromWeb>[0],
+    ),
+    createWriteStream(destinationPath),
+  );
+  return limiter.getBytesRead();
 }
 
 /**

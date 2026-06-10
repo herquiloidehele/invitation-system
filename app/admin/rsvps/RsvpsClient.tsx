@@ -190,12 +190,12 @@ function InvitationsTab({
   const totalDeclined = responses.filter((r) => !r.attending).length;
 
   const handleFilterChange = useCallback(
-    (value: string | null) => {
-      const slug = !value || value === "all" ? null : value;
+    (slug: string | null) => {
+      if (!slug) return;
       startTransition(() => {
         const params = new URLSearchParams();
         params.set("tab", "invitations");
-        if (slug) params.set("invitation", slug);
+        params.set("invitation", slug);
         router.push(`/admin/rsvps?${params}`);
       });
     },
@@ -233,7 +233,7 @@ function InvitationsTab({
         total={responses.length}
         attending={totalAttending}
         declined={totalDeclined}
-        filterLabel={selectedSlug ? `Para ${selectedSlug}` : "Todos os convites"}
+        filterLabel={selectedSlug ? `Para ${selectedSlug}` : "Sem convites"}
       />
 
       <Card>
@@ -245,15 +245,14 @@ function InvitationsTab({
             </div>
             <div className="w-full sm:w-64">
               <Select
-                value={selectedSlug ?? "all"}
+                value={selectedSlug ?? undefined}
                 onValueChange={handleFilterChange}
-                disabled={isPending}
+                disabled={isPending || invitations.length === 0}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Filtrar por convite" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os convites</SelectItem>
                   {invitations.map((inv) => (
                     <SelectItem key={inv.slug} value={inv.slug}>
                       {inv.couple.bride} &amp; {inv.couple.groom} (
@@ -384,12 +383,12 @@ function SaveTheDateTab({
   const totalDeclined = responses.filter((r) => !r.attending).length;
 
   const handleFilterChange = useCallback(
-    (value: string | null) => {
-      const slug = !value || value === "all" ? null : value;
+    (slug: string | null) => {
+      if (!slug) return;
       startTransition(() => {
         const params = new URLSearchParams();
         params.set("tab", "std");
-        if (slug) params.set("std", slug);
+        params.set("std", slug);
         router.push(`/admin/rsvps?${params}`);
       });
     },
@@ -427,7 +426,7 @@ function SaveTheDateTab({
         total={responses.length}
         attending={totalAttending}
         declined={totalDeclined}
-        filterLabel={selectedStdSlug ? `Para ${selectedStdSlug}` : "Todos os Save the Dates"}
+        filterLabel={selectedStdSlug ? `Para ${selectedStdSlug}` : "Sem Save the Dates"}
       />
 
       <Card>
@@ -439,15 +438,14 @@ function SaveTheDateTab({
             </div>
             <div className="w-full sm:w-64">
               <Select
-                value={selectedStdSlug ?? "all"}
+                value={selectedStdSlug ?? undefined}
                 onValueChange={handleFilterChange}
-                disabled={isPending}
+                disabled={isPending || saveDates.length === 0}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Filtrar por Save the Date" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os Save the Dates</SelectItem>
                   {saveDates.map((s) => (
                     <SelectItem key={s.slug} value={s.slug}>
                       {s.couple.bride} &amp; {s.couple.groom} ({s._count.rsvpResponses})
@@ -627,9 +625,17 @@ export function RsvpsClient({
 
   const handleTabChange = useCallback(
     (tab: string) => {
-      router.push(`/admin/rsvps?tab=${tab}`);
+      const params = new URLSearchParams();
+      params.set("tab", tab);
+      if (tab === "invitations" && selectedSlug) {
+        params.set("invitation", selectedSlug);
+      }
+      if (tab === "std" && selectedStdSlug) {
+        params.set("std", selectedStdSlug);
+      }
+      router.push(`/admin/rsvps?${params}`);
     },
-    [router],
+    [router, selectedSlug, selectedStdSlug],
   );
 
   return (

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { landingFeatureInclude } from "@/lib/landing-features";
 
 const SECTIONS = new Set(["hero", "gallery", "live_demo", "best_seller"]);
 const CATEGORIES = new Set([
@@ -13,7 +14,7 @@ const CATEGORIES = new Set([
 export async function GET() {
   const rows = await prisma.landingFeature.findMany({
     orderBy: [{ section: "asc" }, { position: "asc" }],
-    include: { invitation: true, saveTheDate: true },
+    include: landingFeatureInclude,
   });
   return NextResponse.json(rows);
 }
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
       invitationId: invitationId ?? null,
       saveTheDateId: saveTheDateId ?? null,
     },
-    include: { invitation: true, saveTheDate: true },
+    include: landingFeatureInclude,
   });
 
   return NextResponse.json(row, { status: 201 });

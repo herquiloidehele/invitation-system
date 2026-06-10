@@ -66,6 +66,41 @@ function resolveGalleryCategory(
 // Server-side data accessors
 // ---------------------------------------------------------------------------
 
+export const landingInvitationSelect = {
+  slug: true,
+  couple: true,
+  date: true,
+  eventType: true,
+  heroImage: true,
+  landingImageUrl: true,
+  landingModelName: true,
+  landingDescription: true,
+  landingSubtitle: true,
+  priceFromCents: true,
+  discountPriceFromCents: true,
+  currency: true,
+  priceOverrides: true,
+} as const;
+
+export const landingSaveTheDateSelect = {
+  slug: true,
+  couple: true,
+  date: true,
+  landingImageUrl: true,
+  landingModelName: true,
+  landingDescription: true,
+  landingSubtitle: true,
+  priceFromCents: true,
+  discountPriceFromCents: true,
+  currency: true,
+  priceOverrides: true,
+} as const;
+
+export const landingFeatureInclude = {
+  invitation: { select: landingInvitationSelect },
+  saveTheDate: { select: landingSaveTheDateSelect },
+} as const;
+
 export type HeroFeature = {
   title: string;
   href: string;
@@ -118,7 +153,7 @@ export async function getHeroFeature(): Promise<HeroFeature | null> {
   const row = await prisma.landingFeature.findFirst({
     where: { section: "hero", enabled: true },
     orderBy: { updatedAt: "desc" },
-    include: { invitation: true, saveTheDate: true },
+    include: landingFeatureInclude,
   });
 
   if (!row) return null;
@@ -149,7 +184,7 @@ export async function getGalleryFeaturesByCategory(
   const rows = await prisma.landingFeature.findMany({
     where: { section: "gallery", enabled: true },
     orderBy: { position: "asc" },
-    include: { invitation: true, saveTheDate: true },
+    include: landingFeatureInclude,
   });
 
   const result: Record<GalleryCategory, GalleryFeature[]> = {
@@ -278,7 +313,7 @@ export async function getBestSellerFeatures(
   const rows = await prisma.landingFeature.findMany({
     where: { section: "best_seller", enabled: true },
     orderBy: { position: "asc" },
-    include: { invitation: true, saveTheDate: true },
+    include: landingFeatureInclude,
   });
 
   return rows
@@ -290,7 +325,7 @@ export async function getLiveDemoFeatures(): Promise<LiveDemoFeature[]> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "live_demo", enabled: true },
     orderBy: { position: "asc" },
-    include: { invitation: true, saveTheDate: true },
+    include: landingFeatureInclude,
   });
 
   return rows

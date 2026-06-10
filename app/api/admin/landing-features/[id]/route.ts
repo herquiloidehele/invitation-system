@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { landingFeatureInclude } from "@/lib/landing-features";
 
 const CATEGORIES = new Set([
   "wedding",
@@ -36,7 +37,7 @@ export async function PATCH(
   const row = await prisma.landingFeature.update({
     where: { id },
     data,
-    include: { invitation: true, saveTheDate: true },
+    include: landingFeatureInclude,
   });
   return NextResponse.json(row);
 }

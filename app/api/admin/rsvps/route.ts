@@ -9,9 +9,16 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const invitationSlug = searchParams.get("invitation") ?? undefined;
 
+  if (!invitationSlug) {
+    return NextResponse.json(
+      { error: "Missing required invitation filter" },
+      { status: 400 },
+    );
+  }
+
   try {
     const responses = await prisma.rsvpResponse.findMany({
-      where: invitationSlug ? { invitationSlug } : undefined,
+      where: { invitationSlug },
       orderBy: { submittedAt: "desc" },
       include: {
         invitation: {

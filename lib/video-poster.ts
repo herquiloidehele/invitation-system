@@ -64,9 +64,7 @@ function runFfmpeg(binary: string, args: string[]): Promise<string> {
  * Resolves to the JPEG bytes; rejects with `PosterExtractionError` if the
  * binary is unavailable or ffmpeg returns a non-zero exit code.
  */
-export async function extractFirstFrameJpeg(
-  videoBuffer: Buffer,
-): Promise<Buffer> {
+async function assertFfmpegPath(): Promise<string> {
   if (!ffmpegPath) {
     throw new PosterExtractionError(
       "ffmpeg-static did not resolve to a binary path on this platform",
@@ -85,19 +83,24 @@ export async function extractFirstFrameJpeg(
     );
   }
 
+  return ffmpegPath;
+}
+
+export async function extractFirstFrameJpegFromFile(
+  inputPath: string,
+): Promise<Buffer> {
+  const binary = await assertFfmpegPath();
+
   const workDir = await mkdtemp(path.join(os.tmpdir(), "video-poster-"));
-  const inputPath = path.join(workDir, "input");
   const outputPath = path.join(workDir, "frame.jpg");
 
   try {
-    await writeFile(inputPath, videoBuffer);
-
     // -ss 0 → seek to start
     // -frames:v 1 → emit a single frame
     // -vf scale=… → cap width to 1280, preserve aspect ratio
     // -q:v 4 → JPEG quality (~85)
     // -f image2 -an → image2 muxer, no audio
-    await runFfmpeg(ffmpegPath, [
+    await runFfmpeg(binary, [
       "-y",
       "-loglevel",
       "error",
@@ -120,6 +123,20 @@ export async function extractFirstFrameJpeg(
     return await readFile(outputPath);
   } finally {
     // Best-effort cleanup; never let it mask a real error.
+    rm(workDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+export async function extractFirstFrameJpeg(
+  videoBuffer: Buffer,
+): Promise<Buffer> {
+  const workDir = await mkdtemp(path.join(os.tmpdir(), "video-poster-"));
+  const inputPath = path.join(workDir, "input");
+
+  try {
+    await writeFile(inputPath, videoBuffer);
+    return await extractFirstFrameJpegFromFile(inputPath);
+  } finally {
     rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
 }

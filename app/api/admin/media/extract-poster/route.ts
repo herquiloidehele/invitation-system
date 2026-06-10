@@ -1,11 +1,15 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
-  getObjectBuffer,
+  downloadObjectToFile,
+  getObjectContentLength,
   putObjectBuffer,
   s3KeyFromUrl,
 } from "@/lib/s3";
-import { extractFirstFrameJpeg } from "@/lib/video-poster";
+import { extractFirstFrameJpegFromFile } from "@/lib/video-poster";
 
 // ffmpeg + S3 work needs the Node runtime (not edge).
 export const runtime = "nodejs";
@@ -51,11 +55,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Download the video bytes. Vercel's tmpfs and Node's heap are both
-    // sized to handle 100 MB; rejecting larger blobs keeps memory usage
-    // predictable.
-    const videoBuffer = await getObjectBuffer(videoKey);
-    if (videoBuffer.byteLength > MAX_VIDEO_BYTES) {
+    const contentLength = await getObjectContentLength(videoKey);
+    if (contentLength !== null && contentLength > MAX_VIDEO_BYTES) {
       return NextResponse.json(
         {
           error:
@@ -65,14 +66,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const jpeg = await extractFirstFrameJpeg(videoBuffer);
+    const workDir = await mkdtemp(
+      path.join(os.tmpdir(), "video-poster-input-"),
+    );
+    const inputPath = path.join(workDir, "input");
 
-    // Store the poster next to the video, sharing the same name plus
-    // -poster.jpg so it's easy to associate the two by inspection.
-    const posterKey = `${videoKey.replace(/\.[^/.]+$/, "")}-poster.jpg`;
-    const posterUrl = await putObjectBuffer(posterKey, jpeg, "image/jpeg");
+    try {
+      await downloadObjectToFile(videoKey, inputPath, MAX_VIDEO_BYTES);
+      const jpeg = await extractFirstFrameJpegFromFile(inputPath);
 
-    return NextResponse.json({ posterUrl });
+      // Store the poster next to the video, sharing the same name plus
+      // -poster.jpg so it's easy to associate the two by inspection.
+      const posterKey = `${videoKey.replace(/\.[^/.]+$/, "")}-poster.jpg`;
+      const posterUrl = await putObjectBuffer(posterKey, jpeg, "image/jpeg");
+
+      return NextResponse.json({ posterUrl });
+    } catch (err) {
+      if (err instanceof Error && err.message.includes("byte limit")) {
+        return NextResponse.json(
+          {
+            error:
+              "Video exceeds the 100 MB limit for server-side poster extraction.",
+          },
+          { status: 413 },
+        );
+      }
+      throw err;
+    } finally {
+      rm(workDir, { recursive: true, force: true }).catch(() => {});
+    }
   } catch (err) {
     console.error("[extract-poster] Failed:", err);
     return NextResponse.json(
