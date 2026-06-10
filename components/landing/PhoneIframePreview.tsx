@@ -43,16 +43,16 @@ export function PhoneIframePreview({
           />
         </div>
       </div>
-      {showCaption ? (
-        <a
-          href={src}
-          target="_blank"
-          rel="noreferrer"
-          className="md:hidden mt-4 inline-flex rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
-        >
-          Abrir convite →
-        </a>
-      ) : null}
+      {/*{showCaption ? (*/}
+      {/*  <a*/}
+      {/*    href={src}*/}
+      {/*    target="_blank"*/}
+      {/*    rel="noreferrer"*/}
+      {/*    className="md:hidden mt-4 inline-flex rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"*/}
+      {/*  >*/}
+      {/*    Abrir convite →*/}
+      {/*  </a>*/}
+      {/*) : null}*/}
     </article>
   );
 }
