@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { Switch } from "@/components/ui/switch";
 import { isRsvpCustomFieldVisible } from "@/lib/rsvp-custom-fields";
 import type { RsvpCustomField } from "@/lib/types";
 
@@ -52,29 +53,37 @@ export function RSVPCustomFields({
               style={inputStyle}
             />
           ) : field.type === "switch" ? (
-            <label
-              className="flex items-center justify-between rounded-lg border px-3 py-2.5 text-sm"
+            <div
+              className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm"
               style={{
                 borderColor: inputStyle.borderColor,
                 color: inputStyle.color,
+                backgroundColor: inputStyle.backgroundColor,
               }}
             >
               <span>{values[field.id] === true ? "Sim" : "Não"}</span>
-              <input
-                type="checkbox"
+              <Switch
                 checked={values[field.id] === true}
-                onChange={(event) => onChange(field.id, event.target.checked)}
+                onCheckedChange={(checked) => onChange(field.id, checked)}
               />
-            </label>
+            </div>
           ) : field.type === "radio" ? (
-            <div className="flex flex-col gap-2">
-              {(field.options ?? []).map((option) => (
+            <div className="flex gap-3">
+              {(field.options ?? []).map((option) => {
+                const selected = values[field.id] === option.id;
+                return (
                 <label
                   key={option.id}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-sm"
+                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-center text-sm transition-colors"
                   style={{
-                    borderColor: inputStyle.borderColor,
+                    borderColor: selected
+                      ? String(inputStyle.color)
+                      : inputStyle.borderColor,
+                    backgroundColor: selected
+                      ? `${String(inputStyle.color)}15`
+                      : "transparent",
                     color: inputStyle.color,
+                    fontFamily: inputStyle.fontFamily,
                   }}
                 >
                   <input
@@ -83,10 +92,12 @@ export function RSVPCustomFields({
                     value={option.id}
                     checked={values[field.id] === option.id}
                     onChange={() => onChange(field.id, option.id)}
+                    className="sr-only"
                   />
                   {option.label}
                 </label>
-              ))}
+                );
+              })}
             </div>
           ) : field.type === "select" ? (
             <select
