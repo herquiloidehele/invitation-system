@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "NODE_OPTIONS=--max-old-space-size=1024 prisma generate && next build"
+  },
+  "deploy": {
+    "startCommand": "NODE_OPTIONS='--max-old-space-size=512 --max-semi-space-size=16' next start"
+  }
+}
