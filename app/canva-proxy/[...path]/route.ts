@@ -16,6 +16,11 @@ import {
   pickCompressionEncoding,
   type SupportedEncoding,
 } from "@/lib/canva-proxy-compression";
+import {
+  type CachedHtmlResponse,
+  htmlResponseCache,
+  makeHtmlCacheKey,
+} from "@/lib/canva-proxy-html-cache";
 
 /* ------------------------------------------------------------------ */
 /*  Canva Reverse Proxy                                                 */
@@ -211,6 +216,23 @@ async function proxyCanvaRequest(
     return NextResponse.json({ error: "Host not allowed" }, { status: 403 });
   }
 
+  const acceptEncoding = req.headers.get("accept-encoding");
+  const negotiatedEncoding = pickCompressionEncoding(acceptEncoding);
+  const disableScroll = shouldDisableProxiedScroll(req.nextUrl);
+
+  // Fast path: a previously rewritten + compressed HTML shell for this exact
+  // (url, encoding, scroll) is served straight from memory — no upstream
+  // fetch, no ~3 MB string rewrite, no re-compression. Only compressed
+  // responses are cached, so this never fires for the uncompressed case.
+  if (method === "GET" && negotiatedEncoding) {
+    const cached = htmlResponseCache.get(
+      makeHtmlCacheKey(upstream.url.href, negotiatedEncoding, disableScroll),
+    );
+    if (cached) {
+      return buildCachedHtmlResponse(cached);
+    }
+  }
+
   let resp: Response;
   try {
     resp = await fetch(upstream.url, {
@@ -233,8 +255,6 @@ async function proxyCanvaRequest(
     upstream.url.pathname,
     contentType,
   );
-  const acceptEncoding = req.headers.get("accept-encoding");
-  const negotiatedEncoding = pickCompressionEncoding(acceptEncoding);
 
   if (method === "HEAD") {
     return new NextResponse(null, {
@@ -253,6 +273,17 @@ async function proxyCanvaRequest(
       contentType,
       responseHeaders,
       negotiatedEncoding,
+      disableScroll,
+      // Only a compressed 200 shell is worth caching: compression bounds the
+      // entry to ~90 KB, and a non-200 body must never be reused.
+      cacheKey:
+        negotiatedEncoding && resp.status === 200
+          ? makeHtmlCacheKey(
+              upstream.url.href,
+              negotiatedEncoding,
+              disableScroll,
+            )
+          : null,
     });
   }
 
@@ -285,6 +316,13 @@ interface RespondWithHtmlArgs {
   contentType: string;
   responseHeaders: Headers;
   negotiatedEncoding: SupportedEncoding | null;
+  disableScroll: boolean;
+  /**
+   * When non-null, the compressed shell is stored under this key for reuse
+   * by subsequent guests. Null disables caching for this response (e.g.
+   * uncompressed or non-200).
+   */
+  cacheKey: string | null;
 }
 
 async function respondWithHtml({
@@ -295,6 +333,8 @@ async function respondWithHtml({
   contentType,
   responseHeaders,
   negotiatedEncoding,
+  disableScroll,
+  cacheKey,
 }: RespondWithHtmlArgs): Promise<NextResponse> {
   const html = await upstream.text();
   const proxyOrigin =
@@ -309,14 +349,12 @@ async function respondWithHtml({
   // for it (curtain-canva embed appends `?disableScroll=1`). The default
   // ExternalLinkPage renders Canva at fixed size and relies on the
   // iframe document's own scroll, so it must be left untouched.
-  const rewritten = shouldDisableProxiedScroll(reqUrl)
+  const rewritten = disableScroll
     ? injectIframeNoScrollStyle(baseRewritten)
     : baseRewritten;
 
-  responseHeaders.set(
-    "content-type",
-    contentType || "text/html; charset=utf-8",
-  );
+  const responseContentType = contentType || "text/html; charset=utf-8";
+  responseHeaders.set("content-type", responseContentType);
 
   if (!negotiatedEncoding) {
     return new NextResponse(rewritten, {
@@ -328,6 +366,15 @@ async function respondWithHtml({
   const compressed = await compressBuffer(rewritten, negotiatedEncoding);
   responseHeaders.set("content-encoding", negotiatedEncoding);
   responseHeaders.set("content-length", String(compressed.length));
+
+  if (cacheKey) {
+    htmlResponseCache.set(cacheKey, {
+      body: compressed,
+      encoding: negotiatedEncoding,
+      contentType: responseContentType,
+    });
+  }
+
   // `Buffer` is structurally a `Uint8Array`; on Node 22 the runtime
   // type is `Uint8Array<ArrayBufferLike>`, which the DOM-flavoured TS
   // lib in this project does not recognise as a `BodyInit`. Cast at
@@ -335,6 +382,40 @@ async function respondWithHtml({
   return new NextResponse(compressed as unknown as BodyInit, {
     status: upstream.status,
     headers: responseHeaders,
+  });
+}
+
+/**
+ * Rebuilds a full HTML response from a cache hit without any upstream
+ * contact. Mirrors the header policy of `buildResponseHeaders` for the HTML
+ * regime: shared-edge cache window, CORS, the proxy marker, and the
+ * `Vary: accept-encoding` bucketing that keeps a br body from being served
+ * to a gzip-only client.
+ */
+function buildCachedHtmlResponse(cached: CachedHtmlResponse): NextResponse {
+  const headers = new Headers();
+  headers.set("content-type", cached.contentType);
+  headers.set("content-encoding", cached.encoding);
+  headers.set("content-length", String(cached.body.length));
+
+  const cacheControl = pickCanvaProxyCacheControl({
+    upstreamPath: "/",
+    upstreamCacheControl: null,
+    contentType: "text/html",
+  });
+  headers.set("cache-control", cacheControl);
+  if (isSharedCacheable(cacheControl)) {
+    headers.set("vercel-cdn-cache-control", cacheControl);
+    headers.set("cdn-cache-control", cacheControl);
+  }
+  headers.set("access-control-allow-origin", "*");
+  headers.set("x-proxied-by", "canva-proxy");
+  headers.set("x-proxy-cache", "HIT");
+  appendVaryHeader(headers, "accept-encoding");
+
+  return new NextResponse(cached.body as unknown as BodyInit, {
+    status: 200,
+    headers,
   });
 }
 

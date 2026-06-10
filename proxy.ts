@@ -85,5 +85,8 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Exclude /canva-proxy/* — the app's busiest route. It needs no auth,
+  // i18n, or geo-currency handling, so skipping the middleware entirely
+  // removes its per-request allocation/CPU overhead from that hot path.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|canva-proxy).*)"],
 };

@@ -48,6 +48,13 @@ const gzipAsync = promisify(gzipCb);
  */
 const BROTLI_PARAMS = {
   [zlibConstants.BROTLI_PARAM_QUALITY]: 4,
+  // Cap the sliding-window size (LGWIN). Brotli defaults to 22 (a 4 MiB
+  // window) and allocates that window per live compressor — multiplied
+  // across the many concurrent asset streams this proxy opens per guest
+  // page load, that native memory adds up. Window 19 (512 KiB) costs ~3×
+  // less native memory per stream at q=4 with a negligible ratio loss on
+  // the JS/CSS/HTML payloads we compress.
+  [zlibConstants.BROTLI_PARAM_LGWIN]: 19,
 } as const;
 
 /** Gzip level 6 is the canonical "balanced" setting (~9× reduction). */

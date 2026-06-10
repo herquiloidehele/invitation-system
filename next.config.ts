@@ -1,22 +1,41 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
+// Pin the Next image optimizer to THIS app's exact S3 bucket host. A
+// wildcard like `**.amazonaws.com` turns /_next/image into an open resize
+// proxy for ANY S3 bucket on AWS — an unauthenticated path that lets a
+// stranger make sharp decode an arbitrary, potentially huge remote image
+// into hundreds of MB of off-heap RGBA. Deriving the host from the same env
+// the app uploads with keeps dev and prod correct without hardcoding.
+const s3Bucket = process.env.S3_BUCKET_NAME;
+const s3Region = process.env.AWS_REGION;
+const s3ImagePatterns =
+  s3Bucket && s3Region
+    ? [
+        {
+          protocol: "https" as const,
+          hostname: `${s3Bucket}.s3.${s3Region}.amazonaws.com`,
+          pathname: "/**",
+        },
+      ]
+    : [];
+
 const nextConfig: NextConfig = {
   // Packages that ship native binaries or rely on `__dirname` to locate
   // companion files at runtime. Bundling them rewrites paths to a virtual
   // FS root (e.g. `/ROOT/...`) and `spawn` then fails with ENOENT. Marking
   // them external tells Next.js to leave the `require()` until runtime.
   serverExternalPackages: ["pg", "bcrypt", "ffmpeg-static"],
-  // Convert barrel imports (e.g. `import { motion } from "framer-motion"`)
-  // into direct module imports at compile time so unused exports are
-  // tree-shaken. Cuts ~200-400 KB off the per-page client bundle on this
-  // codebase. Safe for any package that re-exports from a barrel and
-  // does not depend on side effects in the barrel itself.
   // Disable Next's in-process ISR/fetch LRU (default 50 MB). The on-disk
   // cache under .next/cache still works; this just stops duplicating it in
   // RSS, which is pure overhead on the memory-tight 1 GB Railway tier.
   cacheMaxMemorySize: 0,
   experimental: {
+    // Convert barrel imports (e.g. `import { motion } from "framer-motion"`)
+    // into direct module imports at compile time so unused exports are
+    // tree-shaken. Cuts ~200-400 KB off the per-page client bundle on this
+    // codebase. Safe for any package that re-exports from a barrel and
+    // does not depend on side effects in the barrel itself.
     optimizePackageImports: [
       "framer-motion",
       "lucide-react",
@@ -32,14 +51,16 @@ const nextConfig: NextConfig = {
     // unbounded concurrency on a large host multiplies peak memory. Image
     // traffic is ~1% of requests here, so capping throughput is harmless.
     imgOptConcurrency: 2,
+    // Cap the source resolution sharp will decode. Next's default is ~268 MP
+    // (a ~1 GB RGBA decode). Every legitimate source here is far smaller —
+    // uploads are client-capped at 2560px, video posters at ~4K (8 MP),
+    // Unsplash at ≤900px — so 26 MP (5120²) clears them all with margin
+    // while bounding a hostile/oversized decode to ~105 MB.
+    imgOptMaxInputPixels: 26_214_400,
   },
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**.amazonaws.com",
-        pathname: "/**",
-      },
+      ...s3ImagePatterns,
       {
         protocol: "https",
         hostname: "images.unsplash.com",
