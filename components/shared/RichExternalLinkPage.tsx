@@ -24,6 +24,7 @@ import PersonalGuestCard, {
   PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
 } from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
+import PlacesSection from "./PlacesSection";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowRichExternalRsvp } from "@/lib/external-invitation-form";
 import DynamicFontLoader from "./DynamicFontLoader";
@@ -251,6 +252,18 @@ export default function RichExternalLinkPage({
           setCanvaPageState({ externalLink, isInitialPage })
         }
         preloading={canvaPreloading}
+      />
+
+      <PlacesSection
+        invitation={invitation}
+        theme={theme}
+        cardStyle={{
+          cardBg: invitation.cardStyles?.places?.cardBg,
+          cardBorder: invitation.cardStyles?.places?.cardBorder,
+          borderRadius: invitation.cardStyles?.places?.borderRadius,
+          accentColor: invitation.cardStyles?.places?.accentColor,
+        }}
+        isPreview={isPreview}
       />
 
       {showRsvp && (

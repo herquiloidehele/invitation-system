@@ -375,4 +375,20 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       },
     ],
   },
+  {
+    id: "places",
+    label: "Locais (Hotéis, Restaurantes…)",
+    fields: [
+      {
+        key: "places_mapLabel",
+        label: "Botão de mapa",
+        placeholder: "Mapa",
+      },
+      {
+        key: "places_callLabel",
+        label: "Botão de telefone",
+        placeholder: "Ligar",
+      },
+    ],
+  },
 ];

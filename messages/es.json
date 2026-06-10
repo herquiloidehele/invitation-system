@@ -301,6 +301,8 @@
     "sectionTitle_guestGuide": "Guía del \n Invitado",
     "sectionTitle_faqs": "Preguntas Frecuentes",
     "sectionTitle_gallery": "Nuestros Momentos",
+    "places_mapLabel": "Mapa",
+    "places_callLabel": "Llamar",
     "cta_confirmLabel": "RSVP",
     "cta_confirmButton": "Confirmar Asistencia",
     "cta_confirmedButton": "Asistencia Confirmada",

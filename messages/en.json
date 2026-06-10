@@ -301,6 +301,8 @@
     "sectionTitle_guestGuide": "Guest \n Guide",
     "sectionTitle_faqs": "Frequently Asked Questions",
     "sectionTitle_gallery": "Our Moments",
+    "places_mapLabel": "Map",
+    "places_callLabel": "Call",
     "cta_confirmLabel": "RSVP",
     "cta_confirmButton": "Confirm Attendance",
     "cta_confirmedButton": "Attendance Confirmed",

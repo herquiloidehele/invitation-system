@@ -11,6 +11,7 @@ import PersonalGuestCard, {
 } from "@/components/shared/PersonalGuestCard";
 import { EditableText } from "@/components/shared/EditableText";
 import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
+import PlacesSection from "@/components/shared/PlacesSection";
 import {
   resolveRevealContentStyle,
   resolveTextElementOverride,
@@ -155,6 +156,19 @@ export default function RevealableExternalSections({
             theme={theme}
             preloading={!revealed}
             onInitialPageChange={onCanvaInitialPageChange}
+          />
+        )}
+
+        {showInitialPageSections && (
+          <PlacesSection
+            invitation={invitation}
+            theme={theme}
+            cardStyle={{
+              cardBg: invitation.cardStyles?.places?.cardBg,
+              cardBorder: invitation.cardStyles?.places?.cardBorder,
+              borderRadius: invitation.cardStyles?.places?.borderRadius,
+              accentColor: invitation.cardStyles?.places?.accentColor,
+            }}
           />
         )}
 

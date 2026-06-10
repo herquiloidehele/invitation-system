@@ -32,6 +32,7 @@ import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
 import CoupleGallery from "./gallery/CoupleGallery";
 import SectionImage from "./SectionImage";
+import PlacesSection from "./PlacesSection";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
@@ -1023,7 +1024,17 @@ export default function InvitationPage({
         </>
       )}
 
-      <SectionDivider theme={theme} />
+      {/* ================================================================= */}
+      {/* Places — hotels, restaurants, attractions (before RSVP CTA)       */}
+      {/* ================================================================= */}
+      <EditableCard sectionKey="places">
+        <PlacesSection
+          invitation={invitation}
+          theme={theme}
+          cardStyle={cs("places", 16)}
+          isPreview={isPreview}
+        />
+      </EditableCard>
 
       {/* ================================================================= */}
       {/* 6. CTA Section                                                    */}

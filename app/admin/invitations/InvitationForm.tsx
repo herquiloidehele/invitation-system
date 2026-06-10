@@ -17,6 +17,10 @@ import type {
   InvitationEventType,
   LocationInfo,
   ParentsInfo,
+  PlaceItem,
+  PlaceSection,
+  PlacesConfig,
+  PlacesLayout,
   SaveDateStyle,
   ScheduleIcon,
   ScheduleStyle,
@@ -70,6 +74,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
+import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
@@ -348,6 +353,12 @@ const MIN_HERO_HEIGHT = 200;
 const MAX_HERO_HEIGHT = 700;
 const HERO_HEIGHT_STEP = 10;
 
+const EMPTY_PLACES: PlacesConfig = {
+  enabled: false,
+  layout: "stacked",
+  sections: [],
+};
+
 const DEFAULT_SCRIM_OPACITY = 0.38;
 const DEFAULT_GRADIENT_START_VIDEO = 40;
 const DEFAULT_GRADIENT_START_IMAGE = 35;
@@ -399,6 +410,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     videoPoster: "",
     faqs: [],
     guestGuide: { enabled: false, items: [] },
+    places: { enabled: false, layout: "stacked", sections: [] },
     envelope: {},
     saveDateStyle: "classic",
     cinematicImageUrl: "",
@@ -828,6 +840,167 @@ export default function InvitationForm({
         return {
           ...prev,
           guestGuide: { enabled: prev.guestGuide?.enabled ?? true, items },
+        };
+      });
+    },
+    [],
+  );
+
+  // Places management
+  const updatePlacesEnabled = useCallback((enabled: boolean) => {
+    setForm((prev) => ({
+      ...prev,
+      places: { ...(prev.places ?? EMPTY_PLACES), enabled },
+    }));
+  }, []);
+
+  const updatePlacesLayout = useCallback((layout: PlacesLayout) => {
+    setForm((prev) => ({
+      ...prev,
+      places: { ...(prev.places ?? EMPTY_PLACES), enabled: true, layout },
+    }));
+  }, []);
+
+  const addPlaceSection = useCallback(() => {
+    const newSection: PlaceSection = {
+      id: `sec-${Date.now()}`,
+      title: "",
+      items: [],
+    };
+    setForm((prev) => {
+      const base = prev.places ?? EMPTY_PLACES;
+      return {
+        ...prev,
+        places: {
+          ...base,
+          enabled: true,
+          sections: [...base.sections, newSection],
+        },
+      };
+    });
+  }, []);
+
+  const updatePlaceSectionTitle = useCallback((id: string, title: string) => {
+    setForm((prev) => {
+      const base = prev.places ?? EMPTY_PLACES;
+      return {
+        ...prev,
+        places: {
+          ...base,
+          sections: base.sections.map((s) =>
+            s.id === id ? { ...s, title } : s,
+          ),
+        },
+      };
+    });
+  }, []);
+
+  const removePlaceSection = useCallback((id: string) => {
+    setForm((prev) => {
+      const base = prev.places ?? EMPTY_PLACES;
+      return {
+        ...prev,
+        places: {
+          ...base,
+          sections: base.sections.filter((s) => s.id !== id),
+        },
+      };
+    });
+  }, []);
+
+  const reorderPlaceSection = useCallback(
+    (id: string, direction: "up" | "down") => {
+      setForm((prev) => {
+        const base = prev.places ?? EMPTY_PLACES;
+        const sections = [...base.sections];
+        const index = sections.findIndex((s) => s.id === id);
+        if (index < 0) return prev;
+        const swap = direction === "up" ? index - 1 : index + 1;
+        if (swap < 0 || swap >= sections.length) return prev;
+        [sections[index], sections[swap]] = [sections[swap], sections[index]];
+        return { ...prev, places: { ...base, sections } };
+      });
+    },
+    [],
+  );
+
+  const addPlaceItem = useCallback((sectionId: string) => {
+    const newItem: PlaceItem = { id: `place-${Date.now()}`, title: "" };
+    setForm((prev) => {
+      const base = prev.places ?? EMPTY_PLACES;
+      return {
+        ...prev,
+        places: {
+          ...base,
+          sections: base.sections.map((s) =>
+            s.id === sectionId ? { ...s, items: [...s.items, newItem] } : s,
+          ),
+        },
+      };
+    });
+  }, []);
+
+  const updatePlaceItem = useCallback(
+    (sectionId: string, itemId: string, patch: Partial<PlaceItem>) => {
+      setForm((prev) => {
+        const base = prev.places ?? EMPTY_PLACES;
+        return {
+          ...prev,
+          places: {
+            ...base,
+            sections: base.sections.map((s) =>
+              s.id === sectionId
+                ? {
+                    ...s,
+                    items: s.items.map((it) =>
+                      it.id === itemId ? { ...it, ...patch } : it,
+                    ),
+                  }
+                : s,
+            ),
+          },
+        };
+      });
+    },
+    [],
+  );
+
+  const removePlaceItem = useCallback((sectionId: string, itemId: string) => {
+    setForm((prev) => {
+      const base = prev.places ?? EMPTY_PLACES;
+      return {
+        ...prev,
+        places: {
+          ...base,
+          sections: base.sections.map((s) =>
+            s.id === sectionId
+              ? { ...s, items: s.items.filter((it) => it.id !== itemId) }
+              : s,
+          ),
+        },
+      };
+    });
+  }, []);
+
+  const reorderPlaceItem = useCallback(
+    (sectionId: string, itemId: string, direction: "up" | "down") => {
+      setForm((prev) => {
+        const base = prev.places ?? EMPTY_PLACES;
+        return {
+          ...prev,
+          places: {
+            ...base,
+            sections: base.sections.map((s) => {
+              if (s.id !== sectionId) return s;
+              const items = [...s.items];
+              const index = items.findIndex((it) => it.id === itemId);
+              if (index < 0) return s;
+              const swap = direction === "up" ? index - 1 : index + 1;
+              if (swap < 0 || swap >= items.length) return s;
+              [items[index], items[swap]] = [items[swap], items[index]];
+              return { ...s, items };
+            }),
+          },
         };
       });
     },
@@ -2938,6 +3111,21 @@ export default function InvitationForm({
                 onUpdateCustom={updateCustomGuideItem}
                 onRemoveItem={removeGuideItem}
                 onReorderItem={reorderGuideItem}
+              />
+
+              {/* ── Locais (Hotéis, Restaurantes…) ── */}
+              <PlacesFormSection
+                places={form.places ?? EMPTY_PLACES}
+                onEnabledChange={updatePlacesEnabled}
+                onLayoutChange={updatePlacesLayout}
+                onAddSection={addPlaceSection}
+                onUpdateSectionTitle={updatePlaceSectionTitle}
+                onRemoveSection={removePlaceSection}
+                onReorderSection={reorderPlaceSection}
+                onAddItem={addPlaceItem}
+                onUpdateItem={updatePlaceItem}
+                onRemoveItem={removePlaceItem}
+                onReorderItem={reorderPlaceItem}
               />
 
               {/* ── Textos Personalizados ── */}

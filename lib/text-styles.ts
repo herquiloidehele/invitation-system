@@ -112,6 +112,14 @@ export interface ResolvedTextStyles {
   audioTitle: CSSProperties;
   /** Audio player — artist name */
   audioArtist: CSSProperties;
+  /** Places — section title */
+  placesSectionTitle: CSSProperties;
+  /** Places — individual place title */
+  placeTitle: CSSProperties;
+  /** Places — individual place description */
+  placeDescription: CSSProperties;
+  /** Places — map/call link text */
+  placeLink: CSSProperties;
 
   // -- Quad Cards variant --
   /** Quad card value (number/text) */
@@ -810,6 +818,53 @@ export function resolveTextStyles(
     el?.audioArtist,
   );
 
+  // -- Places section --
+  const placesSectionTitle = applyOverride(
+    {
+      fontFamily: sectionTitleFont,
+      fontSize: sectionTitleFontSize,
+      fontWeight: sectionTitleFontWeight,
+      letterSpacing: 4,
+      textTransform: "uppercase" as const,
+      color: textSecondary,
+    },
+    el?.placesSectionTitle ?? el?.sectionTitles,
+  );
+
+  const placeTitle = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 16,
+      fontWeight: 600,
+      color: textPrimary,
+      lineHeight: 1.3,
+    },
+    el?.placeTitle ?? el?.locationName,
+  );
+
+  const placeDescription = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 13,
+      lineHeight: 1.5,
+      color: textSecondary,
+    },
+    el?.placeDescription ?? el?.bodyText,
+  );
+
+  const placeLink = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: 11,
+      fontWeight: 500,
+      letterSpacing: 1,
+      textTransform: "uppercase" as const,
+      color: accent,
+      textDecoration: "none",
+    },
+    el?.placeLink ?? el?.giftLink,
+  );
+
   // -- Quad Cards variant --
   const quadDayValue = applyOverride(
     {
@@ -1090,6 +1145,10 @@ export function resolveTextStyles(
     scheduleVenue,
     audioTitle,
     audioArtist,
+    placesSectionTitle,
+    placeTitle,
+    placeDescription,
+    placeLink,
     // Quad Cards
     quadDayValue,
     quadDayLabel,

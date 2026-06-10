@@ -209,6 +209,42 @@ export interface CoupleGallery {
 }
 
 // ---------------------------------------------------------------------------
+// Places — opt-in "where to stay / eat / visit" section
+// ---------------------------------------------------------------------------
+
+/** Card layout for the whole Places feature. */
+export type PlacesLayout = "stacked" | "rows";
+
+export interface PlaceItem {
+  /** Stable id (cuid/uuid) for reordering. */
+  id: string;
+  title: string;
+  description?: string;
+  /** Optional image URL (same S3 upload pipeline as other section images). */
+  imageUrl?: string;
+  /** The "location link" — Google Maps URL. */
+  googleMapsUrl?: string;
+  /** Phone number for tap-to-call (rendered as a tel: link). */
+  phone?: string;
+}
+
+/** A titled block of places (e.g. "Hotéis", "Restaurantes", "Para Visitar"). */
+export interface PlaceSection {
+  /** Stable id for reordering. */
+  id: string;
+  /** Free-text heading rendered above the block. */
+  title: string;
+  items: PlaceItem[];
+}
+
+export interface PlacesConfig {
+  enabled: boolean;
+  /** Card layout applied to every section. */
+  layout: PlacesLayout;
+  sections: PlaceSection[];
+}
+
+// ---------------------------------------------------------------------------
 // Image position & zoom settings
 // ---------------------------------------------------------------------------
 
@@ -355,7 +391,8 @@ export type CardSectionKey =
   | "location"
   | "guestGuide"
   | "faqs"
-  | "countdown";
+  | "countdown"
+  | "places";
 
 /** Per-section card styling overrides stored on each invitation.
  *  Missing keys or undefined fields fall back to theme defaults.
@@ -517,6 +554,11 @@ export interface TextStyleOverrides {
     guestCardPillValue?: TextStyle;
     /** "Convidar mais pessoas" button text */
     guestCardInviteButton?: TextStyle;
+    // -- Places section --
+    placesSectionTitle?: TextStyle;
+    placeTitle?: TextStyle;
+    placeDescription?: TextStyle;
+    placeLink?: TextStyle;
   };
 }
 
@@ -639,6 +681,10 @@ export interface CustomTexts {
   rsvp_deadlineClosedMessage?: string;
   rsvp_deadlineDatePrefix?: string;
 
+  // -- Places --
+  places_mapLabel?: string;
+  places_callLabel?: string;
+
   // -- Common --
   common_close?: string;
 }
@@ -703,6 +749,8 @@ export interface InvitationData {
   sectionImages?: SectionImages;
   /** Optional couple-photos gallery section (opt-in carousel). */
   coupleGallery?: CoupleGallery;
+  /** Optional recommended-places section (hotels, restaurants, attractions). */
+  places?: PlacesConfig;
   /** Optional parents info for the "parents mode" hero section. */
   parents?: ParentsInfo;
   /** Optional "Nossa História" section — the couple's story. */
