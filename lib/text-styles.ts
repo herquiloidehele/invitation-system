@@ -214,6 +214,8 @@ function applyOverride(
     result.fontWeight = override.fontWeight;
   if (override.letterSpacing !== undefined)
     result.letterSpacing = override.letterSpacing;
+  if (override.fontStyle !== undefined)
+    result.fontStyle = override.fontStyle;
   return result;
 }
 

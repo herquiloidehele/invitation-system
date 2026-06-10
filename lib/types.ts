@@ -409,6 +409,7 @@ export interface TextStyle {
   fontSize?: number;
   color?: string;
   fontWeight?: string | number;
+  fontStyle?: string;
   letterSpacing?: number;
 }
 

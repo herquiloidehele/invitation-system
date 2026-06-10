@@ -226,6 +226,25 @@ export default function TextStyleToolbar() {
       {/* Divider */}
       <div className="h-5 w-px bg-border" />
 
+      {/* Font style */}
+      <select
+        value={overrides.fontStyle ?? ""}
+        onChange={(e) => {
+          const v = e.target.value;
+          set("fontStyle", v === "" ? undefined : v);
+        }}
+        title="Estilo da fonte"
+        className="h-7 rounded border bg-background px-1 text-xs outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+      >
+        <option value="">Estilo</option>
+        <option value="normal">Normal</option>
+        <option value="italic">Itálico</option>
+        <option value="oblique">Oblíquo</option>
+      </select>
+
+      {/* Divider */}
+      <div className="h-5 w-px bg-border" />
+
       {/* Letter spacing */}
       <input
         type="number"
@@ -254,6 +273,7 @@ export default function TextStyleToolbar() {
           set("fontFamily", undefined);
           set("fontSize", undefined);
           set("fontWeight", undefined);
+          set("fontStyle", undefined);
           set("color", undefined);
           set("letterSpacing", undefined);
         }}
