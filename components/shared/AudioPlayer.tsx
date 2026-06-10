@@ -64,37 +64,47 @@ interface IntegrationProps {
 
 type AudioPlayerProps = DirectProps | IntegrationProps;
 
-function isIntegrationProps(p: AudioPlayerProps): p is IntegrationProps {
-  return "audio" in p;
-}
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
+/** Public entry — narrows the props union into the flat-props implementation.
+ *  Hook-free on purpose: the ref prop must only flow through JSX here, never
+ *  into render-scope expressions (react-hooks/refs). */
 export default function AudioPlayer(props: AudioPlayerProps) {
-  const src = isIntegrationProps(props) ? props.audio.src : props.src;
-  const title = isIntegrationProps(props) ? props.audio.title : props.title;
-  const artist = isIntegrationProps(props) ? props.audio.artist : props.artist;
-  const playerTheme = isIntegrationProps(props)
-    ? derivePlayerTheme(props.theme)
-    : props.theme;
-  const titleStyle = isIntegrationProps(props) ? undefined : props.titleStyle;
-  const artistStyle = isIntegrationProps(props) ? undefined : props.artistStyle;
-  const externalAudioRef = props.externalAudioRef;
-  const onPlay = props.onPlay;
+  if ("audio" in props) {
+    return (
+      <AudioPlayerImpl
+        src={props.audio.src}
+        title={props.audio.title}
+        artist={props.audio.artist}
+        theme={derivePlayerTheme(props.theme)}
+        externalAudioRef={props.externalAudioRef}
+        onPlay={props.onPlay}
+      />
+    );
+  }
+  return <AudioPlayerImpl {...props} />;
+}
 
+function AudioPlayerImpl({
+  src,
+  title,
+  artist,
+  theme: playerTheme,
+  titleStyle,
+  artistStyle,
+  externalAudioRef,
+  onPlay,
+}: DirectProps) {
   const internalAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // -----------------------------------------------------------------------
-  // Determine whether we own the audio element or an external one was given
-  // -----------------------------------------------------------------------
-  const hasExternal = !!externalAudioRef;
-
-  // Create our own Audio element only when there's no external ref
+  // Create our own Audio element only when there's no external ref.
+  // (externalAudioRef must only be inspected inside effects/handlers, never
+  // during render; as a stable ref object it never retriggers the effect.)
   useEffect(() => {
-    if (hasExternal) return;
+    if (externalAudioRef) return;
 
     const audio = new Audio(src);
     audio.loop = true;
@@ -109,15 +119,18 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       audio.pause();
       audio.src = "";
     };
-  }, [src, hasExternal]);
+  }, [src, externalAudioRef]);
 
   // Sync playing state with external audio (it may already be playing)
   useEffect(() => {
-    if (!hasExternal) return;
     const audio = externalAudioRef?.current;
     if (!audio) return;
 
-    // Check initial state — the envelope already started playback
+    // Check initial state — the envelope may have already started playback
+    // before this component mounted, so the play/pause listeners below would
+    // never fire for it. useSyncExternalStore is no alternative: its
+    // getSnapshot runs during render and may not read the ref.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time initial sync with an already-playing external element
     setIsPlaying(!audio.paused);
 
     const handlePlay = () => setIsPlaying(true);
@@ -133,13 +146,13 @@ export default function AudioPlayer(props: AudioPlayerProps) {
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [hasExternal, externalAudioRef]);
+  }, [externalAudioRef]);
 
-  // Helper to get the active audio element
+  // Helper to get the active audio element — the internal ref is only ever
+  // populated when no external ref was given, so external wins when present.
   const getAudio = useCallback((): HTMLAudioElement | null => {
-    if (hasExternal) return externalAudioRef?.current ?? null;
-    return internalAudioRef.current;
-  }, [hasExternal, externalAudioRef]);
+    return externalAudioRef?.current ?? internalAudioRef.current;
+  }, [externalAudioRef]);
 
   const togglePlay = useCallback(() => {
     const audio = getAudio();
@@ -160,7 +173,7 @@ export default function AudioPlayer(props: AudioPlayerProps) {
           setIsPlaying(false);
         });
     }
-  }, [isPlaying, getAudio]);
+  }, [isPlaying, getAudio, onPlay]);
 
   // Fallback styles when no resolved text styles are provided
   const defaultTitleStyle: CSSProperties = {
