@@ -5,32 +5,6 @@ import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 
 // ---------------------------------------------------------------------------
-// GET /api/admin/invitations — List all invitations
-// ---------------------------------------------------------------------------
-
-export async function GET() {
-  try {
-    const invitations = await prisma.invitation.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        theme: { select: { id: true, name: true, label: true } },
-        _count: {
-          select: { rsvpResponses: true },
-        },
-      },
-    });
-
-    return NextResponse.json(invitations);
-  } catch (error) {
-    console.error("[Admin API] Error listing invitations:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch invitations" },
-      { status: 500 },
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
 // POST /api/admin/invitations — Create a new invitation
 // ---------------------------------------------------------------------------
 
