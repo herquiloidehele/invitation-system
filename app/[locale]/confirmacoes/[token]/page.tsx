@@ -21,6 +21,8 @@ import {
   type AppLocale,
 } from "@/i18n/locales";
 import { createNoIndexMetadata } from "@/lib/seo";
+import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import type { RsvpCustomAnswer } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = createNoIndexMetadata();
@@ -200,6 +202,7 @@ async function InvitationRsvpView({
                 attending: r.attending,
                 dietaryRestrictions: r.dietaryRestrictions,
                 message: r.message,
+                customAnswers: r.customAnswers as RsvpCustomAnswer[] | null,
                 submittedAt: r.submittedAt,
               }))}
               emptyLabel={labels.emptyInvitation}
@@ -293,6 +296,7 @@ async function SaveTheDateRsvpView({
             attending: r.attending,
             dietaryRestrictions: r.dietaryRestrictions,
             message: r.message,
+            customAnswers: r.customAnswers as RsvpCustomAnswer[] | null,
             submittedAt: r.submittedAt,
           }))}
           emptyLabel={labels.emptySaveTheDate}
@@ -337,7 +341,7 @@ function RsvpSummary({
   );
 }
 
-function RsvpList({
+export function RsvpList({
   responses,
   emptyLabel,
   locale,
@@ -350,6 +354,7 @@ function RsvpList({
     attending: boolean;
     dietaryRestrictions: string | null;
     message: string | null;
+    customAnswers: RsvpCustomAnswer[] | null;
     submittedAt: Date;
   }>;
   emptyLabel: string;
@@ -405,6 +410,18 @@ function RsvpList({
                     <blockquote className="mt-2 pl-3 border-l-2 border-stone-200 text-sm italic text-stone-500">
                       &ldquo;{r.message}&rdquo;
                     </blockquote>
+                  )}
+                  {formatRsvpCustomAnswers(r.customAnswers).length > 0 && (
+                    <div className="mt-2 space-y-1 rounded-md bg-stone-50 px-3 py-2 text-sm text-stone-600">
+                      {formatRsvpCustomAnswers(r.customAnswers).map((answer) => (
+                        <p key={`${r.id}-${answer.label}`}>
+                          <span className="font-medium text-stone-700">
+                            {answer.label}:
+                          </span>{" "}
+                          {answer.value}
+                        </p>
+                      ))}
+                    </div>
                   )}
                 </div>
                 <time className="text-xs text-stone-400 whitespace-nowrap shrink-0 mt-0.5">
