@@ -39,22 +39,17 @@ import { getExternalInvitationEmbedSrc } from "@/lib/external-invitation-form";
 interface ExternalLinkPageProps {
   externalLink: string;
   visible?: boolean;
-}
-
-/**
- * Kept for backward compatibility. With the off-viewport preload
- * strategy the iframe is always in the DOM, so this is unconditionally
- * `true`.
- */
-function shouldMountExternalInvitationIframe(): boolean {
-  return true;
+  isLandingPreview?: boolean;
 }
 
 export default function ExternalLinkPage({
   externalLink,
   visible = true,
+  isLandingPreview = false,
 }: ExternalLinkPageProps) {
   const src = getExternalInvitationEmbedSrc(externalLink);
+
+  console.log({ isLandingPreview });
 
   return (
     <div
@@ -84,7 +79,7 @@ export default function ExternalLinkPage({
         src={src}
         title="Convite externo"
         allowFullScreen
-        loading="eager"
+        loading={isLandingPreview ? "lazy" : "eager"}
         style={{
           position: "absolute",
           inset: 0,

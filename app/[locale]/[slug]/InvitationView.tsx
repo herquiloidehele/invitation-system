@@ -333,6 +333,7 @@ function EnvelopeInvitationView({
           <ExternalLinkPage
             externalLink={effectiveExternalLink}
             visible={externalLinkVisible}
+            isLandingPreview={isLandingPreview}
           />
         )}
 
