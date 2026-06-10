@@ -147,7 +147,6 @@ export function GallerySection({
                 <motion.a
                   key={item.id}
                   href={item.href}
-                  target="_blank"
                   rel="noreferrer"
                   aria-label={`${t("previewAria")}: ${item.title || t("fallbackTitle")}`}
                   onClick={(event) => handleCardClick(event, item)}
@@ -170,7 +169,7 @@ export function GallerySection({
                       />
                     ) : null}
                     <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,color-mix(in_srgb,var(--foreground)_16%,transparent))]" />
-                    <div className="pointer-events-none absolute top-3 right-3 z-10 hidden opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:flex">
+                    <div className="pointer-events-none absolute bottom-3 sm:top-3 right-3 z-10 md:opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block">
                       <div className="flex items-center gap-2 rounded-full bg-background/90 py-2 pr-4 pl-3 shadow-lg backdrop-blur-sm">
                         <MousePointerClickIcon className="h-4 w-4 text-foreground" />
                         <span className="text-xs font-medium text-foreground">
