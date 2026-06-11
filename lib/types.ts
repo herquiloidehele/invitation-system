@@ -102,6 +102,7 @@ export interface AudioConfig {
   src: string;
   artist: string;
   title: string;
+  visibility?: boolean;
 }
 
 /**

@@ -2332,6 +2332,20 @@ export default function ExternalInvitationForm({
                             />
                           </div>
                         </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Mostrar player</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Mostra os controlos de áudio no convite
+                            </p>
+                          </div>
+                          <Switch
+                            checked={form.audio.visibility ?? true}
+                            onCheckedChange={(v) =>
+                              updateAudio("visibility", v)
+                            }
+                          />
+                        </div>
                       </div>
                     )}
                   </AccordionContent>

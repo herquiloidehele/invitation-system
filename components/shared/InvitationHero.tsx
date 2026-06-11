@@ -390,7 +390,7 @@ export default function InvitationHero({
       )}
 
       {/* Audio player */}
-      {invitation.audio.enabled && (
+      {invitation.audio.enabled && (invitation.audio.visibility ?? true) && (
         <div className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2">
           <AudioPlayer
             src={invitation.audio.src}
