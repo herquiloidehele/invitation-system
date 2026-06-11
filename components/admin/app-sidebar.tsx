@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   AudioWaveform,
-  BarChart3,
   ChevronsUpDown,
   Database,
   FolderKanban,
@@ -46,11 +45,6 @@ const navMain = [
     url: "/admin/invitations",
     icon: Heart,
     isActive: true,
-  },
-  {
-    title: "Analíticas",
-    url: "/admin/analytics",
-    icon: BarChart3,
   },
   {
     title: "Modelos",

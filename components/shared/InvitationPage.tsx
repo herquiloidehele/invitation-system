@@ -3,7 +3,6 @@
 import {
   type MutableRefObject,
   type RefObject,
-  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -40,7 +39,6 @@ import InvitationHero, {
   getHeroSectionHeight,
   InvitationHeroNames,
 } from "./InvitationHero";
-import { useAnalytics } from "@/hooks/useAnalytics";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import {
   breatheAnimation,
@@ -366,25 +364,6 @@ export default function InvitationPage({
     invitation.date.month,
   );
 
-  const { trackEvent } = useAnalytics(invitation.slug);
-
-  const handleMapsClick = useCallback(
-    () => trackEvent("maps_click"),
-    [trackEvent],
-  );
-  const handleGiftClick = useCallback(
-    () => trackEvent("gift_click"),
-    [trackEvent],
-  );
-  const handleCalendarClick = useCallback(
-    () => trackEvent("calendar_click"),
-    [trackEvent],
-  );
-  const handleAudioPlay = useCallback(
-    () => trackEvent("audio_play"),
-    [trackEvent],
-  );
-
   // Check localStorage on mount (client-only)
   useEffect(() => {
     try {
@@ -453,7 +432,6 @@ export default function InvitationPage({
         theme={theme}
         audioRef={audioRef}
         prefetchedVideoRef={prefetchedVideoRef}
-        onAudioPlay={handleAudioPlay}
       />
 
       {/* ================================================================= */}
@@ -506,7 +484,6 @@ export default function InvitationPage({
               cardBg={cs("saveTheDate", 20).cardBg}
               cardBorder={cs("saveTheDate", 20).cardBorder}
               cardBorderRadius={cs("saveTheDate", 20).borderRadius}
-              onCalendarClick={handleCalendarClick}
               isPreview={isPreview}
               imageSettings={invitation.imageSettings}
               customTexts={invitation.customTexts}
@@ -688,7 +665,6 @@ export default function InvitationPage({
             cardBg={cs("location", 16).cardBg}
             cardBorder={cs("location", 16).cardBorder}
             cardBorderRadius={cs("location", 16).borderRadius}
-            onMapsClick={handleMapsClick}
             imageSettings={invitation.imageSettings}
             imageKey="locationImage1"
             customTexts={invitation.customTexts}
@@ -706,7 +682,6 @@ export default function InvitationPage({
                 cardBg={cs("location", 16).cardBg}
                 cardBorder={cs("location", 16).cardBorder}
                 cardBorderRadius={cs("location", 16).borderRadius}
-                onMapsClick={handleMapsClick}
                 imageSettings={invitation.imageSettings}
                 imageKey="locationImage2"
                 customTexts={invitation.customTexts}
@@ -878,7 +853,6 @@ export default function InvitationPage({
                       href={invitation.giftRegistry.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={handleGiftClick}
                       className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
                       style={ts.giftLink}
                       whileHover={{ scale: 1.02 }}

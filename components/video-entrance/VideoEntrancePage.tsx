@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { useAnalytics } from "@/hooks/useAnalytics";
 import VideoEntranceHero from "./VideoEntranceHero";
 import RevealableExternalSections from "@/components/shared/RevealableExternalSections";
 import { useRevealScrollLock } from "@/hooks/useRevealScrollLock";
@@ -23,7 +22,6 @@ export default function VideoEntrancePage({
   theme,
 }: VideoEntrancePageProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { trackEvent } = useAnalytics(invitation.slug);
   const externalLink = getEffectiveExternalLink({
     invitationType: invitation.invitationType,
     externalLink: invitation.externalLink,
@@ -45,15 +43,6 @@ export default function VideoEntrancePage({
   const [revealed, setRevealed] = useState(false);
   const handleRevealed = useCallback(() => setRevealed(true), []);
   useRevealScrollLock(revealed);
-
-  useEffect(() => {
-    trackEvent("page_view");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleTapped = () => {
-    trackEvent("envelope_open"); // semantic name retained from existing taxonomy
-  };
 
   return (
     <main
@@ -81,7 +70,6 @@ export default function VideoEntrancePage({
             invitation.heroConfetti,
           )}
           showTapPrompt={shouldShowTapPrompt(invitation.heroTapPrompt)}
-          onTapped={handleTapped}
           onRevealed={handleRevealed}
           eventType={invitation.eventType}
         />

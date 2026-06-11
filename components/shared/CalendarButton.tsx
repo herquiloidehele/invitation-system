@@ -24,7 +24,6 @@ interface CalendarButtonProps {
   eventType: InvitationEventType;
   className?: string;
   children: ReactNode;
-  onCalendarClick?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -82,12 +81,10 @@ export default function CalendarButton({
   eventType,
   className,
   children,
-  onCalendarClick,
 }: CalendarButtonProps) {
   const t = useTranslations("Invitation");
 
   const handleClick = () => {
-    onCalendarClick?.();
     const displayName = buildInvitationDisplayName({
       eventType,
       primaryName: couple.bride,

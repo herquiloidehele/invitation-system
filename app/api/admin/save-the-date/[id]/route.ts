@@ -135,9 +135,6 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
-    await prisma.saveTheDateEvent.deleteMany({
-      where: { saveTheDate: { id } },
-    });
     await prisma.saveTheDate.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {

@@ -257,15 +257,6 @@ export default function SaveTheDateView({
 
   const shimmer = saveTheDate.envelope?.shimmer !== false;
 
-  // Track page view
-  useEffect(() => {
-    fetch("/api/save-the-date/event", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: saveTheDate.slug, type: "page_view" }),
-    }).catch(() => {});
-  }, [saveTheDate.slug]);
-
   // Pause audio when tab is hidden; resume on return
   useEffect(() => {
     let wasPlayingBeforeHide = false;
@@ -300,12 +291,6 @@ export default function SaveTheDateView({
   }, []);
 
   const handleEnvelopeOpen = useCallback(() => {
-    fetch("/api/save-the-date/event", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: saveTheDate.slug, type: "envelope_open" }),
-    }).catch(() => {});
-
     // Start music with cinematic volume fade-in (same as InvitationView)
     if (hasAudio) {
       try {
@@ -328,7 +313,7 @@ export default function SaveTheDateView({
         /* silent */
       }
     }
-  }, [saveTheDate.slug, hasAudio]);
+  }, [hasAudio]);
 
   const handleEnvelopeDone = useCallback(() => {
     setEnvelopeDone(true);
@@ -336,12 +321,6 @@ export default function SaveTheDateView({
 
   const handleReveal = useCallback(() => {
     setRevealed(true);
-
-    fetch("/api/save-the-date/event", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: saveTheDate.slug, type: "heart_scratched" }),
-    }).catch(() => {});
 
     const colors = theme.confettiColors;
     const defaults = {
@@ -380,7 +359,7 @@ export default function SaveTheDateView({
         startVelocity: 30,
       });
     }, 500);
-  }, [theme.confettiColors, saveTheDate.slug]);
+  }, [theme.confettiColors]);
 
   const showBottomHero = bottomHero?.enabled && !!bottomHero.mediaUrl;
   const rsvpButtonBackground = getSaveTheDateRsvpButtonBackground(theme);
