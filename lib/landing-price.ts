@@ -97,11 +97,11 @@ export function resolveLandingPrice(
 // ---------------------------------------------------------------------------
 
 const PERSONALIZATION_TIER_CENTS: Record<Currency, [number, number, number]> = {
-  EUR: [150, 100, 75],
-  USD: [150, 100, 75],
-  MZN: [10000, 7500, 5000],
-  AOA: [150000, 100000, 75000],
-  BRL: [1000, 700, 500],
+  EUR: [35, 27, 20],
+  USD: [35, 27, 20],
+  MZN: [2500, 2000, 1500],
+  AOA: [35000, 27000, 20000],
+  BRL: [250, 200, 150],
 };
 
 export function personalizationTierPrices(currency: Currency): [string, string, string] {

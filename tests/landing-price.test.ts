@@ -125,32 +125,32 @@ describe("personalizationTierPrices", () => {
     }
   });
 
-  it("formats EUR tiers as 1,50 € / 1 € / 0,75 €", () => {
+  it("formats EUR tiers as 0,35 € / 0,27 € / 0,20 €", () => {
     const [a, b, c] = personalizationTierPrices("EUR");
-    expect(a).toBe("1,50 €");
-    expect(b).toBe("1 €");
-    expect(c).toBe("0,75 €");
+    expect(a).toBe("0,35 €");
+    expect(b).toBe("0,27 €");
+    expect(c).toBe("0,20 €");
   });
 
-  it("formats USD tiers as $1.50 / $1 / $0.75", () => {
+  it("formats USD tiers as $0.35 / $0.27 / $0.20", () => {
     const [a, b, c] = personalizationTierPrices("USD");
-    expect(a).toBe("$1.50");
-    expect(b).toBe("$1");
-    expect(c).toBe("$0.75");
+    expect(a).toBe("$0.35");
+    expect(b).toBe("$0.27");
+    expect(c).toBe("$0.20");
   });
 
-  it("formats MZN tiers as 100 MZN / 75 MZN / 50 MZN", () => {
+  it("formats MZN tiers as 25 MZN / 20 MZN / 15 MZN", () => {
     const [a, b, c] = personalizationTierPrices("MZN");
-    expect(a).toBe("100 MZN");
-    expect(b).toBe("75 MZN");
-    expect(c).toBe("50 MZN");
+    expect(a).toBe("25 MZN");
+    expect(b).toBe("20 MZN");
+    expect(c).toBe("15 MZN");
   });
 
-  it("formats BRL tiers as R$ 10 / R$ 7 / R$ 5", () => {
+  it("formats BRL tiers as R$ 2,50 / R$ 2 / R$ 1,50", () => {
     const [a, b, c] = personalizationTierPrices("BRL");
-    expect(a).toBe("R$ 10");
-    expect(b).toBe("R$ 7");
-    expect(c).toBe("R$ 5");
+    expect(a).toBe("R$ 2,50");
+    expect(b).toBe("R$ 2");
+    expect(c).toBe("R$ 1,50");
   });
 
   it("tiers descend in value (most expensive first)", () => {
