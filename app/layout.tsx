@@ -104,6 +104,10 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <meta
+          name="google-site-verification"
+          content="Y0Kr3z4thtlf6rUk-x1qM3IO-zAEBdx9VIr41TQsW_8"
+        />
         {/* Early DNS + TLS handshake to the S3 bucket so media loads faster */}
         {s3Origin && (
           <>
