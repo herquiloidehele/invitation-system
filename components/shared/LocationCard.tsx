@@ -74,7 +74,6 @@ export interface LocationCardProps {
   cardBorder?: string;
   /** Per-section card border-radius override. Falls back to 16. */
   cardBorderRadius?: number;
-  onMapsClick?: () => void;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
   /** Which image key to use for this location. */
@@ -90,7 +89,6 @@ export default function LocationCard({
   cardBg,
   cardBorder,
   cardBorderRadius,
-  onMapsClick,
   imageSettings,
   imageKey,
   customTexts: ct,
@@ -234,7 +232,6 @@ export default function LocationCard({
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            onMapsClick?.();
             window.open(
               getExternalMapUrl(location),
               "_blank",

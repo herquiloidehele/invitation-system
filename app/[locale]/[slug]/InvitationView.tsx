@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
-import { useAnalytics } from "@/hooks/useAnalytics";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { isVideoEntranceLayout } from "@/lib/video-entrance";
 import {
@@ -141,8 +140,6 @@ function EnvelopeInvitationView({
     invitation.audio,
   );
 
-  const { trackEvent } = useAnalytics(invitation.slug);
-
   // Merge per-invitation envelope overrides on top of the theme defaults
   const mergedTheme = useMemo<TemplateTheme>(() => {
     const overrides = invitation.envelope;
@@ -157,16 +154,8 @@ function EnvelopeInvitationView({
     };
   }, [theme, invitation.envelope]);
 
-  // Track page view on mount (deduplicated server-side per session)
-  useEffect(() => {
-    trackEvent("page_view");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /** User tapped — start music (only for standard invites), track envelope open. */
+  /** User tapped — start music (only for standard invites). */
   const handleOpen = useCallback(() => {
-    trackEvent("envelope_open");
-
     // The hidden hero video and background audio were mounted with
     // preload="metadata" so the envelope view stays cheap on cold load.
     // The tap is the user gesture that unlocks autoplay AND tells us
@@ -211,7 +200,7 @@ function EnvelopeInvitationView({
         /* silent */
       }
     }
-  }, [hasBackgroundAudio, trackEvent]);
+  }, [hasBackgroundAudio]);
 
   /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
   useEffect(() => {

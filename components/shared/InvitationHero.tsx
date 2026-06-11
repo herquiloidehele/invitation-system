@@ -90,8 +90,6 @@ interface InvitationHeroProps {
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
   prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
-  /** Tracked by the consuming page (used to wire audio analytics). */
-  onAudioPlay?: () => void;
 }
 
 export default function InvitationHero({
@@ -99,7 +97,6 @@ export default function InvitationHero({
   theme,
   audioRef,
   prefetchedVideoRef,
-  onAudioPlay,
 }: InvitationHeroProps) {
   const ts: ResolvedTextStyles = resolveTextStyles(theme, invitation.textStyles);
   const isWedding = isWeddingEventType(invitation.eventType);
@@ -400,7 +397,6 @@ export default function InvitationHero({
             titleStyle={ts.audioTitle}
             artistStyle={ts.audioArtist}
             externalAudioRef={audioRef}
-            onPlay={onAudioPlay}
           />
         </div>
       )}

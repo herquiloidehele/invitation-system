@@ -134,28 +134,8 @@ model Invitation {
   updatedAt    DateTime @updatedAt
 
   rsvpResponses   RsvpResponse[]
-  events          InvitationEvent[]
   guests          Guest[]
   landingFeatures LandingFeature[]
-}
-
-model InvitationEvent {
-  id             String     @id @default(cuid())
-  invitationSlug String
-  invitation     Invitation @relation(fields: [invitationSlug], references: [slug], onDelete: Cascade)
-
-  /// "page_view" | "envelope_open" | "maps_click" | "waze_click" | "gift_click" | "audio_play" | "calendar_click" | "rsvp_submit"
-  type      String
-  visitorId String
-  sessionId String
-  device    String?
-  referrer  String?
-
-  createdAt DateTime @default(now())
-
-  @@index([invitationSlug])
-  @@index([invitationSlug, type])
-  @@index([createdAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -227,29 +207,8 @@ model SaveTheDate {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  events          SaveTheDateEvent[]
   rsvpResponses   SaveTheDateRsvpResponse[]
   landingFeatures LandingFeature[]
-}
-
-model SaveTheDateEvent {
-  id   String @id @default(cuid())
-  slug String
-
-  saveTheDate SaveTheDate @relation(fields: [slug], references: [slug], onDelete: Cascade)
-
-  /// "page_view" | "heart_scratched" | "calendar_click"
-  type      String
-  visitorId String
-  sessionId String
-  device    String?
-  referrer  String?
-
-  createdAt DateTime @default(now())
-
-  @@index([slug])
-  @@index([slug, type])
-  @@index([createdAt])
 }
 
 // ---------------------------------------------------------------------------

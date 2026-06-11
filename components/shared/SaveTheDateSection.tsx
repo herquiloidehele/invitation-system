@@ -42,7 +42,6 @@ export interface SaveTheDateProps {
   cardBorder?: string;
   /** Per-section card border-radius override. Falls back to per-variant default. */
   cardBorderRadius?: number;
-  onCalendarClick?: () => void;
   isPreview?: boolean;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
@@ -96,12 +95,10 @@ function SaveLabel({
 function CalendarCTA({
   invitation,
   ts,
-  onCalendarClick,
   customTexts: ct,
 }: {
   invitation: InvitationData;
   ts: ResolvedTextStyles;
-  onCalendarClick?: () => void;
   customTexts?: CustomTexts;
 }) {
   const t = useCustomText(ct);
@@ -111,7 +108,6 @@ function CalendarCTA({
       location={invitation.location}
       couple={invitation.couple}
       eventType={invitation.eventType}
-      onCalendarClick={onCalendarClick}
       className="mt-5 flex items-center justify-center gap-2 px-5 py-2 transition-all"
     >
       <span style={ts.calendarCta}>
@@ -132,7 +128,6 @@ function SaveTheDateClassic({
   theme,
   ts,
   cardBorderRadius,
-  onCalendarClick,
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
@@ -221,7 +216,6 @@ function SaveTheDateClassic({
         <CalendarCTA
           invitation={invitation}
           ts={ts}
-          onCalendarClick={onCalendarClick}
           customTexts={ct}
         />
       </motion.div>
@@ -299,7 +293,6 @@ function SaveTheDateCountdown({
   theme,
   ts,
   cardBorderRadius,
-  onCalendarClick,
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
@@ -426,7 +419,6 @@ function SaveTheDateCountdown({
       <CalendarCTA
         invitation={invitation}
         ts={ts}
-        onCalendarClick={onCalendarClick}
         customTexts={ct}
       />
     </motion.div>
@@ -532,7 +524,6 @@ function SaveTheDateQuadCards({
   theme,
   ts,
   cardBorderRadius: _cardBorderRadius,
-  onCalendarClick,
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
@@ -620,7 +611,6 @@ function SaveTheDateQuadCards({
         <CalendarCTA
           invitation={invitation}
           ts={ts}
-          onCalendarClick={onCalendarClick}
           customTexts={ct}
         />
       </motion.div>
@@ -640,7 +630,6 @@ function SaveTheDateCinematic({
   theme,
   ts,
   cardBorderRadius,
-  onCalendarClick,
   imageSettings,
   customTexts: ct,
   isPreview,
@@ -862,7 +851,6 @@ function SaveTheDateCinematic({
           <CalendarCTA
             invitation={invitation}
             ts={ts}
-            onCalendarClick={onCalendarClick}
             customTexts={ct}
           />
         </div>
@@ -906,7 +894,6 @@ function SaveTheDateMinimalLine({
   invitation,
   ts,
   cardBorderRadius: _cardBorderRadius,
-  onCalendarClick,
   customTexts: ct,
   isPreview,
 }: SaveTheDateProps) {
@@ -1009,7 +996,6 @@ function SaveTheDateMinimalLine({
       <CalendarCTA
         invitation={invitation}
         ts={ts}
-        onCalendarClick={onCalendarClick}
         customTexts={ct}
       />
     </div>
@@ -1027,7 +1013,6 @@ export default function SaveTheDateSection({
   cardBg,
   cardBorder,
   cardBorderRadius,
-  onCalendarClick,
   isPreview,
   imageSettings,
   customTexts,
@@ -1048,7 +1033,6 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
-          onCalendarClick={onCalendarClick}
           isPreview={isPreview}
           customTexts={customTexts}
         />
@@ -1060,7 +1044,6 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
-          onCalendarClick={onCalendarClick}
           isPreview={isPreview}
           customTexts={customTexts}
         />
@@ -1072,7 +1055,6 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
-          onCalendarClick={onCalendarClick}
           isPreview={isPreview}
           imageSettings={imageSettings}
           customTexts={customTexts}
@@ -1085,7 +1067,6 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
-          onCalendarClick={onCalendarClick}
           isPreview={isPreview}
           customTexts={customTexts}
         />
@@ -1098,7 +1079,6 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
-          onCalendarClick={onCalendarClick}
           isPreview={isPreview}
           customTexts={customTexts}
         />
