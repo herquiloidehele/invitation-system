@@ -76,7 +76,8 @@
     "badge": "BEST SELLER",
     "showMore": "Show more",
     "showLess": "Show less",
-    "clickToPreview": "Click to preview"
+    "clickToPreview": "Click to preview",
+    "buyCta": "Comprar"
   },
   "LandingGallery": {
     "eyebrow": "Models",
@@ -89,6 +90,7 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
+    "buyCta": "Comprar",
     "categories": {
       "all": "All",
       "wedding": "Invitation",

@@ -76,7 +76,8 @@
     "badge": "BEST SELLER",
     "showMore": "Ver mais",
     "showLess": "Ver menos",
-    "clickToPreview": "Clica para visualizar"
+    "clickToPreview": "Clica para visualizar",
+    "buyCta": "Comprar"
   },
   "LandingGallery": {
     "eyebrow": "Modelos",
@@ -89,6 +90,7 @@
     "showMore": "Ver mais",
     "showLess": "Ver menos",
     "clickToPreview": "Clica para visualizar",
+    "buyCta": "Comprar",
     "categories": {
       "all": "Todos",
       "wedding": "Convites",

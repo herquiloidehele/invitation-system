@@ -21,6 +21,11 @@ export function buildWhatsappUrl(message = DEFAULT_CONTACT_MESSAGE) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
+export function buildPurchaseMessage(title: string, fallbackTitle = "Convite") {
+  const modelTitle = title.trim() || fallbackTitle;
+  return `Olá! Quero comprar o modelo ${modelTitle}.`;
+}
+
 export function buildContactMessage({
   fields,
   intro = DEFAULT_CONTACT_MESSAGE,
