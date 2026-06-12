@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import type { HeroFeature } from "@/lib/landing-features";
 import {
   getMotionProps,
@@ -86,9 +85,7 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
         className="mt-9 flex flex-col gap-3 sm:flex-row"
       >
         <motion.a
-          href={buildWhatsappUrl(t("defaultWhatsappMessage"))}
-          target="_blank"
-          rel="noreferrer"
+          href="#modelos"
           whileHover={reduced ? undefined : { y: -2 }}
           whileTap={reduced ? undefined : landingCardTap}
           className="rounded-full bg-primary px-7 py-4 text-center text-sm font-semibold text-primary-foreground shadow-[0_18px_60px_color-mix(in_srgb,var(--primary)_24%,transparent)] transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
@@ -96,7 +93,7 @@ function HeroCopy({ reduceMotion }: { reduceMotion: boolean | null }) {
           {t("heroPrimaryCta")}
         </motion.a>
         <motion.a
-          href="#modelos"
+          href="#processo"
           whileHover={reduced ? undefined : { y: -2 }}
           whileTap={reduced ? undefined : landingCardTap}
           className="rounded-full border border-border px-7 py-4 text-center text-sm font-semibold text-foreground transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
