@@ -36,11 +36,7 @@ const nextConfig: NextConfig = {
     // tree-shaken. Cuts ~200-400 KB off the per-page client bundle on this
     // codebase. Safe for any package that re-exports from a barrel and
     // does not depend on side effects in the barrel itself.
-    optimizePackageImports: [
-      "framer-motion",
-      "lucide-react",
-      "@base-ui/react",
-    ],
+    optimizePackageImports: ["framer-motion", "lucide-react", "@base-ui/react"],
     // Don't eagerly load every one of the ~60 app routes into memory at
     // boot (Next 16 defaults this to true). Public traffic only ever hits a
     // handful; each route now loads lazily on first request instead, trading
@@ -70,6 +66,12 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "brindeal.vercel.app" }],
+        destination: "https://convites.brindealstudio.com/:path*",
+        permanent: true,
+      },
       {
         source: "/:path*",
         has: [{ type: "host", value: "brindealstudio.up.railway.app" }],
