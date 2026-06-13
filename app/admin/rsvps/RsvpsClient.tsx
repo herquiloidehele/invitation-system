@@ -678,6 +678,7 @@ export function RsvpsClient({
 
       <TabsContent value="invitations">
         <InvitationsTab
+          key={selectedSlug ?? "all"}
           invitations={invitations}
           responses={responses}
           selectedSlug={selectedSlug}
@@ -686,6 +687,7 @@ export function RsvpsClient({
 
       <TabsContent value="std">
         <SaveTheDateTab
+          key={selectedStdSlug ?? "all"}
           saveDates={saveDates}
           stdResponses={stdResponses}
           selectedStdSlug={selectedStdSlug}
