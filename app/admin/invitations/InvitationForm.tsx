@@ -83,6 +83,8 @@ import { InlineCardEditProvider } from "@/components/shared/EditableCard";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
+import HeroTextEditor from "@/components/admin/HeroTextEditor";
+import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
@@ -475,6 +477,7 @@ export default function InvitationForm({
   );
 
   // Google Maps link auto-fill state
+  const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
   const [mapsLink1, setMapsLink1] = useState("");
   const [mapsLink2, setMapsLink2] = useState("");
   const [resolvingLoc1, setResolvingLoc1] = useState(false);
@@ -1184,6 +1187,15 @@ export default function InvitationForm({
       },
     };
   }, [themes, form.template, form.envelope]);
+
+  // Hero free-text editor inputs (static still + scaled surface + fonts)
+  const heroTextStillUrl = form.videoUrl
+    ? (form.videoPoster ?? form.heroImage)
+    : form.heroImage;
+  const heroTextAspect = form.videoUrl
+    ? 390 / 780
+    : 390 / (form.heroHeight ?? 300);
+  const heroTextFonts = heroFontsFromTheme(currentTheme, form.textStyles);
 
   // Submit
   async function handleSubmit() {
@@ -1907,6 +1919,39 @@ export default function InvitationForm({
                         )}
                       </div>
                     </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="hideDefaultHeroText">
+                        Ocultar textos predefinidos do hero
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Esconde os nomes, &amp; e citação predefinidos para
+                        poder compor o hero livremente com textos próprios.
+                      </p>
+                    </div>
+                    <Switch
+                      id="hideDefaultHeroText"
+                      checked={form.heroTextLayer?.hideDefaultText === true}
+                      onCheckedChange={(checked) =>
+                        update("heroTextLayer", {
+                          ...(form.heroTextLayer ?? EMPTY_HERO_TEXT_LAYER),
+                          hideDefaultText: checked,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setHeroTextEditorOpen(true)}
+                    >
+                      Editar textos do hero
+                      {form.heroTextLayer?.blocks?.length
+                        ? ` (${form.heroTextLayer.blocks.length})`
+                        : ""}
+                    </Button>
                   </div>
                   <div className="space-y-1.5">
                     <Label>Vídeo (opcional)</Label>
@@ -3460,6 +3505,16 @@ export default function InvitationForm({
           </TabsContent>
         </Tabs>
       </div>
+
+      <HeroTextEditor
+        open={heroTextEditorOpen}
+        onOpenChange={setHeroTextEditorOpen}
+        value={form.heroTextLayer}
+        onChange={(next) => update("heroTextLayer", next)}
+        stillUrl={heroTextStillUrl}
+        aspectRatio={heroTextAspect}
+        fonts={heroTextFonts}
+      />
     </div>
   );
 }

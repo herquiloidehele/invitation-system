@@ -12,6 +12,7 @@ import confetti from "canvas-confetti";
 import type {
   CustomTexts,
   HeroOverlayConfig,
+  HeroTextLayer,
   InvitationData,
   InvitationEventType,
   TemplateTheme,
@@ -19,6 +20,8 @@ import type {
 } from "@/lib/types";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
+import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
+import { heroFontsFromTheme } from "@/lib/hero-text";
 import CurtainHeroVideo from "./CurtainHeroVideo";
 import {
   resolveCurtainVideoSrc,
@@ -68,6 +71,8 @@ interface CurtainsHeroProps {
    * until the curtains are open.
    */
   onRevealed?: () => void;
+  /** Free-positioned custom text layer over the hero media. */
+  heroTextLayer?: HeroTextLayer | null;
 }
 
 type HeroState = "idle" | "playing" | "revealed";
@@ -89,7 +94,11 @@ export default function CurtainsHero({
   onTapped,
   onRevealed,
   eventType,
+  heroTextLayer,
 }: CurtainsHeroProps) {
+  const hideDefaultHeroText = heroTextLayer?.hideDefaultText === true;
+  const heroFonts = heroFontsFromTheme(theme, textStyles);
+
   // Per-element overrides applied to inline styles below. Resolved once
   // per render so we keep the existing curtain typography defaults and
   // only merge in the admin's customizations.
@@ -319,6 +328,7 @@ export default function CurtainsHero({
       style={{
         // ...containerStyle,
         cursor: isInteractive ? "pointer" : "default",
+        containerType: "inline-size",
       }}
       role={isInteractive ? "button" : undefined}
       tabIndex={isInteractive ? 0 : undefined}
@@ -398,7 +408,7 @@ export default function CurtainsHero({
           in place before the curtain is fully open. The date is shown later
           in the dedicated scratch-reveal section, not here. */}
       <AnimatePresence>
-        {heroInfoVisible && (
+        {heroInfoVisible && !hideDefaultHeroText && (
           <motion.div
             className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 sm:px-10 md:px-16 max-w-3xl mx-auto z-10"
             initial={{ opacity: 0 }}
@@ -495,6 +505,11 @@ export default function CurtainsHero({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Free-positioned custom text layer (revealed state). */}
+      {heroInfoVisible && (
+        <HeroTextOverlay layer={heroTextLayer} fonts={heroFonts} />
+      )}
 
       <AnimatePresence>
         {heroInfoVisible && (

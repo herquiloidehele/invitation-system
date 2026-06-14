@@ -143,6 +143,9 @@ export async function PUT(
             null,
           ),
         }),
+        ...(body.heroTextLayer !== undefined && {
+          heroTextLayer: sanitizeJsonField(body.heroTextLayer, null),
+        }),
         ...{ videoUrl: body.videoUrl || "" },
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,

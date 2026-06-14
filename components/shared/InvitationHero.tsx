@@ -12,6 +12,8 @@ import { scrollToNextHeroSection } from "@/lib/curtain-canva";
 import AudioPlayer from "./AudioPlayer";
 import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
 import { EditableText } from "./EditableText";
+import HeroTextOverlay from "./HeroTextOverlay";
+import type { ResolvedHeroFonts } from "@/lib/hero-text";
 
 // ---------------------------------------------------------------------------
 // Animation variants used by the hero
@@ -102,6 +104,15 @@ export default function InvitationHero({
   const isWedding = isWeddingEventType(invitation.eventType);
   const t = useCustomText(invitation.customTexts);
 
+  const hideDefaultHeroText =
+    invitation.heroTextLayer?.hideDefaultText === true;
+  const heroFonts: ResolvedHeroFonts = {
+    display: ts.displayFont,
+    body: ts.bodyFont,
+    script: ts.scriptFont,
+    ui: ts.uiFont,
+  };
+
   const scrimOpacity = clamp(
     invitation.heroOverlay?.scrimOpacity ?? DEFAULT_HERO_SCRIM_OPACITY,
     0,
@@ -119,7 +130,10 @@ export default function InvitationHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ height: getHeroSectionHeight(invitation) }}
+      style={{
+        height: getHeroSectionHeight(invitation),
+        containerType: "inline-size",
+      }}
     >
       {/* Background media */}
       {invitation.videoUrl ? (
@@ -162,8 +176,11 @@ export default function InvitationHero({
         }}
       />
 
+      {/* Free-positioned custom text layer */}
+      <HeroTextOverlay layer={invitation.heroTextLayer} fonts={heroFonts} />
+
       {/* Couple names overlay (video mode) */}
-      {invitation.videoUrl && (
+      {!hideDefaultHeroText && invitation.videoUrl && (
         <motion.div
           variants={heroTextContainer}
           initial="hidden"

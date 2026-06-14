@@ -63,6 +63,8 @@ import {
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
+import HeroTextEditor from "@/components/admin/HeroTextEditor";
+import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
@@ -287,6 +289,7 @@ export default function ExternalInvitationForm({
   const [form, setForm] = useState<InvitationData>(
     initialData ?? getDefaultState(themes[0]),
   );
+  const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
 
   const isWedding = isWeddingEventType(form.eventType);
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
@@ -630,6 +633,15 @@ export default function ExternalInvitationForm({
       },
     };
   }, [themes, form.themeId, form.template, form.envelope]);
+
+  // Hero free-text editor inputs (static still + scaled surface + fonts)
+  const heroTextStillUrl = form.videoUrl
+    ? (form.videoPoster ?? form.heroImage)
+    : form.heroImage;
+  const heroTextAspect = form.videoUrl
+    ? 390 / 780
+    : 390 / (form.heroHeight ?? DEFAULT_HERO_HEIGHT);
+  const heroTextFonts = heroFontsFromTheme(currentTheme, form.textStyles);
 
   // True when the selected theme uses the curtain-canva renderer.
   // Drives the conditional fields accordion and the preview swap.
@@ -1414,6 +1426,41 @@ export default function ExternalInvitationForm({
                             update("videoPoster", "");
                           }}
                         />
+                      </div>
+
+                      {/* Free-positioned hero text */}
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label htmlFor="ellHideDefaultHeroText">
+                            Ocultar textos predefinidos do hero
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Esconde os nomes, &amp; e citação predefinidos para
+                            poder compor o hero livremente com textos próprios.
+                          </p>
+                        </div>
+                        <Switch
+                          id="ellHideDefaultHeroText"
+                          checked={form.heroTextLayer?.hideDefaultText === true}
+                          onCheckedChange={(checked) =>
+                            update("heroTextLayer", {
+                              ...(form.heroTextLayer ?? EMPTY_HERO_TEXT_LAYER),
+                              hideDefaultText: checked,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setHeroTextEditorOpen(true)}
+                        >
+                          Editar textos do hero
+                          {form.heroTextLayer?.blocks?.length
+                            ? ` (${form.heroTextLayer.blocks.length})`
+                            : ""}
+                        </Button>
                       </div>
 
                       {/* Monogram */}
@@ -2738,6 +2785,16 @@ export default function ExternalInvitationForm({
           </TabsContent>
         </Tabs>
       </div>
+
+      <HeroTextEditor
+        open={heroTextEditorOpen}
+        onOpenChange={setHeroTextEditorOpen}
+        value={form.heroTextLayer}
+        onChange={(next) => update("heroTextLayer", next)}
+        stillUrl={heroTextStillUrl}
+        aspectRatio={heroTextAspect}
+        fonts={heroTextFonts}
+      />
     </div>
   );
 }

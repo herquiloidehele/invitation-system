@@ -72,6 +72,7 @@ export default function VideoEntrancePage({
           showTapPrompt={shouldShowTapPrompt(invitation.heroTapPrompt)}
           onRevealed={handleRevealed}
           eventType={invitation.eventType}
+          heroTextLayer={invitation.heroTextLayer}
         />
       </div>
 

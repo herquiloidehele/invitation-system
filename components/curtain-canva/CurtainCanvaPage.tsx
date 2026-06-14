@@ -53,6 +53,7 @@ export default function CurtainCanvaPage({
         confettiEnabled={shouldFireHeroConfetti(invitation.heroConfetti)}
         onRevealed={handleRevealed}
         eventType={invitation.eventType}
+        heroTextLayer={invitation.heroTextLayer}
       />
 
       <RevealableExternalSections

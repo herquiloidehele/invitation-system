@@ -94,6 +94,7 @@ model Invitation {
   heroRevealSeconds Float?  // Video-entrance: seconds into the entrance video at which the hero text reveals. Null → default (5s).
   heroTopText  String?  // Video-entrance: top text line shown above the couple names in the hero.
   heroTapPrompt Boolean @default(true) // Video-entrance: show the cover prompt (play button + tap hint) before tapping. False hides it.
+  heroTextLayer Json?   // HeroTextLayer { hideDefaultText, blocks[] } — free-positioned custom text over the hero media.
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
   envelope     Json?    // EnvelopeConfig { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }

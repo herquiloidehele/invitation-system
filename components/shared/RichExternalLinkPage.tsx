@@ -207,11 +207,13 @@ export default function RichExternalLinkPage({
             audioRef={audioRef}
             prefetchedVideoRef={prefetchedVideoRef}
           />
-          <InvitationHeroNames
-            invitation={invitation}
-            theme={theme}
-            isPreview={isPreview}
-          />
+          {invitation.heroTextLayer?.hideDefaultText !== true && (
+            <InvitationHeroNames
+              invitation={invitation}
+              theme={theme}
+              isPreview={isPreview}
+            />
+          )}
         </>
       )}
 

@@ -127,6 +127,63 @@ export interface HeroScrollIndicatorConfig {
   color?: string;
 }
 
+/** Theme font role a hero text block can use. */
+export type HeroTextFontKey = "display" | "body" | "script" | "ui";
+
+/**
+ * A single free-positioned text block placed over the hero media.
+ *
+ * Positions are percentages of the hero box so the layout scales to any
+ * screen; `fontSizeCqw` is in `cqw` (1cqw = 1% of the hero width) so text
+ * scales proportionally with the hero. See `lib/hero-text.ts`.
+ */
+export interface HeroTextBlock {
+  /** Stable unique id. */
+  id: string;
+  /** Plain text. Line breaks (`\n`) are preserved; no HTML. */
+  content: string;
+  /** Anchor (block center) X as % of hero width (0–100). */
+  xPct: number;
+  /** Anchor (block center) Y as % of hero height (0–100). */
+  yPct: number;
+  /** Max width as % of hero width (controls wrapping). */
+  widthPct: number;
+  /** Theme font role used by this block. */
+  fontKey: HeroTextFontKey;
+  /** Font size in `cqw` (% of hero width). */
+  fontSizeCqw: number;
+  /** Text color (hex). */
+  color: string;
+  /** Font weight (e.g. 400 | 500 | 600 | 700). */
+  fontWeight: number;
+  /** Normal or italic. */
+  fontStyle: "normal" | "italic";
+  /** Horizontal alignment. */
+  textAlign: "left" | "center" | "right";
+  /** Letter spacing in `em` (scales with font size). */
+  letterSpacing: number;
+  /** Line-height multiplier (unitless). */
+  lineHeight: number;
+  /** Whether to apply a legibility text-shadow. */
+  shadow: boolean;
+  /** Rotation in degrees (default 0). */
+  rotation?: number;
+  /** Stacking order. */
+  z: number;
+}
+
+/**
+ * The hero free-text layer: a master toggle to hide all built-in hero text
+ * plus a list of custom, free-positioned text blocks. Absent/`null` means the
+ * feature is unused and the hero renders exactly as before.
+ */
+export interface HeroTextLayer {
+  /** Hide all built-in hero text (couple names, ampersand, quote, etc.). */
+  hideDefaultText: boolean;
+  /** Custom text blocks rendered over the hero media. */
+  blocks: HeroTextBlock[];
+}
+
 // ---------------------------------------------------------------------------
 // Social preview / Open Graph
 // ---------------------------------------------------------------------------
@@ -761,6 +818,8 @@ export interface InvitationData {
   heroOverlay?: HeroOverlayConfig;
   /** Optional animated scroll-down indicator at the bottom of the hero. */
   heroScrollIndicator?: HeroScrollIndicatorConfig;
+  /** Optional free-positioned custom text layer over the hero media. */
+  heroTextLayer?: HeroTextLayer;
   /** Hero background video. On standard invitations this is the InvitationHero video; on curtain-canva it's the looping full-screen hero shown after the curtain opens. */
   videoUrl?: string;
   /** Poster for `videoUrl` (the hero video). Optional. */

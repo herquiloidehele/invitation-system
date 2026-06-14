@@ -12,12 +12,15 @@ import confetti from "canvas-confetti";
 import type {
   CustomTexts,
   HeroOverlayConfig,
+  HeroTextLayer,
   InvitationData,
   InvitationEventType,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
 import { useCustomText } from "@/lib/custom-texts";
+import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
+import { heroFontsFromTheme } from "@/lib/hero-text";
 import { EditableText } from "@/components/shared/EditableText";
 import {
   resolveTextElementOverride,
@@ -61,6 +64,8 @@ interface VideoEntranceHeroProps {
   /** Fires once when the reveal completes so the parent can unlock scroll. */
   onRevealed?: () => void;
   eventType: InvitationEventType;
+  /** Free-positioned custom text layer over the hero media. */
+  heroTextLayer?: HeroTextLayer | null;
 }
 
 type HeroState = "idle" | "playing" | "revealed";
@@ -86,8 +91,12 @@ export default function VideoEntranceHero({
   onTapped,
   onRevealed,
   eventType,
+  heroTextLayer,
 }: VideoEntranceHeroProps) {
   const prefersReducedMotion = useReducedMotion();
+
+  const hideDefaultHeroText = heroTextLayer?.hideDefaultText === true;
+  const heroFonts = heroFontsFromTheme(theme, textStyles);
 
   const topTextOverride = resolveTextElementOverride(textStyles, "heroTopText");
   const coupleNamesOverride = resolveTextElementOverride(
@@ -291,7 +300,10 @@ export default function VideoEntranceHero({
     <section
       id="hero"
       className="relative w-full h-dvh overflow-hidden select-none"
-      style={{ cursor: isInteractive ? "pointer" : "default" }}
+      style={{
+        cursor: isInteractive ? "pointer" : "default",
+        containerType: "inline-size",
+      }}
       role={isInteractive ? "button" : undefined}
       tabIndex={isInteractive ? 0 : undefined}
       aria-label={isInteractive ? tapLabel : undefined}
@@ -402,7 +414,7 @@ export default function VideoEntranceHero({
 
       {/* Revealed hero text: top text → names → quote. */}
       <AnimatePresence>
-        {heroInfoVisible && (
+        {heroInfoVisible && !hideDefaultHeroText && (
           <motion.div
             className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 sm:px-10 md:px-16 max-w-3xl mx-auto z-10"
             initial={{ opacity: 0 }}
@@ -493,6 +505,11 @@ export default function VideoEntranceHero({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Free-positioned custom text layer (revealed state). */}
+      {heroInfoVisible && (
+        <HeroTextOverlay layer={heroTextLayer} fonts={heroFonts} />
+      )}
 
       {/* Scroll-down chevron after reveal. */}
       <AnimatePresence>

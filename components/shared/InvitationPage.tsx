@@ -437,11 +437,13 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 2. Names (no-video fallback)                                      */}
       {/* ================================================================= */}
-      <InvitationHeroNames
-        invitation={invitation}
-        theme={theme}
-        isPreview={isPreview}
-      />
+      {invitation.heroTextLayer?.hideDefaultText !== true && (
+        <InvitationHeroNames
+          invitation={invitation}
+          theme={theme}
+          isPreview={isPreview}
+        />
+      )}
 
       {/* ================================================================= */}
       {/* Personal guest card — shown when ?g=<token> matches a guest, in   */}
