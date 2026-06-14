@@ -148,8 +148,13 @@ export interface HeroTextBlock {
   yPct: number;
   /** Max width as % of hero width (controls wrapping). */
   widthPct: number;
-  /** Theme font role used by this block. */
+  /** Theme font role used by this block (fallback when `fontFamily` is unset). */
   fontKey: HeroTextFontKey;
+  /**
+   * Explicit CSS font-family stack chosen from the Google Fonts catalog,
+   * e.g. `'Lobster', cursive`. When set it overrides `fontKey`.
+   */
+  fontFamily?: string;
   /** Font size in `cqw` (% of hero width). */
   fontSizeCqw: number;
   /** Text color (hex). */

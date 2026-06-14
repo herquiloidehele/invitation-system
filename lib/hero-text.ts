@@ -116,7 +116,7 @@ export function heroTextBlockStyle(
     top: `${block.yPct}%`,
     width: `${block.widthPct}%`,
     transform,
-    fontFamily: heroFontFamily(block.fontKey, fonts),
+    fontFamily: block.fontFamily || heroFontFamily(block.fontKey, fonts),
     fontSize: `max(${HERO_TEXT_MIN_FONT_PX}px, ${block.fontSizeCqw}cqw)`,
     color: block.color,
     fontWeight: block.fontWeight,
@@ -149,6 +149,10 @@ function normalizeBlock(raw: unknown, index: number): HeroTextBlock | null {
     yPct: clampPct(typeof b.yPct === "number" ? b.yPct : 50),
     widthPct: clampNumber(b.widthPct, 5, 100, 80),
     fontKey,
+    fontFamily:
+      typeof b.fontFamily === "string" && b.fontFamily
+        ? b.fontFamily
+        : undefined,
     fontSizeCqw: clampNumber(b.fontSizeCqw, 1, 40, 8),
     color: typeof b.color === "string" ? b.color : "#ffffff",
     fontWeight: clampNumber(b.fontWeight, 100, 900, 500),
@@ -160,6 +164,18 @@ function normalizeBlock(raw: unknown, index: number): HeroTextBlock | null {
     rotation: clampNumber(b.rotation, -180, 180, 0),
     z: clampNumber(b.z, 0, 9999, index + 1),
   };
+}
+
+/**
+ * The explicit CSS font-family stacks used by a layer's blocks — for passing
+ * to `useDynamicFonts` so non-builtin Google Fonts get loaded.
+ */
+export function heroTextLayerFontStacks(
+  layer?: HeroTextLayer | null,
+): string[] {
+  return (layer?.blocks ?? [])
+    .map((b) => b.fontFamily)
+    .filter((f): f is string => !!f);
 }
 
 /** Coerce arbitrary JSON (from the DB or form) into a safe HeroTextLayer. */

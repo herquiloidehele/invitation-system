@@ -4,6 +4,7 @@ import {
   clampPct,
   heroFontFamily,
   heroTextBlockStyle,
+  heroTextLayerFontStacks,
   normalizeHeroTextLayer,
   pxToPct,
   type ResolvedHeroFonts,
@@ -141,5 +142,42 @@ describe("heroTextBlockStyle", () => {
   it("drops the text-shadow when shadow is false", () => {
     const style = heroTextBlockStyle({ ...sampleBlock, shadow: false }, FONTS);
     expect(style.textShadow).toBeUndefined();
+  });
+
+  it("prefers an explicit fontFamily over the role font", () => {
+    const style = heroTextBlockStyle(
+      { ...sampleBlock, fontFamily: "'Lobster', cursive" },
+      FONTS,
+    );
+    expect(style.fontFamily).toBe("'Lobster', cursive");
+  });
+
+  it("falls back to the role font when fontFamily is empty", () => {
+    const style = heroTextBlockStyle(
+      { ...sampleBlock, fontFamily: "" },
+      FONTS,
+    );
+    expect(style.fontFamily).toBe("ScriptFont");
+  });
+});
+
+describe("heroTextLayerFontStacks", () => {
+  it("returns only the blocks' explicit font stacks", () => {
+    const stacks = heroTextLayerFontStacks({
+      hideDefaultText: false,
+      blocks: [
+        { ...sampleBlock, id: "a", fontFamily: "'Lobster', cursive" },
+        { ...sampleBlock, id: "b", fontFamily: undefined },
+        { ...sampleBlock, id: "c", fontFamily: "'Inter', sans-serif" },
+      ],
+    });
+    expect(stacks).toEqual(["'Lobster', cursive", "'Inter', sans-serif"]);
+  });
+
+  it("returns an empty array for null/empty layers", () => {
+    expect(heroTextLayerFontStacks(null)).toEqual([]);
+    expect(
+      heroTextLayerFontStacks({ hideDefaultText: false, blocks: [] }),
+    ).toEqual([]);
   });
 });

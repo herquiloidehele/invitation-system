@@ -19,9 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import FontPicker from "@/components/admin/FontPicker";
+import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import {
   EMPTY_HERO_TEXT_LAYER,
+  heroFontFamily,
   heroTextBlockStyle,
+  heroTextLayerFontStacks,
   pxToPct,
   type ResolvedHeroFonts,
 } from "@/lib/hero-text";
@@ -33,11 +37,7 @@ import {
   removeBlock,
   updateBlock,
 } from "@/lib/hero-text-editor";
-import type {
-  HeroTextBlock,
-  HeroTextFontKey,
-  HeroTextLayer,
-} from "@/lib/types";
+import type { HeroTextBlock, HeroTextLayer } from "@/lib/types";
 
 interface HeroTextEditorProps {
   open: boolean;
@@ -54,13 +54,6 @@ interface HeroTextEditorProps {
 
 const SURFACE_WIDTH = 340;
 const MAX_SURFACE_HEIGHT = 460;
-
-const FONT_OPTIONS: { value: HeroTextFontKey; label: string }[] = [
-  { value: "display", label: "Display" },
-  { value: "script", label: "Script" },
-  { value: "body", label: "Corpo" },
-  { value: "ui", label: "UI" },
-];
 
 const ALIGN_OPTIONS = [
   { value: "left", Icon: AlignLeft, label: "Alinhar à esquerda" },
@@ -88,6 +81,9 @@ export default function HeroTextEditor({
   fonts,
 }: HeroTextEditorProps) {
   const layer = value ?? EMPTY_HERO_TEXT_LAYER;
+  // Load any non-builtin Google Fonts chosen for the blocks so the preview
+  // surface renders them.
+  useDynamicFonts(heroTextLayerFontStacks(layer));
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const dragOffset = useRef<{ x: number; y: number } | null>(null);
@@ -233,26 +229,14 @@ export default function HeroTextEditor({
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label>Fonte</Label>
-                  <Select
-                    value={selected.fontKey}
-                    onValueChange={(v) =>
-                      v && patch({ fontKey: v as HeroTextFontKey })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {FONT_OPTIONS.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <FontPicker
+                  label="Fonte"
+                  value={
+                    selected.fontFamily ||
+                    heroFontFamily(selected.fontKey, fonts)
+                  }
+                  onChange={(v) => patch({ fontFamily: v })}
+                />
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">

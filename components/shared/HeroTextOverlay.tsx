@@ -1,4 +1,11 @@
-import { heroTextBlockStyle, type ResolvedHeroFonts } from "@/lib/hero-text";
+"use client";
+
+import {
+  heroTextBlockStyle,
+  heroTextLayerFontStacks,
+  type ResolvedHeroFonts,
+} from "@/lib/hero-text";
+import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import type { HeroTextLayer } from "@/lib/types";
 
 interface HeroTextOverlayProps {
@@ -17,6 +24,10 @@ export default function HeroTextOverlay({
   layer,
   fonts,
 }: HeroTextOverlayProps) {
+  // Load any non-builtin Google Fonts chosen for blocks (ref-counted, no-op
+  // for builtins). Called unconditionally to satisfy the rules of hooks.
+  useDynamicFonts(heroTextLayerFontStacks(layer));
+
   const blocks = layer?.blocks ?? [];
   if (blocks.length === 0) return null;
   return (
