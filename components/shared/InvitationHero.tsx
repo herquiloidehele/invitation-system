@@ -70,7 +70,7 @@ export function getHeroSectionHeight(
 ): "100dvh" | number {
   return invitation.videoUrl
     ? "100dvh"
-    : invitation.heroHeight ?? DEFAULT_IMAGE_HERO_HEIGHT;
+    : (invitation.heroHeight ?? DEFAULT_IMAGE_HERO_HEIGHT);
 }
 
 function toAudioTheme(theme: TemplateTheme) {
@@ -100,7 +100,10 @@ export default function InvitationHero({
   audioRef,
   prefetchedVideoRef,
 }: InvitationHeroProps) {
-  const ts: ResolvedTextStyles = resolveTextStyles(theme, invitation.textStyles);
+  const ts: ResolvedTextStyles = resolveTextStyles(
+    theme,
+    invitation.textStyles,
+  );
   const isWedding = isWeddingEventType(invitation.eventType);
   const t = useCustomText(invitation.customTexts);
 
@@ -227,7 +230,7 @@ export default function InvitationHero({
               {/* Blessing message */}
               <motion.span
                 variants={heroTextItem}
-                className="mt-5"
+                className="mt-5 whitespace-pre-line"
                 style={ts.blessingMessageVideo}
               >
                 <EditableText elementKey="blessingMessage">
@@ -498,7 +501,7 @@ export function InvitationHeroNames({
             />
 
             {/* Blessing message */}
-            <p style={ts.blessingMessage}>
+            <p className="whitespace-pre-line" style={ts.blessingMessage}>
               <EditableText elementKey="blessingMessage">
                 {invitation.parents.blessingMessage}
               </EditableText>

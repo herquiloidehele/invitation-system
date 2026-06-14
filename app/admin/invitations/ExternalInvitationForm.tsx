@@ -1551,12 +1551,13 @@ export default function ExternalInvitationForm({
                         </div>
                         {form.parents?.enabled && (
                           <div className="space-y-2 pt-2">
-                            <Input
+                            <Textarea
                               placeholder="Mensagem de bênção"
                               value={form.parents.blessingMessage ?? ""}
                               onChange={(e) =>
                                 updateParents("blessingMessage", e.target.value)
                               }
+                              rows={2}
                             />
                             <Input
                               placeholder="Mensagem de convite"

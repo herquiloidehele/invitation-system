@@ -1431,13 +1431,14 @@ export default function InvitationForm({
                           <Label htmlFor="blessingMessage">
                             Mensagem de bênção
                           </Label>
-                          <Input
+                          <Textarea
                             id="blessingMessage"
                             value={form.parents?.blessingMessage ?? ""}
                             onChange={(e) =>
                               updateParents("blessingMessage", e.target.value)
                             }
                             placeholder="Com a bênção dos Pais"
+                            rows={2}
                           />
                         </div>
 
