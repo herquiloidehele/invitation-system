@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import MediaUpload from "@/components/admin/MediaUpload";
 import { deriveCents } from "@/lib/currency/config";
 import {
@@ -26,6 +28,8 @@ export function LandingMetadataFieldset({
   value: LandingMetadata;
   onChange: (next: LandingMetadata) => void;
 }) {
+  const [open, setOpen] = useState(false);
+
   function update(patch: Partial<LandingMetadata>) {
     onChange({ ...value, ...patch });
   }
@@ -70,139 +74,172 @@ export function LandingMetadataFieldset({
       value.discountPriceFromCents >= value.priceFromCents);
 
   return (
-    <fieldset className="space-y-3 rounded-lg border border-neutral-200 p-4">
-      <legend className="px-2 text-sm font-semibold">Landing page</legend>
+    <fieldset className="rounded-lg border border-neutral-200 px-4 pb-4 pt-2">
+      <legend className="px-2">
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          aria-expanded={open}
+          className="flex items-center gap-1.5 text-sm font-semibold"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+            className={`h-4 w-4 text-neutral-400 transition-transform ${
+              open ? "rotate-90" : ""
+            }`}
+          >
+            <path
+              fillRule="evenodd"
+              d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Landing page
+        </button>
+      </legend>
 
-      <label className="block text-sm">
-        Preço base (€)
-        <input
-          type="number"
-          min={0}
-          step={1}
-          value={priceEuros}
-          onChange={(event) => {
-            const raw = event.target.value;
-            update({
-              priceFromCents: raw === "" ? null : Math.round(Number(raw) * 100),
-            });
-          }}
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-          placeholder="149"
-        />
-      </label>
+      {!open ? null : (
+        <div className="space-y-3 pt-1">
+          <label className="block text-sm">
+            Preço base (€)
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={priceEuros}
+              onChange={(event) => {
+                const raw = event.target.value;
+                update({
+                  priceFromCents:
+                    raw === "" ? null : Math.round(Number(raw) * 100),
+                });
+              }}
+              className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
+              placeholder="149"
+            />
+          </label>
 
-      <label className="block text-sm">
-        Preço promocional (€)
-        <input
-          type="number"
-          min={0}
-          step={1}
-          value={discountEuros}
-          onChange={(event) => {
-            const raw = event.target.value;
-            update({
-              discountPriceFromCents:
-                raw === "" ? null : Math.round(Number(raw) * 100),
-            });
-          }}
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-          placeholder="99"
-        />
-        {discountInvalid ? (
-          <span className="mt-1 block text-xs text-amber-600">
-            O preço promocional deve ser inferior ao preço base.
-          </span>
-        ) : null}
-      </label>
+          <label className="block text-sm">
+            Preço promocional (€)
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={discountEuros}
+              onChange={(event) => {
+                const raw = event.target.value;
+                update({
+                  discountPriceFromCents:
+                    raw === "" ? null : Math.round(Number(raw) * 100),
+                });
+              }}
+              className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
+              placeholder="99"
+            />
+            {discountInvalid ? (
+              <span className="mt-1 block text-xs text-amber-600">
+                O preço promocional deve ser inferior ao preço base.
+              </span>
+            ) : null}
+          </label>
 
-      <div className="space-y-2 rounded-md border border-neutral-200 p-3">
-        <p className="text-xs font-semibold text-neutral-600">
-          Preços noutras moedas (vazio = conversão automática a partir do preço
-          base)
-        </p>
-        <div className="grid grid-cols-[3rem_1fr_1fr] gap-2 text-xs text-neutral-400">
-          <span></span>
-          <span>Desde</span>
-          <span>Promo</span>
-        </div>
-        {OVERRIDE_CURRENCIES.map((currency) => {
-          const entry = value.priceOverrides?.[currency] ?? null;
-          const fromMajor = entry?.fromCents != null ? entry.fromCents / 100 : "";
-          const promoMajor =
-            entry?.discountCents != null ? entry.discountCents / 100 : "";
-          const suggestion =
-            value.priceFromCents != null && value.priceFromCents > 0
-              ? String(deriveCents(value.priceFromCents, currency) / 100)
-              : "";
-          return (
-            <div
-              key={currency}
-              className="grid grid-cols-[3rem_1fr_1fr] items-center gap-2 text-sm"
-            >
-              <span className="font-medium">{currency}</span>
-              <input
-                type="number"
-                min={0}
-                step={1}
-                value={fromMajor}
-                placeholder={suggestion}
-                onChange={(event) =>
-                  updateOverride(currency, "fromCents", event.target.value)
-                }
-                className="rounded-md border border-neutral-300 px-2 py-1"
-              />
-              <input
-                type="number"
-                min={0}
-                step={1}
-                value={promoMajor}
-                placeholder="—"
-                onChange={(event) =>
-                  updateOverride(currency, "discountCents", event.target.value)
-                }
-                className="rounded-md border border-neutral-300 px-2 py-1"
-              />
+          <div className="space-y-2 rounded-md border border-neutral-200 p-3">
+            <p className="text-xs font-semibold text-neutral-600">
+              Preços noutras moedas (vazio = conversão automática a partir do
+              preço base)
+            </p>
+            <div className="grid grid-cols-[3rem_1fr_1fr] gap-2 text-xs text-neutral-400">
+              <span></span>
+              <span>Desde</span>
+              <span>Promo</span>
             </div>
-          );
-        })}
-      </div>
+            {OVERRIDE_CURRENCIES.map((currency) => {
+              const entry = value.priceOverrides?.[currency] ?? null;
+              const fromMajor =
+                entry?.fromCents != null ? entry.fromCents / 100 : "";
+              const promoMajor =
+                entry?.discountCents != null ? entry.discountCents / 100 : "";
+              const suggestion =
+                value.priceFromCents != null && value.priceFromCents > 0
+                  ? String(deriveCents(value.priceFromCents, currency) / 100)
+                  : "";
+              return (
+                <div
+                  key={currency}
+                  className="grid grid-cols-[3rem_1fr_1fr] items-center gap-2 text-sm"
+                >
+                  <span className="font-medium">{currency}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={fromMajor}
+                    placeholder={suggestion}
+                    onChange={(event) =>
+                      updateOverride(currency, "fromCents", event.target.value)
+                    }
+                    className="rounded-md border border-neutral-300 px-2 py-1"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={promoMajor}
+                    placeholder="—"
+                    onChange={(event) =>
+                      updateOverride(
+                        currency,
+                        "discountCents",
+                        event.target.value,
+                      )
+                    }
+                    className="rounded-md border border-neutral-300 px-2 py-1"
+                  />
+                </div>
+              );
+            })}
+          </div>
 
-      <label className="block text-sm">
-        Nome do modelo (título do cartão)
-        <input
-          type="text"
-          value={value.landingModelName ?? ""}
-          onChange={(event) =>
-            update({ landingModelName: event.target.value || null })
-          }
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-          placeholder="Modelo Editorial"
-        />
-      </label>
+          <label className="block text-sm">
+            Nome do modelo (título do cartão)
+            <input
+              type="text"
+              value={value.landingModelName ?? ""}
+              onChange={(event) =>
+                update({ landingModelName: event.target.value || null })
+              }
+              className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
+              placeholder="Modelo Editorial"
+            />
+          </label>
 
-      <div className="block text-sm">
-        <span className="mb-1 block">Imagem destaque</span>
-        <MediaUpload
-          kind="image"
-          maxSizeMB={5}
-          value={value.landingImageUrl ?? undefined}
-          onUpload={(url) => update({ landingImageUrl: url })}
-          onClear={() => update({ landingImageUrl: null })}
-          label="Carregar imagem destaque"
-        />
-      </div>
+          <div className="block text-sm">
+            <span className="mb-1 block">Imagem destaque</span>
+            <MediaUpload
+              kind="image"
+              maxSizeMB={5}
+              value={value.landingImageUrl ?? undefined}
+              onUpload={(url) => update({ landingImageUrl: url })}
+              onClear={() => update({ landingImageUrl: null })}
+              label="Carregar imagem destaque"
+            />
+          </div>
 
-      <label className="block text-sm">
-        Descrição curta
-        <textarea
-          value={value.landingDescription ?? ""}
-          onChange={(event) =>
-            update({ landingDescription: event.target.value || null })
-          }
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-          rows={2}
-        />
-      </label>
+          <label className="block text-sm">
+            Descrição curta
+            <textarea
+              value={value.landingDescription ?? ""}
+              onChange={(event) =>
+                update({ landingDescription: event.target.value || null })
+              }
+              className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
+              rows={2}
+            />
+          </label>
+        </div>
+      )}
     </fieldset>
   );
 }
