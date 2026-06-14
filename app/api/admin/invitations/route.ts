@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         countdown: sanitizeJsonField(body.countdown, null),
         personalGuestCard: sanitizeJsonField(body.personalGuestCard, null),
         invitationType: body.invitationType ?? "standard",
-        externalLink: body.externalLink ?? null,
+        externalLink: body.externalLink ?? "",
         isDemo: body.isDemo === true,
         textStyles: sanitizeJsonField(body.textStyles, null),
         cardStyles: sanitizeJsonField(body.cardStyles, null),

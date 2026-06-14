@@ -52,8 +52,8 @@ interface RichExternalLinkPageProps {
  *  - ScratchDateReveal renders when `scratchReveal.enabled === true`.
  *  - RSVP renders when `rsvp.enabled === true`.
  *
- * The iframe section always renders since this is, by definition, an
- * `external_link` invitation.
+ * The iframe section renders only when an external link is set — the link
+ * is optional, so `CanvaEmbed` renders nothing when it is empty.
  */
 export default function RichExternalLinkPage({
   invitation,

@@ -684,10 +684,6 @@ export default function ExternalInvitationForm({
       toast.error("Carrega um vídeo para continuar");
       return;
     }
-    if (subType === "external_link" && !form.externalLink) {
-      toast.error("Introduz o link externo para continuar");
-      return;
-    }
 
     setSaving(true);
     try {
