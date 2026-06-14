@@ -80,6 +80,10 @@ type InvitationWithTheme = {
   socialPreview: unknown;
 };
 
+// Maps a Prisma Invitation row into InvitationData for the PUBLIC rendered page.
+// NOTE: the admin edit form uses a SEPARATE mapper, `toAdminInvitationInitialData`
+// in `lib/invitation-admin-initial-data.ts`. A new persisted field must be added to
+// BOTH. Full checklist: docs/invitation-data-field-checklist.md
 function toInvitationData(row: InvitationWithTheme): InvitationData {
   return {
     slug: row.slug,

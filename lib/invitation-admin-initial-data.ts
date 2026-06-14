@@ -1,3 +1,8 @@
+// Maps a Prisma Invitation row into the InvitationData the ADMIN EDIT FORM is
+// seeded with (app/admin/invitations/[id]/edit/page.tsx). This is a SEPARATE
+// mapper from the public renderer's `toInvitationData()` in `lib/invitations.ts`
+// — a new persisted field must be added to BOTH, or it will save to the DB yet
+// vanish from the form on reload. Full checklist: docs/invitation-data-field-checklist.md
 import type { PriceOverrides } from "@/lib/currency/template-price";
 import type {
   CardStyleOverrides,
@@ -5,6 +10,7 @@ import type {
   ExternalCountdownConfig,
   HeroOverlayConfig,
   HeroScrollIndicatorConfig,
+  HeroTextLayer,
   ImageSettingsMap,
   InvitationData,
   InvitationEventType,
@@ -37,6 +43,7 @@ type AdminInvitationInitialDataRow = {
   heroHeight: number | null;
   heroOverlay: unknown;
   heroScrollIndicator: unknown;
+  heroTextLayer: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
   curtainVideoUrl: string | null;
@@ -104,6 +111,7 @@ export function toAdminInvitationInitialData(
     heroScrollIndicator:
       (row.heroScrollIndicator as HeroScrollIndicatorConfig | null) ??
       undefined,
+    heroTextLayer: (row.heroTextLayer as HeroTextLayer | null) ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
     curtainVideoUrl: row.curtainVideoUrl ?? undefined,
