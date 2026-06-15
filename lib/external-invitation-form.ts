@@ -27,6 +27,32 @@ export function getExternalInvitationEmbedSrc(externalLink: string): string {
   }
 }
 
+/**
+ * Appends `?hideScrollbar=1` to a `/canva-proxy/...` src so the proxy
+ * injects a style block that hides the iframe document's scrollbar while
+ * keeping scrolling functional (see `injectIframeHideScrollbarStyle`).
+ *
+ * Used by the bare-fullscreen `ExternalLinkPage`, whose fixed-size iframe
+ * relies on the Canva document's own internal scroll. No-ops for non-proxy
+ * srcs (e.g. when `getExternalInvitationEmbedSrc` falls back to the raw
+ * external URL) — we only control headers/HTML for URLs we proxy.
+ */
+export function appendCanvaProxyHideScrollbarFlag(src: string): string {
+  if (!src || !src.startsWith("/canva-proxy/")) return src;
+
+  const hashIndex = src.indexOf("#");
+  const beforeHash = hashIndex === -1 ? src : src.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : src.slice(hashIndex);
+  const queryIndex = beforeHash.indexOf("?");
+  const path = queryIndex === -1 ? beforeHash : beforeHash.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : beforeHash.slice(queryIndex + 1);
+  const params = new URLSearchParams(query);
+
+  params.set("hideScrollbar", "1");
+
+  return `${path}?${params.toString()}${hash}`;
+}
+
 export function appendCanvaProxyDisableScrollFlag(src: string): string {
   if (!src) return src;
 

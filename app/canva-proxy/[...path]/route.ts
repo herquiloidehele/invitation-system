@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "node:stream";
 import {
+  injectIframeHideScrollbarStyle,
   injectIframeNoScrollStyle,
   rewriteCanvaHtmlBase,
   shouldDisableProxiedScroll,
+  shouldHideProxiedScrollbar,
 } from "@/lib/canva-proxy-html";
 import {
   isSharedCacheable,
@@ -219,14 +221,21 @@ async function proxyCanvaRequest(
   const acceptEncoding = req.headers.get("accept-encoding");
   const negotiatedEncoding = pickCompressionEncoding(acceptEncoding);
   const disableScroll = shouldDisableProxiedScroll(req.nextUrl);
+  const hideScrollbar = shouldHideProxiedScrollbar(req.nextUrl);
 
   // Fast path: a previously rewritten + compressed HTML shell for this exact
-  // (url, encoding, scroll) is served straight from memory — no upstream
-  // fetch, no ~3 MB string rewrite, no re-compression. Only compressed
-  // responses are cached, so this never fires for the uncompressed case.
+  // (url, encoding, scroll, scrollbar) is served straight from memory — no
+  // upstream fetch, no ~3 MB string rewrite, no re-compression. Only
+  // compressed responses are cached, so this never fires for the
+  // uncompressed case.
   if (method === "GET" && negotiatedEncoding) {
     const cached = htmlResponseCache.get(
-      makeHtmlCacheKey(upstream.url.href, negotiatedEncoding, disableScroll),
+      makeHtmlCacheKey(
+        upstream.url.href,
+        negotiatedEncoding,
+        disableScroll,
+        hideScrollbar,
+      ),
     );
     if (cached) {
       return buildCachedHtmlResponse(cached);
@@ -274,6 +283,7 @@ async function proxyCanvaRequest(
       responseHeaders,
       negotiatedEncoding,
       disableScroll,
+      hideScrollbar,
       // Only a compressed 200 shell is worth caching: compression bounds the
       // entry to ~90 KB, and a non-200 body must never be reused.
       cacheKey:
@@ -282,6 +292,7 @@ async function proxyCanvaRequest(
               upstream.url.href,
               negotiatedEncoding,
               disableScroll,
+              hideScrollbar,
             )
           : null,
     });
@@ -317,6 +328,7 @@ interface RespondWithHtmlArgs {
   responseHeaders: Headers;
   negotiatedEncoding: SupportedEncoding | null;
   disableScroll: boolean;
+  hideScrollbar: boolean;
   /**
    * When non-null, the compressed shell is stored under this key for reuse
    * by subsequent guests. Null disables caching for this response (e.g.
@@ -334,6 +346,7 @@ async function respondWithHtml({
   responseHeaders,
   negotiatedEncoding,
   disableScroll,
+  hideScrollbar,
   cacheKey,
 }: RespondWithHtmlArgs): Promise<NextResponse> {
   const html = await upstream.text();
@@ -345,13 +358,22 @@ async function respondWithHtml({
     proxyOrigin,
     upstreamPath,
   );
-  // Only inject the no-scroll style when the consumer explicitly asks
-  // for it (curtain-canva embed appends `?disableScroll=1`). The default
-  // ExternalLinkPage renders Canva at fixed size and relies on the
-  // iframe document's own scroll, so it must be left untouched.
-  const rewritten = disableScroll
-    ? injectIframeNoScrollStyle(baseRewritten)
-    : baseRewritten;
+  // Layer the optional style injections. These are independent opt-ins:
+  //
+  //   * `?disableScroll=1` (curtain-canva embed) removes internal scroll
+  //     entirely — the iframe is sized to full content height.
+  //   * `?hideScrollbar=1` (ExternalLinkPage) keeps the iframe document's
+  //     own scroll but hides the scrollbar chrome.
+  //
+  // The default consumer (e.g. the admin preview) passes neither and gets
+  // the Canva page rendered untouched.
+  let rewritten = baseRewritten;
+  if (disableScroll) {
+    rewritten = injectIframeNoScrollStyle(rewritten);
+  }
+  if (hideScrollbar) {
+    rewritten = injectIframeHideScrollbarStyle(rewritten);
+  }
 
   const responseContentType = contentType || "text/html; charset=utf-8";
   responseHeaders.set("content-type", responseContentType);

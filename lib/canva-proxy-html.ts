@@ -118,6 +118,78 @@ export function injectIframeNoScrollStyle(html: string): string {
   return `${NO_SCROLL_STYLE}${html}`;
 }
 
+const HIDE_SCROLLBAR_MARKER = "data-canva-proxy-hide-scrollbar";
+
+/**
+ * Style block injected into proxied Canva HTML to hide the scrollbar
+ * **without** disabling scrolling. This is the counterpart to
+ * `NO_SCROLL_STYLE`: there the iframe is sized to full content height so
+ * scroll is removed entirely; here (the fixed-size `ExternalLinkPage`
+ * iframe) the document keeps its own internal scroll, but the scrollbar
+ * chrome would otherwise sit visibly along the iframe's edge.
+ *
+ * The selector is the **universal** `*`, not `html, body`. Canva published
+ * sites pin `body { overflow: hidden; height: 100vh }` and put the real
+ * scroll surface in an inner `<div>` with an obfuscated, per-publish hashed
+ * class (e.g. `.ZRRuDw`) — so the document viewport never owns the
+ * scrollbar and the hashed class can't be targeted by name. Hiding every
+ * element's scrollbar is what actually reaches that div, and it's exactly
+ * the desired behaviour for an invitation page (no element should show a
+ * scrollbar). Verified against the live proxied document: the inner
+ * scroller's computed `scrollbar-width` flips `auto → none` while
+ * programmatic and wheel scrolling keep working.
+ *
+ * Covers all three engines: `scrollbar-width: none` (Firefox + Chrome 121+),
+ * `-ms-overflow-style: none` (legacy Edge/IE), and
+ * `::-webkit-scrollbar { display: none }` (older Chrome/Safari). `!important`
+ * beats Canva's defaults; the live test confirmed no competing `!important`
+ * rule exists on the scroller.
+ */
+const HIDE_SCROLLBAR_STYLE = `<style ${HIDE_SCROLLBAR_MARKER}>* { scrollbar-width: none !important; -ms-overflow-style: none !important; } *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }</style>`;
+
+/**
+ * Query string flag the proxy honours to opt into scrollbar-hiding.
+ * Independent of `disableScroll`: `ExternalLinkPage` appends
+ * `?hideScrollbar=1` because its iframe is fixed-size and *keeps* internal
+ * scroll — it only wants the scrollbar chrome gone. Consumers that omit
+ * the flag get the Canva page rendered untouched.
+ */
+const HIDE_SCROLLBAR_QUERY_PARAM = "hideScrollbar";
+const HIDE_SCROLLBAR_QUERY_VALUE = "1";
+
+/**
+ * Returns true when the proxy should inject the scrollbar-hiding style for
+ * this request. Like `shouldDisableProxiedScroll`, this is checked per
+ * request so two iframes pointing at the same upstream Canva URL can get
+ * different treatments.
+ */
+export function shouldHideProxiedScrollbar(url: URL): boolean {
+  return (
+    url.searchParams.get(HIDE_SCROLLBAR_QUERY_PARAM) ===
+    HIDE_SCROLLBAR_QUERY_VALUE
+  );
+}
+
+/**
+ * Injects a <style> tag into the given HTML document that hides the
+ * scrollbar while leaving scrolling functional. Idempotent — calling it
+ * multiple times results in a single injected style block.
+ *
+ * - When a <head> tag is present, the style is inserted right after it.
+ * - Otherwise, the style is prepended to the document so it still applies.
+ */
+export function injectIframeHideScrollbarStyle(html: string): string {
+  if (html.includes(HIDE_SCROLLBAR_MARKER)) {
+    return html;
+  }
+
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>${HIDE_SCROLLBAR_STYLE}`);
+  }
+
+  return `${HIDE_SCROLLBAR_STYLE}${html}`;
+}
+
 /**
  * Returns the upstream Canva host for an externalLink invitation, suitable
  * for emitting `<link rel="preconnect" href="https://<host>">` from the

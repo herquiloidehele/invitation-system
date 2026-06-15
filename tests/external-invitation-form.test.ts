@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  appendCanvaProxyHideScrollbarFlag,
   isInitialCanvaEmbedPage,
   resolveCanvaEmbedPageState,
   shouldPreloadRichExternalCanva,
@@ -34,6 +35,40 @@ describe("isInitialCanvaEmbedPage", () => {
         initial,
       ),
     ).toBe(false);
+  });
+});
+
+describe("appendCanvaProxyHideScrollbarFlag", () => {
+  it("adds hideScrollbar=1 to a bare proxy src", () => {
+    expect(
+      appendCanvaProxyHideScrollbarFlag(
+        "/canva-proxy/brindealstudio.com/sara-e-hugo",
+      ),
+    ).toBe("/canva-proxy/brindealstudio.com/sara-e-hugo?hideScrollbar=1");
+  });
+
+  it("preserves existing query params and the hash", () => {
+    expect(
+      appendCanvaProxyHideScrollbarFlag(
+        "/canva-proxy/brindealstudio.com/sara-e-hugo?foo=bar#page-1",
+      ),
+    ).toBe(
+      "/canva-proxy/brindealstudio.com/sara-e-hugo?foo=bar&hideScrollbar=1#page-1",
+    );
+  });
+
+  it("is idempotent — does not duplicate the flag", () => {
+    const once = appendCanvaProxyHideScrollbarFlag(
+      "/canva-proxy/brindealstudio.com/sara-e-hugo",
+    );
+    expect(appendCanvaProxyHideScrollbarFlag(once)).toBe(once);
+  });
+
+  it("leaves non-proxy srcs untouched (we don't control their HTML)", () => {
+    expect(
+      appendCanvaProxyHideScrollbarFlag("https://example.com/some-invite"),
+    ).toBe("https://example.com/some-invite");
+    expect(appendCanvaProxyHideScrollbarFlag("")).toBe("");
   });
 });
 

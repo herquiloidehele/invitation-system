@@ -33,6 +33,28 @@ describe("makeHtmlCacheKey", () => {
     expect(keys.size).toBe(4);
   });
 
+  it("distinguishes the hide-scrollbar flag, defaulting it to false", () => {
+    const url = "https://x.canva.site/a";
+    // Omitting the flag must match an explicit `false` so pre-existing
+    // callers keep hitting the same cache entry.
+    expect(makeHtmlCacheKey(url, "br", false)).toBe(
+      makeHtmlCacheKey(url, "br", false, false),
+    );
+    // Toggling it must produce a distinct key so hidden/visible-scrollbar
+    // shells never alias each other.
+    expect(makeHtmlCacheKey(url, "br", false, true)).not.toBe(
+      makeHtmlCacheKey(url, "br", false, false),
+    );
+    // All four (disableScroll × hideScrollbar) combinations are distinct.
+    const keys = new Set([
+      makeHtmlCacheKey(url, "br", false, false),
+      makeHtmlCacheKey(url, "br", false, true),
+      makeHtmlCacheKey(url, "br", true, false),
+      makeHtmlCacheKey(url, "br", true, true),
+    ]);
+    expect(keys.size).toBe(4);
+  });
+
   it("includes the query string so distinct URLs don't collide", () => {
     expect(makeHtmlCacheKey("https://x/a?p=1", "br", false)).not.toBe(
       makeHtmlCacheKey("https://x/a?p=2", "br", false),
