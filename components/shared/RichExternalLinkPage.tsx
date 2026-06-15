@@ -38,6 +38,8 @@ interface RichExternalLinkPageProps {
   /** True when shown inside the public landing-page phone preview iframe.
    *  Forces the sample personal guest card to render for display purposes. */
   isLandingPreview?: boolean;
+  /** Play the hero text blocks' entrance when the rich page is revealed. */
+  animateHeroText?: boolean;
   canvaPreloading?: boolean;
 }
 
@@ -62,6 +64,7 @@ export default function RichExternalLinkPage({
   prefetchedVideoRef,
   isPreview = false,
   isLandingPreview = false,
+  animateHeroText = false,
   canvaPreloading = false,
 }: RichExternalLinkPageProps) {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
@@ -206,6 +209,7 @@ export default function RichExternalLinkPage({
             theme={theme}
             audioRef={audioRef}
             prefetchedVideoRef={prefetchedVideoRef}
+            animateHeroText={animateHeroText}
           />
           {invitation.heroTextLayer?.hideDefaultText !== true && (
             <InvitationHeroNames

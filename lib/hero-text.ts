@@ -101,10 +101,12 @@ export function heroFontsFromTheme(
   };
 }
 
-/** Compute the inline CSS for a single hero text block. */
-export function heroTextBlockStyle(
+/** Positioning + stacking styles for a block. Kept separate from the visual
+ *  styles because this is where the `translate(-50%,-50%)` centering transform
+ *  lives — an animation wrapper must apply its own transform to an INNER
+ *  element so it doesn't clobber this centering. */
+export function heroTextBlockPositionStyle(
   block: HeroTextBlock,
-  fonts: ResolvedHeroFonts,
 ): CSSProperties {
   const rotation = block.rotation ?? 0;
   const transform = `translate(-50%, -50%)${
@@ -116,6 +118,16 @@ export function heroTextBlockStyle(
     top: `${block.yPct}%`,
     width: `${block.widthPct}%`,
     transform,
+    zIndex: block.z,
+  };
+}
+
+/** Visual/text styles for a block (everything except positioning + stacking). */
+export function heroTextBlockTextStyle(
+  block: HeroTextBlock,
+  fonts: ResolvedHeroFonts,
+): CSSProperties {
+  return {
     fontFamily: block.fontFamily || heroFontFamily(block.fontKey, fonts),
     fontSize: `max(${HERO_TEXT_MIN_FONT_PX}px, ${block.fontSizeCqw}cqw)`,
     color: block.color,
@@ -126,8 +138,18 @@ export function heroTextBlockStyle(
     lineHeight: block.lineHeight,
     whiteSpace: "pre-line",
     margin: 0,
-    zIndex: block.z,
     textShadow: block.shadow ? "0 2px 14px rgba(0,0,0,0.45)" : undefined,
+  };
+}
+
+/** Compute the full inline CSS for a single hero text block. */
+export function heroTextBlockStyle(
+  block: HeroTextBlock,
+  fonts: ResolvedHeroFonts,
+): CSSProperties {
+  return {
+    ...heroTextBlockPositionStyle(block),
+    ...heroTextBlockTextStyle(block, fonts),
   };
 }
 

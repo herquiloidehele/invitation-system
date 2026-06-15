@@ -78,6 +78,28 @@ export const popIn: Variants = {
 };
 
 // ---------------------------------------------------------------------------
+// Hero free-text blocks — cinematic blur + rise entrance (on reveal)
+// ---------------------------------------------------------------------------
+
+export const heroTextBlockContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+  },
+};
+
+export const heroTextBlockItem: Variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.96, filter: "blur(8px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.9, ease: EASE },
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Continuous ambient loops
 // ---------------------------------------------------------------------------
 

@@ -292,6 +292,7 @@ function EnvelopeInvitationView({
         audioRef={audioRef}
         prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
         isLandingPreview={isLandingPreview}
+        animateHeroText
       />
     );
   }
@@ -354,6 +355,7 @@ function EnvelopeInvitationView({
               audioRef={audioRef}
               prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
               isLandingPreview={isLandingPreview}
+              animateHeroText={richExternalLinkVisible}
               canvaPreloading={shouldPreloadRichExternalCanva({
                 isPreview: false,
                 isVisible: richExternalLinkVisible,

@@ -343,6 +343,9 @@ interface InvitationPageProps {
    *  even when the invitation has no real guest. Unlike `isPreview`, it does
    *  not change scroll-triggered animation behavior. */
   isLandingPreview?: boolean;
+  /** Play the hero text blocks' entrance animation. Set true only on the real
+   *  guest reveal (after the envelope opens); left false in admin previews. */
+  animateHeroText?: boolean;
 }
 
 export default function InvitationPage({
@@ -352,6 +355,7 @@ export default function InvitationPage({
   prefetchedVideoRef,
   isPreview = false,
   isLandingPreview = false,
+  animateHeroText = false,
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
@@ -432,6 +436,7 @@ export default function InvitationPage({
         theme={theme}
         audioRef={audioRef}
         prefetchedVideoRef={prefetchedVideoRef}
+        animateHeroText={animateHeroText}
       />
 
       {/* ================================================================= */}

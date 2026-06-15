@@ -92,6 +92,8 @@ interface InvitationHeroProps {
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
   prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
+  /** Play the hero text blocks' entrance animation (guest reveal only). */
+  animateHeroText?: boolean;
 }
 
 export default function InvitationHero({
@@ -99,6 +101,7 @@ export default function InvitationHero({
   theme,
   audioRef,
   prefetchedVideoRef,
+  animateHeroText = false,
 }: InvitationHeroProps) {
   const ts: ResolvedTextStyles = resolveTextStyles(
     theme,
@@ -180,7 +183,11 @@ export default function InvitationHero({
       />
 
       {/* Free-positioned custom text layer */}
-      <HeroTextOverlay layer={invitation.heroTextLayer} fonts={heroFonts} />
+      <HeroTextOverlay
+        layer={invitation.heroTextLayer}
+        fonts={heroFonts}
+        play={animateHeroText}
+      />
 
       {/* Couple names overlay (video mode) */}
       {!hideDefaultHeroText && invitation.videoUrl && (

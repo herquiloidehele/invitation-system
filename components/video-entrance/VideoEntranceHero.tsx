@@ -508,7 +508,7 @@ export default function VideoEntranceHero({
 
       {/* Free-positioned custom text layer (revealed state). */}
       {heroInfoVisible && (
-        <HeroTextOverlay layer={heroTextLayer} fonts={heroFonts} />
+        <HeroTextOverlay layer={heroTextLayer} fonts={heroFonts} play />
       )}
 
       {/* Scroll-down chevron after reveal. */}

@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   clampPct,
   heroFontFamily,
+  heroTextBlockPositionStyle,
   heroTextBlockStyle,
+  heroTextBlockTextStyle,
   heroTextLayerFontStacks,
   normalizeHeroTextLayer,
   pxToPct,
@@ -158,6 +160,46 @@ describe("heroTextBlockStyle", () => {
       FONTS,
     );
     expect(style.fontFamily).toBe("ScriptFont");
+  });
+});
+
+describe("heroTextBlockPositionStyle / heroTextBlockTextStyle", () => {
+  it("position style carries only positioning + stacking", () => {
+    expect(heroTextBlockPositionStyle(sampleBlock)).toEqual({
+      position: "absolute",
+      left: "50%",
+      top: "40%",
+      width: "80%",
+      transform: "translate(-50%, -50%) rotate(5deg)",
+      zIndex: 3,
+    });
+  });
+
+  it("position style omits rotation from the transform when 0", () => {
+    expect(
+      heroTextBlockPositionStyle({ ...sampleBlock, rotation: 0 }).transform,
+    ).toBe("translate(-50%, -50%)");
+  });
+
+  it("text style carries the visual properties and no positioning", () => {
+    const text = heroTextBlockTextStyle(sampleBlock, FONTS);
+    expect(text.fontFamily).toBe("ScriptFont");
+    expect(text.fontSize).toBe("max(11px, 8cqw)");
+    expect(text.color).toBe("#ffeeaa");
+    expect(text.letterSpacing).toBe("0.1em");
+    expect(text.textShadow).toBeTruthy();
+    // positioning lives only on the position style
+    expect(text.left).toBeUndefined();
+    expect(text.top).toBeUndefined();
+    expect(text.transform).toBeUndefined();
+    expect(text.zIndex).toBeUndefined();
+  });
+
+  it("union of the two equals heroTextBlockStyle", () => {
+    expect({
+      ...heroTextBlockPositionStyle(sampleBlock),
+      ...heroTextBlockTextStyle(sampleBlock, FONTS),
+    }).toEqual(heroTextBlockStyle(sampleBlock, FONTS));
   });
 });
 
