@@ -29,10 +29,7 @@ export function Footer() {
     },
     {
       heading: t("company"),
-      links: [
-        { label: t("about"), href: "#recursos" },
-        { label: t("contact"), href: "#orcamento" },
-      ],
+      links: [{ label: t("about"), href: "#recursos" }],
     },
   ];
 

@@ -1,13 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { useTranslations } from "next-intl";
-import {
-  buildContactMessage,
-  buildWhatsappUrl,
-  type ContactMessageFields,
-} from "@/lib/landing-whatsapp";
 import type {
   BestSellerFeature,
   GalleryCategory as DbGalleryCategory,
@@ -16,7 +10,6 @@ import type {
   LiveDemoFeature,
 } from "@/lib/landing-features";
 import { BestSellersSection } from "./BestSellersSection";
-import { ContactSection } from "./ContactSection";
 import { FaqSection } from "./FaqSection";
 import { FeaturesSection } from "./FeaturesSection";
 import { Footer } from "./Footer";
@@ -42,39 +35,9 @@ export function BrindealHomepage({
   currentCurrency: Currency;
 }) {
   const reduceMotion = useReducedMotion();
-  const landingT = useTranslations("Landing");
-  const whatsappT = useTranslations("Whatsapp");
   const [activeGalleryCategory, setActiveGalleryCategory] =
     useState<GalleryCategoryKey>("all");
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
-  const [formState, setFormState] = useState<ContactMessageFields>({
-    name: "",
-    eventType: "",
-    message: "",
-  });
-
-  function updateFormField(field: keyof ContactMessageFields, value: string) {
-    setFormState((current) => ({ ...current, [field]: value }));
-  }
-
-  function handleContactSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    window.open(
-      buildWhatsappUrl(
-        buildContactMessage({
-          fields: formState,
-          intro: landingT("defaultWhatsappMessage"),
-          labels: {
-            name: whatsappT("name"),
-            eventType: whatsappT("eventType"),
-            message: whatsappT("message"),
-          },
-        }),
-      ),
-      "_blank",
-      "noopener,noreferrer",
-    );
-  }
 
   return (
     <main className="overflow-hidden bg-background font-[var(--font-outfit)] text-foreground">
@@ -93,11 +56,6 @@ export function BrindealHomepage({
         openIndex={openFaqIndex}
         setOpenIndex={setOpenFaqIndex}
         currentCurrency={currentCurrency}
-      />
-      <ContactSection
-        formState={formState}
-        onFieldChange={updateFormField}
-        onSubmit={handleContactSubmit}
       />
       <Footer />
     </main>
