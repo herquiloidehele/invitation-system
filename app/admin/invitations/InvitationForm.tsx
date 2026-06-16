@@ -3343,6 +3343,31 @@ export default function InvitationForm({
                     />
                   </div>
 
+                  <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                    <div>
+                      <Label className="cursor-pointer">
+                        Ocultar cartão do convidado nas pré-visualizações
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Quando activo, o cartão pessoal do convidado não aparece
+                        nas pré-visualizações da página inicial. Continua
+                        visível para os convidados reais.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.personalGuestCard?.hideInPreview === true}
+                      onCheckedChange={(value) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          personalGuestCard: {
+                            ...(prev.personalGuestCard ?? {}),
+                            hideInPreview: value,
+                          },
+                        }))
+                      }
+                    />
+                  </div>
+
                   {form.guestManagementEnabled && (
                     <>
                       <div className="space-y-1.5">

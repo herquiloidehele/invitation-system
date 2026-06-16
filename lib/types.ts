@@ -431,6 +431,10 @@ export interface PersonalGuestCardConfig {
   backgroundImageUrl?: string | null;
   /** Opacity of the dark scrim overlay (0–1). Defaults to 0.45 when an image is set. */
   scrimOpacity?: number;
+  /** When true, hide the personal guest card in home-page (landing) previews
+   *  only. Real guests and the admin live preview are unaffected. Unset/false
+   *  preserves today's behavior (card shown). */
+  hideInPreview?: boolean;
 }
 
 // ---------------------------------------------------------------------------

@@ -18,6 +18,7 @@ import {
   shouldRenderScratchReveal,
 } from "@/lib/curtain-canva";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
+import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 
 // Lazy-load RSVPForm so its react-hook-form + zod dependencies only ship when
 // a guest actually scrolls down to the RSVP section.
@@ -131,20 +132,22 @@ export default function RevealableExternalSections({
           <ExternalCountdownSection invitation={invitation} theme={theme} />
         )}
 
-        {showInitialPageSections && (invitation.guest || isLandingPreview) && (
-          <PersonalGuestCard
-            guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY}
-            theme={theme}
-            textStyles={invitation.textStyles}
-            customTexts={invitation.customTexts}
-            backgroundImageUrl={
-              invitation.personalGuestCard?.backgroundImageUrl
-            }
-            scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
-            imageSettings={invitation.imageSettings}
-            className={"pb-12 md:pb-16"}
-          />
-        )}
+        {showInitialPageSections &&
+          (invitation.guest || isLandingPreview) &&
+          !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
+            <PersonalGuestCard
+              guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY}
+              theme={theme}
+              textStyles={invitation.textStyles}
+              customTexts={invitation.customTexts}
+              backgroundImageUrl={
+                invitation.personalGuestCard?.backgroundImageUrl
+              }
+              scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
+              imageSettings={invitation.imageSettings}
+              className={"pb-12 md:pb-16"}
+            />
+          )}
 
         {showInitialPageSections && (
           <CoupleGallery invitation={invitation} theme={theme} />

@@ -9,6 +9,7 @@ import {
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
+import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 
 import InvitationHero, { InvitationHeroNames } from "./InvitationHero";
 import ExternalCountdownSection from "./ExternalCountdownSection";
@@ -221,21 +222,22 @@ export default function RichExternalLinkPage({
         </>
       )}
 
-      {(invitation.guestManagementEnabled || isLandingPreview) && (
-        <div className="pb-12 md:pb-16">
-          <PersonalGuestCard
-            guest={
-              invitation.guest ??
-              (isLandingPreview
-                ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
-                : PREVIEW_SAMPLE_GUEST)
-            }
-            theme={theme}
-            textStyles={invitation.textStyles}
-            customTexts={invitation.customTexts}
-          />
-        </div>
-      )}
+      {(invitation.guestManagementEnabled || isLandingPreview) &&
+        !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
+          <div className="pb-12 md:pb-16">
+            <PersonalGuestCard
+              guest={
+                invitation.guest ??
+                (isLandingPreview
+                  ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
+                  : PREVIEW_SAMPLE_GUEST)
+              }
+              theme={theme}
+              textStyles={invitation.textStyles}
+              customTexts={invitation.customTexts}
+            />
+          </div>
+        )}
 
       {scratchOn && (
         <ScratchDateReveal

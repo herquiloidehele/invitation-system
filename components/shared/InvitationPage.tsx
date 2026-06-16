@@ -16,6 +16,7 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
+import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { useLocale } from "next-intl";
 
 import { useCustomText } from "@/lib/custom-texts";
@@ -455,21 +456,22 @@ export default function InvitationPage({
       {/* the admin live preview, or in the landing showcase iframe         */}
       {/* (sample guest, for display only)                                  */}
       {/* ================================================================= */}
-      {(invitation.guest || isPreview || isLandingPreview) && (
-        <div className={"py-8"}>
-          <PersonalGuestCard
-            guest={
-              invitation.guest ??
-              (isLandingPreview
-                ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
-                : PREVIEW_SAMPLE_GUEST)
-            }
-            theme={theme}
-            textStyles={invitation.textStyles}
-            customTexts={invitation.customTexts}
-          />
-        </div>
-      )}
+      {(invitation.guest || isPreview || isLandingPreview) &&
+        !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
+          <div className={"py-8"}>
+            <PersonalGuestCard
+              guest={
+                invitation.guest ??
+                (isLandingPreview
+                  ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
+                  : PREVIEW_SAMPLE_GUEST)
+              }
+              theme={theme}
+              textStyles={invitation.textStyles}
+              customTexts={invitation.customTexts}
+            />
+          </div>
+        )}
 
       {/* ================================================================= */}
       {/* 3. Date Card — Save the Date (style varies per invitation)        */}
