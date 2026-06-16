@@ -7,10 +7,10 @@ import {
   useReducedMotion,
   type Variants,
 } from "framer-motion";
-import confetti from "canvas-confetti";
 import { CheckCircle } from "lucide-react";
 import type { SaveTheDateData } from "@/lib/save-the-date";
 import type { TemplateTheme } from "@/lib/types";
+import { fireCelebrationConfetti } from "@/lib/confetti";
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import LocationCard from "@/components/shared/LocationCard";
@@ -321,44 +321,7 @@ export default function SaveTheDateView({
 
   const handleReveal = useCallback(() => {
     setRevealed(true);
-
-    const colors = theme.confettiColors;
-    const defaults = {
-      spread: 360,
-      ticks: 100,
-      gravity: 0.4,
-      decay: 0.94,
-      startVelocity: 20,
-      colors,
-      scalar: 1.2,
-    };
-
-    confetti({ ...defaults, particleCount: 80, origin: { x: 0.5, y: 0.45 } });
-    setTimeout(() => {
-      confetti({
-        ...defaults,
-        particleCount: 60,
-        spread: 200,
-        origin: { x: 0.4, y: 0.5 },
-      });
-    }, 150);
-    setTimeout(() => {
-      confetti({
-        ...defaults,
-        particleCount: 60,
-        spread: 200,
-        origin: { x: 0.6, y: 0.5 },
-      });
-    }, 300);
-    setTimeout(() => {
-      confetti({
-        ...defaults,
-        particleCount: 40,
-        spread: 300,
-        origin: { x: 0.5, y: 0.4 },
-        startVelocity: 30,
-      });
-    }, 500);
+    fireCelebrationConfetti(theme.confettiColors);
   }, [theme.confettiColors]);
 
   const showBottomHero = bottomHero?.enabled && !!bottomHero.mediaUrl;

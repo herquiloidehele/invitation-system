@@ -15,6 +15,10 @@ import {
 } from "@/lib/external-invitation-form";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
+import {
+  fireCelebrationConfetti,
+  resolveEnvelopeConfettiColors,
+} from "@/lib/confetti";
 
 // Each invitation type renders exactly one of these pages. Splitting them
 // behind dynamic imports keeps the per-guest bundle to just the path
@@ -246,6 +250,16 @@ function EnvelopeInvitationView({
    * is seamless.
    */
   const handleAnimationComplete = useCallback(() => {
+    // Celebratory confetti the moment the envelope finishes opening.
+    // Opt-in per invitation (default off); colors fall back to the theme.
+    const confettiColors = resolveEnvelopeConfettiColors(
+      invitation.envelope,
+      theme,
+    );
+    if (confettiColors) {
+      fireCelebrationConfetti(confettiColors);
+    }
+
     const type = invitation.invitationType ?? "standard";
 
     // For external video: play imperatively (within the gesture context) and
@@ -278,7 +292,7 @@ function EnvelopeInvitationView({
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
-  }, [invitation.invitationType, isRichExternalLink]);
+  }, [invitation.invitationType, invitation.envelope, theme, isRichExternalLink]);
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {

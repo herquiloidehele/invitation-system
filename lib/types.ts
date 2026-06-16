@@ -360,6 +360,12 @@ export interface EnvelopeConfig {
   bottomFlap?: string;
   /** Enable/disable the diagonal shimmer highlight animation on the envelope cover. Defaults to true. */
   shimmer?: boolean;
+  /**
+   * Fire a celebratory confetti burst when the envelope finishes opening.
+   * Defaults to off — only fires when `enabled === true`.
+   * `colors` overrides the burst palette; empty/undefined falls back to theme colors.
+   */
+  confetti?: { enabled: boolean; colors?: string[] };
 }
 
 export interface OurStory {

@@ -46,6 +46,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { ColorArrayField } from "@/components/admin/ColorArrayField";
 import {
   Select,
   SelectContent,
@@ -1026,6 +1027,22 @@ export default function InvitationForm({
     [],
   );
 
+  const updateEnvelopeConfetti = useCallback(
+    (patch: Partial<NonNullable<EnvelopeConfig["confetti"]>>) => {
+      setForm((prev) => {
+        const current = prev.envelope?.confetti ?? { enabled: false };
+        return {
+          ...prev,
+          envelope: {
+            ...prev.envelope,
+            confetti: { ...current, ...patch },
+          },
+        };
+      });
+    },
+    [],
+  );
+
   // Section image overrides
   const updateSectionImage = useCallback(
     (field: keyof SectionImages, value: string | undefined) => {
@@ -1690,6 +1707,33 @@ export default function InvitationForm({
                       onCheckedChange={(v) => updateEnvelope("shimmer", v)}
                     />
                   </div>
+
+                  <Separator />
+
+                  {/* Confetti on open */}
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label>Confetti ao abrir</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Dispara um efeito de confetti quando o envelope termina
+                        de abrir.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.envelope?.confetti?.enabled === true}
+                      onCheckedChange={(v) =>
+                        updateEnvelopeConfetti({ enabled: v })
+                      }
+                    />
+                  </div>
+
+                  {form.envelope?.confetti?.enabled === true && (
+                    <ColorArrayField
+                      label="Cores do confetti (vazio = cores do tema)"
+                      value={form.envelope?.confetti?.colors ?? []}
+                      onChange={(colors) => updateEnvelopeConfetti({ colors })}
+                    />
+                  )}
                 </AccordionContent>
               </AccordionItem>
 
