@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { MousePointerClickIcon } from "lucide-react";
+import { WhatsAppIcon } from "@/components/shared/icons/WhatsAppIcon";
 import type { LandingPrice } from "@/lib/landing-features";
 import { buildPurchaseMessage, buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { ExpandableDescription } from "./ExpandableDescription";
@@ -140,8 +141,9 @@ export function LandingModelCard({
           target="_blank"
           rel="noreferrer"
           aria-label={`${labels.buyCta}: ${title}`}
-          className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${config.buyButtonClassName}`}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${config.buyButtonClassName}`}
         >
+          <WhatsAppIcon className="h-4 w-4" aria-hidden="true" />
           {labels.buyCta}
         </a>
       </div>

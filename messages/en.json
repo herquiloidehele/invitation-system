@@ -77,7 +77,7 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
-    "buyCta": "Comprar"
+    "buyCta": "Send Message"
   },
   "LandingGallery": {
     "eyebrow": "Models",
@@ -90,7 +90,7 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
-    "buyCta": "Comprar",
+    "buyCta": "Send Message",
     "categories": {
       "all": "All",
       "wedding": "Invitation",
