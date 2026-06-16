@@ -115,17 +115,6 @@ export function ProcessSection() {
             );
           })}
         </motion.div>
-        <div className="mt-14 flex flex-col items-center justify-center gap-5 text-center sm:flex-row">
-          <p className="text-2xl font-medium text-foreground">{t("closing")}</p>
-          <a
-            href={buildWhatsappUrl(landingT("defaultWhatsappMessage"))}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
-          >
-            {t("cta")}
-          </a>
-        </div>
       </div>
     </AnimatedSection>
   );
