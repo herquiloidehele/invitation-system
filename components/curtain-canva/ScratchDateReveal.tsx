@@ -154,6 +154,7 @@ export default function ScratchDateReveal({
     fontSize: "clamp(1rem, 4vw, 1.35rem)",
     fontWeight: 500,
     lineHeight: 1,
+    textTransform: "capitalize",
   };
 
   // Coin sizing: scales down with viewport so three fit on one line on
@@ -217,86 +218,86 @@ export default function ScratchDateReveal({
         </>
       )}
       <div className="relative max-w-[640px] mx-auto" style={{ zIndex: 1 }}>
-      <h2
-        style={{
-          fontFamily: theme.displayFont,
-          color: theme.textPrimary,
-          fontSize: "clamp(2rem, 7vw, 2.75rem)",
-          lineHeight: 1.05,
-          ...titleOverride,
-        }}
-      >
-        <EditableText elementKey="sectionTitles">
-          {t("scratch_title")}
-        </EditableText>
-      </h2>
-      {/* Decorative gold rule */}
-      <div
-        aria-hidden
-        className="mx-auto mt-4"
-        style={{
-          width: 48,
-          height: 1,
-          background: theme.accent || "#C9A961",
-          opacity: 0.7,
-        }}
-      />
-      <p
-        className="mt-4 uppercase"
-        style={{
-          fontFamily: theme.uiFont,
-          color: theme.textSecondary,
-          fontSize: "clamp(0.65rem, 2.4vw, 0.75rem)",
-          letterSpacing: "0.22em",
-          ...labelsOverride,
-        }}
-      >
-        <EditableText elementKey="labels">
-          {t("scratch_subtitle")}
-        </EditableText>
-      </p>
+        <h2
+          style={{
+            fontFamily: theme.displayFont,
+            color: theme.textPrimary,
+            fontSize: "clamp(2rem, 7vw, 2.75rem)",
+            lineHeight: 1.05,
+            ...titleOverride,
+          }}
+        >
+          <EditableText elementKey="sectionTitles">
+            {t("scratch_title")}
+          </EditableText>
+        </h2>
+        {/* Decorative gold rule */}
+        <div
+          aria-hidden
+          className="mx-auto mt-4"
+          style={{
+            width: 48,
+            height: 1,
+            background: theme.accent || "#C9A961",
+            opacity: 0.7,
+          }}
+        />
+        <p
+          className="mt-4 uppercase"
+          style={{
+            fontFamily: theme.uiFont,
+            color: theme.textSecondary,
+            fontSize: "clamp(0.65rem, 2.4vw, 0.75rem)",
+            letterSpacing: "0.22em",
+            ...labelsOverride,
+          }}
+        >
+          <EditableText elementKey="labels">
+            {t("scratch_subtitle")}
+          </EditableText>
+        </p>
 
-      <div className="mt-10 flex justify-center items-end gap-3 sm:gap-5">
-        <CoinWithLabel
-          coinSize={coinSize}
-          ariaLabel="Raspe para revelar o dia"
-          contentStyle={datePartStyle}
-          contentOverride={dateDayOverride}
-          content={date.day || "—"}
-          contentElementKey="dateDay"
-          subLabel={t("saveDate_dayLabel")}
-          subLabelOverride={labelsOverride}
-          theme={theme}
-          glitterColors={glitterColors}
-          onRevealed={() => handleCoinRevealed("day")}
-        />
-        <CoinWithLabel
-          coinSize={coinSize}
-          ariaLabel="Raspe para revelar o mês"
-          contentStyle={datePartStyle}
-          contentOverride={dateMonthOverride}
-          content={monthShort || "—"}
-          contentElementKey="dateMonth"
-          subLabel={t("saveDate_monthLabel")}
-          subLabelOverride={labelsOverride}
-          theme={theme}
-          glitterColors={glitterColors}
-          onRevealed={() => handleCoinRevealed("month")}
-        />
-        <CoinWithLabel
-          coinSize={coinSize}
-          ariaLabel="Raspe para revelar o ano"
-          contentStyle={datePartStyle}
-          contentOverride={dateYearOverride}
-          content={date.year || "—"}
-          contentElementKey="dateYear"
-          subLabel={t("saveDate_yearLabel")}
-          subLabelOverride={labelsOverride}
-          theme={theme}
-          glitterColors={glitterColors}
-          onRevealed={() => handleCoinRevealed("year")}
-        />
-      </div>
+        <div className="mt-10 flex justify-center items-end gap-3 sm:gap-5">
+          <CoinWithLabel
+            coinSize={coinSize}
+            ariaLabel="Raspe para revelar o dia"
+            contentStyle={datePartStyle}
+            contentOverride={dateDayOverride}
+            content={date.day || "—"}
+            contentElementKey="dateDay"
+            subLabel={t("saveDate_dayLabel")}
+            subLabelOverride={labelsOverride}
+            theme={theme}
+            glitterColors={glitterColors}
+            onRevealed={() => handleCoinRevealed("day")}
+          />
+          <CoinWithLabel
+            coinSize={coinSize}
+            ariaLabel="Raspe para revelar o mês"
+            contentStyle={datePartStyle}
+            contentOverride={dateMonthOverride}
+            content={monthShort || "—"}
+            contentElementKey="dateMonth"
+            subLabel={t("saveDate_monthLabel")}
+            subLabelOverride={labelsOverride}
+            theme={theme}
+            glitterColors={glitterColors}
+            onRevealed={() => handleCoinRevealed("month")}
+          />
+          <CoinWithLabel
+            coinSize={coinSize}
+            ariaLabel="Raspe para revelar o ano"
+            contentStyle={datePartStyle}
+            contentOverride={dateYearOverride}
+            content={date.year || "—"}
+            contentElementKey="dateYear"
+            subLabel={t("saveDate_yearLabel")}
+            subLabelOverride={labelsOverride}
+            theme={theme}
+            glitterColors={glitterColors}
+            onRevealed={() => handleCoinRevealed("year")}
+          />
+        </div>
       </div>
     </motion.section>
   );
