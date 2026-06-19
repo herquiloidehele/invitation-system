@@ -13,6 +13,7 @@ const upsertSchema = z.object({
   phoneCountryCode: z.string().min(2),
   phoneNumber: z.string(),
   tableLabel: z.string().optional(),
+  totalGuests: z.coerce.number().int().min(0).nullable().optional(),
   canInviteOthers: z.boolean().optional(),
   note: z.string().optional(),
 });

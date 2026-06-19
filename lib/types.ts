@@ -1028,7 +1028,8 @@ export interface GuestUpsertInput {
   phoneCountryCode: string;
   phoneNumber: string;
   tableLabel?: string;
-  totalGuests?: number;
+  /** Number of people for this guest. `null` clears a previously-set value. */
+  totalGuests?: number | null;
   canInviteOthers?: boolean;
   note?: string;
   customExternalLink?: string;

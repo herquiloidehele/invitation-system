@@ -42,6 +42,7 @@ import {
   getGuestFormSheetProps,
   getGuestFormShellVariant,
 } from "./guest-form-sheet";
+import { buildGuestUpsertInput } from "./guest-form-payload";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -141,22 +142,7 @@ export default function GuestForm({
   const canInviteOthers = watch("canInviteOthers");
 
   async function submit(values: FormValues) {
-    await onSubmit({
-      name: values.name,
-      companion: values.companion?.trim() || undefined,
-      phoneCountryCode: values.phoneCountryCode,
-      phoneNumber: values.phoneNumber?.trim() ?? "",
-      tableLabel: values.tableLabel?.trim() ?? "",
-      totalGuests:
-        values.totalGuests && values.totalGuests.trim() !== ""
-          ? Number(values.totalGuests)
-          : undefined,
-      canInviteOthers: values.canInviteOthers,
-      note: values.note?.trim() || undefined,
-      ...(showCustomExternalLink
-        ? { customExternalLink: values.customExternalLink?.trim() || undefined }
-        : {}),
-    });
+    await onSubmit(buildGuestUpsertInput(values, { showCustomExternalLink }));
   }
 
   const title = guest ? "Editar convidado" : "Adicionar convidado";

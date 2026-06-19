@@ -14,6 +14,7 @@ const updateSchema = z
     phoneCountryCode: z.string().min(2).optional(),
     phoneNumber: z.string().optional(),
     tableLabel: z.string().optional(),
+    totalGuests: z.coerce.number().int().min(0).nullable().optional(),
     canInviteOthers: z.boolean().optional(),
     note: z.string().optional(),
   })
