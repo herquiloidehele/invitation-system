@@ -24,8 +24,10 @@ const baseRow = {
   heroHeight: 300,
   heroOverlay: null,
   heroScrollIndicator: null,
+  heroTextLayer: null,
   videoUrl: null,
   videoPoster: null,
+  heroMediaFit: null,
   curtainVideoUrl: null,
   curtainVideoPoster: null,
   heroRevealSeconds: null,
@@ -100,5 +102,19 @@ describe("toAdminInvitationInitialData — heroTextLayer round-trip", () => {
     const row = { ...baseRow, heroTextLayer: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.heroTextLayer).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — heroMediaFit round-trip", () => {
+  it("hydrates a stored heroMediaFit into the admin form initial data", () => {
+    const row = { ...baseRow, heroMediaFit: "contain" };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.heroMediaFit).toBe("contain");
+  });
+
+  it("leaves heroMediaFit undefined when the column is null", () => {
+    const row = { ...baseRow, heroMediaFit: null };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.heroMediaFit).toBeUndefined();
   });
 });

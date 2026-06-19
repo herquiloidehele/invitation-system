@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
+import { isObjectFit } from "@/lib/hero-media-fit";
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations/[id] — Get a single invitation
@@ -149,6 +150,11 @@ export async function PUT(
         ...{ videoUrl: body.videoUrl || "" },
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,
+        }),
+        ...(body.heroMediaFit !== undefined && {
+          heroMediaFit: isObjectFit(body.heroMediaFit)
+            ? body.heroMediaFit
+            : null,
         }),
         ...(body.curtainVideoUrl !== undefined && {
           curtainVideoUrl: body.curtainVideoUrl || null,

@@ -21,6 +21,7 @@ import RSVPModal from "@/components/shared/RSVPModal";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { useCustomText } from "@/lib/custom-texts";
+import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
 
 export interface ExternalVideoPageHandle {
   play: () => void;
@@ -41,6 +42,7 @@ const ExternalVideoPage = forwardRef<
   { videoUrl, visible = true, invitation, theme },
   ref,
 ) {
+  const mediaFit = resolveHeroMediaFit(invitation.heroMediaFit);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [rsvpOpen, setRsvpOpen] = useState(false);
@@ -105,7 +107,7 @@ const ExternalVideoPage = forwardRef<
             inset: 0,
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            objectFit: mediaFit,
             display: "block",
           }}
         />

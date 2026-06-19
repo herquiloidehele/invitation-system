@@ -7,6 +7,7 @@ import RevealableExternalSections from "@/components/shared/RevealableExternalSe
 import { useRevealScrollLock } from "@/hooks/useRevealScrollLock";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowVideoEntranceInitialSections } from "@/lib/external-invitation-form";
+import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
 import {
   shouldFireVideoEntranceConfetti,
   shouldShowTapPrompt,
@@ -62,6 +63,7 @@ export default function VideoEntrancePage({
           audioRef={audioRef}
           videoUrl={invitation.videoUrl}
           videoPoster={invitation.videoPoster}
+          mediaFit={resolveHeroMediaFit(invitation.heroMediaFit)}
           heroOverlay={invitation.heroOverlay}
           revealSeconds={invitation.heroRevealSeconds}
           customTexts={invitation.customTexts}

@@ -15,6 +15,7 @@ import type {
   HeroTextLayer,
   InvitationData,
   InvitationEventType,
+  ObjectFit,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
@@ -48,6 +49,8 @@ interface VideoEntranceHeroProps {
   audioRef: RefObject<HTMLAudioElement | null>;
   /** The single entrance video (invitation.videoUrl), used as cover + hero. */
   videoUrl?: string;
+  /** Resolved hero media object-fit (defaults to "cover"). */
+  mediaFit?: ObjectFit;
   /** Poster/first-frame still shown as the cover before the video plays. */
   videoPoster?: string;
   /** Admin-tunable scrim + bottom gradient over the video. */
@@ -81,6 +84,7 @@ export default function VideoEntranceHero({
   theme,
   audioRef,
   videoUrl,
+  mediaFit = "cover",
   videoPoster,
   heroOverlay,
   revealSeconds,
@@ -303,6 +307,7 @@ export default function VideoEntranceHero({
       style={{
         cursor: isInteractive ? "pointer" : "default",
         containerType: "inline-size",
+        backgroundColor: theme.bg,
       }}
       role={isInteractive ? "button" : undefined}
       tabIndex={isInteractive ? 0 : undefined}
@@ -346,8 +351,8 @@ export default function VideoEntranceHero({
           onError={handleVideoError}
           onPlaying={handleVideoPlaying}
           onTimeUpdate={handleVideoTimeUpdate}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-          style={{ zIndex: 2 }}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ zIndex: 2, objectFit: mediaFit }}
         />
       )}
 

@@ -15,6 +15,7 @@ import type {
   InvitationData,
   InvitationEventType,
   InvitationType,
+  ObjectFit,
   OurStory,
   ParentsInfo,
   SaveDateStyle,
@@ -46,6 +47,7 @@ type AdminInvitationInitialDataRow = {
   heroTextLayer: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
+  heroMediaFit: string | null;
   curtainVideoUrl: string | null;
   curtainVideoPoster: string | null;
   heroRevealSeconds: number | null;
@@ -114,6 +116,7 @@ export function toAdminInvitationInitialData(
     heroTextLayer: (row.heroTextLayer as HeroTextLayer | null) ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
+    heroMediaFit: (row.heroMediaFit as ObjectFit | null) ?? undefined,
     curtainVideoUrl: row.curtainVideoUrl ?? undefined,
     curtainVideoPoster: row.curtainVideoPoster ?? undefined,
     heroRevealSeconds: row.heroRevealSeconds ?? undefined,

@@ -89,6 +89,7 @@ model Invitation {
   heroScrollIndicator Json? // HeroScrollIndicatorConfig { enabled, color? } — toggles the animated scroll-down arrow shown above the audio player.
   videoUrl     String?  // Hero background video (InvitationHero on standard invitations; the looping full-screen hero on curtain-canva).
   videoPoster  String?  // Poster for videoUrl (the hero video). Optional.
+  heroMediaFit String?  // "cover" | "contain" | "fill" | "scale-down" | "none"; null => "cover". CSS object-fit for hero video + standard hero image.
   curtainVideoUrl String?  // Curtain-canva only: the curtain animation video played on tap. Empty → bundled default.
   curtainVideoPoster String? // Poster for curtainVideoUrl — the closed-curtain still shown (esp. on iOS) while the curtain video loads.
   heroRevealSeconds Float?  // Video-entrance: seconds into the entrance video at which the hero text reveals. Null → default (5s).

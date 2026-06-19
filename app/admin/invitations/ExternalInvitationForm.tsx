@@ -63,6 +63,7 @@ import {
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
+import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import HeroTextEditor from "@/components/admin/HeroTextEditor";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
@@ -1278,6 +1279,11 @@ export default function ExternalInvitationForm({
                         update("videoPoster", "");
                       }}
                     />
+                    <HeroMediaFitSelect
+                      id="extVideoMediaFit"
+                      value={form.heroMediaFit}
+                      onChange={(v) => update("heroMediaFit", v)}
+                    />
                   </AccordionContent>
                 </AccordionItem>
               )}
@@ -1467,6 +1473,12 @@ export default function ExternalInvitationForm({
                           }}
                         />
                       </div>
+
+                      <HeroMediaFitSelect
+                        id="ellHeroMediaFit"
+                        value={form.heroMediaFit}
+                        onChange={(v) => update("heroMediaFit", v)}
+                      />
 
                       {/* Free-positioned hero text */}
                       <div className="flex items-center justify-between gap-4">
@@ -2095,6 +2107,11 @@ export default function ExternalInvitationForm({
                           update("videoUrl", "");
                           update("videoPoster", "");
                         }}
+                      />
+                      <HeroMediaFitSelect
+                        id="veHeroMediaFit"
+                        value={form.heroMediaFit}
+                        onChange={(v) => update("heroMediaFit", v)}
                       />
                     </div>
 

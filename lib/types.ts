@@ -105,6 +105,9 @@ export interface AudioConfig {
   visibility?: boolean;
 }
 
+/** CSS `object-fit` values offered for hero media (video + standard hero image). */
+export type ObjectFit = "cover" | "contain" | "fill" | "scale-down" | "none";
+
 /**
  * Visual overlay controls for the hero section.
  * - `scrimOpacity` darkens the hero video background (0–1). Ignored for image heroes.
@@ -839,6 +842,8 @@ export interface InvitationData {
   videoUrl?: string;
   /** Poster for `videoUrl` (the hero video). Optional. */
   videoPoster?: string;
+  /** How the hero video/image is fitted to the hero box. Unset => "cover". */
+  heroMediaFit?: ObjectFit;
   /** Curtain-canva only: the curtain animation video played on tap. Falls back to the bundled default when empty. */
   curtainVideoUrl?: string;
   /** Poster for `curtainVideoUrl` — the closed-curtain still shown (esp. on iOS) while the curtain video loads. */

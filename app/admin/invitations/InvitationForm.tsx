@@ -73,6 +73,7 @@ import InvitationPage from "@/components/shared/InvitationPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
+import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import PlacesFormSection from "@/components/admin/PlacesFormSection";
@@ -1808,6 +1809,11 @@ export default function InvitationForm({
                         className="w-full accent-foreground cursor-pointer"
                       />
                     </div>
+                    <HeroMediaFitSelect
+                      id="heroMediaFit"
+                      value={form.heroMediaFit}
+                      onChange={(v) => update("heroMediaFit", v)}
+                    />
                     {/* Hero overlay controls */}
                     <div className="space-y-3 pt-2">
                       {form.videoUrl ? (

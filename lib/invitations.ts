@@ -13,6 +13,7 @@ import type {
   InvitationEventType,
   InvitationType,
   LocationInfo,
+  ObjectFit,
   OurStory,
   ParentsInfo,
   SaveDateStyle,
@@ -48,6 +49,7 @@ type InvitationWithTheme = {
   heroTextLayer: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
+  heroMediaFit: string | null;
   curtainVideoUrl: string | null;
   curtainVideoPoster: string | null;
   heroRevealSeconds: number | null;
@@ -109,6 +111,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     heroTextLayer: (row.heroTextLayer as HeroTextLayer | null) ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
+    heroMediaFit: (row.heroMediaFit as ObjectFit | null) ?? undefined,
     curtainVideoUrl: row.curtainVideoUrl ?? undefined,
     curtainVideoPoster: row.curtainVideoPoster ?? undefined,
     heroRevealSeconds: row.heroRevealSeconds ?? undefined,

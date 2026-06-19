@@ -15,6 +15,7 @@ import type {
   HeroTextLayer,
   InvitationData,
   InvitationEventType,
+  ObjectFit,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
@@ -23,6 +24,7 @@ import { EditableText } from "@/components/shared/EditableText";
 import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
 import { heroFontsFromTheme } from "@/lib/hero-text";
 import CurtainHeroVideo from "./CurtainHeroVideo";
+import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
 import {
   resolveCurtainVideoSrc,
   resolveTextElementOverride,
@@ -46,6 +48,7 @@ interface CurtainsHeroProps {
   curtainVideoPoster?: string;
   /** Hero background video shown after the curtain opens (invitation.videoUrl). */
   heroVideoUrl?: string;
+  heroMediaFit?: ObjectFit;
   /** Poster for the hero background video (invitation.videoPoster). */
   heroVideoPoster?: string;
   /** Admin-tunable scrim + bottom gradient for the hero video (invitation.heroOverlay). */
@@ -86,6 +89,7 @@ export default function CurtainsHero({
   curtainVideoUrl,
   curtainVideoPoster,
   heroVideoUrl,
+  heroMediaFit,
   heroVideoPoster,
   heroOverlay,
   customTexts,
@@ -400,6 +404,7 @@ export default function CurtainsHero({
           videoPoster={heroVideoPoster}
           backgroundColor={theme.bg}
           heroOverlay={heroOverlay}
+          mediaFit={resolveHeroMediaFit(heroMediaFit)}
         />
       )}
 

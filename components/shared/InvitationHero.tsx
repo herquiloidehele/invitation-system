@@ -6,6 +6,7 @@ import { motion, type Variants } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
+import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
 import { useCustomText } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { scrollToNextHeroSection } from "@/lib/curtain-canva";
@@ -132,6 +133,7 @@ export default function InvitationHero({
     0,
     100,
   );
+  const mediaFit = resolveHeroMediaFit(invitation.heroMediaFit);
 
   return (
     <section
@@ -139,12 +141,13 @@ export default function InvitationHero({
       style={{
         height: getHeroSectionHeight(invitation),
         containerType: "inline-size",
+        backgroundColor: theme.bg,
       }}
     >
       {/* Background media */}
       {invitation.videoUrl ? (
         prefetchedVideoRef ? (
-          <PrefetchedVideoSlot videoRef={prefetchedVideoRef} />
+          <PrefetchedVideoSlot videoRef={prefetchedVideoRef} mediaFit={mediaFit} />
         ) : (
           <video
             src={invitation.videoUrl}
@@ -154,15 +157,19 @@ export default function InvitationHero({
             autoPlay
             preload="auto"
             data-invitation-video
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full"
+            style={{ objectFit: mediaFit }}
           />
         )
       ) : (
         <img
           src={invitation.heroImage}
           alt="Hero"
-          className="h-full w-full object-cover"
-          style={getImageStyle(invitation.imageSettings, "heroImage")}
+          className="h-full w-full"
+          style={{
+            objectFit: mediaFit,
+            ...getImageStyle(invitation.imageSettings, "heroImage"),
+          }}
         />
       )}
 

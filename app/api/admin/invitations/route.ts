@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
+import { isObjectFit } from "@/lib/hero-media-fit";
 
 // ---------------------------------------------------------------------------
 // POST /api/admin/invitations — Create a new invitation
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
         heroTextLayer: sanitizeJsonField(body.heroTextLayer, null),
         videoUrl: body.videoUrl ?? null,
         videoPoster: body.videoPoster ?? null,
+        heroMediaFit: isObjectFit(body.heroMediaFit) ? body.heroMediaFit : null,
         curtainVideoUrl: body.curtainVideoUrl ?? null,
         curtainVideoPoster: body.curtainVideoPoster ?? null,
         heroRevealSeconds:

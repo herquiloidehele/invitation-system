@@ -4,7 +4,7 @@ import {
   DEFAULT_HERO_GRADIENT_START_VIDEO,
   DEFAULT_HERO_SCRIM_OPACITY,
 } from "@/components/shared/InvitationHero";
-import type { HeroOverlayConfig } from "@/lib/types";
+import type { HeroOverlayConfig, ObjectFit } from "@/lib/types";
 
 interface CurtainHeroVideoProps {
   /** Hero background video URL (invitation.videoUrl). */
@@ -19,6 +19,8 @@ interface CurtainHeroVideoProps {
    * when fields are missing.
    */
   heroOverlay?: HeroOverlayConfig;
+  /** Resolved hero media object-fit (defaults to "cover"). */
+  mediaFit?: ObjectFit;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -39,6 +41,7 @@ export default function CurtainHeroVideo({
   videoPoster,
   backgroundColor,
   heroOverlay,
+  mediaFit = "cover",
 }: CurtainHeroVideoProps) {
   const scrimOpacity = clamp(
     heroOverlay?.scrimOpacity ?? DEFAULT_HERO_SCRIM_OPACITY,
@@ -55,7 +58,7 @@ export default function CurtainHeroVideo({
     <div
       aria-hidden
       className="absolute inset-0 pointer-events-none"
-      style={{ zIndex: 0 }}
+      style={{ zIndex: 0, backgroundColor }}
     >
       <video
         src={videoUrl}
@@ -65,7 +68,8 @@ export default function CurtainHeroVideo({
         playsInline
         autoPlay
         preload="auto"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full"
+        style={{ objectFit: mediaFit }}
       />
 
       {/* Dark scrim so the hero info stays legible over bright video. */}

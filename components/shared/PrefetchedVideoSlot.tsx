@@ -2,6 +2,8 @@
 
 import { type RefObject, useEffect, useRef } from "react";
 
+import type { ObjectFit } from "@/lib/types";
+
 // ---------------------------------------------------------------------------
 // PrefetchedVideoSlot — adopts an already-buffered <video> DOM element into
 // the hero section so the browser reuses the same element (avoiding a
@@ -10,8 +12,10 @@ import { type RefObject, useEffect, useRef } from "react";
 
 export function PrefetchedVideoSlot({
   videoRef,
+  mediaFit = "cover",
 }: {
   videoRef: RefObject<HTMLVideoElement | null>;
+  mediaFit?: ObjectFit;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +25,8 @@ export function PrefetchedVideoSlot({
     if (!video || !container) return;
 
     // Re-style the video for hero display
-    video.className = "absolute inset-0 h-full w-full object-cover";
+    video.className = "absolute inset-0 h-full w-full";
+    video.style.objectFit = mediaFit;
     video.style.position = "";
     video.style.width = "";
     video.style.height = "";
@@ -34,7 +39,7 @@ export function PrefetchedVideoSlot({
     // Move the existing DOM node into this container
     container.appendChild(video);
     video.play().catch(() => {});
-  }, [videoRef]);
+  }, [videoRef, mediaFit]);
 
   return <div ref={containerRef} className="absolute inset-0 h-full w-full" />;
 }

@@ -47,6 +47,7 @@ export default function CurtainCanvaPage({
         curtainVideoPoster={invitation.curtainVideoPoster}
         heroVideoUrl={invitation.videoUrl}
         heroVideoPoster={invitation.videoPoster}
+        heroMediaFit={invitation.heroMediaFit}
         heroOverlay={invitation.heroOverlay}
         customTexts={invitation.customTexts}
         textStyles={invitation.textStyles}
