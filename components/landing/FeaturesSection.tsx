@@ -2,26 +2,8 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  BarChart3,
-  Languages,
-  Palette,
-  Sparkles,
-  UserPen,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+import { Languages, type LucideIcon, Palette, Sparkles, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { type Currency } from "@/lib/currency/config";
-import { personalizationTierPrices } from "@/lib/landing-price";
 import { AnimatedSection } from "./AnimatedSection";
 import {
   getMotionProps,
@@ -31,16 +13,12 @@ import {
   landingItemVariants,
   landingStaggerVariants,
   landingTransition,
-  shouldReduceMotion,
+  shouldReduceMotion
 } from "./landing-motion";
 import { landingImages } from "./landing-images";
 import { SectionEyebrow } from "./SectionEyebrow";
 
-export function FeaturesSection({
-  currentCurrency,
-}: {
-  currentCurrency: Currency;
-}) {
+export function FeaturesSection() {
   const t = useTranslations("LandingFeatures");
   const reduceMotion = useReducedMotion();
 
@@ -104,8 +82,6 @@ export function FeaturesSection({
           >
             <CustomizationPanel />
           </FeatureSmallCard>
-
-          <PersonalizationCard currentCurrency={currentCurrency} />
         </motion.div>
       </div>
     </AnimatedSection>
@@ -418,82 +394,5 @@ function CustomizationPanel() {
         </span>
       </p>
     </>
-  );
-}
-
-function PersonalizationCard({
-  currentCurrency,
-}: {
-  currentCurrency: Currency;
-}) {
-  const t = useTranslations("LandingFeatures");
-  const reduceMotion = useReducedMotion();
-  const reduced = shouldReduceMotion(reduceMotion);
-  const labels = t.raw("personalizationTierLabels") as readonly string[];
-  const prices = personalizationTierPrices(currentCurrency);
-
-  return (
-    <motion.article
-      variants={landingCardVariants}
-      whileHover={reduced ? undefined : landingCardHover}
-      whileTap={reduced ? undefined : landingCardTap}
-      className="rounded-[1.5rem] border border-border bg-card p-6 shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_3.5%,transparent)] sm:p-8 lg:col-span-12"
-    >
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-5 sm:max-w-2xl">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-muted text-primary">
-            <UserPen className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-              {t("personalizationTitle")}
-            </h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              {t("personalizationText")}
-            </p>
-          </div>
-        </div>
-        <Dialog>
-          <DialogTrigger
-            render={
-              <motion.button
-                type="button"
-                whileHover={reduced ? undefined : { y: -2 }}
-                whileTap={reduced ? undefined : landingCardTap}
-                className="shrink-0 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
-              />
-            }
-          >
-            {t("personalizationCta")}
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>{t("personalizationModalTitle")}</DialogTitle>
-              <DialogDescription>
-                {t("personalizationModalDescription")}
-              </DialogDescription>
-            </DialogHeader>
-            <ul className="mt-2 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-muted">
-              {labels.map((label, i) => (
-                <li
-                  key={label}
-                  className="flex items-center justify-between gap-4 px-4 py-3"
-                >
-                  <span className="text-sm text-foreground">{label}</span>
-                  <span className="text-right">
-                    <span className="block text-lg font-semibold text-primary">
-                      {prices[i]}
-                    </span>
-                    <span className="block text-[8px] uppercase tracking-[0.18em] text-muted-foreground">
-                      {t("personalizationPerInvite")}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </motion.article>
   );
 }

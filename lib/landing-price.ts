@@ -1,11 +1,7 @@
 // Pure landing-page price formatting. No data-access imports so this stays a
 // fast unit and so the "is this discount valid?" rule lives in exactly one place.
 
-import {
-  CURRENCY_LOCALE,
-  CURRENCY_SYMBOL,
-  type Currency,
-} from "@/lib/currency/config";
+import { CURRENCY_SYMBOL, type Currency } from "@/lib/currency/config";
 
 export type LandingPrice = {
   /** Effective price WITH the "Desde" prefix, e.g. "Desde 99 €". */
@@ -89,23 +85,4 @@ export function resolveLandingPrice(
     originalLabel: null,
     discountPercent: null,
   };
-}
-
-// ---------------------------------------------------------------------------
-// Personalization tier pricing — curated per-currency, minor units
-// Tier order: [≤50, 50–100, >100]
-// ---------------------------------------------------------------------------
-
-const PERSONALIZATION_TIER_CENTS: Record<Currency, [number, number, number]> = {
-  EUR: [35, 27, 20],
-  USD: [35, 27, 20],
-  MZN: [2500, 2000, 1500],
-  AOA: [35000, 27000, 20000],
-  BRL: [250, 200, 150],
-};
-
-export function personalizationTierPrices(currency: Currency): [string, string, string] {
-  const cents = PERSONALIZATION_TIER_CENTS[currency];
-  const locale = CURRENCY_LOCALE[currency];
-  return cents.map((c) => formatCurrencyAmount(c, currency, locale)) as [string, string, string];
 }
