@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  appendCanvaPersonalizationParams,
   appendCanvaProxyHideScrollbarFlag,
   getExternalInvitationEmbedSrc,
 } from "@/lib/external-invitation-form";
+import type { PublicGuestData } from "@/lib/types";
 
 /* ------------------------------------------------------------------ */
 /*  ExternalLinkPage                                                    */
@@ -43,19 +45,24 @@ interface ExternalLinkPageProps {
   externalLink: string;
   visible?: boolean;
   lazyLoadIframe?: boolean;
+  guest?: PublicGuestData | null;
 }
 
 export default function ExternalLinkPage({
   externalLink,
   visible = true,
   lazyLoadIframe = false,
+  guest,
 }: ExternalLinkPageProps) {
   // Hide the iframe document's scrollbar while keeping its internal scroll
   // working. The proxy injects the scrollbar-hiding CSS server-side (it
   // serves the Canva HTML same-origin), so no content is clipped — see
   // `injectIframeHideScrollbarStyle`.
-  const src = appendCanvaProxyHideScrollbarFlag(
-    getExternalInvitationEmbedSrc(externalLink),
+  const src = appendCanvaPersonalizationParams(
+    appendCanvaProxyHideScrollbarFlag(
+      getExternalInvitationEmbedSrc(externalLink),
+    ),
+    guest,
   );
 
   return (

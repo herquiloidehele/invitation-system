@@ -260,6 +260,7 @@ export default function RichExternalLinkPage({
           setCanvaPageState({ externalLink, isInitialPage })
         }
         preloading={canvaPreloading}
+        guest={invitation.guest ?? null}
       />
 
       <PlacesSection

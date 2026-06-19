@@ -18,6 +18,7 @@ function entry(tag: string): CachedHtmlResponse {
     body: Buffer.from(`body-${tag}`),
     encoding: "br",
     contentType: "text/html; charset=utf-8",
+    cacheControl: "public, max-age=0, s-maxage=300, stale-while-revalidate=86400",
   };
 }
 

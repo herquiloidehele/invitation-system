@@ -343,6 +343,7 @@ function EnvelopeInvitationView({
             externalLink={effectiveExternalLink}
             visible={externalLinkVisible}
             lazyLoadIframe={lazyExternalIframe}
+            guest={invitation.guest ?? null}
           />
         )}
 

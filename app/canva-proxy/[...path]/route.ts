@@ -20,9 +20,17 @@ import {
 } from "@/lib/canva-proxy-compression";
 import {
   type CachedHtmlResponse,
+  type CachedHtmlTemplate,
   htmlResponseCache,
+  htmlTemplateCache,
   makeHtmlCacheKey,
+  makeTemplateCacheKey,
 } from "@/lib/canva-proxy-html-cache";
+import {
+  applyCanvaPersonalization,
+  decodeCanvaPersonalization,
+  type CanvaPersonalization,
+} from "@/lib/canva-personalization";
 
 /* ------------------------------------------------------------------ */
 /*  Canva Reverse Proxy                                                 */
@@ -212,7 +220,16 @@ async function proxyCanvaRequest(
   method: "GET" | "HEAD",
 ) {
   const { path } = await params;
-  const upstream = buildUpstreamUrl(path ?? [], req.nextUrl.search);
+
+  // Strip the personalization payload before building the upstream URL so
+  // guest data never reaches Canva and the shared template key is guest-free.
+  const reqSearchParams = new URLSearchParams(req.nextUrl.search);
+  const pz = reqSearchParams.get("pz");
+  reqSearchParams.delete("pz");
+  const cleanedSearch = reqSearchParams.toString()
+    ? `?${reqSearchParams.toString()}`
+    : "";
+  const upstream = buildUpstreamUrl(path ?? [], cleanedSearch);
 
   if (!upstream) {
     return NextResponse.json({ error: "Host not allowed" }, { status: 403 });
@@ -222,6 +239,8 @@ async function proxyCanvaRequest(
   const negotiatedEncoding = pickCompressionEncoding(acceptEncoding);
   const disableScroll = shouldDisableProxiedScroll(req.nextUrl);
   const hideScrollbar = shouldHideProxiedScrollbar(req.nextUrl);
+  const personalization = decodeCanvaPersonalization(pz);
+  const pzSignature = personalization ? (pz as string) : "none";
 
   // Fast path: a previously rewritten + compressed HTML shell for this exact
   // (url, encoding, scroll, scrollbar) is served straight from memory — no
@@ -229,16 +248,30 @@ async function proxyCanvaRequest(
   // compressed responses are cached, so this never fires for the
   // uncompressed case.
   if (method === "GET" && negotiatedEncoding) {
-    const cached = htmlResponseCache.get(
-      makeHtmlCacheKey(
-        upstream.url.href,
-        negotiatedEncoding,
-        disableScroll,
-        hideScrollbar,
-      ),
+    // (1) Compressed body for this exact (url, encoding, flags, payload).
+    const compressedCacheKey = makeHtmlCacheKey(
+      upstream.url.href,
+      negotiatedEncoding,
+      disableScroll,
+      hideScrollbar,
+      pzSignature,
     );
+    const cached = htmlResponseCache.get(compressedCacheKey);
     if (cached) {
       return buildCachedHtmlResponse(cached);
+    }
+
+    // (2) Shared token-intact template → personalize + compress (no fetch).
+    const template = htmlTemplateCache.get(
+      makeTemplateCacheKey(upstream.url.href, disableScroll, hideScrollbar),
+    );
+    if (template) {
+      return await buildHtmlFromTemplate({
+        template,
+        personalization,
+        negotiatedEncoding,
+        compressedCacheKey,
+      });
     }
   }
 
@@ -278,21 +311,23 @@ async function proxyCanvaRequest(
       upstream: resp,
       upstreamHost: upstream.host,
       upstreamPath: upstream.url.pathname,
+      upstreamHref: upstream.url.href,
       reqUrl: req.nextUrl,
       contentType,
-      responseHeaders,
       negotiatedEncoding,
       disableScroll,
       hideScrollbar,
+      personalization,
       // Only a compressed 200 shell is worth caching: compression bounds the
       // entry to ~90 KB, and a non-200 body must never be reused.
-      cacheKey:
+      compressedCacheKey:
         negotiatedEncoding && resp.status === 200
           ? makeHtmlCacheKey(
               upstream.url.href,
               negotiatedEncoding,
               disableScroll,
               hideScrollbar,
+              pzSignature,
             )
           : null,
     });
@@ -323,31 +358,32 @@ interface RespondWithHtmlArgs {
   upstream: Response;
   upstreamHost: string;
   upstreamPath: string;
+  upstreamHref: string;
   reqUrl: URL;
   contentType: string;
-  responseHeaders: Headers;
   negotiatedEncoding: SupportedEncoding | null;
   disableScroll: boolean;
   hideScrollbar: boolean;
+  personalization: CanvaPersonalization | null;
   /**
-   * When non-null, the compressed shell is stored under this key for reuse
-   * by subsequent guests. Null disables caching for this response (e.g.
-   * uncompressed or non-200).
+   * When non-null AND a real encoding, the compressed body is stored under
+   * this key for reuse. Null disables caching (e.g. uncompressed or non-200).
    */
-  cacheKey: string | null;
+  compressedCacheKey: string | null;
 }
 
 async function respondWithHtml({
   upstream,
   upstreamHost,
   upstreamPath,
+  upstreamHref,
   reqUrl,
   contentType,
-  responseHeaders,
   negotiatedEncoding,
   disableScroll,
   hideScrollbar,
-  cacheKey,
+  personalization,
+  compressedCacheKey,
 }: RespondWithHtmlArgs): Promise<NextResponse> {
   const html = await upstream.text();
   const proxyOrigin =
@@ -376,35 +412,85 @@ async function respondWithHtml({
   }
 
   const responseContentType = contentType || "text/html; charset=utf-8";
-  responseHeaders.set("content-type", responseContentType);
+
+  // Cache the shared token-intact template (200s only) so other guests skip
+  // the upstream fetch + rewrite.
+  if (upstream.status === 200) {
+    htmlTemplateCache.set(
+      makeTemplateCacheKey(upstreamHref, disableScroll, hideScrollbar),
+      { html: rewritten, contentType: responseContentType },
+    );
+  }
+
+  return await buildHtmlFromTemplate({
+    template: { html: rewritten, contentType: responseContentType },
+    personalization,
+    negotiatedEncoding,
+    status: upstream.status,
+    compressedCacheKey: upstream.status === 200 ? compressedCacheKey : null,
+  });
+}
+
+interface BuildHtmlFromTemplateArgs {
+  template: CachedHtmlTemplate;
+  personalization: CanvaPersonalization | null;
+  negotiatedEncoding: SupportedEncoding | null;
+  status?: number;
+  /** When non-null AND a real encoding, the compressed body is cached here. */
+  compressedCacheKey: string | null;
+}
+
+/**
+ * Personalizes a token-intact template, compresses, and (optionally) caches
+ * the compressed body. Personalized output (a guest payload) is marked
+ * `private` and emits no CDN-cacheable headers; the no-guest shell keeps the
+ * public shared-edge policy.
+ */
+async function buildHtmlFromTemplate({
+  template,
+  personalization,
+  negotiatedEncoding,
+  status = 200,
+  compressedCacheKey,
+}: BuildHtmlFromTemplateArgs): Promise<NextResponse> {
+  const personalized = applyCanvaPersonalization(template.html, personalization);
+
+  const cacheControl = personalization
+    ? "private, no-store"
+    : pickCanvaProxyCacheControl({
+        upstreamPath: "/",
+        upstreamCacheControl: null,
+        contentType: "text/html",
+      });
+
+  const headers = new Headers();
+  headers.set("content-type", template.contentType);
+  headers.set("cache-control", cacheControl);
+  if (isSharedCacheable(cacheControl)) {
+    headers.set("vercel-cdn-cache-control", cacheControl);
+    headers.set("cdn-cache-control", cacheControl);
+  }
+  headers.set("access-control-allow-origin", "*");
+  headers.set("x-proxied-by", "canva-proxy");
+  appendVaryHeader(headers, "accept-encoding");
 
   if (!negotiatedEncoding) {
-    return new NextResponse(rewritten, {
-      status: upstream.status,
-      headers: responseHeaders,
-    });
+    return new NextResponse(personalized, { status, headers });
   }
 
-  const compressed = await compressBuffer(rewritten, negotiatedEncoding);
-  responseHeaders.set("content-encoding", negotiatedEncoding);
-  responseHeaders.set("content-length", String(compressed.length));
+  const compressed = await compressBuffer(personalized, negotiatedEncoding);
+  headers.set("content-encoding", negotiatedEncoding);
+  headers.set("content-length", String(compressed.length));
 
-  if (cacheKey) {
-    htmlResponseCache.set(cacheKey, {
+  if (compressedCacheKey) {
+    htmlResponseCache.set(compressedCacheKey, {
       body: compressed,
       encoding: negotiatedEncoding,
-      contentType: responseContentType,
+      contentType: template.contentType,
+      cacheControl,
     });
   }
-
-  // `Buffer` is structurally a `Uint8Array`; on Node 22 the runtime
-  // type is `Uint8Array<ArrayBufferLike>`, which the DOM-flavoured TS
-  // lib in this project does not recognise as a `BodyInit`. Cast at
-  // the boundary — the bytes themselves are valid.
-  return new NextResponse(compressed as unknown as BodyInit, {
-    status: upstream.status,
-    headers: responseHeaders,
-  });
+  return new NextResponse(compressed as unknown as BodyInit, { status, headers });
 }
 
 /**
@@ -419,16 +505,10 @@ function buildCachedHtmlResponse(cached: CachedHtmlResponse): NextResponse {
   headers.set("content-type", cached.contentType);
   headers.set("content-encoding", cached.encoding);
   headers.set("content-length", String(cached.body.length));
-
-  const cacheControl = pickCanvaProxyCacheControl({
-    upstreamPath: "/",
-    upstreamCacheControl: null,
-    contentType: "text/html",
-  });
-  headers.set("cache-control", cacheControl);
-  if (isSharedCacheable(cacheControl)) {
-    headers.set("vercel-cdn-cache-control", cacheControl);
-    headers.set("cdn-cache-control", cacheControl);
+  headers.set("cache-control", cached.cacheControl);
+  if (isSharedCacheable(cached.cacheControl)) {
+    headers.set("vercel-cdn-cache-control", cached.cacheControl);
+    headers.set("cdn-cache-control", cached.cacheControl);
   }
   headers.set("access-control-allow-origin", "*");
   headers.set("x-proxied-by", "canva-proxy");

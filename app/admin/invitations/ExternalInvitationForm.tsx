@@ -1309,6 +1309,41 @@ export default function ExternalInvitationForm({
                       onChange={(e) => update("externalLink", e.target.value)}
                       placeholder="https://..."
                     />
+                    <div className="mt-3 rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground space-y-1">
+                      <p className="font-medium text-foreground">
+                        Personalização no design Canva
+                      </p>
+                      <p>
+                        No design Canva, escreve estes marcadores (cada um como
+                        um elemento de texto, num único estilo) onde queres os
+                        dados do convidado:
+                      </p>
+                      <ul className="list-disc pl-4">
+                        <li>
+                          <code>{"{{nome}}"}</code> — nome do convidado
+                        </li>
+                        <li>
+                          <code>{"{{acompanhante}}"}</code> — acompanhante
+                        </li>
+                        <li>
+                          <code>{"{{mesa}}"}</code> — mesa
+                        </li>
+                        <li>
+                          <code>{"{{num_total}}"}</code> — nº de convidados
+                        </li>
+                      </ul>
+                      <p>
+                        Para nomes compridos ficarem centrados, dá à caixa de
+                        texto do marcador uma <strong>largura fixa</strong>{" "}
+                        (arrasta as pegas laterais) com alinhamento ao centro —
+                        senão a caixa cresce para o lado e o texto sai do centro.
+                      </p>
+                      <p>
+                        O botão de confirmação deve apontar para{" "}
+                        <code>/confirmar/&lt;slug&gt;</code> — o token do
+                        convidado é acrescentado automaticamente.
+                      </p>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
               )}

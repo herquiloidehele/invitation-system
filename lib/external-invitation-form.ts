@@ -1,4 +1,6 @@
-import type { InvitationData, InvitationType } from "./types";
+import type { InvitationData, InvitationType, PublicGuestData } from "./types";
+import { slugifyName } from "./guest-links";
+import { encodeCanvaPersonalization } from "./canva-personalization";
 
 export function shouldShowExternalInvitationAudioControls(
   invitationType: InvitationType,
@@ -66,6 +68,40 @@ export function appendCanvaProxyDisableScrollFlag(src: string): string {
 
   params.set("disableScroll", "1");
 
+  return `${path}?${params.toString()}${hash}`;
+}
+
+/**
+ * Appends an opaque `?pz=<payload>` param carrying the guest's personalization
+ * values to a `/canva-proxy/...` src. The proxy strips `pz` before the upstream
+ * fetch and uses it to replace text tokens + augment the `/confirmar/` link.
+ *
+ * No-ops for non-proxy srcs and when no guest is present (so generic links,
+ * admin preview and the landing demo render the no-guest fallbacks).
+ */
+export function appendCanvaPersonalizationParams(
+  src: string,
+  guest: PublicGuestData | null | undefined,
+): string {
+  if (!src || !src.startsWith("/canva-proxy/") || !guest) return src;
+
+  const pz = encodeCanvaPersonalization({
+    name: guest.name,
+    companion: guest.companion ?? "",
+    tableLabel: guest.tableLabel ?? "",
+    totalGuests: guest.totalGuests != null ? String(guest.totalGuests) : "",
+    token: guest.token,
+    nameSlug: slugifyName(guest.name),
+  });
+
+  const hashIndex = src.indexOf("#");
+  const beforeHash = hashIndex === -1 ? src : src.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : src.slice(hashIndex);
+  const queryIndex = beforeHash.indexOf("?");
+  const path = queryIndex === -1 ? beforeHash : beforeHash.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : beforeHash.slice(queryIndex + 1);
+  const params = new URLSearchParams(query);
+  params.set("pz", pz);
   return `${path}?${params.toString()}${hash}`;
 }
 
