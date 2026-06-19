@@ -184,6 +184,7 @@ function getDefaultState(
     countdown: { enabled: false },
     imageSettings: {},
     guestManagementEnabled: false,
+    ownerCanAddGuests: false,
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
 }
@@ -2629,6 +2630,28 @@ export default function ExternalInvitationForm({
 
                   {form.guestManagementEnabled && (
                     <>
+                      <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                        <div>
+                          <Label className="cursor-pointer">
+                            Permitir que o anfitrião adicione convidados
+                          </Label>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Quando activo, o anfitrião pode adicionar convidados na
+                            página de gestão dele. Quando desactivado, só tu podes
+                            adicionar convidados aqui.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.ownerCanAddGuests === true}
+                          onCheckedChange={(value) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              ownerCanAddGuests: value,
+                            }))
+                          }
+                        />
+                      </div>
+
                       <div className="space-y-1.5">
                         <Label htmlFor="external-guest-msg-template">
                           Mensagem de convite (template)

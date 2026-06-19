@@ -55,6 +55,7 @@ const baseRow = {
   externalLink: null,
   isDemo: false,
   guestManagementEnabled: false,
+  ownerCanAddGuests: false,
   guestMessageTemplate: null,
   socialPreview: null,
   priceFromCents: null,
@@ -102,6 +103,20 @@ describe("toAdminInvitationInitialData — heroTextLayer round-trip", () => {
     const row = { ...baseRow, heroTextLayer: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.heroTextLayer).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — ownerCanAddGuests round-trip", () => {
+  it("hydrates a stored ownerCanAddGuests=true into the admin form initial data", () => {
+    const row = { ...baseRow, ownerCanAddGuests: true };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.ownerCanAddGuests).toBe(true);
+  });
+
+  it("preserves ownerCanAddGuests=false (the default)", () => {
+    const row = { ...baseRow, ownerCanAddGuests: false };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.ownerCanAddGuests).toBe(false);
   });
 });
 

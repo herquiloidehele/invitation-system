@@ -119,6 +119,7 @@ model Invitation {
   externalLink   String? // URL for the external link / iframe (external_link type)
   isDemo         Boolean @default(false)
   guestManagementEnabled Boolean @default(false)
+  ownerCanAddGuests      Boolean @default(false) // When true, the host (owner-link page) may add guests; otherwise the "Add guest" button is hidden and the owner API rejects creation.
   guestMessageTemplate   String?
   socialPreview Json?    // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
 

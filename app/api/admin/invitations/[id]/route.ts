@@ -243,6 +243,9 @@ export async function PUT(
         ...(body.guestManagementEnabled !== undefined && {
           guestManagementEnabled: body.guestManagementEnabled === true,
         }),
+        ...(body.ownerCanAddGuests !== undefined && {
+          ownerCanAddGuests: body.ownerCanAddGuests === true,
+        }),
         ...(body.guestMessageTemplate !== undefined && {
           guestMessageTemplate: body.guestMessageTemplate || null,
         }),

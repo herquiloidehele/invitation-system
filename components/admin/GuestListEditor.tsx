@@ -31,6 +31,8 @@ interface GuestListEditorProps {
   /** Optional: shown in the header. */
   title?: string;
   showCustomExternalLink?: boolean;
+  /** When false, hides the "add guest" affordances. Defaults to true — set false on the host page when `ownerCanAddGuests` is off. */
+  canAddGuests?: boolean;
 }
 
 export default function GuestListEditor({
@@ -40,6 +42,7 @@ export default function GuestListEditor({
   messageTemplate,
   title = "Convidados",
   showCustomExternalLink = false,
+  canAddGuests = true,
 }: GuestListEditorProps) {
   const [guests, setGuests] = useState<GuestData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,10 +144,12 @@ export default function GuestListEditor({
             {guests.length} convidado{guests.length === 1 ? "" : "s"}
           </p>
         </div>
-        <Button type="button" onClick={openAdd}>
-          <Plus className="mr-1 size-4" />
-          Adicionar convidado
-        </Button>
+        {canAddGuests && (
+          <Button type="button" onClick={openAdd}>
+            <Plus className="mr-1 size-4" />
+            Adicionar convidado
+          </Button>
+        )}
       </div>
 
       <div className="relative">
@@ -170,7 +175,7 @@ export default function GuestListEditor({
               ? "Nenhum convidado ainda"
               : "Nenhum convidado corresponde à pesquisa"}
           </p>
-          {guests.length === 0 && (
+          {guests.length === 0 && canAddGuests && (
             <Button
               type="button"
               variant="outline"

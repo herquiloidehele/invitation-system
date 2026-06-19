@@ -116,6 +116,7 @@ export async function POST(request: NextRequest) {
         customTexts: sanitizeJsonField(body.customTexts, null),
         eventType: normalizeInvitationEventType(body.eventType),
         guestManagementEnabled: body.guestManagementEnabled === true,
+        ownerCanAddGuests: body.ownerCanAddGuests === true,
         guestMessageTemplate: body.guestMessageTemplate ?? null,
         socialPreview: sanitizeJsonField(body.socialPreview, null),
         priceFromCents:

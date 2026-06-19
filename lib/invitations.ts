@@ -78,6 +78,7 @@ type InvitationWithTheme = {
   customTexts: unknown;
   eventType: string;
   guestManagementEnabled: boolean;
+  ownerCanAddGuests: boolean;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
 };
@@ -145,6 +146,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     customTexts: (row.customTexts as CustomTexts | null) ?? undefined,
     eventType: (row.eventType as InvitationEventType) ?? "wedding",
     guestManagementEnabled: row.guestManagementEnabled ?? false,
+    ownerCanAddGuests: row.ownerCanAddGuests ?? false,
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"]) ?? undefined,

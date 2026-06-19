@@ -899,6 +899,8 @@ export interface InvitationData {
   customTexts?: CustomTexts;
   /** Whether the guest-management feature is active for this invitation. */
   guestManagementEnabled?: boolean;
+  /** Whether the host (owner-link page) may add guests. When false, the "Add guest" button is hidden there and the owner API rejects creation. Defaults to false. */
+  ownerCanAddGuests?: boolean;
   /** WhatsApp/SMS message template with `{name}` and `{link}` placeholders. */
   guestMessageTemplate?: string;
   /** Override values used only for OG/Twitter meta tags. Image is never rendered on the page. */

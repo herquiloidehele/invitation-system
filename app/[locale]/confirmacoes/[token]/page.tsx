@@ -213,6 +213,7 @@ async function InvitationRsvpView({
             ownerToken={token}
             invitationSlug={invitation.slug}
             messageTemplate={invitation.guestMessageTemplate ?? ""}
+            canAddGuests={invitation.ownerCanAddGuests}
           />
         )}
       </main>

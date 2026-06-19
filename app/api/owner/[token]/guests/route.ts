@@ -20,7 +20,11 @@ const upsertSchema = z.object({
 async function resolveOwner(token: string) {
   const invitation = await prisma.invitation.findUnique({
     where: { ownerToken: token },
-    select: { slug: true, guestManagementEnabled: true },
+    select: {
+      slug: true,
+      guestManagementEnabled: true,
+      ownerCanAddGuests: true,
+    },
   });
   return invitation;
 }
@@ -42,6 +46,7 @@ export async function GET(
     guests,
     invitationSlug: inv.slug,
     guestManagementEnabled: inv.guestManagementEnabled,
+    ownerCanAddGuests: inv.ownerCanAddGuests,
   });
 }
 
@@ -60,6 +65,12 @@ export async function POST(
   if (!inv.guestManagementEnabled) {
     return NextResponse.json(
       { error: "Guest management is disabled for this invitation" },
+      { status: 403 },
+    );
+  }
+  if (!inv.ownerCanAddGuests) {
+    return NextResponse.json(
+      { error: "Adding guests is disabled for this invitation" },
       { status: 403 },
     );
   }

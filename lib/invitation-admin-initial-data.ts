@@ -75,6 +75,7 @@ type AdminInvitationInitialDataRow = {
   externalLink: string | null;
   isDemo: boolean;
   guestManagementEnabled: boolean;
+  ownerCanAddGuests: boolean;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
   priceFromCents: number | null;
@@ -150,6 +151,7 @@ export function toAdminInvitationInitialData(
     externalLink: row.externalLink ?? undefined,
     isDemo: row.isDemo,
     guestManagementEnabled: row.guestManagementEnabled,
+    ownerCanAddGuests: row.ownerCanAddGuests,
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"] | null) ??

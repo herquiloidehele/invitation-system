@@ -9,6 +9,8 @@ interface GuestsTabClientProps {
   ownerToken: string;
   invitationSlug: string;
   messageTemplate: string;
+  /** Whether the host is allowed to add guests (Invitation.ownerCanAddGuests). */
+  canAddGuests: boolean;
 }
 
 /**
@@ -31,6 +33,7 @@ export default function GuestsTabClient({
   ownerToken,
   invitationSlug,
   messageTemplate,
+  canAddGuests,
 }: GuestsTabClientProps) {
   const origin = useWindowOrigin();
   const t = useTranslations("OwnerConfirmations");
@@ -46,6 +49,7 @@ export default function GuestsTabClient({
       invitationOrigin={origin}
       messageTemplate={messageTemplate || DEFAULT_GUEST_MESSAGE_TEMPLATE}
       title={t("guestsListTitle")}
+      canAddGuests={canAddGuests}
     />
   );
 }
