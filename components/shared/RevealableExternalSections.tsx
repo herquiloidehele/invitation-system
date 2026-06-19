@@ -159,6 +159,7 @@ export default function RevealableExternalSections({
             theme={theme}
             preloading={!revealed}
             onInitialPageChange={onCanvaInitialPageChange}
+            guest={invitation.guest ?? null}
           />
         )}
 

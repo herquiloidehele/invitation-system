@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { TemplateTheme } from "@/lib/types";
+import type { PublicGuestData, TemplateTheme } from "@/lib/types";
 import {
   measureIframeBodyHeight,
   shouldRestoreParentScrollForNavigation,
   shouldResetIframeHeightForNavigation,
 } from "@/lib/canva-embed-measurement";
 import {
+  appendCanvaPersonalizationParams,
   appendCanvaProxyDisableScrollFlag,
   getExternalInvitationEmbedSrc,
   isInitialCanvaEmbedPage,
@@ -22,6 +23,8 @@ interface CanvaEmbedProps {
   /** iframe accessibility title. Defaults to "Convite". */
   title?: string;
   onInitialPageChange?: (isInitialPage: boolean) => void;
+  /** Real per-recipient guest (NOT the preview sample). Drives the `pz` param. */
+  guest?: PublicGuestData | null;
   /**
    * When true, the iframe mounts and starts fetching but is positioned
    * off-screen (fixed, far below the viewport) so it never participates
@@ -40,6 +43,7 @@ export default function CanvaEmbed({
   aspectRatio,
   title,
   onInitialPageChange,
+  guest,
   preloading = false,
 }: CanvaEmbedProps) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -63,8 +67,11 @@ export default function CanvaEmbed({
   // ExternalLinkPage omits the flag and gets the Canva page rendered as-is.
   const ar = aspectRatio ?? 9 / 16;
   const defaultProxiedUrl = externalLink
-    ? appendCanvaProxyDisableScrollFlag(
-        getExternalInvitationEmbedSrc(externalLink),
+    ? appendCanvaPersonalizationParams(
+        appendCanvaProxyDisableScrollFlag(
+          getExternalInvitationEmbedSrc(externalLink),
+        ),
+        guest,
       )
     : "";
   const proxiedUrl =
@@ -232,8 +239,11 @@ export default function CanvaEmbed({
 
       keepParentScrollUntilLoad(window.scrollY);
 
-      const nextSrc = appendCanvaProxyDisableScrollFlag(
-        `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`,
+      const nextSrc = appendCanvaPersonalizationParams(
+        appendCanvaProxyDisableScrollFlag(
+          `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`,
+        ),
+        guest,
       );
       const isInitialPage = isInitialCanvaEmbedPage(nextSrc, defaultProxiedUrl);
 
@@ -258,6 +268,7 @@ export default function CanvaEmbed({
   }, [
     defaultProxiedUrl,
     externalLink,
+    guest,
     keepParentScrollUntilLoad,
     onInitialPageChange,
   ]);

@@ -24,6 +24,7 @@ type GuestRow = {
   phoneCountryCode: string;
   phoneNumber: string;
   tableLabel: string | null;
+  totalGuests: number | null;
   canInviteOthers: boolean;
   note: string | null;
   customExternalLink: string | null;
@@ -44,6 +45,7 @@ function toGuestData(row: GuestRow): GuestData {
     phoneCountryCode: row.phoneCountryCode,
     phoneNumber: row.phoneNumber,
     tableLabel: row.tableLabel ?? undefined,
+    totalGuests: row.totalGuests ?? undefined,
     canInviteOthers: row.canInviteOthers,
     note: row.note ?? undefined,
     customExternalLink: row.customExternalLink ?? undefined,
@@ -61,6 +63,7 @@ function toPublicGuestData(
     | "name"
     | "companion"
     | "tableLabel"
+    | "totalGuests"
     | "note"
     | "customExternalLink"
     | "canInviteOthers"
@@ -72,6 +75,7 @@ function toPublicGuestData(
     name: row.name,
     companion: row.companion ?? undefined,
     tableLabel: row.tableLabel ?? undefined,
+    totalGuests: row.totalGuests ?? undefined,
     note: row.note ?? undefined,
     customExternalLink: row.customExternalLink ?? undefined,
     canInviteOthers: row.canInviteOthers,
@@ -142,6 +146,7 @@ export async function getPublicGuestByToken(
       name: true,
       companion: true,
       tableLabel: true,
+      totalGuests: true,
       note: true,
       customExternalLink: true,
       canInviteOthers: true,
@@ -177,6 +182,7 @@ export async function createGuest(
       phoneCountryCode: input.phoneCountryCode,
       phoneNumber: input.phoneNumber.replace(/\s+/g, ""),
       tableLabel: input.tableLabel?.trim() || "",
+      totalGuests: input.totalGuests ?? null,
       canInviteOthers: input.canInviteOthers ?? false,
       note: input.note?.trim() || null,
       customExternalLink: normalizeOptionalText(input.customExternalLink),
@@ -229,6 +235,8 @@ export async function updateGuest(
     data.phoneNumber = input.phoneNumber.replace(/\s+/g, "");
   if (input.tableLabel !== undefined)
     data.tableLabel = input.tableLabel.trim() || "";
+  if (input.totalGuests !== undefined)
+    data.totalGuests = input.totalGuests ?? null;
   if (input.canInviteOthers !== undefined)
     data.canInviteOthers = input.canInviteOthers;
   if (input.note !== undefined) data.note = input.note?.trim() || null;

@@ -9,12 +9,16 @@ import {
 } from "@/lib/rsvp-config";
 import { createNoIndexMetadata } from "@/lib/seo";
 import { formatLocalizedLongDate } from "@/lib/date-format";
+import { getPublicGuestByToken } from "@/lib/guests";
 import RsvpPage from "./RsvpPage";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = createNoIndexMetadata();
 
-type Props = { params: Promise<{ locale: string; slug: string }> };
+type Props = {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ g?: string }>;
+};
 
 // ---------------------------------------------------------------------------
 // Deadline helper — tries to parse the deadline string and compare to now.
@@ -32,8 +36,9 @@ function isDeadlinePassed(deadline: string | undefined): boolean {
 // Page
 // ---------------------------------------------------------------------------
 
-export default async function ConfirmarPage({ params }: Props) {
+export default async function ConfirmarPage({ params, searchParams }: Props) {
   const { slug, locale } = await params;
+  const { g: guestToken } = await searchParams;
 
   const invitation = await prisma.invitation.findUnique({
     where: { slug },
@@ -66,9 +71,23 @@ export default async function ConfirmarPage({ params }: Props) {
     ? formatLocalizedLongDate(date.iso, locale, date.display)
     : date.display;
 
+  // When the Canva confirm link carried `?g=<token>`, resolve the guest (scoped
+  // to this invitation) so the RSVP prefills the name and links to the guest.
+  let guestName: string | undefined;
+  let resolvedGuestToken: string | undefined;
+  if (guestToken) {
+    const guest = await getPublicGuestByToken(guestToken);
+    if (guest && guest.invitationSlug === slug) {
+      guestName = guest.name;
+      resolvedGuestToken = guest.token;
+    }
+  }
+
   return (
     <RsvpPage
       slug={slug}
+      guestToken={resolvedGuestToken}
+      prefillName={guestName}
       eventType={(invitation.eventType as InvitationEventType) ?? "wedding"}
       bride={couple.bride}
       groom={couple.groom}

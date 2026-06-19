@@ -256,6 +256,7 @@ model Guest {
   phoneNumber      String
 
   tableLabel      String?
+  totalGuests     Int?
   canInviteOthers Boolean  @default(false)
   note            String?
   customExternalLink String?

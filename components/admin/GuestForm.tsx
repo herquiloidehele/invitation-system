@@ -61,6 +61,7 @@ const formSchema = z.object({
       { message: "Telefone deve ter entre 6 e 15 dígitos" },
     ),
   tableLabel: z.string().optional(),
+  totalGuests: z.string().optional(),
   canInviteOthers: z.boolean(),
   note: z.string().optional(),
   customExternalLink: z.string().optional(),
@@ -97,6 +98,7 @@ export default function GuestForm({
       phoneCountryCode: DEFAULT_COUNTRY_CODE,
       phoneNumber: "",
       tableLabel: "",
+      totalGuests: "",
       canInviteOthers: false,
       note: "",
       customExternalLink: "",
@@ -115,6 +117,7 @@ export default function GuestForm({
         phoneCountryCode: guest.phoneCountryCode || DEFAULT_COUNTRY_CODE,
         phoneNumber: guest.phoneNumber ?? "",
         tableLabel: guest.tableLabel ?? "",
+        totalGuests: guest.totalGuests != null ? String(guest.totalGuests) : "",
         canInviteOthers: guest.canInviteOthers,
         note: guest.note ?? "",
         customExternalLink: guest.customExternalLink ?? "",
@@ -126,6 +129,7 @@ export default function GuestForm({
         phoneCountryCode: DEFAULT_COUNTRY_CODE,
         phoneNumber: "",
         tableLabel: "",
+        totalGuests: "",
         canInviteOthers: false,
         note: "",
         customExternalLink: "",
@@ -143,6 +147,10 @@ export default function GuestForm({
       phoneCountryCode: values.phoneCountryCode,
       phoneNumber: values.phoneNumber?.trim() ?? "",
       tableLabel: values.tableLabel?.trim() ?? "",
+      totalGuests:
+        values.totalGuests && values.totalGuests.trim() !== ""
+          ? Number(values.totalGuests)
+          : undefined,
       canInviteOthers: values.canInviteOthers,
       note: values.note?.trim() || undefined,
       ...(showCustomExternalLink
@@ -227,6 +235,18 @@ export default function GuestForm({
               id="guest-table"
               placeholder="Ex: Mesa 7 ou Os Amigos do Pedro"
               {...register("tableLabel")}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="guest-total">Nº de convidados</Label>
+            <Input
+              id="guest-total"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              placeholder="Ex: 2"
+              {...register("totalGuests")}
             />
           </div>
 

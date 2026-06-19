@@ -80,6 +80,10 @@ interface RsvpPageProps {
   customFields?: RsvpCustomField[];
   backgroundImageUrl?: string;
   customTexts?: CustomTexts;
+  /** Guest token from the `?g=` confirm link — links the RSVP to a guest. */
+  guestToken?: string;
+  /** Display name to prefill, resolved from the guest token server-side. */
+  prefillName?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -124,6 +128,8 @@ export default function RsvpPage({
   customFields = [],
   backgroundImageUrl,
   customTexts: ct,
+  guestToken,
+  prefillName,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [customValues, setCustomValues] = useState<RsvpCustomValues>({});
@@ -147,7 +153,7 @@ export default function RsvpPage({
   } = useForm<RSVPFormData>({
     resolver: zodResolver(rsvpSchema) as unknown as Resolver<RSVPFormData>,
     defaultValues: {
-      name: "",
+      name: prefillName ?? "",
       email: "",
       attending: undefined,
       dietaryRestrictions: "",
@@ -195,6 +201,7 @@ export default function RsvpPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationSlug: slug,
+          guestToken,
           guestName: data.name,
           email: data.email || undefined,
           attending: data.attending === "yes",
