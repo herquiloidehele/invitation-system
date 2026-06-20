@@ -7,7 +7,7 @@ import type {
   GalleryCategory as DbGalleryCategory,
   GalleryFeature,
   HeroFeature,
-  LiveDemoFeature,
+  LiveDemoFeature
 } from "@/lib/landing-features";
 import { BestSellersSection } from "./BestSellersSection";
 import { FaqSection } from "./FaqSection";
@@ -50,7 +50,7 @@ export function BrindealHomepage({
         itemsByCategory={galleryByCategory}
       />
       <ProcessSection />
-      <FeaturesSection currentCurrency={currentCurrency} />
+      <FeaturesSection />
       <LiveDemoSection items={liveDemoFeatures} />
       <FaqSection
         openIndex={openFaqIndex}
