@@ -20,21 +20,6 @@ export const APP_TABLES = [
   "ContactSubmission",
 ] as const;
 
-/** Baseline counts captured 2026-06-07. Logged for sanity; pass/fail is source==target. */
-export const BASELINE_COUNTS: Record<string, number> = {
-  InvitationEvent: 30350,
-  RsvpResponse: 1548,
-  SaveTheDateEvent: 687,
-  Guest: 246,
-  Invitation: 69,
-  Theme: 15,
-  LandingFeature: 13,
-  SaveTheDate: 3,
-  SaveTheDateRsvpResponse: 4,
-  SaveTheDateTheme: 2,
-  ContactSubmission: 0,
-};
-
 export const DUMP_FILE = "neon_data.sql";
 export const PG18_BIN = "/opt/homebrew/opt/postgresql@18/bin";
 
@@ -104,7 +89,9 @@ export function run(
     child.on("close", (code) =>
       code === 0
         ? resolve()
-        : reject(new Error(`${cmd} ${args.join(" ")} exited with code ${code}`)),
+        : reject(
+            new Error(`${cmd} ${args.join(" ")} exited with code ${code}`),
+          ),
     );
   });
 }
@@ -147,7 +134,9 @@ export async function ensurePgTools(): Promise<void> {
     console.log("PostgreSQL 18 client tools present.");
     return;
   }
-  console.log("Installing PostgreSQL 18 client (brew install postgresql@18)...");
+  console.log(
+    "Installing PostgreSQL 18 client (brew install postgresql@18)...",
+  );
   await run("brew", ["install", "postgresql@18"]);
   if (!existsSync(`${PG18_BIN}/pg_dump`) || !existsSync(`${PG18_BIN}/psql`)) {
     throw new Error(`pg_dump/psql not found at ${PG18_BIN} after install`);
@@ -302,7 +291,10 @@ export async function verify(
         (await c.query(`select count(*)::int as n from "_prisma_migrations"`))
           .rows[0].n as number,
     );
-  const [sm, tm] = await Promise.all([migCount(sourceUrl), migCount(targetUrl)]);
+  const [sm, tm] = await Promise.all([
+    migCount(sourceUrl),
+    migCount(targetUrl),
+  ]);
   const migOk = sm === tm;
   console.log(
     `_prisma_migrations: source=${sm} target=${tm} ${migOk ? "OK" : "MISMATCH"}`,
