@@ -70,11 +70,14 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
+import ElegantFloralPage from "@/components/elegant-floral/ElegantFloralPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
+import ElegantFloralDressFields from "@/components/admin/ElegantFloralDressFields";
+import LocationPhotosEditor from "@/components/admin/LocationPhotosEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
@@ -1206,6 +1209,34 @@ export default function InvitationForm({
       },
     };
   }, [themes, form.template, form.envelope]);
+
+  const isElegantFloral = currentTheme.layout === "elegant-floral";
+
+  const patchDressCode = useCallback(
+    (patch: Partial<InvitationData["dressCode"]>) => {
+      setForm((prev) => ({
+        ...prev,
+        dressCode: { ...prev.dressCode, ...patch },
+      }));
+    },
+    [],
+  );
+
+  const setLocationPhotos = useCallback(
+    (
+      which: "location" | "location2",
+      photos: NonNullable<InvitationData["location"]["photos"]>,
+    ) => {
+      setForm((prev) => {
+        if (which === "location2") {
+          if (!prev.location2) return prev;
+          return { ...prev, location2: { ...prev.location2, photos } };
+        }
+        return { ...prev, location: { ...prev.location, photos } };
+      });
+    },
+    [],
+  );
 
   // Hero free-text editor inputs (static still + scaled surface + fonts)
   const heroTextStillUrl = form.videoUrl
@@ -2462,6 +2493,13 @@ export default function InvitationForm({
                     )}
                   </div>
 
+                  {isElegantFloral && (
+                    <LocationPhotosEditor
+                      value={form.location.photos}
+                      onChange={(next) => setLocationPhotos("location", next)}
+                    />
+                  )}
+
                   {/* ── Second Location (optional) ── */}
                   <Separator className="my-4" />
                   {!form.location2 ? (
@@ -2654,6 +2692,15 @@ export default function InvitationForm({
                           />
                         )}
                       </div>
+
+                      {isElegantFloral && (
+                        <LocationPhotosEditor
+                          value={form.location2.photos}
+                          onChange={(next) =>
+                            setLocationPhotos("location2", next)
+                          }
+                        />
+                      )}
                     </div>
                   )}
                 </AccordionContent>
@@ -2747,6 +2794,13 @@ export default function InvitationForm({
                           Adicione até 6 cores para exibir no convite.
                         </p>
                       </div>
+                    )}
+
+                    {form.dressCode.enabled && isElegantFloral && (
+                      <ElegantFloralDressFields
+                        value={form.dressCode}
+                        onChange={patchDressCode}
+                      />
                     )}
                   </div>
 
@@ -3586,11 +3640,20 @@ export default function InvitationForm({
                 <CardStyleToolbar />
                 <div className="mx-auto origin-top w-full max-h-165 relative">
                   {hasRequiredNames ? (
-                    <InvitationPage
-                      invitation={form}
-                      theme={currentTheme}
-                      isPreview
-                    />
+                    isElegantFloral ? (
+                      <ElegantFloralPage
+                        invitation={form}
+                        theme={currentTheme}
+                        isPreview
+                        animateHeroText
+                      />
+                    ) : (
+                      <InvitationPage
+                        invitation={form}
+                        theme={currentTheme}
+                        isPreview
+                      />
+                    )
                   ) : (
                     <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
                       {isWedding

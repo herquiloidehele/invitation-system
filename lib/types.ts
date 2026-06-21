@@ -38,6 +38,16 @@ export interface DateInfo {
   year: string;
 }
 
+export interface LocationPhoto {
+  src: string;
+  /** Horizontal focal point 0-100 (default 50). */
+  positionX?: number;
+  /** Vertical focal point 0-100 (default 50). */
+  positionY?: number;
+  /** Zoom / scale 1-2.5 (default 1). */
+  zoom?: number;
+}
+
 export interface LocationInfo {
   name: string;
   address: string;
@@ -47,6 +57,8 @@ export interface LocationInfo {
   longitude?: number;
   imageUrl?: string;
   mapZoom?: number;
+  /** Elegant-floral: venue photo carousel. Falls back to `imageUrl` when empty. */
+  photos?: LocationPhoto[];
 }
 
 export type ScheduleStyle = "default" | "illustrated";
@@ -85,10 +97,32 @@ export interface ScheduleEvent {
   iconUrl?: string;
 }
 
+export interface DressColor {
+  /** Color name shown to guests, e.g. "Azul safira". */
+  name: string;
+  /** Optional swatch color (hex). */
+  hex?: string;
+}
+
 export interface DressCode {
   enabled: boolean;
   text: string;
   colors?: string[]; // 1-6 hex color values, e.g. ["#000000", "#FFFFFF"]
+  /** Elegant-floral rich fields (all optional; older invitations unaffected). */
+  title?: string; // "LE JARDIN DE PARADIS"
+  intro?: string; // "Uma noite de elegância, romance e sofisticação."
+  ladies?: {
+    label?: string;
+    note?: string;
+    palette?: DressColor[];
+    imageUrl?: string;
+  };
+  gentlemen?: {
+    label?: string;
+    note?: string;
+    imageUrl?: string;
+  };
+  reservedNote?: string; // the "Nota" reserved-colors block
 }
 
 export interface GiftRegistry {
@@ -977,7 +1011,7 @@ export interface TemplateTheme {
    * - "video-entrance": VideoEntrancePage flow (single tap-to-play video as
    *   cover + hero, timed text reveal, then the same external sections)
    */
-  layout?: "default" | "curtain-canva" | "video-entrance";
+  layout?: "default" | "curtain-canva" | "video-entrance" | "elegant-floral";
 }
 
 // ---------------------------------------------------------------------------

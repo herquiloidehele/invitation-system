@@ -1,0 +1,150 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import type { MutableRefObject, RefObject } from "react";
+import type { InvitationData, TemplateTheme } from "@/lib/types";
+import InvitationHero from "@/components/shared/InvitationHero";
+import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
+import Announcement from "./Announcement";
+import Countdown from "./Countdown";
+import LocationCard from "./LocationCard";
+import HeartDivider from "./HeartDivider";
+import ScheduleBlock from "./ScheduleBlock";
+import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
+import DressCodeSection from "./DressCodeSection";
+import GiftsSection from "./GiftsSection";
+import FaqSection from "./FaqSection";
+import ScriptTitle from "./ScriptTitle";
+import { Reveal, EfRevealProvider } from "./motion";
+
+// The inline RSVP form pulls in react-hook-form + zod; lazy-load it (below the
+// fold) so it doesn't bloat the initial page bundle.
+const RSVPForm = dynamic(() => import("@/components/shared/RSVPForm"), {
+  ssr: false,
+});
+
+export interface ElegantFloralPageProps {
+  invitation: InvitationData;
+  theme: TemplateTheme;
+  audioRef?: MutableRefObject<HTMLAudioElement | null>;
+  prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
+  isLandingPreview?: boolean;
+  /** Admin/live preview — reveal all sections immediately instead of on scroll. */
+  isPreview?: boolean;
+  animateHeroText?: boolean;
+}
+
+/**
+ * Bespoke page for the "elegant-floral" layout. Reuses the envelope shell
+ * (rendered by EnvelopeInvitationView) and the shared InvitationHero + RSVP
+ * form, with custom sections matching the Canva reference. Sections reveal on
+ * scroll via the helpers in ./motion.
+ */
+export default function ElegantFloralPage({
+  invitation,
+  theme,
+  audioRef,
+  prefetchedVideoRef,
+  isPreview,
+  animateHeroText,
+}: ElegantFloralPageProps) {
+  return (
+    <EfRevealProvider instant={isPreview ?? false}>
+      <div style={{ backgroundColor: theme.bg, color: theme.textPrimary }}>
+      <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
+
+      <InvitationHero
+        invitation={invitation}
+        theme={theme}
+        audioRef={audioRef}
+        prefetchedVideoRef={prefetchedVideoRef}
+        animateHeroText={animateHeroText}
+      />
+
+      {invitation.quote && (
+        <Reveal>
+          <p
+            style={{
+              margin: 0,
+              textAlign: "center",
+              padding: "1.4rem clamp(2rem, 9vw, 4rem) 0",
+              fontFamily: theme.bodyFont,
+              fontStyle: "italic",
+              color: theme.textSecondary,
+              fontSize: "clamp(1.02rem, 4vw, 1.28rem)",
+              lineHeight: 1.5,
+            }}
+          >
+            {invitation.quote}
+          </p>
+        </Reveal>
+      )}
+
+      <Announcement invitation={invitation} theme={theme} />
+
+      <CoupleGallery
+        invitation={invitation}
+        theme={theme}
+        isPreview={isPreview}
+      />
+
+      <Countdown invitation={invitation} theme={theme} />
+
+      <LocationCard
+        label="Cerimónia Religiosa"
+        location={invitation.location}
+        theme={theme}
+      />
+
+      {invitation.location2 && (
+        <LocationCard
+          label="Recepção"
+          location={invitation.location2}
+          theme={theme}
+        />
+      )}
+
+      <Reveal>
+        <HeartDivider color={theme.secondary} style={{ marginTop: "1.5rem" }} />
+      </Reveal>
+
+      <ScheduleBlock invitation={invitation} theme={theme} />
+
+      <DressCodeSection dressCode={invitation.dressCode} theme={theme} />
+
+      <GiftsSection giftRegistry={invitation.giftRegistry} theme={theme} />
+
+      {invitation.faqs && <FaqSection faqs={invitation.faqs} theme={theme} />}
+
+      {/* RSVP — inline form (Canva style). The shared form renders its own
+          header, which we hide so our gold-script title is the single heading. */}
+      <section
+        style={{
+          padding: "2rem clamp(1.5rem, 7vw, 3rem) 3.5rem",
+          maxWidth: 560,
+          marginInline: "auto",
+        }}
+      >
+        <Reveal style={{ textAlign: "center" }}>
+          <ScriptTitle theme={theme}>Confirmar Presença</ScriptTitle>
+        </Reveal>
+
+        {invitation.rsvp?.enabled && (
+          <Reveal delay={0.05}>
+            <div className="ef-rsvp" style={{ marginTop: "1.5rem" }}>
+              <style>{`.ef-rsvp > div:first-of-type{display:none}`}</style>
+              <RSVPForm
+                inline
+                invitation={invitation}
+                theme={theme}
+                customTexts={invitation.customTexts}
+                guest={invitation.guest}
+              />
+            </div>
+          </Reveal>
+        )}
+      </section>
+      </div>
+    </EfRevealProvider>
+  );
+}
