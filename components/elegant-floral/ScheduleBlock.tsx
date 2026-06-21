@@ -30,7 +30,7 @@ export default function ScheduleBlock({
       fontFamily: theme.displayFont,
       textTransform: "uppercase",
       letterSpacing: "0.05em",
-      fontSize: "clamp(0.92rem, 3.9vw, 1.12rem)",
+      fontSize: "clamp(0.78rem, 3.2vw, 0.96rem)",
       color: theme.textPrimary,
     },
     ts,
