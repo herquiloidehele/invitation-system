@@ -15,7 +15,6 @@ interface LocationCardProps {
   theme: TemplateTheme;
   textStyles?: TextStyleOverrides | null;
   mapLabel?: string;
-  routeLabel?: string;
 }
 
 function MapPin({ color }: { color: string }) {
@@ -45,7 +44,6 @@ export default function LocationCard({
   theme,
   textStyles: ts,
   mapLabel = "Ver mapa",
-  routeLabel = "Itinerário",
 }: LocationCardProps) {
   const reveal = useRevealProps();
   const photos = resolveLocationPhotos(location);
@@ -126,31 +124,24 @@ export default function LocationCard({
         </motion.p>
       )}
 
-      <motion.div
-        variants={efItem}
-        style={{
-          display: "flex",
-          gap: 12,
-          justifyContent: "center",
-          flexWrap: "wrap",
-          margin: "1.2rem 0 1.4rem",
-        }}
-      >
-        {location.googleMapsUrl && (
+      {photos.length > 0 && (
+        <motion.div variants={efItem} style={{ marginTop: "1.3rem" }}>
+          <PhotoCarousel photos={photos} theme={theme} />
+        </motion.div>
+      )}
+
+      {location.googleMapsUrl && (
+        <motion.div
+          variants={efItem}
+          style={{
+            marginTop: "1.3rem",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           <PillButton href={location.googleMapsUrl} theme={theme} textStyles={ts}>
             {mapLabel}
           </PillButton>
-        )}
-        {location.wazeUrl && (
-          <PillButton href={location.wazeUrl} theme={theme} textStyles={ts}>
-            {routeLabel}
-          </PillButton>
-        )}
-      </motion.div>
-
-      {photos.length > 0 && (
-        <motion.div variants={efItem}>
-          <PhotoCarousel photos={photos} theme={theme} />
         </motion.div>
       )}
     </motion.section>

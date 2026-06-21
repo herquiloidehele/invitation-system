@@ -5,7 +5,6 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
-import HeartDivider from "./HeartDivider";
 import { efGroup, efItem, useRevealProps } from "./motion";
 
 interface ScheduleBlockProps {
@@ -69,9 +68,6 @@ export default function ScheduleBlock({
           {title}
         </ScriptTitle>
       </motion.div>
-      <motion.div variants={efItem}>
-        <HeartDivider color={theme.secondary} style={{ margin: "1.2rem auto 2rem" }} />
-      </motion.div>
 
       <motion.div
         variants={efGroup}
@@ -80,11 +76,15 @@ export default function ScheduleBlock({
         {items.map((ev, i) => (
           <motion.div key={`${ev.label}-${i}`} variants={efItem}>
             <p style={labelStyle}>
-              <EditableText elementKey="efScheduleLabel">{ev.label}</EditableText>
+              <EditableText elementKey="efScheduleLabel">
+                {ev.label}
+              </EditableText>
             </p>
             {ev.time && (
               <p style={timeStyle}>
-                <EditableText elementKey="efScheduleTime">{ev.time}</EditableText>
+                <EditableText elementKey="efScheduleTime">
+                  {ev.time}
+                </EditableText>
               </p>
             )}
             {ev.venue && (
