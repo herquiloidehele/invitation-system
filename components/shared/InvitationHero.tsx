@@ -1,6 +1,7 @@
 "use client";
 
 import { type MutableRefObject, type RefObject } from "react";
+import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
@@ -161,17 +162,19 @@ export default function InvitationHero({
             style={{ objectFit: mediaFit }}
           />
         )
-      ) : (
-        <img
+      ) : invitation.heroImage ? (
+        <Image
           src={invitation.heroImage}
-          alt="Hero"
-          className="h-full w-full"
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 600px) 100vw, 600px"
           style={{
             objectFit: mediaFit,
             ...getImageStyle(invitation.imageSettings, "heroImage"),
           }}
         />
-      )}
+      ) : null}
 
       {/* Dark scrim (video only) */}
       {invitation.videoUrl && scrimOpacity > 0 && (

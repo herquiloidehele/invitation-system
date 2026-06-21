@@ -8,7 +8,7 @@ import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import Announcement from "./Announcement";
 import Countdown from "./Countdown";
 import LocationCard from "./LocationCard";
-import HeartDivider from "./HeartDivider";
+import FloralDivider from "./FloralDivider";
 import ScheduleBlock from "./ScheduleBlock";
 import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
 import DressCodeSection from "./DressCodeSection";
@@ -114,7 +114,11 @@ export default function ElegantFloralPage({
       )}
 
       <Reveal>
-        <HeartDivider color={theme.secondary} style={{ marginTop: "1.5rem" }} />
+        <FloralDivider
+          primary={theme.primary}
+          secondary={theme.secondary}
+          style={{ marginTop: "1.5rem" }}
+        />
       </Reveal>
 
       <ScheduleBlock invitation={invitation} theme={theme} />
@@ -148,6 +152,15 @@ export default function ElegantFloralPage({
           <ScriptTitle theme={theme} textStyles={ts}>
             Confirmar Presença
           </ScriptTitle>
+        </Reveal>
+
+        <Reveal delay={0.04}>
+          <FloralDivider
+            primary={theme.primary}
+            secondary={theme.secondary}
+            width={170}
+            style={{ marginTop: "0.6rem" }}
+          />
         </Reveal>
 
         {invitation.rsvp?.enabled && (

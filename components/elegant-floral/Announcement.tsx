@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
-import HeartDivider from "./HeartDivider";
+import FloralDivider from "./FloralDivider";
 import { efGroup, efItem, efNames, useRevealProps } from "./motion";
 
 interface AnnouncementProps {
@@ -140,7 +140,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       )}
 
       <motion.div variants={efItem} style={{ marginTop: "1.9rem" }}>
-        <HeartDivider color={theme.secondary} />
+        <FloralDivider primary={theme.primary} secondary={theme.secondary} />
       </motion.div>
     </motion.section>
   );
