@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { GiftRegistry, TemplateTheme } from "@/lib/types";
+import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import { efStyle } from "@/lib/elegant-floral";
+import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
 import PillButton from "./PillButton";
 import ConfettiAccordion from "./ConfettiAccordion";
@@ -10,6 +12,7 @@ import { efGroup, efItem, useRevealProps } from "./motion";
 interface GiftsSectionProps {
   giftRegistry: GiftRegistry;
   theme: TemplateTheme;
+  textStyles?: TextStyleOverrides | null;
   title?: string;
   /** Accordion bar label that reveals the gift message + link. */
   label?: string;
@@ -20,6 +23,7 @@ interface GiftsSectionProps {
 export default function GiftsSection({
   giftRegistry,
   theme,
+  textStyles: ts,
   title = "Presentes",
   label = "Opção presentear",
   buttonLabel = "Ver Lista",
@@ -34,30 +38,34 @@ export default function GiftsSection({
       {...reveal}
     >
       <motion.div variants={efItem}>
-        <ScriptTitle theme={theme} style={{ marginBottom: "1.5rem" }}>
+        <ScriptTitle theme={theme} textStyles={ts} style={{ marginBottom: "1.5rem" }}>
           {title}
         </ScriptTitle>
       </motion.div>
 
       <motion.div variants={efItem}>
-        <ConfettiAccordion header={label} theme={theme}>
+        <ConfettiAccordion header={label} theme={theme} textStyles={ts}>
           {giftRegistry.text && (
             <p
-              style={{
-                margin: "0.2rem 0 0",
-                textAlign: "center",
-                fontFamily: theme.bodyFont,
-                color: theme.textSecondary,
-                fontSize: "clamp(0.96rem, 3.7vw, 1.16rem)",
-                lineHeight: 1.6,
-              }}
+              style={efStyle(
+                {
+                  margin: "0.2rem 0 0",
+                  textAlign: "center",
+                  fontFamily: theme.bodyFont,
+                  color: theme.textSecondary,
+                  fontSize: "clamp(0.96rem, 3.7vw, 1.16rem)",
+                  lineHeight: 1.6,
+                },
+                ts,
+                "efBody",
+              )}
             >
-              {giftRegistry.text}
+              <EditableText elementKey="efBody">{giftRegistry.text}</EditableText>
             </p>
           )}
           {giftRegistry.link && (
             <div style={{ marginTop: "1.3rem", textAlign: "center" }}>
-              <PillButton href={giftRegistry.link} theme={theme}>
+              <PillButton href={giftRegistry.link} theme={theme} textStyles={ts}>
                 {buttonLabel}
               </PillButton>
             </div>

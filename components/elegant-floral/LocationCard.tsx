@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { LocationInfo, TemplateTheme } from "@/lib/types";
-import { resolveLocationPhotos } from "@/lib/elegant-floral";
+import type { LocationInfo, TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import { efStyle, resolveLocationPhotos } from "@/lib/elegant-floral";
+import { EditableText } from "@/components/shared/EditableText";
 import PhotoCarousel from "./PhotoCarousel";
 import PillButton from "./PillButton";
 import { efGroup, efItem, useRevealProps } from "./motion";
@@ -12,6 +13,7 @@ interface LocationCardProps {
   label: string;
   location: LocationInfo;
   theme: TemplateTheme;
+  textStyles?: TextStyleOverrides | null;
   mapLabel?: string;
   routeLabel?: string;
 }
@@ -41,6 +43,7 @@ export default function LocationCard({
   label,
   location,
   theme,
+  textStyles: ts,
   mapLabel = "Ver mapa",
   routeLabel = "Itinerário",
 }: LocationCardProps) {
@@ -69,43 +72,57 @@ export default function LocationCard({
       >
         <MapPin color={theme.secondary} />
         <span
-          style={{
-            fontFamily: theme.scriptFont ?? theme.displayFont,
-            fontSize: "clamp(1.4rem, 6vw, 1.9rem)",
-            color: theme.primary,
-            lineHeight: 1.1,
-          }}
+          style={efStyle(
+            {
+              fontFamily: theme.scriptFont ?? theme.displayFont,
+              fontSize: "clamp(1.4rem, 6vw, 1.9rem)",
+              color: theme.primary,
+              lineHeight: 1.1,
+            },
+            ts,
+            "efSectionTitle",
+          )}
         >
-          {label}
+          <EditableText elementKey="efSectionTitle">{label}</EditableText>
         </span>
       </motion.div>
 
       <motion.h3
         variants={efItem}
-        style={{
-          margin: "0.7rem 0 0.2rem",
-          fontFamily: theme.displayFont,
-          fontWeight: 600,
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-          fontSize: "clamp(1rem, 4.2vw, 1.25rem)",
-          color: theme.textPrimary,
-        }}
+        style={efStyle(
+          {
+            margin: "0.7rem 0 0.2rem",
+            fontFamily: theme.displayFont,
+            fontWeight: 600,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            fontSize: "clamp(1rem, 4.2vw, 1.25rem)",
+            color: theme.textPrimary,
+          },
+          ts,
+          "efLocationName",
+        )}
       >
-        {location.name}
+        <EditableText elementKey="efLocationName">{location.name}</EditableText>
       </motion.h3>
 
       {location.address && (
         <motion.p
           variants={efItem}
-          style={{
-            margin: 0,
-            fontFamily: theme.bodyFont,
-            color: theme.textSecondary,
-            fontSize: "clamp(0.92rem, 3.6vw, 1.1rem)",
-          }}
+          style={efStyle(
+            {
+              margin: 0,
+              fontFamily: theme.bodyFont,
+              color: theme.textSecondary,
+              fontSize: "clamp(0.92rem, 3.6vw, 1.1rem)",
+            },
+            ts,
+            "efLocationAddress",
+          )}
         >
-          {location.address}
+          <EditableText elementKey="efLocationAddress">
+            {location.address}
+          </EditableText>
         </motion.p>
       )}
 
@@ -120,12 +137,12 @@ export default function LocationCard({
         }}
       >
         {location.googleMapsUrl && (
-          <PillButton href={location.googleMapsUrl} theme={theme}>
+          <PillButton href={location.googleMapsUrl} theme={theme} textStyles={ts}>
             {mapLabel}
           </PillButton>
         )}
         {location.wazeUrl && (
-          <PillButton href={location.wazeUrl} theme={theme}>
+          <PillButton href={location.wazeUrl} theme={theme} textStyles={ts}>
             {routeLabel}
           </PillButton>
         )}

@@ -4,7 +4,9 @@ import { useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { ChevronDown } from "lucide-react";
-import type { TemplateTheme } from "@/lib/types";
+import type { TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import { efStyle, type EfTextKey } from "@/lib/elegant-floral";
+import { EditableText } from "@/components/shared/EditableText";
 import { EASE } from "@/components/shared/animations";
 
 /** Fire a small confetti burst centered on the just-opened header. */
@@ -35,10 +37,14 @@ export default function ConfettiAccordion({
   header,
   children,
   theme,
+  textStyles,
+  headerKey = "efFaqQuestion",
 }: {
   header: ReactNode;
   children: ReactNode;
   theme: TemplateTheme;
+  textStyles?: TextStyleOverrides | null;
+  headerKey?: EfTextKey;
 }) {
   const [open, setOpen] = useState(false);
   const colors = [theme.primary, theme.secondary, theme.accent, "#FFFFFF"];
@@ -49,6 +55,27 @@ export default function ConfettiAccordion({
     if (next) burstAt(e.currentTarget, colors);
   };
 
+  const headerStyle = efStyle(
+    {
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10,
+      padding: "0.8rem 1rem",
+      background: "transparent",
+      border: "none",
+      cursor: "pointer",
+      textAlign: "left",
+      fontFamily: theme.uiFont,
+      fontSize: "clamp(0.92rem, 3.6vw, 1.05rem)",
+      color: theme.primary,
+      lineHeight: 1.3,
+    },
+    textStyles,
+    headerKey,
+  );
+
   return (
     <div
       style={{
@@ -57,28 +84,10 @@ export default function ConfettiAccordion({
         background: `color-mix(in srgb, ${theme.secondary} 12%, transparent)`,
       }}
     >
-      <button
-        type="button"
-        onClick={toggle}
-        aria-expanded={open}
-        style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 10,
-          padding: "0.8rem 1rem",
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          textAlign: "left",
-          fontFamily: theme.uiFont,
-          fontSize: "clamp(0.92rem, 3.6vw, 1.05rem)",
-          color: theme.primary,
-          lineHeight: 1.3,
-        }}
-      >
-        <span>{header}</span>
+      <button type="button" onClick={toggle} aria-expanded={open} style={headerStyle}>
+        <span>
+          <EditableText elementKey={headerKey}>{header}</EditableText>
+        </span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.3, ease: EASE }}

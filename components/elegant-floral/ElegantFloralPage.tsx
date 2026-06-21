@@ -16,6 +16,8 @@ import GiftsSection from "./GiftsSection";
 import FaqSection from "./FaqSection";
 import ScriptTitle from "./ScriptTitle";
 import { Reveal, EfRevealProvider } from "./motion";
+import { efStyle } from "@/lib/elegant-floral";
+import { EditableText } from "@/components/shared/EditableText";
 
 // The inline RSVP form pulls in react-hook-form + zod; lazy-load it (below the
 // fold) so it doesn't bloat the initial page bundle.
@@ -48,6 +50,7 @@ export default function ElegantFloralPage({
   isPreview,
   animateHeroText,
 }: ElegantFloralPageProps) {
+  const ts = invitation.textStyles;
   return (
     <EfRevealProvider instant={isPreview ?? false}>
       <div style={{ backgroundColor: theme.bg, color: theme.textPrimary }}>
@@ -64,18 +67,22 @@ export default function ElegantFloralPage({
       {invitation.quote && (
         <Reveal>
           <p
-            style={{
-              margin: 0,
-              textAlign: "center",
-              padding: "1.4rem clamp(2rem, 9vw, 4rem) 0",
-              fontFamily: theme.bodyFont,
-              fontStyle: "italic",
-              color: theme.textSecondary,
-              fontSize: "clamp(1.02rem, 4vw, 1.28rem)",
-              lineHeight: 1.5,
-            }}
+            style={efStyle(
+              {
+                margin: 0,
+                textAlign: "center",
+                padding: "1.4rem clamp(2rem, 9vw, 4rem) 0",
+                fontFamily: theme.bodyFont,
+                fontStyle: "italic",
+                color: theme.textSecondary,
+                fontSize: "clamp(1.02rem, 4vw, 1.28rem)",
+                lineHeight: 1.5,
+              },
+              ts,
+              "efBlessing",
+            )}
           >
-            {invitation.quote}
+            <EditableText elementKey="efBlessing">{invitation.quote}</EditableText>
           </p>
         </Reveal>
       )}
@@ -94,6 +101,7 @@ export default function ElegantFloralPage({
         label="Cerimónia Religiosa"
         location={invitation.location}
         theme={theme}
+        textStyles={ts}
       />
 
       {invitation.location2 && (
@@ -101,6 +109,7 @@ export default function ElegantFloralPage({
           label="Recepção"
           location={invitation.location2}
           theme={theme}
+          textStyles={ts}
         />
       )}
 
@@ -110,11 +119,21 @@ export default function ElegantFloralPage({
 
       <ScheduleBlock invitation={invitation} theme={theme} />
 
-      <DressCodeSection dressCode={invitation.dressCode} theme={theme} />
+      <DressCodeSection
+        dressCode={invitation.dressCode}
+        theme={theme}
+        textStyles={ts}
+      />
 
-      <GiftsSection giftRegistry={invitation.giftRegistry} theme={theme} />
+      <GiftsSection
+        giftRegistry={invitation.giftRegistry}
+        theme={theme}
+        textStyles={ts}
+      />
 
-      {invitation.faqs && <FaqSection faqs={invitation.faqs} theme={theme} />}
+      {invitation.faqs && (
+        <FaqSection faqs={invitation.faqs} theme={theme} textStyles={ts} />
+      )}
 
       {/* RSVP — inline form (Canva style). The shared form renders its own
           header, which we hide so our gold-script title is the single heading. */}
@@ -126,7 +145,9 @@ export default function ElegantFloralPage({
         }}
       >
         <Reveal style={{ textAlign: "center" }}>
-          <ScriptTitle theme={theme}>Confirmar Presença</ScriptTitle>
+          <ScriptTitle theme={theme} textStyles={ts}>
+            Confirmar Presença
+          </ScriptTitle>
         </Reveal>
 
         {invitation.rsvp?.enabled && (

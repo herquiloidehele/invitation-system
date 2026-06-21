@@ -1,4 +1,11 @@
-import type { TemplateTheme, LocationInfo, LocationPhoto } from "./types";
+import type { CSSProperties } from "react";
+import type {
+  TemplateTheme,
+  LocationInfo,
+  LocationPhoto,
+  TextStyleOverrides,
+} from "./types";
+import { applyOverride } from "./text-styles";
 
 /**
  * Returns true when the theme should render via the ElegantFloralPage pipeline.
@@ -62,4 +69,24 @@ export function countdownPartsFrom(
     seconds: s % 60,
     done: false,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Inline text-style editing
+// ---------------------------------------------------------------------------
+
+/** Element keys available to the elegant-floral inline text editor. */
+export type EfTextKey = keyof NonNullable<TextStyleOverrides["elements"]>;
+
+/**
+ * Merge the admin's per-element text-style override (font / size / color /
+ * weight / letter-spacing) over a component's base style. With no override the
+ * base is returned unchanged, so the public page renders identically.
+ */
+export function efStyle(
+  base: CSSProperties,
+  textStyles: TextStyleOverrides | null | undefined,
+  key: EfTextKey,
+): CSSProperties {
+  return applyOverride(base, textStyles?.elements?.[key]);
 }

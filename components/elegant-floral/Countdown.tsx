@@ -3,7 +3,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { countdownPartsFrom, type CountdownParts } from "@/lib/elegant-floral";
+import {
+  countdownPartsFrom,
+  efStyle,
+  type CountdownParts,
+} from "@/lib/elegant-floral";
+import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
 import { efGroup, efItem, efPop, useRevealProps } from "./motion";
 
@@ -17,6 +22,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 /** Minimal "DD : HH : MM : SS" countdown matching the Canva, popped in on scroll. */
 export default function Countdown({ invitation, theme }: CountdownProps) {
   const reveal = useRevealProps();
+  const ts = invitation.textStyles;
   const config = invitation.countdown;
   const [parts, setParts] = useState<CountdownParts | null>(null);
 
@@ -38,40 +44,44 @@ export default function Countdown({ invitation, theme }: CountdownProps) {
     { value: pad(p.seconds), label: config.secondsLabel || "SEGUNDOS" },
   ];
 
-  const numberStyle = {
+  const numberBase = {
     fontFamily: theme.displayFont,
     fontWeight: 600,
     fontSize: "clamp(1.7rem, 9vw, 2.5rem)",
     color: theme.primary,
     lineHeight: 1,
   } as const;
-  const labelStyle = {
+  const labelBase = {
     fontFamily: theme.uiFont,
     fontSize: "clamp(0.56rem, 2.2vw, 0.7rem)",
     letterSpacing: "0.12em",
     color: theme.textMuted,
   } as const;
 
+  const numStyle = efStyle(numberBase, ts, "efCountdownValue");
+  const colonStyle = efStyle(
+    { ...numberBase, color: theme.secondary },
+    ts,
+    "efCountdownValue",
+  );
+  const labStyle = efStyle(labelBase, ts, "efCountdownLabel");
+
   const row1: ReactNode[] = [];
   const row2: ReactNode[] = [];
   cells.forEach((c, i) => {
     row1.push(
-      <motion.span key={`num-${i}`} variants={efPop} style={numberStyle}>
-        {c.value}
+      <motion.span key={`num-${i}`} variants={efPop} style={numStyle}>
+        <EditableText elementKey="efCountdownValue">{c.value}</EditableText>
       </motion.span>,
     );
     row2.push(
-      <motion.span key={`lab-${i}`} variants={efPop} style={labelStyle}>
-        {c.label}
+      <motion.span key={`lab-${i}`} variants={efPop} style={labStyle}>
+        <EditableText elementKey="efCountdownLabel">{c.label}</EditableText>
       </motion.span>,
     );
     if (i < cells.length - 1) {
       row1.push(
-        <motion.span
-          key={`col-${i}`}
-          variants={efPop}
-          style={{ ...numberStyle, color: theme.secondary }}
-        >
+        <motion.span key={`col-${i}`} variants={efPop} style={colonStyle}>
           :
         </motion.span>,
       );
@@ -86,7 +96,7 @@ export default function Countdown({ invitation, theme }: CountdownProps) {
       {...reveal}
     >
       <motion.div variants={efItem}>
-        <ScriptTitle theme={theme} size="clamp(1.6rem, 6.8vw, 2.2rem)">
+        <ScriptTitle theme={theme} textStyles={ts} size="clamp(1.6rem, 6.8vw, 2.2rem)">
           {config.title || "Contagem Decrescente"}
         </ScriptTitle>
       </motion.div>

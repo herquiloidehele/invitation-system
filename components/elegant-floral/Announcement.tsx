@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
+import { efStyle } from "@/lib/elegant-floral";
+import { EditableText } from "@/components/shared/EditableText";
 import HeartDivider from "./HeartDivider";
 import { efGroup, efItem, efNames, useRevealProps } from "./motion";
 
@@ -15,6 +17,7 @@ const SIDE_PAD = "clamp(1.75rem, 8vw, 3.5rem)";
 /** Parents announcement → couple names (script) → date, staggered into view. */
 export default function Announcement({ invitation, theme }: AnnouncementProps) {
   const reveal = useRevealProps();
+  const ts = invitation.textStyles;
   const { parents, couple, date, eventType } = invitation;
   const names =
     eventType === "wedding" ? `${couple.bride} e ${couple.groom}` : couple.bride;
@@ -42,67 +45,97 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       {parents?.enabled && (brideParents || groomParents) && (
         <motion.div
           variants={efItem}
-          style={{ fontSize: "clamp(1rem, 4vw, 1.25rem)", lineHeight: 1.5 }}
-        >
-          {brideParents && <p style={{ margin: 0 }}>{brideParents}</p>}
-          {brideParents && groomParents && (
-            <p style={{ margin: "0.2em 0", color: theme.textMuted }}>e</p>
+          style={efStyle(
+            { fontSize: "clamp(1rem, 4vw, 1.25rem)", lineHeight: 1.5 },
+            ts,
+            "efParents",
           )}
-          {groomParents && <p style={{ margin: 0 }}>{groomParents}</p>}
+        >
+          <EditableText elementKey="efParents">
+            {brideParents && <p style={{ margin: 0 }}>{brideParents}</p>}
+            {brideParents && groomParents && (
+              <p style={{ margin: "0.2em 0", color: theme.textMuted }}>e</p>
+            )}
+            {groomParents && <p style={{ margin: 0 }}>{groomParents}</p>}
+          </EditableText>
         </motion.div>
       )}
 
       {parents?.inviteMessage && (
         <motion.p
           variants={efItem}
-          style={{ margin: "1.35rem 0 0", fontSize: "clamp(0.98rem, 3.8vw, 1.2rem)" }}
+          style={efStyle(
+            { margin: "1.35rem 0 0", fontSize: "clamp(0.98rem, 3.8vw, 1.2rem)" },
+            ts,
+            "efInviteMessage",
+          )}
         >
-          {parents.inviteMessage}
+          <EditableText elementKey="efInviteMessage">
+            {parents.inviteMessage}
+          </EditableText>
         </motion.p>
       )}
 
       <motion.h1
         variants={efNames}
-        style={{
-          margin: "0.3rem 0",
-          fontFamily: theme.scriptFont ?? theme.displayFont,
-          fontWeight: 400,
-          fontSize: "clamp(2.3rem, 11vw, 3.9rem)",
-          lineHeight: 1.05,
-          color: theme.primary,
-        }}
+        style={efStyle(
+          {
+            margin: "0.3rem 0",
+            fontFamily: theme.scriptFont ?? theme.displayFont,
+            fontWeight: 400,
+            fontSize: "clamp(2.3rem, 11vw, 3.9rem)",
+            lineHeight: 1.05,
+            color: theme.primary,
+          },
+          ts,
+          "efNames",
+        )}
       >
-        {names}
+        <EditableText elementKey="efNames">{names}</EditableText>
       </motion.h1>
 
       <motion.p
         variants={efItem}
-        style={{ margin: "1rem 0 0.35rem", fontSize: "clamp(0.95rem, 3.6vw, 1.15rem)" }}
+        style={efStyle(
+          { margin: "1rem 0 0.35rem", fontSize: "clamp(0.95rem, 3.6vw, 1.15rem)" },
+          ts,
+          "efDateLabel",
+        )}
       >
-        A realizar-se no dia
+        <EditableText elementKey="efDateLabel">A realizar-se no dia</EditableText>
       </motion.p>
       <motion.p
         variants={efItem}
-        style={{
-          margin: 0,
-          fontFamily: theme.displayFont,
-          fontWeight: 600,
-          fontSize: "clamp(1.45rem, 6vw, 2rem)",
-          color: theme.secondary,
-        }}
+        style={efStyle(
+          {
+            margin: 0,
+            fontFamily: theme.displayFont,
+            fontWeight: 600,
+            fontSize: "clamp(1.45rem, 6vw, 2rem)",
+            color: theme.secondary,
+          },
+          ts,
+          "efDate",
+        )}
       >
-        {date.display}
+        <EditableText elementKey="efDate">{date.display}</EditableText>
       </motion.p>
       {(date.dayOfWeek || date.time) && (
         <motion.p
           variants={efItem}
-          style={{
-            margin: "0.35rem 0 0",
-            color: theme.textMuted,
-            fontSize: "clamp(0.85rem, 3.2vw, 1.05rem)",
-          }}
+          style={efStyle(
+            {
+              margin: "0.35rem 0 0",
+              color: theme.textMuted,
+              fontSize: "clamp(0.85rem, 3.2vw, 1.05rem)",
+            },
+            ts,
+            "efDateTime",
+          )}
         >
-          {[date.dayOfWeek, date.time].filter(Boolean).join(", ")}
+          <EditableText elementKey="efDateTime">
+            {[date.dayOfWeek, date.time].filter(Boolean).join(", ")}
+          </EditableText>
         </motion.p>
       )}
 

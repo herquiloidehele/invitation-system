@@ -557,6 +557,28 @@ export interface TextStyleOverrides {
     quote?: TextStyle;
     /** Video-entrance hero top text (above the couple names). */
     heroTopText?: TextStyle;
+    // -- Elegant Floral template (role-based keys) --
+    efSectionTitle?: TextStyle;
+    efNames?: TextStyle;
+    efParents?: TextStyle;
+    efInviteMessage?: TextStyle;
+    efDateLabel?: TextStyle;
+    efDate?: TextStyle;
+    efDateTime?: TextStyle;
+    efBlessing?: TextStyle;
+    efBody?: TextStyle;
+    efDressTitle?: TextStyle;
+    efSubLabel?: TextStyle;
+    efPalette?: TextStyle;
+    efCountdownValue?: TextStyle;
+    efCountdownLabel?: TextStyle;
+    efLocationName?: TextStyle;
+    efLocationAddress?: TextStyle;
+    efScheduleLabel?: TextStyle;
+    efScheduleTime?: TextStyle;
+    efPill?: TextStyle;
+    efFaqQuestion?: TextStyle;
+    efFaqAnswer?: TextStyle;
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
     dressCodeText?: TextStyle;
