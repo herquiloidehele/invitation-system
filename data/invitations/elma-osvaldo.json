@@ -1,0 +1,127 @@
+{
+  "slug": "elma-osvaldo",
+  "template": "elegant-floral",
+  "eventType": "wedding",
+  "couple": {
+    "bride": "Elma",
+    "groom": "Osvaldo",
+    "monogram": "EO"
+  },
+  "date": {
+    "iso": "2026-08-15T16:00:00",
+    "display": "15 de Agosto de 2026",
+    "dayOfWeek": "sábado",
+    "time": "16h",
+    "day": "15",
+    "month": "Agosto",
+    "year": "2026"
+  },
+  "quote": "Com a benção de Deus e da sua família",
+  "parents": {
+    "enabled": true,
+    "blessingMessage": "Com a benção de Deus e da sua família",
+    "inviteMessage": "Anunciam com alegria o casamento de",
+    "bridesFather": "Pai da noiva",
+    "bridesMother": "Mãe da noiva",
+    "groomsFather": "Pai do noivo",
+    "groomsMother": "Mãe do noivo"
+  },
+  "location": {
+    "name": "Igreja de Jesus",
+    "address": "Sé Catedral (Cidade Alta)",
+    "googleMapsUrl": "https://maps.google.com/?q=Se+Catedral+Cidade+Alta+Luanda",
+    "wazeUrl": "https://waze.com/ul?q=Se%20Catedral%20Luanda",
+    "photos": [
+      { "src": "https://images.unsplash.com/photo-1713766056165-666537a07103?w=900&q=80" },
+      { "src": "https://images.unsplash.com/photo-1645856050970-fc1150f4f47d?w=800&q=80" },
+      { "src": "https://images.unsplash.com/photo-1655045802235-889a17a9d3d4?w=800&q=80" },
+      { "src": "https://images.unsplash.com/photo-1662959832799-c7203051862b?w=800&q=80" }
+    ]
+  },
+  "location2": {
+    "name": "Centro de Conferências",
+    "address": "Fundungo de Belas",
+    "googleMapsUrl": "https://maps.google.com/?q=Belas+Luanda",
+    "wazeUrl": "https://waze.com/ul?q=Belas%20Luanda",
+    "photos": [
+      { "src": "https://images.unsplash.com/photo-1655045802235-889a17a9d3d4?w=800&q=80" },
+      { "src": "https://images.unsplash.com/photo-1662959832799-c7203051862b?w=800&q=80" },
+      { "src": "https://images.unsplash.com/photo-1713766056165-666537a07103?w=900&q=80" },
+      { "src": "https://images.unsplash.com/photo-1645856050970-fc1150f4f47d?w=800&q=80" }
+    ]
+  },
+  "rsvp": {
+    "enabled": true,
+    "showDietaryRestrictions": true
+  },
+  "countdown": {
+    "enabled": true,
+    "title": "Contagem Decrescente",
+    "daysLabel": "DIAS",
+    "hoursLabel": "HORAS",
+    "minutesLabel": "MINUTOS",
+    "secondsLabel": "SEGUNDOS"
+  },
+  "schedule": [
+    { "time": "16:00", "label": "Cerimónia Religiosa", "venue": "", "icon": "church" },
+    { "time": "18:00", "label": "Copo de Água", "venue": "", "icon": "toast" },
+    { "time": "18:30", "label": "Recepção com Welcome Drinks", "venue": "", "icon": "party" },
+    { "time": "19:00", "label": "Entrada dos Noivos", "venue": "", "icon": "rings" },
+    { "time": "19:30", "label": "Jantar", "venue": "", "icon": "dinner" },
+    { "time": "21:00", "label": "Corte do Bolo", "venue": "", "icon": "cake" },
+    { "time": "", "label": "Abertura do Salão", "venue": "", "icon": "dance" }
+  ],
+  "coupleGallery": {
+    "enabled": true,
+    "style": "grid",
+    "images": [
+      { "src": "https://images.unsplash.com/photo-1645856050970-fc1150f4f47d?w=800&q=80" },
+      { "src": "https://images.unsplash.com/photo-1655045802235-889a17a9d3d4?w=800&q=80" },
+      { "src": "https://images.unsplash.com/photo-1662959832799-c7203051862b?w=800&q=80" }
+    ]
+  },
+  "dressCode": {
+    "enabled": true,
+    "text": "Le Jardin de Paradis",
+    "title": "LE JARDIN DE PARADIS",
+    "intro": "Uma noite de elegância, romance e sofisticação.",
+    "ladies": {
+      "label": "SENHORAS",
+      "note": "VESTIDOS LONGOS EM TONS COMO:",
+      "palette": [
+        { "name": "Azul safira", "hex": "#0F52BA" },
+        { "name": "Verde esmeralda", "hex": "#046307" },
+        { "name": "Ameixa profunda", "hex": "#580F41" },
+        { "name": "Lavanda ametista", "hex": "#9966CC" },
+        { "name": "Azul-marinho", "hex": "#1B1F3B" },
+        { "name": "Laranja queimado", "hex": "#BF5700" },
+        { "name": "Amarelo torrado", "hex": "#D4A017" }
+      ],
+      "imageUrl": "/templates/elegant-floral/gowns.png"
+    },
+    "gentlemen": {
+      "label": "SENHORES",
+      "note": "Smoking ou fato escuro elegante, preferencialmente em preto, azul-noite ou tons profundos.",
+      "imageUrl": "/templates/elegant-floral/suits.png"
+    },
+    "reservedNote": "Vermelho é reservado às madrinhas e mães. Rosa velho é reservado às irmãs. Branco, prateado e tons semelhantes são reservados."
+  },
+  "giftRegistry": {
+    "enabled": true,
+    "text": "A vossa presença tornará o nosso dia verdadeiramente especial. Para aqueles que desejarem assinalar esta ocasião com um gesto de carinho, ficaremos profundamente gratos pelo vosso contributo para os sonhos que estamos a construir juntos.",
+    "link": "https://example.com/lista-de-presentes"
+  },
+  "faqs": [
+    { "question": "Podemos levar crianças?", "answer": "Não." },
+    { "question": "Tem estacionamento?", "answer": "Sim." }
+  ],
+  "audio": {
+    "enabled": false,
+    "src": "",
+    "artist": "",
+    "title": ""
+  },
+  "heroImage": "https://images.unsplash.com/photo-1713766056165-666537a07103?w=900&q=80",
+  "heroHeight": 560,
+  "heroOverlay": { "scrimOpacity": 0, "gradientStart": 45 }
+}

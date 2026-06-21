@@ -200,7 +200,7 @@ function isScriptFont(displayFont: string): boolean {
 }
 
 /** Merge a base style with an optional element-level TextStyle override. */
-function applyOverride(
+export function applyOverride(
   base: CSSProperties,
   override?: TextStyle,
 ): CSSProperties {

@@ -53,6 +53,7 @@ const THEMES = [
       "radial-gradient(ellipse at 50% 30%, rgba(196,160,80,0.06) 0%, transparent 70%)",
     decorativeColor: "rgba(196,160,80,0.18)",
     ctaGlow: "rgba(196,160,80,0.25)",
+    layout: "default",
   },
   {
     id: "theme_modern_minimal",
@@ -88,6 +89,7 @@ const THEMES = [
       "radial-gradient(ellipse at 50% 40%, rgba(212,175,55,0.04) 0%, transparent 60%)",
     decorativeColor: "rgba(212,175,55,0.2)",
     ctaGlow: "rgba(44,44,44,0.12)",
+    layout: "default",
   },
   {
     id: "theme_boho_chic",
@@ -123,6 +125,7 @@ const THEMES = [
       "radial-gradient(ellipse at 50% 35%, rgba(139,154,122,0.06) 0%, transparent 65%)",
     decorativeColor: "rgba(139,154,122,0.22)",
     ctaGlow: "rgba(160,113,90,0.2)",
+    layout: "default",
   },
   {
     id: "theme_midnight_elegance",
@@ -158,6 +161,43 @@ const THEMES = [
       "radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.03) 0%, transparent 60%)",
     decorativeColor: "rgba(255,215,0,0.15)",
     ctaGlow: "rgba(255,215,0,0.18)",
+    layout: "default",
+  },
+  {
+    id: "theme_elegant_floral",
+    name: "elegant-floral",
+    label: "Elegant Floral",
+    description: "Cremes, Dourado & Florais",
+    envelope: {
+      base: "#F3E9DC",
+      topFlap: "/images/top.png",
+      bottomFlap: "/images/bottom.png",
+    },
+    bg: "#FBF7F0",
+    cardBg: "rgba(255,255,255,0.7)",
+    cardBorder: "rgba(184,144,47,0.15)",
+    primary: "#B8902F",
+    secondary: "#C49A86",
+    accent: "#9CA77F",
+    textPrimary: "#8A6D3B",
+    textSecondary: "#A88A5A",
+    textMuted: "rgba(138,109,59,0.5)",
+    displayFont: "'Playfair Display', serif",
+    bodyFont: "'Cormorant Garamond', serif",
+    scriptFont: "'Pinyon Script', cursive",
+    uiFont: "'Outfit', sans-serif",
+    ctaPrimaryBg: "#B8902F",
+    ctaPrimaryText: "#FFFFFF",
+    ctaSecondaryBorder: "#C49A86",
+    ctaSecondaryText: "#B8902F",
+    ctaRadius: "9999px",
+    monogramColor: "#B8902F",
+    tapTextColor: "#A88A5A",
+    bgGradient:
+      "radial-gradient(ellipse at 50% 0%, rgba(184,144,47,0.06) 0%, transparent 60%)",
+    decorativeColor: "#C49A86",
+    ctaGlow: "rgba(184,144,47,0.25)",
+    layout: "elegant-floral",
   },
 ];
 
@@ -167,6 +207,7 @@ const TEMPLATE_TO_THEME_ID: Record<string, string> = {
   "modern-minimal": "theme_modern_minimal",
   "boho-chic": "theme_boho_chic",
   "midnight-elegance": "theme_midnight_elegance",
+  "elegant-floral": "theme_elegant_floral",
 };
 
 // Read all invitation JSON files
@@ -177,6 +218,7 @@ const jsonFiles = [
   "ana-miguel.json",
   "sofia-pedro.json",
   "leonor-diogo.json",
+  "elma-osvaldo.json",
 ];
 
 async function main() {
@@ -214,6 +256,7 @@ async function main() {
         bgGradient: theme.bgGradient,
         decorativeColor: theme.decorativeColor,
         ctaGlow: theme.ctaGlow,
+        layout: theme.layout,
       },
       create: {
         id: theme.id,
@@ -244,6 +287,7 @@ async function main() {
         bgGradient: theme.bgGradient,
         decorativeColor: theme.decorativeColor,
         ctaGlow: theme.ctaGlow,
+        layout: theme.layout,
       },
     });
     console.log(`  ✓ theme: ${theme.label}`);
@@ -282,6 +326,18 @@ async function main() {
         videoUrl: data.videoUrl ?? null,
         videoPoster: data.videoPoster ?? null,
         faqs: data.faqs ?? null,
+        location2: data.location2 ?? null,
+        parents: data.parents ?? null,
+        countdown: data.countdown ?? null,
+        coupleGallery: data.coupleGallery ?? null,
+        eventType: data.eventType ?? "wedding",
+        heroHeight: data.heroHeight ?? null,
+        heroOverlay: data.heroOverlay ?? null,
+        heroMediaFit: data.heroMediaFit ?? null,
+        scheduleStyle: data.scheduleStyle ?? null,
+        customTexts: data.customTexts ?? null,
+        textStyles: data.textStyles ?? null,
+        cardStyles: data.cardStyles ?? null,
       },
       create: {
         slug: data.slug,
@@ -299,6 +355,18 @@ async function main() {
         videoUrl: data.videoUrl ?? null,
         videoPoster: data.videoPoster ?? null,
         faqs: data.faqs ?? null,
+        location2: data.location2 ?? null,
+        parents: data.parents ?? null,
+        countdown: data.countdown ?? null,
+        coupleGallery: data.coupleGallery ?? null,
+        eventType: data.eventType ?? "wedding",
+        heroHeight: data.heroHeight ?? null,
+        heroOverlay: data.heroOverlay ?? null,
+        heroMediaFit: data.heroMediaFit ?? null,
+        scheduleStyle: data.scheduleStyle ?? null,
+        customTexts: data.customTexts ?? null,
+        textStyles: data.textStyles ?? null,
+        cardStyles: data.cardStyles ?? null,
       },
     });
 

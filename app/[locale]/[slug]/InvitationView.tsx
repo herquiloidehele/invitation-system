@@ -9,6 +9,7 @@ import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoP
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { isVideoEntranceLayout } from "@/lib/video-entrance";
+import { isElegantFloralLayout } from "@/lib/elegant-floral";
 import {
   hasRichExternalSections,
   shouldPreloadRichExternalCanva,
@@ -49,6 +50,10 @@ const CurtainCanvaPage = dynamic(
 );
 const VideoEntrancePage = dynamic(
   () => import("@/components/video-entrance/VideoEntrancePage"),
+  { ssr: false },
+);
+const ElegantFloralPage = dynamic(
+  () => import("@/components/elegant-floral/ElegantFloralPage"),
   { ssr: false },
 );
 
@@ -298,6 +303,19 @@ function EnvelopeInvitationView({
   function renderContent() {
     // External link/video are rendered as persistent siblings (outside this
     // AnimatePresence) so they can prefetch behind the envelope cover.
+    // Elegant-floral keeps the envelope shell but swaps the post-envelope page.
+    if (isElegantFloralLayout(theme)) {
+      return (
+        <ElegantFloralPage
+          invitation={invitation}
+          theme={theme}
+          audioRef={audioRef}
+          prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+          isLandingPreview={isLandingPreview}
+          animateHeroText
+        />
+      );
+    }
     // Default: standard full invitation page.
     return (
       <InvitationPage
