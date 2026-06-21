@@ -153,13 +153,25 @@ export default function ElegantFloralPage({
         {invitation.rsvp?.enabled && (
           <Reveal delay={0.05}>
             <div className="ef-rsvp" style={{ marginTop: "1.5rem" }}>
-              <style>{`.ef-rsvp > div:first-of-type{display:none}`}</style>
+              <style>{`
+                .ef-rsvp > div:first-of-type{display:none}
+                .ef-rsvp ::placeholder{color:${theme.textMuted};opacity:.75}
+                .ef-rsvp input:focus,.ef-rsvp textarea:focus{--tw-ring-color:${theme.secondary}55;border-color:${theme.primary} !important}
+              `}</style>
               <RSVPForm
                 inline
                 invitation={invitation}
                 theme={theme}
                 customTexts={invitation.customTexts}
                 guest={invitation.guest}
+                paletteOverride={{
+                  fieldBg: `color-mix(in srgb, ${theme.secondary} 9%, #ffffff)`,
+                  border: `color-mix(in srgb, ${theme.secondary} 48%, transparent)`,
+                  text: theme.textPrimary,
+                  textSoft: theme.secondary,
+                  textMuted: theme.textMuted,
+                  accent: theme.primary,
+                }}
               />
             </div>
           </Reveal>

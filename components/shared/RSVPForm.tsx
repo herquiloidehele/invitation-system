@@ -125,6 +125,8 @@ export interface RSVPFormDirectProps {
   inline?: boolean;
   /** Called when the modal wrapper wants the form to close. Ignored in inline mode. */
   onClose?: () => void;
+  /** Optional palette overrides to theme the form (field bg, border, text colors, fonts). */
+  paletteOverride?: Partial<ModalPalette>;
 }
 
 export interface RSVPFormIntegrationProps {
@@ -136,6 +138,8 @@ export interface RSVPFormIntegrationProps {
   guest?: PublicGuestData;
   inline?: boolean;
   onClose?: () => void;
+  /** Optional palette overrides to theme the form (field bg, border, text colors, fonts). */
+  paletteOverride?: Partial<ModalPalette>;
 }
 
 export type RSVPFormProps = RSVPFormDirectProps | RSVPFormIntegrationProps;
@@ -205,7 +209,7 @@ export default function RSVPForm(props: RSVPFormProps) {
   const apiEndpoint = props.apiEndpoint ?? "/api/rsvp";
   const slugKey = props.slugKey ?? "invitationSlug";
 
-  const p = buildModalPalette(props.theme);
+  const p = { ...buildModalPalette(props.theme), ...props.paletteOverride };
 
   // Per-element text style overrides — only available in integration mode
   // (legacy direct-theme callers pass no `invitation`). Resolved once per
