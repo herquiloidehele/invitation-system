@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  APP_TABLES,
   deriveDirectEndpoint,
   diffCounts,
   formatCountTable,
@@ -30,14 +29,6 @@ describe("parseArgs", () => {
 
   it("sets reset true when --reset is present", () => {
     expect(parseArgs(["--reset"])).toEqual({ reset: true });
-  });
-});
-
-describe("APP_TABLES", () => {
-  it("contains the 11 application tables and not _prisma_migrations", () => {
-    expect(APP_TABLES).toHaveLength(11);
-    expect(APP_TABLES).not.toContain("_prisma_migrations");
-    expect(APP_TABLES).toContain("InvitationEvent");
   });
 });
 

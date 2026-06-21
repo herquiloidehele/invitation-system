@@ -5,21 +5,6 @@ import { Client } from "pg";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-/** The 11 application tables. Order is FK-safe enough for TRUNCATE ... CASCADE. */
-export const APP_TABLES = [
-  "InvitationEvent",
-  "RsvpResponse",
-  "Guest",
-  "SaveTheDateEvent",
-  "SaveTheDateRsvpResponse",
-  "SaveTheDate",
-  "SaveTheDateTheme",
-  "Invitation",
-  "Theme",
-  "LandingFeature",
-  "ContactSubmission",
-] as const;
-
 export const DUMP_FILE = "neon_data.sql";
 export const PG18_BIN = "/opt/homebrew/opt/postgresql@18/bin";
 
@@ -113,6 +98,34 @@ export async function withClient<T>(
   }
 }
 
+/**
+ * Discover the application tables on a database: every public base table except
+ * Prisma's bookkeeping table. Derived at runtime so adding/removing models needs
+ * no edits to this script.
+ */
+export async function listAppTables(url: string): Promise<string[]> {
+  return withClient(url, async (c) => {
+    const res = await c.query(`
+      select table_name
+      from information_schema.tables
+      where table_schema = 'public'
+        and table_type = 'BASE TABLE'
+        and table_name <> '_prisma_migrations'
+      order by table_name`);
+    return res.rows.map((r) => r.table_name as string);
+  });
+}
+
+/** Number of applied migrations (rows in _prisma_migrations). Throws if the table is absent. */
+export async function migrationCount(url: string): Promise<number> {
+  return withClient(url, async (c) => {
+    const res = await c.query(
+      `select count(*)::int as n from "_prisma_migrations"`,
+    );
+    return res.rows[0].n as number;
+  });
+}
+
 /** Count rows for each table on the given database. */
 export async function tableCounts(
   url: string,
@@ -165,10 +178,14 @@ export async function pickDumpEndpoint(sourceUrl: string): Promise<string> {
   }
 }
 
-/** TRUNCATE all app tables (RESTART IDENTITY CASCADE). No-op-safe on empty tables. */
-export async function truncateAppTables(targetUrl: string): Promise<void> {
+/** TRUNCATE the given app tables (RESTART IDENTITY CASCADE). No-op-safe on empty tables. */
+export async function truncateAppTables(
+  targetUrl: string,
+  tables: readonly string[],
+): Promise<void> {
+  if (tables.length === 0) return;
   await withClient(targetUrl, async (c) => {
-    const list = APP_TABLES.map((t) => `"${t}"`).join(", ");
+    const list = tables.map((t) => `"${t}"`).join(", ");
     await c.query(`TRUNCATE TABLE ${list} RESTART IDENTITY CASCADE`);
   });
 }
@@ -178,17 +195,18 @@ export async function truncateAppTables(targetUrl: string): Promise<void> {
  * If they exist but hold rows: abort, unless --reset, which truncates them first.
  *
  * Note: a freshly built schema is NOT necessarily empty — migration
- * 20260322000001_add_theme_table seeds 4 default Themes. Those seeded rows are
+ * 20260322000001_add_theme_table seeds default Themes. Those seeded rows are
  * cleared by the unconditional truncate in main() right before the data load, so
  * this guard only fires on a target that already holds real migrated data.
  */
 export async function guardTarget(
   targetUrl: string,
+  tables: readonly string[],
   opts: CliOptions,
 ): Promise<void> {
   let counts: Record<string, number>;
   try {
-    counts = await tableCounts(targetUrl, APP_TABLES);
+    counts = await tableCounts(targetUrl, tables);
   } catch {
     console.log("Target schema not present yet — clean target.");
     return;
@@ -206,32 +224,29 @@ export async function guardTarget(
     );
   }
   console.log("--reset: truncating target app tables...");
-  await truncateAppTables(targetUrl);
+  await truncateAppTables(targetUrl, tables);
 }
-
-export const EXPECTED_MIGRATIONS = 47;
 
 /**
  * Build the schema on the target via `prisma migrate deploy`.
  * DATABASE_URL is set explicitly to the target; prisma.config.ts's dotenv load
  * does NOT override an already-set env var, so the target wins. The post-condition
- * (migrations recorded on the TARGET) proves migrate deploy hit Railway, not Neon.
+ * (target migration count equals the source's) proves migrate deploy hit Railway
+ * and that the two schemas are in sync before any data is copied.
  */
-export async function buildSchema(targetUrl: string): Promise<void> {
+export async function buildSchema(
+  targetUrl: string,
+  expectedMigrations: number,
+): Promise<void> {
   console.log("Phase 1: prisma migrate deploy -> Railway");
   await run("npx", ["prisma", "migrate", "deploy"], {
     env: { ...process.env, DATABASE_URL: targetUrl, NODE_ENV: "production" },
   });
-  const migrations = await withClient(targetUrl, async (c) => {
-    const res = await c.query(
-      `select count(*)::int as n from "_prisma_migrations"`,
-    );
-    return res.rows[0].n as number;
-  });
-  if (migrations !== EXPECTED_MIGRATIONS) {
+  const migrations = await migrationCount(targetUrl);
+  if (migrations !== expectedMigrations) {
     throw new Error(
-      `Expected ${EXPECTED_MIGRATIONS} migrations on target after deploy, found ${migrations}. ` +
-        `Did migrate deploy target the wrong database?`,
+      `Expected ${expectedMigrations} migrations on target (to match source), found ${migrations}. ` +
+        `Either migrate deploy targeted the wrong database, or the repo's migrations are out of sync with Neon.`,
     );
   }
   console.log(`Schema built: ${migrations} migrations recorded on Railway.`);
@@ -274,26 +289,20 @@ export async function loadData(targetUrl: string): Promise<void> {
 export async function verify(
   sourceUrl: string,
   targetUrl: string,
+  tables: readonly string[],
 ): Promise<boolean> {
   console.log("Phase 4: verify row counts");
   const [src, tgt] = await Promise.all([
-    tableCounts(sourceUrl, APP_TABLES),
-    tableCounts(targetUrl, APP_TABLES),
+    tableCounts(sourceUrl, tables),
+    tableCounts(targetUrl, tables),
   ]);
-  const rows = diffCounts(src, tgt, APP_TABLES);
+  const rows = diffCounts(src, tgt, tables);
   console.log(formatCountTable(rows));
   const countsOk = rows.every((r) => r.ok);
 
-  const migCount = (url: string) =>
-    withClient(
-      url,
-      async (c) =>
-        (await c.query(`select count(*)::int as n from "_prisma_migrations"`))
-          .rows[0].n as number,
-    );
   const [sm, tm] = await Promise.all([
-    migCount(sourceUrl),
-    migCount(targetUrl),
+    migrationCount(sourceUrl),
+    migrationCount(targetUrl),
   ]);
   const migOk = sm === tm;
   console.log(
@@ -318,17 +327,26 @@ export async function main(): Promise<void> {
   await ensurePgTools();
   console.log("Checking connectivity...");
   const dumpEndpoint = await pickDumpEndpoint(sourceUrl);
-  await guardTarget(targetUrl, opts);
 
-  await buildSchema(targetUrl);
+  // Discover what to migrate from the SOURCE so schema changes need no edits here.
+  const tables = await listAppTables(sourceUrl);
+  const expectedMigrations = await migrationCount(sourceUrl);
+  console.log(
+    `Source: ${tables.length} app tables, ${expectedMigrations} migrations.`,
+  );
+  console.log(`Tables: ${tables.join(", ")}`);
+
+  await guardTarget(targetUrl, tables, opts);
+
+  await buildSchema(targetUrl, expectedMigrations);
   await dumpData(dumpEndpoint);
   // The freshly built schema is not necessarily empty (migrations seed default
   // Themes). Clear all app tables so the COPY load never hits a PK conflict.
   console.log("Clearing target app tables before load...");
-  await truncateAppTables(targetUrl);
+  await truncateAppTables(targetUrl, tables);
   await loadData(targetUrl);
 
-  const ok = await verify(sourceUrl, targetUrl);
+  const ok = await verify(sourceUrl, targetUrl, tables);
   if (!ok) {
     console.error("\n❌ Verification FAILED — counts do not match.");
     process.exit(1);
