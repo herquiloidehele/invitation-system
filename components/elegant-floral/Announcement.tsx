@@ -48,27 +48,40 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
         (brideParents.length > 0 || groomParents.length > 0) && (
           <motion.div
             variants={efItem}
-            style={efStyle(
-              { fontSize: "clamp(1rem, 4vw, 1.25rem)", lineHeight: 1.5 },
-              ts,
-              "efParents",
-            )}
+            style={{ fontSize: "clamp(1rem, 4vw, 1.25rem)", lineHeight: 1.5 }}
           >
-            <EditableText elementKey="efParents">
-              {brideParents.map((name, i) => (
-                <p key={`bride-${i}`} style={{ margin: 0 }}>
-                  {name}
-                </p>
-              ))}
-              {brideParents.length > 0 && groomParents.length > 0 && (
-                <p style={{ margin: "0.2em 0", color: theme.textMuted }}>e</p>
-              )}
-              {groomParents.map((name, i) => (
-                <p key={`groom-${i}`} style={{ margin: 0 }}>
-                  {name}
-                </p>
-              ))}
-            </EditableText>
+            {/* Parent names + "e" divider are each their own selectable
+                element so the admin can (a) actually see the selection outline
+                and (b) style the names and the "e" independently. Wrapping the
+                whole block in one inline <span> broke the outline because a
+                span can't render a box around block-level <p> children. */}
+            {brideParents.map((name, i) => (
+              <p
+                key={`bride-${i}`}
+                style={efStyle({ margin: 0 }, ts, "efParents")}
+              >
+                <EditableText elementKey="efParents">{name}</EditableText>
+              </p>
+            ))}
+            {brideParents.length > 0 && groomParents.length > 0 && (
+              <p
+                style={efStyle(
+                  { margin: "0.2em 0", color: theme.textMuted },
+                  ts,
+                  "efParentsDivider",
+                )}
+              >
+                <EditableText elementKey="efParentsDivider">e</EditableText>
+              </p>
+            )}
+            {groomParents.map((name, i) => (
+              <p
+                key={`groom-${i}`}
+                style={efStyle({ margin: 0 }, ts, "efParents")}
+              >
+                <EditableText elementKey="efParents">{name}</EditableText>
+              </p>
+            ))}
           </motion.div>
         )}
 

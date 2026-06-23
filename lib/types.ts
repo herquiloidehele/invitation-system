@@ -561,6 +561,8 @@ export interface TextStyleOverrides {
     efSectionTitle?: TextStyle;
     efNames?: TextStyle;
     efParents?: TextStyle;
+    /** The "e" divider between the two families' parent names. */
+    efParentsDivider?: TextStyle;
     efInviteMessage?: TextStyle;
     efDateLabel?: TextStyle;
     efDate?: TextStyle;
