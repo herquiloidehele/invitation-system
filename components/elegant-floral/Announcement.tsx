@@ -22,14 +22,14 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
   const names =
     eventType === "wedding" ? `${couple.bride} e ${couple.groom}` : couple.bride;
 
-  const join = (a?: string, b?: string) =>
-    [a, b].filter((s) => s && s.trim()).join("  •  ");
+  const namesOf = (a?: string, b?: string) =>
+    [a, b].map((s) => s?.trim()).filter((s): s is string => Boolean(s));
   const brideParents = parents
-    ? join(parents.bridesFather, parents.bridesMother)
-    : "";
+    ? namesOf(parents.bridesFather, parents.bridesMother)
+    : [];
   const groomParents = parents
-    ? join(parents.groomsFather, parents.groomsMother)
-    : "";
+    ? namesOf(parents.groomsFather, parents.groomsMother)
+    : [];
 
   return (
     <motion.section
@@ -42,7 +42,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       variants={efGroup}
       {...reveal}
     >
-      {parents?.enabled && (brideParents || groomParents) && (
+      {parents?.enabled && (brideParents.length > 0 || groomParents.length > 0) && (
         <motion.div
           variants={efItem}
           style={efStyle(
@@ -52,11 +52,19 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
           )}
         >
           <EditableText elementKey="efParents">
-            {brideParents && <p style={{ margin: 0 }}>{brideParents}</p>}
-            {brideParents && groomParents && (
+            {brideParents.map((name, i) => (
+              <p key={`bride-${i}`} style={{ margin: 0 }}>
+                {name}
+              </p>
+            ))}
+            {brideParents.length > 0 && groomParents.length > 0 && (
               <p style={{ margin: "0.2em 0", color: theme.textMuted }}>e</p>
             )}
-            {groomParents && <p style={{ margin: 0 }}>{groomParents}</p>}
+            {groomParents.map((name, i) => (
+              <p key={`groom-${i}`} style={{ margin: 0 }}>
+                {name}
+              </p>
+            ))}
           </EditableText>
         </motion.div>
       )}
