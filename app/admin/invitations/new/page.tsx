@@ -48,6 +48,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
           deadline: "",
           showEmail: false,
           showDietaryRestrictions: true,
+          showCompanion: false,
         },
         schedule: [],
         dressCode: { enabled: false, text: "" },

@@ -225,6 +225,7 @@ model RsvpResponse {
   email               String?
   attending           Boolean
   dietaryRestrictions String?
+  companion           String?
   message             String?
   customAnswers       Json?
   submittedAt         DateTime @default(now())
@@ -282,6 +283,7 @@ model SaveTheDateRsvpResponse {
   email               String?
   attending           Boolean
   dietaryRestrictions String?
+  companion           String?
   message             String?
   customAnswers       Json?
   submittedAt         DateTime @default(now())

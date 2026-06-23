@@ -30,6 +30,7 @@ import {
 import { getSaveTheDateRsvpButtonBackground } from "@/lib/save-the-date-rsvp-button";
 import {
   getRsvpCustomFields,
+  shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
 } from "@/lib/rsvp-config";
@@ -756,6 +757,7 @@ export default function SaveTheDateView({
             showDietaryRestrictions={shouldShowRsvpDietaryRestrictions(
               saveTheDate.rsvp,
             )}
+            showCompanion={shouldShowRsvpCompanion(saveTheDate.rsvp)}
             customFields={getRsvpCustomFields(saveTheDate.rsvp)}
             theme={{
               bg: theme.bgColor,

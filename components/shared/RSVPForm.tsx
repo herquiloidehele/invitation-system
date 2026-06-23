@@ -19,6 +19,7 @@ import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { EditableText } from "@/components/shared/EditableText";
 import {
   getRsvpCustomFields,
+  shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
 } from "@/lib/rsvp-config";
@@ -39,6 +40,7 @@ function createRsvpSchema(t: (key: keyof CustomTexts) => string) {
     email: z.string().email(t("rsvp_invalidEmail")).or(z.literal("")),
     attending: z.enum(["yes", "no"], { error: t("rsvp_selectOption") }),
     dietaryRestrictions: z.string(),
+    companion: z.string(),
     message: z.string(),
   });
 }
@@ -118,6 +120,7 @@ export interface RSVPFormDirectProps {
   theme: RSVPThemeLegacy;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
+  showCompanion?: boolean;
   customFields?: RsvpCustomField[];
   apiEndpoint?: string;
   slugKey?: string;
@@ -203,6 +206,9 @@ export default function RSVPForm(props: RSVPFormProps) {
   const showDietaryRestrictions = isIntegration(props)
     ? shouldShowRsvpDietaryRestrictions(props.invitation.rsvp)
     : props.showDietaryRestrictions !== false;
+  const showCompanion = isIntegration(props)
+    ? shouldShowRsvpCompanion(props.invitation.rsvp)
+    : props.showCompanion === true;
   const customFields = isIntegration(props)
     ? getRsvpCustomFields(props.invitation.rsvp)
     : (props.customFields ?? []);
@@ -242,6 +248,7 @@ export default function RSVPForm(props: RSVPFormProps) {
       email: "",
       attending: undefined,
       dietaryRestrictions: "",
+      companion: "",
       message: "",
     },
   });
@@ -293,6 +300,7 @@ export default function RSVPForm(props: RSVPFormProps) {
           email: data.email || undefined,
           attending: data.attending === "yes",
           dietaryRestrictions: data.dietaryRestrictions || undefined,
+          companion: data.companion || undefined,
           message: data.message || undefined,
           customAnswers: customValidation.answers.map((answer) => ({
             fieldId: answer.fieldId,
@@ -564,6 +572,22 @@ export default function RSVPForm(props: RSVPFormProps) {
                 </span>
               )}
             </div>
+
+            {showCompanion && (
+              <div className="flex flex-col gap-1.5">
+                <label style={labelStyle}>
+                  <EditableText elementKey="labels">
+                    {resolveText("rsvp_companionLabel")}
+                  </EditableText>
+                </label>
+                <input
+                  {...register("companion")}
+                  placeholder={resolveText("rsvp_companionPlaceholder")}
+                  className={inputClass}
+                  style={inputStyle}
+                />
+              </div>
+            )}
 
             {showEmail && (
               <div className="flex flex-col gap-1.5">

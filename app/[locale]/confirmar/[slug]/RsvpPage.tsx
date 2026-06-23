@@ -30,6 +30,7 @@ function createRsvpSchema(t: (key: keyof CustomTexts) => string) {
     email: z.string().email(t("rsvp_invalidEmail")).or(z.literal("")),
     attending: z.enum(["yes", "no"], { error: t("rsvp_selectOption") }),
     dietaryRestrictions: z.string(),
+    companion: z.string(),
     message: z.string(),
   });
 }
@@ -77,6 +78,7 @@ interface RsvpPageProps {
   deadlinePassed: boolean;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
+  showCompanion?: boolean;
   customFields?: RsvpCustomField[];
   backgroundImageUrl?: string;
   customTexts?: CustomTexts;
@@ -125,6 +127,7 @@ export default function RsvpPage({
   deadlinePassed,
   showEmail = false,
   showDietaryRestrictions = true,
+  showCompanion = false,
   customFields = [],
   backgroundImageUrl,
   customTexts: ct,
@@ -157,6 +160,7 @@ export default function RsvpPage({
       email: "",
       attending: undefined,
       dietaryRestrictions: "",
+      companion: "",
       message: "",
     },
   });
@@ -206,6 +210,7 @@ export default function RsvpPage({
           email: data.email || undefined,
           attending: data.attending === "yes",
           dietaryRestrictions: data.dietaryRestrictions || undefined,
+          companion: data.companion || undefined,
           message: data.message || undefined,
           customAnswers: customValidation.answers.map((answer) => ({
             fieldId: answer.fieldId,
@@ -408,6 +413,20 @@ export default function RsvpPage({
                   </span>
                 )}
               </div>
+
+              {showCompanion && (
+                <div className="flex flex-col gap-1.5">
+                  <label style={labelStyle}>
+                    {resolveText("rsvp_companionLabel")}
+                  </label>
+                  <input
+                    {...register("companion")}
+                    placeholder={resolveText("rsvp_companionPlaceholder")}
+                    className={inputBase}
+                    style={inputStyle}
+                  />
+                </div>
+              )}
 
               {showEmail && (
                 <div className="flex flex-col gap-1.5">

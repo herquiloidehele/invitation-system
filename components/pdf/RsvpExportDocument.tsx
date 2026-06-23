@@ -7,6 +7,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import { countAttendingGuests } from "@/lib/rsvp-config";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -18,6 +19,7 @@ export type RsvpEntry = {
   email: string | null;
   attending: boolean;
   dietaryRestrictions: string | null;
+  companion?: string | null;
   message: string | null;
   customAnswers?: unknown;
   submittedAt: Date | string;
@@ -476,7 +478,10 @@ function GuestTable({
             <View style={styles.tableRow}>
               <Text style={[styles.tableCellMuted, styles.colNum]}>{i + 1}</Text>
               <Text style={[styles.tableCell, styles.colName]}>
-                {truncate(r.guestName, 28)}
+                {truncate(
+                  r.companion ? `${r.guestName} & ${r.companion}` : r.guestName,
+                  28,
+                )}
               </Text>
               <View style={styles.colResponse}>
                 <View
@@ -564,7 +569,7 @@ export function RsvpExportDocument({
   documentType,
 }: RsvpExportDocumentProps) {
   const styles = makeStyles(theme);
-  const attending = responses.filter((r) => r.attending).length;
+  const attending = countAttendingGuests(responses);
   const declined = responses.filter((r) => !r.attending).length;
 
   return (

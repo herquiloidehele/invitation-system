@@ -330,6 +330,8 @@
     "rsvp_attendingNo": "Não poderei ir",
     "rsvp_dietaryLabel": "Restrições alimentares",
     "rsvp_dietaryPlaceholder": "Vegetariano, sem glúten…",
+    "rsvp_companionLabel": "Acompanhante",
+    "rsvp_companionPlaceholder": "Nome do acompanhante",
     "rsvp_messageLabel": "Mensagem",
     "rsvp_messagePlaceholder": "Deixe uma mensagem especial…",
     "rsvp_deadlinePrefix": "Confirme até",

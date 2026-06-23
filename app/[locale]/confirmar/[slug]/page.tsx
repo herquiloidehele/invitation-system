@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import type { CustomTexts, InvitationEventType } from "@/lib/types";
 import {
   getRsvpCustomFields,
+  shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
 } from "@/lib/rsvp-config";
@@ -96,6 +97,7 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       deadlinePassed={deadlinePassed}
       showEmail={shouldShowRsvpEmail(rsvp)}
       showDietaryRestrictions={shouldShowRsvpDietaryRestrictions(rsvp)}
+      showCompanion={shouldShowRsvpCompanion(rsvp)}
       customFields={getRsvpCustomFields(rsvp)}
       backgroundImageUrl={rsvp.backgroundImageUrl}
       customTexts={customTexts}

@@ -152,6 +152,7 @@ function getDefaultState(
       enabled: false,
       showEmail: false,
       showDietaryRestrictions: true,
+      showCompanion: false,
       showOnExternalPage: false,
       backgroundImageUrl: "",
     },
@@ -2540,6 +2541,19 @@ export default function ExternalInvitationForm({
                           onCheckedChange={(v) =>
                             updateRsvp("showDietaryRestrictions", v)
                           }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Pedir acompanhante no RSVP</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, o formulário pede o nome de um
+                            acompanhante (opcional).
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.showCompanion === true}
+                          onCheckedChange={(v) => updateRsvp("showCompanion", v)}
                         />
                       </div>
                       <div className="flex items-center justify-between gap-4">

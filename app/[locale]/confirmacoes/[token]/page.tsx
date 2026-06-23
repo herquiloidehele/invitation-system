@@ -22,6 +22,7 @@ import {
 } from "@/i18n/locales";
 import { createNoIndexMetadata } from "@/lib/seo";
 import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import { countAttendingGuests } from "@/lib/rsvp-config";
 import type { RsvpCustomAnswer } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -142,7 +143,7 @@ async function InvitationRsvpView({
   const location = invitation.location as { name: string; address?: string };
 
   const responses = invitation.rsvpResponses;
-  const totalAttending = responses.filter((r) => r.attending).length;
+  const totalAttending = countAttendingGuests(responses);
   const totalDeclined = responses.filter((r) => !r.attending).length;
   const showGuests = invitation.guestManagementEnabled === true;
   const activeTab = showGuests && tab === "guests" ? "guests" : "rsvps";
@@ -201,6 +202,7 @@ async function InvitationRsvpView({
                 email: r.email,
                 attending: r.attending,
                 dietaryRestrictions: r.dietaryRestrictions,
+                companion: r.companion,
                 message: r.message,
                 customAnswers: r.customAnswers as RsvpCustomAnswer[] | null,
                 submittedAt: r.submittedAt,
@@ -249,7 +251,7 @@ async function SaveTheDateRsvpView({
   const date = std.date as { display: string };
 
   const responses = std.rsvpResponses;
-  const totalAttending = responses.filter((r) => r.attending).length;
+  const totalAttending = countAttendingGuests(responses);
   const totalDeclined = responses.filter((r) => !r.attending).length;
 
   return (
@@ -296,6 +298,7 @@ async function SaveTheDateRsvpView({
             email: r.email,
             attending: r.attending,
             dietaryRestrictions: r.dietaryRestrictions,
+            companion: r.companion,
             message: r.message,
             customAnswers: r.customAnswers as RsvpCustomAnswer[] | null,
             submittedAt: r.submittedAt,
@@ -354,6 +357,7 @@ export function RsvpList({
     email: string | null;
     attending: boolean;
     dietaryRestrictions: string | null;
+    companion: string | null;
     message: string | null;
     customAnswers: RsvpCustomAnswer[] | null;
     submittedAt: Date;
@@ -387,6 +391,11 @@ export function RsvpList({
                     <span className="font-medium text-stone-800">
                       {r.guestName}
                     </span>
+                    {r.companion && (
+                      <span className="text-sm text-stone-500">
+                        &amp; {r.companion}
+                      </span>
+                    )}
                     {r.attending ? (
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                         <CheckCircle2 className="size-3" />

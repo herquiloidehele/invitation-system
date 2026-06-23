@@ -266,6 +266,16 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "Vegetariano, sem glúten…",
       },
       {
+        key: "rsvp_companionLabel",
+        label: "Label acompanhante",
+        placeholder: "Acompanhante",
+      },
+      {
+        key: "rsvp_companionPlaceholder",
+        label: "Placeholder acompanhante",
+        placeholder: "Nome do acompanhante",
+      },
+      {
         key: "rsvp_messageLabel",
         label: "Label mensagem",
         placeholder: "Mensagem",

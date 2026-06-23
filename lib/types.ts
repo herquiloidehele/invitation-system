@@ -784,6 +784,8 @@ export interface CustomTexts {
   rsvp_attendingNo?: string;
   rsvp_dietaryLabel?: string;
   rsvp_dietaryPlaceholder?: string;
+  rsvp_companionLabel?: string;
+  rsvp_companionPlaceholder?: string;
   rsvp_messageLabel?: string;
   rsvp_messagePlaceholder?: string;
 
@@ -875,6 +877,7 @@ export interface InvitationData {
     deadline?: string;
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
+    showCompanion?: boolean;
     showOnExternalPage?: boolean;
     backgroundImageUrl?: string;
     customFields?: RsvpCustomField[];
