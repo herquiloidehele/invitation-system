@@ -14,7 +14,7 @@ const HEART_PATH =
 /** Thin line with a centered heart and small end hearts — the Canva section divider. */
 export default function HeartDivider({
   color = "currentColor",
-  width = 240,
+  width = 200,
   className,
   style,
 }: HeartDividerProps) {
@@ -38,7 +38,14 @@ export default function HeartDivider({
           <path d={HEART_PATH} />
         </g>
         <line x1="16" y1="10" x2="104" y2="10" stroke={color} strokeWidth="1" />
-        <line x1="136" y1="10" x2="224" y2="10" stroke={color} strokeWidth="1" />
+        <line
+          x1="136"
+          y1="10"
+          x2="224"
+          y2="10"
+          stroke={color}
+          strokeWidth="1"
+        />
         <g transform="translate(110,2) scale(1.05)" fill={color}>
           <path d={HEART_PATH} />
         </g>

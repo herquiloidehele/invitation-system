@@ -1,13 +1,9 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import {
-  countdownPartsFrom,
-  efStyle,
-  type CountdownParts,
-} from "@/lib/elegant-floral";
+import { type CountdownParts, countdownPartsFrom, efStyle } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
 import { efGroup, efItem, efPop, useRevealProps } from "./motion";
@@ -91,12 +87,19 @@ export default function Countdown({ invitation, theme }: CountdownProps) {
 
   return (
     <motion.section
-      style={{ textAlign: "center", padding: "2rem clamp(1rem, 4.5vw, 1.75rem)" }}
+      style={{
+        textAlign: "center",
+        padding: "2rem clamp(1rem, 4.5vw, 1.75rem)",
+      }}
       variants={efGroup}
       {...reveal}
     >
       <motion.div variants={efItem}>
-        <ScriptTitle theme={theme} textStyles={ts} size="clamp(1.6rem, 6.8vw, 2.2rem)">
+        <ScriptTitle
+          theme={theme}
+          textStyles={ts}
+          size="clamp(1.6rem, 6.8vw, 2.2rem)"
+        >
           {config.title || "Contagem Decrescente"}
         </ScriptTitle>
       </motion.div>
@@ -110,7 +113,7 @@ export default function Countdown({ invitation, theme }: CountdownProps) {
           rowGap: "0.6rem",
           alignItems: "center",
           justifyItems: "center",
-          marginTop: "2.25rem",
+          marginTop: "1.5rem",
         }}
       >
         {row1}

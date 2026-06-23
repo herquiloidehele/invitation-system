@@ -20,7 +20,9 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
   const ts = invitation.textStyles;
   const { parents, couple, date, eventType } = invitation;
   const names =
-    eventType === "wedding" ? `${couple.bride} e ${couple.groom}` : couple.bride;
+    eventType === "wedding"
+      ? `${couple.bride} e ${couple.groom}`
+      : couple.bride;
 
   const namesOf = (a?: string, b?: string) =>
     [a, b].map((s) => s?.trim()).filter((s): s is string => Boolean(s));
@@ -42,38 +44,42 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       variants={efGroup}
       {...reveal}
     >
-      {parents?.enabled && (brideParents.length > 0 || groomParents.length > 0) && (
-        <motion.div
-          variants={efItem}
-          style={efStyle(
-            { fontSize: "clamp(1rem, 4vw, 1.25rem)", lineHeight: 1.5 },
-            ts,
-            "efParents",
-          )}
-        >
-          <EditableText elementKey="efParents">
-            {brideParents.map((name, i) => (
-              <p key={`bride-${i}`} style={{ margin: 0 }}>
-                {name}
-              </p>
-            ))}
-            {brideParents.length > 0 && groomParents.length > 0 && (
-              <p style={{ margin: "0.2em 0", color: theme.textMuted }}>e</p>
+      {parents?.enabled &&
+        (brideParents.length > 0 || groomParents.length > 0) && (
+          <motion.div
+            variants={efItem}
+            style={efStyle(
+              { fontSize: "clamp(1rem, 4vw, 1.25rem)", lineHeight: 1.5 },
+              ts,
+              "efParents",
             )}
-            {groomParents.map((name, i) => (
-              <p key={`groom-${i}`} style={{ margin: 0 }}>
-                {name}
-              </p>
-            ))}
-          </EditableText>
-        </motion.div>
-      )}
+          >
+            <EditableText elementKey="efParents">
+              {brideParents.map((name, i) => (
+                <p key={`bride-${i}`} style={{ margin: 0 }}>
+                  {name}
+                </p>
+              ))}
+              {brideParents.length > 0 && groomParents.length > 0 && (
+                <p style={{ margin: "0.2em 0", color: theme.textMuted }}>e</p>
+              )}
+              {groomParents.map((name, i) => (
+                <p key={`groom-${i}`} style={{ margin: 0 }}>
+                  {name}
+                </p>
+              ))}
+            </EditableText>
+          </motion.div>
+        )}
 
       {parents?.inviteMessage && (
         <motion.p
           variants={efItem}
           style={efStyle(
-            { margin: "1.35rem 0 0", fontSize: "clamp(0.98rem, 3.8vw, 1.2rem)" },
+            {
+              margin: "1.35rem 0 0",
+              fontSize: "clamp(0.98rem, 3.8vw, 1.2rem)",
+            },
             ts,
             "efInviteMessage",
           )}
@@ -88,7 +94,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
         variants={efNames}
         style={efStyle(
           {
-            margin: "0.3rem 0",
+            margin: "2rem 0",
             fontFamily: theme.scriptFont ?? theme.displayFont,
             fontWeight: 400,
             fontSize: "clamp(2.3rem, 11vw, 3.9rem)",
@@ -105,12 +111,17 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       <motion.p
         variants={efItem}
         style={efStyle(
-          { margin: "1rem 0 0.35rem", fontSize: "clamp(0.95rem, 3.6vw, 1.15rem)" },
+          {
+            margin: "1rem 0 0.35rem",
+            fontSize: "clamp(0.95rem, 3.6vw, 1.15rem)",
+          },
           ts,
           "efDateLabel",
         )}
       >
-        <EditableText elementKey="efDateLabel">A realizar-se no dia</EditableText>
+        <EditableText elementKey="efDateLabel">
+          A realizar-se no dia
+        </EditableText>
       </motion.p>
       <motion.p
         variants={efItem}

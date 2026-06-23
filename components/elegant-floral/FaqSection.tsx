@@ -44,7 +44,7 @@ export default function FaqSection({
       {...reveal}
     >
       <motion.div variants={efItem}>
-        <ScriptTitle theme={theme} textStyles={ts} style={{ marginBottom: "2.25rem" }}>
+        <ScriptTitle theme={theme} textStyles={ts} style={{ marginBottom: "3rem" }}>
           {title}
         </ScriptTitle>
       </motion.div>

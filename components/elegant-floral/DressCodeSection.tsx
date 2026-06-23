@@ -78,7 +78,7 @@ export default function DressCodeSection({
       variants={efGroup}
       {...reveal}
     >
-      <motion.div variants={efItem} style={{ marginBottom: "1.6rem" }}>
+      <motion.div variants={efItem} style={{ marginBottom: "2.2rem" }}>
         <ScriptTitle theme={theme} textStyles={ts}>
           {title}
         </ScriptTitle>
