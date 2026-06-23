@@ -126,7 +126,12 @@ export default function LocationCard({
 
       {photos.length > 0 && (
         <motion.div variants={efItem} style={{ marginTop: "1.3rem" }}>
-          <PhotoCarousel photos={photos} theme={theme} />
+          <PhotoCarousel
+            photos={photos}
+            theme={theme}
+            perPage={1}
+            aspectRatio="4 / 3"
+          />
         </motion.div>
       )}
 
