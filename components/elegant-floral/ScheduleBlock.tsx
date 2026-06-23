@@ -59,11 +59,11 @@ export default function ScheduleBlock({
 
   return (
     <motion.section
-      style={{ textAlign: "center", padding: "2rem clamp(1.5rem, 7vw, 3rem)" }}
+      style={{ textAlign: "center", padding: "2rem clamp(1rem, 4.5vw, 1.75rem)" }}
       variants={efGroup}
       {...reveal}
     >
-      <motion.div variants={efItem} className={"py-4"}>
+      <motion.div variants={efItem} className={"py-4"} style={{ marginBottom: "1.25rem" }}>
         <ScriptTitle theme={theme} textStyles={ts}>
           {title}
         </ScriptTitle>

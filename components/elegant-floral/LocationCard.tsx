@@ -52,7 +52,7 @@ export default function LocationCard({
     <motion.section
       style={{
         textAlign: "center",
-        padding: "1.5rem clamp(1.5rem, 7vw, 3rem)",
+        padding: "1.5rem clamp(1rem, 4.5vw, 1.75rem)",
         maxWidth: 520,
         margin: "0 auto",
       }}

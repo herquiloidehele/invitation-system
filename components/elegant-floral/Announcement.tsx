@@ -12,7 +12,7 @@ interface AnnouncementProps {
   theme: TemplateTheme;
 }
 
-const SIDE_PAD = "clamp(1.75rem, 8vw, 3.5rem)";
+const SIDE_PAD = "clamp(1rem, 5vw, 2rem)";
 
 /** Parents announcement → couple names (script) → date, staggered into view. */
 export default function Announcement({ invitation, theme }: AnnouncementProps) {

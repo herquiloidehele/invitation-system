@@ -16,7 +16,7 @@ interface DressCodeSectionProps {
   noteTitle?: string;
 }
 
-const SIDE_PAD = "clamp(1.5rem, 7vw, 3rem)";
+const SIDE_PAD = "clamp(1rem, 4.5vw, 1.75rem)";
 
 /** Dress code: title/intro, ladies palette + gowns art, gentlemen + suits art, reserved note. */
 export default function DressCodeSection({
@@ -78,7 +78,7 @@ export default function DressCodeSection({
       variants={efGroup}
       {...reveal}
     >
-      <motion.div variants={efItem}>
+      <motion.div variants={efItem} style={{ marginBottom: "1.6rem" }}>
         <ScriptTitle theme={theme} textStyles={ts}>
           {title}
         </ScriptTitle>

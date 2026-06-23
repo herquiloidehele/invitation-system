@@ -39,12 +39,12 @@ export default function FaqSection({
 
   return (
     <motion.section
-      style={{ padding: "2rem clamp(1.5rem, 7vw, 3rem)", maxWidth: 520, marginInline: "auto" }}
+      style={{ padding: "2rem clamp(1rem, 4.5vw, 1.75rem)", maxWidth: 520, marginInline: "auto" }}
       variants={efGroup}
       {...reveal}
     >
       <motion.div variants={efItem}>
-        <ScriptTitle theme={theme} textStyles={ts} style={{ marginBottom: "1.5rem" }}>
+        <ScriptTitle theme={theme} textStyles={ts} style={{ marginBottom: "2.25rem" }}>
           {title}
         </ScriptTitle>
       </motion.div>

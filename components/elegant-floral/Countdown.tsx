@@ -91,7 +91,7 @@ export default function Countdown({ invitation, theme }: CountdownProps) {
 
   return (
     <motion.section
-      style={{ textAlign: "center", padding: "2rem clamp(1.5rem, 6vw, 3rem)" }}
+      style={{ textAlign: "center", padding: "2rem clamp(1rem, 4.5vw, 1.75rem)" }}
       variants={efGroup}
       {...reveal}
     >
@@ -110,7 +110,7 @@ export default function Countdown({ invitation, theme }: CountdownProps) {
           rowGap: "0.6rem",
           alignItems: "center",
           justifyItems: "center",
-          marginTop: "1.5rem",
+          marginTop: "2.25rem",
         }}
       >
         {row1}

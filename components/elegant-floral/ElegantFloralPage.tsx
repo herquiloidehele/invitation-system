@@ -71,7 +71,7 @@ export default function ElegantFloralPage({
               {
                 margin: 0,
                 textAlign: "center",
-                padding: "1.4rem clamp(2rem, 9vw, 4rem) 0",
+                padding: "1.4rem clamp(1.25rem, 6vw, 2.75rem) 0",
                 fontFamily: theme.bodyFont,
                 fontStyle: "italic",
                 color: theme.textSecondary,
@@ -143,7 +143,7 @@ export default function ElegantFloralPage({
           header, which we hide so our gold-script title is the single heading. */}
       <section
         style={{
-          padding: "2rem clamp(1.5rem, 7vw, 3rem) 3.5rem",
+          padding: "2rem clamp(1rem, 4.5vw, 1.75rem) 3.5rem",
           maxWidth: 560,
           marginInline: "auto",
         }}
