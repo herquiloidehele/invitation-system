@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { BrindealHomepage } from "@/components/landing/BrindealHomepage";
+import { prefersLightweightEmbeds } from "@/lib/device";
 import { getFaqs } from "@/components/landing/landing-data";
 import {
   getBestSellerFeatures,
@@ -56,6 +58,12 @@ export async function generateMetadata({
 
 export default async function Home() {
   const viewerCurrency = await getViewerCurrency();
+  // On phones / in-app browsers, render the live-demo invitations as static
+  // posters instead of booting full invitation apps inside iframes — that load
+  // can crash the memory-constrained WebView and blank the whole homepage.
+  const staticDemoPreviews = prefersLightweightEmbeds(
+    (await headers()).get("user-agent"),
+  );
   const [
     heroFeature,
     galleryByCategory,
@@ -91,6 +99,7 @@ export default async function Home() {
         liveDemoFeatures={liveDemoFeatures}
         bestSellerFeatures={bestSellerFeatures}
         currentCurrency={viewerCurrency}
+        staticDemoPreviews={staticDemoPreviews}
       />
     </>
   );
