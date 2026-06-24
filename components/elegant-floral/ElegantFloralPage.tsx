@@ -64,7 +64,9 @@ export default function ElegantFloralPage({
         animateHeroText={animateHeroText}
       />
 
-      {invitation.quote && (
+      {/* Blessing line — driven by the parents block's "Mensagem de bênção"
+          (parents.blessingMessage), shown only when parents mode is enabled. */}
+      {invitation.parents?.enabled && invitation.parents.blessingMessage && (
         <Reveal>
           <p
             style={efStyle(
@@ -82,7 +84,9 @@ export default function ElegantFloralPage({
               "efBlessing",
             )}
           >
-            <EditableText elementKey="efBlessing">{invitation.quote}</EditableText>
+            <EditableText elementKey="efBlessing">
+              {invitation.parents.blessingMessage}
+            </EditableText>
           </p>
         </Reveal>
       )}
