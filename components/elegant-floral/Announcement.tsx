@@ -48,7 +48,11 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
         (brideParents.length > 0 || groomParents.length > 0) && (
           <motion.div
             variants={efItem}
-            style={{ fontSize: "clamp(1rem, 4vw, 1.25rem)", lineHeight: 1.5 }}
+            style={{
+              fontSize: "clamp(1rem, 4vw, 1.25rem)",
+              lineHeight: 1.5,
+              margin: "4.5rem 0 0",
+            }}
           >
             {/* Parent names + "e" divider are each their own selectable
                 element so the admin can (a) actually see the selection outline
@@ -90,7 +94,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
           variants={efItem}
           style={efStyle(
             {
-              margin: "1.35rem 0 0",
+              margin: "2.2rem 0 5rem 0",
               fontSize: "clamp(0.98rem, 3.8vw, 1.2rem)",
             },
             ts,
@@ -107,7 +111,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
         variants={efNames}
         style={efStyle(
           {
-            margin: "2rem 0",
+            margin: "4rem 0",
             fontFamily: theme.scriptFont ?? theme.displayFont,
             fontWeight: 400,
             fontSize: "clamp(2.3rem, 11vw, 3.9rem)",
@@ -157,7 +161,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
           variants={efItem}
           style={efStyle(
             {
-              margin: "0.35rem 0 0",
+              margin: "1.35rem 0 0",
               color: theme.textMuted,
               fontSize: "clamp(0.85rem, 3.2vw, 1.05rem)",
             },
@@ -171,7 +175,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
         </motion.p>
       )}
 
-      <motion.div variants={efItem} style={{ marginTop: "1.9rem" }}>
+      <motion.div variants={efItem} style={{ marginTop: "3rem" }}>
         <FloralDivider primary={theme.primary} secondary={theme.secondary} />
       </motion.div>
     </motion.section>
