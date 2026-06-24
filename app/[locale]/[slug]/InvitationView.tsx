@@ -65,6 +65,9 @@ interface InvitationViewProps {
   isLandingPreview?: boolean;
   /** Allows landing showcase iframes to lazy-load nested external-link iframes. */
   lazyExternalIframe?: boolean;
+  /** Section id to reveal + scroll to on load (e.g. "gifts" when returning from
+   *  the gifts sub-page). When set, the envelope cover is skipped. */
+  initialSection?: string;
 }
 
 export default function InvitationView({
@@ -72,6 +75,7 @@ export default function InvitationView({
   theme,
   isLandingPreview = false,
   lazyExternalIframe = false,
+  initialSection,
 }: InvitationViewProps) {
   // Curtain-Canva templates skip the entire envelope flow and render
   // their own self-contained page. Branch at the top so the
@@ -94,6 +98,7 @@ export default function InvitationView({
       theme={theme}
       isLandingPreview={isLandingPreview}
       lazyExternalIframe={lazyExternalIframe}
+      initialSection={initialSection}
     />
   );
 }
@@ -103,9 +108,17 @@ function EnvelopeInvitationView({
   theme,
   isLandingPreview = false,
   lazyExternalIframe = false,
+  initialSection,
 }: InvitationViewProps) {
-  const [coverVisible, setCoverVisible] = useState(true);
-  const [showContent, setShowContent] = useState(false);
+  // When arriving back from a sub-page (e.g. the gifts list) via `?section=`,
+  // skip the envelope cover and reveal the content directly so we can scroll to
+  // that section. Only applies to the standard scrollable invitation flow.
+  const skipToSection =
+    initialSection && (invitation.invitationType ?? "standard") === "standard"
+      ? initialSection
+      : null;
+  const [coverVisible, setCoverVisible] = useState(!skipToSection);
+  const [showContent, setShowContent] = useState(Boolean(skipToSection));
   const [videoVisible, setVideoVisible] = useState(false);
   const [externalLinkVisible, setExternalLinkVisible] = useState(false);
   const [richExternalLinkVisible, setRichExternalLinkVisible] = useState(false);
@@ -247,6 +260,48 @@ function EnvelopeInvitationView({
       }
     };
   }, []);
+
+  /**
+   * Returning from a sub-page with `?section=`: scroll to that section once it
+   * exists (the elegant-floral page is a dynamic `ssr:false` import, so poll
+   * briefly), re-scroll a couple of times as images above settle, then strip
+   * the param so the URL stays clean (and a refresh re-shows the envelope).
+   */
+  useEffect(() => {
+    if (!skipToSection) return;
+    let cancelled = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const scrollToEl = () => {
+      const el = document.getElementById(skipToSection);
+      if (el) el.scrollIntoView({ block: "start" });
+      return Boolean(el);
+    };
+    let waited = 0;
+    const settle = () => {
+      if (cancelled) return;
+      if (scrollToEl()) {
+        timers.push(setTimeout(scrollToEl, 250));
+        timers.push(setTimeout(scrollToEl, 700));
+      } else if (waited < 3000) {
+        waited += 60;
+        timers.push(setTimeout(settle, 60));
+      }
+    };
+    settle();
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("section")) {
+      url.searchParams.delete("section");
+      window.history.replaceState(
+        window.history.state,
+        "",
+        url.pathname + url.search + url.hash,
+      );
+    }
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
+  }, [skipToSection]);
 
   /**
    * The envelope's internal animation sequence is done.

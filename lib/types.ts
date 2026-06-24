@@ -125,10 +125,26 @@ export interface DressCode {
   reservedNote?: string; // the "Nota" reserved-colors block
 }
 
+export interface GiftItem {
+  /** Stable id for reorder keys, e.g. "gift-<timestamp>". */
+  id: string;
+  /** Product name (required). */
+  name: string;
+  /** Optional product image (same S3 upload pipeline as other sections). */
+  imageUrl?: string;
+  /** Optional free-text price, e.g. "R$ 350". Empty → no price shown. */
+  price?: string;
+  /** Optional store / buy / PIX URL. When set, the card is tappable. */
+  link?: string;
+}
+
 export interface GiftRegistry {
   enabled: boolean;
   text: string;
+  /** Legacy external registry link (kept for backwards-compat; non-breaking). */
   link?: string;
+  /** Product grid shown on /{slug}/gifts. */
+  items?: GiftItem[];
 }
 
 export interface AudioConfig {

@@ -138,10 +138,11 @@ export default async function InvitationSlugPage({
     n?: string;
     landingPreview?: string;
     lazyExternalIframe?: string;
+    section?: string;
   }>;
 }) {
   const { slug } = await params;
-  const { g: guestToken, landingPreview, lazyExternalIframe } =
+  const { g: guestToken, landingPreview, lazyExternalIframe, section } =
     await searchParams;
 
   const invitation = await getInvitation(slug);
@@ -203,6 +204,7 @@ export default async function InvitationSlugPage({
         theme={theme}
         isLandingPreview={landingPreview === "1"}
         lazyExternalIframe={lazyExternalIframe === "1"}
+        initialSection={section}
       />
     </>
   );

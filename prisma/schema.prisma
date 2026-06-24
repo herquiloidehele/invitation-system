@@ -81,7 +81,7 @@ model Invitation {
   schedule     Json     // ScheduleEvent[]
   scheduleStyle String? // "default" | "illustrated"
   dressCode    Json     // { enabled, text }
-  giftRegistry Json     // { enabled, text, link? }
+  giftRegistry Json     // { enabled, text, link?, items? }
   audio        Json     // { enabled, src, artist, title }
   heroImage    String
   heroHeight   Int?     // Pixel height for image-based heroes. Null falls back to 300px in the renderer.
