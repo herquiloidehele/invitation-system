@@ -72,6 +72,7 @@ export default function ElegantFloralPage({
               style={efStyle(
                 {
                   margin: 0,
+                  marginTop: "2rem",
                   textAlign: "center",
                   padding: "1.4rem clamp(1.25rem, 6vw, 2.75rem) 0",
                   fontFamily: theme.bodyFont,
