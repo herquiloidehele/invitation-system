@@ -41,8 +41,8 @@ export default function GiftsListView({
   const title = ct("sectionTitle_giftRegistry");
   const message = invitation.giftRegistry.text?.trim();
   const scriptFont = theme.scriptFont ?? theme.displayFont;
-  const backHref = `/${slug}${
-    guestToken ? `?g=${encodeURIComponent(guestToken)}` : ""
+  const backHref = `/${slug}?section=gifts${
+    guestToken ? `&g=${encodeURIComponent(guestToken)}` : ""
   }`;
 
   const reveal = reduceMotion

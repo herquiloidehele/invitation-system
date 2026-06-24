@@ -40,6 +40,7 @@ export default function GiftsSection({
 
   return (
     <motion.section
+      id="gifts"
       style={{ padding: "2rem clamp(1rem, 4.5vw, 1.75rem)", maxWidth: 520, marginInline: "auto" }}
       variants={efGroup}
       {...reveal}

@@ -816,6 +816,7 @@ export default function InvitationPage({
             {invitation.giftRegistry.enabled && (
               <EditableCard sectionKey="giftRegistry">
                 <motion.div
+                  id="gifts"
                   variants={slideFromRight}
                   initial="hidden"
                   whileInView="visible"
