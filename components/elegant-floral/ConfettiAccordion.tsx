@@ -39,20 +39,26 @@ export default function ConfettiAccordion({
   theme,
   textStyles,
   headerKey = "efFaqQuestion",
+  defaultOpen = false,
+  confettiOnOpen = true,
 }: {
   header: ReactNode;
   children: ReactNode;
   theme: TemplateTheme;
   textStyles?: TextStyleOverrides | null;
   headerKey?: EfTextKey;
+  /** Start expanded. Defaults to collapsed. */
+  defaultOpen?: boolean;
+  /** Pop confetti when the row is expanded. Defaults to true. */
+  confettiOnOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const colors = [theme.primary, theme.secondary, theme.accent, "#FFFFFF"];
 
   const toggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     const next = !open;
     setOpen(next);
-    if (next) burstAt(e.currentTarget, colors);
+    if (next && confettiOnOpen) burstAt(e.currentTarget, colors);
   };
 
   const headerStyle = efStyle(

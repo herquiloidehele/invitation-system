@@ -1,14 +1,20 @@
 "use client";
 
+import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
 import { giftsPagePath, hasGiftItems } from "@/lib/gift-registry";
+import { useRouter } from "@/i18n/routing";
 import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
 import PillButton from "./PillButton";
 import ConfettiAccordion from "./ConfettiAccordion";
 import { efGroup, efItem, useRevealProps } from "./motion";
+
+/** How long the celebratory confetti runs before navigating to the gift list. */
+const GIFT_CONFETTI_MS = 1200;
 
 interface GiftsSectionProps {
   giftRegistry: GiftRegistry;
@@ -19,12 +25,13 @@ interface GiftsSectionProps {
   /** Personal guest token to preserve on the gifts-page link. */
   guestToken?: string;
   title?: string;
-  /** Accordion bar label that reveals the gift message + link. */
+  /** Accordion bar label that reveals the gift message + button. */
   label?: string;
   buttonLabel?: string;
 }
 
-/** "Presentes" — collapsible bar revealing the gift message + "Ver Lista", with confetti on open. */
+/** "Presentes" — an open-by-default bar with the gift message + "Ver Lista",
+ *  which bursts confetti for a beat before opening the gift list. */
 export default function GiftsSection({
   giftRegistry,
   theme,
@@ -36,23 +43,70 @@ export default function GiftsSection({
   buttonLabel = "Ver Lista",
 }: GiftsSectionProps) {
   const reveal = useRevealProps();
+  const router = useRouter();
+  const firingRef = useRef(false);
+
+  const handleVerLista = useCallback(() => {
+    if (firingRef.current) return;
+    const href = giftsPagePath(slug, guestToken);
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      router.push(href);
+      return;
+    }
+    firingRef.current = true;
+    const colors = [theme.primary, theme.secondary, theme.accent, "#FFFFFF"];
+    const end = Date.now() + GIFT_CONFETTI_MS;
+    const frame = () => {
+      confetti({
+        particleCount: 10,
+        spread: 55,
+        startVelocity: 22,
+        gravity: 1,
+        scalar: 0.7,
+        ticks: 130,
+        origin: { x: 0.5, y: 0.6 },
+        colors,
+      });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    };
+    frame();
+    window.setTimeout(() => router.push(href), GIFT_CONFETTI_MS);
+  }, [slug, guestToken, theme.primary, theme.secondary, theme.accent, router]);
+
   if (!giftRegistry?.enabled) return null;
 
   return (
     <motion.section
       id="gifts"
-      style={{ padding: "2rem clamp(1rem, 4.5vw, 1.75rem)", maxWidth: 520, marginInline: "auto" }}
+      style={{
+        padding: "2rem clamp(1rem, 4.5vw, 1.75rem)",
+        maxWidth: 520,
+        marginInline: "auto",
+      }}
       variants={efGroup}
       {...reveal}
     >
       <motion.div variants={efItem}>
-        <ScriptTitle theme={theme} textStyles={ts} style={{ marginBottom: "3rem" }}>
+        <ScriptTitle
+          theme={theme}
+          textStyles={ts}
+          style={{ marginBottom: "3rem" }}
+        >
           {title}
         </ScriptTitle>
       </motion.div>
 
       <motion.div variants={efItem}>
-        <ConfettiAccordion header={label} theme={theme} textStyles={ts}>
+        <ConfettiAccordion
+          header={label}
+          theme={theme}
+          textStyles={ts}
+          defaultOpen
+          confettiOnOpen={false}
+        >
           {giftRegistry.text && (
             <p
               style={efStyle(
@@ -68,14 +122,15 @@ export default function GiftsSection({
                 "efBody",
               )}
             >
-              <EditableText elementKey="efBody">{giftRegistry.text}</EditableText>
+              <EditableText elementKey="efBody">
+                {giftRegistry.text}
+              </EditableText>
             </p>
           )}
           {hasGiftItems(giftRegistry) ? (
             <div style={{ marginTop: "1.3rem", textAlign: "center" }}>
               <PillButton
-                internal
-                href={giftsPagePath(slug, guestToken)}
+                onClick={handleVerLista}
                 theme={theme}
                 textStyles={ts}
               >
@@ -84,7 +139,11 @@ export default function GiftsSection({
             </div>
           ) : giftRegistry.link ? (
             <div style={{ marginTop: "1.3rem", textAlign: "center" }}>
-              <PillButton href={giftRegistry.link} theme={theme} textStyles={ts}>
+              <PillButton
+                href={giftRegistry.link}
+                theme={theme}
+                textStyles={ts}
+              >
                 {buttonLabel}
               </PillButton>
             </div>
