@@ -11,9 +11,12 @@ interface PillButtonProps {
    *  Link (no target=_blank) instead of an external anchor. */
   internal?: boolean;
   onClick?: () => void;
+  /** Optional leading icon (e.g. a lucide `<MapPin size={15} />`). Inherits the
+   *  button's text color via `currentColor`. */
+  icon?: ReactNode;
   theme: Pick<
     TemplateTheme,
-    "ctaSecondaryBorder" | "ctaSecondaryText" | "uiFont"
+    "ctaPrimaryBg" | "ctaPrimaryText" | "ctaGlow" | "uiFont"
   >;
   className?: string;
   style?: CSSProperties;
@@ -21,12 +24,14 @@ interface PillButtonProps {
   elementKey?: EfTextKey;
 }
 
-/** Rounded outline button/link — the "Ver mapa" / "Itinerário" / "Ver Lista" style. */
+/** Filled rounded button/link (8px radius, gold fill, soft shadow) — the
+ *  "Ver mapa" / "Itinerário" / "Ver Lista" style. */
 export default function PillButton({
   children,
   href,
   internal = false,
   onClick,
+  icon,
   theme,
   className,
   style,
@@ -40,10 +45,11 @@ export default function PillButton({
       justifyContent: "center",
       gap: 6,
       padding: "9px 26px",
-      borderRadius: 9999,
-      border: `1px solid ${theme.ctaSecondaryBorder}`,
-      color: theme.ctaSecondaryText,
-      background: "transparent",
+      borderRadius: 8,
+      border: "none",
+      color: theme.ctaPrimaryText,
+      background: theme.ctaPrimaryBg,
+      boxShadow: `0 4px 12px ${theme.ctaGlow ?? "rgba(140,106,28,0.25)"}`,
       fontFamily: theme.uiFont,
       fontSize: 13,
       letterSpacing: "0.06em",
@@ -57,7 +63,12 @@ export default function PillButton({
     elementKey,
   );
 
-  const content = <EditableText elementKey={elementKey}>{children}</EditableText>;
+  const content = (
+    <>
+      {icon}
+      <EditableText elementKey={elementKey}>{children}</EditableText>
+    </>
+  );
 
   if (href) {
     if (internal) {

@@ -144,7 +144,12 @@ export default function LocationCard({
             justifyContent: "center",
           }}
         >
-          <PillButton href={location.googleMapsUrl} theme={theme} textStyles={ts}>
+          <PillButton
+            href={location.googleMapsUrl}
+            theme={theme}
+            textStyles={ts}
+            icon={<MapPin color="currentColor" />}
+          >
             {mapLabel}
           </PillButton>
         </motion.div>

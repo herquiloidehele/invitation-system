@@ -2,6 +2,7 @@
 
 import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
+import { Gift } from "lucide-react";
 import confetti from "canvas-confetti";
 import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
@@ -133,6 +134,7 @@ export default function GiftsSection({
                 onClick={handleVerLista}
                 theme={theme}
                 textStyles={ts}
+                icon={<Gift size={16} strokeWidth={1.6} />}
               >
                 {buttonLabel}
               </PillButton>
@@ -143,6 +145,7 @@ export default function GiftsSection({
                 href={giftRegistry.link}
                 theme={theme}
                 textStyles={ts}
+                icon={<Gift size={16} strokeWidth={1.6} />}
               >
                 {buttonLabel}
               </PillButton>
