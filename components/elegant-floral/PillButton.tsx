@@ -2,10 +2,14 @@ import type { CSSProperties, ReactNode } from "react";
 import type { TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle, type EfTextKey } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
+import { Link } from "@/i18n/routing";
 
 interface PillButtonProps {
   children: ReactNode;
   href?: string;
+  /** When true and `href` is set, navigate internally via the locale-aware
+   *  Link (no target=_blank) instead of an external anchor. */
+  internal?: boolean;
   onClick?: () => void;
   theme: Pick<
     TemplateTheme,
@@ -21,6 +25,7 @@ interface PillButtonProps {
 export default function PillButton({
   children,
   href,
+  internal = false,
   onClick,
   theme,
   className,
@@ -55,6 +60,13 @@ export default function PillButton({
   const content = <EditableText elementKey={elementKey}>{children}</EditableText>;
 
   if (href) {
+    if (internal) {
+      return (
+        <Link href={href} className={className} style={css}>
+          {content}
+        </Link>
+      );
+    }
     return (
       <a
         href={href}

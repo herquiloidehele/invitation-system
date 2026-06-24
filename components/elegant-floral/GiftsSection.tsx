@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
+import { giftsPagePath, hasGiftItems } from "@/lib/gift-registry";
 import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
 import PillButton from "./PillButton";
@@ -13,6 +14,10 @@ interface GiftsSectionProps {
   giftRegistry: GiftRegistry;
   theme: TemplateTheme;
   textStyles?: TextStyleOverrides | null;
+  /** Invitation slug — used to build the internal gifts-page link. */
+  slug: string;
+  /** Personal guest token to preserve on the gifts-page link. */
+  guestToken?: string;
   title?: string;
   /** Accordion bar label that reveals the gift message + link. */
   label?: string;
@@ -24,6 +29,8 @@ export default function GiftsSection({
   giftRegistry,
   theme,
   textStyles: ts,
+  slug,
+  guestToken,
   title = "Presentes",
   label = "Opção presentear",
   buttonLabel = "Ver Lista",
@@ -63,13 +70,24 @@ export default function GiftsSection({
               <EditableText elementKey="efBody">{giftRegistry.text}</EditableText>
             </p>
           )}
-          {giftRegistry.link && (
+          {hasGiftItems(giftRegistry) ? (
+            <div style={{ marginTop: "1.3rem", textAlign: "center" }}>
+              <PillButton
+                internal
+                href={giftsPagePath(slug, guestToken)}
+                theme={theme}
+                textStyles={ts}
+              >
+                {buttonLabel}
+              </PillButton>
+            </div>
+          ) : giftRegistry.link ? (
             <div style={{ marginTop: "1.3rem", textAlign: "center" }}>
               <PillButton href={giftRegistry.link} theme={theme} textStyles={ts}>
                 {buttonLabel}
               </PillButton>
             </div>
-          )}
+          ) : null}
         </ConfettiAccordion>
       </motion.div>
     </motion.section>

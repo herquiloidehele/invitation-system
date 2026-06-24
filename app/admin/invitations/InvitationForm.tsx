@@ -10,6 +10,7 @@ import type {
   CoupleGallery,
   CustomTexts,
   EnvelopeConfig,
+  GiftItem,
   GuestGuideItem,
   ImageSettings,
   ImageSettingsKey,
@@ -76,6 +77,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
+import GiftsListEditor from "@/components/admin/GiftsListEditor";
 import ElegantFloralDressFields from "@/components/admin/ElegantFloralDressFields";
 import LocationPhotosEditor from "@/components/admin/LocationPhotosEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
@@ -412,7 +414,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     schedule: [],
     scheduleStyle: "default",
     dressCode: { enabled: false, text: "" },
-    giftRegistry: { enabled: false, text: "", link: "" },
+    giftRegistry: { enabled: false, text: "", link: "", items: [] },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
     heroHeight: DEFAULT_HERO_HEIGHT,
@@ -708,6 +710,13 @@ export default function InvitationForm({
     },
     [],
   );
+
+  const updateGiftItems = useCallback((items: GiftItem[]) => {
+    setForm((prev) => ({
+      ...prev,
+      giftRegistry: { ...prev.giftRegistry, items },
+    }));
+  }, []);
 
   const updateAudio = useCallback(
     (field: keyof InvitationData["audio"], value: boolean | string) => {
@@ -2924,6 +2933,10 @@ export default function InvitationForm({
                             }
                           />
                         </div>
+                        <GiftsListEditor
+                          value={form.giftRegistry.items}
+                          onChange={updateGiftItems}
+                        />
                       </>
                     )}
                   </div>

@@ -133,6 +133,8 @@ export default function ElegantFloralPage({
         giftRegistry={invitation.giftRegistry}
         theme={theme}
         textStyles={ts}
+        slug={invitation.slug}
+        guestToken={invitation.guest?.token}
       />
 
       {invitation.faqs && (

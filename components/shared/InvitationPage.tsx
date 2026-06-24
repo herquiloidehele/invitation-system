@@ -7,7 +7,14 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { ChevronDown, ExternalLink, Gift, Heart, Shirt } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  ExternalLink,
+  Gift,
+  Heart,
+  Shirt,
+} from "lucide-react";
 
 import type {
   CardSectionKey,
@@ -20,6 +27,8 @@ import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { useLocale } from "next-intl";
 
 import { useCustomText } from "@/lib/custom-texts";
+import { giftsPagePath, hasGiftItems } from "@/lib/gift-registry";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
 import { formatLocalizedMonthLong } from "@/lib/date-format";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
@@ -857,7 +866,29 @@ export default function InvitationPage({
                       {invitation.giftRegistry.text}
                     </EditableText>
                   </span>
-                  {invitation.giftRegistry.link && (
+                  {hasGiftItems(invitation.giftRegistry) ? (
+                    <motion.a
+                      href={
+                        locale === DEFAULT_LOCALE
+                          ? giftsPagePath(
+                              invitation.slug,
+                              invitation.guest?.token,
+                            )
+                          : `/${locale}${giftsPagePath(
+                              invitation.slug,
+                              invitation.guest?.token,
+                            )}`
+                      }
+                      className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
+                      style={ts.giftLink}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <ArrowRight size={10} strokeWidth={1.5} />
+                      <EditableText elementKey="giftLink">
+                        {t("cta_giftLink")}
+                      </EditableText>
+                    </motion.a>
+                  ) : invitation.giftRegistry.link ? (
                     <motion.a
                       href={invitation.giftRegistry.link}
                       target="_blank"
@@ -871,7 +902,7 @@ export default function InvitationPage({
                         {t("cta_giftLink")}
                       </EditableText>
                     </motion.a>
-                  )}
+                  ) : null}
                 </motion.div>
               </EditableCard>
             )}
