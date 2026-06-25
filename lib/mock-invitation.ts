@@ -61,6 +61,21 @@ export const MOCK_INVITATION: InvitationData = {
     enabled: true,
     text: "A vossa presença é o melhor presente. Se desejarem contribuir, temos uma lista simbólica.",
     link: "https://example.com",
+    bankTransferText: "Para quem preferir contribuir por transferência:",
+    bankTransfer: [
+      {
+        id: "bank-1",
+        label: "Beneficiário",
+        value: "Lucía & Felipe",
+        copyable: false,
+      },
+      {
+        id: "bank-2",
+        label: "IBAN",
+        value: "GB82 WEST 1234 5698 7654 32",
+        copyable: true,
+      },
+    ],
   },
 
   audio: {

@@ -138,6 +138,17 @@ export interface GiftItem {
   link?: string;
 }
 
+export interface BankTransferDetail {
+  /** Stable id for reorder keys, e.g. "bank-<timestamp>". */
+  id: string;
+  /** Row label, e.g. "Beneficiário", "IBAN", "Chave PIX". */
+  label: string;
+  /** Row value, e.g. "Lucía & Felipe", "GB82 WEST 1234 …". */
+  value: string;
+  /** When true, render a Copy button that copies `value`. */
+  copyable?: boolean;
+}
+
 export interface GiftRegistry {
   enabled: boolean;
   text: string;
@@ -145,6 +156,10 @@ export interface GiftRegistry {
   link?: string;
   /** Product grid shown on /{slug}/gifts. */
   items?: GiftItem[];
+  /** Optional intro shown above the bank-transfer rows. */
+  bankTransferText?: string;
+  /** Flexible bank-detail rows for the "Transferência bancária" sub-accordion. */
+  bankTransfer?: BankTransferDetail[];
 }
 
 export interface AudioConfig {

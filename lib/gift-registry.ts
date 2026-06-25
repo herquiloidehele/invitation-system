@@ -7,6 +7,15 @@ export function hasGiftItems(
   return Boolean(registry?.items && registry.items.length > 0);
 }
 
+/** True when the registry has at least one bank-transfer row with content. */
+export function hasBankTransfer(
+  registry: Pick<GiftRegistry, "bankTransfer"> | null | undefined,
+): boolean {
+  return Boolean(
+    registry?.bankTransfer?.some((r) => r.label?.trim() || r.value?.trim()),
+  );
+}
+
 /** Locale-less path to the gifts page, preserving the guest token when present. */
 export function giftsPagePath(slug: string, guestToken?: string | null): string {
   const query = guestToken ? `?g=${encodeURIComponent(guestToken)}` : "";

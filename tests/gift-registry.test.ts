@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { giftsPagePath, hasGiftItems } from "@/lib/gift-registry";
+import { giftsPagePath, hasBankTransfer, hasGiftItems } from "@/lib/gift-registry";
 import type { GiftItem } from "@/lib/types";
 
 const item = (over: Partial<GiftItem> = {}): GiftItem => ({
@@ -22,6 +22,39 @@ describe("hasGiftItems", () => {
 
   it("is true when at least one item exists", () => {
     expect(hasGiftItems({ items: [item()] })).toBe(true);
+  });
+});
+
+describe("hasBankTransfer", () => {
+  it("is false when the registry is null/undefined", () => {
+    expect(hasBankTransfer(null)).toBe(false);
+    expect(hasBankTransfer(undefined)).toBe(false);
+  });
+
+  it("is false when bankTransfer is missing or empty", () => {
+    expect(hasBankTransfer({})).toBe(false);
+    expect(hasBankTransfer({ bankTransfer: [] })).toBe(false);
+  });
+
+  it("is false when every row is blank/whitespace-only", () => {
+    expect(
+      hasBankTransfer({
+        bankTransfer: [{ id: "bank-1", label: "  ", value: "" }],
+      }),
+    ).toBe(false);
+  });
+
+  it("is true when a row has a non-empty label or value", () => {
+    expect(
+      hasBankTransfer({
+        bankTransfer: [{ id: "bank-1", label: "IBAN", value: "" }],
+      }),
+    ).toBe(true);
+    expect(
+      hasBankTransfer({
+        bankTransfer: [{ id: "bank-2", label: "", value: "GB82 WEST" }],
+      }),
+    ).toBe(true);
   });
 });
 

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import type {
   CardSectionKey,
+  BankTransferDetail,
   CardStyle,
   CoupleGallery,
   CustomTexts,
@@ -78,6 +79,7 @@ import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GiftsListEditor from "@/components/admin/GiftsListEditor";
+import BankTransferEditor from "@/components/admin/BankTransferEditor";
 import ElegantFloralDressFields from "@/components/admin/ElegantFloralDressFields";
 import LocationPhotosEditor from "@/components/admin/LocationPhotosEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
@@ -717,6 +719,16 @@ export default function InvitationForm({
       giftRegistry: { ...prev.giftRegistry, items },
     }));
   }, []);
+
+  const updateBankTransfer = useCallback(
+    (bankTransfer: BankTransferDetail[]) => {
+      setForm((prev) => ({
+        ...prev,
+        giftRegistry: { ...prev.giftRegistry, bankTransfer },
+      }));
+    },
+    [],
+  );
 
   const updateAudio = useCallback(
     (field: keyof InvitationData["audio"], value: boolean | string) => {
@@ -2936,6 +2948,26 @@ export default function InvitationForm({
                         <GiftsListEditor
                           value={form.giftRegistry.items}
                           onChange={updateGiftItems}
+                        />
+                        <div className="space-y-1.5">
+                          <Label htmlFor="bankTransferText">
+                            Texto da Transferência Bancária (opcional)
+                          </Label>
+                          <Textarea
+                            id="bankTransferText"
+                            value={form.giftRegistry.bankTransferText ?? ""}
+                            onChange={(e) =>
+                              updateGiftRegistry(
+                                "bankTransferText",
+                                e.target.value,
+                              )
+                            }
+                            rows={2}
+                          />
+                        </div>
+                        <BankTransferEditor
+                          value={form.giftRegistry.bankTransfer}
+                          onChange={updateBankTransfer}
                         />
                       </>
                     )}
