@@ -51,7 +51,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
             style={{
               fontSize: "clamp(1rem, 4vw, 1.25rem)",
               lineHeight: 1.5,
-              margin: "4.5rem 0 0",
+              margin: "3rem 0 4.5rem 0",
             }}
           >
             {/* Parent names + "e" divider are each their own selectable
@@ -137,7 +137,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
         )}
       >
         <EditableText elementKey="efDateLabel">
-          A realizar-se no dia
+          Que se realizará no dia
         </EditableText>
       </motion.p>
       <motion.p

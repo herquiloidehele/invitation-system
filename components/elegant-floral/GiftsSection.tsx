@@ -272,8 +272,9 @@ export default function GiftsSection({
                       style={{
                         display: "flex",
                         alignItems: "center",
+                        flexDirection: "column",
                         justifyContent: "space-between",
-                        gap: 12,
+                        gap: 16,
                       }}
                     >
                       <div style={{ minWidth: 0 }}>
@@ -282,7 +283,7 @@ export default function GiftsSection({
                             style={{
                               fontFamily: theme.uiFont,
                               fontWeight: 600,
-                              fontSize: "0.95rem",
+                              fontSize: "0.8rem",
                               color: theme.textPrimary,
                             }}
                           >
@@ -291,8 +292,8 @@ export default function GiftsSection({
                         )}
                         <div
                           style={{
-                            fontFamily: theme.bodyFont,
-                            fontSize: "0.95rem",
+                            fontFamily: theme.uiFont,
+                            fontSize: "0.8rem",
                             color: theme.textSecondary,
                             wordBreak: "break-word",
                           }}
