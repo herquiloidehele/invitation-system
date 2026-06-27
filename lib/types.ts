@@ -189,10 +189,17 @@ export interface HeroOverlayConfig {
  * (above the audio player). When `enabled` is true, an animated chevron
  * arrow appears that scrolls the page to the next section on click.
  * `color` overrides the chevron stroke color; falls back to `theme.textPrimary`.
+ * `size` (px) scales the chevron; `offsetY` (px) nudges it up from the
+ * audio-aware bottom baseline. Both fall back to defaults in
+ * `lib/hero-scroll-indicator.ts`.
  */
 export interface HeroScrollIndicatorConfig {
   enabled: boolean;
   color?: string;
+  /** Chevron icon size in px; the button renders at 2× this. Falls back to 24. */
+  size?: number;
+  /** Vertical nudge in px added to the audio-aware bottom baseline; positive raises it. Falls back to 0. */
+  offsetY?: number;
 }
 
 /** Theme font role a hero text block can use. */

@@ -33,6 +33,14 @@ import type {
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
+import {
+  DEFAULT_HERO_SCROLL_INDICATOR_OFFSET_Y,
+  DEFAULT_HERO_SCROLL_INDICATOR_SIZE,
+  HERO_SCROLL_INDICATOR_OFFSET_Y_MAX,
+  HERO_SCROLL_INDICATOR_OFFSET_Y_MIN,
+  HERO_SCROLL_INDICATOR_SIZE_MAX,
+  HERO_SCROLL_INDICATOR_SIZE_MIN,
+} from "@/lib/hero-scroll-indicator";
 
 import {
   ExternalLink,
@@ -1965,60 +1973,133 @@ export default function InvitationForm({
                           />
                         </div>
                         {form.heroScrollIndicator?.enabled && (
-                          <div className="space-y-1.5">
-                            <Label>Cor da seta</Label>
-                            <p className="text-xs text-muted-foreground">
-                              Deixe em branco para usar a cor principal do tema.
-                            </p>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="color"
-                                value={colorPickerValue(
-                                  form.heroScrollIndicator?.color,
-                                  currentTheme?.textPrimary || "#000000",
-                                )}
-                                onChange={(e) =>
-                                  update("heroScrollIndicator", {
-                                    ...(form.heroScrollIndicator ?? {
-                                      enabled: true,
-                                    }),
-                                    color: e.target.value,
-                                  })
-                                }
-                                className="h-9 w-9 rounded border cursor-pointer shrink-0"
-                                title="Escolher cor"
-                              />
-                              <input
-                                type="text"
-                                value={form.heroScrollIndicator?.color ?? ""}
-                                onChange={(e) =>
-                                  update("heroScrollIndicator", {
-                                    ...(form.heroScrollIndicator ?? {
-                                      enabled: true,
-                                    }),
-                                    color: e.target.value,
-                                  })
-                                }
-                                placeholder={`Padrão: ${currentTheme?.textPrimary || ""}`}
-                                className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
-                              />
-                              {form.heroScrollIndicator?.color && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="shrink-0 text-muted-foreground"
-                                  onClick={() =>
+                          <div className="space-y-4">
+                            <div className="space-y-1.5">
+                              <Label>Cor da seta</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Deixe em branco para usar a cor principal do
+                                tema.
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="color"
+                                  value={colorPickerValue(
+                                    form.heroScrollIndicator?.color,
+                                    currentTheme?.textPrimary || "#000000",
+                                  )}
+                                  onChange={(e) =>
                                     update("heroScrollIndicator", {
                                       ...(form.heroScrollIndicator ?? {
                                         enabled: true,
                                       }),
-                                      color: undefined,
+                                      color: e.target.value,
                                     })
                                   }
-                                >
-                                  Repor
-                                </Button>
-                              )}
+                                  className="h-9 w-9 rounded border cursor-pointer shrink-0"
+                                  title="Escolher cor"
+                                />
+                                <input
+                                  type="text"
+                                  value={form.heroScrollIndicator?.color ?? ""}
+                                  onChange={(e) =>
+                                    update("heroScrollIndicator", {
+                                      ...(form.heroScrollIndicator ?? {
+                                        enabled: true,
+                                      }),
+                                      color: e.target.value,
+                                    })
+                                  }
+                                  placeholder={`Padrão: ${currentTheme?.textPrimary || ""}`}
+                                  className="font-mono text-sm h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+                                />
+                                {form.heroScrollIndicator?.color && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="shrink-0 text-muted-foreground"
+                                    onClick={() =>
+                                      update("heroScrollIndicator", {
+                                        ...(form.heroScrollIndicator ?? {
+                                          enabled: true,
+                                        }),
+                                        color: undefined,
+                                      })
+                                    }
+                                  >
+                                    Repor
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor="heroScrollIndicatorSize">
+                                  Tamanho da seta
+                                </Label>
+                                <span className="text-xs text-muted-foreground tabular-nums">
+                                  {form.heroScrollIndicator?.size ??
+                                    DEFAULT_HERO_SCROLL_INDICATOR_SIZE}
+                                  px
+                                </span>
+                              </div>
+                              <input
+                                id="heroScrollIndicatorSize"
+                                type="range"
+                                min={HERO_SCROLL_INDICATOR_SIZE_MIN}
+                                max={HERO_SCROLL_INDICATOR_SIZE_MAX}
+                                step={2}
+                                value={
+                                  form.heroScrollIndicator?.size ??
+                                  DEFAULT_HERO_SCROLL_INDICATOR_SIZE
+                                }
+                                onChange={(e) =>
+                                  update("heroScrollIndicator", {
+                                    ...(form.heroScrollIndicator ?? {
+                                      enabled: true,
+                                    }),
+                                    size: parseInt(e.target.value, 10),
+                                  })
+                                }
+                                className="w-full accent-foreground cursor-pointer"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor="heroScrollIndicatorOffsetY">
+                                  Posição vertical
+                                </Label>
+                                <span className="text-xs text-muted-foreground tabular-nums">
+                                  {form.heroScrollIndicator?.offsetY ??
+                                    DEFAULT_HERO_SCROLL_INDICATOR_OFFSET_Y}
+                                  px
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                Valores mais altos sobem a seta; mais baixos
+                                descem-na.
+                              </p>
+                              <input
+                                id="heroScrollIndicatorOffsetY"
+                                type="range"
+                                min={HERO_SCROLL_INDICATOR_OFFSET_Y_MIN}
+                                max={HERO_SCROLL_INDICATOR_OFFSET_Y_MAX}
+                                step={4}
+                                value={
+                                  form.heroScrollIndicator?.offsetY ??
+                                  DEFAULT_HERO_SCROLL_INDICATOR_OFFSET_Y
+                                }
+                                onChange={(e) =>
+                                  update("heroScrollIndicator", {
+                                    ...(form.heroScrollIndicator ?? {
+                                      enabled: true,
+                                    }),
+                                    offsetY: parseInt(e.target.value, 10),
+                                  })
+                                }
+                                className="w-full accent-foreground cursor-pointer"
+                              />
                             </div>
                           </div>
                         )}

@@ -8,6 +8,7 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
+import { resolveHeroScrollIndicator } from "@/lib/hero-scroll-indicator";
 import { useCustomText } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { scrollToNextHeroSection } from "@/lib/curtain-canva";
@@ -135,6 +136,10 @@ export default function InvitationHero({
     100,
   );
   const mediaFit = resolveHeroMediaFit(invitation.heroMediaFit);
+  const scrollIndicator = resolveHeroScrollIndicator(
+    invitation.heroScrollIndicator,
+    invitation.audio.enabled,
+  );
 
   return (
     <section
@@ -148,7 +153,10 @@ export default function InvitationHero({
       {/* Background media */}
       {invitation.videoUrl ? (
         prefetchedVideoRef ? (
-          <PrefetchedVideoSlot videoRef={prefetchedVideoRef} mediaFit={mediaFit} />
+          <PrefetchedVideoSlot
+            videoRef={prefetchedVideoRef}
+            mediaFit={mediaFit}
+          />
         ) : (
           <video
             src={invitation.videoUrl}
@@ -388,11 +396,11 @@ export default function InvitationHero({
           type="button"
           aria-label="Scroll to next section"
           onClick={() => scrollToNextHeroSection()}
-          className="absolute left-1/2 z-20 flex h-12 w-12 -translate-x-1/2 items-center justify-center transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          className="bg-white rounded-full absolute left-1/2 z-20 flex -translate-x-1/2 items-center justify-center transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           style={{
-            bottom: invitation.audio.enabled
-              ? "calc(env(safe-area-inset-bottom) + 6rem)"
-              : "calc(env(safe-area-inset-bottom) + 2rem)",
+            width: scrollIndicator.buttonSize,
+            height: scrollIndicator.buttonSize,
+            bottom: scrollIndicator.bottom,
             color: invitation.heroScrollIndicator.color || theme.textPrimary,
             cursor: "pointer",
           }}
@@ -411,7 +419,8 @@ export default function InvitationHero({
           <svg
             aria-hidden="true"
             viewBox="0 0 24 24"
-            className="h-6 w-6"
+            width={scrollIndicator.iconSize}
+            height={scrollIndicator.iconSize}
             fill="none"
             stroke="currentColor"
             strokeWidth="1.7"
