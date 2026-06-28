@@ -471,11 +471,11 @@ export function InvitationHeroNames({
   theme,
   isPreview = false,
 }: InvitationHeroNamesProps) {
-  if (invitation.videoUrl) return null;
-
   const ts = resolveTextStyles(theme, invitation.textStyles);
   const isWedding = isWeddingEventType(invitation.eventType);
   const t = useCustomText(invitation.customTexts);
+
+  if (invitation.videoUrl) return null;
 
   return (
     <motion.section
