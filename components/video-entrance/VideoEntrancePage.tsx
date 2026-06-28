@@ -65,6 +65,7 @@ export default function VideoEntrancePage({
           videoPoster={invitation.videoPoster}
           mediaFit={resolveHeroMediaFit(invitation.heroMediaFit)}
           heroOverlay={invitation.heroOverlay}
+          heroScrollIndicator={invitation.heroScrollIndicator}
           revealSeconds={invitation.heroRevealSeconds}
           customTexts={invitation.customTexts}
           textStyles={invitation.textStyles}

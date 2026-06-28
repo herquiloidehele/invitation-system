@@ -12,6 +12,7 @@ import confetti from "canvas-confetti";
 import type {
   CustomTexts,
   HeroOverlayConfig,
+  HeroScrollIndicatorConfig,
   HeroTextLayer,
   InvitationData,
   InvitationEventType,
@@ -23,6 +24,10 @@ import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
 import { heroFontsFromTheme } from "@/lib/hero-text";
+import {
+  heroScrollIndicatorBottom,
+  resolveHeroScrollIndicator,
+} from "@/lib/hero-scroll-indicator";
 import CurtainHeroVideo from "./CurtainHeroVideo";
 import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
 import {
@@ -53,6 +58,8 @@ interface CurtainsHeroProps {
   heroVideoPoster?: string;
   /** Admin-tunable scrim + bottom gradient for the hero video (invitation.heroOverlay). */
   heroOverlay?: HeroOverlayConfig;
+  /** Admin-tunable scroll-down indicator (defaults to on for this layout). */
+  heroScrollIndicator?: HeroScrollIndicatorConfig;
   customTexts?: CustomTexts;
   eventType: InvitationEventType;
   /**
@@ -92,6 +99,7 @@ export default function CurtainsHero({
   heroMediaFit,
   heroVideoPoster,
   heroOverlay,
+  heroScrollIndicator,
   customTexts,
   textStyles,
   confettiEnabled = true,
@@ -102,6 +110,10 @@ export default function CurtainsHero({
 }: CurtainsHeroProps) {
   const hideDefaultHeroText = heroTextLayer?.hideDefaultText === true;
   const heroFonts = heroFontsFromTheme(theme, textStyles);
+  const scrollIndicator = resolveHeroScrollIndicator(heroScrollIndicator, {
+    defaultEnabled: true,
+    defaultSize: 28,
+  });
 
   // Per-element overrides applied to inline styles below. Resolved once
   // per render so we keep the existing curtain typography defaults and
@@ -517,15 +529,20 @@ export default function CurtainsHero({
       )}
 
       <AnimatePresence>
-        {heroInfoVisible && (
+        {heroInfoVisible && scrollIndicator.enabled && (
           <motion.button
             type="button"
             aria-label="Scroll to next section"
-            className="absolute left-1/2 z-20 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-white/70  transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="absolute left-1/2 z-20 flex -translate-x-1/2 items-center justify-center rounded-full bg-white/70 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{
-              bottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+              width: scrollIndicator.buttonSize,
+              height: scrollIndicator.buttonSize,
+              bottom: heroScrollIndicatorBottom(
+                "2rem",
+                scrollIndicator.offsetY,
+              ),
               borderColor: `${theme.textPrimary}33`,
-              color: theme.textPrimary,
+              color: heroScrollIndicator?.color || theme.textPrimary,
               cursor: "pointer",
             }}
             initial={{ opacity: 0, y: 10 }}
@@ -545,7 +562,8 @@ export default function CurtainsHero({
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"
-              className="h-7 w-7"
+              width={scrollIndicator.iconSize}
+              height={scrollIndicator.iconSize}
               fill="none"
               stroke="currentColor"
               strokeWidth="1.7"

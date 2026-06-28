@@ -12,6 +12,7 @@ import confetti from "canvas-confetti";
 import type {
   CustomTexts,
   HeroOverlayConfig,
+  HeroScrollIndicatorConfig,
   HeroTextLayer,
   InvitationData,
   InvitationEventType,
@@ -39,6 +40,10 @@ import {
   DEFAULT_HERO_GRADIENT_START_VIDEO,
   DEFAULT_HERO_SCRIM_OPACITY,
 } from "@/components/shared/InvitationHero";
+import {
+  heroScrollIndicatorBottom,
+  resolveHeroScrollIndicator,
+} from "@/lib/hero-scroll-indicator";
 
 interface VideoEntranceHeroProps {
   couple: InvitationData["couple"];
@@ -55,6 +60,8 @@ interface VideoEntranceHeroProps {
   videoPoster?: string;
   /** Admin-tunable scrim + bottom gradient over the video. */
   heroOverlay?: HeroOverlayConfig;
+  /** Admin-tunable scroll-down indicator (defaults to on for this layout). */
+  heroScrollIndicator?: HeroScrollIndicatorConfig;
   /** Seconds into the video at which the hero text reveals. */
   revealSeconds?: number;
   customTexts?: CustomTexts;
@@ -87,6 +94,7 @@ export default function VideoEntranceHero({
   mediaFit = "cover",
   videoPoster,
   heroOverlay,
+  heroScrollIndicator,
   revealSeconds,
   customTexts,
   textStyles,
@@ -101,6 +109,10 @@ export default function VideoEntranceHero({
 
   const hideDefaultHeroText = heroTextLayer?.hideDefaultText === true;
   const heroFonts = heroFontsFromTheme(theme, textStyles);
+  const scrollIndicator = resolveHeroScrollIndicator(heroScrollIndicator, {
+    defaultEnabled: true,
+    defaultSize: 28,
+  });
 
   const topTextOverride = resolveTextElementOverride(textStyles, "heroTopText");
   const coupleNamesOverride = resolveTextElementOverride(
@@ -518,15 +530,20 @@ export default function VideoEntranceHero({
 
       {/* Scroll-down chevron after reveal. */}
       <AnimatePresence>
-        {heroInfoVisible && (
+        {heroInfoVisible && scrollIndicator.enabled && (
           <motion.button
             type="button"
             aria-label="Scroll to next section"
-            className="absolute left-1/2 z-20 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-white/70 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="absolute left-1/2 z-20 flex -translate-x-1/2 items-center justify-center rounded-full bg-white/70 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{
-              bottom: "calc(env(safe-area-inset-bottom) + 2rem)",
+              width: scrollIndicator.buttonSize,
+              height: scrollIndicator.buttonSize,
+              bottom: heroScrollIndicatorBottom(
+                "2rem",
+                scrollIndicator.offsetY,
+              ),
               borderColor: `${theme.textPrimary}33`,
-              color: theme.textPrimary,
+              color: heroScrollIndicator?.color || theme.textPrimary,
               cursor: "pointer",
             }}
             initial={{ opacity: 0, y: 10 }}
@@ -534,14 +551,20 @@ export default function VideoEntranceHero({
             exit={{ opacity: 0, y: 10 }}
             transition={{
               opacity: { delay: 0.8, duration: 0.35 },
-              y: { delay: 1, duration: 1.4, repeat: Infinity, ease: "easeInOut" },
+              y: {
+                delay: 1,
+                duration: 1.4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
             }}
             onClick={handleScrollNext}
           >
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"
-              className="h-7 w-7"
+              width={scrollIndicator.iconSize}
+              height={scrollIndicator.iconSize}
               fill="none"
               stroke="currentColor"
               strokeWidth="1.7"

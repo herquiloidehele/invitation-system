@@ -8,7 +8,10 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
-import { resolveHeroScrollIndicator } from "@/lib/hero-scroll-indicator";
+import {
+  heroScrollIndicatorBottom,
+  resolveHeroScrollIndicator,
+} from "@/lib/hero-scroll-indicator";
 import { useCustomText } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { scrollToNextHeroSection } from "@/lib/curtain-canva";
@@ -138,7 +141,6 @@ export default function InvitationHero({
   const mediaFit = resolveHeroMediaFit(invitation.heroMediaFit);
   const scrollIndicator = resolveHeroScrollIndicator(
     invitation.heroScrollIndicator,
-    invitation.audio.enabled,
   );
 
   return (
@@ -391,7 +393,7 @@ export default function InvitationHero({
       )}
 
       {/* Animated scroll-down indicator (above audio player) */}
-      {invitation.heroScrollIndicator?.enabled && (
+      {scrollIndicator.enabled && (
         <motion.button
           type="button"
           aria-label="Scroll to next section"
@@ -400,8 +402,11 @@ export default function InvitationHero({
           style={{
             width: scrollIndicator.buttonSize,
             height: scrollIndicator.buttonSize,
-            bottom: scrollIndicator.bottom,
-            color: invitation.heroScrollIndicator.color || theme.textPrimary,
+            bottom: heroScrollIndicatorBottom(
+              invitation.audio.enabled ? "6rem" : "2rem",
+              scrollIndicator.offsetY,
+            ),
+            color: invitation.heroScrollIndicator?.color || theme.textPrimary,
             cursor: "pointer",
           }}
           initial={{ opacity: 0, y: 10 }}

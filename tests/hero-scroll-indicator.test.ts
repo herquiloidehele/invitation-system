@@ -3,47 +3,68 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_HERO_SCROLL_INDICATOR_OFFSET_Y,
   DEFAULT_HERO_SCROLL_INDICATOR_SIZE,
+  heroScrollIndicatorBottom,
   resolveHeroScrollIndicator,
 } from "@/lib/hero-scroll-indicator";
 
 describe("resolveHeroScrollIndicator", () => {
-  it("uses defaults (24px icon, 48px button, 2rem base) when config is undefined", () => {
-    const r = resolveHeroScrollIndicator(undefined, false);
+  it("defaults: disabled, 24px icon / 48px button, 0 offset", () => {
+    const r = resolveHeroScrollIndicator(undefined);
+    expect(r.enabled).toBe(false);
     expect(r.iconSize).toBe(DEFAULT_HERO_SCROLL_INDICATOR_SIZE);
     expect(r.iconSize).toBe(24);
     expect(r.buttonSize).toBe(48);
-    expect(r.bottom).toBe("calc(env(safe-area-inset-bottom) + 2rem + 0px)");
+    expect(r.offsetY).toBe(DEFAULT_HERO_SCROLL_INDICATOR_OFFSET_Y);
+    expect(r.offsetY).toBe(0);
   });
 
-  it("uses the 6rem base when audio is enabled", () => {
-    const r = resolveHeroScrollIndicator({}, true);
-    expect(r.bottom).toBe("calc(env(safe-area-inset-bottom) + 6rem + 0px)");
+  it("enabled resolves from config, honoring defaultEnabled", () => {
+    expect(resolveHeroScrollIndicator({ enabled: true }).enabled).toBe(true);
+    expect(
+      resolveHeroScrollIndicator(undefined, { defaultEnabled: true }).enabled,
+    ).toBe(true);
+    // explicit false always wins over a true default
+    expect(
+      resolveHeroScrollIndicator({ enabled: false }, { defaultEnabled: true })
+        .enabled,
+    ).toBe(false);
   });
 
-  it("keeps the button at 2× the icon size", () => {
-    const r = resolveHeroScrollIndicator({ size: 40 }, false);
-    expect(r.iconSize).toBe(40);
-    expect(r.buttonSize).toBe(80);
+  it("uses defaultSize when config.size is unset", () => {
+    expect(
+      resolveHeroScrollIndicator(undefined, { defaultSize: 28 }).iconSize,
+    ).toBe(28);
+    expect(
+      resolveHeroScrollIndicator(undefined, { defaultSize: 28 }).buttonSize,
+    ).toBe(56);
+    // explicit size overrides the default
+    expect(
+      resolveHeroScrollIndicator({ size: 40 }, { defaultSize: 28 }).iconSize,
+    ).toBe(40);
   });
 
   it("clamps size to 16..56", () => {
-    expect(resolveHeroScrollIndicator({ size: 4 }, false).iconSize).toBe(16);
-    expect(resolveHeroScrollIndicator({ size: 999 }, false).iconSize).toBe(56);
+    expect(resolveHeroScrollIndicator({ size: 4 }).iconSize).toBe(16);
+    expect(resolveHeroScrollIndicator({ size: 999 }).iconSize).toBe(56);
   });
 
-  it("applies offsetY to the bottom and clamps it to -24..240", () => {
-    expect(resolveHeroScrollIndicator({ offsetY: 100 }, false).bottom).toBe(
-      "calc(env(safe-area-inset-bottom) + 2rem + 100px)",
-    );
-    expect(resolveHeroScrollIndicator({ offsetY: -999 }, false).bottom).toBe(
-      "calc(env(safe-area-inset-bottom) + 2rem + -24px)",
-    );
-    expect(resolveHeroScrollIndicator({ offsetY: 9999 }, false).bottom).toBe(
-      "calc(env(safe-area-inset-bottom) + 2rem + 240px)",
-    );
+  it("clamps offsetY to -84..240", () => {
+    expect(resolveHeroScrollIndicator({ offsetY: -999 }).offsetY).toBe(-84);
+    expect(resolveHeroScrollIndicator({ offsetY: 9999 }).offsetY).toBe(240);
+    expect(resolveHeroScrollIndicator({ offsetY: 100 }).offsetY).toBe(100);
   });
+});
 
-  it("falls back to the offset default constant", () => {
-    expect(DEFAULT_HERO_SCROLL_INDICATOR_OFFSET_Y).toBe(0);
+describe("heroScrollIndicatorBottom", () => {
+  it("composes a safe-area + base + offset calc string", () => {
+    expect(heroScrollIndicatorBottom("2rem", 0)).toBe(
+      "calc(env(safe-area-inset-bottom) + 2rem + 0px)",
+    );
+    expect(heroScrollIndicatorBottom("6rem", 40)).toBe(
+      "calc(env(safe-area-inset-bottom) + 6rem + 40px)",
+    );
+    expect(heroScrollIndicatorBottom("2rem", -84)).toBe(
+      "calc(env(safe-area-inset-bottom) + 2rem + -84px)",
+    );
   });
 });

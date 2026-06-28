@@ -15,26 +15,37 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+export interface ResolveHeroScrollIndicatorOptions {
+  /** Effective `enabled` when `config.enabled` is unset. Defaults to false. */
+  defaultEnabled?: boolean;
+  /** Icon size (px) used when `config.size` is unset. Defaults to 24. */
+  defaultSize?: number;
+}
+
 export interface ResolvedHeroScrollIndicator {
+  /** Whether the indicator should render. */
+  enabled: boolean;
   /** Chevron icon size in px. */
   iconSize: number;
   /** Button (tap target) size in px — always 2× the icon. */
   buttonSize: number;
-  /** Computed CSS `bottom`: safe-area inset + audio-aware base + offset. */
-  bottom: string;
+  /** Clamped vertical offset in px (compose into `bottom` per layout). */
+  offsetY: number;
 }
 
 /**
  * Resolve the stored scroll-indicator config into render-ready values,
- * applying defaults and clamps. `audioEnabled` selects the bottom baseline
- * (6rem to clear the audio player, otherwise 2rem).
+ * applying defaults and clamps. Positioning is intentionally NOT computed
+ * here — each layout composes its own `bottom` via `heroScrollIndicatorBottom`
+ * because the baseline differs (audio-aware 6rem/2rem for the standard hero,
+ * fixed 2rem for the video-entrance / curtain-canva heroes).
  */
 export function resolveHeroScrollIndicator(
-  config: Pick<HeroScrollIndicatorConfig, "size" | "offsetY"> | undefined,
-  audioEnabled: boolean,
+  config: Partial<HeroScrollIndicatorConfig> | undefined,
+  opts: ResolveHeroScrollIndicatorOptions = {},
 ): ResolvedHeroScrollIndicator {
   const iconSize = clamp(
-    config?.size ?? DEFAULT_HERO_SCROLL_INDICATOR_SIZE,
+    config?.size ?? opts.defaultSize ?? DEFAULT_HERO_SCROLL_INDICATOR_SIZE,
     HERO_SCROLL_INDICATOR_SIZE_MIN,
     HERO_SCROLL_INDICATOR_SIZE_MAX,
   );
@@ -43,10 +54,18 @@ export function resolveHeroScrollIndicator(
     HERO_SCROLL_INDICATOR_OFFSET_Y_MIN,
     HERO_SCROLL_INDICATOR_OFFSET_Y_MAX,
   );
-  const base = audioEnabled ? "6rem" : "2rem";
   return {
+    enabled: config?.enabled ?? opts.defaultEnabled ?? false,
     iconSize,
     buttonSize: iconSize * 2,
-    bottom: `calc(env(safe-area-inset-bottom) + ${base} + ${offsetY}px)`,
+    offsetY,
   };
+}
+
+/** Compose the CSS `bottom` for the indicator: safe-area + layout base + offset. */
+export function heroScrollIndicatorBottom(
+  base: string,
+  offsetY: number,
+): string {
+  return `calc(env(safe-area-inset-bottom) + ${base} + ${offsetY}px)`;
 }

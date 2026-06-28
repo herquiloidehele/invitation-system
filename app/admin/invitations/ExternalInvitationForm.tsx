@@ -64,6 +64,7 @@ import {
 import MediaUpload from "@/components/admin/MediaUpload";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
+import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFields";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import HeroTextEditor from "@/components/admin/HeroTextEditor";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
@@ -1517,6 +1518,13 @@ export default function ExternalInvitationForm({
                         onChange={(v) => update("heroMediaFit", v)}
                       />
 
+                      <HeroScrollIndicatorFields
+                        value={form.heroScrollIndicator}
+                        onChange={(v) => update("heroScrollIndicator", v)}
+                        themeTextPrimary={currentTheme?.textPrimary}
+                        idPrefix="ellHeroScrollIndicator"
+                      />
+
                       {/* Free-positioned hero text */}
                       <div className="flex items-center justify-between gap-4">
                         <div className="space-y-0.5">
@@ -2106,6 +2114,17 @@ export default function ExternalInvitationForm({
                         onCheckedChange={updateHeroConfetti}
                       />
                     </div>
+
+                    <Separator />
+
+                    <HeroScrollIndicatorFields
+                      value={form.heroScrollIndicator}
+                      onChange={(v) => update("heroScrollIndicator", v)}
+                      themeTextPrimary={currentTheme?.textPrimary}
+                      defaultEnabled
+                      defaultSize={28}
+                      idPrefix="ccHeroScrollIndicator"
+                    />
                   </AccordionContent>
                 </AccordionItem>
               )}
@@ -2333,6 +2352,17 @@ export default function ExternalInvitationForm({
                         />
                       </div>
                     </div>
+
+                    <Separator />
+
+                    <HeroScrollIndicatorFields
+                      value={form.heroScrollIndicator}
+                      onChange={(v) => update("heroScrollIndicator", v)}
+                      themeTextPrimary={currentTheme?.textPrimary}
+                      defaultEnabled
+                      defaultSize={28}
+                      idPrefix="veHeroScrollIndicator"
+                    />
 
                     <Separator />
 
