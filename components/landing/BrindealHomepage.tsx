@@ -27,12 +27,16 @@ export function BrindealHomepage({
   liveDemoFeatures,
   bestSellerFeatures,
   currentCurrency,
+  staticDemoPreviews = false,
 }: {
   heroFeature: HeroFeature | null;
   galleryByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
   liveDemoFeatures: LiveDemoFeature[];
   bestSellerFeatures: BestSellerFeature[];
   currentCurrency: Currency;
+  /** Render live-demo invitations as static posters (phones / in-app browsers)
+   *  instead of live iframes, to avoid crashing memory-constrained WebViews. */
+  staticDemoPreviews?: boolean;
 }) {
   const reduceMotion = useReducedMotion();
   const [activeGalleryCategory, setActiveGalleryCategory] =
@@ -51,7 +55,7 @@ export function BrindealHomepage({
       />
       <ProcessSection />
       <FeaturesSection />
-      <LiveDemoSection items={liveDemoFeatures} />
+      <LiveDemoSection items={liveDemoFeatures} staticPreviews={staticDemoPreviews} />
       <FaqSection
         openIndex={openFaqIndex}
         setOpenIndex={setOpenFaqIndex}
