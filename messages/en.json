@@ -385,6 +385,8 @@
     "rsvp_deadlineClosedTitle": "Deadline closed",
     "rsvp_deadlineClosedMessage": "The RSVP deadline ended{deadline}.",
     "rsvp_deadlineDatePrefix": " on {deadline}",
+    "rsvp_closedTitle": "Confirmations closed",
+    "rsvp_closedMessage": "RSVP confirmations are closed.",
     "common_close": "Close"
   }
 }

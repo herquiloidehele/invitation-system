@@ -10,6 +10,18 @@ export interface RsvpConfigWithEmail {
   showNumAdults?: boolean;
   showNumChildren?: boolean;
   customFields?: RsvpCustomField[];
+  acceptingResponses?: boolean;
+}
+
+/**
+ * True when the host has closed RSVP confirmations for this invitation.
+ * `acceptingResponses` is default-open: only an explicit `false` closes it,
+ * so missing/`true` values (every existing invitation) stay open.
+ */
+export function isRsvpClosed(
+  config: RsvpConfigWithEmail | null | undefined,
+): boolean {
+  return config?.acceptingResponses === false;
 }
 
 export function shouldShowRsvpEmail(

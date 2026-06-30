@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Loader2, Lock } from "lucide-react";
 import type {
   CustomTexts,
   InvitationEventType,
@@ -78,6 +78,7 @@ interface RsvpPageProps {
   dateDisplay: string;
   deadline?: string;
   deadlinePassed: boolean;
+  closed: boolean;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
   showCompanion?: boolean;
@@ -129,6 +130,7 @@ export default function RsvpPage({
   dateDisplay,
   deadline,
   deadlinePassed,
+  closed,
   showEmail = false,
   showDietaryRestrictions = true,
   showCompanion = false,
@@ -305,8 +307,26 @@ export default function RsvpPage({
           className="w-full max-w-md rounded-2xl border shadow-sm overflow-hidden"
           style={{ backgroundColor: palette.card, borderColor: palette.border }}
         >
-          {/* ── Deadline closed ── */}
-          {deadlinePassed ? (
+          {/* ── Confirmations closed by host ── */}
+          {closed ? (
+            <div className="flex flex-col items-center gap-4 px-6 py-14 text-center">
+              <Lock
+                size={44}
+                strokeWidth={1.3}
+                style={{ color: palette.textMuted }}
+              />
+              <p
+                className="text-lg font-medium"
+                style={{ color: palette.text }}
+              >
+                {resolveText("rsvp_closedTitle")}
+              </p>
+              <p className="text-sm" style={{ color: palette.textSoft }}>
+                {resolveText("rsvp_closedMessage")}
+              </p>
+            </div>
+          ) : /* ── Deadline closed ── */
+          deadlinePassed ? (
             <div className="flex flex-col items-center gap-4 px-6 py-14 text-center">
               <Clock
                 size={44}

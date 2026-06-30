@@ -2851,6 +2851,22 @@ export default function InvitationForm({
                             }
                           />
                         </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Aceitar confirmações</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Quando desativado, os convidados deixam de poder
+                              confirmar presença e veem uma mensagem de
+                              confirmações encerradas.
+                            </p>
+                          </div>
+                          <Switch
+                            checked={form.rsvp.acceptingResponses !== false}
+                            onCheckedChange={(v) =>
+                              updateRsvp("acceptingResponses", v)
+                            }
+                          />
+                        </div>
                         <RsvpCustomFieldsBuilder
                           fields={form.rsvp.customFields ?? []}
                           onChange={(customFields) =>

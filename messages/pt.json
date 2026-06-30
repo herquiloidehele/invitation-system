@@ -385,6 +385,8 @@
     "rsvp_deadlineClosedTitle": "Prazo encerrado",
     "rsvp_deadlineClosedMessage": "O prazo para confirmação de presença terminou{deadline}.",
     "rsvp_deadlineDatePrefix": " em {deadline}",
+    "rsvp_closedTitle": "Confirmações encerradas",
+    "rsvp_closedMessage": "As confirmações de presença estão encerradas.",
     "common_close": "Fechar"
   }
 }
