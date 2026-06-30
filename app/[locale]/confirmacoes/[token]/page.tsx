@@ -61,6 +61,8 @@ type OwnerLabels = {
   attendingBadge: string;
   declinedBadge: string;
   dietaryRestrictions: (value: string) => string;
+  partyAdults: (count: number) => string;
+  partyChildren: (count: number) => string;
   footer: string;
 };
 
@@ -206,6 +208,8 @@ async function InvitationRsvpView({
                 attending: r.attending,
                 dietaryRestrictions: r.dietaryRestrictions,
                 companion: r.companion,
+                numAdults: r.numAdults,
+                numChildren: r.numChildren,
                 message: r.message,
                 customAnswers: r.customAnswers as RsvpCustomAnswer[] | null,
                 submittedAt: r.submittedAt,
@@ -305,6 +309,8 @@ async function SaveTheDateRsvpView({
             attending: r.attending,
             dietaryRestrictions: r.dietaryRestrictions,
             companion: r.companion,
+            numAdults: r.numAdults,
+            numChildren: r.numChildren,
             message: r.message,
             customAnswers: r.customAnswers as RsvpCustomAnswer[] | null,
             submittedAt: r.submittedAt,
@@ -364,6 +370,8 @@ export function RsvpList({
     attending: boolean;
     dietaryRestrictions: string | null;
     companion: string | null;
+    numAdults: number | null;
+    numChildren: number | null;
     message: string | null;
     customAnswers: RsvpCustomAnswer[] | null;
     submittedAt: Date;
@@ -422,6 +430,22 @@ export function RsvpList({
                       {labels.dietaryRestrictions(r.dietaryRestrictions)}
                     </p>
                   )}
+                  {r.attending &&
+                    (r.numAdults != null || r.numChildren != null) && (
+                      <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-stone-600">
+                        <Users className="size-3.5 text-stone-400" />
+                        {[
+                          r.numAdults != null
+                            ? labels.partyAdults(r.numAdults)
+                            : null,
+                          r.numChildren != null && r.numChildren > 0
+                            ? labels.partyChildren(r.numChildren)
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    )}
                   {r.message && (
                     <blockquote className="mt-2 pl-3 border-l-2 border-stone-200 text-sm italic text-stone-500">
                       &ldquo;{r.message}&rdquo;
@@ -484,6 +508,8 @@ export default async function OwnerRsvpPage({ params, searchParams }: Props) {
     attendingBadge: t("attendingBadge"),
     declinedBadge: t("declinedBadge"),
     dietaryRestrictions: (value) => t("dietaryRestrictions", { value }),
+    partyAdults: (count) => t("partyAdults", { count }),
+    partyChildren: (count) => t("partyChildren", { count }),
     footer: t("footer"),
   };
 
