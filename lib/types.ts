@@ -893,6 +893,8 @@ export interface CustomTexts {
   rsvp_deadlineClosedTitle?: string;
   rsvp_deadlineClosedMessage?: string;
   rsvp_deadlineDatePrefix?: string;
+  rsvp_closedTitle?: string;
+  rsvp_closedMessage?: string;
 
   // -- Places --
   places_mapLabel?: string;
@@ -925,6 +927,13 @@ export interface InvitationData {
     showOnExternalPage?: boolean;
     backgroundImageUrl?: string;
     customFields?: RsvpCustomField[];
+    /**
+     * When false, guests can no longer submit confirmations (the invitation
+     * stays visible, but the RSVP form is replaced by a "closed" message).
+     * Missing or true = open. Default-open keeps every existing invitation
+     * accepting responses with no backfill.
+     */
+    acceptingResponses?: boolean;
   };
   schedule: ScheduleEvent[];
   /** Visual layout for the schedule section. Defaults to "default". */

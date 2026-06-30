@@ -6,6 +6,7 @@ import {
   normalizeRsvpCustomFields,
   validateRsvpCustomAnswers,
 } from "@/lib/rsvp-custom-fields";
+import { isRsvpClosed, type RsvpConfigWithEmail } from "@/lib/rsvp-config";
 
 // ---------------------------------------------------------------------------
 // Validation schema
@@ -66,6 +67,18 @@ export async function POST(request: NextRequest) {
           message: "Convite não encontrado",
         },
         { status: 404 },
+      );
+    }
+
+    // Host has closed confirmations for this invitation — reject new responses.
+    // `invitation.rsvp` is a Prisma JsonValue; the rsvp config shape is known.
+    if (isRsvpClosed(invitation.rsvp as RsvpConfigWithEmail)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "As confirmações de presença estão encerradas",
+        },
+        { status: 403 },
       );
     }
 

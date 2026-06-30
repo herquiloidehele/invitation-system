@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import type { CustomTexts, InvitationEventType } from "@/lib/types";
 import {
   getRsvpCustomFields,
+  isRsvpClosed,
   shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
@@ -65,11 +66,13 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
     backgroundImageUrl?: string;
+    acceptingResponses?: boolean;
   };
   const customTexts =
     (invitation.customTexts as CustomTexts | null) ?? undefined;
 
   const deadlinePassed = isDeadlinePassed(rsvp.deadline);
+  const closed = isRsvpClosed(rsvp);
   const dateDisplay = date.iso
     ? formatLocalizedLongDate(date.iso, locale, date.display)
     : date.display;
@@ -97,6 +100,7 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       dateDisplay={dateDisplay}
       deadline={rsvp.deadline}
       deadlinePassed={deadlinePassed}
+      closed={closed}
       showEmail={shouldShowRsvpEmail(rsvp)}
       showDietaryRestrictions={shouldShowRsvpDietaryRestrictions(rsvp)}
       showCompanion={shouldShowRsvpCompanion(rsvp)}

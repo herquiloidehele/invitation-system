@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Loader2, CheckCircle, AlertCircle, Lock } from "lucide-react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +19,7 @@ import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { EditableText } from "@/components/shared/EditableText";
 import {
   getRsvpCustomFields,
+  isRsvpClosed,
   shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
@@ -206,6 +207,7 @@ export default function RSVPForm(props: RSVPFormProps) {
   const resolveText = useCustomText(ct);
   const rsvpSchema = createRsvpSchema(resolveText);
   const guest = isIntegration(props) ? props.guest : undefined;
+  const closed = isIntegration(props) && isRsvpClosed(props.invitation.rsvp);
   const showEmail = isIntegration(props)
     ? shouldShowRsvpEmail(props.invitation.rsvp)
     : props.showEmail === true;
@@ -408,7 +410,54 @@ export default function RSVPForm(props: RSVPFormProps) {
           inline ? "px-1 py-2" : "flex-1 overflow-y-auto px-5 py-5"
         }
       >
-        {submitState === "already_submitted" && (
+        {closed ? (
+          <motion.div
+            className="flex flex-col items-center gap-3 py-10 text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <Lock size={48} color={p.iconColor} strokeWidth={1.5} />
+            <p
+              className="text-lg font-medium"
+              style={{
+                fontFamily: p.displayFont,
+                color: p.text,
+                ...titleOverride,
+              }}
+            >
+              <EditableText elementKey="sectionTitles">
+                {resolveText("rsvp_closedTitle")}
+              </EditableText>
+            </p>
+            <p
+              className="text-sm"
+              style={{ color: p.textSoft, ...bodyTextOverride }}
+            >
+              <EditableText elementKey="bodyText">
+                {resolveText("rsvp_closedMessage")}
+              </EditableText>
+            </p>
+            {!inline && (
+              <button
+                onClick={handleCloseInModal}
+                className="mt-4 px-6 py-2 text-sm font-medium"
+                style={{
+                  fontFamily: uiFont,
+                  background: p.ctaBg,
+                  color: p.ctaText,
+                  borderRadius: p.ctaRadius,
+                  ...ctaLabelOverride,
+                }}
+              >
+                <EditableText elementKey="ctaLabel">
+                  {resolveText("rsvp_closeButton")}
+                </EditableText>
+              </button>
+            )}
+          </motion.div>
+        ) : null}
+
+        {!closed && submitState === "already_submitted" && (
           <motion.div
             className="flex flex-col items-center gap-3 py-10 text-center"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -455,7 +504,7 @@ export default function RSVPForm(props: RSVPFormProps) {
           </motion.div>
         )}
 
-        {submitState === "success" && (
+        {!closed && submitState === "success" && (
           <motion.div
             className="flex flex-col items-center gap-3 py-10 text-center"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -502,7 +551,7 @@ export default function RSVPForm(props: RSVPFormProps) {
           </motion.div>
         )}
 
-        {submitState === "error" && (
+        {!closed && submitState === "error" && (
           <motion.div
             className="flex flex-col items-center gap-3 py-10 text-center"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -547,7 +596,7 @@ export default function RSVPForm(props: RSVPFormProps) {
           </motion.div>
         )}
 
-        {(submitState === "idle" || submitState === "loading") && (
+        {!closed && (submitState === "idle" || submitState === "loading") && (
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
