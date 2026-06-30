@@ -2618,6 +2618,22 @@ export default function ExternalInvitationForm({
                       </div>
                       <div className="flex items-center justify-between gap-4">
                         <div className="space-y-0.5">
+                          <Label>Aceitar confirmações</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando desativado, os convidados deixam de poder
+                            confirmar presença e veem uma mensagem de
+                            confirmações encerradas.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.acceptingResponses !== false}
+                          onCheckedChange={(v) =>
+                            updateRsvp("acceptingResponses", v)
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
                           <Label>Mostrar RSVP no fim do convite externo</Label>
                           <p className="text-xs text-muted-foreground">
                             Quando ativo, a página externa (link Canva sem
