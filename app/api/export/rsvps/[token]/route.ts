@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { DocumentProps } from "@react-pdf/renderer";
 import type { ReactElement } from "react";
 import { prisma } from "@/lib/db";
+import type { RsvpConfigWithEmail } from "@/lib/rsvp-config";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -99,6 +100,8 @@ export async function GET(
       attending: r.attending,
       dietaryRestrictions: r.dietaryRestrictions,
       companion: r.companion,
+      numAdults: r.numAdults,
+      numChildren: r.numChildren,
       message: r.message,
       customAnswers: r.customAnswers,
       submittedAt: r.submittedAt,
@@ -112,6 +115,7 @@ export async function GET(
       responses,
       theme: pdfTheme,
       documentType: "invitation",
+      rsvpConfig: invitation.rsvp as RsvpConfigWithEmail | null,
     }) as ReactElement<DocumentProps>;
     const buffer = await renderToBuffer(document);
 
@@ -165,6 +169,8 @@ export async function GET(
       attending: r.attending,
       dietaryRestrictions: r.dietaryRestrictions,
       companion: r.companion,
+      numAdults: r.numAdults,
+      numChildren: r.numChildren,
       message: r.message,
       customAnswers: r.customAnswers,
       submittedAt: r.submittedAt,
@@ -177,6 +183,7 @@ export async function GET(
       responses,
       theme: pdfTheme,
       documentType: "save-the-date",
+      rsvpConfig: std.rsvp as RsvpConfigWithEmail | null,
     }) as ReactElement<DocumentProps>;
     const buffer = await renderToBuffer(document);
 

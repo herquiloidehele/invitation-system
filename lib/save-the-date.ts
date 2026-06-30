@@ -59,6 +59,8 @@ export interface SaveTheDateRsvpConfig {
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
   showCompanion?: boolean;
+  showNumAdults?: boolean;
+  showNumChildren?: boolean;
   customFields?: RsvpCustomField[];
 }
 

@@ -68,6 +68,8 @@ export default function RSVPModal(props: RSVPModalProps) {
         showEmail: props.showEmail,
         showDietaryRestrictions: props.showDietaryRestrictions,
         showCompanion: props.showCompanion,
+        showNumAdults: props.showNumAdults,
+        showNumChildren: props.showNumChildren,
         customFields: props.customFields,
         apiEndpoint: props.apiEndpoint,
         slugKey: props.slugKey,

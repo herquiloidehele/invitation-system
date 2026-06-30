@@ -31,6 +31,8 @@ function createRsvpSchema(t: (key: keyof CustomTexts) => string) {
     attending: z.enum(["yes", "no"], { error: t("rsvp_selectOption") }),
     dietaryRestrictions: z.string(),
     companion: z.string(),
+    numAdults: z.coerce.number().int().min(1),
+    numChildren: z.coerce.number().int().min(0),
     message: z.string(),
   });
 }
@@ -79,6 +81,8 @@ interface RsvpPageProps {
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
   showCompanion?: boolean;
+  showNumAdults?: boolean;
+  showNumChildren?: boolean;
   customFields?: RsvpCustomField[];
   backgroundImageUrl?: string;
   customTexts?: CustomTexts;
@@ -128,6 +132,8 @@ export default function RsvpPage({
   showEmail = false,
   showDietaryRestrictions = true,
   showCompanion = false,
+  showNumAdults = false,
+  showNumChildren = false,
   customFields = [],
   backgroundImageUrl,
   customTexts: ct,
@@ -161,6 +167,8 @@ export default function RsvpPage({
       attending: undefined,
       dietaryRestrictions: "",
       companion: "",
+      numAdults: 1,
+      numChildren: 0,
       message: "",
     },
   });
@@ -211,6 +219,8 @@ export default function RsvpPage({
           attending: data.attending === "yes",
           dietaryRestrictions: data.dietaryRestrictions || undefined,
           companion: data.companion || undefined,
+          numAdults: showNumAdults ? data.numAdults : undefined,
+          numChildren: showNumChildren ? data.numChildren : undefined,
           message: data.message || undefined,
           customAnswers: customValidation.answers.map((answer) => ({
             fieldId: answer.fieldId,
@@ -498,6 +508,48 @@ export default function RsvpPage({
                     className={inputBase}
                     style={inputStyle}
                   />
+                </div>
+              )}
+
+              {attending === "yes" && showNumAdults && (
+                <div className="flex flex-col gap-1.5">
+                  <label style={labelStyle}>
+                    {resolveText("rsvp_adultsLabel")}
+                  </label>
+                  <input
+                    {...register("numAdults")}
+                    type="number"
+                    min={1}
+                    inputMode="numeric"
+                    className={inputBase}
+                    style={inputStyle}
+                  />
+                  {errors.numAdults && (
+                    <span className="text-xs text-red-500">
+                      {errors.numAdults.message}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {attending === "yes" && showNumChildren && (
+                <div className="flex flex-col gap-1.5">
+                  <label style={labelStyle}>
+                    {resolveText("rsvp_childrenLabel")}
+                  </label>
+                  <input
+                    {...register("numChildren")}
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    className={inputBase}
+                    style={inputStyle}
+                  />
+                  {errors.numChildren && (
+                    <span className="text-xs text-red-500">
+                      {errors.numChildren.message}
+                    </span>
+                  )}
                 </div>
               )}
 

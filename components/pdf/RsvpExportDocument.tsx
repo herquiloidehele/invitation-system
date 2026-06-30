@@ -7,7 +7,10 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
-import { countAttendingGuests } from "@/lib/rsvp-config";
+import {
+  countAttendingGuests,
+  type RsvpConfigWithEmail,
+} from "@/lib/rsvp-config";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -20,6 +23,8 @@ export type RsvpEntry = {
   attending: boolean;
   dietaryRestrictions: string | null;
   companion?: string | null;
+  numAdults?: number | null;
+  numChildren?: number | null;
   message: string | null;
   customAnswers?: unknown;
   submittedAt: Date | string;
@@ -46,6 +51,7 @@ export type RsvpExportDocumentProps = {
   responses: RsvpEntry[];
   theme: PdfTheme;
   documentType: "invitation" | "save-the-date";
+  rsvpConfig?: RsvpConfigWithEmail | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -567,9 +573,10 @@ export function RsvpExportDocument({
   responses,
   theme,
   documentType,
+  rsvpConfig,
 }: RsvpExportDocumentProps) {
   const styles = makeStyles(theme);
-  const attending = countAttendingGuests(responses);
+  const attending = countAttendingGuests(responses, rsvpConfig);
   const declined = responses.filter((r) => !r.attending).length;
 
   return (

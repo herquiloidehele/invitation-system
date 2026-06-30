@@ -33,6 +33,8 @@ import {
   shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
+  shouldShowRsvpNumAdults,
+  shouldShowRsvpNumChildren,
 } from "@/lib/rsvp-config";
 
 interface SaveTheDateViewProps {
@@ -758,6 +760,8 @@ export default function SaveTheDateView({
               saveTheDate.rsvp,
             )}
             showCompanion={shouldShowRsvpCompanion(saveTheDate.rsvp)}
+            showNumAdults={shouldShowRsvpNumAdults(saveTheDate.rsvp)}
+            showNumChildren={shouldShowRsvpNumChildren(saveTheDate.rsvp)}
             customFields={getRsvpCustomFields(saveTheDate.rsvp)}
             theme={{
               bg: theme.bgColor,

@@ -7,6 +7,8 @@ import {
   shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
+  shouldShowRsvpNumAdults,
+  shouldShowRsvpNumChildren,
 } from "@/lib/rsvp-config";
 import { createNoIndexMetadata } from "@/lib/seo";
 import { formatLocalizedLongDate } from "@/lib/date-format";
@@ -98,6 +100,8 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       showEmail={shouldShowRsvpEmail(rsvp)}
       showDietaryRestrictions={shouldShowRsvpDietaryRestrictions(rsvp)}
       showCompanion={shouldShowRsvpCompanion(rsvp)}
+      showNumAdults={shouldShowRsvpNumAdults(rsvp)}
+      showNumChildren={shouldShowRsvpNumChildren(rsvp)}
       customFields={getRsvpCustomFields(rsvp)}
       backgroundImageUrl={rsvp.backgroundImageUrl}
       customTexts={customTexts}

@@ -143,7 +143,10 @@ async function InvitationRsvpView({
   const location = invitation.location as { name: string; address?: string };
 
   const responses = invitation.rsvpResponses;
-  const totalAttending = countAttendingGuests(responses);
+  const totalAttending = countAttendingGuests(
+    responses,
+    invitation.rsvp as Parameters<typeof countAttendingGuests>[1],
+  );
   const totalDeclined = responses.filter((r) => !r.attending).length;
   const showGuests = invitation.guestManagementEnabled === true;
   const activeTab = showGuests && tab === "guests" ? "guests" : "rsvps";
@@ -251,7 +254,10 @@ async function SaveTheDateRsvpView({
   const date = std.date as { display: string };
 
   const responses = std.rsvpResponses;
-  const totalAttending = countAttendingGuests(responses);
+  const totalAttending = countAttendingGuests(
+    responses,
+    std.rsvp as Parameters<typeof countAttendingGuests>[1],
+  );
   const totalDeclined = responses.filter((r) => !r.attending).length;
 
   return (

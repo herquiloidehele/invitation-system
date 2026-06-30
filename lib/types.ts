@@ -826,6 +826,8 @@ export interface CustomTexts {
   rsvp_dietaryPlaceholder?: string;
   rsvp_companionLabel?: string;
   rsvp_companionPlaceholder?: string;
+  rsvp_adultsLabel?: string;
+  rsvp_childrenLabel?: string;
   rsvp_messageLabel?: string;
   rsvp_messagePlaceholder?: string;
 
@@ -918,6 +920,8 @@ export interface InvitationData {
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
     showCompanion?: boolean;
+    showNumAdults?: boolean;
+    showNumChildren?: boolean;
     showOnExternalPage?: boolean;
     backgroundImageUrl?: string;
     customFields?: RsvpCustomField[];

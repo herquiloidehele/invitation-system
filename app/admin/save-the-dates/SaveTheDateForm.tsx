@@ -88,6 +88,8 @@ export interface SaveTheDateFormData {
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
     showCompanion?: boolean;
+    showNumAdults?: boolean;
+    showNumChildren?: boolean;
     customFields?: RsvpCustomField[];
   };
   audio?: { enabled: boolean; src: string; artist: string; title: string };
@@ -1138,6 +1140,48 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                               ...p.rsvp,
                               enabled: p.rsvp?.enabled ?? true,
                               showCompanion: v,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Pedir número de adultos no RSVP</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Quando activo, soma o número de adultos ao total.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={data.rsvp?.showNumAdults === true}
+                        onCheckedChange={(v) =>
+                          setData((p) => ({
+                            ...p,
+                            rsvp: {
+                              ...p.rsvp,
+                              enabled: p.rsvp?.enabled ?? true,
+                              showNumAdults: v,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Pedir número de crianças no RSVP</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Quando activo, soma o número de crianças ao total.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={data.rsvp?.showNumChildren === true}
+                        onCheckedChange={(v) =>
+                          setData((p) => ({
+                            ...p,
+                            rsvp: {
+                              ...p.rsvp,
+                              enabled: p.rsvp?.enabled ?? true,
+                              showNumChildren: v,
                             },
                           }))
                         }

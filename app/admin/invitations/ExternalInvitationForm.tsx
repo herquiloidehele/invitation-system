@@ -154,6 +154,8 @@ function getDefaultState(
       showEmail: false,
       showDietaryRestrictions: true,
       showCompanion: false,
+      showNumAdults: false,
+      showNumChildren: false,
       showOnExternalPage: false,
       backgroundImageUrl: "",
     },
@@ -2584,6 +2586,34 @@ export default function ExternalInvitationForm({
                         <Switch
                           checked={form.rsvp.showCompanion === true}
                           onCheckedChange={(v) => updateRsvp("showCompanion", v)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Pedir número de adultos no RSVP</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, o formulário pede o número de adultos
+                            e soma-o ao total de convidados.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.showNumAdults === true}
+                          onCheckedChange={(v) => updateRsvp("showNumAdults", v)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Pedir número de crianças no RSVP</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, o formulário pede o número de crianças
+                            e soma-o ao total de convidados.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.showNumChildren === true}
+                          onCheckedChange={(v) =>
+                            updateRsvp("showNumChildren", v)
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between gap-4">

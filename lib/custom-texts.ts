@@ -276,6 +276,16 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "Nome do acompanhante",
       },
       {
+        key: "rsvp_adultsLabel",
+        label: "Label adultos",
+        placeholder: "Adultos",
+      },
+      {
+        key: "rsvp_childrenLabel",
+        label: "Label crianças",
+        placeholder: "Crianças",
+      },
+      {
         key: "rsvp_messageLabel",
         label: "Label mensagem",
         placeholder: "Mensagem",

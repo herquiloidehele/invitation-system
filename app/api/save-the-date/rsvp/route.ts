@@ -18,6 +18,8 @@ const rsvpSchema = z.object({
   attending: z.boolean({ error: "Confirmação de presença é obrigatória" }),
   dietaryRestrictions: z.string().optional(),
   companion: z.string().optional(),
+  numAdults: z.number().int().min(0).optional(),
+  numChildren: z.number().int().min(0).optional(),
   message: z.string().optional(),
   customAnswers: z
     .array(z.object({ fieldId: z.string(), value: z.unknown() }))
@@ -101,6 +103,8 @@ export async function POST(request: NextRequest) {
         attending: data.attending,
         dietaryRestrictions: data.dietaryRestrictions ?? null,
         companion: data.companion?.trim() || null,
+        numAdults: data.numAdults ?? null,
+        numChildren: data.numChildren ?? null,
         message: data.message ?? null,
         customAnswers: customAnswersJson,
       },

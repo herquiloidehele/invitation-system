@@ -22,6 +22,8 @@ import {
   shouldShowRsvpCompanion,
   shouldShowRsvpDietaryRestrictions,
   shouldShowRsvpEmail,
+  shouldShowRsvpNumAdults,
+  shouldShowRsvpNumChildren,
 } from "@/lib/rsvp-config";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
@@ -41,6 +43,8 @@ function createRsvpSchema(t: (key: keyof CustomTexts) => string) {
     attending: z.enum(["yes", "no"], { error: t("rsvp_selectOption") }),
     dietaryRestrictions: z.string(),
     companion: z.string(),
+    numAdults: z.coerce.number().int().min(1),
+    numChildren: z.coerce.number().int().min(0),
     message: z.string(),
   });
 }
@@ -121,6 +125,8 @@ export interface RSVPFormDirectProps {
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
   showCompanion?: boolean;
+  showNumAdults?: boolean;
+  showNumChildren?: boolean;
   customFields?: RsvpCustomField[];
   apiEndpoint?: string;
   slugKey?: string;
@@ -209,6 +215,12 @@ export default function RSVPForm(props: RSVPFormProps) {
   const showCompanion = isIntegration(props)
     ? shouldShowRsvpCompanion(props.invitation.rsvp)
     : props.showCompanion === true;
+  const showNumAdults = isIntegration(props)
+    ? shouldShowRsvpNumAdults(props.invitation.rsvp)
+    : props.showNumAdults === true;
+  const showNumChildren = isIntegration(props)
+    ? shouldShowRsvpNumChildren(props.invitation.rsvp)
+    : props.showNumChildren === true;
   const customFields = isIntegration(props)
     ? getRsvpCustomFields(props.invitation.rsvp)
     : (props.customFields ?? []);
@@ -249,6 +261,8 @@ export default function RSVPForm(props: RSVPFormProps) {
       attending: undefined,
       dietaryRestrictions: "",
       companion: "",
+      numAdults: 1,
+      numChildren: 0,
       message: "",
     },
   });
@@ -301,6 +315,8 @@ export default function RSVPForm(props: RSVPFormProps) {
           attending: data.attending === "yes",
           dietaryRestrictions: data.dietaryRestrictions || undefined,
           companion: data.companion || undefined,
+          numAdults: showNumAdults ? data.numAdults : undefined,
+          numChildren: showNumChildren ? data.numChildren : undefined,
           message: data.message || undefined,
           customAnswers: customValidation.answers.map((answer) => ({
             fieldId: answer.fieldId,
@@ -681,6 +697,52 @@ export default function RSVPForm(props: RSVPFormProps) {
                   className={inputClass}
                   style={inputStyle}
                 />
+              </div>
+            )}
+
+            {attending === "yes" && showNumAdults && (
+              <div className="flex flex-col gap-1.5">
+                <label style={labelStyle}>
+                  <EditableText elementKey="labels">
+                    {resolveText("rsvp_adultsLabel")}
+                  </EditableText>
+                </label>
+                <input
+                  {...register("numAdults")}
+                  type="number"
+                  min={1}
+                  inputMode="numeric"
+                  className={inputClass}
+                  style={inputStyle}
+                />
+                {errors.numAdults && (
+                  <span className="text-xs text-red-500">
+                    {errors.numAdults.message}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {attending === "yes" && showNumChildren && (
+              <div className="flex flex-col gap-1.5">
+                <label style={labelStyle}>
+                  <EditableText elementKey="labels">
+                    {resolveText("rsvp_childrenLabel")}
+                  </EditableText>
+                </label>
+                <input
+                  {...register("numChildren")}
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  className={inputClass}
+                  style={inputStyle}
+                />
+                {errors.numChildren && (
+                  <span className="text-xs text-red-500">
+                    {errors.numChildren.message}
+                  </span>
+                )}
               </div>
             )}
 
