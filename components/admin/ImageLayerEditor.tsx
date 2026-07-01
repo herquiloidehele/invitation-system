@@ -6,6 +6,7 @@ import {
   useEffect,
   useReducer,
   useRef,
+  useState,
 } from "react";
 
 import { EMPTY_IMAGE_LAYER, moveItem, updateItem } from "@/lib/image-layer";
@@ -70,6 +71,7 @@ export default function ImageLayerEditor({
   const dragOffset = useRef<{ dx: number; dy: number } | null>(null);
   const handleMode = useRef<null | "resize" | "rotate">(null);
   const [, force] = useReducer((x: number) => x + 1, 0);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Re-measure on scroll/resize so the overlay tracks the preview as the user
   // scrolls the (tall) invitation to position images.
@@ -184,12 +186,7 @@ export default function ImageLayerEditor({
       const centerY = canvas.top + (item.yPct / 100) * canvas.height;
       onChange(
         updateItem(layer, item.id, {
-          rotation: rotationFromPointer(
-            centerX,
-            centerY,
-            e.clientX,
-            e.clientY,
-          ),
+          rotation: rotationFromPointer(centerX, centerY, e.clientX, e.clientY),
         }),
       );
     },
@@ -215,64 +212,73 @@ export default function ImageLayerEditor({
         zIndex: 40,
       }}
     >
-      {layer.items.map((item) => {
-        const cx = canvas.left + (item.xPct / 100) * canvas.width;
-        const cy = canvas.top + (item.yPct / 100) * canvas.height;
-        const w = (item.widthPct / 100) * canvas.width;
-        const h = w / (item.aspect || 1);
-        const left = cx - preview.left - w / 2;
-        const top = cy - preview.top - h / 2;
-        const isSel = item.id === selectedId;
-        return (
-          <div
-            key={item.id}
-            onPointerDown={(e) => handlePointerDown(e, item.id)}
-            onPointerMove={(e) => handlePointerMove(e, item.id)}
-            onPointerUp={handlePointerUp}
-            className="pointer-events-auto absolute"
-            style={{
-              left,
-              top,
-              width: w,
-              height: h,
-              transform: `rotate(${item.rotation}deg)`,
-              cursor: "move",
-              outline: isSel
-                ? "1.5px dashed #85B7EB"
-                : "1px solid rgba(0,0,0,0.25)",
-              outlineOffset: 2,
-              touchAction: "none",
-            }}
-          >
-            {isSel && (
-              <>
-                {CORNERS.map((c) => (
+      {/* Sort by z so the visually-topmost image is the one a click hits. */}
+      {[...layer.items]
+        .sort((a, b) => a.z - b.z)
+        .map((item) => {
+          const cx = canvas.left + (item.xPct / 100) * canvas.width;
+          const cy = canvas.top + (item.yPct / 100) * canvas.height;
+          const w = (item.widthPct / 100) * canvas.width;
+          const h = w / (item.aspect || 1);
+          const left = cx - preview.left - w / 2;
+          const top = cy - preview.top - h / 2;
+          const isSel = item.id === selectedId;
+          return (
+            <div
+              key={item.id}
+              onPointerDown={(e) => handlePointerDown(e, item.id)}
+              onPointerMove={(e) => handlePointerMove(e, item.id)}
+              onPointerUp={handlePointerUp}
+              onPointerEnter={() => setHoveredId(item.id)}
+              onPointerLeave={() =>
+                setHoveredId((h) => (h === item.id ? null : h))
+              }
+              className="pointer-events-auto absolute"
+              style={{
+                left,
+                top,
+                width: w,
+                height: h,
+                transform: `rotate(${item.rotation}deg)`,
+                cursor: isSel ? "move" : "pointer",
+                outline: isSel
+                  ? "1.5px dashed #85B7EB"
+                  : hoveredId === item.id
+                    ? "1.5px solid rgba(133,183,235,0.8)"
+                    : "none",
+                outlineOffset: 2,
+                touchAction: "none",
+              }}
+            >
+              {isSel && (
+                <>
+                  {CORNERS.map((c) => (
+                    <div
+                      key={c.k}
+                      onPointerDown={(e) => startHandle(e, "resize", item.id)}
+                      onPointerMove={(e) => onResizeMove(e, item)}
+                      onPointerUp={endHandle}
+                      style={{ ...HANDLE_DOT, ...c.pos, cursor: "nwse-resize" }}
+                    />
+                  ))}
                   <div
-                    key={c.k}
-                    onPointerDown={(e) => startHandle(e, "resize", item.id)}
-                    onPointerMove={(e) => onResizeMove(e, item)}
+                    onPointerDown={(e) => startHandle(e, "rotate", item.id)}
+                    onPointerMove={(e) => onRotateMove(e, item)}
                     onPointerUp={endHandle}
-                    style={{ ...HANDLE_DOT, ...c.pos, cursor: "nwse-resize" }}
+                    style={{
+                      ...HANDLE_DOT,
+                      left: "50%",
+                      top: -24,
+                      marginLeft: -5,
+                      background: "#4a7",
+                      cursor: "grab",
+                    }}
                   />
-                ))}
-                <div
-                  onPointerDown={(e) => startHandle(e, "rotate", item.id)}
-                  onPointerMove={(e) => onRotateMove(e, item)}
-                  onPointerUp={endHandle}
-                  style={{
-                    ...HANDLE_DOT,
-                    left: "50%",
-                    top: -24,
-                    marginLeft: -5,
-                    background: "#4a7",
-                    cursor: "grab",
-                  }}
-                />
-              </>
-            )}
-          </div>
-        );
-      })}
+                </>
+              )}
+            </div>
+          );
+        })}
     </div>
   );
 }

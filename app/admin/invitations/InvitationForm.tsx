@@ -495,9 +495,9 @@ export default function InvitationForm({
 
   // Google Maps link auto-fill state
   const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
-  const [imageEditActive, setImageEditActive] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const previewRootRef = useRef<HTMLDivElement | null>(null);
+  const hasImageItems = (form.imageLayer?.items?.length ?? 0) > 0;
   const [mapsLink1, setMapsLink1] = useState("");
   const [mapsLink2, setMapsLink2] = useState("");
   const [resolvingLoc1, setResolvingLoc1] = useState(false);
@@ -2132,55 +2132,24 @@ export default function InvitationForm({
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   <p className="text-xs text-muted-foreground">
-                    Carregue imagens e posicione-as livremente sobre o convite —
-                    atrás ou à frente de qualquer secção.
+                    Carregue imagens e clique numa imagem na pré-visualização
+                    para a posicionar e personalizar — atrás ou à frente do
+                    conteúdo.
                   </p>
                   <ImageLayerUploader
                     value={form.imageLayer}
                     onChange={(next) => update("imageLayer", next)}
                     getPreviewRoot={() => previewRootRef.current}
-                    onAdded={(id) => {
-                      setImageEditActive(true);
-                      setSelectedImageId(id);
-                    }}
+                    onAdded={(id) => setSelectedImageId(id)}
                   />
-                  {imageEditActive ? (
+                  {(form.imageLayer?.items?.length ?? 0) > 0 && (
                     <div className="space-y-2 rounded-md border p-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium">
-                          A posicionar imagens
-                        </span>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setImageEditActive(false);
-                            setSelectedImageId(null);
-                          }}
-                        >
-                          Concluir
-                        </Button>
-                      </div>
                       <ImageLayerInspector
                         layer={form.imageLayer}
                         selectedId={selectedImageId}
                         onChange={(next) => update("imageLayer", next)}
                         onSelect={setSelectedImageId}
                       />
-                    </div>
-                  ) : (
-                    <div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setImageEditActive(true)}
-                      >
-                        Posicionar imagens
-                        {form.imageLayer?.items?.length
-                          ? ` (${form.imageLayer.items.length})`
-                          : ""}
-                      </Button>
                     </div>
                   )}
                 </AccordionContent>
@@ -3769,7 +3738,7 @@ export default function InvitationForm({
       />
 
       <ImageLayerEditor
-        active={imageEditActive}
+        active={hasImageItems}
         value={form.imageLayer}
         onChange={(next) => update("imageLayer", next)}
         getPreviewRoot={() => previewRootRef.current}
