@@ -147,6 +147,9 @@ export async function PUT(
         ...(body.heroTextLayer !== undefined && {
           heroTextLayer: sanitizeJsonField(body.heroTextLayer, null),
         }),
+        ...(body.imageLayer !== undefined && {
+          imageLayer: sanitizeJsonField(body.imageLayer, null),
+        }),
         ...{ videoUrl: body.videoUrl || "" },
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,

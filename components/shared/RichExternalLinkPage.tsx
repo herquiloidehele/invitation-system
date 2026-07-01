@@ -12,6 +12,7 @@ import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 
 import InvitationHero, { InvitationHeroNames } from "./InvitationHero";
+import ImageCanvas from "./ImageCanvas";
 import ExternalCountdownSection from "./ExternalCountdownSection";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
@@ -201,6 +202,7 @@ export default function RichExternalLinkPage({
         overflowAnchor: "none",
       }}
     >
+      <ImageCanvas layer={invitation.imageLayer}>
       <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
 
       {heroOn && (
@@ -330,6 +332,7 @@ export default function RichExternalLinkPage({
           </section>
         </>
       )}
+      </ImageCanvas>
     </main>
   );
 }

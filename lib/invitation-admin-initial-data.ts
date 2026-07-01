@@ -11,6 +11,7 @@ import type {
   HeroOverlayConfig,
   HeroScrollIndicatorConfig,
   HeroTextLayer,
+  ImageLayer,
   ImageSettingsMap,
   InvitationData,
   InvitationEventType,
@@ -45,6 +46,7 @@ type AdminInvitationInitialDataRow = {
   heroOverlay: unknown;
   heroScrollIndicator: unknown;
   heroTextLayer: unknown;
+  imageLayer: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
   heroMediaFit: string | null;
@@ -115,6 +117,7 @@ export function toAdminInvitationInitialData(
       (row.heroScrollIndicator as HeroScrollIndicatorConfig | null) ??
       undefined,
     heroTextLayer: (row.heroTextLayer as HeroTextLayer | null) ?? undefined,
+    imageLayer: (row.imageLayer as ImageLayer | null) ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
     heroMediaFit: (row.heroMediaFit as ObjectFit | null) ?? undefined,

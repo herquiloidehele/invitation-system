@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -67,6 +67,9 @@ import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFields";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import HeroTextEditor from "@/components/admin/HeroTextEditor";
+import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
+import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
+import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
@@ -297,6 +300,9 @@ export default function ExternalInvitationForm({
     initialData ?? getDefaultState(themes[0]),
   );
   const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
+  const [imageEditActive, setImageEditActive] = useState(false);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const previewRootRef = useRef<HTMLDivElement | null>(null);
 
   const isWedding = isWeddingEventType(form.eventType);
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
@@ -980,6 +986,69 @@ export default function ExternalInvitationForm({
                       update("landingDescription", next.landingDescription);
                     }}
                   />
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ── Imagens de fundo ── */}
+              <AccordionItem
+                value="imageLayer"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Imagens de fundo
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pb-4">
+                  <p className="text-xs text-muted-foreground">
+                    Carregue imagens e posicione-as livremente sobre o convite.
+                  </p>
+                  <ImageLayerUploader
+                    value={form.imageLayer}
+                    onChange={(next) => update("imageLayer", next)}
+                    getPreviewRoot={() => previewRootRef.current}
+                    onAdded={(id) => {
+                      setImageEditActive(true);
+                      setSelectedImageId(id);
+                    }}
+                  />
+                  {imageEditActive ? (
+                    <div className="space-y-2 rounded-md border p-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium">
+                          A posicionar imagens
+                        </span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setImageEditActive(false);
+                            setSelectedImageId(null);
+                          }}
+                        >
+                          Concluir
+                        </Button>
+                      </div>
+                      <ImageLayerInspector
+                        layer={form.imageLayer}
+                        selectedId={selectedImageId}
+                        onChange={(next) => update("imageLayer", next)}
+                        onSelect={setSelectedImageId}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setImageEditActive(true)}
+                      >
+                        Posicionar imagens
+                        {form.imageLayer?.items?.length
+                          ? ` (${form.imageLayer.items.length})`
+                          : ""}
+                      </Button>
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
 
@@ -2968,7 +3037,10 @@ export default function ExternalInvitationForm({
                   >
                     <TextStyleToolbar />
                     <CardStyleToolbar />
-                    <div className="absolute inset-0 overflow-y-auto bg-background">
+                    <div
+                      ref={previewRootRef}
+                      className="absolute inset-0 overflow-y-auto bg-background"
+                    >
                       <RichExternalLinkPage
                         invitation={form}
                         theme={currentTheme as TemplateTheme}
@@ -3003,6 +3075,15 @@ export default function ExternalInvitationForm({
         stillUrl={heroTextStillUrl}
         aspectRatio={heroTextAspect}
         fonts={heroTextFonts}
+      />
+
+      <ImageLayerEditor
+        active={imageEditActive}
+        value={form.imageLayer}
+        onChange={(next) => update("imageLayer", next)}
+        getPreviewRoot={() => previewRootRef.current}
+        selectedId={selectedImageId}
+        onSelectedIdChange={setSelectedImageId}
       />
     </div>
   );
