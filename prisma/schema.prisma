@@ -100,6 +100,7 @@ model Invitation {
   faqs         Json?    // FAQItem[]
   guestGuide   Json?    // GuestGuide { enabled, items[] }
   envelope     Json?    // EnvelopeConfig { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }
+  coverVideos  Json?    // CoverVideos { enabled, items: { url, poster? }[] } — tap-to-play video-sequence cover; replaces the envelope when enabled.
   saveDateStyle  String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line"
   cinematicImageUrl String? // background image for the cinematic Save the Date style
   sectionImages  Json?   // SectionImages { image1?, image2?, image3?, image4? }

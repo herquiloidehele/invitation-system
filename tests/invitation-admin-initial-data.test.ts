@@ -41,6 +41,7 @@ const baseRow = {
   cinematicImageUrl: null,
   sectionImages: null,
   coupleGallery: null,
+  coverVideos: null,
   places: null,
   parents: null,
   ourStory: null,
@@ -168,5 +169,29 @@ describe("toAdminInvitationInitialData — imageLayer round-trip", () => {
     const row = { ...baseRow, imageLayer: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.imageLayer).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — coverVideos round-trip", () => {
+  it("hydrates coverVideos into the admin form initial data", () => {
+    const coverVideos = {
+      enabled: true,
+      items: [
+        {
+          url: "https://cdn.example.com/a.mp4",
+          poster: "https://cdn.example.com/a.jpg",
+        },
+        { url: "https://cdn.example.com/b.mp4" },
+      ],
+    };
+    const row = { ...baseRow, coverVideos };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.coverVideos).toEqual(coverVideos);
+  });
+
+  it("leaves coverVideos undefined when the column is null", () => {
+    const row = { ...baseRow, coverVideos: null };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.coverVideos).toBeUndefined();
   });
 });

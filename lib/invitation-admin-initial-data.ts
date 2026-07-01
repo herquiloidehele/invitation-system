@@ -62,6 +62,7 @@ type AdminInvitationInitialDataRow = {
   cinematicImageUrl: string | null;
   sectionImages: unknown;
   coupleGallery: unknown;
+  coverVideos: unknown;
   places: unknown;
   parents: unknown;
   ourStory: unknown;
@@ -134,6 +135,8 @@ export function toAdminInvitationInitialData(
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     coupleGallery: (row.coupleGallery as CoupleGallery | null) ?? undefined,
+    coverVideos:
+      (row.coverVideos as InvitationData["coverVideos"] | null) ?? undefined,
     places: (row.places as InvitationData["places"] | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as OurStory | null) ?? undefined,

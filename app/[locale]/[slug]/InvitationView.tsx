@@ -7,8 +7,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import VideoSequenceCover from "@/components/shared/VideoSequenceCover";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { isVideoEntranceLayout } from "@/lib/video-entrance";
+import { shouldRenderVideoSequenceCover } from "@/lib/cover-videos";
 import { isElegantFloralLayout } from "@/lib/elegant-floral";
 import {
   hasRichExternalSections,
@@ -118,6 +120,9 @@ function EnvelopeInvitationView({
       ? initialSection
       : null;
   const [coverVisible, setCoverVisible] = useState(!skipToSection);
+  // Flips to true if the video-sequence cover's first clip fails to load before
+  // playback — we then render the standard envelope instead.
+  const [videoCoverFailed, setVideoCoverFailed] = useState(false);
   const [showContent, setShowContent] = useState(Boolean(skipToSection));
   const [videoVisible, setVideoVisible] = useState(false);
   const [externalLinkVisible, setExternalLinkVisible] = useState(false);
@@ -162,6 +167,16 @@ function EnvelopeInvitationView({
     invitation.audio,
   );
 
+  // The video-sequence cover replaces the envelope on the standard scrollable
+  // flow. It's excluded for external_video, whose handoff plays an external
+  // video imperatively and assumes the short envelope delay (not a multi-clip
+  // sequence). external_video can't enable it from the admin anyway; this just
+  // guards against inconsistent data.
+  const usesVideoCover =
+    shouldRenderVideoSequenceCover(invitation.coverVideos) &&
+    !videoCoverFailed &&
+    (invitation.invitationType ?? "standard") !== "external_video";
+
   // Merge per-invitation envelope overrides on top of the theme defaults
   const mergedTheme = useMemo<TemplateTheme>(() => {
     const overrides = invitation.envelope;
@@ -176,53 +191,77 @@ function EnvelopeInvitationView({
     };
   }, [theme, invitation.envelope]);
 
-  /** User tapped — start music (only for standard invites). */
-  const handleOpen = useCallback(() => {
-    // The hidden hero video and background audio were mounted with
-    // preload="metadata" so the envelope view stays cheap on cold load.
-    // The tap is the user gesture that unlocks autoplay AND tells us
-    // they're committed to viewing the invitation, so upgrade the preload
-    // hint to "auto" — the browser then fetches the rest of the file,
-    // continuing from the bytes it already buffered.
-    //
-    // Do NOT call `.load()` here: that runs the media element load
-    // algorithm, which aborts the in-flight fetch and re-downloads the
-    // resource from scratch, throwing away everything preload="metadata"
-    // already pulled. That produced a duplicate network request *and*
-    // delayed audio playback (play() had to wait for the fresh buffer).
+  /** Upgrade the hero prefetch video's preload hint once the user commits. */
+  const upgradeHeroPreload = useCallback(() => {
+    // Do NOT call `.load()` here: that runs the media element load algorithm,
+    // which aborts the in-flight fetch and re-downloads the resource from
+    // scratch, throwing away everything preload="metadata" already pulled.
     const heroVideo = heroVideoRef.current;
     if (heroVideo) {
       heroVideo.preload = "auto";
     }
+  }, []);
 
+  /** Start the pre-buffered background music with a cinematic volume fade-in. */
+  const startBackgroundAudio = useCallback(() => {
+    if (!hasBackgroundAudio) return;
     // Use the pre-buffered <audio> element so playback starts instantly.
     // play() continues the download from the buffered metadata and starts
     // as soon as it has enough — no `.load()` reset needed.
-    if (hasBackgroundAudio) {
-      try {
-        const audio = audioRef.current;
-        if (!audio) return;
-        audio.preload = "auto";
-        audio.loop = true;
-        audio.volume = 0.03;
-        audio
-          .play()
-          .then(() => {
-            // Cinematic volume fade-in synced with the slow-motion opening
-            let vol = 0.03;
-            const fade = setInterval(() => {
-              vol = Math.min(vol + 0.02, 0.5);
-              audio.volume = vol;
-              if (vol >= 0.5) clearInterval(fade);
-            }, 200); // ~5s to reach full volume
-            fadeIntervalRef.current = fade;
-          })
-          .catch(() => {});
-      } catch {
-        /* silent */
-      }
+    try {
+      const audio = audioRef.current;
+      if (!audio) return;
+      audio.preload = "auto";
+      audio.loop = true;
+      // Unmute in case the video-cover path primed this element muted inside
+      // the tap gesture (see handleVideoCoverOpen); no-op on the envelope path.
+      audio.muted = false;
+      audio.volume = 0.03;
+      audio
+        .play()
+        .then(() => {
+          // Cinematic volume fade-in synced with the slow-motion opening
+          let vol = 0.03;
+          const fade = setInterval(() => {
+            vol = Math.min(vol + 0.02, 0.5);
+            audio.volume = vol;
+            if (vol >= 0.5) clearInterval(fade);
+          }, 200); // ~5s to reach full volume
+          fadeIntervalRef.current = fade;
+        })
+        .catch(() => {});
+    } catch {
+      /* silent */
     }
   }, [hasBackgroundAudio]);
+
+  /** Standard envelope path: the tap unlocks + starts the background music. */
+  const handleOpen = useCallback(() => {
+    upgradeHeroPreload();
+    startBackgroundAudio();
+  }, [upgradeHeroPreload, startBackgroundAudio]);
+
+  /**
+   * Video-sequence cover path: the clips carry their own sound, so on tap we
+   * only warm the hero prefetch — the background music is deferred to the
+   * handoff (`handleAnimationComplete`) so it never clashes with the clips.
+   */
+  const handleVideoCoverOpen = useCallback(() => {
+    upgradeHeroPreload();
+    // Prime the background <audio> INSIDE the tap gesture — muted, so it stays
+    // silent under the clips (which carry their own sound). Starting playback
+    // now (a user activation) lets the deferred unmute at handoff succeed on
+    // iOS, which blocks audio.play() outside a gesture.
+    if (hasBackgroundAudio) {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.loop = true;
+        audio.muted = true;
+        audio.volume = 0;
+        audio.play().catch(() => {});
+      }
+    }
+  }, [upgradeHeroPreload, hasBackgroundAudio]);
 
   /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
   useEffect(() => {
@@ -320,6 +359,13 @@ function EnvelopeInvitationView({
       fireCelebrationConfetti(confettiColors);
     }
 
+    // The video-sequence cover deferred the background music (its clips had
+    // their own audio). The tap already produced a user-activation, so start
+    // it now as the invitation is revealed.
+    if (usesVideoCover) {
+      startBackgroundAudio();
+    }
+
     const type = invitation.invitationType ?? "standard";
 
     // For external video: play imperatively (within the gesture context) and
@@ -352,7 +398,14 @@ function EnvelopeInvitationView({
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
-  }, [invitation.invitationType, invitation.envelope, theme, isRichExternalLink]);
+  }, [
+    invitation.invitationType,
+    invitation.envelope,
+    theme,
+    isRichExternalLink,
+    usesVideoCover,
+    startBackgroundAudio,
+  ]);
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
@@ -514,18 +567,27 @@ function EnvelopeInvitationView({
         {/* Envelope cover sits on top. Its final phase fades to the bg color,
             then it's removed from the DOM revealing the content beneath. */}
         <AnimatePresence>
-          {coverVisible && (
-            <EnvelopeCover
-              key="envelope-cover"
-              theme={mergedTheme}
-              coverBackground={invitation.envelope?.coverBackground}
-              onOpen={handleOpen}
-              onAnimationComplete={handleAnimationComplete}
-              monogram={invitation.couple.monogram}
-              shimmer={invitation.envelope?.shimmer !== false}
-              imageSettings={invitation.imageSettings}
-            />
-          )}
+          {coverVisible &&
+            (usesVideoCover ? (
+              <VideoSequenceCover
+                key="video-sequence-cover"
+                items={invitation.coverVideos!.items}
+                onOpen={handleVideoCoverOpen}
+                onAnimationComplete={handleAnimationComplete}
+                onUnavailable={() => setVideoCoverFailed(true)}
+              />
+            ) : (
+              <EnvelopeCover
+                key="envelope-cover"
+                theme={mergedTheme}
+                coverBackground={invitation.envelope?.coverBackground}
+                onOpen={handleOpen}
+                onAnimationComplete={handleAnimationComplete}
+                monogram={invitation.couple.monogram}
+                shimmer={invitation.envelope?.shimmer !== false}
+                imageSettings={invitation.imageSettings}
+              />
+            ))}
         </AnimatePresence>
       </div>
     </div>
