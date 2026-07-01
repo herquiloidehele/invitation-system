@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import {
   EMPTY_IMAGE_LAYER,
-  bringToFront,
   duplicateItem,
   removeItem,
   setItemBehind,
@@ -181,20 +180,20 @@ export default function ImageLayerInspector({
         <Button
           type="button"
           size="sm"
-          variant={selected.z < 0 ? "default" : "outline"}
+          variant={selected.z >= 0 ? "default" : "outline"}
           onClick={() =>
-            onChange(setItemBehind(layer, selected.id, selected.z >= 0))
+            onChange(setItemBehind(layer, selected.id, false))
           }
         >
-          Atrás
+          À frente
         </Button>
         <Button
           type="button"
           size="sm"
-          variant="outline"
-          onClick={() => onChange(bringToFront(layer, selected.id))}
+          variant={selected.z < 0 ? "default" : "outline"}
+          onClick={() => onChange(setItemBehind(layer, selected.id, true))}
         >
-          Frente
+          Atrás
         </Button>
         <Button
           type="button"

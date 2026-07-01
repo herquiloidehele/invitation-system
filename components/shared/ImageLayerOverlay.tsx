@@ -27,7 +27,7 @@ export default function ImageLayerOverlay({
       aria-hidden
       data-image-band={band}
       className="pointer-events-none absolute inset-0"
-      style={{ isolation: "isolate" }}
+      style={{ isolation: "isolate", zIndex: band === "front" ? 2 : 0 }}
     >
       {items.map((item) => (
         <div key={item.id} style={imageItemBoxStyle(item)}>

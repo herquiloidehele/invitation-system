@@ -31,7 +31,10 @@ export default function ImageCanvas({ layer, children }: ImageCanvasProps) {
   const front = items.filter((i) => i.z >= 0);
 
   return (
-    <div data-image-canvas style={{ position: "relative" }}>
+    <div
+      data-image-canvas
+      style={{ position: "relative", isolation: "isolate" }}
+    >
       <ImageLayerOverlay items={behind} band="behind" />
       <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
       <ImageLayerOverlay items={front} band="front" />
