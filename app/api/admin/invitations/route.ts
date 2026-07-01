@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
         heroOverlay: sanitizeJsonField(body.heroOverlay, null),
         heroScrollIndicator: sanitizeJsonField(body.heroScrollIndicator, null),
         heroTextLayer: sanitizeJsonField(body.heroTextLayer, null),
+        imageLayer: sanitizeJsonField(body.imageLayer, null),
         videoUrl: body.videoUrl ?? null,
         videoPoster: body.videoPoster ?? null,
         heroMediaFit: isObjectFit(body.heroMediaFit) ? body.heroMediaFit : null,

@@ -5,6 +5,7 @@ import type { MutableRefObject, RefObject } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import InvitationHero from "@/components/shared/InvitationHero";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
+import ImageCanvas from "@/components/shared/ImageCanvas";
 import Announcement from "./Announcement";
 import Countdown from "./Countdown";
 import LocationCard from "./LocationCard";
@@ -54,6 +55,7 @@ export default function ElegantFloralPage({
   return (
     <EfRevealProvider instant={isPreview ?? false}>
       <div style={{ backgroundColor: theme.bg, color: theme.textPrimary }}>
+        <ImageCanvas layer={invitation.imageLayer}>
         <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
 
         <InvitationHero
@@ -212,6 +214,7 @@ export default function ElegantFloralPage({
             </Reveal>
           )}
         </section>
+        </ImageCanvas>
       </div>
     </EfRevealProvider>
   );

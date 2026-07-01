@@ -265,6 +265,76 @@ export interface HeroTextLayer {
 }
 
 // ---------------------------------------------------------------------------
+// Free-floating image layer
+// ---------------------------------------------------------------------------
+
+/** Drop shadow for an image item. */
+export interface ImageItemShadow {
+  x: number;
+  y: number;
+  blur: number;
+  color: string;
+}
+
+/** Focal-point crop applied to the image inside its box. */
+export interface ImageItemCrop {
+  /** object-position X within the image, 0–100 (%). */
+  offsetXPct: number;
+  /** object-position Y within the image, 0–100 (%). */
+  offsetYPct: number;
+  /** Zoom factor applied to the image inside its box (>= 1). */
+  zoom: number;
+}
+
+/**
+ * A single free-floating image positioned on the page-wide canvas. Geometry is
+ * stored relative to the whole invitation (page width × total scroll height),
+ * not anchored to any section. See `lib/image-layer.ts`.
+ */
+export interface ImageItem {
+  /** Stable unique id. */
+  id: string;
+  /** Image URL (S3 public URL from the presign upload flow). */
+  src: string;
+  /** Intrinsic width/height of the uploaded image. */
+  naturalAspect: number;
+  /** Center X, % of the page canvas width (may be <0 or >100). */
+  xPct: number;
+  /** Center Y, % of the total page canvas height. */
+  yPct: number;
+  /** Box width, % of the page canvas width. */
+  widthPct: number;
+  /** Box width/height ratio (defaults to naturalAspect; stretch changes it). */
+  aspect: number;
+  /** Rotation in degrees (-180..180). */
+  rotation: number;
+  /** Mirror horizontally. */
+  flipH: boolean;
+  /** Mirror vertically. */
+  flipV: boolean;
+  /** Opacity 0..1. */
+  opacity: number;
+  /** Corner radius, % of the box's shortest side (0..50). */
+  radiusPct: number;
+  /** Blur in px (filter: blur), 0..20. */
+  blurPx: number;
+  /** Drop shadow, or null for none. */
+  shadow: ImageItemShadow | null;
+  /** Focal-point crop inside the image. */
+  crop: ImageItemCrop;
+  /** Signed stacking order: < 0 behind section content, >= 0 in front. */
+  z: number;
+}
+
+/**
+ * The free-floating image layer: a list of images anchored across the
+ * invitation's sections. Absent/`null` means the feature is unused.
+ */
+export interface ImageLayer {
+  items: ImageItem[];
+}
+
+// ---------------------------------------------------------------------------
 // Social preview / Open Graph
 // ---------------------------------------------------------------------------
 
@@ -950,6 +1020,8 @@ export interface InvitationData {
   heroScrollIndicator?: HeroScrollIndicatorConfig;
   /** Optional free-positioned custom text layer over the hero media. */
   heroTextLayer?: HeroTextLayer;
+  /** Optional free-floating images anchored across the invitation's sections. */
+  imageLayer?: ImageLayer;
   /** Hero background video. On standard invitations this is the InvitationHero video; on curtain-canva it's the looping full-screen hero shown after the curtain opens. */
   videoUrl?: string;
   /** Poster for `videoUrl` (the hero video). Optional. */

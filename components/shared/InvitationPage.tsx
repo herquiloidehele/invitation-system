@@ -41,6 +41,7 @@ import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
 import CoupleGallery from "./gallery/CoupleGallery";
 import SectionImage from "./SectionImage";
+import ImageCanvas from "./ImageCanvas";
 import PlacesSection from "./PlacesSection";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
@@ -411,6 +412,7 @@ export default function InvitationPage({
         position: "relative",
       }}
     >
+      <ImageCanvas layer={invitation.imageLayer}>
       {/* Load any non-builtin Google Fonts used by this theme */}
       <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
 
@@ -1251,6 +1253,7 @@ export default function InvitationPage({
         customTexts={invitation.customTexts}
         guest={invitation.guest}
       />
+      </ImageCanvas>
     </div>
   );
 }

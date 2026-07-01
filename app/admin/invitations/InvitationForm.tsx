@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -94,6 +94,9 @@ import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import HeroTextEditor from "@/components/admin/HeroTextEditor";
+import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
+import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
+import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
@@ -492,6 +495,9 @@ export default function InvitationForm({
 
   // Google Maps link auto-fill state
   const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const previewRootRef = useRef<HTMLDivElement | null>(null);
+  const hasImageItems = (form.imageLayer?.items?.length ?? 0) > 0;
   const [mapsLink1, setMapsLink1] = useState("");
   const [mapsLink2, setMapsLink2] = useState("");
   const [resolvingLoc1, setResolvingLoc1] = useState(false);
@@ -2116,6 +2122,39 @@ export default function InvitationForm({
                 </AccordionContent>
               </AccordionItem>
 
+              {/* ── Imagens de fundo ── */}
+              <AccordionItem
+                value="imageLayer"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Imagens de fundo
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pb-4">
+                  <p className="text-xs text-muted-foreground">
+                    Carregue imagens e clique numa imagem na pré-visualização
+                    para a posicionar e personalizar — atrás ou à frente do
+                    conteúdo.
+                  </p>
+                  <ImageLayerUploader
+                    value={form.imageLayer}
+                    onChange={(next) => update("imageLayer", next)}
+                    getPreviewRoot={() => previewRootRef.current}
+                    onAdded={(id) => setSelectedImageId(id)}
+                  />
+                  {(form.imageLayer?.items?.length ?? 0) > 0 && (
+                    <div className="space-y-2 rounded-md border p-2">
+                      <ImageLayerInspector
+                        layer={form.imageLayer}
+                        selectedId={selectedImageId}
+                        onChange={(next) => update("imageLayer", next)}
+                        onSelect={setSelectedImageId}
+                      />
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+
               {/* ── Date & Time ── */}
               <AccordionItem value="date" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
@@ -3671,7 +3710,10 @@ export default function InvitationForm({
               >
                 <TextStyleToolbar />
                 <CardStyleToolbar />
-                <div className="mx-auto origin-top w-full max-h-165 relative">
+                <div
+                  ref={previewRootRef}
+                  className="mx-auto origin-top w-full max-h-165 relative"
+                >
                   {hasRequiredNames ? (
                     isElegantFloral ? (
                       <ElegantFloralPage
@@ -3709,6 +3751,15 @@ export default function InvitationForm({
         stillUrl={heroTextStillUrl}
         aspectRatio={heroTextAspect}
         fonts={heroTextFonts}
+      />
+
+      <ImageLayerEditor
+        active={hasImageItems}
+        value={form.imageLayer}
+        onChange={(next) => update("imageLayer", next)}
+        getPreviewRoot={() => previewRootRef.current}
+        selectedId={selectedImageId}
+        onSelectedIdChange={setSelectedImageId}
       />
     </div>
   );

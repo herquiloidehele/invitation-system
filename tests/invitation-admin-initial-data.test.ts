@@ -25,6 +25,7 @@ const baseRow = {
   heroOverlay: null,
   heroScrollIndicator: null,
   heroTextLayer: null,
+  imageLayer: null,
   videoUrl: null,
   videoPoster: null,
   heroMediaFit: null,
@@ -131,5 +132,41 @@ describe("toAdminInvitationInitialData — heroMediaFit round-trip", () => {
     const row = { ...baseRow, heroMediaFit: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.heroMediaFit).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — imageLayer round-trip", () => {
+  it("hydrates imageLayer into the admin form initial data", () => {
+    const imageLayer = {
+      items: [
+        {
+          id: "img1",
+          src: "https://example.com/a.png",
+          naturalAspect: 1.5,
+          xPct: 50,
+          yPct: 50,
+          widthPct: 40,
+          aspect: 1.5,
+          rotation: 0,
+          flipH: false,
+          flipV: false,
+          opacity: 1,
+          radiusPct: 0,
+          blurPx: 0,
+          shadow: null,
+          crop: { offsetXPct: 50, offsetYPct: 50, zoom: 1 },
+          z: 1,
+        },
+      ],
+    };
+    const row = { ...baseRow, imageLayer };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.imageLayer).toEqual(imageLayer);
+  });
+
+  it("leaves imageLayer undefined when the column is null", () => {
+    const row = { ...baseRow, imageLayer: null };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.imageLayer).toBeUndefined();
   });
 });
