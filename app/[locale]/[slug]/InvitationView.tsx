@@ -12,16 +12,10 @@ import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { isVideoEntranceLayout } from "@/lib/video-entrance";
 import { shouldRenderVideoSequenceCover } from "@/lib/cover-videos";
 import { isElegantFloralLayout } from "@/lib/elegant-floral";
-import {
-  hasRichExternalSections,
-  shouldPreloadRichExternalCanva,
-} from "@/lib/external-invitation-form";
+import { hasRichExternalSections, shouldPreloadRichExternalCanva } from "@/lib/external-invitation-form";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
-import {
-  fireCelebrationConfetti,
-  resolveEnvelopeConfettiColors,
-} from "@/lib/confetti";
+import { fireCelebrationConfetti, resolveEnvelopeConfettiColors } from "@/lib/confetti";
 
 // Each invitation type renders exactly one of these pages. Splitting them
 // behind dynamic imports keeps the per-guest bundle to just the path
@@ -489,7 +483,9 @@ function EnvelopeInvitationView({
               invitation={invitation}
               theme={theme}
               audioRef={audioRef}
-              prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+              prefetchedVideoRef={
+                isStandardWithVideo ? heroVideoRef : undefined
+              }
               isLandingPreview={isLandingPreview}
               animateHeroText={richExternalLinkVisible}
               canvaPreloading={shouldPreloadRichExternalCanva({
@@ -509,7 +505,7 @@ function EnvelopeInvitationView({
           <video
             ref={heroVideoRef}
             src={invitation.videoUrl!}
-            preload="metadata"
+            preload="auto"
             muted
             loop
             playsInline
@@ -524,16 +520,19 @@ function EnvelopeInvitationView({
           />
         )}
 
-        {/* Persistent prefetch audio — mounted once. `preload="metadata"`
-            keeps the cold-start payload small; `handleOpen` upgrades the
-            preload hint to "auto" the moment the user taps, so the browser
-            fetches the rest of the file (continuing from the buffered
-            metadata) rather than re-downloading it. */}
+        {/* Persistent prefetch audio — mounted once, `preload="auto"` so the
+            whole file downloads ahead of the tap and plays instantly on open.
+            A matching <link rel="preload" as="audio"> in the server-rendered
+            <head> (see page.tsx) starts this during HTML parse — before
+            hydration and not subject to the mobile media-preload throttle.
+            NOTE: `preload="metadata"` here is wrong — the element aborts the
+            download after the header, which also cancels the head preload's
+            full fetch, so only a few seconds buffer before the tap. */}
         {hasBackgroundAudio && (
           <audio
             ref={audioRef}
             src={invitation.audio.src}
-            preload="metadata"
+            preload="auto"
             aria-hidden
             style={{
               position: "absolute",

@@ -7,6 +7,7 @@ import {
   isValidCoverVideoItem,
   shouldRenderVideoSequenceCover,
 } from "@/lib/cover-videos";
+import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getInvitation } from "@/lib/invitations";
 import { getPublicGuestByToken } from "@/lib/guests";
@@ -192,6 +193,24 @@ export default async function InvitationSlugPage({
       if (firstClip.poster) {
         ReactDOM.preload(firstClip.poster, { as: "image", fetchPriority: "high" });
       }
+    }
+  }
+
+  // Pre-download the background music during HTML parse too, so it plays the
+  // instant the guest opens the invitation instead of only starting to download
+  // on the tap. Applies to every invitation with background audio (envelope and
+  // video covers alike). Left at the default preload priority so it never
+  // outranks the first cover clip on video-cover invitations — the clip is what
+  // the guest sees and taps; the music only needs to be ready by the handoff.
+  if (shouldUseBackgroundAudio(invitation.invitationType, invitation.audio)) {
+    const audioSrc = invitation.audio.src;
+    if (audioSrc) {
+      try {
+        ReactDOM.preconnect(new URL(audioSrc).origin);
+      } catch {
+        /* non-absolute URL — skip preconnect */
+      }
+      ReactDOM.preload(audioSrc, { as: "audio" });
     }
   }
 
