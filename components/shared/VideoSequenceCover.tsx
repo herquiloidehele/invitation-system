@@ -26,8 +26,6 @@ const CROSSFADE_SEC = 0.5;
 /** If the active clip makes no progress for this long (buffering stall or a
  *  blocked autoplay), fail open to the invitation rather than dead-ending. */
 const STALL_TIMEOUT_MS = 10000;
-/** Delay before the "skip" affordance appears, so it doesn't distract up front. */
-const SKIP_DELAY_MS = 2500;
 
 /** Play a clip, retrying muted if autoplay-with-sound is rejected (some strict
  *  in-app WebViews block sounded playback even inside a gesture) so it plays
@@ -60,7 +58,6 @@ export default function VideoSequenceCover({
   const [activeIndex, setActiveIndex] = useState(0);
   const [crossfading, setCrossfading] = useState(false);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
-  const [showSkip, setShowSkip] = useState(false);
 
   const doneRef = useRef(false);
   const startedRef = useRef(false);
@@ -241,13 +238,6 @@ export default function VideoSequenceCover({
     armWatchdog();
   }, [started, activeIndex, armWatchdog]);
 
-  // Reveal the skip affordance a moment after playback begins.
-  useEffect(() => {
-    if (!started) return;
-    const tmr = setTimeout(() => setShowSkip(true), SKIP_DELAY_MS);
-    return () => clearTimeout(tmr);
-  }, [started]);
-
   // Tidy timers on unmount.
   useEffect(() => {
     return () => {
@@ -363,21 +353,6 @@ export default function VideoSequenceCover({
         </div>
       )}
 
-      {/* Skip affordance — appears shortly after start; also the escape hatch
-          if a clip stalls. */}
-      {started && showSkip && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handoff();
-          }}
-          className="absolute bottom-5 right-4 z-20 rounded-full bg-black/35 px-3 py-1.5 text-xs uppercase text-white/85 backdrop-blur-sm"
-          style={{ letterSpacing: "0.15em" }}
-        >
-          {t("cover_skip")} ›
-        </button>
-      )}
     </motion.div>
   );
 }
