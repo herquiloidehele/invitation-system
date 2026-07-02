@@ -167,15 +167,14 @@ function EnvelopeInvitationView({
     invitation.audio,
   );
 
-  // The video-sequence cover replaces the envelope on the standard scrollable
-  // flow. It's excluded for external_video, whose handoff plays an external
-  // video imperatively and assumes the short envelope delay (not a multi-clip
-  // sequence). external_video can't enable it from the admin anyway; this just
-  // guards against inconsistent data.
+  // The video-sequence cover replaces the envelope for every invitation type
+  // (standard, external_video, external_link — bare or rich). Each type's
+  // existing handoff runs when the last clip ends: standard/rich fade in their
+  // content, bare external_link reveals its preloaded iframe, and external_video
+  // plays imperatively (keeping its own muted-autoplay fallback if iOS blocks
+  // sound after the longer cover).
   const usesVideoCover =
-    shouldRenderVideoSequenceCover(invitation.coverVideos) &&
-    !videoCoverFailed &&
-    (invitation.invitationType ?? "standard") !== "external_video";
+    shouldRenderVideoSequenceCover(invitation.coverVideos) && !videoCoverFailed;
 
   // Merge per-invitation envelope overrides on top of the theme defaults
   const mergedTheme = useMemo<TemplateTheme>(() => {

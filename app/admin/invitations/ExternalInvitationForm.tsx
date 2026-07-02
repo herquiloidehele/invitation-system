@@ -18,6 +18,7 @@ import type {
   InvitationType,
   TemplateTheme,
   EnvelopeConfig,
+  CoverVideos,
   TextStyle,
   TextStyleOverrides,
   ImageSettings,
@@ -62,6 +63,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
+import CoverVideosEditor from "@/components/admin/CoverVideosEditor";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFields";
@@ -177,6 +179,7 @@ function getDefaultState(
     isDemo: false,
     saveDateStyle: "classic",
     envelope: {},
+    coverVideos: { enabled: false, items: [] },
     parents: {
       enabled: false,
       inviteMessage: "",
@@ -413,6 +416,10 @@ export default function ExternalInvitationForm({
     },
     [],
   );
+
+  const updateCoverVideos = useCallback((next: CoverVideos) => {
+    setForm((prev) => ({ ...prev, coverVideos: next }));
+  }, []);
 
   const updateEnvelopeConfetti = useCallback(
     (patch: Partial<NonNullable<EnvelopeConfig["confetti"]>>) => {
@@ -1292,6 +1299,23 @@ export default function ExternalInvitationForm({
                       onChange={(colors) => updateEnvelopeConfetti({ colors })}
                     />
                   )}
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ── Capa em vídeo ── */}
+              <AccordionItem
+                value="coverVideos"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Capa em vídeo{" "}
+                  {form.coverVideos?.enabled ? "(ativo)" : "(desativado)"}
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <CoverVideosEditor
+                    value={form.coverVideos}
+                    onChange={updateCoverVideos}
+                  />
                 </AccordionContent>
               </AccordionItem>
 
