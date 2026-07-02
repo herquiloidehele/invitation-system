@@ -46,10 +46,12 @@ function playWithFallback(el: HTMLVideoElement | null) {
  * Tap-to-play cover that plays a sequence of videos with a crossfade between
  * them, then hands off to the invitation page. On tap, every remaining clip
  * starts buffering in parallel so each is ready by its turn; already-played
- * clips unmount and are reclaimed. The first clip preloads in the background so
- * it starts fast on tap; the tap is available immediately and a single spinner
- * shows only after the tap while the clip isn't painting yet. Fails open (hands
- * off) on load failure or a buffering stall.
+ * clips unmount and are reclaimed. The first clip is muted-primed on mount (a
+ * gesture-free muted play(), paused back at frame 0) so its buffer + first frame
+ * are ready and the tap plays instantly — even on mobile, where `preload` is
+ * throttled until a user gesture. The tap is available immediately; a single
+ * spinner shows only after the tap if the clip still isn't painting. Fails open
+ * (hands off) on load failure or a buffering stall.
  */
 export default function VideoSequenceCover({
   items,
@@ -69,6 +71,7 @@ export default function VideoSequenceCover({
   const doneRef = useRef(false);
   const startedRef = useRef(false);
   const playbackStartedRef = useRef(false);
+  const primedRef = useRef(false);
   const failedRef = useRef<Set<number>>(new Set());
   const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({});
   const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -98,7 +101,11 @@ export default function VideoSequenceCover({
   const markPainted = useCallback(
     (index: number) => {
       setPainted((prev) => (prev[index] ? prev : { ...prev, [index]: true }));
-      if (!playbackStartedRef.current) {
+      // Only treat progress as *real* playback (and start the soundtrack) once
+      // the guest has tapped. Clip 1 is muted-primed before the tap to warm its
+      // buffer (see the prime effect below); that pre-tap progress must not
+      // unmute the background music.
+      if (startedRef.current && !playbackStartedRef.current) {
         playbackStartedRef.current = true;
         onPlaybackStart?.();
       }
@@ -251,6 +258,45 @@ export default function VideoSequenceCover({
     if (total === 0) handoff();
   }, [total, handoff]);
 
+  // Warm the first clip's *own* media buffer as early as possible so the tap
+  // plays instantly. `preload="auto"` is enough on desktop, but mobile browsers
+  // throttle media preload to metadata-only until a user gesture — so on mobile
+  // clip 1's bytes would otherwise not download until the tap, forcing a
+  // post-tap buffering spinner. A muted play() is permitted without a gesture
+  // (incl. mobile) and forces a real fetch + decode; we pause it back at frame 0
+  // the moment it starts, so the buffer and first frame are ready for the tap.
+  // Best-effort: if autoplay is blocked (e.g. iOS Low Power Mode) it simply
+  // falls back to loading on tap. primedRef makes it run exactly once (incl.
+  // under React StrictMode's dev double-invoke).
+  useEffect(() => {
+    if (started || total === 0) return;
+    const v = videoRefs.current[0];
+    if (!v) return;
+    const prime = () => {
+      if (primedRef.current || startedRef.current) return;
+      primedRef.current = true;
+      v.muted = true;
+      v.play()
+        .then(() => {
+          // Don't fight a guest who tapped while we were priming.
+          if (!startedRef.current) {
+            v.pause();
+            try {
+              v.currentTime = 0;
+            } catch {
+              /* ignore */
+            }
+          }
+        })
+        .catch(() => {
+          /* autoplay blocked → clip loads on tap instead */
+        });
+    };
+    if (v.readyState >= 1) prime();
+    else v.addEventListener("loadedmetadata", prime);
+    return () => v.removeEventListener("loadedmetadata", prime);
+  }, [started, total]);
+
   // Ensure the active clip is playing (covers a blocked crossfade pre-play),
   // and arm the stall watchdog so a clip that never progresses fails open.
   useEffect(() => {
@@ -336,7 +382,7 @@ export default function VideoSequenceCover({
                 timeupdate). This guarantees no black gap between tapping and the
                 first video frame, which the native <video poster> attribute does
                 not reliably prevent across browsers. */}
-            {poster && !painted[i] && (
+            {poster && (!started || !painted[i]) && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={poster}
@@ -349,11 +395,14 @@ export default function VideoSequenceCover({
         );
       })}
 
-      {/* Single buffering spinner — shown only after the tap while the active
-          clip isn't painting a frame yet (so it appears once, only if playback
-          isn't instant). The faint dark disc keeps the white spinner visible
-          over light and dark posters alike. */}
-      {started && !painted[activeIndex] && (
+      {/* Buffering spinner — scoped to the FIRST clip only. It shows after the
+          tap while clip 1 hasn't painted its first frame yet (i.e. only when the
+          muted-prime didn't finish in time, e.g. autoplay was blocked). Later
+          clips never spin: they preload in parallel on tap and, if one isn't
+          ready by its turn, it simply holds on its poster frame while it buffers
+          (the stall watchdog fails open). The faint dark disc keeps the white
+          spinner visible over light and dark posters alike. */}
+      {started && activeIndex === 0 && !painted[0] && (
         <div className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/25 backdrop-blur-sm">
             <span className="block h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" />
