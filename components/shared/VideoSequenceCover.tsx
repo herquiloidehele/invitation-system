@@ -57,7 +57,8 @@ export default function VideoSequenceCover({
   const [started, setStarted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [crossfading, setCrossfading] = useState(false);
-  const [firstFrameReady, setFirstFrameReady] = useState(false);
+  // True once clip 1 has buffered enough to play — clears the loading spinner.
+  const [ready, setReady] = useState(false);
   // Per-clip flag: true once the clip's <video> is actually painting frames,
   // so we hide its poster <img> overlay exactly then (no black gap on tap).
   const [painted, setPainted] = useState<Record<number, boolean>>({});
@@ -254,13 +255,24 @@ export default function VideoSequenceCover({
     };
   }, [clearWatchdog, clearAudioRamp]);
 
+  // Clear the loading spinner once clip 1 can play. We poll readyState rather
+  // than rely only on the canplay event, which some browsers don't fire
+  // reliably for a preloading (paused) video.
+  useEffect(() => {
+    if (started || ready) return;
+    const id = setInterval(() => {
+      const el = videoRefs.current[0];
+      if (el && el.readyState >= 3) {
+        setReady(true);
+        clearInterval(id);
+      }
+    }, 150);
+    return () => clearInterval(id);
+  }, [started, ready]);
+
   // Mount the active clip and every clip after it, so on tap they can all
   // preload in parallel; already-played clips (< activeIndex) unmount.
   const mountedIndices = clips.map((_, i) => i).filter((i) => i >= activeIndex);
-
-  // Cold start with no paintable frame yet (no poster, metadata still loading)
-  // → show a loading shimmer instead of a dead black screen.
-  const showShimmer = !started && !firstFrameReady && !clips[0]?.poster;
 
   return (
     <motion.div
@@ -305,11 +317,11 @@ export default function VideoSequenceCover({
               src={clips[i].url}
               muted={!started}
               playsInline
-              preload={!started ? (i === 0 ? "metadata" : "none") : "auto"}
+              // Buffer clip 1 up front so tapping plays instantly and the
+              // loading spinner reflects real progress; the rest load on tap.
+              preload={!started ? (i === 0 ? "auto" : "none") : "auto"}
               className="h-full w-full object-cover"
-              onLoadedData={
-                i === 0 ? () => setFirstFrameReady(true) : undefined
-              }
+              onCanPlay={i === 0 ? () => setReady(true) : undefined}
               onTimeUpdate={(e) => {
                 if (e.currentTarget.currentTime > 0) markPainted(i);
                 handleTimeUpdate(i);
@@ -341,19 +353,15 @@ export default function VideoSequenceCover({
         );
       })}
 
-      {/* Loading shimmer while clip 1 has no paintable frame yet (cold start,
-          no poster) — so the guest sees "loading", not a dead black screen. */}
-      {showShimmer && (
-        <motion.div
-          className="pointer-events-none absolute inset-0 z-[5]"
-          style={{
-            background:
-              "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%)",
-            backgroundSize: "200% 100%",
-          }}
-          animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
-          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-        />
+      {/* Subtle loading spinner while clip 1 buffers on first load, before the
+          guest taps — cleared once it can play. The faint dark disc keeps the
+          white spinner visible over light and dark posters alike. */}
+      {!started && !ready && (
+        <div className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/25 backdrop-blur-sm">
+            <span className="block h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          </span>
+        </div>
       )}
 
       {/* Progress dots (multi-clip only). */}
