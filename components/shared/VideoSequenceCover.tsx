@@ -60,17 +60,19 @@ export default function VideoSequenceCover({
     startedRef.current = true;
     setStarted(true);
     onOpen();
-    // Within the user gesture: unmute + play clip 1 (autoplay-with-sound is
-    // allowed here), and warm clip 2 so the first crossfade is ready.
+    // Kick off buffering of EVERY clip in parallel the moment the guest
+    // commits, so each is ready by its turn and the crossfades never stall.
+    for (let i = 0; i < total; i++) {
+      const v = videoRefs.current[i];
+      if (v) v.preload = "auto";
+    }
+    // Unmute + play clip 1 within the gesture (autoplay-with-sound is allowed).
     const first = videoRefs.current[0];
     if (first) {
       first.muted = false;
-      first.preload = "auto";
       first.play().catch(() => {});
     }
-    const next = videoRefs.current[1];
-    if (next) next.preload = "auto";
-  }, [onOpen]);
+  }, [onOpen, total]);
 
   /** Begin overlapping the current clip with the next as it nears its end. */
   const handleTimeUpdate = useCallback(
@@ -150,10 +152,12 @@ export default function VideoSequenceCover({
     if (el && el.paused) el.play().catch(() => {});
   }, [started, activeIndex]);
 
-  // Render only the active clip and the next one (preloading).
-  const visibleIndices = [activeIndex, activeIndex + 1].filter(
-    (i) => i >= 0 && i < total,
-  );
+  // Mount the active clip and every clip after it, so on tap they can all
+  // preload in parallel (see handleTap). Already-played clips (< activeIndex)
+  // unmount and are reclaimed by the browser.
+  const mountedIndices = items
+    .map((_, i) => i)
+    .filter((i) => i >= activeIndex);
 
   return (
     <motion.div
@@ -173,9 +177,12 @@ export default function VideoSequenceCover({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      {visibleIndices.map((i) => {
-        const isActive = i === activeIndex;
-        const opacity = crossfading ? (isActive ? 0 : 1) : isActive ? 1 : 0;
+      {mountedIndices.map((i) => {
+        // Active clip is visible; the next fades in during a crossfade; clips
+        // beyond it stay invisible (opacity 0) while they preload.
+        let opacity = 0;
+        if (i === activeIndex) opacity = crossfading ? 0 : 1;
+        else if (i === activeIndex + 1) opacity = crossfading ? 1 : 0;
         return (
           <motion.div
             key={i}
