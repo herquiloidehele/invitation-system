@@ -212,9 +212,6 @@ function EnvelopeInvitationView({
       if (!audio) return;
       audio.preload = "auto";
       audio.loop = true;
-      // Unmute in case the video-cover path primed this element muted inside
-      // the tap gesture (see handleVideoCoverOpen); no-op on the envelope path.
-      audio.muted = false;
       audio.volume = 0.03;
       audio
         .play()
@@ -234,33 +231,12 @@ function EnvelopeInvitationView({
     }
   }, [hasBackgroundAudio]);
 
-  /** Standard envelope path: the tap unlocks + starts the background music. */
+  /** Cover tap (envelope or video sequence): warm the hero prefetch and start
+   *  the background music immediately, within the user gesture. */
   const handleOpen = useCallback(() => {
     upgradeHeroPreload();
     startBackgroundAudio();
   }, [upgradeHeroPreload, startBackgroundAudio]);
-
-  /**
-   * Video-sequence cover path: the clips carry their own sound, so on tap we
-   * only warm the hero prefetch — the background music is deferred to the
-   * handoff (`handleAnimationComplete`) so it never clashes with the clips.
-   */
-  const handleVideoCoverOpen = useCallback(() => {
-    upgradeHeroPreload();
-    // Prime the background <audio> INSIDE the tap gesture — muted, so it stays
-    // silent under the clips (which carry their own sound). Starting playback
-    // now (a user activation) lets the deferred unmute at handoff succeed on
-    // iOS, which blocks audio.play() outside a gesture.
-    if (hasBackgroundAudio) {
-      const audio = audioRef.current;
-      if (audio) {
-        audio.loop = true;
-        audio.muted = true;
-        audio.volume = 0;
-        audio.play().catch(() => {});
-      }
-    }
-  }, [upgradeHeroPreload, hasBackgroundAudio]);
 
   /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
   useEffect(() => {
@@ -358,13 +334,6 @@ function EnvelopeInvitationView({
       fireCelebrationConfetti(confettiColors);
     }
 
-    // The video-sequence cover deferred the background music (its clips had
-    // their own audio). The tap already produced a user-activation, so start
-    // it now as the invitation is revealed.
-    if (usesVideoCover) {
-      startBackgroundAudio();
-    }
-
     const type = invitation.invitationType ?? "standard";
 
     // For external video: play imperatively (within the gesture context) and
@@ -397,14 +366,7 @@ function EnvelopeInvitationView({
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
-  }, [
-    invitation.invitationType,
-    invitation.envelope,
-    theme,
-    isRichExternalLink,
-    usesVideoCover,
-    startBackgroundAudio,
-  ]);
+  }, [invitation.invitationType, invitation.envelope, theme, isRichExternalLink]);
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
@@ -571,7 +533,7 @@ function EnvelopeInvitationView({
               <VideoSequenceCover
                 key="video-sequence-cover"
                 items={invitation.coverVideos!.items}
-                onOpen={handleVideoCoverOpen}
+                onOpen={handleOpen}
                 onAnimationComplete={handleAnimationComplete}
                 onUnavailable={() => setVideoCoverFailed(true)}
               />
