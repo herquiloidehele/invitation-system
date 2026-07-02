@@ -60,7 +60,7 @@ type UploadState =
   | { status: "idle" }
   | { status: "compressing" }
   | { status: "uploading"; progress: number }
-  | { status: "extracting-poster" }
+  | { status: "processing-video" }
   | { status: "done"; url: string }
   | { status: "error"; message: string };
 
@@ -172,41 +172,48 @@ export default function MediaUpload({
           },
         });
 
-        // Best-effort poster extraction for videos. We try to grab the
-        // first frame server-side so callers that show a poster image
-        // (e.g. the curtain hero) don't need a second admin upload. A
-        // failure here never blocks the video upload itself.
+        // Server-side video processing (best-effort). This normalises the
+        // upload to a broadly-playable H.264 MP4 when needed — phone
+        // recordings are frequently HEVC/.mov, which many browsers can't
+        // decode — and extracts a first-frame poster so callers that show a
+        // poster image don't need a second admin upload. On any failure we
+        // fall back to the original upload URL and no poster.
+        let finalUrl = publicUrl;
         let posterUrl: string | undefined;
         if (kind === "video") {
-          setUploadState({ status: "extracting-poster" });
+          setUploadState({ status: "processing-video" });
           try {
-            const posterRes = await fetch(
-              "/api/admin/media/extract-poster",
+            const processRes = await fetch(
+              "/api/admin/media/process-video",
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ videoUrl: publicUrl }),
               },
             );
-            if (posterRes.ok) {
-              const json = (await posterRes.json()) as { posterUrl?: string };
+            if (processRes.ok) {
+              const json = (await processRes.json()) as {
+                url?: string;
+                posterUrl?: string;
+              };
+              if (json.url) finalUrl = json.url;
               if (json.posterUrl) posterUrl = json.posterUrl;
             } else {
               console.warn(
-                "[MediaUpload] Poster extraction returned non-2xx status",
-                posterRes.status,
+                "[MediaUpload] Video processing returned non-2xx status",
+                processRes.status,
               );
             }
-          } catch (posterErr) {
+          } catch (processErr) {
             console.warn(
-              "[MediaUpload] Poster extraction failed; continuing without it",
-              posterErr,
+              "[MediaUpload] Video processing failed; using original upload",
+              processErr,
             );
           }
         }
 
-        setUploadState({ status: "done", url: publicUrl });
-        onUpload(publicUrl, posterUrl ? { posterUrl } : undefined);
+        setUploadState({ status: "done", url: finalUrl });
+        onUpload(finalUrl, posterUrl ? { posterUrl } : undefined);
       } catch (err) {
         setUploadState({
           status: "error",
@@ -231,7 +238,7 @@ export default function MediaUpload({
     disabled:
       uploadState.status === "compressing" ||
       uploadState.status === "uploading" ||
-      uploadState.status === "extracting-poster",
+      uploadState.status === "processing-video",
     noClick: !!value,
     noDrag: !!value,
   });
@@ -307,14 +314,14 @@ export default function MediaUpload({
     );
   }
 
-  // ── Render: uploading / compressing / extracting poster ──
+  // ── Render: uploading / compressing / processing video ──
   if (
     uploadState.status === "compressing" ||
     uploadState.status === "uploading" ||
-    uploadState.status === "extracting-poster"
+    uploadState.status === "processing-video"
   ) {
     const isCompressing = uploadState.status === "compressing";
-    const isExtracting = uploadState.status === "extracting-poster";
+    const isProcessing = uploadState.status === "processing-video";
     const progress =
       uploadState.status === "uploading" ? uploadState.progress : 0;
 
@@ -324,10 +331,10 @@ export default function MediaUpload({
           <Loader2Icon className="h-8 w-8 text-primary animate-spin" />
           <p className="text-sm font-medium">
             {isCompressing && "A comprimir imagem..."}
-            {isExtracting && "A gerar miniatura do vídeo..."}
-            {!isCompressing && !isExtracting && `A carregar... ${progress}%`}
+            {isProcessing && "A processar o vídeo..."}
+            {!isCompressing && !isProcessing && `A carregar... ${progress}%`}
           </p>
-          {!isCompressing && !isExtracting && (
+          {!isCompressing && !isProcessing && (
             <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
               <div
                 className="h-full bg-primary transition-all duration-200 rounded-full"
