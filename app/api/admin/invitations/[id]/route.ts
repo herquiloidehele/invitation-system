@@ -90,7 +90,6 @@ export async function PUT(
       if (theme) themeId = theme.id;
     }
 
-    console.log("[Admin API] Updating invitation with data:", [body]);
     const invitation = await prisma.invitation.update({
       where: { id },
       data: {

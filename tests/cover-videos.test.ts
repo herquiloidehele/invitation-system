@@ -30,6 +30,38 @@ describe("shouldRenderVideoSequenceCover", () => {
   it("does not render for undefined", () => {
     expect(shouldRenderVideoSequenceCover(undefined)).toBe(false);
   });
+
+  // Malformed shapes are reachable from the DB — the admin API stores
+  // `coverVideos` without shape validation. These must never throw; they
+  // fall back to the envelope.
+  type CoverVideosArg = Parameters<typeof shouldRenderVideoSequenceCover>[0];
+  const cv = (v: unknown) => v as unknown as CoverVideosArg;
+
+  it("does not render (and does not throw) when items is missing", () => {
+    expect(shouldRenderVideoSequenceCover(cv({ enabled: true }))).toBe(false);
+  });
+
+  it("does not render (and does not throw) when items is not an array", () => {
+    expect(
+      shouldRenderVideoSequenceCover(cv({ enabled: true, items: "x" })),
+    ).toBe(false);
+  });
+
+  it("does not render when no item has a valid url", () => {
+    expect(
+      shouldRenderVideoSequenceCover(
+        cv({ enabled: true, items: [{}, { url: "" }, null] }),
+      ),
+    ).toBe(false);
+  });
+
+  it("renders when at least one item has a valid url", () => {
+    expect(
+      shouldRenderVideoSequenceCover(
+        cv({ enabled: true, items: [{ url: "" }, { url: "a.mp4" }] }),
+      ),
+    ).toBe(true);
+  });
 });
 
 describe("nextCoverStep", () => {

@@ -1815,7 +1815,11 @@ export default function InvitationForm({
               >
                 <AccordionTrigger className="text-sm font-medium">
                   Capa em vídeo{" "}
-                  {form.coverVideos?.enabled ? "(ativo)" : "(desativado)"}
+                  {form.coverVideos?.enabled
+                    ? form.coverVideos.items?.some((it) => it?.url)
+                      ? "(ativo)"
+                      : "(ativo, sem vídeos)"
+                    : "(desativado)"}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-4">
                   <CoverVideosEditor
