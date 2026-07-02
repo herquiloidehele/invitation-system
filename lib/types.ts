@@ -492,6 +492,20 @@ export type ImageSettingsKey =
 /** Map of image-slot key → position/zoom settings. */
 export type ImageSettingsMap = Partial<Record<ImageSettingsKey, ImageSettings>>;
 
+export interface CoverVideoItem {
+  /** Video URL (same S3 upload pipeline as the hero video). */
+  url: string;
+  /** Optional first-frame poster; shown on clip 1 before the guest taps. */
+  poster?: string;
+}
+
+export interface CoverVideos {
+  /** Master toggle: when true (with ≥1 item) the video cover replaces the envelope. */
+  enabled: boolean;
+  /** Ordered clips (1–4), played in sequence. */
+  items: CoverVideoItem[];
+}
+
 export interface EnvelopeConfig {
   /** Override the envelope body fill color (hex). Falls back to theme default if empty. */
   base?: string;
@@ -1051,6 +1065,8 @@ export interface InvitationData {
   sectionImages?: SectionImages;
   /** Optional couple-photos gallery section (opt-in carousel). */
   coupleGallery?: CoupleGallery;
+  /** Tap-to-play video-sequence cover; replaces the envelope when enabled. */
+  coverVideos?: CoverVideos;
   /** Optional recommended-places section (hotels, restaurants, attractions). */
   places?: PlacesConfig;
   /** Optional parents info for the "parents mode" hero section. */

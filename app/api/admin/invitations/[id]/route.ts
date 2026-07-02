@@ -198,6 +198,9 @@ export async function PUT(
         ...(body.coupleGallery !== undefined && {
           coupleGallery: sanitizeJsonField(body.coupleGallery, null),
         }),
+        ...(body.coverVideos !== undefined && {
+          coverVideos: sanitizeJsonField(body.coverVideos, null),
+        }),
         ...(body.places !== undefined && {
           places: sanitizeJsonField(body.places, null),
         }),

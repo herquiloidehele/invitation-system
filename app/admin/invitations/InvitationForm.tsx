@@ -9,6 +9,7 @@ import type {
   BankTransferDetail,
   CardStyle,
   CoupleGallery,
+  CoverVideos,
   CustomTexts,
   EnvelopeConfig,
   GiftItem,
@@ -75,6 +76,7 @@ import InvitationPage from "@/components/shared/InvitationPage";
 import ElegantFloralPage from "@/components/elegant-floral/ElegantFloralPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
+import CoverVideosEditor from "@/components/admin/CoverVideosEditor";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
 import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFields";
@@ -432,6 +434,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     guestGuide: { enabled: false, items: [] },
     places: { enabled: false, layout: "stacked", sections: [] },
     envelope: {},
+    coverVideos: { enabled: false, items: [] },
     saveDateStyle: "classic",
     cinematicImageUrl: "",
     sectionImages: {},
@@ -1093,6 +1096,10 @@ export default function InvitationForm({
   // Couple gallery
   const updateCoupleGallery = useCallback((next: CoupleGallery) => {
     setForm((prev) => ({ ...prev, coupleGallery: next }));
+  }, []);
+
+  const updateCoverVideos = useCallback((next: CoverVideos) => {
+    setForm((prev) => ({ ...prev, coverVideos: next }));
   }, []);
 
   // Image position/zoom settings
@@ -1798,6 +1805,23 @@ export default function InvitationForm({
                       onChange={(colors) => updateEnvelopeConfetti({ colors })}
                     />
                   )}
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* ── Capa em vídeo ── */}
+              <AccordionItem
+                value="coverVideos"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Capa em vídeo{" "}
+                  {form.coverVideos?.enabled ? "(ativo)" : "(desativado)"}
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <CoverVideosEditor
+                    value={form.coverVideos}
+                    onChange={updateCoverVideos}
+                  />
                 </AccordionContent>
               </AccordionItem>
 
