@@ -58,6 +58,9 @@ export default function VideoSequenceCover({
   const [activeIndex, setActiveIndex] = useState(0);
   const [crossfading, setCrossfading] = useState(false);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
+  // Per-clip flag: true once the clip's <video> is actually painting frames,
+  // so we hide its poster <img> overlay exactly then (no black gap on tap).
+  const [painted, setPainted] = useState<Record<number, boolean>>({});
 
   const doneRef = useRef(false);
   const startedRef = useRef(false);
@@ -82,6 +85,11 @@ export default function VideoSequenceCover({
       clearInterval(audioRampRef.current);
       audioRampRef.current = null;
     }
+  }, []);
+
+  /** Mark a clip as painting frames → hide its poster <img> overlay. */
+  const markPainted = useCallback((index: number) => {
+    setPainted((prev) => (prev[index] ? prev : { ...prev, [index]: true }));
   }, []);
 
   const handoff = useCallback(() => {
@@ -248,9 +256,7 @@ export default function VideoSequenceCover({
 
   // Mount the active clip and every clip after it, so on tap they can all
   // preload in parallel; already-played clips (< activeIndex) unmount.
-  const mountedIndices = clips
-    .map((_, i) => i)
-    .filter((i) => i >= activeIndex);
+  const mountedIndices = clips.map((_, i) => i).filter((i) => i >= activeIndex);
 
   // Cold start with no paintable frame yet (no poster, metadata still loading)
   // → show a loading shimmer instead of a dead black screen.
@@ -280,6 +286,7 @@ export default function VideoSequenceCover({
         let opacity = 0;
         if (i === activeIndex) opacity = crossfading ? 0 : 1;
         else if (i === activeIndex + 1) opacity = crossfading ? 1 : 0;
+        const poster = clips[i].poster;
         return (
           <motion.div
             key={i}
@@ -296,9 +303,6 @@ export default function VideoSequenceCover({
                 videoRefs.current[i] = el;
               }}
               src={clips[i].url}
-              // Poster only matters for the pre-tap first clip; the preloading
-              // "next" clip is invisible, so don't fetch its poster.
-              poster={!started && i === 0 ? clips[i].poster : undefined}
               muted={!started}
               playsInline
               preload={!started ? (i === 0 ? "metadata" : "none") : "auto"}
@@ -306,15 +310,33 @@ export default function VideoSequenceCover({
               onLoadedData={
                 i === 0 ? () => setFirstFrameReady(true) : undefined
               }
-              onTimeUpdate={() => handleTimeUpdate(i)}
+              onTimeUpdate={(e) => {
+                if (e.currentTarget.currentTime > 0) markPainted(i);
+                handleTimeUpdate(i);
+              }}
               onEnded={() => handleEnded(i)}
               onError={() => handleError(i)}
               onWaiting={() => handleWaiting(i)}
               onStalled={() => handleWaiting(i)}
               onPlaying={() => {
                 if (i === activeIndex) clearWatchdog();
+                markPainted(i);
               }}
             />
+            {/* Poster image overlay — sits on top of the <video> and is removed
+                only once the clip is actually painting frames (onPlaying / first
+                timeupdate). This guarantees no black gap between tapping and the
+                first video frame, which the native <video poster> attribute does
+                not reliably prevent across browsers. */}
+            {poster && !painted[i] && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={poster}
+                alt=""
+                draggable={false}
+                className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              />
+            )}
           </motion.div>
         );
       })}
@@ -352,7 +374,6 @@ export default function VideoSequenceCover({
           ))}
         </div>
       )}
-
     </motion.div>
   );
 }
