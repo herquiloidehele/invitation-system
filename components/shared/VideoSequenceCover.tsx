@@ -320,7 +320,7 @@ export default function VideoSequenceCover({
 
   return (
     <motion.div
-      className={`absolute inset-0 z-[100] overflow-hidden bg-black${
+      className={`absolute inset-0 z-[100] overflow-hidden bg-white${
         started ? "" : " cursor-pointer"
       }`}
       role={started ? undefined : "button"}
@@ -361,9 +361,10 @@ export default function VideoSequenceCover({
               src={clips[i].url}
               muted={!started}
               playsInline
+              poster={clips[i]?.poster || ""}
               // Buffer clip 1 up front so it starts fast on tap; the rest load
               // on tap.
-              preload={!started ? (i === 0 ? "auto" : "none") : "auto"}
+              preload={"auto"}
               className="h-full w-full object-cover"
               onTimeUpdate={(e) => {
                 if (e.currentTarget.currentTime > 0) markPainted(i);

@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import ReactDOM from "react-dom";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
+import {
+  isValidCoverVideoItem,
+  shouldRenderVideoSequenceCover,
+} from "@/lib/cover-videos";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getInvitation } from "@/lib/invitations";
 import { getPublicGuestByToken } from "@/lib/guests";
@@ -166,6 +171,29 @@ export default async function InvitationSlugPage({
     invitation,
     SITE_URL,
   );
+
+  // Warm the first cover clip during initial HTML parse — before the (heavy)
+  // client bundle hydrates. VideoSequenceCover is a client component, so its
+  // <video> element, and therefore the clip download, otherwise can't start
+  // until React hydrates; on a mobile network that's several seconds of dead
+  // time before the first video even begins loading. A <link rel="preload"> is
+  // emitted into <head> immediately and is NOT subject to the media-element
+  // preload throttling mobile browsers apply, so the bytes start downloading
+  // right away and the tap plays from a warm buffer.
+  if (shouldRenderVideoSequenceCover(invitation.coverVideos)) {
+    const firstClip = invitation.coverVideos?.items.find(isValidCoverVideoItem);
+    if (firstClip) {
+      try {
+        ReactDOM.preconnect(new URL(firstClip.url).origin);
+      } catch {
+        /* non-absolute URL — skip preconnect */
+      }
+      ReactDOM.preload(firstClip.url, { as: "video", fetchPriority: "high" });
+      if (firstClip.poster) {
+        ReactDOM.preload(firstClip.poster, { as: "image", fetchPriority: "high" });
+      }
+    }
+  }
 
   // Look up the personal guest if a token was provided. Silently fall back
   // when the token does not exist, belongs to another invitation, or the
