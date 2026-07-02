@@ -128,6 +128,7 @@ function EnvelopeInvitationView({
   const [externalLinkVisible, setExternalLinkVisible] = useState(false);
   const [richExternalLinkVisible, setRichExternalLinkVisible] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const bgAudioStartedRef = useRef(false);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<ExternalVideoPageHandle | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -204,6 +205,8 @@ function EnvelopeInvitationView({
   /** Start the pre-buffered background music with a cinematic volume fade-in. */
   const startBackgroundAudio = useCallback(() => {
     if (!hasBackgroundAudio) return;
+    if (bgAudioStartedRef.current) return; // start once (on playback-start or handoff)
+    bgAudioStartedRef.current = true;
     // Use the pre-buffered <audio> element so playback starts instantly.
     // play() continues the download from the buffered metadata and starts
     // as soon as it has enough — no `.load()` reset needed.
@@ -212,6 +215,7 @@ function EnvelopeInvitationView({
       if (!audio) return;
       audio.preload = "auto";
       audio.loop = true;
+      audio.muted = false; // unmute if it was primed muted on the video-cover tap
       audio.volume = 0.03;
       audio
         .play()
@@ -237,6 +241,24 @@ function EnvelopeInvitationView({
     upgradeHeroPreload();
     startBackgroundAudio();
   }, [upgradeHeroPreload, startBackgroundAudio]);
+
+  /** Video-sequence cover tap: warm the hero prefetch and PRIME the background
+   *  music muted inside the gesture. It's unmuted only once the video actually
+   *  starts playing (onPlaybackStart) or at handoff — so it's never audible
+   *  while the video is still buffering or failing to render (e.g. an
+   *  unsupported codec), which would otherwise be "audio with no video". */
+  const handleVideoCoverOpen = useCallback(() => {
+    upgradeHeroPreload();
+    if (hasBackgroundAudio) {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.loop = true;
+        audio.muted = true;
+        audio.volume = 0;
+        audio.play().catch(() => {});
+      }
+    }
+  }, [upgradeHeroPreload, hasBackgroundAudio]);
 
   /** Pause audio when the tab is hidden / browser is minimized; resume on return. */
   useEffect(() => {
@@ -324,6 +346,12 @@ function EnvelopeInvitationView({
    * is seamless.
    */
   const handleAnimationComplete = useCallback(() => {
+    // Ensure the background music is playing by the time the cover hands off.
+    // Covers the video-sequence case where the clips never actually started
+    // (unsupported codec / stall): it unmutes the primed track now. Idempotent —
+    // a no-op if it already started with playback or on the envelope tap.
+    startBackgroundAudio();
+
     // Celebratory confetti the moment the envelope finishes opening.
     // Opt-in per invitation (default off); colors fall back to the theme.
     const confettiColors = resolveEnvelopeConfettiColors(
@@ -366,7 +394,13 @@ function EnvelopeInvitationView({
     requestAnimationFrame(() => {
       setCoverVisible(false);
     });
-  }, [invitation.invitationType, invitation.envelope, theme, isRichExternalLink]);
+  }, [
+    invitation.invitationType,
+    invitation.envelope,
+    theme,
+    isRichExternalLink,
+    startBackgroundAudio,
+  ]);
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
@@ -533,7 +567,8 @@ function EnvelopeInvitationView({
               <VideoSequenceCover
                 key="video-sequence-cover"
                 items={invitation.coverVideos!.items}
-                onOpen={handleOpen}
+                onOpen={handleVideoCoverOpen}
+                onPlaybackStart={startBackgroundAudio}
                 onAnimationComplete={handleAnimationComplete}
                 onUnavailable={() => setVideoCoverFailed(true)}
               />

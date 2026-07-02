@@ -12,6 +12,10 @@ interface VideoSequenceCoverProps {
   items: CoverVideoItem[];
   /** Fired on the tap-to-begin gesture (parent upgrades hero prefetch). */
   onOpen: () => void;
+  /** Fired once when a clip actually starts progressing (currentTime > 0), so
+   *  the parent can sync the background music to real playback rather than the
+   *  bare tap — never audible while the video buffers or fails to render. */
+  onPlaybackStart?: () => void;
   /** Fired after the last clip (or a mid-sequence failure/stall/skip) → parent reveals the invitation. */
   onAnimationComplete: () => void;
   /**
@@ -42,14 +46,15 @@ function playWithFallback(el: HTMLVideoElement | null) {
  * Tap-to-play cover that plays a sequence of videos with a crossfade between
  * them, then hands off to the invitation page. On tap, every remaining clip
  * starts buffering in parallel so each is ready by its turn; already-played
- * clips unmount and are reclaimed. Before the tap only the first clip loads
- * its metadata, so guests who never open the invitation don't download the
- * whole sequence. Fails open (hands off) on load failure or a buffering stall,
- * and offers a skip control so a guest is never trapped.
+ * clips unmount and are reclaimed. The first clip preloads in the background so
+ * it starts fast on tap; the tap is available immediately and a single spinner
+ * shows only after the tap while the clip isn't painting yet. Fails open (hands
+ * off) on load failure or a buffering stall.
  */
 export default function VideoSequenceCover({
   items,
   onOpen,
+  onPlaybackStart,
   onAnimationComplete,
   onUnavailable,
 }: VideoSequenceCoverProps) {
@@ -63,6 +68,7 @@ export default function VideoSequenceCover({
 
   const doneRef = useRef(false);
   const startedRef = useRef(false);
+  const playbackStartedRef = useRef(false);
   const failedRef = useRef<Set<number>>(new Set());
   const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({});
   const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -86,10 +92,19 @@ export default function VideoSequenceCover({
     }
   }, []);
 
-  /** Mark a clip as painting frames → hide its poster <img> overlay. */
-  const markPainted = useCallback((index: number) => {
-    setPainted((prev) => (prev[index] ? prev : { ...prev, [index]: true }));
-  }, []);
+  /** A clip actually progressed (a real frame rendered): hide its poster
+   *  overlay, and on the very first one tell the parent playback has truly
+   *  started, so it can start the music in sync — not on the bare tap. */
+  const markPainted = useCallback(
+    (index: number) => {
+      setPainted((prev) => (prev[index] ? prev : { ...prev, [index]: true }));
+      if (!playbackStartedRef.current) {
+        playbackStartedRef.current = true;
+        onPlaybackStart?.();
+      }
+    },
+    [onPlaybackStart],
+  );
 
   const handoff = useCallback(() => {
     if (doneRef.current) return;
@@ -300,10 +315,9 @@ export default function VideoSequenceCover({
               src={clips[i].url}
               muted={!started}
               playsInline
-              // Keep the pre-tap load light (metadata only) so the guest can tap
-              // immediately; on tap every clip preloads and playback begins as
-              // soon as it can, without waiting for the full download.
-              preload={!started ? (i === 0 ? "metadata" : "none") : "auto"}
+              // Buffer clip 1 up front so it starts fast on tap; the rest load
+              // on tap.
+              preload={!started ? (i === 0 ? "auto" : "none") : "auto"}
               className="h-full w-full object-cover"
               onTimeUpdate={(e) => {
                 if (e.currentTarget.currentTime > 0) markPainted(i);
@@ -315,7 +329,6 @@ export default function VideoSequenceCover({
               onStalled={() => handleWaiting(i)}
               onPlaying={() => {
                 if (i === activeIndex) clearWatchdog();
-                markPainted(i);
               }}
             />
             {/* Poster image overlay — sits on top of the <video> and is removed
@@ -336,10 +349,10 @@ export default function VideoSequenceCover({
         );
       })}
 
-      {/* Buffering spinner shown only AFTER the tap, while the active clip is
-          still loading enough to play — so the guest taps immediately and only
-          sees a spinner if playback isn't instant. The faint dark disc keeps the
-          white spinner visible over light and dark posters alike. */}
+      {/* Single buffering spinner — shown only after the tap while the active
+          clip isn't painting a frame yet (so it appears once, only if playback
+          isn't instant). The faint dark disc keeps the white spinner visible
+          over light and dark posters alike. */}
       {started && !painted[activeIndex] && (
         <div className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/25 backdrop-blur-sm">
