@@ -259,42 +259,41 @@ export default function VideoSequenceCover({
   }, [total, handoff]);
 
   // Warm the first clip's *own* media buffer as early as possible so the tap
-  // plays instantly. `preload="auto"` is enough on desktop, but mobile browsers
-  // throttle media preload to metadata-only until a user gesture — so on mobile
-  // clip 1's bytes would otherwise not download until the tap, forcing a
-  // post-tap buffering spinner. A muted play() is permitted without a gesture
-  // (incl. mobile) and forces a real fetch + decode; we pause it back at frame 0
-  // the moment it starts, so the buffer and first frame are ready for the tap.
+  // plays instantly. `preload="auto"` is enough on desktop Chrome, but mobile
+  // browsers throttle media preload to metadata-only until a user gesture, so
+  // clip 1's bytes would otherwise not download until the tap. A muted play() is
+  // permitted without a gesture (incl. mobile) and forces a real fetch + decode;
+  // we pause it back at frame 0 the moment it starts, so the buffer and first
+  // frame are ready for the tap.
+  //
+  // We call play() IMMEDIATELY rather than waiting for `loadedmetadata`: on iOS
+  // Safari, preload is throttled so metadata never auto-loads and that event
+  // would never fire — leaving the clip un-primed and forcing a load-on-tap
+  // spinner (exactly the Safari symptom). play() itself kicks off the load.
   // Best-effort: if autoplay is blocked (e.g. iOS Low Power Mode) it simply
   // falls back to loading on tap. primedRef makes it run exactly once (incl.
   // under React StrictMode's dev double-invoke).
   useEffect(() => {
     if (started || total === 0) return;
     const v = videoRefs.current[0];
-    if (!v) return;
-    const prime = () => {
-      if (primedRef.current || startedRef.current) return;
-      primedRef.current = true;
-      v.muted = true;
-      v.play()
-        .then(() => {
-          // Don't fight a guest who tapped while we were priming.
-          if (!startedRef.current) {
-            v.pause();
-            try {
-              v.currentTime = 0;
-            } catch {
-              /* ignore */
-            }
+    if (!v || primedRef.current || startedRef.current) return;
+    primedRef.current = true;
+    v.muted = true;
+    v.play()
+      .then(() => {
+        // Don't fight a guest who tapped while we were priming.
+        if (!startedRef.current) {
+          v.pause();
+          try {
+            v.currentTime = 0;
+          } catch {
+            /* ignore */
           }
-        })
-        .catch(() => {
-          /* autoplay blocked → clip loads on tap instead */
-        });
-    };
-    if (v.readyState >= 1) prime();
-    else v.addEventListener("loadedmetadata", prime);
-    return () => v.removeEventListener("loadedmetadata", prime);
+        }
+      })
+      .catch(() => {
+        /* autoplay blocked → clip loads on tap instead */
+      });
   }, [started, total]);
 
   // Ensure the active clip is playing (covers a blocked crossfade pre-play),
