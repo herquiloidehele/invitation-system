@@ -13,7 +13,13 @@ import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
 import { useMemo } from "react";
 
-export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
+export function LiveDemoSection({
+  items,
+  staticPreviews = false,
+}: {
+  items: LiveDemoFeature[];
+  staticPreviews?: boolean;
+}) {
   const t = useTranslations("LandingLiveDemo");
   const reduceMotion = useReducedMotion();
 
@@ -42,8 +48,10 @@ export function LiveDemoSection({ items }: { items: LiveDemoFeature[] }) {
               <PhoneIframePreview
                 title={preview.title || t("fallbackInvitation")}
                 src={preview.href}
-                loading={undefined}
+                loading="lazy"
                 lazyExternalIframe
+                staticPreview={staticPreviews}
+                posterSrc={preview.posterUrl}
               />
             </motion.div>
           ))}

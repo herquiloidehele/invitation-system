@@ -1,0 +1,12 @@
+# Target older in-app WebView engines (Instagram/Facebook) so Next/SWC
+# down-levels modern syntax (??=, ?.) that crashes old iOS/Android WebViews.
+# TEST FILE for white-screen investigation — remove/tune as needed.
+iOS >= 12.2
+Safari >= 12.1
+Chrome >= 80
+ChromeAndroid >= 80
+Android >= 80
+Firefox >= 78
+Samsung >= 12
+> 0.2%
+not dead

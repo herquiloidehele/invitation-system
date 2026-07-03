@@ -123,6 +123,9 @@ export type LiveDemoFeature = {
   id: string;
   title: string;
   href: string;
+  /** Static cover image used as the preview poster in memory-constrained
+   *  contexts (in-app browsers / phones) instead of a live invitation iframe. */
+  posterUrl: string | null;
 };
 
 type AnyJson = Record<string, unknown>;
@@ -335,6 +338,8 @@ export async function getLiveDemoFeatures(): Promise<LiveDemoFeature[]> {
           id: row.id,
           title: readCouple(row.invitation.couple),
           href: invitationHref(row.invitation.slug),
+          posterUrl:
+            row.invitation.landingImageUrl ?? row.invitation.heroImage ?? null,
         };
       }
       if (row.saveTheDate) {
@@ -342,6 +347,7 @@ export async function getLiveDemoFeatures(): Promise<LiveDemoFeature[]> {
           id: row.id,
           title: readCouple(row.saveTheDate.couple),
           href: saveTheDateHref(row.saveTheDate.slug),
+          posterUrl: row.saveTheDate.landingImageUrl ?? null,
         };
       }
       return null;
