@@ -46,3 +46,10 @@ export function buildInstagramIOSBrowserUrl(url: string): string {
 
   return `instagram://extbrowser/?url=${encodeURIComponent(parsedUrl.href)}`;
 }
+
+export function shouldShowInstagramBrowserDialog(
+  isInstagramBrowser: boolean,
+  dismissed: boolean,
+): boolean {
+  return isInstagramBrowser && !dismissed;
+}

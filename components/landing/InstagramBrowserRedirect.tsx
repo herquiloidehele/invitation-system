@@ -17,6 +17,7 @@ import {
   buildInstagramIOSBrowserUrl,
   getMobilePlatform,
   isInstagramWebView,
+  shouldShowInstagramBrowserDialog,
   type MobilePlatform,
 } from "@/lib/instagram-webview";
 
@@ -32,15 +33,20 @@ function getInstagramBrowserSnapshot() {
 
 export function InstagramBrowserRedirect() {
   const [copied, setCopied] = useState(false);
-  const isOpen = useSyncExternalStore(
+  const [dismissed, setDismissed] = useState(false);
+  const isInstagramBrowser = useSyncExternalStore(
     subscribeToBrowserEnvironment,
     getInstagramBrowserSnapshot,
     getServerSnapshot,
   );
-  const platform: MobilePlatform = isOpen
+  const isOpen = shouldShowInstagramBrowserDialog(
+    isInstagramBrowser,
+    dismissed,
+  );
+  const platform: MobilePlatform = isInstagramBrowser
     ? getMobilePlatform(navigator.userAgent || navigator.vendor || "")
     : "other";
-  const currentUrl = isOpen ? window.location.href : "#";
+  const currentUrl = isInstagramBrowser ? window.location.href : "#";
   const externalBrowserUrl =
     platform === "android"
       ? buildAndroidBrowserIntent(currentUrl)
@@ -78,6 +84,7 @@ export function InstagramBrowserRedirect() {
           href={externalBrowserUrl}
           target={platform === "other" ? "_blank" : undefined}
           rel={platform === "other" ? "noopener noreferrer" : undefined}
+          onClick={() => setDismissed(true)}
           className={buttonVariants({
             className: "h-12 w-full text-base",
           })}

@@ -5,6 +5,7 @@ import {
   buildInstagramIOSBrowserUrl,
   getMobilePlatform,
   isInstagramWebView,
+  shouldShowInstagramBrowserDialog,
 } from "@/lib/instagram-webview";
 
 const IOS_INSTAGRAM_USER_AGENT =
@@ -87,5 +88,19 @@ describe("buildInstagramIOSBrowserUrl", () => {
     expect(() => buildInstagramIOSBrowserUrl("javascript:alert(1)")).toThrow(
       "Only HTTP(S) URLs can be opened",
     );
+  });
+});
+
+describe("shouldShowInstagramBrowserDialog", () => {
+  it("shows for an Instagram visit that has not been dismissed", () => {
+    expect(shouldShowInstagramBrowserDialog(true, false)).toBe(true);
+  });
+
+  it("stays closed after the browser action is clicked", () => {
+    expect(shouldShowInstagramBrowserDialog(true, true)).toBe(false);
+  });
+
+  it("stays closed outside Instagram", () => {
+    expect(shouldShowInstagramBrowserDialog(false, false)).toBe(false);
   });
 });
