@@ -16,13 +16,18 @@ export function getMobilePlatform(userAgent: string): MobilePlatform {
   return "other";
 }
 
-export function buildAndroidBrowserIntent(url: string): string {
+function parseBrowserUrl(url: string): URL {
   const parsedUrl = new URL(url);
 
   if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
     throw new Error("Only HTTP(S) URLs can be opened");
   }
 
+  return parsedUrl;
+}
+
+export function buildAndroidBrowserIntent(url: string): string {
+  const parsedUrl = parseBrowserUrl(url);
   const scheme = parsedUrl.protocol.slice(0, -1);
   const intentTarget = `${parsedUrl.host}${parsedUrl.pathname}${parsedUrl.search}`;
 
@@ -34,4 +39,10 @@ export function buildAndroidBrowserIntent(url: string): string {
     `S.browser_fallback_url=${encodeURIComponent(parsedUrl.href)}`,
     "end",
   ].join(";");
+}
+
+export function buildInstagramIOSBrowserUrl(url: string): string {
+  const parsedUrl = parseBrowserUrl(url);
+
+  return `instagram://extbrowser/?url=${encodeURIComponent(parsedUrl.href)}`;
 }

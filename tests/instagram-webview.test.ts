@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildAndroidBrowserIntent,
+  buildInstagramIOSBrowserUrl,
   getMobilePlatform,
   isInstagramWebView,
 } from "@/lib/instagram-webview";
@@ -67,6 +68,23 @@ describe("buildAndroidBrowserIntent", () => {
 
   it("rejects URLs that cannot be opened safely in a browser", () => {
     expect(() => buildAndroidBrowserIntent("javascript:alert(1)")).toThrow(
+      "Only HTTP(S) URLs can be opened",
+    );
+  });
+});
+
+describe("buildInstagramIOSBrowserUrl", () => {
+  it("builds Instagram's external-browser handoff with the complete URL", () => {
+    const url =
+      "https://convites.brindealstudio.com/pt?utm_source=instagram#precos";
+
+    expect(buildInstagramIOSBrowserUrl(url)).toBe(
+      "instagram://extbrowser/?url=https%3A%2F%2Fconvites.brindealstudio.com%2Fpt%3Futm_source%3Dinstagram%23precos",
+    );
+  });
+
+  it("rejects non-HTTP URLs", () => {
+    expect(() => buildInstagramIOSBrowserUrl("javascript:alert(1)")).toThrow(
       "Only HTTP(S) URLs can be opened",
     );
   });

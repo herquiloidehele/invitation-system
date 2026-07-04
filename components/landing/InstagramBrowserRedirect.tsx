@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { Check, Copy, ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   buildAndroidBrowserIntent,
+  buildInstagramIOSBrowserUrl,
   getMobilePlatform,
   isInstagramWebView,
   type MobilePlatform,
@@ -38,22 +40,13 @@ export function InstagramBrowserRedirect() {
   const platform: MobilePlatform = isOpen
     ? getMobilePlatform(navigator.userAgent || navigator.vendor || "")
     : "other";
-
-  function openInBrowser() {
-    const currentUrl = window.location.href;
-
-    if (platform === "android") {
-      window.location.href = buildAndroidBrowserIntent(currentUrl);
-      return;
-    }
-
-    if (platform === "ios") {
-      window.location.href = `x-safari-${currentUrl}`;
-      return;
-    }
-
-    window.open(currentUrl, "_blank", "noopener,noreferrer");
-  }
+  const currentUrl = isOpen ? window.location.href : "#";
+  const externalBrowserUrl =
+    platform === "android"
+      ? buildAndroidBrowserIntent(currentUrl)
+      : platform === "ios"
+        ? buildInstagramIOSBrowserUrl(currentUrl)
+        : currentUrl;
 
   async function copyLink() {
     try {
@@ -81,10 +74,17 @@ export function InstagramBrowserRedirect() {
           </DialogDescription>
         </DialogHeader>
 
-        <Button className="h-12 w-full text-base" onClick={openInBrowser}>
+        <a
+          href={externalBrowserUrl}
+          target={platform === "other" ? "_blank" : undefined}
+          rel={platform === "other" ? "noopener noreferrer" : undefined}
+          className={buttonVariants({
+            className: "h-12 w-full text-base",
+          })}
+        >
           <ExternalLink className="size-4" aria-hidden="true" />
           Abrir no navegador
-        </Button>
+        </a>
 
         <div className="rounded-xl bg-muted p-4 text-sm text-muted-foreground">
           <p className="font-medium text-foreground">
