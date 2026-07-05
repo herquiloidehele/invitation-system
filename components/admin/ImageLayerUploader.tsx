@@ -4,7 +4,10 @@ import { toast } from "sonner";
 
 import MediaUpload from "@/components/admin/MediaUpload";
 import { EMPTY_IMAGE_LAYER, addItem, canAddItem } from "@/lib/image-layer";
-import { clientToCanvasPct } from "@/lib/image-layer-editor-geometry";
+import {
+  findImageEditorViewport,
+  visibleViewportCenterPct,
+} from "@/lib/image-layer-editor-geometry";
 import type { ImageLayer } from "@/lib/types";
 
 interface ImageLayerUploaderProps {
@@ -56,12 +59,15 @@ export default function ImageLayerUploader({
         "[data-image-canvas]",
       ) as HTMLElement | null;
       if (root && canvasEl) {
-        const pr = root.getBoundingClientRect();
+        const viewport = findImageEditorViewport(root, (element) => {
+          const style = window.getComputedStyle(element);
+          return `${style.overflow} ${style.overflowX} ${style.overflowY}`;
+        });
+        const vr = viewport.getBoundingClientRect();
         const cr = canvasEl.getBoundingClientRect();
-        const p = clientToCanvasPct(
+        const p = visibleViewportCenterPct(
           { left: cr.left, top: cr.top, width: cr.width, height: cr.height },
-          pr.left + pr.width / 2,
-          pr.top + pr.height / 2,
+          { left: vr.left, top: vr.top, width: vr.width, height: vr.height },
         );
         xPct = p.xPct;
         yPct = p.yPct;

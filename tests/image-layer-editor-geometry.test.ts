@@ -3,6 +3,7 @@ import {
   type Rect,
   clientToCanvasPct,
   findImageEditorViewport,
+  visibleViewportCenterPct,
   widthPxToPct,
   resizeWidthPct,
   rotationFromPointer,
@@ -53,6 +54,27 @@ describe("findImageEditorViewport", () => {
     expect(
       findImageEditorViewport(previewRoot, (element) => element.overflow),
     ).toBe(previewRoot);
+  });
+});
+
+describe("visibleViewportCenterPct", () => {
+  it("places a new image in the center of the currently visible scrolled section", () => {
+    const scrolledCanvas: Rect = {
+      left: 100,
+      top: -1900,
+      width: 400,
+      height: 4000,
+    };
+    const viewport: Rect = {
+      left: 100,
+      top: 100,
+      width: 400,
+      height: 600,
+    };
+
+    const position = visibleViewportCenterPct(scrolledCanvas, viewport);
+    expect(position.xPct).toBe(50);
+    expect(position.yPct).toBeCloseTo(57.5);
   });
 });
 

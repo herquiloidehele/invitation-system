@@ -36,6 +36,18 @@ export function clientToCanvasPct(
   };
 }
 
+/** Center of the visible preview viewport expressed in canvas percentages. */
+export function visibleViewportCenterPct(
+  canvas: Rect,
+  viewport: Rect,
+): { xPct: number; yPct: number } {
+  return clientToCanvasPct(
+    canvas,
+    viewport.left + viewport.width / 2,
+    viewport.top + viewport.height / 2,
+  );
+}
+
 /** A pixel width as a percentage of the canvas width. */
 export function widthPxToPct(px: number, rect: Rect): number {
   return rect.width > 0 ? (px / rect.width) * 100 : 0;
