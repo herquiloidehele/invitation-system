@@ -194,15 +194,7 @@ export function GallerySection({
       className="bg-background px-5 py-24 sm:px-8 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
-        {/*<div className="mx-auto max-w-3xl text-center">*/}
-        {/*  <div className="flex justify-center">*/}
-        {/*    <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>*/}
-        {/*  </div>*/}
-        {/*  <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">*/}
-        {/*    {t("title")}*/}
-        {/*  </h2>*/}
-        {/*  <p className="mt-5 text-muted-foreground">{t("body")}</p>*/}
-        {/*</div>*/}
+        {/* Header content is rendered per customization collection below. */}
         {fullyCustomizable.allItems.length === 0 &&
         preDesigned.allItems.length === 0 ? (
           <p className="mt-16 text-center text-sm text-muted-foreground">
