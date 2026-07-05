@@ -42,6 +42,15 @@
     "footerDescription": "Personal, elegant digital invitations made with care.",
     "footerCopyright": "© 2026 Brindeal Studio · Made with care"
   },
+  "LandingInstagramBrowserRedirect": {
+    "title": "Open in browser",
+    "description": "To ensure the best experience, open this site outside Instagram's browser.",
+    "openBrowser": "Open in browser",
+    "fallbackTitle": "If the browser does not open:",
+    "fallbackDescription": "Tap Instagram's <menu></menu> menu and choose <open>Open in browser</open>.",
+    "copyLink": "Copy link",
+    "copiedLink": "Link copied"
+  },
   "LandingNav": {
     "bestSellers": "Best sellers",
     "gallery": "Models",

@@ -42,6 +42,15 @@
     "footerDescription": "Convites digitais pessoais, elegantes e feitos com cuidado.",
     "footerCopyright": "© 2026 Brindeal Studio · Feito com cuidado"
   },
+  "LandingInstagramBrowserRedirect": {
+    "title": "Abrir no navegador",
+    "description": "Para garantir a melhor experiência, abra este site fora do navegador do Instagram.",
+    "openBrowser": "Abrir no navegador",
+    "fallbackTitle": "Se o navegador não abrir:",
+    "fallbackDescription": "Toque no menu <menu></menu> do Instagram e escolha <open>Abrir no navegador</open>.",
+    "copyLink": "Copiar link",
+    "copiedLink": "Link copiado"
+  },
   "LandingNav": {
     "bestSellers": "Mais vendidos",
     "gallery": "Modelos",

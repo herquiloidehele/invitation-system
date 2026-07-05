@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { BrindealHomepage } from "@/components/landing/BrindealHomepage";
+import { InstagramBrowserRedirect } from "@/components/landing/InstagramBrowserRedirect";
 import { getFaqs } from "@/components/landing/landing-data";
 import {
   getBestSellerFeatures,
@@ -92,6 +93,7 @@ export default async function Home() {
         bestSellerFeatures={bestSellerFeatures}
         currentCurrency={viewerCurrency}
       />
+      <InstagramBrowserRedirect />
     </>
   );
 }
