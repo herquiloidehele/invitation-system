@@ -238,7 +238,7 @@
       "customAnswers": "Perguntas personalizadas e mensagens",
       "guestTracking": "Gestão e acompanhamento de convidados",
       "whatsapp": "Partilha por WhatsApp",
-      "excelExport": "Exportação para Excel"
+      "pdfExport": "Exportação para PDF"
     }
   },
   "LandingLiveDemo": {

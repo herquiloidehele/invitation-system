@@ -1,8 +1,4 @@
-export type ConstellationGroupKey =
-  | "entrance"
-  | "story"
-  | "guide"
-  | "organize";
+export type ConstellationGroupKey = "entrance" | "story" | "guide" | "organize";
 
 export type ConstellationFeatureKey =
   | "animatedEntrance"
@@ -26,7 +22,7 @@ export type ConstellationFeatureKey =
   | "customAnswers"
   | "guestTracking"
   | "whatsapp"
-  | "excelExport";
+  | "pdfExport";
 
 export type ConstellationGroup = {
   key: ConstellationGroupKey;
@@ -48,12 +44,7 @@ export function getConstellationPreview(
 export const CONSTELLATION_GROUPS = [
   {
     key: "entrance",
-    features: [
-      "animatedEntrance",
-      "music",
-      "customDesign",
-      "socialPreview",
-    ],
+    features: ["animatedEntrance", "music", "customDesign", "socialPreview"],
   },
   {
     key: "story",
@@ -85,7 +76,7 @@ export const CONSTELLATION_GROUPS = [
       "customAnswers",
       "guestTracking",
       "whatsapp",
-      "excelExport",
+      "pdfExport",
     ],
   },
 ] as const satisfies readonly ConstellationGroup[];

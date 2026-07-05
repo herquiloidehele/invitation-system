@@ -20,7 +20,7 @@ import {
   Shirt,
   Users,
   Utensils,
-  Video
+  Video,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AnimatedSection } from "./AnimatedSection";
@@ -32,7 +32,7 @@ import {
   type ConstellationFeatureKey,
   type ConstellationGroup,
   type ConstellationGroupKey,
-  type ConstellationPreview
+  type ConstellationPreview,
 } from "./landing-constellation-data";
 
 const FEATURE_ICONS: Record<ConstellationFeatureKey, LucideIcon> = {
@@ -57,7 +57,7 @@ const FEATURE_ICONS: Record<ConstellationFeatureKey, LucideIcon> = {
   customAnswers: MessageCircle,
   guestTracking: Users,
   whatsapp: MessageCircle,
-  excelExport: Download,
+  pdfExport: Download,
 };
 
 const CLUSTER_POSITIONS: Record<ConstellationGroupKey, string> = {
@@ -201,7 +201,7 @@ const FEATURE_ORDERS: Record<
     "dietaryNotes",
     "customAnswers",
     "whatsapp",
-    "excelExport",
+    "pdfExport",
   ],
 };
 
