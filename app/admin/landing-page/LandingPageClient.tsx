@@ -32,6 +32,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { LandingCustomizationLevel } from "@/lib/landing-customization";
+import {
+  filterPickablesForCustomizationLevel,
+  groupGalleryFeaturesByCustomizationLevel,
+} from "@/lib/landing-admin-groups";
 
 type PickableKind = "invitation" | "save_the_date";
 
@@ -44,6 +49,7 @@ type Pickable = {
   landingImageUrl: string | null;
   priceLabel: string | null;
   couple: string;
+  customizationLevel: LandingCustomizationLevel;
 };
 
 type FeatureRow = {
@@ -60,11 +66,13 @@ type FeatureRow = {
     landingImageUrl: string | null;
     heroImage: string | null;
     eventType: string | null;
+    landingCustomizationLevel: string;
   } | null;
   saveTheDate?: {
     slug: string;
     couple: unknown;
     landingImageUrl: string | null;
+    landingCustomizationLevel: string;
   } | null;
 };
 
@@ -109,6 +117,17 @@ function readHref(row: FeatureRow): string {
 
 function readKindLabel(row: FeatureRow): string {
   return row.invitation ? "Convite" : "Save the Date";
+}
+
+function readModelId(row: FeatureRow): string {
+  return row.invitationId ?? row.saveTheDateId ?? "";
+}
+
+function readCustomizationLevel(row: FeatureRow): LandingCustomizationLevel {
+  const value =
+    row.invitation?.landingCustomizationLevel ??
+    row.saveTheDate?.landingCustomizationLevel;
+  return value === "pre_designed" ? "pre_designed" : "fully_customizable";
 }
 
 function readImage(row: FeatureRow): string | null {
@@ -225,19 +244,41 @@ export function LandingPageClient() {
         .sort((a, b) => a.position - b.position),
     [features],
   );
-  const gallery = useMemo(
+  const galleryRows = useMemo(
     () =>
-      CATEGORIES.map((category) => ({
-        ...category,
-        rows: features
-          .filter(
-            (row) =>
-              row.section === "gallery" &&
-              row.galleryCategory === category.value,
-          )
-          .sort((a, b) => a.position - b.position),
-      })),
+      features
+        .filter((row) => row.section === "gallery")
+        .map((row) => ({
+          ...row,
+          customizationLevel: readCustomizationLevel(row),
+        })),
     [features],
+  );
+  const galleryGroups = useMemo(
+    () => groupGalleryFeaturesByCustomizationLevel(galleryRows),
+    [galleryRows],
+  );
+  const placedGalleryIds = useMemo(
+    () => new Set(galleryRows.map(readModelId).filter(Boolean)),
+    [galleryRows],
+  );
+  const fullyCustomizablePickables = useMemo(
+    () =>
+      filterPickablesForCustomizationLevel(
+        pickables,
+        "fully_customizable",
+        placedGalleryIds,
+      ),
+    [pickables, placedGalleryIds],
+  );
+  const preDesignedPickables = useMemo(
+    () =>
+      filterPickablesForCustomizationLevel(
+        pickables,
+        "pre_designed",
+        placedGalleryIds,
+      ),
+    [pickables, placedGalleryIds],
   );
 
   const stats = useMemo(
@@ -438,61 +479,118 @@ export function LandingPageClient() {
             Modelos
           </CardTitle>
           <CardDescription>
-            Cada categoria aparece como um separador nos modelos públicos.
+            Escolha separadamente os modelos de cada nível de personalização.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {gallery.map((category, categoryIndex) => (
-            <div key={category.value} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">{category.label}</h3>
-                <Badge variant="secondary" className="font-normal">
-                  {category.rows.length} item
-                  {category.rows.length !== 1 ? "s" : ""}
-                </Badge>
-              </div>
-
-              <div className="space-y-2">
-                {category.rows.length === 0 ? (
-                  <EmptyState
-                    text={`Sem convites em ${category.label}.`}
-                    compact
-                  />
-                ) : (
-                  category.rows.map((row, index) => (
-                    <FeatureItem
-                      key={row.id}
-                      row={row}
-                      busy={busy}
-                      canMoveUp={index > 0}
-                      canMoveDown={index < category.rows.length - 1}
-                      onMoveUp={() => move(row.id, -1)}
-                      onMoveDown={() => move(row.id, 1)}
-                      onRemove={() => deleteFeature(row.id)}
-                    />
-                  ))
-                )}
-
-                <PickableSelect
-                  label={`Adicionar a ${category.label}`}
-                  disabled={busy}
-                  options={pickables}
-                  onPick={(pickableId) =>
-                    addFeature({
-                      section: "gallery",
-                      galleryCategory: category.value,
-                      pickableId,
-                    })
-                  }
-                />
-              </div>
-
-              {categoryIndex < gallery.length - 1 ? <Separator /> : null}
-            </div>
-          ))}
+        <CardContent className="space-y-10">
+          <GalleryAdminGroup
+            title="Totalmente personalizáveis"
+            description="A estrutura e o layout podem ser alterados."
+            rows={galleryGroups.fullyCustomizable}
+            pickables={fullyCustomizablePickables}
+            busy={busy}
+            onAdd={(galleryCategory, pickableId) =>
+              addFeature({
+                section: "gallery",
+                galleryCategory,
+                pickableId,
+              })
+            }
+            onMove={move}
+            onRemove={deleteFeature}
+          />
+          <Separator />
+          <GalleryAdminGroup
+            title="Design predefinido"
+            description="O conteúdo e o estilo mudam, mas a estrutura mantém-se."
+            rows={galleryGroups.preDesigned}
+            pickables={preDesignedPickables}
+            busy={busy}
+            onAdd={(galleryCategory, pickableId) =>
+              addFeature({
+                section: "gallery",
+                galleryCategory,
+                pickableId,
+              })
+            }
+            onMove={move}
+            onRemove={deleteFeature}
+          />
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function GalleryAdminGroup({
+  title,
+  description,
+  rows,
+  pickables,
+  busy,
+  onAdd,
+  onMove,
+  onRemove,
+}: {
+  title: string;
+  description: string;
+  rows: FeatureRow[];
+  pickables: Pickable[];
+  busy: boolean;
+  onAdd: (category: GalleryCategoryKey, pickableId: string) => void;
+  onMove: (id: string, delta: number) => void;
+  onRemove: (id: string) => void;
+}) {
+  const categories = CATEGORIES.map((category) => ({
+    ...category,
+    rows: rows
+      .filter((row) => row.galleryCategory === category.value)
+      .sort((a, b) => a.position - b.position),
+  }));
+
+  return (
+    <section className="space-y-5">
+      <div>
+        <h3 className="font-semibold">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+      {categories.map((category, categoryIndex) => (
+        <div key={category.value} className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold">{category.label}</h4>
+            <Badge variant="secondary" className="font-normal">
+              {category.rows.length} item
+              {category.rows.length !== 1 ? "s" : ""}
+            </Badge>
+          </div>
+          <div className="space-y-2">
+            {category.rows.length === 0 ? (
+              <EmptyState text={`Sem convites em ${category.label}.`} compact />
+            ) : (
+              category.rows.map((row, index) => (
+                <FeatureItem
+                  key={row.id}
+                  row={row}
+                  busy={busy}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < category.rows.length - 1}
+                  onMoveUp={() => onMove(row.id, -1)}
+                  onMoveDown={() => onMove(row.id, 1)}
+                  onRemove={() => onRemove(row.id)}
+                />
+              ))
+            )}
+            <PickableSelect
+              label={`Adicionar a ${category.label}`}
+              disabled={busy}
+              options={pickables}
+              onPick={(pickableId) => onAdd(category.value, pickableId)}
+            />
+          </div>
+          {categoryIndex < categories.length - 1 ? <Separator /> : null}
+        </div>
+      ))}
+    </section>
   );
 }
 

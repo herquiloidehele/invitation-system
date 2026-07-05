@@ -83,10 +83,15 @@ export default async function EditSaveTheDatePage({
     priceFromCents: item.priceFromCents,
     discountPriceFromCents: item.discountPriceFromCents,
     currency: item.currency,
-    priceOverrides: (item.priceOverrides as unknown as PriceOverrides | null) ?? null,
+    priceOverrides:
+      (item.priceOverrides as unknown as PriceOverrides | null) ?? null,
     landingModelName: item.landingModelName,
     landingImageUrl: item.landingImageUrl,
     landingDescription: item.landingDescription,
+    landingCustomizationLevel:
+      item.landingCustomizationLevel === "pre_designed"
+        ? "pre_designed"
+        : "fully_customizable",
   };
 
   return (

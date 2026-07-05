@@ -6,6 +6,10 @@ import {
 } from "@/lib/currency/template-price";
 import { resolveLandingGalleryMetadata } from "@/lib/landing-gallery-metadata";
 import { resolveLandingPrice, type LandingPrice } from "@/lib/landing-price";
+import {
+  normalizeLandingCustomizationLevel,
+  type LandingCustomizationLevel,
+} from "@/lib/landing-customization";
 
 /** Format a template's price for a viewer currency from its base + overrides. */
 function templateLandingPrice(
@@ -16,7 +20,8 @@ function templateLandingPrice(
   },
   viewerCurrency: Currency,
 ): LandingPrice | null {
-  const overrides = (target.priceOverrides ?? null) as unknown as PriceOverrides | null;
+  const overrides = (target.priceOverrides ??
+    null) as unknown as PriceOverrides | null;
   const { fromCents, discountCents } = getTemplatePriceCents(
     {
       priceFromCents: target.priceFromCents,
@@ -76,6 +81,7 @@ export const landingInvitationSelect = {
   landingModelName: true,
   landingDescription: true,
   landingSubtitle: true,
+  landingCustomizationLevel: true,
   priceFromCents: true,
   discountPriceFromCents: true,
   currency: true,
@@ -90,6 +96,7 @@ export const landingSaveTheDateSelect = {
   landingModelName: true,
   landingDescription: true,
   landingSubtitle: true,
+  landingCustomizationLevel: true,
   priceFromCents: true,
   discountPriceFromCents: true,
   currency: true,
@@ -117,6 +124,7 @@ export type GalleryFeature = {
   description: string | null;
   price: LandingPrice | null;
   category: GalleryCategory;
+  customizationLevel: LandingCustomizationLevel;
 };
 
 export type LiveDemoFeature = {
@@ -232,6 +240,9 @@ export async function getGalleryFeaturesByCategory(
       description: metadata.description,
       price: templateLandingPrice(target, viewerCurrency),
       category,
+      customizationLevel: normalizeLandingCustomizationLevel(
+        target.landingCustomizationLevel,
+      ),
     });
   }
 
@@ -246,6 +257,7 @@ export type BestSellerFeature = {
   subtitle: string | null;
   description: string | null;
   price: LandingPrice | null;
+  customizationLevel: LandingCustomizationLevel;
 };
 
 type BestSellerSourceRow = {
@@ -263,6 +275,7 @@ type BestSellerSourceRow = {
     discountPriceFromCents: number | null;
     currency: string;
     priceOverrides: unknown;
+    landingCustomizationLevel: string;
   } | null;
   saveTheDate: {
     slug: string;
@@ -276,6 +289,7 @@ type BestSellerSourceRow = {
     discountPriceFromCents: number | null;
     currency: string;
     priceOverrides: unknown;
+    landingCustomizationLevel: string;
   } | null;
 };
 
@@ -304,6 +318,9 @@ function mapBestSellerRowToFeature(
     subtitle: target.landingSubtitle ?? null,
     description: metadata.description,
     price: templateLandingPrice(target, viewerCurrency),
+    customizationLevel: normalizeLandingCustomizationLevel(
+      target.landingCustomizationLevel,
+    ),
   };
 }
 

@@ -1116,6 +1116,7 @@ export interface InvitationData {
   landingImageUrl?: string | null;
   landingDescription?: string | null;
   landingSubtitle?: string | null;
+  landingCustomizationLevel?: import("@/lib/landing-customization").LandingCustomizationLevel;
 }
 
 export interface TemplateTheme {

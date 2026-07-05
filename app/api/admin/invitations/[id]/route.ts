@@ -4,6 +4,7 @@ import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { isObjectFit } from "@/lib/hero-media-fit";
+import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations/[id] — Get a single invitation
@@ -305,6 +306,11 @@ export async function PUT(
             body.landingSubtitle.length
               ? body.landingSubtitle
               : null,
+        }),
+        ...(body.landingCustomizationLevel !== undefined && {
+          landingCustomizationLevel: normalizeLandingCustomizationLevel(
+            body.landingCustomizationLevel,
+          ),
         }),
       },
       include: {

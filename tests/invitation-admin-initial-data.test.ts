@@ -68,7 +68,28 @@ const baseRow = {
   landingImageUrl: null,
   landingDescription: null,
   landingSubtitle: null,
+  landingCustomizationLevel: "fully_customizable",
 };
+
+describe("toAdminInvitationInitialData — landing customization", () => {
+  it("hydrates an explicit pre-designed level", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      landingCustomizationLevel: "pre_designed",
+    });
+
+    expect(result.landingCustomizationLevel).toBe("pre_designed");
+  });
+
+  it("falls back to fully customizable for an unknown legacy value", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      landingCustomizationLevel: "legacy",
+    });
+
+    expect(result.landingCustomizationLevel).toBe("fully_customizable");
+  });
+});
 
 describe("toAdminInvitationInitialData — heroTextLayer round-trip", () => {
   it("hydrates heroTextLayer into the admin form initial data", () => {

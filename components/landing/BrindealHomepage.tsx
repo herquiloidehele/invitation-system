@@ -7,7 +7,7 @@ import type {
   GalleryCategory as DbGalleryCategory,
   GalleryFeature,
   HeroFeature,
-  LiveDemoFeature
+  LiveDemoFeature,
 } from "@/lib/landing-features";
 import { BestSellersSection } from "./BestSellersSection";
 import { FaqSection } from "./FaqSection";
@@ -15,10 +15,11 @@ import { FeaturesSection } from "./FeaturesSection";
 import { Footer } from "./Footer";
 import { GallerySection } from "./GallerySection";
 import { HeroSection } from "./HeroSection";
+import { InvitationConstellationSection } from "./InvitationConstellationSection";
 import { LandingNav } from "./LandingNav";
 import { LiveDemoSection } from "./LiveDemoSection";
 import { ProcessSection } from "./ProcessSection";
-import { type GalleryCategoryKey } from "./landing-data";
+import { getConstellationPreview } from "./landing-constellation-data";
 import { type Currency } from "@/lib/currency/config";
 
 export function BrindealHomepage({
@@ -35,8 +36,6 @@ export function BrindealHomepage({
   currentCurrency: Currency;
 }) {
   const reduceMotion = useReducedMotion();
-  const [activeGalleryCategory, setActiveGalleryCategory] =
-    useState<GalleryCategoryKey>("all");
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
   return (
@@ -44,13 +43,12 @@ export function BrindealHomepage({
       <LandingNav currentCurrency={currentCurrency} />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
       <BestSellersSection items={bestSellerFeatures} />
-      <GallerySection
-        activeCategory={activeGalleryCategory}
-        onCategoryChange={setActiveGalleryCategory}
-        itemsByCategory={galleryByCategory}
-      />
+      <GallerySection itemsByCategory={galleryByCategory} />
       <ProcessSection />
       <FeaturesSection />
+      <InvitationConstellationSection
+        preview={getConstellationPreview(liveDemoFeatures)}
+      />
       <LiveDemoSection items={liveDemoFeatures} />
       <FaqSection
         openIndex={openFaqIndex}

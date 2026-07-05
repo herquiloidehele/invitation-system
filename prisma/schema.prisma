@@ -133,6 +133,7 @@ model Invitation {
   landingImageUrl    String?
   landingDescription String?
   landingSubtitle    String?
+  landingCustomizationLevel String @default("fully_customizable")
 
   ownerToken   String   @unique @default(cuid())
   createdAt    DateTime @default(now())
@@ -207,6 +208,7 @@ model SaveTheDate {
   landingImageUrl    String?
   landingDescription String?
   landingSubtitle    String?
+  landingCustomizationLevel String @default("fully_customizable")
 
   ownerToken String   @unique @default(cuid())
   createdAt  DateTime @default(now())

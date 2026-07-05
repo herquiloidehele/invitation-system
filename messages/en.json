@@ -78,7 +78,7 @@
   "LandingBestSellers": {
     "eyebrow": "Best sellers",
     "title": "Our most-loved invitations",
-    "body": "The models couples reach for the most. Tap one to preview. All models include guest name personalization.",
+    "body": "The models couples reach for the most. Tap one to preview. Models marked pre-designed retain the structure shown.",
     "empty": "Coming soon.",
     "fallbackTitle": "Invitation",
     "previewAria": "Preview invitation",
@@ -100,6 +100,16 @@
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
     "buyCta": "Send Message",
+    "fullyCustomizable": {
+      "title": "Fully customizable invitations",
+      "shortDescription": "Change the layout, sections, and visual direction.",
+      "description": "The structure, section order, layout, and visual styling can be adapted to your event."
+    },
+    "preDesigned": {
+      "title": "Pre-designed invitations",
+      "shortDescription": "Keep the layout and personalize the content and visual details.",
+      "description": "Personalize names, wording, photographs, colors, typography, and event information while retaining the structure shown."
+    },
     "categories": {
       "all": "All",
       "wedding": "Invitation",
@@ -196,6 +206,41 @@
     "rsvp": "RSVP",
     "mapVenue": "Quinta da Aroeira"
   },
+  "LandingConstellation": {
+    "eyebrow": "Everything included",
+    "title": "Every detail, in one invitation",
+    "body": "From the first tap to the final guest count, every detail lives in one thoughtful experience.",
+    "groups": {
+      "entrance": { "title": "Make an entrance" },
+      "story": { "title": "Tell your story" },
+      "guide": { "title": "Guide every guest" },
+      "organize": { "title": "Stay effortlessly organized" }
+    },
+    "features": {
+      "animatedEntrance": "Animated envelope or video entrance",
+      "music": "Background music",
+      "customDesign": "Custom design, typography and text",
+      "socialPreview": "Personalized sharing preview",
+      "countdown": "Countdown and Save the Date",
+      "schedule": "Event schedule",
+      "coupleStory": "Couple story",
+      "photoGallery": "Photo gallery",
+      "dressCode": "Dress code",
+      "maps": "Maps and multiple locations",
+      "calendar": "Add to calendar",
+      "giftRegistry": "Gift registry",
+      "guestGuide": "Guest guide and local recommendations",
+      "faqs": "Frequently asked questions",
+      "languages": "Multiple languages",
+      "personalizedRsvp": "Personalized RSVP",
+      "partyResponses": "Companions and party-size responses",
+      "dietaryNotes": "Dietary notes",
+      "customAnswers": "Custom questions and messages",
+      "guestTracking": "Guest tracking and management",
+      "whatsapp": "WhatsApp sharing",
+      "excelExport": "Excel export"
+    }
+  },
   "LandingLiveDemo": {
     "eyebrow": "Live demo",
     "title": "See how guests will open it",
@@ -218,7 +263,7 @@
       },
       {
         "question": "Can I personalize my invitation?",
-        "answer": "Yes. We have fully customizable invitations as well as pre-designed templates — check each model's description."
+        "answer": "Yes. Fully customizable invitations allow changes to the structure, sections, and layout. With pre-designed models, we personalize the content and visual details while retaining the structure shown."
       },
       {
         "question": "Can I order for other events besides weddings?",

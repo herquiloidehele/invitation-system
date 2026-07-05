@@ -4,6 +4,7 @@ import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { isObjectFit } from "@/lib/hero-media-fit";
+import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 
 // ---------------------------------------------------------------------------
 // POST /api/admin/invitations — Create a new invitation
@@ -152,6 +153,9 @@ export async function POST(request: NextRequest) {
           body.landingSubtitle.length
             ? body.landingSubtitle
             : null,
+        landingCustomizationLevel: normalizeLandingCustomizationLevel(
+          body.landingCustomizationLevel,
+        ),
       },
       include: {
         theme: { select: { id: true, name: true, label: true } },

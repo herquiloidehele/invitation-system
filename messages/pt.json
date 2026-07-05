@@ -78,7 +78,7 @@
   "LandingBestSellers": {
     "eyebrow": "Mais vendidos",
     "title": "Os convites mais escolhidos",
-    "body": "Os modelos que mais entusiasmam os nossos casais. Toquem num para pré-visualizar. Todos modelos com personalização de nome do convidado incluso",
+    "body": "Os modelos que mais entusiasmam os nossos casais. Toque num para pré-visualizar. Os modelos com design predefinido mantêm a estrutura apresentada.",
     "empty": "Em breve.",
     "fallbackTitle": "Convite",
     "previewAria": "Pré-visualizar convite",
@@ -100,6 +100,16 @@
     "showLess": "Ver menos",
     "clickToPreview": "Clica para visualizar",
     "buyCta": "Enviar Mensagem",
+    "fullyCustomizable": {
+      "title": "Convites totalmente personalizáveis",
+      "shortDescription": "Altere o layout, as secções e a direção visual.",
+      "description": "A estrutura, a ordem das secções, o layout e o estilo visual podem ser adaptados ao seu evento."
+    },
+    "preDesigned": {
+      "title": "Convites com design predefinido",
+      "shortDescription": "Mantenha o layout e personalize o conteúdo e os detalhes visuais.",
+      "description": "Personalize nomes, textos, fotografias, cores, tipografia e informações do evento, mantendo a estrutura apresentada."
+    },
     "categories": {
       "all": "Todos",
       "wedding": "Convites",
@@ -196,6 +206,41 @@
     "rsvp": "RSVP",
     "mapVenue": "Quinta da Aroeira"
   },
+  "LandingConstellation": {
+    "eyebrow": "Tudo incluído",
+    "title": "Todos os detalhes, num só convite",
+    "body": "Do primeiro toque à contagem final de convidados, cada detalhe vive numa única experiência.",
+    "groups": {
+      "entrance": { "title": "Cause uma primeira impressão" },
+      "story": { "title": "Conte a vossa história" },
+      "guide": { "title": "Oriente cada convidado" },
+      "organize": { "title": "Organize tudo com facilidade" }
+    },
+    "features": {
+      "animatedEntrance": "Envelope ou entrada em vídeo",
+      "music": "Música de fundo",
+      "customDesign": "Design, tipografia e textos personalizados",
+      "socialPreview": "Pré-visualização personalizada na partilha",
+      "countdown": "Contagem decrescente e Save the Date",
+      "schedule": "Programa do evento",
+      "coupleStory": "História do casal",
+      "photoGallery": "Galeria de fotografias",
+      "dressCode": "Dress code",
+      "maps": "Mapas e vários locais",
+      "calendar": "Adicionar ao calendário",
+      "giftRegistry": "Lista de presentes",
+      "guestGuide": "Guia e recomendações locais",
+      "faqs": "Perguntas frequentes",
+      "languages": "Vários idiomas",
+      "personalizedRsvp": "RSVP personalizado",
+      "partyResponses": "Acompanhantes e número de convidados",
+      "dietaryNotes": "Restrições alimentares",
+      "customAnswers": "Perguntas personalizadas e mensagens",
+      "guestTracking": "Gestão e acompanhamento de convidados",
+      "whatsapp": "Partilha por WhatsApp",
+      "excelExport": "Exportação para Excel"
+    }
+  },
   "LandingLiveDemo": {
     "eyebrow": "Demo ao vivo",
     "title": "Veja como os convidados vão abrir",
@@ -218,7 +263,7 @@
       },
       {
         "question": "Posso personalizar o meu convite?",
-        "answer": "Sim. Temos convites 100% personalizáveis e também modelos com design pré-definido — consulte a descrição de cada modelo."
+        "answer": "Sim. Nos convites totalmente personalizáveis, podemos alterar a estrutura, as secções e o layout. Nos modelos com design predefinido, personalizamos o conteúdo e os detalhes visuais, mantendo a estrutura apresentada."
       },
       {
         "question": "Posso encomendar para outro tipo de evento além de casamento?",

@@ -4,6 +4,7 @@
 // — a new persisted field must be added to BOTH, or it will save to the DB yet
 // vanish from the form on reload. Full checklist: docs/invitation-data-field-checklist.md
 import type { PriceOverrides } from "@/lib/currency/template-price";
+import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -89,6 +90,7 @@ type AdminInvitationInitialDataRow = {
   landingImageUrl: string | null;
   landingDescription: string | null;
   landingSubtitle: string | null;
+  landingCustomizationLevel: string;
 };
 
 export function toAdminInvitationInitialData(
@@ -170,5 +172,8 @@ export function toAdminInvitationInitialData(
     landingImageUrl: row.landingImageUrl,
     landingDescription: row.landingDescription,
     landingSubtitle: row.landingSubtitle,
+    landingCustomizationLevel: normalizeLandingCustomizationLevel(
+      row.landingCustomizationLevel,
+    ),
   };
 }

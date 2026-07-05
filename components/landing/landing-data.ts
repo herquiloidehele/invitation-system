@@ -13,18 +13,29 @@ export type GalleryCategoryKey =
 
 export type GalleryCategoryTab = { key: GalleryCategoryKey; label: string };
 
+export type GalleryItemsByCategory = Record<
+  DbGalleryCategory,
+  GalleryFeature[]
+>;
+
+export type GalleryCustomizationGroups = {
+  fullyCustomizable: GalleryItemsByCategory;
+  preDesigned: GalleryItemsByCategory;
+};
+
 export type FaqItem = {
   question: string;
   answer: string;
 };
 
-export const dbCategoryToTabKey: Record<DbGalleryCategory, GalleryCategoryKey> = {
-  wedding: "wedding",
-  save_the_date: "saveTheDate",
-  baptism: "baptism",
-  anniversary: "anniversary",
-  engagement: "engagement",
-};
+export const dbCategoryToTabKey: Record<DbGalleryCategory, GalleryCategoryKey> =
+  {
+    wedding: "wedding",
+    save_the_date: "saveTheDate",
+    baptism: "baptism",
+    anniversary: "anniversary",
+    engagement: "engagement",
+  };
 
 const tabKeyToDbCategory: Record<
   Exclude<GalleryCategoryKey, "all">,
@@ -78,6 +89,53 @@ export function getVisibleGalleryCategories(
   if (populatedCategories.length <= 1) return [];
 
   return [{ key: "all", label: t("categories.all") }, ...populatedCategories];
+}
+
+const galleryCategoryKeys: DbGalleryCategory[] = [
+  "wedding",
+  "save_the_date",
+  "baptism",
+  "anniversary",
+  "engagement",
+];
+
+function emptyGalleryItemsByCategory(): GalleryItemsByCategory {
+  return {
+    wedding: [],
+    save_the_date: [],
+    baptism: [],
+    anniversary: [],
+    engagement: [],
+  };
+}
+
+export function groupGalleryByCustomization(
+  itemsByCategory: GalleryItemsByCategory,
+): GalleryCustomizationGroups {
+  const groups: GalleryCustomizationGroups = {
+    fullyCustomizable: emptyGalleryItemsByCategory(),
+    preDesigned: emptyGalleryItemsByCategory(),
+  };
+
+  for (const category of galleryCategoryKeys) {
+    for (const item of itemsByCategory[category]) {
+      const target =
+        item.customizationLevel === "pre_designed"
+          ? groups.preDesigned
+          : groups.fullyCustomizable;
+      target[category].push(item);
+    }
+  }
+
+  return groups;
+}
+
+export function getPopulatedGalleryCategoryKeys(
+  itemsByCategory: GalleryItemsByCategory,
+): DbGalleryCategory[] {
+  return galleryCategoryKeys.filter(
+    (category) => itemsByCategory[category].length > 0,
+  );
 }
 
 export function getProcessSteps(t: LandingTranslator) {
