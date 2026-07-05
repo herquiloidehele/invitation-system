@@ -13,9 +13,11 @@ import { EMPTY_IMAGE_LAYER, moveItem, updateItem } from "@/lib/image-layer";
 import {
   type Rect,
   clientToCanvasPct,
+  findImageEditorViewport,
   resizeWidthPct,
   rotationFromPointer,
 } from "@/lib/image-layer-editor-geometry";
+import { observeImageLayerEditor } from "@/lib/image-layer-editor-observer";
 import type { ImageItem, ImageLayer } from "@/lib/types";
 
 const CORNERS: { k: string; pos: CSSProperties }[] = [
@@ -53,6 +55,13 @@ function rectOf(el: Element | null | undefined): Rect | null {
   return { left: r.left, top: r.top, width: r.width, height: r.height };
 }
 
+function viewportOf(root: HTMLElement): HTMLElement {
+  return findImageEditorViewport(root, (element) => {
+    const style = window.getComputedStyle(element);
+    return `${style.overflow} ${style.overflowX} ${style.overflowY}`;
+  });
+}
+
 /**
  * On-preview interaction overlay for the free-floating image layer: drag to
  * move, corner handles to resize, top handle to rotate. Selection is
@@ -79,14 +88,11 @@ export default function ImageLayerEditor({
     if (!active) return;
     const root = getPreviewRoot();
     const onMove = () => force();
-    root?.addEventListener("scroll", onMove, true);
-    window.addEventListener("resize", onMove);
-    window.addEventListener("scroll", onMove, true);
-    return () => {
-      root?.removeEventListener("scroll", onMove, true);
-      window.removeEventListener("resize", onMove);
-      window.removeEventListener("scroll", onMove, true);
-    };
+    return observeImageLayerEditor(
+      root ? viewportOf(root) : null,
+      window,
+      onMove,
+    );
   }, [active, getPreviewRoot]);
 
   const readCanvasRect = useCallback((): Rect | null => {
@@ -195,7 +201,8 @@ export default function ImageLayerEditor({
 
   if (!active) return null;
 
-  const preview = rectOf(getPreviewRoot());
+  const previewRoot = getPreviewRoot();
+  const preview = rectOf(previewRoot ? viewportOf(previewRoot) : null);
   const canvas = readCanvasRect();
   if (!preview || !canvas) return null;
 

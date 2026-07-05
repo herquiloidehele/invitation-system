@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   type Rect,
   clientToCanvasPct,
+  findImageEditorViewport,
   widthPxToPct,
   resizeWidthPct,
   rotationFromPointer,
@@ -24,6 +25,37 @@ describe("clientToCanvasPct", () => {
   });
 });
 
+describe("findImageEditorViewport", () => {
+  it("uses the scrolling preview ancestor instead of the height-limited content root", () => {
+    type Node = {
+      overflow: string;
+      parentElement: Node | null;
+    };
+    const page: Node = { overflow: "visible", parentElement: null };
+    const scrollViewport: Node = { overflow: "auto", parentElement: page };
+    const previewRoot: Node = {
+      overflow: "visible",
+      parentElement: scrollViewport,
+    };
+
+    expect(
+      findImageEditorViewport(previewRoot, (element) => element.overflow),
+    ).toBe(scrollViewport);
+  });
+
+  it("uses the preview root when it is itself the scrolling viewport", () => {
+    type Node = {
+      overflow: string;
+      parentElement: Node | null;
+    };
+    const previewRoot: Node = { overflow: "auto", parentElement: null };
+
+    expect(
+      findImageEditorViewport(previewRoot, (element) => element.overflow),
+    ).toBe(previewRoot);
+  });
+});
+
 describe("widthPxToPct", () => {
   it("expresses a pixel width as a percentage of the canvas width", () => {
     expect(widthPxToPct(200, canvas)).toBe(50);
@@ -32,15 +64,15 @@ describe("widthPxToPct", () => {
 
 describe("resizeWidthPct", () => {
   it("computes width % from the pointer distance to box center", () => {
-    expect(resizeWidthPct({ centerX: 200, centerY: 150 }, 300, 150, canvas)).toBe(
-      50,
-    );
+    expect(
+      resizeWidthPct({ centerX: 200, centerY: 150 }, 300, 150, canvas),
+    ).toBe(50);
   });
 
   it("never returns below a 2% floor", () => {
-    expect(resizeWidthPct({ centerX: 200, centerY: 150 }, 200, 150, canvas)).toBe(
-      2,
-    );
+    expect(
+      resizeWidthPct({ centerX: 200, centerY: 150 }, 200, 150, canvas),
+    ).toBe(2);
   });
 });
 

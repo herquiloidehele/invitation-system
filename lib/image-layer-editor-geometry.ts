@@ -5,6 +5,25 @@ export interface Rect {
   height: number;
 }
 
+/**
+ * Find the element that clips and scrolls the invitation preview. The preview
+ * content root can be height-limited while its canvas continues below it, so
+ * it must not be used as the interaction overlay's clipping boundary.
+ */
+export function findImageEditorViewport<T extends { parentElement: T | null }>(
+  start: T,
+  readOverflow: (element: T) => string,
+): T {
+  let element: T | null = start;
+  while (element) {
+    if (/\b(auto|scroll)\b/.test(readOverflow(element))) {
+      return element;
+    }
+    element = element.parentElement;
+  }
+  return start;
+}
+
 /** Center-relative position of a client point as % of the page canvas box. */
 export function clientToCanvasPct(
   rect: Rect,
