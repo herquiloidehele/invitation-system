@@ -15,9 +15,11 @@ import { FeaturesSection } from "./FeaturesSection";
 import { Footer } from "./Footer";
 import { GallerySection } from "./GallerySection";
 import { HeroSection } from "./HeroSection";
+import { InvitationConstellationSection } from "./InvitationConstellationSection";
 import { LandingNav } from "./LandingNav";
 import { LiveDemoSection } from "./LiveDemoSection";
 import { ProcessSection } from "./ProcessSection";
+import { getConstellationPreview } from "./landing-constellation-data";
 import { type GalleryCategoryKey } from "./landing-data";
 import { type Currency } from "@/lib/currency/config";
 
@@ -51,6 +53,9 @@ export function BrindealHomepage({
       />
       <ProcessSection />
       <FeaturesSection />
+      <InvitationConstellationSection
+        preview={getConstellationPreview(liveDemoFeatures)}
+      />
       <LiveDemoSection items={liveDemoFeatures} />
       <FaqSection
         openIndex={openFaqIndex}

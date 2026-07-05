@@ -187,6 +187,41 @@
     "rsvp": "RSVP",
     "mapVenue": "Quinta da Aroeira"
   },
+  "LandingConstellation": {
+    "eyebrow": "Tudo incluído",
+    "title": "Todos os detalhes, num só convite",
+    "body": "Do primeiro toque à contagem final de convidados, cada detalhe vive numa única experiência.",
+    "groups": {
+      "entrance": { "title": "Cause uma primeira impressão" },
+      "story": { "title": "Conte a vossa história" },
+      "guide": { "title": "Oriente cada convidado" },
+      "organize": { "title": "Organize tudo com facilidade" }
+    },
+    "features": {
+      "animatedEntrance": "Envelope ou entrada em vídeo",
+      "music": "Música de fundo",
+      "customDesign": "Design, tipografia e textos personalizados",
+      "socialPreview": "Pré-visualização personalizada na partilha",
+      "countdown": "Contagem decrescente e Save the Date",
+      "schedule": "Programa do evento",
+      "coupleStory": "História do casal",
+      "photoGallery": "Galeria de fotografias",
+      "dressCode": "Dress code",
+      "maps": "Mapas e vários locais",
+      "calendar": "Adicionar ao calendário",
+      "giftRegistry": "Lista de presentes",
+      "guestGuide": "Guia e recomendações locais",
+      "faqs": "Perguntas frequentes",
+      "languages": "Vários idiomas",
+      "personalizedRsvp": "RSVP personalizado",
+      "partyResponses": "Acompanhantes e número de convidados",
+      "dietaryNotes": "Restrições alimentares",
+      "customAnswers": "Perguntas personalizadas e mensagens",
+      "guestTracking": "Gestão e acompanhamento de convidados",
+      "whatsapp": "Partilha por WhatsApp",
+      "excelExport": "Exportação para Excel"
+    }
+  },
   "LandingLiveDemo": {
     "eyebrow": "Demo ao vivo",
     "title": "Veja como os convidados vão abrir",

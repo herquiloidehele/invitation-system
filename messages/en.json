@@ -187,6 +187,41 @@
     "rsvp": "RSVP",
     "mapVenue": "Quinta da Aroeira"
   },
+  "LandingConstellation": {
+    "eyebrow": "Everything included",
+    "title": "Every detail, in one invitation",
+    "body": "From the first tap to the final guest count, every detail lives in one thoughtful experience.",
+    "groups": {
+      "entrance": { "title": "Make an entrance" },
+      "story": { "title": "Tell your story" },
+      "guide": { "title": "Guide every guest" },
+      "organize": { "title": "Stay effortlessly organized" }
+    },
+    "features": {
+      "animatedEntrance": "Animated envelope or video entrance",
+      "music": "Background music",
+      "customDesign": "Custom design, typography and text",
+      "socialPreview": "Personalized sharing preview",
+      "countdown": "Countdown and Save the Date",
+      "schedule": "Event schedule",
+      "coupleStory": "Couple story",
+      "photoGallery": "Photo gallery",
+      "dressCode": "Dress code",
+      "maps": "Maps and multiple locations",
+      "calendar": "Add to calendar",
+      "giftRegistry": "Gift registry",
+      "guestGuide": "Guest guide and local recommendations",
+      "faqs": "Frequently asked questions",
+      "languages": "Multiple languages",
+      "personalizedRsvp": "Personalized RSVP",
+      "partyResponses": "Companions and party-size responses",
+      "dietaryNotes": "Dietary notes",
+      "customAnswers": "Custom questions and messages",
+      "guestTracking": "Guest tracking and management",
+      "whatsapp": "WhatsApp sharing",
+      "excelExport": "Excel export"
+    }
+  },
   "LandingLiveDemo": {
     "eyebrow": "Live demo",
     "title": "See how guests will open it",
