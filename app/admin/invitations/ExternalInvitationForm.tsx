@@ -979,6 +979,8 @@ export default function ExternalInvitationForm({
                       landingModelName: form.landingModelName ?? null,
                       landingImageUrl: form.landingImageUrl ?? null,
                       landingDescription: form.landingDescription ?? null,
+                      landingCustomizationLevel:
+                        form.landingCustomizationLevel ?? "fully_customizable",
                     }}
                     onChange={(next) => {
                       update("priceFromCents", next.priceFromCents);
@@ -991,6 +993,10 @@ export default function ExternalInvitationForm({
                       update("landingModelName", next.landingModelName);
                       update("landingImageUrl", next.landingImageUrl);
                       update("landingDescription", next.landingDescription);
+                      update(
+                        "landingCustomizationLevel",
+                        next.landingCustomizationLevel,
+                      );
                     }}
                   />
                 </AccordionContent>

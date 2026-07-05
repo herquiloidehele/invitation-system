@@ -10,6 +10,7 @@ import {
   type PriceOverrideEntry,
   type PriceOverrides,
 } from "@/lib/currency/template-price";
+import type { LandingCustomizationLevel } from "@/lib/landing-customization";
 
 export type LandingMetadata = {
   priceFromCents: number | null;
@@ -19,6 +20,7 @@ export type LandingMetadata = {
   landingModelName: string | null;
   landingImageUrl: string | null;
   landingDescription: string | null;
+  landingCustomizationLevel: LandingCustomizationLevel;
 };
 
 export function LandingMetadataFieldset({
@@ -102,6 +104,52 @@ export function LandingMetadataFieldset({
 
       {!open ? null : (
         <div className="space-y-3 pt-1">
+          <div className="space-y-2">
+            <span className="block text-sm font-medium">
+              Nível de personalização
+            </span>
+            <label className="flex cursor-pointer gap-3 rounded-md border border-neutral-200 p-3 text-sm">
+              <input
+                type="radio"
+                name="landingCustomizationLevel"
+                value="fully_customizable"
+                checked={
+                  value.landingCustomizationLevel === "fully_customizable"
+                }
+                onChange={() =>
+                  update({
+                    landingCustomizationLevel: "fully_customizable",
+                  })
+                }
+                className="mt-0.5"
+              />
+              <span>
+                <strong className="block">Totalmente personalizável</strong>
+                <span className="text-xs text-neutral-500">
+                  A estrutura e o layout podem ser alterados.
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer gap-3 rounded-md border border-neutral-200 p-3 text-sm">
+              <input
+                type="radio"
+                name="landingCustomizationLevel"
+                value="pre_designed"
+                checked={value.landingCustomizationLevel === "pre_designed"}
+                onChange={() =>
+                  update({ landingCustomizationLevel: "pre_designed" })
+                }
+                className="mt-0.5"
+              />
+              <span>
+                <strong className="block">Design predefinido</strong>
+                <span className="text-xs text-neutral-500">
+                  O conteúdo e o estilo mudam, mas a estrutura mantém-se.
+                </span>
+              </span>
+            </label>
+          </div>
+
           <label className="block text-sm">
             Preço base (€)
             <input

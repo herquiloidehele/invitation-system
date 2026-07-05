@@ -11,6 +11,7 @@ import { AnimatedSection } from "./AnimatedSection";
 import { LandingModelCard } from "./LandingModelCard";
 import { PhoneIframePreview } from "./PhoneIframePreview";
 import { SectionEyebrow } from "./SectionEyebrow";
+import { getLandingCustomizationBadge } from "@/lib/landing-customization";
 
 export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
   const t = useTranslations("LandingBestSellers");
@@ -75,6 +76,12 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                       exit: { opacity: 0, scale: 0.96 },
                     }}
                     badgeLabel={`${indexLabel} · ${t("badge")}`}
+                    customizationBadgeLabel={
+                      getLandingCustomizationBadge(
+                        item.customizationLevel,
+                        t("preDesignedBadge"),
+                      ) ?? undefined
+                    }
                     labels={{
                       fallbackTitle: t("fallbackTitle"),
                       previewAria: t("previewAria"),

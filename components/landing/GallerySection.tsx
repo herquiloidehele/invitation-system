@@ -3,10 +3,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import type {
-  GalleryCategory as DbGalleryCategory,
-  GalleryFeature,
-} from "@/lib/landing-features";
+import type { GalleryCategory as DbGalleryCategory, GalleryFeature } from "@/lib/landing-features";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,6 +12,7 @@ import {
   dbCategoryToTabKey,
   type GalleryCategoryKey,
   getVisibleGalleryCategories,
+  groupGalleryByCustomization
 } from "./landing-data";
 import {
   getMotionProps,
@@ -22,21 +20,16 @@ import {
   landingCardVariants,
   landingFastTransition,
   landingStaggerVariants,
-  shouldReduceMotion,
+  shouldReduceMotion
 } from "./landing-motion";
 import { LandingModelCard } from "./LandingModelCard";
 import { PhoneIframePreview } from "./PhoneIframePreview";
-import { SectionEyebrow } from "./SectionEyebrow";
 
 type GalleryCard = GalleryFeature & { tab: GalleryCategoryKey };
 
 export function GallerySection({
-  activeCategory,
-  onCategoryChange,
   itemsByCategory,
 }: {
-  activeCategory: GalleryCategoryKey;
-  onCategoryChange: (category: GalleryCategoryKey) => void;
   itemsByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
 }) {
   const t = useTranslations("LandingGallery");
@@ -44,25 +37,44 @@ export function GallerySection({
   const reduceMotion = useReducedMotion();
   const reduced = shouldReduceMotion(reduceMotion);
   const [previewItem, setPreviewItem] = useState<GalleryCard | null>(null);
-  const galleryCategories = getVisibleGalleryCategories(t, itemsByCategory);
-  const allItems = useMemo<GalleryCard[]>(
-    () =>
-      Object.entries(itemsByCategory).flatMap(([key, list]) =>
-        list.map((item) => ({
-          ...item,
-          tab: dbCategoryToTabKey[key as DbGalleryCategory],
-        })),
-      ),
+  const [activeFullyCustomizableCategory, setActiveFullyCustomizableCategory] =
+    useState<GalleryCategoryKey>("all");
+  const [activePreDesignedCategory, setActivePreDesignedCategory] =
+    useState<GalleryCategoryKey>("all");
+  const groups = useMemo(
+    () => groupGalleryByCustomization(itemsByCategory),
     [itemsByCategory],
   );
 
-  const hasActiveCategory = galleryCategories.some(
-    (category) => category.key === activeCategory,
+  function collectionData(
+    groupItems: Record<DbGalleryCategory, GalleryFeature[]>,
+    activeCategory: GalleryCategoryKey,
+  ) {
+    const categories = getVisibleGalleryCategories(t, groupItems);
+    const allItems = Object.entries(groupItems).flatMap(([key, list]) =>
+      list.map((item) => ({
+        ...item,
+        tab: dbCategoryToTabKey[key as DbGalleryCategory],
+      })),
+    );
+    const hasActiveCategory = categories.some(
+      (category) => category.key === activeCategory,
+    );
+    const visibleItems =
+      activeCategory === "all" || !hasActiveCategory
+        ? allItems
+        : allItems.filter((item) => item.tab === activeCategory);
+    return { categories, allItems, visibleItems };
+  }
+
+  const fullyCustomizable = collectionData(
+    groups.fullyCustomizable,
+    activeFullyCustomizableCategory,
   );
-  const visibleItems =
-    activeCategory === "all" || !hasActiveCategory
-      ? allItems
-      : allItems.filter((item) => item.tab === activeCategory);
+  const preDesigned = collectionData(
+    groups.preDesigned,
+    activePreDesignedCategory,
+  );
 
   function handleCardClick(
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -89,24 +101,36 @@ export function GallerySection({
 
   const previewTitle = previewItem?.title || t("fallbackTitle");
 
-  return (
-    <AnimatedSection
-      id="modelos"
-      className="bg-background px-5 py-24 sm:px-8 lg:py-28"
-    >
-      <div className="mx-auto max-w-7xl">
+  function renderCollection({
+    id,
+    title,
+    description,
+    data,
+    activeCategory,
+    onCategoryChange,
+    preDesignedBadge,
+  }: {
+    id: string;
+    title: string;
+    description: string;
+    data: ReturnType<typeof collectionData>;
+    activeCategory: GalleryCategoryKey;
+    onCategoryChange: (category: GalleryCategoryKey) => void;
+    preDesignedBadge?: boolean;
+  }) {
+    if (data.allItems.length === 0) return null;
+
+    return (
+      <section id={id} className="scroll-mt-24 pt-20 first:pt-0">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="flex justify-center">
-            <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
-          </div>
-          <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
-            {t("title")}
+          <h2 className="text-4xl font-medium tracking-[-0.025em] sm:text-4xl">
+            {title}
           </h2>
-          <p className="mt-5 text-muted-foreground">{t("body")}</p>
+          <p className="mt-3 text-muted-foreground">{description}</p>
         </div>
-        {galleryCategories.length > 0 ? (
-          <div className="mt-12 flex flex-wrap justify-center gap-2">
-            {galleryCategories.map((category) => (
+        {data.categories.length > 0 ? (
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
+            {data.categories.map((category) => (
               <motion.button
                 key={category.key}
                 type="button"
@@ -130,44 +154,85 @@ export function GallerySection({
             ))}
           </div>
         ) : null}
-        {visibleItems.length === 0 ? (
+        <motion.div
+          layout
+          {...getMotionProps(reduceMotion, landingStaggerVariants)}
+          className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-3"
+        >
+          <AnimatePresence mode="popLayout" initial={false}>
+            {data.visibleItems.map((item) => (
+              <LandingModelCard
+                key={item.id}
+                item={item}
+                variant="gallery"
+                customizationBadgeLabel={
+                  preDesignedBadge ? t("preDesigned.badge") : undefined
+                }
+                motionProps={{
+                  layout: true,
+                  variants: landingCardVariants,
+                  initial: reduced ? false : "hidden",
+                  animate: reduced ? undefined : "visible",
+                  exit: reduced ? undefined : "exit",
+                  whileTap: reduced ? undefined : landingCardTap,
+                }}
+                labels={{
+                  fallbackTitle: t("fallbackTitle"),
+                  previewAria: t("previewAria"),
+                  clickToPreview: t("clickToPreview"),
+                  showMore: t("showMore"),
+                  showLess: t("showLess"),
+                  buyCta: t("buyCta"),
+                }}
+                onPreviewClick={(event) => handleCardClick(event, item)}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      </section>
+    );
+  }
+
+  return (
+    <AnimatedSection
+      id="modelos"
+      className="bg-background px-5 py-24 sm:px-8 lg:py-28"
+    >
+      <div className="mx-auto max-w-7xl">
+        {/*<div className="mx-auto max-w-3xl text-center">*/}
+        {/*  <div className="flex justify-center">*/}
+        {/*    <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>*/}
+        {/*  </div>*/}
+        {/*  <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">*/}
+        {/*    {t("title")}*/}
+        {/*  </h2>*/}
+        {/*  <p className="mt-5 text-muted-foreground">{t("body")}</p>*/}
+        {/*</div>*/}
+        {fullyCustomizable.allItems.length === 0 &&
+        preDesigned.allItems.length === 0 ? (
           <p className="mt-16 text-center text-sm text-muted-foreground">
             {t("empty")}
           </p>
-        ) : (
-          <motion.div
-            layout
-            {...getMotionProps(reduceMotion, landingStaggerVariants)}
-            className="mt-12 grid gap-3 md:grid-cols-2 lg:grid-cols-3"
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              {visibleItems.map((item) => (
-                <LandingModelCard
-                  key={item.id}
-                  item={item}
-                  variant="gallery"
-                  motionProps={{
-                    layout: true,
-                    variants: landingCardVariants,
-                    initial: reduced ? false : "hidden",
-                    animate: reduced ? undefined : "visible",
-                    exit: reduced ? undefined : "exit",
-                    whileTap: reduced ? undefined : landingCardTap,
-                  }}
-                  labels={{
-                    fallbackTitle: t("fallbackTitle"),
-                    previewAria: t("previewAria"),
-                    clickToPreview: t("clickToPreview"),
-                    showMore: t("showMore"),
-                    showLess: t("showLess"),
-                    buyCta: t("buyCta"),
-                  }}
-                  onPreviewClick={(event) => handleCardClick(event, item)}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        )}
+        ) : null}
+        <div className="mt-14">
+          {renderCollection({
+            id: "modelos-personalizaveis",
+            title: t("fullyCustomizable.title"),
+            description: t("fullyCustomizable.description"),
+            data: fullyCustomizable,
+            activeCategory: activeFullyCustomizableCategory,
+            onCategoryChange: setActiveFullyCustomizableCategory,
+          })}
+          {renderCollection({
+            id: "modelos-predefinidos",
+            title: t("preDesigned.title"),
+            description: t("preDesigned.description"),
+            data: preDesigned,
+            activeCategory: activePreDesignedCategory,
+            onCategoryChange: setActivePreDesignedCategory,
+            preDesignedBadge: true,
+          })}
+        </div>
       </div>
 
       <DialogPrimitive.Root

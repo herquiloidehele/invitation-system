@@ -69,11 +69,12 @@
   "LandingBestSellers": {
     "eyebrow": "Más vendidos",
     "title": "Las invitaciones más elegidas",
-    "body": "Los modelos que más entusiasman a nuestras parejas. Toca uno para previsualizar. Todos los modelos incluyen personalización con el nombre del huésped.",
+    "body": "Los modelos que más entusiasman a nuestras parejas. Toca uno para previsualizar. Los modelos marcados como prediseñados mantienen la estructura mostrada.",
     "empty": "Próximamente.",
     "fallbackTitle": "Invitación",
     "previewAria": "Previsualizar invitación",
     "badge": "BEST SELLER",
+    "preDesignedBadge": "Diseño prediseñado",
     "showMore": "Ver más",
     "showLess": "Ver menos",
     "clickToPreview": "Haz clic para visualizar",
@@ -91,6 +92,17 @@
     "showLess": "Ver menos",
     "clickToPreview": "Haz clic para visualizar",
     "buyCta": "Enviar Mensaje",
+    "fullyCustomizable": {
+      "title": "Invitaciones totalmente personalizables",
+      "shortDescription": "Cambia el diseño, las secciones y la dirección visual.",
+      "description": "La estructura, el orden de las secciones, el diseño y el estilo visual pueden adaptarse a tu evento."
+    },
+    "preDesigned": {
+      "title": "Invitaciones con diseño prediseñado",
+      "shortDescription": "Mantén el diseño y personaliza el contenido y los detalles visuales.",
+      "description": "Personaliza nombres, textos, fotografías, colores, tipografía e información del evento manteniendo la estructura mostrada.",
+      "badge": "Diseño prediseñado"
+    },
     "categories": {
       "all": "Todos",
       "wedding": "Invitación",
@@ -244,7 +256,7 @@
       },
       {
         "question": "¿Puedo personalizar mi invitación?",
-        "answer": "Sí. Tenemos invitaciones 100% personalizables y también modelos con diseño predefinido — consulta la descripción de cada modelo."
+        "answer": "Sí. Las invitaciones totalmente personalizables permiten cambiar la estructura, las secciones y el diseño. En los modelos prediseñados, personalizamos el contenido y los detalles visuales manteniendo la estructura mostrada."
       },
       {
         "question": "¿Puedo encargar para otro tipo de evento además de bodas?",

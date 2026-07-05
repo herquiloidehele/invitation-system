@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
+import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 
 export async function GET() {
   const items = await prisma.saveTheDate.findMany({
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
       landingImageUrl,
       landingDescription,
       landingSubtitle,
+      landingCustomizationLevel,
     } = body;
 
     if (!slug || !themeId || !couple || !date) {
@@ -87,6 +89,9 @@ export async function POST(req: NextRequest) {
           typeof landingSubtitle === "string" && landingSubtitle.length
             ? landingSubtitle
             : null,
+        landingCustomizationLevel: normalizeLandingCustomizationLevel(
+          landingCustomizationLevel,
+        ),
       },
       include: { theme: true },
     });

@@ -69,11 +69,12 @@
   "LandingBestSellers": {
     "eyebrow": "Best sellers",
     "title": "Our most-loved invitations",
-    "body": "The models couples reach for the most. Tap one to preview. All models include guest name personalization.",
+    "body": "The models couples reach for the most. Tap one to preview. Models marked pre-designed retain the structure shown.",
     "empty": "Coming soon.",
     "fallbackTitle": "Invitation",
     "previewAria": "Preview invitation",
     "badge": "BEST SELLER",
+    "preDesignedBadge": "Pre-designed",
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
@@ -91,6 +92,17 @@
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
     "buyCta": "Send Message",
+    "fullyCustomizable": {
+      "title": "Fully customizable invitations",
+      "shortDescription": "Change the layout, sections, and visual direction.",
+      "description": "The structure, section order, layout, and visual styling can be adapted to your event."
+    },
+    "preDesigned": {
+      "title": "Pre-designed invitations",
+      "shortDescription": "Keep the layout and personalize the content and visual details.",
+      "description": "Personalize names, wording, photographs, colors, typography, and event information while retaining the structure shown.",
+      "badge": "Pre-designed"
+    },
     "categories": {
       "all": "All",
       "wedding": "Invitation",
@@ -244,7 +256,7 @@
       },
       {
         "question": "Can I personalize my invitation?",
-        "answer": "Yes. We have fully customizable invitations as well as pre-designed templates — check each model's description."
+        "answer": "Yes. Fully customizable invitations allow changes to the structure, sections, and layout. With pre-designed models, we personalize the content and visual details while retaining the structure shown."
       },
       {
         "question": "Can I order for other events besides weddings?",
