@@ -20,10 +20,3 @@ export function normalizeLandingCustomizationLevel(
 export function isPreDesigned(value: unknown): boolean {
   return normalizeLandingCustomizationLevel(value) === "pre_designed";
 }
-
-export function getLandingCustomizationBadge(
-  value: unknown,
-  preDesignedLabel: string,
-): string | null {
-  return isPreDesigned(value) ? preDesignedLabel : null;
-}

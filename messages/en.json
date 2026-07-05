@@ -74,7 +74,6 @@
     "fallbackTitle": "Invitation",
     "previewAria": "Preview invitation",
     "badge": "BEST SELLER",
-    "preDesignedBadge": "Pre-designed",
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
@@ -100,8 +99,7 @@
     "preDesigned": {
       "title": "Pre-designed invitations",
       "shortDescription": "Keep the layout and personalize the content and visual details.",
-      "description": "Personalize names, wording, photographs, colors, typography, and event information while retaining the structure shown.",
-      "badge": "Pre-designed"
+      "description": "Personalize names, wording, photographs, colors, typography, and event information while retaining the structure shown."
     },
     "categories": {
       "all": "All",

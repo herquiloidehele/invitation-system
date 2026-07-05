@@ -108,7 +108,6 @@ export function GallerySection({
     data,
     activeCategory,
     onCategoryChange,
-    preDesignedBadge,
   }: {
     id: string;
     title: string;
@@ -116,7 +115,6 @@ export function GallerySection({
     data: ReturnType<typeof collectionData>;
     activeCategory: GalleryCategoryKey;
     onCategoryChange: (category: GalleryCategoryKey) => void;
-    preDesignedBadge?: boolean;
   }) {
     if (data.allItems.length === 0) return null;
 
@@ -165,9 +163,6 @@ export function GallerySection({
                 key={item.id}
                 item={item}
                 variant="gallery"
-                customizationBadgeLabel={
-                  preDesignedBadge ? t("preDesigned.badge") : undefined
-                }
                 motionProps={{
                   layout: true,
                   variants: landingCardVariants,
@@ -230,7 +225,6 @@ export function GallerySection({
             data: preDesigned,
             activeCategory: activePreDesignedCategory,
             onCategoryChange: setActivePreDesignedCategory,
-            preDesignedBadge: true,
           })}
         </div>
       </div>

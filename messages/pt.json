@@ -74,7 +74,6 @@
     "fallbackTitle": "Convite",
     "previewAria": "Pré-visualizar convite",
     "badge": "BEST SELLER",
-    "preDesignedBadge": "Design predefinido",
     "showMore": "Ver mais",
     "showLess": "Ver menos",
     "clickToPreview": "Clica para visualizar",
@@ -100,8 +99,7 @@
     "preDesigned": {
       "title": "Convites com design predefinido",
       "shortDescription": "Mantenha o layout e personalize o conteúdo e os detalhes visuais.",
-      "description": "Personalize nomes, textos, fotografias, cores, tipografia e informações do evento, mantendo a estrutura apresentada.",
-      "badge": "Design predefinido"
+      "description": "Personalize nomes, textos, fotografias, cores, tipografia e informações do evento, mantendo a estrutura apresentada."
     },
     "categories": {
       "all": "Todos",

@@ -36,7 +36,6 @@ export function LandingModelCard({
   labels,
   onPreviewClick,
   badgeLabel,
-  customizationBadgeLabel,
   motionProps,
 }: {
   item: LandingModelCardItem;
@@ -44,7 +43,6 @@ export function LandingModelCard({
   labels: LandingModelCardLabels;
   onPreviewClick: (event: React.MouseEvent<HTMLAnchorElement>) => void;
   badgeLabel?: string;
-  customizationBadgeLabel?: string;
   motionProps?: HTMLMotionProps<"article">;
 }) {
   const config = getLandingModelCardVariantConfig(variant);
@@ -85,21 +83,12 @@ export function LandingModelCard({
               </span>
             </div>
           </div>
-          {badgeLabel || customizationBadgeLabel ? (
-            <div className="absolute left-4 top-4 flex flex-col items-start gap-2">
-              {badgeLabel ? (
-                <span
-                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${config.badgeClassName}`}
-                >
-                  {badgeLabel}
-                </span>
-              ) : null}
-              {customizationBadgeLabel ? (
-                <span className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-amber-950 shadow-sm ring-1 ring-amber-900/10">
-                  {customizationBadgeLabel}
-                </span>
-              ) : null}
-            </div>
+          {badgeLabel ? (
+            <span
+              className={`absolute left-4 top-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] ${config.badgeClassName}`}
+            >
+              {badgeLabel}
+            </span>
           ) : null}
         </div>
         <div className={config.bodyClassName}>

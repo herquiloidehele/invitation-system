@@ -74,7 +74,6 @@
     "fallbackTitle": "Invitación",
     "previewAria": "Previsualizar invitación",
     "badge": "BEST SELLER",
-    "preDesignedBadge": "Diseño prediseñado",
     "showMore": "Ver más",
     "showLess": "Ver menos",
     "clickToPreview": "Haz clic para visualizar",
@@ -100,8 +99,7 @@
     "preDesigned": {
       "title": "Invitaciones con diseño prediseñado",
       "shortDescription": "Mantén el diseño y personaliza el contenido y los detalles visuales.",
-      "description": "Personaliza nombres, textos, fotografías, colores, tipografía e información del evento manteniendo la estructura mostrada.",
-      "badge": "Diseño prediseñado"
+      "description": "Personaliza nombres, textos, fotografías, colores, tipografía e información del evento manteniendo la estructura mostrada."
     },
     "categories": {
       "all": "Todos",

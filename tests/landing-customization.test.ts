@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_LANDING_CUSTOMIZATION_LEVEL,
-  getLandingCustomizationBadge,
   isPreDesigned,
   normalizeLandingCustomizationLevel,
 } from "@/lib/landing-customization";
@@ -24,14 +23,5 @@ describe("landing customization levels", () => {
     );
     expect(isPreDesigned("pre_designed")).toBe(true);
     expect(isPreDesigned("fully_customizable")).toBe(false);
-  });
-
-  it("shows a customization badge only for pre-designed models", () => {
-    expect(getLandingCustomizationBadge("pre_designed", "Pre-designed")).toBe(
-      "Pre-designed",
-    );
-    expect(
-      getLandingCustomizationBadge("fully_customizable", "Pre-designed"),
-    ).toBeNull();
   });
 });
