@@ -20,18 +20,21 @@ import { LandingNav } from "./LandingNav";
 import { ProcessSection } from "./ProcessSection";
 import { getConstellationPreview } from "./landing-constellation-data";
 import { type Currency } from "@/lib/currency/config";
+import type { LandingGallerySettings } from "@/lib/landing-gallery-settings";
 
 export function BrindealHomepage({
   heroFeature,
   galleryByCategory,
   liveDemoFeatures,
   bestSellerFeatures,
+  gallerySettings,
   currentCurrency,
 }: {
   heroFeature: HeroFeature | null;
   galleryByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
   liveDemoFeatures: LiveDemoFeature[];
   bestSellerFeatures: BestSellerFeature[];
+  gallerySettings: LandingGallerySettings;
   currentCurrency: Currency;
 }) {
   const reduceMotion = useReducedMotion();
@@ -42,7 +45,10 @@ export function BrindealHomepage({
       <LandingNav currentCurrency={currentCurrency} />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
       <BestSellersSection items={bestSellerFeatures} />
-      <GallerySection itemsByCategory={galleryByCategory} />
+      <GallerySection
+        itemsByCategory={galleryByCategory}
+        settings={gallerySettings}
+      />
       <ProcessSection />
       <FeaturesSection />
       <InvitationConstellationSection

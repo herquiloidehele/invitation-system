@@ -9,6 +9,7 @@ import {
   getHeroFeature,
   getLiveDemoFeatures,
 } from "@/lib/landing-features";
+import { getLandingGallerySettings } from "@/lib/landing-gallery-settings-data";
 import { resolveLocale } from "@/i18n/locales";
 import { getViewerCurrency } from "@/lib/currency/viewer-currency";
 import { formatUrgencySurcharge } from "@/lib/currency/urgency";
@@ -62,12 +63,14 @@ export default async function Home() {
     galleryByCategory,
     liveDemoFeatures,
     bestSellerFeatures,
+    gallerySettings,
     faqT,
   ] = await Promise.all([
     getHeroFeature(),
     getGalleryFeaturesByCategory(viewerCurrency),
     getLiveDemoFeatures(),
     getBestSellerFeatures(viewerCurrency),
+    getLandingGallerySettings(),
     getTranslations("LandingFaq"),
   ]);
   const jsonLd = [
@@ -91,6 +94,7 @@ export default async function Home() {
         galleryByCategory={galleryByCategory}
         liveDemoFeatures={liveDemoFeatures}
         bestSellerFeatures={bestSellerFeatures}
+        gallerySettings={gallerySettings}
         currentCurrency={viewerCurrency}
       />
       <InstagramBrowserRedirect />

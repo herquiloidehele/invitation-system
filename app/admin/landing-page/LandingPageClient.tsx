@@ -32,11 +32,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LandingFeatureListEditor } from "@/components/admin/LandingFeatureListEditor";
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";
 import {
   filterPickablesForCustomizationLevel,
   groupGalleryFeaturesByCustomizationLevel,
 } from "@/lib/landing-admin-groups";
+import {
+  EMPTY_LANDING_GALLERY_SETTINGS,
+  parseLandingGallerySettings,
+  type LandingGallerySettings,
+  validateLandingGallerySettings,
+} from "@/lib/landing-gallery-settings";
 
 type PickableKind = "invitation" | "save_the_date";
 
@@ -143,18 +150,20 @@ function readImage(row: FeatureRow): string | null {
 export function LandingPageClient() {
   const [features, setFeatures] = useState<FeatureRow[]>([]);
   const [pickables, setPickables] = useState<Pickable[]>([]);
+  const [gallerySettings, setGallerySettings] =
+    useState<LandingGallerySettings>(EMPTY_LANDING_GALLERY_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
   async function refresh() {
-    const [featuresRes, pickRes] = await Promise.all([
+    const [featuresRes, pickRes, settingsRes] = await Promise.all([
       fetch("/api/admin/landing-features").then((r) => r.json()),
       fetch("/api/admin/landing-pickable").then((r) => r.json()),
+      fetch("/api/admin/landing-gallery-settings").then((r) => r.json()),
     ]);
     setFeatures(featuresRes);
     setPickables(pickRes);
-
-    console.log({ pickRes, featuresRes });
+    setGallerySettings(parseLandingGallerySettings(settingsRes));
   }
 
   useEffect(() => {
@@ -224,6 +233,34 @@ export function LandingPageClient() {
       await refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro a reordenar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveGallerySettings(next: LandingGallerySettings) {
+    const previous = gallerySettings;
+    setGallerySettings(next);
+    setBusy(true);
+    try {
+      const response = await fetch("/api/admin/landing-gallery-settings", {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(next),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(body?.error || "Erro ao guardar funcionalidades");
+      }
+      setGallerySettings(validateLandingGallerySettings(body));
+      toast.success("Funcionalidades atualizadas");
+    } catch (error) {
+      setGallerySettings(previous);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao guardar funcionalidades",
+      );
     } finally {
       setBusy(false);
     }
@@ -486,9 +523,16 @@ export function LandingPageClient() {
           <GalleryAdminGroup
             title="Totalmente personalizáveis"
             description="A estrutura e o layout podem ser alterados."
+            features={gallerySettings.fullyCustomizableFeatures}
             rows={galleryGroups.fullyCustomizable}
             pickables={fullyCustomizablePickables}
             busy={busy}
+            onFeaturesChange={(features) =>
+              saveGallerySettings({
+                ...gallerySettings,
+                fullyCustomizableFeatures: features,
+              })
+            }
             onAdd={(galleryCategory, pickableId) =>
               addFeature({
                 section: "gallery",
@@ -503,9 +547,16 @@ export function LandingPageClient() {
           <GalleryAdminGroup
             title="Design predefinido"
             description="O conteúdo e o estilo mudam, mas a estrutura mantém-se."
+            features={gallerySettings.preDesignedFeatures}
             rows={galleryGroups.preDesigned}
             pickables={preDesignedPickables}
             busy={busy}
+            onFeaturesChange={(features) =>
+              saveGallerySettings({
+                ...gallerySettings,
+                preDesignedFeatures: features,
+              })
+            }
             onAdd={(galleryCategory, pickableId) =>
               addFeature({
                 section: "gallery",
@@ -525,18 +576,22 @@ export function LandingPageClient() {
 function GalleryAdminGroup({
   title,
   description,
+  features,
   rows,
   pickables,
   busy,
+  onFeaturesChange,
   onAdd,
   onMove,
   onRemove,
 }: {
   title: string;
   description: string;
+  features: string[];
   rows: FeatureRow[];
   pickables: Pickable[];
   busy: boolean;
+  onFeaturesChange: (next: string[]) => Promise<void>;
   onAdd: (category: GalleryCategoryKey, pickableId: string) => void;
   onMove: (id: string, delta: number) => void;
   onRemove: (id: string) => void;
@@ -554,6 +609,12 @@ function GalleryAdminGroup({
         <h3 className="font-semibold">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
+      <LandingFeatureListEditor
+        title="Funcionalidades"
+        value={features}
+        disabled={busy}
+        onChange={onFeaturesChange}
+      />
       {categories.map((category, categoryIndex) => (
         <div key={category.value} className="space-y-3">
           <div className="flex items-center justify-between">

@@ -24,13 +24,20 @@ import {
 } from "./landing-motion";
 import { LandingModelCard } from "./LandingModelCard";
 import { PhoneIframePreview } from "./PhoneIframePreview";
+import { GalleryFeatureList } from "./GalleryFeatureList";
+import {
+  getFeaturesForCustomizationLevel,
+  type LandingGallerySettings,
+} from "@/lib/landing-gallery-settings";
 
 type GalleryCard = GalleryFeature & { tab: GalleryCategoryKey };
 
 export function GallerySection({
   itemsByCategory,
+  settings,
 }: {
   itemsByCategory: Record<DbGalleryCategory, GalleryFeature[]>;
+  settings: LandingGallerySettings;
 }) {
   const t = useTranslations("LandingGallery");
   const isMobile = useIsMobile();
@@ -105,6 +112,7 @@ export function GallerySection({
     id,
     title,
     description,
+    features,
     data,
     activeCategory,
     onCategoryChange,
@@ -112,6 +120,7 @@ export function GallerySection({
     id: string;
     title: string;
     description: string;
+    features: string[];
     data: ReturnType<typeof collectionData>;
     activeCategory: GalleryCategoryKey;
     onCategoryChange: (category: GalleryCategoryKey) => void;
@@ -125,6 +134,7 @@ export function GallerySection({
             {title}
           </h2>
           <p className="mt-3 text-muted-foreground">{description}</p>
+          <GalleryFeatureList features={features} />
         </div>
         {data.categories.length > 0 ? (
           <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -206,6 +216,10 @@ export function GallerySection({
             id: "modelos-personalizaveis",
             title: t("fullyCustomizable.title"),
             description: t("fullyCustomizable.description"),
+            features: getFeaturesForCustomizationLevel(
+              settings,
+              "fully_customizable",
+            ),
             data: fullyCustomizable,
             activeCategory: activeFullyCustomizableCategory,
             onCategoryChange: setActiveFullyCustomizableCategory,
@@ -214,6 +228,10 @@ export function GallerySection({
             id: "modelos-predefinidos",
             title: t("preDesigned.title"),
             description: t("preDesigned.description"),
+            features: getFeaturesForCustomizationLevel(
+              settings,
+              "pre_designed",
+            ),
             data: preDesigned,
             activeCategory: activePreDesignedCategory,
             onCategoryChange: setActivePreDesignedCategory,
