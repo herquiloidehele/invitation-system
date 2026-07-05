@@ -18,3 +18,12 @@ export function observeImageLayerEditor(
     viewport.removeEventListener("scroll", onMeasure, true);
   };
 }
+
+/** Keep wheel scrolling inside the preview when a fixed image hitbox is under the cursor. */
+export function forwardImageEditorWheel(
+  preview: { scrollBy(options: ScrollToOptions): void },
+  deltaX: number,
+  deltaY: number,
+): void {
+  preview.scrollBy({ left: deltaX, top: deltaY });
+}

@@ -17,7 +17,10 @@ import {
   resizeWidthPct,
   rotationFromPointer,
 } from "@/lib/image-layer-editor-geometry";
-import { observeImageLayerEditor } from "@/lib/image-layer-editor-observer";
+import {
+  forwardImageEditorWheel,
+  observeImageLayerEditor,
+} from "@/lib/image-layer-editor-observer";
 import type { ImageItem, ImageLayer } from "@/lib/types";
 
 const CORNERS: { k: string; pos: CSSProperties }[] = [
@@ -99,6 +102,16 @@ export default function ImageLayerEditor({
     const root = getPreviewRoot();
     return rectOf(root?.querySelector("[data-image-canvas]"));
   }, [getPreviewRoot]);
+
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      const root = getPreviewRoot();
+      if (!root) return;
+      e.preventDefault();
+      forwardImageEditorWheel(viewportOf(root), e.deltaX, e.deltaY);
+    },
+    [getPreviewRoot],
+  );
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>, id: string) => {
@@ -209,6 +222,7 @@ export default function ImageLayerEditor({
   return (
     <div
       className="pointer-events-none"
+      onWheel={handleWheel}
       style={{
         position: "fixed",
         left: preview.left,
