@@ -2,6 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { Check, Copy, ExternalLink } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -32,6 +33,7 @@ function getInstagramBrowserSnapshot() {
 }
 
 export function InstagramBrowserRedirect() {
+  const t = useTranslations("LandingInstagramBrowserRedirect");
   const [copied, setCopied] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const isInstagramBrowser = useSyncExternalStore(
@@ -73,10 +75,9 @@ export function InstagramBrowserRedirect() {
           <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
             <ExternalLink className="size-6" aria-hidden="true" />
           </span>
-          <DialogTitle className="text-xl">Abrir no navegador</DialogTitle>
+          <DialogTitle className="text-xl">{t("title")}</DialogTitle>
           <DialogDescription className="max-w-sm leading-relaxed">
-            Para garantir a melhor experiência, abra este site fora do
-            navegador do Instagram.
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -90,16 +91,16 @@ export function InstagramBrowserRedirect() {
           })}
         >
           <ExternalLink className="size-4" aria-hidden="true" />
-          Abrir no navegador
+          {t("openBrowser")}
         </a>
 
         <div className="rounded-xl bg-muted p-4 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">
-            Se o navegador não abrir:
-          </p>
+          <p className="font-medium text-foreground">{t("fallbackTitle")}</p>
           <p className="mt-1 leading-relaxed">
-            Toque no menu <strong>⋯</strong> do Instagram e escolha{" "}
-            <strong>Abrir no navegador</strong>.
+            {t.rich("fallbackDescription", {
+              menu: () => <strong>⋯</strong>,
+              open: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
         </div>
 
@@ -113,7 +114,7 @@ export function InstagramBrowserRedirect() {
           ) : (
             <Copy className="size-4" aria-hidden="true" />
           )}
-          {copied ? "Link copiado" : "Copiar link"}
+          {copied ? t("copiedLink") : t("copyLink")}
         </Button>
       </DialogContent>
     </Dialog>
