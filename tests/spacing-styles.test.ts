@@ -95,4 +95,13 @@ describe("spacing styles", () => {
       ),
     ).toBeUndefined();
   });
+
+  it("keeps missing public spacing style undefined so default classes remain in control", () => {
+    expect(
+      spacingToStyle(getSectionSpacing(undefined, "schedule")),
+    ).toBeUndefined();
+    expect(
+      spacingToStyle(getElementSpacing(null, "sectionTitles")),
+    ).toBeUndefined();
+  });
 });

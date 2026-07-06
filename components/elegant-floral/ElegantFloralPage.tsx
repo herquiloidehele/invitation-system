@@ -19,6 +19,7 @@ import ScriptTitle from "./ScriptTitle";
 import { EfRevealProvider, Reveal } from "./motion";
 import { efStyle } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
+import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 
 // The inline RSVP form pulls in react-hook-form + zod; lazy-load it (below the
 // fold) so it doesn't bloat the initial page bundle.
@@ -53,7 +54,8 @@ export default function ElegantFloralPage({
 }: ElegantFloralPageProps) {
   const ts = invitation.textStyles;
   return (
-    <EfRevealProvider instant={isPreview ?? false}>
+    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+      <EfRevealProvider instant={isPreview ?? false}>
       <div style={{ backgroundColor: theme.bg, color: theme.textPrimary }}>
         <ImageCanvas layer={invitation.imageLayer}>
         <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
@@ -216,6 +218,7 @@ export default function ElegantFloralPage({
         </section>
         </ImageCanvas>
       </div>
-    </EfRevealProvider>
+      </EfRevealProvider>
+    </SpacingStyleProvider>
   );
 }

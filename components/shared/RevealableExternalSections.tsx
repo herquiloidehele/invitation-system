@@ -12,6 +12,7 @@ import PersonalGuestCard, {
 import { EditableText } from "@/components/shared/EditableText";
 import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
 import PlacesSection from "@/components/shared/PlacesSection";
+import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 import {
   resolveRevealContentStyle,
   resolveTextElementOverride,
@@ -97,7 +98,7 @@ export default function RevealableExternalSections({
   const scratchRevealOn = shouldRenderScratchReveal(invitation.scratchReveal);
 
   return (
-    <>
+    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
       {/* Persistent prefetched audio — no UI controls (per spec) */}
       {audioEnabled && (
         <audio
@@ -231,6 +232,6 @@ export default function RevealableExternalSections({
           </>
         )}
       </div>
-    </>
+    </SpacingStyleProvider>
   );
 }
