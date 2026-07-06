@@ -8,7 +8,18 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CardSectionKey, CardStyle } from "@/lib/types";
+import {
+  getSectionSpacing,
+  spacingToStyle,
+  type SpacingField,
+} from "@/lib/spacing-styles";
+import type {
+  CardSectionKey,
+  CardStyle,
+  SpacingStyleOverrides,
+  SpacingValue,
+} from "@/lib/types";
+import { useSpacingStyles } from "./SpacingStyleProvider";
 
 // ---------------------------------------------------------------------------
 // Context
@@ -24,7 +35,14 @@ interface InlineCardEditContextValue {
     field: keyof CardStyle,
     value: string | number | undefined,
   ) => void;
+  updateSpacing: (
+    section: string,
+    field: SpacingField,
+    value: number | undefined,
+  ) => void;
   getOverrides: (section: string) => CardStyle | undefined;
+  getSpacingOverrides: (section: string) => SpacingValue | undefined;
+  spacingStyles?: SpacingStyleOverrides;
 }
 
 const InlineCardEditContext = createContext<InlineCardEditContextValue | null>(
@@ -46,13 +64,21 @@ interface InlineCardEditProviderProps {
     field: keyof CardStyle,
     value: string | number | undefined,
   ) => void;
+  updateSectionSpacing?: (
+    section: string,
+    field: SpacingField,
+    value: number | undefined,
+  ) => void;
   cardStyles?: Partial<Record<CardSectionKey, CardStyle>>;
+  spacingStyles?: SpacingStyleOverrides;
 }
 
 export function InlineCardEditProvider({
   children,
   updateCardStyle,
+  updateSectionSpacing,
   cardStyles,
+  spacingStyles,
 }: InlineCardEditProviderProps) {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [selectedRef, setSelectedRef] = useState<HTMLElement | null>(null);
@@ -74,6 +100,11 @@ export function InlineCardEditProvider({
     [cardStyles],
   );
 
+  const getSpacingOverrides = useCallback(
+    (section: string) => getSectionSpacing(spacingStyles, section),
+    [spacingStyles],
+  );
+
   return (
     <InlineCardEditContext.Provider
       value={{
@@ -82,7 +113,10 @@ export function InlineCardEditProvider({
         selectCard,
         clearSelection,
         updateStyle: updateCardStyle,
+        updateSpacing: updateSectionSpacing ?? (() => undefined),
         getOverrides,
+        getSpacingOverrides,
+        spacingStyles,
       }}
     >
       {children}
@@ -107,10 +141,18 @@ interface EditableCardProps {
  */
 export function EditableCard({ sectionKey, children }: EditableCardProps) {
   const ctx = useInlineCardEdit();
+  const spacingStyles = useSpacingStyles();
   const ref = useRef<HTMLDivElement>(null);
+  const spacing =
+    ctx?.getSpacingOverrides(sectionKey) ??
+    getSectionSpacing(spacingStyles, sectionKey);
+  const spacingStyle = spacingToStyle(spacing);
 
   // No context → public page → render children as-is
-  if (!ctx) return <>{children}</>;
+  if (!ctx) {
+    if (!spacingStyle) return <>{children}</>;
+    return <div style={spacingStyle}>{children}</div>;
+  }
 
   const isSelected = ctx.selectedCard === sectionKey;
 
@@ -127,6 +169,7 @@ export function EditableCard({ sectionKey, children }: EditableCardProps) {
         }
       }}
       style={{
+        ...spacingStyle,
         cursor: "pointer",
         outline: isSelected ? "2px solid rgba(59,130,246,0.8)" : undefined,
         outlineOffset: isSelected ? 2 : undefined,
