@@ -114,6 +114,7 @@ model Invitation {
   personalGuestCard Json? // PersonalGuestCardConfig — optional background image + scrim behind the personal guest card (video-entrance / curtain-canva)
   textStyles     Json?   // TextStyleOverrides — per-invitation text styling overrides (fonts, colors, sizes)
   cardStyles     Json?   // CardStyleOverrides — per-section card background/border overrides
+  spacingStyles  Json?   // SpacingStyleOverrides — per-section and per-element vertical spacing overrides
   imageSettings  Json?   // ImageSettingsMap — per-image position & zoom overrides
   customTexts    Json?   // CustomTexts — per-invitation UI text overrides (section titles, buttons, RSVP labels, etc.)
   eventType      String  @default("wedding") // "wedding" | "anniversary" | "baptism" | "engagement" | "other"
