@@ -3,7 +3,6 @@
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -90,8 +89,9 @@ export default function SpacingStyleToolbar() {
     setPos(computePosition(selectedRef, toolbarRef.current));
   }, [selectedRef]);
 
-  useLayoutEffect(() => {
-    reposition();
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(reposition);
+    return () => window.cancelAnimationFrame(frame);
   }, [reposition]);
 
   useEffect(() => {
