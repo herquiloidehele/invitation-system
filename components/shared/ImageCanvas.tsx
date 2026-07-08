@@ -5,7 +5,13 @@ import ImageLayerOverlay from "./ImageLayerOverlay";
 
 interface ImageCanvasProps {
   layer?: ImageLayer | null;
-  children: ReactNode;
+  children?: ReactNode;
+  /**
+   * Normal invitations render "front" images above content. Entrance layouts
+   * can interleave that band with hero internals so images sit above revealed
+   * hero media but below temporary curtain/cover surfaces.
+   */
+  frontLayerPosition?: "above-content" | "below-content" | "interleaved";
 }
 
 /**
@@ -16,7 +22,11 @@ interface ImageCanvasProps {
  * cursor → percentage. Always present (even with no images) so the editor can
  * place the first one.
  */
-export default function ImageCanvas({ layer, children }: ImageCanvasProps) {
+export default function ImageCanvas({
+  layer,
+  children,
+  frontLayerPosition = "above-content",
+}: ImageCanvasProps) {
   const items = layer?.items ?? [];
 
   if (items.length === 0) {
@@ -36,8 +46,24 @@ export default function ImageCanvas({ layer, children }: ImageCanvasProps) {
       style={{ position: "relative", isolation: "isolate" }}
     >
       <ImageLayerOverlay items={behind} band="behind" />
-      <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
-      <ImageLayerOverlay items={front} band="front" />
+      {frontLayerPosition === "below-content" && (
+        <ImageLayerOverlay items={front} band="front" zIndex={0} />
+      )}
+      <div
+        style={
+          frontLayerPosition === "interleaved"
+            ? { position: "relative" }
+            : { position: "relative", zIndex: 1 }
+        }
+      >
+        {children}
+      </div>
+      {frontLayerPosition === "interleaved" && (
+        <ImageLayerOverlay items={front} band="front" zIndex={4} />
+      )}
+      {frontLayerPosition === "above-content" && (
+        <ImageLayerOverlay items={front} band="front" />
+      )}
     </div>
   );
 }

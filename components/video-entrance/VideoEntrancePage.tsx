@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import VideoEntranceHero from "./VideoEntranceHero";
 import RevealableExternalSections from "@/components/shared/RevealableExternalSections";
+import ImageCanvas from "@/components/shared/ImageCanvas";
 import { useRevealScrollLock } from "@/hooks/useRevealScrollLock";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowVideoEntranceInitialSections } from "@/lib/external-invitation-form";
@@ -54,41 +55,46 @@ export default function VideoEntrancePage({
         overflowAnchor: "none",
       }}
     >
-      <div style={{ display: showInitialPageSections ? undefined : "none" }}>
-        <VideoEntranceHero
-          couple={invitation.couple}
-          topText={invitation.heroTopText}
-          quote={invitation.quote}
-          theme={theme}
-          audioRef={audioRef}
-          videoUrl={invitation.videoUrl}
-          videoPoster={invitation.videoPoster}
-          mediaFit={resolveHeroMediaFit(invitation.heroMediaFit)}
-          heroOverlay={invitation.heroOverlay}
-          heroScrollIndicator={invitation.heroScrollIndicator}
-          revealSeconds={invitation.heroRevealSeconds}
-          customTexts={invitation.customTexts}
-          textStyles={invitation.textStyles}
-          confettiEnabled={shouldFireVideoEntranceConfetti(
-            invitation.heroConfetti,
-          )}
-          showTapPrompt={shouldShowTapPrompt(invitation.heroTapPrompt)}
-          onRevealed={handleRevealed}
-          eventType={invitation.eventType}
-          heroTextLayer={invitation.heroTextLayer}
-        />
-      </div>
+      <ImageCanvas
+        layer={invitation.imageLayer}
+        frontLayerPosition="interleaved"
+      >
+        <div style={{ display: showInitialPageSections ? undefined : "none" }}>
+          <VideoEntranceHero
+            couple={invitation.couple}
+            topText={invitation.heroTopText}
+            quote={invitation.quote}
+            theme={theme}
+            audioRef={audioRef}
+            videoUrl={invitation.videoUrl}
+            videoPoster={invitation.videoPoster}
+            mediaFit={resolveHeroMediaFit(invitation.heroMediaFit)}
+            heroOverlay={invitation.heroOverlay}
+            heroScrollIndicator={invitation.heroScrollIndicator}
+            revealSeconds={invitation.heroRevealSeconds}
+            customTexts={invitation.customTexts}
+            textStyles={invitation.textStyles}
+            confettiEnabled={shouldFireVideoEntranceConfetti(
+              invitation.heroConfetti,
+            )}
+            showTapPrompt={shouldShowTapPrompt(invitation.heroTapPrompt)}
+            onRevealed={handleRevealed}
+            eventType={invitation.eventType}
+            heroTextLayer={invitation.heroTextLayer}
+          />
+        </div>
 
-      <RevealableExternalSections
-        invitation={invitation}
-        theme={theme}
-        revealed={revealed}
-        audioRef={audioRef}
-        showInitialPageSections={showInitialPageSections}
-        onCanvaInitialPageChange={(isInitialPage) =>
-          setCanvaPageState({ externalLink, isInitialPage })
-        }
-      />
+        <RevealableExternalSections
+          invitation={invitation}
+          theme={theme}
+          revealed={revealed}
+          audioRef={audioRef}
+          showInitialPageSections={showInitialPageSections}
+          onCanvaInitialPageChange={(isInitialPage) =>
+            setCanvaPageState({ externalLink, isInitialPage })
+          }
+        />
+      </ImageCanvas>
     </main>
   );
 }

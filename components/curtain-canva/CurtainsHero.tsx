@@ -378,7 +378,7 @@ export default function CurtainsHero({
           // revealed even if the curtain video failed to play.
           opacity: videoReady || (heroVideoOn && state === "revealed") ? 0 : 1,
           transition: "opacity 200ms ease-out",
-          zIndex: 1,
+          zIndex: state === "revealed" ? 1 : 9,
         }}
       />
 
@@ -396,7 +396,7 @@ export default function CurtainsHero({
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         style={{
           cursor: isInteractive ? "pointer" : "default",
-          zIndex: 2,
+          zIndex: state === "revealed" ? 2 : 8,
           // When a hero video is present, fade the curtain video out once it
           // has opened so the hero video already playing behind it (zIndex 0)
           // is revealed.

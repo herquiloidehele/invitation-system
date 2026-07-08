@@ -2985,7 +2985,10 @@ export default function ExternalInvitationForm({
                   >
                     <TextStyleToolbar />
                     <CardStyleToolbar />
-                    <div className="absolute inset-0 overflow-y-auto bg-background">
+                    <div
+                      ref={previewRootRef}
+                      className="absolute inset-0 overflow-y-auto bg-background"
+                    >
                       <VideoEntrancePage
                         invitation={previewInvitation}
                         theme={currentTheme as TemplateTheme}
@@ -3015,7 +3018,10 @@ export default function ExternalInvitationForm({
                   >
                     <TextStyleToolbar />
                     <CardStyleToolbar />
-                    <div className="absolute inset-0 overflow-y-auto bg-background">
+                    <div
+                      ref={previewRootRef}
+                      className="absolute inset-0 overflow-y-auto bg-background"
+                    >
                       <CurtainCanvaPage
                         invitation={previewInvitation}
                         theme={currentTheme as TemplateTheme}

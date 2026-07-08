@@ -347,7 +347,7 @@ export default function VideoEntranceHero({
           backgroundPosition: "center",
           opacity: videoReady ? 0 : 1,
           transition: "opacity 200ms ease-out",
-          zIndex: 1,
+          zIndex: state === "revealed" ? 1 : 9,
         }}
       />
 
@@ -364,7 +364,7 @@ export default function VideoEntranceHero({
           onPlaying={handleVideoPlaying}
           onTimeUpdate={handleVideoTimeUpdate}
           className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ zIndex: 2, objectFit: mediaFit }}
+          style={{ zIndex: state === "revealed" ? 2 : 8, objectFit: mediaFit }}
         />
       )}
 

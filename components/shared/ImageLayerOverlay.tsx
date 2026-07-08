@@ -10,6 +10,7 @@ interface ImageLayerOverlayProps {
   items: ImageItem[];
   /** Which band this layer represents (informational; affects nothing visually). */
   band: "behind" | "front";
+  zIndex?: number;
 }
 
 /**
@@ -20,6 +21,7 @@ interface ImageLayerOverlayProps {
 export default function ImageLayerOverlay({
   items,
   band,
+  zIndex,
 }: ImageLayerOverlayProps) {
   if (items.length === 0) return null;
   return (
@@ -27,7 +29,10 @@ export default function ImageLayerOverlay({
       aria-hidden
       data-image-band={band}
       className="pointer-events-none absolute inset-0"
-      style={{ isolation: "isolate", zIndex: band === "front" ? 2 : 0 }}
+      style={{
+        isolation: "isolate",
+        zIndex: zIndex ?? (band === "front" ? 2 : 0),
+      }}
     >
       {items.map((item) => (
         <div key={item.id} style={imageItemBoxStyle(item)}>
