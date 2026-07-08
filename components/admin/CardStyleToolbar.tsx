@@ -3,12 +3,12 @@
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { useInlineCardEdit } from "@/components/shared/EditableCard";
 import { RotateCcw, X } from "lucide-react";
+import type { SpacingField } from "@/lib/spacing-styles";
 import type { CardSectionKey, CardStyle } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -44,6 +44,37 @@ function computePosition(
   return { top: topBelow, left, placement: "below" };
 }
 
+function SpacingInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
+}) {
+  return (
+    <label className="flex items-center gap-1" title={`${label} (px)`}>
+      <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+        {label}
+      </span>
+      <input
+        type="number"
+        min={-80}
+        max={160}
+        step={1}
+        value={value ?? ""}
+        onChange={(e) => {
+          const next = e.target.value;
+          onChange(next === "" ? undefined : Number(next));
+        }}
+        placeholder="Auto"
+        className="h-7 w-14 rounded border bg-background px-1.5 text-center text-xs tabular-nums outline-none focus:ring-1 focus:ring-ring"
+      />
+    </label>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // CardStyleToolbar
 // ---------------------------------------------------------------------------
@@ -52,19 +83,21 @@ export default function CardStyleToolbar() {
   const ctx = useInlineCardEdit();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<ToolbarPosition | null>(null);
+  const selectedRef = ctx?.selectedRef ?? null;
 
   // ---- Reposition on selection change, scroll, resize --------------------
   const reposition = useCallback(() => {
-    if (!ctx?.selectedRef || !toolbarRef.current) {
+    if (!selectedRef || !toolbarRef.current) {
       setPos(null);
       return;
     }
-    setPos(computePosition(ctx.selectedRef, toolbarRef.current));
-  }, [ctx?.selectedRef]);
+    setPos(computePosition(selectedRef, toolbarRef.current));
+  }, [selectedRef]);
 
-  // Initial position + layout effect to avoid flash
-  useLayoutEffect(() => {
-    reposition();
+  // Initial position after layout
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(reposition);
+    return () => window.cancelAnimationFrame(frame);
   }, [reposition]);
 
   // Reposition on scroll/resize
@@ -117,10 +150,14 @@ export default function CardStyleToolbar() {
 
   const sectionKey = ctx.selectedCard as CardSectionKey;
   const overrides: CardStyle = ctx.getOverrides(sectionKey) ?? {};
+  const spacing = ctx.getSpacingOverrides(sectionKey);
 
   // ---- Handlers ---------------------------------------------------------
   const set = (field: keyof CardStyle, value: string | number | undefined) => {
     ctx.updateStyle(sectionKey, field, value);
+  };
+  const setSpacing = (field: SpacingField, value: number | undefined) => {
+    ctx.updateSpacing(sectionKey, field, value);
   };
 
   return (
@@ -205,6 +242,20 @@ export default function CardStyleToolbar() {
       {/* Divider */}
       <div className="h-5 w-px bg-border" />
 
+      <SpacingInput
+        label="Acima"
+        value={spacing?.spaceBefore}
+        onChange={(value) => setSpacing("spaceBefore", value)}
+      />
+      <SpacingInput
+        label="Abaixo"
+        value={spacing?.spaceAfter}
+        onChange={(value) => setSpacing("spaceAfter", value)}
+      />
+
+      {/* Divider */}
+      <div className="h-5 w-px bg-border" />
+
       {/* Reset this section */}
       <button
         type="button"
@@ -213,6 +264,8 @@ export default function CardStyleToolbar() {
           set("cardBg", undefined);
           set("cardBorder", undefined);
           set("borderRadius", undefined);
+          setSpacing("spaceBefore", undefined);
+          setSpacing("spaceAfter", undefined);
         }}
         className="flex h-7 w-7 items-center justify-center rounded border bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
       >

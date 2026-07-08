@@ -90,7 +90,6 @@ import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
-import SpacingStyleToolbar from "@/components/admin/SpacingStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
@@ -3820,7 +3819,6 @@ export default function InvitationForm({
                 >
                   <TextStyleToolbar />
                   <CardStyleToolbar />
-                  <SpacingStyleToolbar />
                   <div
                     ref={previewRootRef}
                     className="mx-auto origin-top w-full max-h-165 relative"
