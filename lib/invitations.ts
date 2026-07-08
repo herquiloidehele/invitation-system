@@ -20,6 +20,7 @@ import type {
   SaveDateStyle,
   ScheduleStyle,
   SectionImages,
+  SpacingStyleOverrides,
   TextStyleOverrides,
 } from "./types";
 
@@ -77,6 +78,7 @@ type InvitationWithTheme = {
   isDemo: boolean;
   textStyles: unknown;
   cardStyles: unknown;
+  spacingStyles: unknown;
   imageSettings: unknown;
   customTexts: unknown;
   eventType: string;
@@ -148,6 +150,8 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     isDemo: row.isDemo,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
+    spacingStyles:
+      (row.spacingStyles as SpacingStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     customTexts: (row.customTexts as CustomTexts | null) ?? undefined,
     eventType: (row.eventType as InvitationEventType) ?? "wedding",

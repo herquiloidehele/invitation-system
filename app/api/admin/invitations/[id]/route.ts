@@ -5,6 +5,7 @@ import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { isObjectFit } from "@/lib/hero-media-fit";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations/[id] — Get a single invitation
@@ -236,6 +237,12 @@ export async function PUT(
         }),
         ...(body.cardStyles !== undefined && {
           cardStyles: sanitizeJsonField(body.cardStyles, null),
+        }),
+        ...(body.spacingStyles !== undefined && {
+          spacingStyles: sanitizeJsonField(
+            sanitizeSpacingStyles(body.spacingStyles),
+            null,
+          ),
         }),
         ...(body.imageSettings !== undefined && {
           imageSettings: sanitizeJsonField(body.imageSettings, null),

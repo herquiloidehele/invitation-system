@@ -46,6 +46,7 @@ import PlacesSection from "./PlacesSection";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
+import { SpacingStyleProvider } from "./SpacingStyleProvider";
 import InvitationHero, {
   getHeroSectionHeight,
   InvitationHeroNames,
@@ -404,7 +405,8 @@ export default function InvitationPage({
   });
 
   return (
-    <div
+    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+      <div
       style={{
         background: theme.bg,
         color: theme.textPrimary,
@@ -1254,6 +1256,7 @@ export default function InvitationPage({
         guest={invitation.guest}
       />
       </ImageCanvas>
-    </div>
+      </div>
+    </SpacingStyleProvider>
   );
 }

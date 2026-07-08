@@ -51,6 +51,7 @@ const baseRow = {
   personalGuestCard: null,
   textStyles: null,
   cardStyles: null,
+  spacingStyles: null,
   imageSettings: null,
   eventType: "wedding",
   invitationType: "external_link",
@@ -126,6 +127,31 @@ describe("toAdminInvitationInitialData — heroTextLayer round-trip", () => {
     const row = { ...baseRow, heroTextLayer: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.heroTextLayer).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — spacingStyles round-trip", () => {
+  it("hydrates spacingStyles into the admin form initial data", () => {
+    const spacingStyles = {
+      sections: { schedule: { spaceBefore: 16, spaceAfter: 24 } },
+      elements: { sectionTitles: { spaceAfter: 12 } },
+    };
+
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      spacingStyles,
+    });
+
+    expect(result.spacingStyles).toEqual(spacingStyles);
+  });
+
+  it("leaves spacingStyles undefined when the column is null", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      spacingStyles: null,
+    });
+
+    expect(result.spacingStyles).toBeUndefined();
   });
 });
 

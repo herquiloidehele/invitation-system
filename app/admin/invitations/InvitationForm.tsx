@@ -92,6 +92,7 @@ import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
+import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
@@ -109,6 +110,11 @@ import {
   buildInvitationSlug,
   isWeddingEventType,
 } from "@/lib/invitation-event-types";
+import {
+  setSpacingOverride,
+  type SpacingField,
+  type SpacingTarget,
+} from "@/lib/spacing-styles";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1210,6 +1216,46 @@ export default function InvitationForm({
     setForm((prev) => ({ ...prev, cardStyles: undefined }));
   }, []);
 
+  // Spacing overrides per section/element
+  const updateSpacingStyle = useCallback(
+    (
+      target: SpacingTarget,
+      key: string,
+      field: SpacingField,
+      value: number | undefined,
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        spacingStyles: setSpacingOverride(
+          prev.spacingStyles,
+          target,
+          key,
+          field,
+          value,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const updateElementSpacing = useCallback(
+    (element: string, field: SpacingField, value: number | undefined) => {
+      updateSpacingStyle("elements", element, field, value);
+    },
+    [updateSpacingStyle],
+  );
+
+  const updateSectionSpacing = useCallback(
+    (section: string, field: SpacingField, value: number | undefined) => {
+      updateSpacingStyle("sections", section, field, value);
+    },
+    [updateSpacingStyle],
+  );
+
+  const clearSpacingStyles = useCallback(() => {
+    setForm((prev) => ({ ...prev, spacingStyles: undefined }));
+  }, []);
+
   // -- Custom Texts --
   const updateCustomText = useCallback(
     (key: keyof CustomTexts, value: string) => {
@@ -1249,6 +1295,12 @@ export default function InvitationForm({
   }, [themes, form.template, form.envelope]);
 
   const isElegantFloral = currentTheme.layout === "elegant-floral";
+  const hasSpacingStyles = Boolean(
+    (form.spacingStyles?.sections &&
+      Object.keys(form.spacingStyles.sections).length > 0) ||
+      (form.spacingStyles?.elements &&
+        Object.keys(form.spacingStyles.elements).length > 0),
+  );
 
   const patchDressCode = useCallback(
     (patch: Partial<InvitationData["dressCode"]>) => {
@@ -3681,6 +3733,24 @@ export default function InvitationForm({
                   </Tooltip>
                 </TooltipProvider>
               )}
+              {hasSpacingStyles && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <button
+                          type="button"
+                          onClick={clearSpacingStyles}
+                          className="inline-flex items-center justify-center rounded-md p-1 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                        />
+                      }
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                    </TooltipTrigger>
+                    <TooltipContent>Resetar espaçamentos</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               <span className="text-xs text-muted-foreground shrink-0">
                 {form.slug ? (
                   <TooltipProvider>
@@ -3734,45 +3804,51 @@ export default function InvitationForm({
             value="invite"
             className="flex-1 overflow-auto m-0 bg-neutral-100"
           >
-            <InlineTextEditProvider
-              updateTextStyleElement={updateTextStyleElement}
-              textStyles={form.textStyles}
-            >
-              <InlineCardEditProvider
-                updateCardStyle={updateCardStyle}
-                cardStyles={form.cardStyles}
+            <SpacingStyleProvider spacingStyles={form.spacingStyles}>
+              <InlineTextEditProvider
+                updateTextStyleElement={updateTextStyleElement}
+                updateElementSpacing={updateElementSpacing}
+                textStyles={form.textStyles}
+                spacingStyles={form.spacingStyles}
               >
-                <TextStyleToolbar />
-                <CardStyleToolbar />
-                <div
-                  ref={previewRootRef}
-                  className="mx-auto origin-top w-full max-h-165 relative"
+                <InlineCardEditProvider
+                  updateCardStyle={updateCardStyle}
+                  updateSectionSpacing={updateSectionSpacing}
+                  cardStyles={form.cardStyles}
+                  spacingStyles={form.spacingStyles}
                 >
-                  {hasRequiredNames ? (
-                    isElegantFloral ? (
-                      <ElegantFloralPage
-                        invitation={form}
-                        theme={currentTheme}
-                        isPreview
-                        animateHeroText
-                      />
+                  <TextStyleToolbar />
+                  <CardStyleToolbar />
+                  <div
+                    ref={previewRootRef}
+                    className="mx-auto origin-top w-full max-h-165 relative"
+                  >
+                    {hasRequiredNames ? (
+                      isElegantFloral ? (
+                        <ElegantFloralPage
+                          invitation={form}
+                          theme={currentTheme}
+                          isPreview
+                          animateHeroText
+                        />
+                      ) : (
+                        <InvitationPage
+                          invitation={form}
+                          theme={currentTheme}
+                          isPreview
+                        />
+                      )
                     ) : (
-                      <InvitationPage
-                        invitation={form}
-                        theme={currentTheme}
-                        isPreview
-                      />
-                    )
-                  ) : (
-                    <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
-                      {isWedding
-                        ? "Insira os nomes do casal para ver a pré-visualização"
-                        : "Insira o nome para ver a pré-visualização"}
-                    </div>
-                  )}
-                </div>
-              </InlineCardEditProvider>
-            </InlineTextEditProvider>
+                      <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
+                        {isWedding
+                          ? "Insira os nomes do casal para ver a pré-visualização"
+                          : "Insira o nome para ver a pré-visualização"}
+                      </div>
+                    )}
+                  </div>
+                </InlineCardEditProvider>
+              </InlineTextEditProvider>
+            </SpacingStyleProvider>
           </TabsContent>
         </Tabs>
       </div>

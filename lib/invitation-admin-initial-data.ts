@@ -23,6 +23,7 @@ import type {
   SaveDateStyle,
   ScheduleStyle,
   SectionImages,
+  SpacingStyleOverrides,
   TextStyleOverrides,
 } from "./types";
 
@@ -73,6 +74,7 @@ type AdminInvitationInitialDataRow = {
   personalGuestCard: unknown;
   textStyles: unknown;
   cardStyles: unknown;
+  spacingStyles: unknown;
   imageSettings: unknown;
   eventType: string | null;
   invitationType: string;
@@ -153,6 +155,8 @@ export function toAdminInvitationInitialData(
       undefined,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
+    spacingStyles:
+      (row.spacingStyles as SpacingStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     eventType: (row.eventType as InvitationEventType | null) ?? "wedding",
     invitationType: (row.invitationType as InvitationType) ?? "standard",

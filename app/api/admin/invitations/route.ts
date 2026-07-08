@@ -5,6 +5,7 @@ import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { isObjectFit } from "@/lib/hero-media-fit";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 
 // ---------------------------------------------------------------------------
 // POST /api/admin/invitations — Create a new invitation
@@ -115,6 +116,10 @@ export async function POST(request: NextRequest) {
         isDemo: body.isDemo === true,
         textStyles: sanitizeJsonField(body.textStyles, null),
         cardStyles: sanitizeJsonField(body.cardStyles, null),
+        spacingStyles: sanitizeJsonField(
+          sanitizeSpacingStyles(body.spacingStyles),
+          null,
+        ),
         imageSettings: sanitizeJsonField(body.imageSettings, null),
         customTexts: sanitizeJsonField(body.customTexts, null),
         eventType: normalizeInvitationEventType(body.eventType),

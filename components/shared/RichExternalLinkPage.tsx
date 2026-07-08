@@ -30,6 +30,7 @@ import PlacesSection from "./PlacesSection";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowRichExternalRsvp } from "@/lib/external-invitation-form";
 import DynamicFontLoader from "./DynamicFontLoader";
+import { SpacingStyleProvider } from "./SpacingStyleProvider";
 
 interface RichExternalLinkPageProps {
   invitation: InvitationData;
@@ -190,7 +191,8 @@ export default function RichExternalLinkPage({
   }, [isPreview]);
 
   return (
-    <main
+    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+      <main
       style={{
         background: theme.bg,
         color: theme.textPrimary,
@@ -333,7 +335,8 @@ export default function RichExternalLinkPage({
         </>
       )}
       </ImageCanvas>
-    </main>
+      </main>
+    </SpacingStyleProvider>
   );
 }
 

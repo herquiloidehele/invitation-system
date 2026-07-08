@@ -8,7 +8,18 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { TextStyle, TextStyleOverrides } from "@/lib/types";
+import {
+  getElementSpacing,
+  spacingToStyle,
+  type SpacingField,
+} from "@/lib/spacing-styles";
+import type {
+  SpacingStyleOverrides,
+  SpacingValue,
+  TextStyle,
+  TextStyleOverrides,
+} from "@/lib/types";
+import { useSpacingStyles } from "./SpacingStyleProvider";
 
 // ---------------------------------------------------------------------------
 // Context
@@ -26,8 +37,15 @@ interface InlineTextEditContextValue {
     field: keyof TextStyle,
     value: string | number | undefined,
   ) => void;
+  updateSpacing: (
+    element: string,
+    field: SpacingField,
+    value: number | undefined,
+  ) => void;
   getOverrides: (element: string) => TextStyle | undefined;
+  getSpacingOverrides: (element: string) => SpacingValue | undefined;
   textStyles?: TextStyleOverrides;
+  spacingStyles?: SpacingStyleOverrides;
 }
 
 const InlineTextEditContext = createContext<InlineTextEditContextValue | null>(
@@ -49,13 +67,21 @@ interface InlineTextEditProviderProps {
     field: keyof TextStyle,
     value: string | number | undefined,
   ) => void;
+  updateElementSpacing?: (
+    element: string,
+    field: SpacingField,
+    value: number | undefined,
+  ) => void;
   textStyles?: TextStyleOverrides;
+  spacingStyles?: SpacingStyleOverrides;
 }
 
 export function InlineTextEditProvider({
   children,
   updateTextStyleElement,
+  updateElementSpacing,
   textStyles,
+  spacingStyles,
 }: InlineTextEditProviderProps) {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [selectedRef, setSelectedRef] = useState<HTMLElement | null>(null);
@@ -77,6 +103,11 @@ export function InlineTextEditProvider({
     [textStyles],
   );
 
+  const getSpacingOverrides = useCallback(
+    (element: string) => getElementSpacing(spacingStyles, element),
+    [spacingStyles],
+  );
+
   return (
     <InlineTextEditContext.Provider
       value={{
@@ -85,8 +116,11 @@ export function InlineTextEditProvider({
         selectElement,
         clearSelection,
         updateStyle: updateTextStyleElement,
+        updateSpacing: updateElementSpacing ?? (() => undefined),
         getOverrides,
+        getSpacingOverrides,
         textStyles,
+        spacingStyles,
       }}
     >
       {children}
@@ -111,10 +145,22 @@ interface EditableTextProps {
  */
 export function EditableText({ elementKey, children }: EditableTextProps) {
   const ctx = useInlineTextEdit();
+  const spacingStyles = useSpacingStyles();
   const ref = useRef<HTMLSpanElement>(null);
+  const spacing =
+    ctx?.getSpacingOverrides(elementKey) ??
+    getElementSpacing(spacingStyles, elementKey);
+  const spacingStyle = spacingToStyle(spacing);
 
   // No context → public page → render children as-is
-  if (!ctx) return <>{children}</>;
+  if (!ctx) {
+    if (!spacingStyle) return <>{children}</>;
+    return (
+      <span style={{ display: "inline-block", ...spacingStyle }}>
+        {children}
+      </span>
+    );
+  }
 
   const isSelected = ctx.selectedElement === elementKey;
 
@@ -140,6 +186,8 @@ export function EditableText({ elementKey, children }: EditableTextProps) {
         }
       }}
       style={{
+        ...(spacingStyle ? { display: "inline-block" } : {}),
+        ...spacingStyle,
         cursor: "pointer",
         outline: isSelected ? "2px solid rgba(59,130,246,0.8)" : undefined,
         outlineOffset: isSelected ? 2 : undefined,

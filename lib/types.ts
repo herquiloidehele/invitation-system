@@ -632,6 +632,22 @@ export type CardSectionKey =
 export type CardStyleOverrides = Partial<Record<CardSectionKey, CardStyle>>;
 
 // ---------------------------------------------------------------------------
+// Per-invitation spacing overrides
+// ---------------------------------------------------------------------------
+
+/** Vertical spacing override in pixels. Missing fields use template defaults. */
+export interface SpacingValue {
+  spaceBefore?: number;
+  spaceAfter?: number;
+}
+
+/** Per-section and per-element vertical spacing overrides. */
+export interface SpacingStyleOverrides {
+  sections?: Record<string, SpacingValue>;
+  elements?: Record<string, SpacingValue>;
+}
+
+// ---------------------------------------------------------------------------
 // Per-invitation text style overrides
 // ---------------------------------------------------------------------------
 
@@ -1085,6 +1101,8 @@ export interface InvitationData {
   textStyles?: TextStyleOverrides;
   /** Per-section card background/border overrides. Missing keys fall back to theme.cardBg / theme.cardBorder. */
   cardStyles?: CardStyleOverrides;
+  /** Per-section and per-element vertical spacing overrides. Missing keys use template defaults. */
+  spacingStyles?: SpacingStyleOverrides;
   /** Event type — wedding invitations show two names; other event types show only the primary name. */
   eventType: InvitationEventType;
   /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
