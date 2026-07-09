@@ -1053,6 +1053,10 @@ export interface InvitationData {
     showNumChildren?: boolean;
     showOnExternalPage?: boolean;
     backgroundImageUrl?: string;
+    inputBackgroundColor?: string;
+    inputTextColor?: string;
+    inputPlaceholderColor?: string;
+    inputBorderColor?: string;
     customFields?: RsvpCustomField[];
     /**
      * When false, guests can no longer submit confirmations (the invitation

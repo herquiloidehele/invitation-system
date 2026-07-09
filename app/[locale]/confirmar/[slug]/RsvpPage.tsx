@@ -13,6 +13,10 @@ import type {
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { useCustomText } from "@/lib/custom-texts";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
+import {
+  resolveRsvpInputColors,
+  type RsvpInputColorConfig,
+} from "@/lib/rsvp-input-colors";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
@@ -86,6 +90,7 @@ interface RsvpPageProps {
   showNumChildren?: boolean;
   customFields?: RsvpCustomField[];
   backgroundImageUrl?: string;
+  inputColors?: RsvpInputColorConfig;
   customTexts?: CustomTexts;
   /** Guest token from the `?g=` confirm link — links the RSVP to a guest. */
   guestToken?: string;
@@ -138,6 +143,7 @@ export default function RsvpPage({
   showNumChildren = false,
   customFields = [],
   backgroundImageUrl,
+  inputColors,
   customTexts: ct,
   guestToken,
   prefillName,
@@ -244,10 +250,17 @@ export default function RsvpPage({
   const inputBase =
     "w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors focus:ring-2 focus:ring-offset-1 focus:ring-[#BE8C7A]/30";
 
-  const inputStyle: React.CSSProperties = {
+  const rsvpInputColors = resolveRsvpInputColors(inputColors, {
     backgroundColor: palette.fieldBg,
+    textColor: palette.text,
+    placeholderColor: palette.textMuted,
     borderColor: palette.border,
-    color: palette.text,
+  });
+
+  const inputStyle: React.CSSProperties = {
+    backgroundColor: rsvpInputColors.backgroundColor,
+    borderColor: rsvpInputColors.borderColor,
+    color: rsvpInputColors.textColor,
     fontFamily: "'Inter', system-ui, sans-serif",
   };
 
@@ -408,7 +421,12 @@ export default function RsvpPage({
             /* ── Form ── */
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-5 px-6 py-8"
+              className="rsvp-input-color-scope flex flex-col gap-5 px-6 py-8"
+              style={
+                {
+                  "--rsvp-placeholder-color": rsvpInputColors.placeholderColor,
+                } as React.CSSProperties
+              }
             >
               {/* Card title */}
               <div className="mb-1">
@@ -493,11 +511,11 @@ export default function RsvpPage({
                         style={{
                           borderColor: selected
                             ? palette.accent
-                            : palette.border,
+                            : rsvpInputColors.borderColor,
                           backgroundColor: selected
                             ? palette.accent + "18"
                             : "transparent",
-                          color: palette.text,
+                          color: rsvpInputColors.textColor,
                           fontFamily: "'Inter', system-ui, sans-serif",
                         }}
                       >

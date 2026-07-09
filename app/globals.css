@@ -162,6 +162,12 @@ body {
     }
 }
 
+.rsvp-input-color-scope input::placeholder,
+.rsvp-input-color-scope textarea::placeholder {
+    color: var(--rsvp-placeholder-color);
+    opacity: 1;
+}
+
 .text-balance {
     text-wrap: balance;
 }
@@ -521,4 +527,3 @@ body {
 .animate-shimmer {
     animation: shimmer 3s ease-in-out infinite;
 }
-

@@ -66,6 +66,10 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;
     backgroundImageUrl?: string;
+    inputBackgroundColor?: string;
+    inputTextColor?: string;
+    inputPlaceholderColor?: string;
+    inputBorderColor?: string;
     acceptingResponses?: boolean;
   };
   const customTexts =
@@ -108,6 +112,7 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       showNumChildren={shouldShowRsvpNumChildren(rsvp)}
       customFields={getRsvpCustomFields(rsvp)}
       backgroundImageUrl={rsvp.backgroundImageUrl}
+      inputColors={rsvp}
       customTexts={customTexts}
     />
   );

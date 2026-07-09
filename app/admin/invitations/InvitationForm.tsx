@@ -88,6 +88,7 @@ import LocationPhotosEditor from "@/components/admin/LocationPhotosEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
+import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
@@ -425,6 +426,10 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       showCompanion: false,
       showNumAdults: false,
       showNumChildren: false,
+      inputBackgroundColor: "",
+      inputTextColor: "",
+      inputPlaceholderColor: "",
+      inputBorderColor: "",
       customFields: [],
     },
     schedule: [],
@@ -2992,6 +2997,10 @@ export default function InvitationForm({
                             }
                           />
                         </div>
+                        <RsvpInputColorFields
+                          rsvp={form.rsvp}
+                          onChange={updateRsvp}
+                        />
                         <RsvpCustomFieldsBuilder
                           fields={form.rsvp.customFields ?? []}
                           onChange={(customFields) =>

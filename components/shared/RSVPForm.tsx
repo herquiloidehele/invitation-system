@@ -26,6 +26,7 @@ import {
   shouldShowRsvpNumAdults,
   shouldShowRsvpNumChildren,
 } from "@/lib/rsvp-config";
+import { resolveRsvpInputColors } from "@/lib/rsvp-input-colors";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
@@ -230,6 +231,18 @@ export default function RSVPForm(props: RSVPFormProps) {
   const slugKey = props.slugKey ?? "invitationSlug";
 
   const p = { ...buildModalPalette(props.theme), ...props.paletteOverride };
+  const rsvpInputColors = resolveRsvpInputColors(
+    isIntegration(props) ? props.invitation.rsvp : undefined,
+    {
+      backgroundColor: p.fieldBg,
+      textColor: p.text,
+      placeholderColor: p.textMuted,
+      borderColor: p.border,
+    },
+  );
+  const rsvpPlaceholderStyle = {
+    "--rsvp-placeholder-color": rsvpInputColors.placeholderColor,
+  } as React.CSSProperties;
 
   // Per-element text style overrides — only available in integration mode
   // (legacy direct-theme callers pass no `invitation`). Resolved once per
@@ -352,9 +365,9 @@ export default function RSVPForm(props: RSVPFormProps) {
 
   const inputStyle = {
     fontFamily: uiFont,
-    backgroundColor: p.fieldBg,
-    borderColor: p.border,
-    color: p.text,
+    backgroundColor: rsvpInputColors.backgroundColor,
+    borderColor: rsvpInputColors.borderColor,
+    color: rsvpInputColors.textColor,
   };
 
   const labelStyle = {
@@ -406,9 +419,8 @@ export default function RSVPForm(props: RSVPFormProps) {
 
       {/* Body */}
       <div
-        className={
-          inline ? "px-1 py-2" : "flex-1 overflow-y-auto px-5 py-5"
-        }
+        className={`${inline ? "px-1 py-2" : "flex-1 overflow-y-auto px-5 py-5"} rsvp-input-color-scope`}
+        style={rsvpPlaceholderStyle}
       >
         {closed ? (
           <motion.div
@@ -686,12 +698,13 @@ export default function RSVPForm(props: RSVPFormProps) {
                 <label
                   className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
                   style={{
-                    borderColor: attending === "yes" ? p.accent : p.border,
+                    borderColor:
+                      attending === "yes" ? p.accent : rsvpInputColors.borderColor,
                     backgroundColor:
                       attending === "yes" ? p.accent + "15" : "transparent",
-                    color: p.text,
                     fontFamily: uiFont,
                     ...bodyTextOverride,
+                    color: rsvpInputColors.textColor,
                   }}
                 >
                   <input
@@ -707,12 +720,13 @@ export default function RSVPForm(props: RSVPFormProps) {
                 <label
                   className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
                   style={{
-                    borderColor: attending === "no" ? p.accent : p.border,
+                    borderColor:
+                      attending === "no" ? p.accent : rsvpInputColors.borderColor,
                     backgroundColor:
                       attending === "no" ? p.accent + "15" : "transparent",
-                    color: p.text,
                     fontFamily: uiFont,
                     ...bodyTextOverride,
+                    color: rsvpInputColors.textColor,
                   }}
                 >
                   <input

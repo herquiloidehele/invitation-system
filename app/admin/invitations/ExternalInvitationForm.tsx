@@ -72,6 +72,7 @@ import HeroTextEditor from "@/components/admin/HeroTextEditor";
 import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
 import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
 import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
+import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
@@ -163,6 +164,10 @@ function getDefaultState(
       showNumChildren: false,
       showOnExternalPage: false,
       backgroundImageUrl: "",
+      inputBackgroundColor: "",
+      inputTextColor: "",
+      inputPlaceholderColor: "",
+      inputBorderColor: "",
     },
     schedule: [],
     dressCode: { enabled: false, text: "" },
@@ -2733,6 +2738,10 @@ export default function ExternalInvitationForm({
                           onClear={() => updateRsvp("backgroundImageUrl", "")}
                         />
                       </div>
+                      <RsvpInputColorFields
+                        rsvp={form.rsvp}
+                        onChange={updateRsvp}
+                      />
                     </>
                   )}
                 </AccordionContent>

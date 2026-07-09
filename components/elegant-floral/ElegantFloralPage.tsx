@@ -194,7 +194,7 @@ export default function ElegantFloralPage({
               <div className="ef-rsvp" style={{ marginTop: "1.5rem" }}>
                 <style>{`
                 .ef-rsvp > div:first-of-type{display:none}
-                .ef-rsvp ::placeholder{color:${theme.textMuted};opacity:.75}
+                .ef-rsvp ::placeholder{color:var(--rsvp-placeholder-color, ${theme.textMuted});opacity:.75}
                 .ef-rsvp input:focus,.ef-rsvp textarea:focus{--tw-ring-color:${theme.secondary}55;border-color:${theme.primary} !important}
               `}</style>
                 <RSVPForm
