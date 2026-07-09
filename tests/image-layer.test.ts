@@ -15,6 +15,7 @@ import {
   imageItemImgStyle,
   MAX_ITEMS_TOTAL,
   canAddItem,
+  itemsForSection,
 } from "@/lib/image-layer";
 import type { ImageItem } from "@/lib/types";
 
@@ -195,5 +196,30 @@ describe("soft cap", () => {
 
   it("allows adding under the cap", () => {
     expect(canAddItem({ items: [] }).ok).toBe(true);
+  });
+});
+
+describe("itemsForSection", () => {
+  it("returns items assigned to the requested section", () => {
+    const hero = makeItem({ id: "hero" });
+    const schedule = makeItem({ id: "schedule", sectionKey: "schedule" });
+
+    expect(itemsForSection({ items: [hero, schedule] }, "schedule")).toEqual([
+      schedule,
+    ]);
+  });
+
+  it("treats legacy items without a section as hero items", () => {
+    const legacy = makeItem({ id: "legacy" });
+    const schedule = makeItem({ id: "schedule", sectionKey: "schedule" });
+
+    expect(itemsForSection({ items: [legacy, schedule] }, "hero")).toEqual([
+      legacy,
+    ]);
+  });
+
+  it("returns an empty list for missing layers", () => {
+    expect(itemsForSection(null, "hero")).toEqual([]);
+    expect(itemsForSection(undefined, "hero")).toEqual([]);
   });
 });

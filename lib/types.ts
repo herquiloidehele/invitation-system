@@ -268,6 +268,28 @@ export interface HeroTextLayer {
 // Free-floating image layer
 // ---------------------------------------------------------------------------
 
+export const IMAGE_LAYER_SECTION_KEYS = [
+  "hero",
+  "saveTheDate",
+  "sectionImage1",
+  "sectionImage2",
+  "sectionImage3",
+  "sectionImage4",
+  "ourStory",
+  "coupleGallery",
+  "schedule",
+  "location",
+  "dressCode",
+  "giftRegistry",
+  "guestGuide",
+  "faqs",
+  "places",
+  "countdown",
+  "footer",
+] as const;
+
+export type ImageLayerSectionKey = (typeof IMAGE_LAYER_SECTION_KEYS)[number];
+
 /** Drop shadow for an image item. */
 export interface ImageItemShadow {
   x: number;
@@ -294,6 +316,11 @@ export interface ImageItemCrop {
 export interface ImageItem {
   /** Stable unique id. */
   id: string;
+  /**
+   * Section this image is anchored to. Missing means legacy page-wide/hero
+   * placement and is treated as "hero" by section-aware renderers.
+   */
+  sectionKey?: ImageLayerSectionKey;
   /** Image URL (S3 public URL from the presign upload flow). */
   src: string;
   /** Intrinsic width/height of the uploaded image. */

@@ -1,6 +1,11 @@
 import type { CSSProperties } from "react";
 
-import type { ImageItem, ImageLayer } from "./types";
+import {
+  IMAGE_LAYER_SECTION_KEYS,
+  type ImageItem,
+  type ImageLayer,
+  type ImageLayerSectionKey,
+} from "./types";
 
 export const EMPTY_IMAGE_LAYER: ImageLayer = { items: [] };
 
@@ -70,8 +75,14 @@ function normalizeItem(raw: unknown, index: number): ImageItem | null {
               : "rgba(0,0,0,0.35)",
         }
       : null;
+  const sectionKey =
+    typeof r.sectionKey === "string" &&
+    IMAGE_LAYER_SECTION_KEYS.includes(r.sectionKey as ImageLayerSectionKey)
+      ? (r.sectionKey as ImageLayerSectionKey)
+      : undefined;
   return {
     id: typeof r.id === "string" && r.id ? r.id : `img-${index}`,
+    ...(sectionKey ? { sectionKey } : {}),
     src: r.src,
     naturalAspect: clampNumber(r.naturalAspect, 0.05, 20, 1),
     xPct: clampPos(typeof r.xPct === "number" ? r.xPct : 50),
@@ -114,6 +125,15 @@ export function canAddItem(layer: ImageLayer): { ok: boolean; reason?: string } 
     };
   }
   return { ok: true };
+}
+
+export function itemsForSection(
+  layer: ImageLayer | null | undefined,
+  sectionKey: ImageLayerSectionKey,
+): ImageItem[] {
+  return (layer?.items ?? []).filter(
+    (item) => (item.sectionKey ?? "hero") === sectionKey,
+  );
 }
 
 export function addItem(
