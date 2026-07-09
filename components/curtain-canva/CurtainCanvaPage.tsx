@@ -31,10 +31,11 @@ export default function CurtainCanvaPage({
 
   return (
     <main
-      className="min-h-dvh overflow-x-hidden"
+      className="min-h-dvh"
       style={{
         background: theme.bg,
         color: theme.textPrimary,
+        overflowX: "clip",
         overflowAnchor: "none",
       }}
     >

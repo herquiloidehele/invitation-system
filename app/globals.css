@@ -152,7 +152,7 @@ body {
     font-family: var(--font-outfit);
     background: var(--background);
     color: var(--foreground);
-    overflow-x: hidden;
+    overflow-x: clip;
 
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -521,5 +521,4 @@ body {
 .animate-shimmer {
     animation: shimmer 3s ease-in-out infinite;
 }
-
 

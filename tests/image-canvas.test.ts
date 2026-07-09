@@ -99,4 +99,27 @@ describe("ImageCanvas", () => {
     );
     expect(videoHero).toContain('zIndex: state === "revealed" ? 2 : 8');
   });
+
+  it("does not make entrance page mains vertical scroll containers", () => {
+    const curtainPage = readFileSync(
+      "components/curtain-canva/CurtainCanvaPage.tsx",
+      "utf8",
+    );
+    expect(curtainPage).not.toContain("overflow-x-hidden");
+    expect(curtainPage).toContain('overflowX: "clip"');
+
+    const videoPage = readFileSync(
+      "components/video-entrance/VideoEntrancePage.tsx",
+      "utf8",
+    );
+    expect(videoPage).not.toContain("overflow-x-hidden");
+    expect(videoPage).toContain('overflowX: "clip"');
+  });
+
+  it("does not make the global body a vertical scroll container while clipping horizontal spill", () => {
+    const globals = readFileSync("app/globals.css", "utf8");
+
+    expect(globals).not.toContain("overflow-x: hidden");
+    expect(globals).toContain("overflow-x: clip");
+  });
 });
