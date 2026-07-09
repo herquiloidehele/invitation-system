@@ -182,6 +182,21 @@ describe("external invitation helper source", () => {
 
     expect(source).not.toContain("localhost");
   });
+
+  it("forwards scratch reveal background image props in the rich external page", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/shared/RichExternalLinkPage.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain(
+      "backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}",
+    );
+    expect(source).toContain(
+      "scrimOpacity={invitation.scratchReveal?.scrimOpacity}",
+    );
+    expect(source).toContain("imageSettings={invitation.imageSettings}");
+  });
 });
 
 describe("shouldPreloadRichExternalCanva", () => {
