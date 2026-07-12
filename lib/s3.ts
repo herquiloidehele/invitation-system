@@ -1,11 +1,13 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { createWriteStream } from "node:fs";
+import { createReadStream, createWriteStream } from "node:fs";
+import { stat } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 
@@ -184,4 +186,31 @@ export async function putObjectBuffer(
     }),
   );
   return publicUrlForKey(key);
+}
+
+/** Streams a local file to S3 without buffering the full asset in memory. */
+export async function putObjectFile(
+  key: string,
+  filePath: string,
+  contentType: string,
+): Promise<string> {
+  const client = getS3Client();
+  const metadata = await stat(filePath);
+  await client.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: createReadStream(filePath),
+      ContentLength: metadata.size,
+      ContentType: contentType,
+    }),
+  );
+  return publicUrlForKey(key);
+}
+
+/** Deletes one object created by a failed processing attempt. */
+export async function deleteObject(key: string): Promise<void> {
+  await getS3Client().send(
+    new DeleteObjectCommand({ Bucket: bucket, Key: key }),
+  );
 }

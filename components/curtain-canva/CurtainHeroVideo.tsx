@@ -1,10 +1,14 @@
 "use client";
 
+import { useRef } from "react";
+
 import {
   DEFAULT_HERO_GRADIENT_START_VIDEO,
   DEFAULT_HERO_SCRIM_OPACITY,
 } from "@/components/shared/InvitationHero";
 import type { HeroOverlayConfig, ObjectFit } from "@/lib/types";
+import VideoPosterLayer from "@/components/shared/VideoPosterLayer";
+import { useVideoFrameReady } from "@/components/shared/useVideoFrameReady";
 
 interface CurtainHeroVideoProps {
   /** Hero background video URL (invitation.videoUrl). */
@@ -43,6 +47,8 @@ export default function CurtainHeroVideo({
   heroOverlay,
   mediaFit = "cover",
 }: CurtainHeroVideoProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoReady = useVideoFrameReady(videoRef, videoUrl);
   const scrimOpacity = clamp(
     heroOverlay?.scrimOpacity ?? DEFAULT_HERO_SCRIM_OPACITY,
     0,
@@ -61,6 +67,7 @@ export default function CurtainHeroVideo({
       style={{ zIndex: 0, backgroundColor }}
     >
       <video
+        ref={videoRef}
         src={videoUrl}
         poster={videoPoster}
         muted
@@ -72,11 +79,18 @@ export default function CurtainHeroVideo({
         style={{ objectFit: mediaFit }}
       />
 
+      <VideoPosterLayer
+        posterUrl={videoPoster}
+        visible={!videoReady}
+        mediaFit={mediaFit}
+        zIndex={1}
+      />
+
       {/* Dark scrim so the hero info stays legible over bright video. */}
       {scrimOpacity > 0 && (
         <div
           className="absolute inset-0"
-          style={{ background: `rgba(0,0,0,${scrimOpacity})` }}
+          style={{ background: `rgba(0,0,0,${scrimOpacity})`, zIndex: 2 }}
         />
       )}
 
@@ -85,6 +99,7 @@ export default function CurtainHeroVideo({
         className="absolute inset-0"
         style={{
           background: `linear-gradient(to bottom, transparent ${gradientStart}%, ${backgroundColor} 100%)`,
+          zIndex: 2,
         }}
       />
     </div>

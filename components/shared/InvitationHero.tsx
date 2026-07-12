@@ -1,6 +1,6 @@
 "use client";
 
-import { type MutableRefObject, type RefObject } from "react";
+import { type MutableRefObject, type RefObject, useRef } from "react";
 import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
 
@@ -20,6 +20,8 @@ import { PrefetchedVideoSlot } from "./PrefetchedVideoSlot";
 import { EditableText } from "./EditableText";
 import HeroTextOverlay from "./HeroTextOverlay";
 import type { ResolvedHeroFonts } from "@/lib/hero-text";
+import VideoPosterLayer from "./VideoPosterLayer";
+import { useVideoFrameReady } from "./useVideoFrameReady";
 
 // ---------------------------------------------------------------------------
 // Animation variants used by the hero
@@ -142,6 +144,11 @@ export default function InvitationHero({
   const scrollIndicator = resolveHeroScrollIndicator(
     invitation.heroScrollIndicator,
   );
+  const directVideoRef = useRef<HTMLVideoElement | null>(null);
+  const directVideoReady = useVideoFrameReady(
+    directVideoRef,
+    invitation.videoUrl ?? "",
+  );
 
   return (
     <section
@@ -157,20 +164,31 @@ export default function InvitationHero({
         prefetchedVideoRef ? (
           <PrefetchedVideoSlot
             videoRef={prefetchedVideoRef}
+            posterUrl={invitation.videoPoster}
             mediaFit={mediaFit}
           />
         ) : (
-          <video
-            src={invitation.videoUrl}
-            muted
-            loop
-            playsInline
-            autoPlay
-            preload="auto"
-            data-invitation-video
-            className="absolute inset-0 h-full w-full"
-            style={{ objectFit: mediaFit }}
-          />
+          <div className="absolute inset-0 z-0 h-full w-full">
+            <video
+              ref={directVideoRef}
+              src={invitation.videoUrl}
+              poster={invitation.videoPoster}
+              muted
+              loop
+              playsInline
+              autoPlay
+              preload="auto"
+              data-invitation-video
+              className="absolute inset-0 h-full w-full"
+              style={{ objectFit: mediaFit }}
+            />
+            <VideoPosterLayer
+              posterUrl={invitation.videoPoster}
+              visible={!directVideoReady}
+              mediaFit={mediaFit}
+              zIndex={1}
+            />
+          </div>
         )
       ) : invitation.heroImage ? (
         <Image

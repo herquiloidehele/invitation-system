@@ -98,6 +98,7 @@ import {
   shouldShowExternalInvitationAudioControls,
 } from "@/lib/external-invitation-form";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
+import { HERO_VIDEO_UPLOAD_PROFILE } from "@/lib/video-upload";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 
@@ -1348,6 +1349,7 @@ export default function ExternalInvitationForm({
                     <MediaUpload
                       kind="video"
                       maxSizeMB={500}
+                      uploadProfile={HERO_VIDEO_UPLOAD_PROFILE}
                       value={form.videoUrl}
                       onUpload={(url, meta) => {
                         update("videoUrl", url);
@@ -2161,6 +2163,7 @@ export default function ExternalInvitationForm({
                       <MediaUpload
                         kind="video"
                         maxSizeMB={500}
+                        uploadProfile={HERO_VIDEO_UPLOAD_PROFILE}
                         value={form.curtainVideoUrl || undefined}
                         onUpload={(url, meta) => {
                           update("curtainVideoUrl", url);
@@ -2233,6 +2236,7 @@ export default function ExternalInvitationForm({
                       <MediaUpload
                         kind="video"
                         maxSizeMB={500}
+                        uploadProfile={HERO_VIDEO_UPLOAD_PROFILE}
                         value={form.videoUrl || undefined}
                         onUpload={(url, meta) => {
                           update("videoUrl", url);

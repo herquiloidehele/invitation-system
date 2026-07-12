@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { parseProcessedVideoUpload } from "@/lib/video-upload";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -172,48 +173,42 @@ export default function MediaUpload({
           },
         });
 
-        // Server-side video processing (best-effort). This normalises the
+        // Server-side video processing. This normalises the
         // upload to a broadly-playable H.264 MP4 when needed — phone
         // recordings are frequently HEVC/.mov, which many browsers can't
         // decode — and extracts a first-frame poster so callers that show a
-        // poster image don't need a second admin upload. On any failure we
-        // fall back to the original upload URL and no poster.
+        // poster image don't need a second admin upload. Both derived URLs
+        // are mandatory: a partial result fails instead of entering the form.
         let finalUrl = publicUrl;
         let posterUrl: string | undefined;
         if (kind === "video") {
           setUploadState({ status: "processing-video" });
-          try {
-            const processRes = await fetch(
-              "/api/admin/media/process-video",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ videoUrl: publicUrl }),
-              },
-            );
-            if (processRes.ok) {
-              const json = (await processRes.json()) as {
-                url?: string;
-                posterUrl?: string;
-              };
-              if (json.url) finalUrl = json.url;
-              if (json.posterUrl) posterUrl = json.posterUrl;
-            } else {
-              console.warn(
-                "[MediaUpload] Video processing returned non-2xx status",
-                processRes.status,
-              );
-            }
-          } catch (processErr) {
-            console.warn(
-              "[MediaUpload] Video processing failed; using original upload",
-              processErr,
-            );
+          const processRes = await fetch("/api/admin/media/process-video", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              videoUrl: publicUrl,
+              profile: uploadProfile,
+            }),
+          });
+          const json = await processRes.json().catch(() => null);
+          if (!processRes.ok) {
+            const message =
+              json && typeof json.error === "string"
+                ? json.error
+                : "Falha ao processar o vídeo.";
+            throw new Error(message);
           }
+          const processed = parseProcessedVideoUpload(json);
+          finalUrl = processed.url;
+          posterUrl = processed.posterUrl;
         }
 
         setUploadState({ status: "done", url: finalUrl });
-        onUpload(finalUrl, posterUrl ? { posterUrl } : undefined);
+        onUpload(
+          finalUrl,
+          kind === "video" ? { posterUrl: posterUrl! } : undefined,
+        );
       } catch (err) {
         setUploadState({
           status: "error",
@@ -424,15 +419,17 @@ export default function MediaUpload({
             </p>
           )}
 
-          {/* URL fallback */}
-          <button
-            type="button"
-            onClick={() => setShowUrlInput(true)}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LinkIcon className="h-3 w-3" />
-            Ou cole um URL directamente
-          </button>
+          {/* URL fallback. Videos must pass through server-side processing. */}
+          {kind !== "video" && (
+            <button
+              type="button"
+              onClick={() => setShowUrlInput(true)}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LinkIcon className="h-3 w-3" />
+              Ou cole um URL directamente
+            </button>
+          )}
         </>
       )}
     </div>

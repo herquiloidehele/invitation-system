@@ -1,14 +1,20 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
+  deleteObject,
   downloadObjectToFile,
   getObjectContentLength,
   putObjectBuffer,
+  putObjectFile,
   s3KeyFromUrl,
 } from "@/lib/s3";
+import {
+  formatUploadLimit,
+  getUploadMaxSizeBytes,
+} from "@/lib/upload-limits";
 import { extractFirstFrameJpegFromFile } from "@/lib/video-poster";
 import { ensureWebSafeMp4 } from "@/lib/video-transcode";
 
@@ -20,28 +26,26 @@ export const runtime = "nodejs";
 // this is mostly a hint for serverless-style deploys.)
 export const maxDuration = 120;
 
-// Same cap the upload route enforces.
-const MAX_VIDEO_BYTES = 100 * 1024 * 1024;
-
 // ---------------------------------------------------------------------------
 // POST /api/admin/media/process-video
 //
-// Body: { videoUrl: string }  (an object already uploaded to our S3 bucket)
+// Body: { videoUrl: string, profile?: string }
 //
 // 1. Normalises the video to a web-safe H.264 MP4 when needed (e.g. HEVC/.mov
 //    phone recordings that many browsers can't decode). When converted, the
 //    new MP4 is stored alongside the original and its URL is returned.
 // 2. Extracts a first-frame poster from the final video.
 //
-// Returns: { url, posterUrl?, transcoded }.
+// Returns: { url, posterUrl, transcoded }.
 //   - `url` is the URL callers should persist (the converted MP4 when one was
 //     produced, otherwise the original).
-// Best-effort: on failure the caller should fall back to the original upload.
+// Strict: any normalization or poster failure rejects the upload.
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json().catch(() => null)) as {
       videoUrl?: unknown;
+      profile?: unknown;
     } | null;
     const videoUrl =
       body && typeof body.videoUrl === "string" ? body.videoUrl : null;
@@ -61,10 +65,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const profile =
+      body && typeof body.profile === "string" ? body.profile : undefined;
+    const maxVideoBytes = getUploadMaxSizeBytes("videos", profile);
+    const formattedLimit = formatUploadLimit(maxVideoBytes);
     const contentLength = await getObjectContentLength(videoKey);
-    if (contentLength !== null && contentLength > MAX_VIDEO_BYTES) {
+    if (contentLength !== null && contentLength > maxVideoBytes) {
       return NextResponse.json(
-        { error: "Video exceeds the 100 MB processing limit." },
+        { error: `Video exceeds the ${formattedLimit} processing limit.` },
         { status: 413 },
       );
     }
@@ -72,45 +80,47 @@ export async function POST(req: NextRequest) {
     const workDir = await mkdtemp(path.join(os.tmpdir(), "video-process-"));
     const inputPath = path.join(workDir, "input");
     const outputPath = path.join(workDir, "web.mp4");
+    const createdKeys: string[] = [];
 
     try {
-      await downloadObjectToFile(videoKey, inputPath, MAX_VIDEO_BYTES);
+      await downloadObjectToFile(videoKey, inputPath, maxVideoBytes);
 
       // 1) Transcode to a web-safe H.264 MP4 if the source isn't already one.
       const sourceExt = (videoKey.match(/\.([^./]+)$/)?.[1] ?? "").toLowerCase();
-      let transcoded = false;
-      try {
-        transcoded = await ensureWebSafeMp4(inputPath, outputPath, sourceExt);
-      } catch (transcodeErr) {
-        // Non-fatal: keep the original upload and still try the poster.
-        console.warn("[process-video] transcode failed", transcodeErr);
-      }
+      const transcoded = await ensureWebSafeMp4(
+        inputPath,
+        outputPath,
+        sourceExt,
+      );
 
       let finalUrl = videoUrl;
       let posterSourcePath = inputPath;
       if (transcoded) {
-        const mp4Buffer = await readFile(outputPath);
         const mp4Key = `${videoKey.replace(/\.[^/.]+$/, "")}-web.mp4`;
-        finalUrl = await putObjectBuffer(mp4Key, mp4Buffer, "video/mp4");
+        finalUrl = await putObjectFile(mp4Key, outputPath, "video/mp4");
+        createdKeys.push(mp4Key);
         posterSourcePath = outputPath;
       }
 
-      // 2) Extract a poster from the final video (best-effort).
-      let posterUrl: string | undefined;
-      try {
-        const jpeg = await extractFirstFrameJpegFromFile(posterSourcePath);
-        const finalKey = s3KeyFromUrl(finalUrl) ?? videoKey;
-        const posterKey = `${finalKey.replace(/\.[^/.]+$/, "")}-poster.jpg`;
-        posterUrl = await putObjectBuffer(posterKey, jpeg, "image/jpeg");
-      } catch (posterErr) {
-        console.warn("[process-video] poster extraction failed", posterErr);
-      }
+      // 2) Extract and persist the required poster from the final video.
+      const jpeg = await extractFirstFrameJpegFromFile(posterSourcePath);
+      const finalKey = s3KeyFromUrl(finalUrl) ?? videoKey;
+      const posterKey = `${finalKey.replace(/\.[^/.]+$/, "")}-poster.jpg`;
+      const posterUrl = await putObjectBuffer(posterKey, jpeg, "image/jpeg");
+      createdKeys.push(posterKey);
 
       return NextResponse.json({ url: finalUrl, posterUrl, transcoded });
     } catch (err) {
+      for (const key of new Set([videoKey, ...createdKeys])) {
+        try {
+          await deleteObject(key);
+        } catch (cleanupError) {
+          console.warn("[process-video] cleanup failed", key, cleanupError);
+        }
+      }
       if (err instanceof Error && err.message.includes("byte limit")) {
         return NextResponse.json(
-          { error: "Video exceeds the 100 MB processing limit." },
+          { error: `Video exceeds the ${formattedLimit} processing limit.` },
           { status: 413 },
         );
       }
