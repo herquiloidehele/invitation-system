@@ -443,6 +443,7 @@ function EnvelopeInvitationView({
           <ExternalVideoPage
             ref={videoRef}
             videoUrl={invitation.videoUrl ?? ""}
+            videoPoster={invitation.videoPoster}
             visible={videoVisible}
             invitation={invitation}
             theme={mergedTheme}
@@ -505,6 +506,7 @@ function EnvelopeInvitationView({
           <video
             ref={heroVideoRef}
             src={invitation.videoUrl!}
+            poster={invitation.videoPoster}
             preload="auto"
             muted
             loop

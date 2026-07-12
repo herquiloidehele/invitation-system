@@ -22,6 +22,8 @@ import type {
 } from "@/lib/types";
 import { useCustomText } from "@/lib/custom-texts";
 import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
+import VideoPosterLayer from "@/components/shared/VideoPosterLayer";
+import { useVideoFrameReady } from "@/components/shared/useVideoFrameReady";
 import { heroFontsFromTheme } from "@/lib/hero-text";
 import { EditableText } from "@/components/shared/EditableText";
 import {
@@ -125,7 +127,6 @@ export default function VideoEntranceHero({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [state, setState] = useState<HeroState>("idle");
   const [heroInfoVisible, setHeroInfoVisible] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
   const confettiFiredRef = useRef(false);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -134,6 +135,7 @@ export default function VideoEntranceHero({
   const tapLabel = t("curtain_tapToOpen");
   const heroVideoOn =
     typeof videoUrl === "string" && videoUrl.trim().length > 0;
+  const videoReady = useVideoFrameReady(videoRef, videoUrl ?? "");
 
   const scrimOpacity = clamp(
     heroOverlay?.scrimOpacity ?? DEFAULT_HERO_SCRIM_OPACITY,
@@ -298,10 +300,6 @@ export default function VideoEntranceHero({
     reveal();
   }, [reveal]);
 
-  const handleVideoPlaying = useCallback(() => {
-    setVideoReady(true);
-  }, []);
-
   const handleScrollNext = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
@@ -336,19 +334,11 @@ export default function VideoEntranceHero({
           : undefined
       }
     >
-      {/* Poster cover — opaque until the video starts painting. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: videoPoster ? `url(${videoPoster})` : undefined,
-          backgroundColor: theme.bg,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: videoReady ? 0 : 1,
-          transition: "opacity 200ms ease-out",
-          zIndex: state === "revealed" ? 1 : 9,
-        }}
+      <VideoPosterLayer
+        posterUrl={videoPoster}
+        visible={!videoReady}
+        mediaFit={mediaFit}
+        zIndex={state === "revealed" ? 1 : 9}
       />
 
       {heroVideoOn && (
@@ -361,7 +351,6 @@ export default function VideoEntranceHero({
           preload="auto"
           onEnded={handleVideoEnded}
           onError={handleVideoError}
-          onPlaying={handleVideoPlaying}
           onTimeUpdate={handleVideoTimeUpdate}
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ zIndex: state === "revealed" ? 2 : 8, objectFit: mediaFit }}

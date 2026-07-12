@@ -22,6 +22,8 @@ import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { useCustomText } from "@/lib/custom-texts";
 import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
+import VideoPosterLayer from "./VideoPosterLayer";
+import { useVideoFrameReady } from "./useVideoFrameReady";
 
 export interface ExternalVideoPageHandle {
   play: () => void;
@@ -29,6 +31,7 @@ export interface ExternalVideoPageHandle {
 
 interface ExternalVideoPageProps {
   videoUrl: string;
+  videoPoster?: string;
   /** When false the wrapper is invisible but still mounted (preloading). */
   visible?: boolean;
   invitation: InvitationData;
@@ -39,11 +42,12 @@ const ExternalVideoPage = forwardRef<
   ExternalVideoPageHandle,
   ExternalVideoPageProps
 >(function ExternalVideoPage(
-  { videoUrl, visible = true, invitation, theme },
+  { videoUrl, videoPoster, visible = true, invitation, theme },
   ref,
 ) {
   const mediaFit = resolveHeroMediaFit(invitation.heroMediaFit);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoReady = useVideoFrameReady(videoRef, videoUrl);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
@@ -99,6 +103,7 @@ const ExternalVideoPage = forwardRef<
         <video
           ref={videoRef}
           src={videoUrl}
+          poster={videoPoster}
           loop
           playsInline
           preload="auto"
@@ -110,6 +115,13 @@ const ExternalVideoPage = forwardRef<
             objectFit: mediaFit,
             display: "block",
           }}
+        />
+
+        <VideoPosterLayer
+          posterUrl={videoPoster}
+          visible={!videoReady}
+          mediaFit={mediaFit}
+          zIndex={1}
         />
 
         {/* Fixed RSVP button — slides up 4 s after video starts */}

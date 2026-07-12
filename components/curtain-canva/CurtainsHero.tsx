@@ -23,6 +23,8 @@ import type {
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
+import VideoPosterLayer from "@/components/shared/VideoPosterLayer";
+import { useVideoFrameReady } from "@/components/shared/useVideoFrameReady";
 import { heroFontsFromTheme } from "@/lib/hero-text";
 import {
   heroScrollIndicatorBottom,
@@ -131,7 +133,6 @@ export default function CurtainsHero({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [state, setState] = useState<HeroState>("idle");
   const [heroInfoVisible, setHeroInfoVisible] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
   // Tracks whether the celebratory confetti has already fired in this play
   // session. Confetti is triggered at ~80% of the curtain video so the
   // burst lands as the curtain finishes opening; this ref prevents the
@@ -181,6 +182,7 @@ export default function CurtainsHero({
   const t = useCustomText(customTexts);
   const tapLabel = t("curtain_tapToOpen");
   const videoSrc = resolveCurtainVideoSrc(curtainVideoUrl);
+  const videoReady = useVideoFrameReady(videoRef, videoSrc);
   const heroVideoOn = shouldRenderCurtainHeroVideo(heroVideoUrl);
 
   const handleTap = useCallback(() => {
@@ -319,13 +321,6 @@ export default function CurtainsHero({
     }
   }, [fireConfetti, heroInfoVisible]);
 
-  // Fired once the video element has rendered its first frame and is
-  // actually progressing. We use this to fade out the poster overlay so
-  // the swap from poster image → video is invisible to the user.
-  const handleVideoPlaying = useCallback(() => {
-    setVideoReady(true);
-  }, []);
-
   const handleScrollNext = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
@@ -361,25 +356,11 @@ export default function CurtainsHero({
           : undefined
       }
     >
-      {/* Poster overlay painted as a background image directly on the
-          section. Sits behind the <video> and stays opaque until playback
-          actually starts (`playing` event), so the user never sees a blank
-          rectangle while the browser swaps from poster → first decoded
-          frame. The fade-out is brief so the transition feels instant. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${curtainVideoPoster})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          // Hide once the curtain video has painted, or once the curtain has
-          // opened with a hero video present — so the hero video behind is
-          // revealed even if the curtain video failed to play.
-          opacity: videoReady || (heroVideoOn && state === "revealed") ? 0 : 1,
-          transition: "opacity 200ms ease-out",
-          zIndex: state === "revealed" ? 1 : 9,
-        }}
+      <VideoPosterLayer
+        posterUrl={curtainVideoPoster}
+        visible={!videoReady && !(heroVideoOn && state === "revealed")}
+        mediaFit="cover"
+        zIndex={state === "revealed" ? 1 : 9}
       />
 
       <video
@@ -391,7 +372,6 @@ export default function CurtainsHero({
         preload="auto"
         onEnded={handleVideoEnded}
         onError={handleVideoError}
-        onPlaying={handleVideoPlaying}
         onTimeUpdate={handleVideoTimeUpdate}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         style={{

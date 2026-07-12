@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { createByteLimitTransform } from "@/lib/s3";
@@ -44,5 +45,20 @@ describe("createByteLimitTransform", () => {
       "S3 object exceeded the download byte limit",
     );
     expect(transform.getBytesRead()).toBe(4);
+  });
+
+  it("streams transcoded videos and treats poster extraction as mandatory", () => {
+    const route = readFileSync(
+      "app/api/admin/media/process-video/route.ts",
+      "utf8",
+    );
+
+    expect(route).toContain(
+      'putObjectFile(mp4Key, outputPath, "video/mp4")',
+    );
+    expect(route).not.toContain("readFile(outputPath)");
+    expect(route).not.toContain("Non-fatal: keep the original upload");
+    expect(route).not.toContain("poster extraction failed");
+    expect(route).toContain("await deleteObject(key)");
   });
 });
