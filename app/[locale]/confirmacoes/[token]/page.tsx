@@ -24,6 +24,8 @@ import { createNoIndexMetadata } from "@/lib/seo";
 import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import { countAttendingGuests } from "@/lib/rsvp-config";
 import type { RsvpCustomAnswer } from "@/lib/types";
+import { isExclusiveGiftSelectionEnabled } from "@/lib/gift-registry";
+import GiftReservationsTabClient from "./GiftReservationsTabClient";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = createNoIndexMetadata();
@@ -50,6 +52,7 @@ function formatDate(date: Date, locale: AppLocale) {
 type OwnerLabels = {
   rsvpsTab: string;
   guestsTab: string;
+  giftsTab: string;
   responses: string;
   attending: string;
   declined: string;
@@ -64,7 +67,19 @@ type OwnerLabels = {
   partyAdults: (count: number) => string;
   partyChildren: (count: number) => string;
   footer: string;
+  giftsTitle: string;
+  giftsEmpty: string;
+  giftsPersonalized: string;
+  giftsPublicLink: string;
+  giftsRemoved: string;
+  giftsRelease: string;
+  giftsReleaseTitle: string;
+  giftsReleaseDescription: string;
+  giftsCancel: string;
+  giftsError: string;
 };
+
+type OwnerTab = "rsvps" | "guests" | "gifts";
 
 // ---------------------------------------------------------------------------
 // Tab navigation (server-rendered, link-based)
@@ -74,11 +89,13 @@ function TabNav({
   active,
   token,
   showGuests,
+  showGifts,
   labels,
 }: {
-  active: "rsvps" | "guests";
+  active: OwnerTab;
   token: string;
   showGuests: boolean;
+  showGifts: boolean;
   labels: OwnerLabels;
 }) {
   return (
@@ -106,6 +123,18 @@ function TabNav({
             {labels.guestsTab}
           </Link>
         )}
+        {showGifts && (
+          <Link
+            href={`/confirmacoes/${token}?tab=gifts`}
+            className={`pb-3 -mb-px text-sm font-medium border-b-2 transition-colors ${
+              active === "gifts"
+                ? "border-stone-800 text-stone-800"
+                : "border-transparent text-stone-500 hover:text-stone-700"
+            }`}
+          >
+            {labels.giftsTab}
+          </Link>
+        )}
       </nav>
     </div>
   );
@@ -122,7 +151,7 @@ async function InvitationRsvpView({
   labels,
 }: {
   token: string;
-  tab: "rsvps" | "guests";
+  tab: OwnerTab;
   locale: AppLocale;
   labels: OwnerLabels;
 }) {
@@ -151,7 +180,17 @@ async function InvitationRsvpView({
   );
   const totalDeclined = responses.filter((r) => !r.attending).length;
   const showGuests = invitation.guestManagementEnabled === true;
-  const activeTab = showGuests && tab === "guests" ? "guests" : "rsvps";
+  const showGifts = isExclusiveGiftSelectionEnabled(
+    invitation.giftRegistry as Parameters<
+      typeof isExclusiveGiftSelectionEnabled
+    >[0],
+  );
+  const activeTab: OwnerTab =
+    showGifts && tab === "gifts"
+      ? "gifts"
+      : showGuests && tab === "guests"
+        ? "guests"
+        : "rsvps";
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -188,7 +227,13 @@ async function InvitationRsvpView({
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <TabNav active={activeTab} token={token} showGuests={showGuests} labels={labels} />
+        <TabNav
+          active={activeTab}
+          token={token}
+          showGuests={showGuests}
+          showGifts={showGifts}
+          labels={labels}
+        />
 
         {activeTab === "rsvps" ? (
           <div className="space-y-6">
@@ -217,12 +262,29 @@ async function InvitationRsvpView({
               emptyLabel={labels.emptyInvitation}
             />
           </div>
-        ) : (
+        ) : activeTab === "guests" ? (
           <GuestsTabClient
             ownerToken={token}
             invitationSlug={invitation.slug}
             messageTemplate={invitation.guestMessageTemplate ?? ""}
             canAddGuests={invitation.ownerCanAddGuests}
+          />
+        ) : (
+          <GiftReservationsTabClient
+            ownerToken={token}
+            locale={locale}
+            labels={{
+              title: labels.giftsTitle,
+              empty: labels.giftsEmpty,
+              personalized: labels.giftsPersonalized,
+              publicLink: labels.giftsPublicLink,
+              removed: labels.giftsRemoved,
+              release: labels.giftsRelease,
+              releaseTitle: labels.giftsReleaseTitle,
+              releaseDescription: labels.giftsReleaseDescription,
+              cancel: labels.giftsCancel,
+              error: labels.giftsError,
+            }}
           />
         )}
       </main>
@@ -384,9 +446,7 @@ export function RsvpList({
     <div className="bg-white rounded-xl border overflow-hidden">
       <div className="px-5 py-4 border-b">
         <h2 className="font-semibold text-stone-800">{labels.listTitle}</h2>
-        <p className="text-sm text-stone-500 mt-0.5">
-          {labels.updated}
-        </p>
+        <p className="text-sm text-stone-500 mt-0.5">{labels.updated}</p>
       </div>
 
       {responses.length === 0 ? (
@@ -453,14 +513,16 @@ export function RsvpList({
                   )}
                   {formatRsvpCustomAnswers(r.customAnswers).length > 0 && (
                     <div className="mt-2 space-y-1 rounded-md bg-stone-50 px-3 py-2 text-sm text-stone-600">
-                      {formatRsvpCustomAnswers(r.customAnswers).map((answer) => (
-                        <p key={`${r.id}-${answer.label}`}>
-                          <span className="font-medium text-stone-700">
-                            {answer.label}:
-                          </span>{" "}
-                          {answer.value}
-                        </p>
-                      ))}
+                      {formatRsvpCustomAnswers(r.customAnswers).map(
+                        (answer) => (
+                          <p key={`${r.id}-${answer.label}`}>
+                            <span className="font-medium text-stone-700">
+                              {answer.label}:
+                            </span>{" "}
+                            {answer.value}
+                          </p>
+                        ),
+                      )}
                     </div>
                   )}
                 </div>
@@ -491,12 +553,14 @@ function PageFooter({ labels }: { labels: OwnerLabels }) {
 export default async function OwnerRsvpPage({ params, searchParams }: Props) {
   const { locale: rawLocale, token } = await params;
   const { tab } = await searchParams;
-  const activeTab = tab === "guests" ? "guests" : "rsvps";
+  const activeTab: OwnerTab =
+    tab === "guests" ? "guests" : tab === "gifts" ? "gifts" : "rsvps";
   const locale = resolveLocale(rawLocale);
   const t = await getTranslations("OwnerConfirmations");
   const labels: OwnerLabels = {
     rsvpsTab: t("rsvpsTab"),
     guestsTab: t("guestsTab"),
+    giftsTab: t("giftsTab"),
     responses: t("responses"),
     attending: t("attending"),
     declined: t("declined"),
@@ -511,6 +575,16 @@ export default async function OwnerRsvpPage({ params, searchParams }: Props) {
     partyAdults: (count) => t("partyAdults", { count }),
     partyChildren: (count) => t("partyChildren", { count }),
     footer: t("footer"),
+    giftsTitle: t("giftsTitle"),
+    giftsEmpty: t("giftsEmpty"),
+    giftsPersonalized: t("giftsPersonalized"),
+    giftsPublicLink: t("giftsPublicLink"),
+    giftsRemoved: t("giftsRemoved"),
+    giftsRelease: t("giftsRelease"),
+    giftsReleaseTitle: t("giftsReleaseTitle"),
+    giftsReleaseDescription: t("giftsReleaseDescription"),
+    giftsCancel: t("giftsCancel"),
+    giftsError: t("giftsError"),
   };
 
   // Try invitation first (most common case)
@@ -535,7 +609,9 @@ export default async function OwnerRsvpPage({ params, searchParams }: Props) {
   });
 
   if (std) {
-    return <SaveTheDateRsvpView token={token} locale={locale} labels={labels} />;
+    return (
+      <SaveTheDateRsvpView token={token} locale={locale} labels={labels} />
+    );
   }
 
   notFound();

@@ -171,7 +171,11 @@ function getDefaultState(
     },
     schedule: [],
     dressCode: { enabled: false, text: "" },
-    giftRegistry: { enabled: false, text: "" },
+    giftRegistry: {
+      enabled: false,
+      text: "",
+      exclusiveSelectionEnabled: false,
+    },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
     heroHeight: DEFAULT_HERO_HEIGHT,

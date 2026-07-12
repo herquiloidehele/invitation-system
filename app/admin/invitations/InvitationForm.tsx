@@ -435,7 +435,13 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     schedule: [],
     scheduleStyle: "default",
     dressCode: { enabled: false, text: "" },
-    giftRegistry: { enabled: false, text: "", link: "", items: [] },
+    giftRegistry: {
+      enabled: false,
+      text: "",
+      link: "",
+      items: [],
+      exclusiveSelectionEnabled: false,
+    },
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
     heroHeight: DEFAULT_HERO_HEIGHT,
@@ -3026,6 +3032,26 @@ export default function InvitationForm({
                     </div>
                     {form.giftRegistry.enabled && (
                       <>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Limitar cada presente a um convidado</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Cada presente poderá ser escolhido apenas uma vez.
+                            </p>
+                          </div>
+                          <Switch
+                            checked={
+                              form.giftRegistry.exclusiveSelectionEnabled ===
+                              true
+                            }
+                            onCheckedChange={(value) =>
+                              updateGiftRegistry(
+                                "exclusiveSelectionEnabled",
+                                value,
+                              )
+                            }
+                          />
+                        </div>
                         <div className="space-y-1.5">
                           <Label htmlFor="giftText">
                             Texto da Lista de Presentes

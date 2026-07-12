@@ -16,6 +16,16 @@ export function hasBankTransfer(
   );
 }
 
+/** Missing configuration is deliberately unrestricted for backward compatibility. */
+export function isExclusiveGiftSelectionEnabled(
+  registry:
+    | Pick<GiftRegistry, "exclusiveSelectionEnabled">
+    | null
+    | undefined,
+): boolean {
+  return registry?.exclusiveSelectionEnabled === true;
+}
+
 /** Locale-less path to the gifts page, preserving the guest token when present. */
 export function giftsPagePath(slug: string, guestToken?: string | null): string {
   const query = guestToken ? `?g=${encodeURIComponent(guestToken)}` : "";
