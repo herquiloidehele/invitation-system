@@ -8,10 +8,7 @@ import {
 } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import {
-  ArrowRight,
   ChevronDown,
-  ExternalLink,
-  Gift,
   Heart,
   Shirt,
 } from "lucide-react";
@@ -27,8 +24,6 @@ import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { useLocale } from "next-intl";
 
 import { useCustomText } from "@/lib/custom-texts";
-import { giftsPagePath, hasGiftItems } from "@/lib/gift-registry";
-import { DEFAULT_LOCALE } from "@/i18n/locales";
 import { formatLocalizedMonthLong } from "@/lib/date-format";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
@@ -37,6 +32,7 @@ import PersonalGuestCard, {
   PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
 } from "./PersonalGuestCard";
 import LocationCard from "./LocationCard";
+import GiftsSection from "./GiftsSection";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
 import CoupleGallery from "./gallery/CoupleGallery";
@@ -841,73 +837,16 @@ export default function InvitationPage({
                     border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
                   }}
                 >
-                  <motion.div
-                    className="flex h-10 w-10 items-center justify-center rounded-full"
-                    style={{
-                      background: `${ts.accent}12`,
-                    }}
-                    animate={{ y: [0, -3, 0] }}
-                    transition={{
-                      duration: 4.2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.8,
-                    }}
-                  >
-                    <Gift size={20} color={ts.accent} strokeWidth={1.5} />
-                  </motion.div>
-                  <span style={ts.labels}>
-                    <EditableText elementKey="labels">
-                      {t("sectionTitle_giftRegistry")}
-                    </EditableText>
-                  </span>
-                  <span
-                    style={{
-                      ...ts.giftText,
-                      whiteSpace: "pre-line",
-                    }}
-                  >
-                    <EditableText elementKey="giftText">
-                      {invitation.giftRegistry.text}
-                    </EditableText>
-                  </span>
-                  {hasGiftItems(invitation.giftRegistry) ? (
-                    <motion.a
-                      href={
-                        locale === DEFAULT_LOCALE
-                          ? giftsPagePath(
-                              invitation.slug,
-                              invitation.guest?.token,
-                            )
-                          : `/${locale}${giftsPagePath(
-                              invitation.slug,
-                              invitation.guest?.token,
-                            )}`
-                      }
-                      className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
-                      style={ts.giftLink}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <ArrowRight size={10} strokeWidth={1.5} />
-                      <EditableText elementKey="giftLink">
-                        {t("cta_giftLink")}
-                      </EditableText>
-                    </motion.a>
-                  ) : invitation.giftRegistry.link ? (
-                    <motion.a
-                      href={invitation.giftRegistry.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 mt-1 transition-opacity hover:opacity-70"
-                      style={ts.giftLink}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <ExternalLink size={10} strokeWidth={1.5} />
-                      <EditableText elementKey="giftLink">
-                        {t("cta_giftLink")}
-                      </EditableText>
-                    </motion.a>
-                  ) : null}
+                  <GiftsSection
+                    giftRegistry={invitation.giftRegistry}
+                    theme={theme}
+                    ts={ts}
+                    cardStyle={cs("giftRegistry", 16)}
+                    slug={invitation.slug}
+                    guestToken={invitation.guest?.token}
+                    locale={locale}
+                    t={t}
+                  />
                 </motion.div>
               </EditableCard>
             )}

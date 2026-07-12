@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
-import { Check, Copy, Gift } from "lucide-react";
+import { Gift } from "lucide-react";
 import confetti from "canvas-confetti";
 import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
 import { giftsPagePath, hasBankTransfer, hasGiftItems } from "@/lib/gift-registry";
 import { useRouter } from "@/i18n/routing";
 import { EditableText } from "@/components/shared/EditableText";
+import { CopyableValue } from "@/components/gifts/CopyableValue";
 import ScriptTitle from "./ScriptTitle";
 import PillButton from "./PillButton";
 import ConfettiAccordion from "./ConfettiAccordion";
@@ -16,74 +17,6 @@ import { efGroup, efItem, useRevealProps } from "./motion";
 
 /** How long the celebratory confetti runs before navigating to the gift list. */
 const GIFT_CONFETTI_MS = 1200;
-
-/** A bank-detail value with a small button that copies it, flashing a check ~1.5s. */
-function CopyableValue({
-  value,
-  theme,
-}: {
-  value: string;
-  theme: TemplateTheme;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const copy = useCallback(async () => {
-    let ok = false;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(value);
-        ok = true;
-      }
-    } catch {
-      ok = false;
-    }
-    if (!ok) {
-      // Fallback for in-app webviews without the async clipboard API.
-      try {
-        const ta = document.createElement("textarea");
-        ta.value = value;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        ok = document.execCommand("copy");
-        document.body.removeChild(ta);
-      } catch {
-        ok = false;
-      }
-    }
-    if (ok) {
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    }
-  }, [value]);
-
-  return (
-    <button
-      type="button"
-      onClick={copy}
-      aria-label="Copiar"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        flexShrink: 0,
-        padding: "0.35rem 0.65rem",
-        borderRadius: 8,
-        border: "none",
-        cursor: "pointer",
-        background: `color-mix(in srgb, ${theme.secondary} 18%, transparent)`,
-        color: theme.primary,
-        fontFamily: theme.uiFont,
-        fontSize: "0.78rem",
-        lineHeight: 1,
-      }}
-    >
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-      {copied ? "Copiado" : "Copiar"}
-    </button>
-  );
-}
 
 interface GiftsSectionProps {
   giftRegistry: GiftRegistry;
@@ -302,7 +235,24 @@ export default function GiftsSection({
                         </div>
                       </div>
                       {row.copyable && (
-                        <CopyableValue value={row.value} theme={theme} />
+                        <CopyableValue
+                          value={row.value}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            flexShrink: 0,
+                            padding: "0.35rem 0.65rem",
+                            borderRadius: 8,
+                            border: "none",
+                            cursor: "pointer",
+                            background: `color-mix(in srgb, ${theme.secondary} 18%, transparent)`,
+                            color: theme.primary,
+                            fontFamily: theme.uiFont,
+                            fontSize: "0.78rem",
+                            lineHeight: 1,
+                          }}
+                        />
                       )}
                     </div>
                   ))}
