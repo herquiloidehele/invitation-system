@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { giftsPagePath, hasBankTransfer, hasGiftItems } from "@/lib/gift-registry";
+import {
+  giftsPagePath,
+  hasBankTransfer,
+  hasGiftItems,
+  isExclusiveGiftSelectionEnabled,
+} from "@/lib/gift-registry";
 import type { GiftItem } from "@/lib/types";
 
 const item = (over: Partial<GiftItem> = {}): GiftItem => ({
@@ -72,5 +77,21 @@ describe("giftsPagePath", () => {
   it("ignores a null/empty token", () => {
     expect(giftsPagePath("joao-maria", null)).toBe("/joao-maria/gifts");
     expect(giftsPagePath("joao-maria", "")).toBe("/joao-maria/gifts");
+  });
+});
+
+describe("isExclusiveGiftSelectionEnabled", () => {
+  it("defaults missing configuration to false", () => {
+    expect(isExclusiveGiftSelectionEnabled(null)).toBe(false);
+    expect(isExclusiveGiftSelectionEnabled({})).toBe(false);
+  });
+
+  it("is true only for an explicit true value", () => {
+    expect(
+      isExclusiveGiftSelectionEnabled({ exclusiveSelectionEnabled: false }),
+    ).toBe(false);
+    expect(
+      isExclusiveGiftSelectionEnabled({ exclusiveSelectionEnabled: true }),
+    ).toBe(true);
   });
 });

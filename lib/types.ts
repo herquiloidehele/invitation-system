@@ -152,6 +152,8 @@ export interface BankTransferDetail {
 export interface GiftRegistry {
   enabled: boolean;
   text: string;
+  /** When true, each product item can have only one active guest reservation. */
+  exclusiveSelectionEnabled?: boolean;
   /** Legacy external registry link (kept for backwards-compat; non-breaking). */
   link?: string;
   /** Product grid shown on /{slug}/gifts. */

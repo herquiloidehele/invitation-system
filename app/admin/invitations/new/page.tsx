@@ -56,7 +56,12 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         },
         schedule: [],
         dressCode: { enabled: false, text: "" },
-        giftRegistry: { enabled: false, text: "", link: "" },
+        giftRegistry: {
+          enabled: false,
+          text: "",
+          link: "",
+          exclusiveSelectionEnabled: false,
+        },
         audio: { enabled: false, src: "", artist: "", title: "" },
         heroImage: "",
         videoUrl: "",
