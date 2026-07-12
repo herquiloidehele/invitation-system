@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 
 import GiftsListView from "@/components/gifts/GiftsListView";
-import { hasGiftItems } from "@/lib/gift-registry";
+import {
+  hasGiftItems,
+  isExclusiveGiftSelectionEnabled,
+} from "@/lib/gift-registry";
+import { getGiftAvailability } from "@/lib/gift-reservations";
 import { getInvitation } from "@/lib/invitations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
@@ -43,12 +47,19 @@ export default async function GiftsPage({
     if (found && found.invitationSlug === slug) guest = found;
   }
 
+  const initialAvailability = isExclusiveGiftSelectionEnabled(
+    invitation.giftRegistry,
+  )
+    ? await getGiftAvailability({ slug, guestToken: guest?.token })
+    : undefined;
+
   return (
     <GiftsListView
       invitation={{ ...invitation, guest }}
       theme={theme}
       slug={slug}
       guestToken={guest?.token}
+      initialAvailability={initialAvailability}
     />
   );
 }
