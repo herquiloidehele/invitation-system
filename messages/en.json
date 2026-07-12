@@ -328,6 +328,7 @@
   "OwnerConfirmations": {
     "rsvpsTab": "Confirmations",
     "guestsTab": "Guests",
+    "giftsTab": "Gifts",
     "responses": "Responses",
     "attending": "Confirmed",
     "declined": "Not attending",
@@ -346,7 +347,17 @@
     "exportLoading": "Generating PDF…",
     "exportErrorStatus": "Failed to generate PDF ({status})",
     "exportErrorUnknown": "Unknown error",
-    "guestsListTitle": "Guest list"
+    "guestsListTitle": "Guest list",
+    "giftsTitle": "Chosen gifts",
+    "giftsEmpty": "No gifts have been chosen yet.",
+    "giftsPersonalized": "Personalized invitation",
+    "giftsPublicLink": "Public link",
+    "giftsRemoved": "Removed from gift list",
+    "giftsRelease": "Release gift",
+    "giftsReleaseTitle": "Release this gift?",
+    "giftsReleaseDescription": "The gift will become available to guests again.",
+    "giftsCancel": "Cancel",
+    "giftsError": "The gift list could not be updated. Try again."
   },
   "Invitation": {
     "sectionTitle_ourStory": "Our Story",

@@ -4,6 +4,7 @@ import {
   normalizePublicGuestName,
   projectGiftAvailability,
   type GiftAvailability,
+  type GiftReservationOwnerRow,
 } from "@/lib/gift-reservation-domain";
 import { isExclusiveGiftSelectionEnabled } from "@/lib/gift-registry";
 import type { GiftItem, GiftRegistry } from "@/lib/types";
@@ -88,7 +89,10 @@ async function loadExclusiveInvitation(
 
   const registry = asGiftRegistry(invitation.giftRegistry);
   if (!registry.enabled || !isExclusiveGiftSelectionEnabled(registry)) {
-    throw new GiftReservationError("disabled", "Gift reservations are disabled");
+    throw new GiftReservationError(
+      "disabled",
+      "Gift reservations are disabled",
+    );
   }
 
   return {
@@ -121,7 +125,9 @@ async function findPublicReservation(managementToken: string) {
   });
 }
 
-async function ownedReservationId(input: IdentityInput): Promise<string | null> {
+async function ownedReservationId(
+  input: IdentityInput,
+): Promise<string | null> {
   if (input.guestToken) {
     const guest = await resolvePersonalizedGuest(input.slug, input.guestToken);
     const reservation = await prisma.giftReservation.findUnique({
@@ -308,4 +314,74 @@ export async function releaseGuestGift(
   return {
     availability: await getGiftAvailability(input),
   };
+}
+
+async function resolveOwnerInvitation(ownerToken: string) {
+  const invitation = await prisma.invitation.findUnique({
+    where: { ownerToken },
+    select: { slug: true, giftRegistry: true },
+  });
+  if (!invitation) {
+    throw new GiftReservationError("not_found", "Invitation not found");
+  }
+  return {
+    slug: invitation.slug,
+    registry: asGiftRegistry(invitation.giftRegistry),
+  };
+}
+
+export async function listOwnerGiftReservations(
+  ownerToken: string,
+): Promise<GiftReservationOwnerRow[]> {
+  const invitation = await resolveOwnerInvitation(ownerToken);
+  if (!isExclusiveGiftSelectionEnabled(invitation.registry)) {
+    throw new GiftReservationError(
+      "disabled",
+      "Gift reservations are disabled",
+    );
+  }
+
+  const reservations = await prisma.giftReservation.findMany({
+    where: { invitationSlug: invitation.slug },
+    orderBy: { reservedAt: "desc" },
+    select: {
+      id: true,
+      giftItemId: true,
+      giftName: true,
+      guestName: true,
+      guestId: true,
+      reservedAt: true,
+    },
+  });
+  const currentGiftIds = new Set(
+    (invitation.registry.items ?? []).map((gift) => gift.id),
+  );
+
+  return reservations.map((reservation) => ({
+    id: reservation.id,
+    giftItemId: reservation.giftItemId,
+    giftName: reservation.giftName,
+    guestName: reservation.guestName,
+    source: reservation.guestId ? "personalized" : "public",
+    reservedAt: reservation.reservedAt.toISOString(),
+    removedFromGiftList: !currentGiftIds.has(reservation.giftItemId),
+  }));
+}
+
+export async function releaseOwnerGiftReservation(
+  ownerToken: string,
+  reservationId: string,
+): Promise<void> {
+  const invitation = await resolveOwnerInvitation(ownerToken);
+  const reservation = await prisma.giftReservation.findUnique({
+    where: { id: reservationId },
+    select: { id: true, invitationSlug: true },
+  });
+  if (!reservation) {
+    throw new GiftReservationError("not_found", "Reservation not found");
+  }
+  if (reservation.invitationSlug !== invitation.slug) {
+    throw new GiftReservationError("forbidden", "Forbidden");
+  }
+  await prisma.giftReservation.delete({ where: { id: reservation.id } });
 }

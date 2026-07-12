@@ -328,6 +328,7 @@
   "OwnerConfirmations": {
     "rsvpsTab": "Confirmações",
     "guestsTab": "Convidados",
+    "giftsTab": "Presentes",
     "responses": "Respostas",
     "attending": "Confirmados",
     "declined": "Não vão",
@@ -346,7 +347,17 @@
     "exportLoading": "A gerar PDF…",
     "exportErrorStatus": "Erro ao gerar PDF ({status})",
     "exportErrorUnknown": "Erro desconhecido",
-    "guestsListTitle": "Lista de convidados"
+    "guestsListTitle": "Lista de convidados",
+    "giftsTitle": "Presentes escolhidos",
+    "giftsEmpty": "Nenhum presente foi escolhido ainda.",
+    "giftsPersonalized": "Convite personalizado",
+    "giftsPublicLink": "Link público",
+    "giftsRemoved": "Removido da lista de presentes",
+    "giftsRelease": "Libertar presente",
+    "giftsReleaseTitle": "Libertar este presente?",
+    "giftsReleaseDescription": "O presente ficará novamente disponível para os convidados.",
+    "giftsCancel": "Cancelar",
+    "giftsError": "Não foi possível atualizar a lista de presentes. Tente novamente."
   },
   "Invitation": {
     "sectionTitle_ourStory": "Nossa História",
