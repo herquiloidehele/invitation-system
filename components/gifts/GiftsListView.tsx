@@ -1,27 +1,18 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { type CSSProperties, useMemo, useState } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
-import {
-  ArrowLeft,
-  Check,
-  ChevronLeft,
-  ExternalLink,
-  Gift,
-  LockKeyhole,
-} from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ExternalLink, Gift, LockKeyhole } from "lucide-react";
 
-import GiftReservationDialog, {
-  type GiftReservationDialogMode,
-} from "@/components/gifts/GiftReservationDialog";
+import GiftReservationDialog, { type GiftReservationDialogMode } from "@/components/gifts/GiftReservationDialog";
 import { useGiftReservations } from "@/components/gifts/useGiftReservations";
 import { Link } from "@/i18n/routing";
 import { useCustomText } from "@/lib/custom-texts";
 import {
-  resolveGiftCardState,
   type GiftAvailability,
   type GiftAvailabilityStatus,
+  resolveGiftCardState
 } from "@/lib/gift-reservation-domain";
 import type { GiftItem, InvitationData, TemplateTheme } from "@/lib/types";
 
@@ -493,7 +484,10 @@ function GiftCardReservationActions({
       <button
         type="button"
         disabled={pending}
-        onClick={onChoose}
+        onClick={(event) => {
+          event.preventDefault();
+          onChoose();
+        }}
         style={{
           ...actionStyle,
           border: "none",
@@ -533,7 +527,10 @@ function GiftCardReservationActions({
       <button
         type="button"
         disabled={pending}
-        onClick={onRelease}
+        onClick={(event) => {
+          event.preventDefault();
+          onRelease();
+        }}
         style={{
           ...actionStyle,
           border: "none",
