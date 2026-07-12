@@ -36,7 +36,65 @@
   "dressCode": { "enabled": true, "text": "Cocktail Attire" },
   "giftRegistry": {
     "enabled": true,
-    "text": "A vossa presença é o melhor presente"
+    "text": "A vossa presença é o melhor presente. Se desejarem contribuir, temos uma lista simbólica.",
+    "link": "https://example.com/lista-kezia-ruben",
+    "exclusiveSelectionEnabled": false,
+    "items": [
+      {
+        "id": "gift-1",
+        "name": "Jogo de taças de cristal",
+        "imageUrl": "https://images.unsplash.com/photo-1578911373434-0cb395d2cbfb?w=400&q=80",
+        "price": "€85",
+        "link": "https://example.com/produto/tacas-cristal"
+      },
+      {
+        "id": "gift-2",
+        "name": "Conjunto de facas profissionais",
+        "price": "€120"
+      },
+      {
+        "id": "gift-3",
+        "name": "Máquina de café expresso",
+        "imageUrl": "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&q=80",
+        "price": "€250"
+      },
+      {
+        "id": "gift-4",
+        "name": "Jogo de lençóis de algodão egípcio",
+        "price": "€95"
+      },
+      {
+        "id": "gift-5",
+        "name": "Vale de jantar para dois",
+        "price": "€150",
+        "link": "https://example.com/produto/jantar-dois"
+      }
+    ],
+    "bankTransferText": "Para quem preferir contribuir por transferência bancária:",
+    "bankTransfer": [
+      {
+        "id": "bank-1",
+        "label": "Banco",
+        "value": "Caixa Geral de Depósitos"
+      },
+      {
+        "id": "bank-2",
+        "label": "IBAN",
+        "value": "PT50 0007 0000 1234 5678 9012 3",
+        "copyable": true
+      },
+      {
+        "id": "bank-3",
+        "label": "NIB",
+        "value": "0007 0000 1234 5678 9012 3",
+        "copyable": true
+      },
+      {
+        "id": "bank-4",
+        "label": "Titular",
+        "value": "Kézia & Rúben"
+      }
+    ]
   },
   "audio": {
     "enabled": true,
