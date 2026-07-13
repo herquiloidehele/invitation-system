@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  type MutableRefObject,
-  type RefObject,
-  useLayoutEffect,
-  useState,
-} from "react";
+import { type MutableRefObject, type RefObject, useLayoutEffect, useState } from "react";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
@@ -17,20 +12,17 @@ import ExternalCountdownSection from "./ExternalCountdownSection";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import dynamic from "next/dynamic";
-
-// Lazy-load RSVPForm so its react-hook-form + zod dependencies only
-// ship when a guest actually scrolls down to the RSVP section.
-const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
-import PersonalGuestCard, {
-  PREVIEW_SAMPLE_GUEST,
-  PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
-} from "./PersonalGuestCard";
+import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST, PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY } from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
 import PlacesSection from "./PlacesSection";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowRichExternalRsvp } from "@/lib/external-invitation-form";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { SpacingStyleProvider } from "./SpacingStyleProvider";
+
+// Lazy-load RSVPForm so its react-hook-form + zod dependencies only
+// ship when a guest actually scrolls down to the RSVP section.
+const RSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
 
 interface RichExternalLinkPageProps {
   invitation: InvitationData;
@@ -193,151 +185,154 @@ export default function RichExternalLinkPage({
   return (
     <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
       <main
-      style={{
-        background: theme.bg,
-        color: theme.textPrimary,
-        minHeight: "100dvh",
-        // Belt-and-suspenders alongside the document-level overflowAnchor
-        // override applied in the layout effect above — keeps this subtree
-        // out of the browser's scroll-anchor candidate set even if the
-        // <main> renders before the effect commits.
-        overflowAnchor: "none",
-      }}
-    >
-      <ImageCanvas layer={invitation.imageLayer}>
-      <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
-
-      {heroOn && (
-        <>
-          <InvitationHero
-            invitation={invitation}
-            theme={theme}
-            audioRef={audioRef}
-            prefetchedVideoRef={prefetchedVideoRef}
-            animateHeroText={animateHeroText}
-          />
-          {invitation.heroTextLayer?.hideDefaultText !== true && (
-            <InvitationHeroNames
-              invitation={invitation}
-              theme={theme}
-              isPreview={isPreview}
-            />
-          )}
-        </>
-      )}
-
-      {(invitation.guestManagementEnabled || isLandingPreview) &&
-        !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
-          <div className="pb-12 md:pb-16">
-            <PersonalGuestCard
-              guest={
-                invitation.guest ??
-                (isLandingPreview
-                  ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
-                  : PREVIEW_SAMPLE_GUEST)
-              }
-              theme={theme}
-              textStyles={invitation.textStyles}
-              customTexts={invitation.customTexts}
-            />
-          </div>
-        )}
-
-      {scratchOn && (
-        <ScratchDateReveal
-          date={invitation.date}
-          theme={theme}
-          customTexts={invitation.customTexts}
-          textStyles={invitation.textStyles}
-          backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}
-          scrimOpacity={invitation.scratchReveal?.scrimOpacity}
-          imageSettings={invitation.imageSettings}
-        />
-      )}
-
-      {countdownOn && (
-        <ExternalCountdownSection invitation={invitation} theme={theme} />
-      )}
-
-      <CanvaEmbed
-        externalLink={externalLink}
-        theme={theme}
-        title="Convite"
-        onInitialPageChange={(isInitialPage) =>
-          setCanvaPageState({ externalLink, isInitialPage })
-        }
-        preloading={canvaPreloading}
-        guest={invitation.guest ?? null}
-      />
-
-      <PlacesSection
-        invitation={invitation}
-        theme={theme}
-        cardStyle={{
-          cardBg: invitation.cardStyles?.places?.cardBg,
-          cardBorder: invitation.cardStyles?.places?.cardBorder,
-          borderRadius: invitation.cardStyles?.places?.borderRadius,
-          accentColor: invitation.cardStyles?.places?.accentColor,
+        style={{
+          background: theme.bg,
+          color: theme.textPrimary,
+          minHeight: "100dvh",
+          // Belt-and-suspenders alongside the document-level overflowAnchor
+          // override applied in the layout effect above — keeps this subtree
+          // out of the browser's scroll-anchor candidate set even if the
+          // <main> renders before the effect commits.
+          overflowAnchor: "none",
         }}
-        isPreview={isPreview}
-      />
+      >
+        <ImageCanvas layer={invitation.imageLayer}>
+          <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
 
-      {showRsvp && (
-        <>
-          <SectionOrnament theme={theme} />
-          <section
-            id="rsvp"
-            className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
-            style={
-              invitation.rsvp.backgroundImageUrl
-                ? {
-                    backgroundImage: `url(${invitation.rsvp.backgroundImageUrl})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }
-                : undefined
-            }
-          >
-            <div className="max-w-[600px] mx-auto">
-              <div className="text-center mb-8">
-                <span
-                  className="uppercase"
-                  style={{
-                    fontFamily: theme.uiFont,
-                    color: theme.textSecondary,
-                    fontSize: 11,
-                    letterSpacing: "0.3em",
-                    ...resolveTextElementOverride(
-                      invitation.textStyles,
-                      "inviteLabel",
-                    ),
-                  }}
-                >
-                  <EditableText elementKey="inviteLabel">RSVP</EditableText>
-                </span>
-                <div
-                  aria-hidden
-                  className="mx-auto mt-3"
-                  style={{
-                    width: 40,
-                    height: 1,
-                    background: theme.accent || "#C9A961",
-                    opacity: 0.7,
-                  }}
-                />
-              </div>
-              <RSVPForm
-                inline
+          {heroOn && (
+            <>
+              <InvitationHero
                 invitation={invitation}
                 theme={theme}
-                customTexts={invitation.customTexts}
-                guest={invitation.guest}
+                audioRef={audioRef}
+                prefetchedVideoRef={prefetchedVideoRef}
+                animateHeroText={animateHeroText}
               />
-            </div>
-          </section>
-        </>
-      )}
-      </ImageCanvas>
+              {invitation.heroTextLayer?.hideDefaultText !== true && (
+                <InvitationHeroNames
+                  invitation={invitation}
+                  theme={theme}
+                  isPreview={isPreview}
+                />
+              )}
+            </>
+          )}
+
+          {scratchOn && (
+            <ScratchDateReveal
+              date={invitation.date}
+              theme={theme}
+              customTexts={invitation.customTexts}
+              textStyles={invitation.textStyles}
+              backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}
+              scrimOpacity={invitation.scratchReveal?.scrimOpacity}
+              imageSettings={invitation.imageSettings}
+            />
+          )}
+
+          {countdownOn && (
+            <ExternalCountdownSection invitation={invitation} theme={theme} />
+          )}
+
+          {(invitation.guestManagementEnabled || isLandingPreview) &&
+            !isPersonalGuestCardHiddenInPreview(
+              invitation,
+              isLandingPreview,
+            ) && (
+              <div className="pb-2">
+                <PersonalGuestCard
+                  guest={
+                    invitation.guest ??
+                    (isLandingPreview
+                      ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
+                      : PREVIEW_SAMPLE_GUEST)
+                  }
+                  theme={theme}
+                  textStyles={invitation.textStyles}
+                  customTexts={invitation.customTexts}
+                />
+              </div>
+            )}
+
+          <CanvaEmbed
+            externalLink={externalLink}
+            theme={theme}
+            title="Convite"
+            onInitialPageChange={(isInitialPage) =>
+              setCanvaPageState({ externalLink, isInitialPage })
+            }
+            preloading={canvaPreloading}
+            guest={invitation.guest ?? null}
+          />
+
+          <PlacesSection
+            invitation={invitation}
+            theme={theme}
+            cardStyle={{
+              cardBg: invitation.cardStyles?.places?.cardBg,
+              cardBorder: invitation.cardStyles?.places?.cardBorder,
+              borderRadius: invitation.cardStyles?.places?.borderRadius,
+              accentColor: invitation.cardStyles?.places?.accentColor,
+            }}
+            isPreview={isPreview}
+          />
+
+          {showRsvp && (
+            <>
+              <SectionOrnament theme={theme} />
+              <section
+                id="rsvp"
+                className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
+                style={
+                  invitation.rsvp.backgroundImageUrl
+                    ? {
+                        backgroundImage: `url(${invitation.rsvp.backgroundImageUrl})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }
+                    : undefined
+                }
+              >
+                <div className="max-w-[600px] mx-auto">
+                  <div className="text-center mb-8">
+                    <span
+                      className="uppercase"
+                      style={{
+                        fontFamily: theme.uiFont,
+                        color: theme.textSecondary,
+                        fontSize: 11,
+                        letterSpacing: "0.3em",
+                        ...resolveTextElementOverride(
+                          invitation.textStyles,
+                          "inviteLabel",
+                        ),
+                      }}
+                    >
+                      <EditableText elementKey="inviteLabel">RSVP</EditableText>
+                    </span>
+                    <div
+                      aria-hidden
+                      className="mx-auto mt-3"
+                      style={{
+                        width: 40,
+                        height: 1,
+                        background: theme.accent || "#C9A961",
+                        opacity: 0.7,
+                      }}
+                    />
+                  </div>
+                  <RSVPForm
+                    inline
+                    invitation={invitation}
+                    theme={theme}
+                    customTexts={invitation.customTexts}
+                    guest={invitation.guest}
+                  />
+                </div>
+              </section>
+            </>
+          )}
+        </ImageCanvas>
       </main>
     </SpacingStyleProvider>
   );
