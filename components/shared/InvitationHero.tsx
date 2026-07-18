@@ -8,6 +8,7 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
+import { getHeroSectionHeight } from "@/lib/hero-section-height";
 import {
   heroScrollIndicatorBottom,
   resolveHeroScrollIndicator,
@@ -58,8 +59,6 @@ const namesFadeInUp: Variants = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const DEFAULT_IMAGE_HERO_HEIGHT = 300;
-
 /** Default opacity for the dark scrim shown over hero videos. */
 export const DEFAULT_HERO_SCRIM_OPACITY = 0.38;
 /**
@@ -73,13 +72,7 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-export function getHeroSectionHeight(
-  invitation: Pick<InvitationData, "videoUrl" | "heroHeight">,
-): "100dvh" | number {
-  return invitation.videoUrl
-    ? "100dvh"
-    : (invitation.heroHeight ?? DEFAULT_IMAGE_HERO_HEIGHT);
-}
+export { getHeroSectionHeight } from "@/lib/hero-section-height";
 
 function toAudioTheme(theme: TemplateTheme) {
   return {

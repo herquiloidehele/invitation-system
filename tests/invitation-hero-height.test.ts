@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getHeroSectionHeight } from "../components/shared/InvitationPage";
+import { getHeroSectionHeight } from "@/lib/hero-section-height";
 
 describe("getHeroSectionHeight", () => {
   it("keeps video heroes full viewport height", () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -8,6 +9,7 @@ import {
   Link2,
   CheckCircle2,
   Copy,
+  CopyPlus,
   Check,
   ExternalLink,
 } from "lucide-react";
@@ -34,6 +36,7 @@ import {
 } from "@/lib/invitation-event-types";
 
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -101,6 +104,16 @@ import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
 import { HERO_VIDEO_UPLOAD_PROFILE } from "@/lib/video-upload";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
+import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
+import {
+  invitationFormCopy,
+  invitationFormRequest,
+  isCreateLikeInvitationMode,
+  readInvitationFormError,
+  type InvitationFormError,
+  type InvitationFormMode,
+} from "@/lib/invitation-form-mode";
+import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -217,8 +230,10 @@ type ExternalSubType = "external_video" | "external_link";
 
 interface ExternalInvitationFormProps {
   initialData?: InvitationData & { id?: string };
-  mode: "create" | "edit";
+  mode: InvitationFormMode;
   invitationId?: string;
+  sourceInvitationId?: string;
+  sourceCustomerName?: string;
   ownerUrl?: string;
   themes: TemplateTheme[];
 }
@@ -303,11 +318,19 @@ export default function ExternalInvitationForm({
   initialData,
   mode,
   invitationId,
+  sourceInvitationId,
+  sourceCustomerName,
   ownerUrl,
   themes,
 }: ExternalInvitationFormProps) {
   const router = useRouter();
+  const formCopy = invitationFormCopy(mode, true);
+  const createLike = isCreateLikeInvitationMode(mode);
   const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<InvitationFormError | null>(
+    null,
+  );
+  const clearSubmitError = useCallback(() => setSubmitError(null), []);
 
   const [form, setForm] = useState<InvitationData>(
     initialData ?? getDefaultState(themes[0]),
@@ -332,9 +355,10 @@ export default function ExternalInvitationForm({
   // Generic field updater
   const update = useCallback(
     <K extends keyof InvitationData>(key: K, value: InvitationData[K]) => {
+      clearSubmitError();
       setForm((prev) => ({ ...prev, [key]: value }));
     },
-    [],
+    [clearSubmitError],
   );
 
   // Per-element text style override updater. Mirrors the helper in
@@ -368,6 +392,7 @@ export default function ExternalInvitationForm({
   // Couple fields — auto-derive slug + monogram
   const updateCouple = useCallback(
     (field: "bride" | "groom", value: string) => {
+      clearSubmitError();
       setForm((prev) => {
         const couple = { ...prev.couple, [field]: value };
         couple.monogram = buildInvitationMonogram({
@@ -375,22 +400,22 @@ export default function ExternalInvitationForm({
           primaryName: field === "bride" ? value : prev.couple.bride,
           secondaryName: field === "groom" ? value : prev.couple.groom,
         });
-        const newSlug =
-          mode === "create"
-            ? buildInvitationSlug({
-                eventType: prev.eventType,
-                primaryName: field === "bride" ? value : prev.couple.bride,
-                secondaryName: field === "groom" ? value : prev.couple.groom,
-              })
-            : prev.slug;
+        const newSlug = createLike
+          ? buildInvitationSlug({
+              eventType: prev.eventType,
+              primaryName: field === "bride" ? value : prev.couple.bride,
+              secondaryName: field === "groom" ? value : prev.couple.groom,
+            })
+          : prev.slug;
         return { ...prev, couple, slug: newSlug };
       });
     },
-    [mode],
+    [clearSubmitError, createLike],
   );
 
   const updateEventType = useCallback(
     (eventType: InvitationEventType) => {
+      clearSubmitError();
       setForm((prev) => {
         const couple = {
           ...prev.couple,
@@ -401,7 +426,7 @@ export default function ExternalInvitationForm({
           }),
         };
         const next: InvitationData = { ...prev, eventType, couple };
-        return mode === "create"
+        return createLike
           ? {
               ...next,
               slug: buildInvitationSlug({
@@ -413,7 +438,7 @@ export default function ExternalInvitationForm({
           : next;
       });
     },
-    [mode],
+    [clearSubmitError, createLike],
   );
 
   // Envelope overrides
@@ -733,11 +758,11 @@ export default function ExternalInvitationForm({
 
     setSaving(true);
     try {
-      const url =
-        mode === "create"
-          ? "/api/admin/invitations"
-          : `/api/admin/invitations/${invitationId}`;
-      const method = mode === "create" ? "POST" : "PUT";
+      const { url, method } = invitationFormRequest(
+        mode,
+        invitationId,
+        sourceInvitationId,
+      );
 
       const res = await fetch(url, {
         method,
@@ -745,16 +770,16 @@ export default function ExternalInvitationForm({
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Falha ao guardar");
-      }
-
       const data = await res.json();
-      toast.success(
-        mode === "create" ? "Convite externo criado!" : "Convite atualizado!",
-      );
-      if (mode === "create") {
+      if (!res.ok) {
+        const nextError = readInvitationFormError(data, "Falha ao guardar");
+        setSubmitError(nextError);
+        throw new Error(nextError.message);
+      }
+      setSubmitError(null);
+
+      toast.success(formCopy.successMessage);
+      if (mode !== "edit") {
         router.push(`/admin/invitations/${data.id}/edit`);
       }
       router.refresh();
@@ -777,22 +802,41 @@ export default function ExternalInvitationForm({
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-semibold tracking-tight">
-                  {mode === "create"
-                    ? "Novo Convite Externo"
-                    : "Editar Convite Externo"}
+                  {formCopy.title}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
                   Capa animada + vídeo ou link externo em ecrã completo
                 </p>
               </div>
-              <Button onClick={handleSubmit} disabled={saving}>
-                {saving
-                  ? "A guardar..."
-                  : mode === "create"
-                    ? "Criar"
-                    : "Guardar Alterações"}
-              </Button>
+              <div className="flex items-center gap-2">
+                {mode === "edit" && invitationId && (
+                  <Link
+                    href={getInvitationDuplicatePath(invitationId)}
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    <CopyPlus className="size-4" />
+                    Duplicar convite
+                  </Link>
+                )}
+                {mode === "duplicate" && (
+                  <Link
+                    href="/admin/invitations"
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    Cancelar
+                  </Link>
+                )}
+                <Button onClick={handleSubmit} disabled={saving}>
+                  {saving ? "A guardar..." : formCopy.submitLabel}
+                </Button>
+              </div>
             </div>
+
+            {mode === "duplicate" && sourceCustomerName && (
+              <InvitationDuplicateNotice
+                sourceCustomerName={sourceCustomerName}
+              />
+            )}
 
             {/* Owner link (edit only) */}
             {mode === "edit" && ownerUrl && (
@@ -925,6 +969,11 @@ export default function ExternalInvitationForm({
                       </div>
                     )}
                   </div>
+                  {submitError?.field === "couple" && (
+                    <p role="alert" className="text-sm text-destructive">
+                      {submitError.message}
+                    </p>
+                  )}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label
@@ -963,6 +1012,11 @@ export default function ExternalInvitationForm({
                       />
                     </div>
                   </div>
+                  {submitError?.field === "slug" && (
+                    <p role="alert" className="text-sm text-destructive">
+                      {submitError.message}
+                    </p>
+                  )}
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
                     <div className="space-y-0.5">
                       <Label htmlFor="external-isDemo">
@@ -1420,7 +1474,8 @@ export default function ExternalInvitationForm({
                         Para nomes compridos ficarem centrados, dá à caixa de
                         texto do marcador uma <strong>largura fixa</strong>{" "}
                         (arrasta as pegas laterais) com alinhamento ao centro —
-                        senão a caixa cresce para o lado e o texto sai do centro.
+                        senão a caixa cresce para o lado e o texto sai do
+                        centro.
                       </p>
                       <p>
                         O botão de confirmação deve apontar para{" "}
@@ -2666,7 +2721,9 @@ export default function ExternalInvitationForm({
                         </div>
                         <Switch
                           checked={form.rsvp.showCompanion === true}
-                          onCheckedChange={(v) => updateRsvp("showCompanion", v)}
+                          onCheckedChange={(v) =>
+                            updateRsvp("showCompanion", v)
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between gap-4">
@@ -2679,7 +2736,9 @@ export default function ExternalInvitationForm({
                         </div>
                         <Switch
                           checked={form.rsvp.showNumAdults === true}
-                          onCheckedChange={(v) => updateRsvp("showNumAdults", v)}
+                          onCheckedChange={(v) =>
+                            updateRsvp("showNumAdults", v)
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between gap-4">
@@ -2811,9 +2870,9 @@ export default function ExternalInvitationForm({
                             Permitir que o anfitrião adicione convidados
                           </Label>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            Quando activo, o anfitrião pode adicionar convidados na
-                            página de gestão dele. Quando desactivado, só tu podes
-                            adicionar convidados aqui.
+                            Quando activo, o anfitrião pode adicionar convidados
+                            na página de gestão dele. Quando desactivado, só tu
+                            podes adicionar convidados aqui.
                           </p>
                         </div>
                         <Switch
@@ -2903,7 +2962,10 @@ export default function ExternalInvitationForm({
                             "personalGuestCardBackground",
                           )}
                           onPositionChange={(s) =>
-                            updateImageSettings("personalGuestCardBackground", s)
+                            updateImageSettings(
+                              "personalGuestCardBackground",
+                              s,
+                            )
                           }
                           idPrefix="pgcBg"
                         />

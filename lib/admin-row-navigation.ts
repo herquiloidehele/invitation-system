@@ -1,6 +1,9 @@
 export const getInvitationEditPath = (id: string) =>
   `/admin/invitations/${id}/edit`;
 
+export const getInvitationDuplicatePath = (id: string) =>
+  `/admin/invitations/${id}/duplicate`;
+
 export const getSaveTheDateEditPath = (id: string) =>
   `/admin/save-the-dates/${id}/edit`;
 
