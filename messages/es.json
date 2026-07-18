@@ -119,6 +119,18 @@
       "engagement": "Compromiso"
     }
   },
+  "LandingCustomInvitation": {
+    "eyebrow": "Una alternativa solo para ti",
+    "title": "¿No te han gustado las plantillas del modelo Dream de arriba? ¿Quieres crear algo nuevo y completamente tuyo?",
+    "body": "No te preocupes, podemos crear tu modelo totalmente personalizado con la estructura que quieras.",
+    "priceLabel": "precio del proyecto",
+    "timelineValue": "1 mes",
+    "timelineLabel": "plazo mínimo",
+    "cta": "Crear mi invitación",
+    "ctaNote": "Se abre en WhatsApp",
+    "ctaAria": "Crear una invitación personalizada por WhatsApp",
+    "whatsappMessage": "¡Hola! Me gustaría crear una invitación 100 % personalizada."
+  },
   "LandingProcess": {
     "eyebrow": "Proceso",
     "title": "Del primer contacto al envío final.",

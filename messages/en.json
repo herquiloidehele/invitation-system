@@ -119,6 +119,18 @@
       "engagement": "Engagement"
     }
   },
+  "LandingCustomInvitation": {
+    "eyebrow": "Made just for you",
+    "title": "Didn't like the Dream model templates above? Want to create something completely your own?",
+    "body": "Don't worry, we can create a fully customized model with whatever structure you want.",
+    "priceLabel": "project price",
+    "timelineValue": "1 month",
+    "timelineLabel": "minimum lead time",
+    "cta": "Create my invitation",
+    "ctaNote": "Opens in WhatsApp",
+    "ctaAria": "Create a custom invitation on WhatsApp",
+    "whatsappMessage": "Hello! I'd like to create a 100% custom invitation."
+  },
   "LandingProcess": {
     "eyebrow": "Process",
     "title": "From the first chat to the final share.",

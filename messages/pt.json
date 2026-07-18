@@ -119,6 +119,18 @@
       "engagement": "Noivado"
     }
   },
+  "LandingCustomInvitation": {
+    "eyebrow": "Uma alternativa só sua",
+    "title": "Não gostou dos templates do modelo Dream acima? Quer criar algo novo completamente seu?",
+    "body": "Não te preocupes, é possível criar o seu modelo totalmente customizado com a estrutura que tu desejares.",
+    "priceLabel": "preço do projeto",
+    "timelineValue": "1 mês",
+    "timelineLabel": "prazo mínimo",
+    "cta": "Criar o meu convite",
+    "ctaNote": "Abre no WhatsApp",
+    "ctaAria": "Criar um convite personalizado pelo WhatsApp",
+    "whatsappMessage": "Olá! Gostaria de criar um convite 100% personalizado."
+  },
   "LandingProcess": {
     "eyebrow": "Processo",
     "title": "Do primeiro contacto à partilha.",

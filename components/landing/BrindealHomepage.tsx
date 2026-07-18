@@ -10,6 +10,7 @@ import type {
   LiveDemoFeature
 } from "@/lib/landing-features";
 import { BestSellersSection } from "./BestSellersSection";
+import { CustomInvitationSection } from "./CustomInvitationSection";
 import { FaqSection } from "./FaqSection";
 import { FeaturesSection } from "./FeaturesSection";
 import { Footer } from "./Footer";
@@ -49,6 +50,7 @@ export function BrindealHomepage({
         itemsByCategory={galleryByCategory}
         settings={gallerySettings}
       />
+      <CustomInvitationSection currentCurrency={currentCurrency} />
       <ProcessSection />
       <FeaturesSection />
       <InvitationConstellationSection
