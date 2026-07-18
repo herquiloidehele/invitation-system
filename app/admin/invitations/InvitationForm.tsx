@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -40,11 +41,13 @@ import {
   Loader2,
   MapPin,
   Plus,
+  CopyPlus,
   RotateCcw,
   X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -103,6 +106,7 @@ import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
 import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
+import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
@@ -116,6 +120,15 @@ import {
   type SpacingField,
   type SpacingTarget,
 } from "@/lib/spacing-styles";
+import {
+  invitationFormCopy,
+  invitationFormRequest,
+  isCreateLikeInvitationMode,
+  readInvitationFormError,
+  type InvitationFormError,
+  type InvitationFormMode,
+} from "@/lib/invitation-form-mode";
+import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -485,8 +498,10 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
 
 interface InvitationFormProps {
   initialData?: InvitationData & { id?: string };
-  mode: "create" | "edit";
+  mode: InvitationFormMode;
   invitationId?: string;
+  sourceInvitationId?: string;
+  sourceCustomerName?: string;
   ownerUrl?: string;
   /** All available themes (fetched by the server parent and passed down). */
   themes: TemplateTheme[];
@@ -496,11 +511,19 @@ export default function InvitationForm({
   initialData,
   mode,
   invitationId,
+  sourceInvitationId,
+  sourceCustomerName,
   ownerUrl,
   themes,
 }: InvitationFormProps) {
   const router = useRouter();
+  const formCopy = invitationFormCopy(mode, false);
+  const createLike = isCreateLikeInvitationMode(mode);
   const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<InvitationFormError | null>(
+    null,
+  );
+  const clearSubmitError = useCallback(() => setSubmitError(null), []);
   const [form, setForm] = useState<InvitationData>(
     initialData ?? getDefaultFormState(themes[0]),
   );
@@ -583,14 +606,16 @@ export default function InvitationForm({
   // Generic updater
   const update = useCallback(
     <K extends keyof InvitationData>(key: K, value: InvitationData[K]) => {
+      clearSubmitError();
       setForm((prev) => ({ ...prev, [key]: value }));
     },
-    [],
+    [clearSubmitError],
   );
 
   // Nested updaters
   const updateCouple = useCallback(
     (field: keyof InvitationData["couple"], value: string) => {
+      clearSubmitError();
       setForm((prev) => {
         const couple = { ...prev.couple, [field]: value };
         // Auto-derive monogram
@@ -602,7 +627,7 @@ export default function InvitationForm({
           });
         }
         // Auto-derive slug when creating
-        if (mode === "create" && (field === "bride" || field === "groom")) {
+        if (createLike && (field === "bride" || field === "groom")) {
           const slug = buildInvitationSlug({
             eventType: prev.eventType,
             primaryName: field === "bride" ? value : prev.couple.bride,
@@ -613,11 +638,12 @@ export default function InvitationForm({
         return { ...prev, couple };
       });
     },
-    [mode],
+    [clearSubmitError, createLike],
   );
 
   const updateEventType = useCallback(
     (eventType: InvitationEventType) => {
+      clearSubmitError();
       setForm((prev) => {
         const couple = {
           ...prev.couple,
@@ -628,7 +654,7 @@ export default function InvitationForm({
           }),
         };
         const next: InvitationData = { ...prev, eventType, couple };
-        return mode === "create"
+        return createLike
           ? {
               ...next,
               slug: buildInvitationSlug({
@@ -640,7 +666,7 @@ export default function InvitationForm({
           : next;
       });
     },
-    [mode],
+    [clearSubmitError, createLike],
   );
 
   const updateDate = useCallback(
@@ -1309,8 +1335,8 @@ export default function InvitationForm({
   const hasSpacingStyles = Boolean(
     (form.spacingStyles?.sections &&
       Object.keys(form.spacingStyles.sections).length > 0) ||
-      (form.spacingStyles?.elements &&
-        Object.keys(form.spacingStyles.elements).length > 0),
+    (form.spacingStyles?.elements &&
+      Object.keys(form.spacingStyles.elements).length > 0),
   );
 
   const patchDressCode = useCallback(
@@ -1382,11 +1408,11 @@ export default function InvitationForm({
 
     setSaving(true);
     try {
-      const url =
-        mode === "create"
-          ? "/api/admin/invitations"
-          : `/api/admin/invitations/${invitationId}`;
-      const method = mode === "create" ? "POST" : "PUT";
+      const { url, method } = invitationFormRequest(
+        mode,
+        invitationId,
+        sourceInvitationId,
+      );
 
       const res = await fetch(url, {
         method,
@@ -1394,17 +1420,16 @@ export default function InvitationForm({
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Falha ao guardar");
-      }
-
       const data = await res.json();
+      if (!res.ok) {
+        const nextError = readInvitationFormError(data, "Falha ao guardar");
+        setSubmitError(nextError);
+        throw new Error(nextError.message);
+      }
+      setSubmitError(null);
 
-      toast.success(
-        mode === "create" ? "Convite criado!" : "Convite atualizado!",
-      );
-      if (mode === "create") {
+      toast.success(formCopy.successMessage);
+      if (mode !== "edit") {
         router.push(`/admin/invitations/${data.id}/edit`);
       }
       router.refresh();
@@ -1426,16 +1451,37 @@ export default function InvitationForm({
             {/* Page title */}
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-semibold tracking-tight">
-                {mode === "create" ? "Novo Convite" : "Editar Convite"}
+                {formCopy.title}
               </h1>
-              <Button onClick={handleSubmit} disabled={saving}>
-                {saving
-                  ? "A guardar..."
-                  : mode === "create"
-                    ? "Criar"
-                    : "Guardar Alterações"}
-              </Button>
+              <div className="flex items-center gap-2">
+                {mode === "edit" && invitationId && (
+                  <Link
+                    href={getInvitationDuplicatePath(invitationId)}
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    <CopyPlus className="size-4" />
+                    Duplicar convite
+                  </Link>
+                )}
+                {mode === "duplicate" && (
+                  <Link
+                    href="/admin/invitations"
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    Cancelar
+                  </Link>
+                )}
+                <Button onClick={handleSubmit} disabled={saving}>
+                  {saving ? "A guardar..." : formCopy.submitLabel}
+                </Button>
+              </div>
             </div>
+
+            {mode === "duplicate" && sourceCustomerName && (
+              <InvitationDuplicateNotice
+                sourceCustomerName={sourceCustomerName}
+              />
+            )}
 
             {/* Owner link — only shown in edit mode */}
             {mode === "edit" && ownerUrl && (
@@ -1496,6 +1542,11 @@ export default function InvitationForm({
                       </div>
                     )}
                   </div>
+                  {submitError?.field === "couple" && (
+                    <p role="alert" className="text-sm text-destructive">
+                      {submitError.message}
+                    </p>
+                  )}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="monogram">Monograma</Label>
@@ -1518,6 +1569,11 @@ export default function InvitationForm({
                       />
                     </div>
                   </div>
+                  {submitError?.field === "slug" && (
+                    <p role="alert" className="text-sm text-destructive">
+                      {submitError.message}
+                    </p>
+                  )}
 
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
                     <div className="space-y-0.5">
@@ -3630,9 +3686,9 @@ export default function InvitationForm({
                             Permitir que o anfitrião adicione convidados
                           </Label>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            Quando activo, o anfitrião pode adicionar convidados na
-                            página de gestão dele. Quando desactivado, só tu podes
-                            adicionar convidados aqui.
+                            Quando activo, o anfitrião pode adicionar convidados
+                            na página de gestão dele. Quando desactivado, só tu
+                            podes adicionar convidados aqui.
                           </p>
                         </div>
                         <Switch

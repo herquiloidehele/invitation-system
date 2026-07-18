@@ -53,6 +53,7 @@ const baseRow = {
   cardStyles: null,
   spacingStyles: null,
   imageSettings: null,
+  customTexts: null,
   eventType: "wedding",
   invitationType: "external_link",
   externalLink: null,
@@ -216,6 +217,16 @@ describe("toAdminInvitationInitialData — imageLayer round-trip", () => {
     const row = { ...baseRow, imageLayer: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.imageLayer).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — customTexts round-trip", () => {
+  it("hydrates per-invitation copy into admin initial data", () => {
+    const customTexts = { sectionTitle_schedule: "Programa" };
+
+    expect(
+      toAdminInvitationInitialData({ ...baseRow, customTexts }).customTexts,
+    ).toEqual(customTexts);
   });
 });
 

@@ -76,6 +76,7 @@ type AdminInvitationInitialDataRow = {
   cardStyles: unknown;
   spacingStyles: unknown;
   imageSettings: unknown;
+  customTexts: unknown;
   eventType: string | null;
   invitationType: string;
   externalLink: string | null;
@@ -158,6 +159,8 @@ export function toAdminInvitationInitialData(
     spacingStyles:
       (row.spacingStyles as SpacingStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
+    customTexts:
+      (row.customTexts as InvitationData["customTexts"] | null) ?? undefined,
     eventType: (row.eventType as InvitationEventType | null) ?? "wedding",
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,

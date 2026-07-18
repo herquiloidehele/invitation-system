@@ -1,9 +1,20 @@
-import { createElement } from "react";
+import { createElement, type ComponentProps, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import SectionImageHost from "@/components/shared/SectionImageHost";
 import type { ImageItem, ImageLayer } from "@/lib/types";
+
+type TestSectionImageHostProps = Omit<
+  ComponentProps<typeof SectionImageHost>,
+  "children"
+> & {
+  children?: ReactNode;
+};
+
+const TestSectionImageHost = SectionImageHost as (
+  props: TestSectionImageHostProps,
+) => ReactNode;
 
 function makeItem(
   id: string,
@@ -42,8 +53,11 @@ describe("SectionImageHost", () => {
   it("renders only images assigned to its section", () => {
     const html = renderToStaticMarkup(
       createElement(
-        SectionImageHost,
-        { sectionKey: "dressCode", layer },
+        TestSectionImageHost,
+        {
+          sectionKey: "dressCode",
+          layer,
+        },
         createElement("div", null, "Dress content"),
       ),
     );
@@ -56,8 +70,11 @@ describe("SectionImageHost", () => {
   it("keeps section overflow visible for unrestricted placement", () => {
     const html = renderToStaticMarkup(
       createElement(
-        SectionImageHost,
-        { sectionKey: "dressCode", layer },
+        TestSectionImageHost,
+        {
+          sectionKey: "dressCode",
+          layer,
+        },
         createElement("div", null, "Dress content"),
       ),
     );

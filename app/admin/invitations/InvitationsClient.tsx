@@ -59,12 +59,16 @@ import {
   ChevronDown,
   Scroll,
   Link2,
+  CopyPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { InvitationRow } from "./page";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
-import { getInvitationEditPath } from "@/lib/admin-row-navigation";
+import {
+  getInvitationDuplicatePath,
+  getInvitationEditPath,
+} from "@/lib/admin-row-navigation";
 
 const TEMPLATE_LABELS: Record<string, string> = {
   "pink-floral": "Pink Floral",
@@ -470,7 +474,22 @@ export function InvitationsClient({
                             </Link>
 
                             <Link
-                              href={`/admin/invitations/${inv.id}/edit`}
+                              href={getInvitationDuplicatePath(inv.id)}
+                              className={cn(
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "icon",
+                                }),
+                                "size-8 text-muted-foreground",
+                              )}
+                              title="Duplicar convite"
+                            >
+                              <CopyPlus className="size-4" />
+                              <span className="sr-only">Duplicar convite</span>
+                            </Link>
+
+                            <Link
+                              href={getInvitationEditPath(inv.id)}
                               className={cn(
                                 buttonVariants({
                                   variant: "ghost",
