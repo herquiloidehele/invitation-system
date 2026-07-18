@@ -29,7 +29,41 @@ const layer: ImageLayer = {
   ],
 };
 
+const mixedLayer: ImageLayer = {
+  items: [
+    {
+      ...layer.items[0],
+      id: "dress",
+      src: "/dress.png",
+      sectionKey: "dressCode",
+    },
+    { ...layer.items[0], id: "legacy", src: "/legacy.png" },
+  ],
+};
+
 describe("ImageCanvas", () => {
+  it("leaves hosted section items to SectionImageHost", () => {
+    const html = renderToStaticMarkup(
+      createElement(
+        ImageCanvas,
+        { layer: mixedLayer, hostedSectionKeys: ["dressCode"] },
+        createElement("section", null, "Content"),
+      ),
+    );
+
+    expect(html).not.toContain("/dress.png");
+    expect(html).toContain("/legacy.png");
+  });
+
+  it("falls back to the page canvas when an anchor is not hosted", () => {
+    const html = renderToStaticMarkup(
+      createElement(ImageCanvas, { layer: mixedLayer }, null),
+    );
+
+    expect(html).toContain("/dress.png");
+    expect(html).toContain("/legacy.png");
+  });
+
   it("renders front images above content by default", () => {
     const html = renderToStaticMarkup(
       createElement(
@@ -69,7 +103,7 @@ describe("ImageCanvas", () => {
 
     expect(html).toContain('data-image-band="front"');
     expect(html).toContain("z-index:4");
-    expect(html).not.toContain("z-index:1\">Hero content");
+    expect(html).not.toContain('z-index:1">Hero content');
   });
 
   it("interleaves front images in the entrance curtain and video cover layouts", () => {

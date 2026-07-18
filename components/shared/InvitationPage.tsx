@@ -7,11 +7,7 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import {
-  ChevronDown,
-  Heart,
-  Shirt,
-} from "lucide-react";
+import { ChevronDown, Heart, Shirt } from "lucide-react";
 
 import type {
   CardSectionKey,
@@ -38,6 +34,7 @@ import SaveTheDateSection from "./SaveTheDateSection";
 import CoupleGallery from "./gallery/CoupleGallery";
 import SectionImage from "./SectionImage";
 import ImageCanvas from "./ImageCanvas";
+import SectionImageHost from "./SectionImageHost";
 import PlacesSection from "./PlacesSection";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
@@ -48,6 +45,9 @@ import InvitationHero, {
   InvitationHeroNames,
 } from "./InvitationHero";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { getStandardInvitationImageSectionKeys } from "@/lib/standard-invitation-image-sections";
+import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
+import { shouldRenderPlaces } from "@/lib/places";
 import {
   breatheAnimation,
   EASE,
@@ -410,7 +410,10 @@ export default function InvitationPage({
         position: "relative",
       }}
     >
-      <ImageCanvas layer={invitation.imageLayer}>
+        <ImageCanvas
+          layer={invitation.imageLayer}
+          hostedSectionKeys={getStandardInvitationImageSectionKeys(invitation)}
+        >
       {/* Load any non-builtin Google Fonts used by this theme */}
       <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
 
@@ -441,6 +444,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 1. Hero — full viewport video or image                            */}
       {/* ================================================================= */}
+          <SectionImageHost sectionKey="hero" layer={invitation.imageLayer}>
       <InvitationHero
         invitation={invitation}
         theme={theme}
@@ -459,6 +463,7 @@ export default function InvitationPage({
           isPreview={isPreview}
         />
       )}
+          </SectionImageHost>
 
       {/* ================================================================= */}
       {/* Personal guest card — shown when ?g=<token> matches a guest, in   */}
@@ -466,7 +471,10 @@ export default function InvitationPage({
       {/* (sample guest, for display only)                                  */}
       {/* ================================================================= */}
       {(invitation.guest || isPreview || isLandingPreview) &&
-        !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
+            !isPersonalGuestCardHiddenInPreview(
+              invitation,
+              isLandingPreview,
+            ) && (
           <div className={"py-8"}>
             <PersonalGuestCard
               guest={
@@ -485,6 +493,10 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 3. Date Card — Save the Date (style varies per invitation)        */}
       {/* ================================================================= */}
+          <SectionImageHost
+            sectionKey="saveTheDate"
+            layer={invitation.imageLayer}
+          >
       <AnimatedSection
         className={`px-4 pb-10 ${invitation.videoUrl ? "pt-16" : ""}`}
         variants={scaleIn}
@@ -509,17 +521,23 @@ export default function InvitationPage({
           </EditableCard>
         </motion.div>
       </AnimatedSection>
+          </SectionImageHost>
 
       {/* ================================================================= */}
       {/* IMAGE 1 — after Save the Date info                                */}
       {/* ================================================================= */}
       {invitation.sectionImages?.image1 && (
+            <SectionImageHost
+              sectionKey="sectionImage1"
+              layer={invitation.imageLayer}
+            >
         <SectionImage
           src={invitation.sectionImages.image1}
           theme={theme}
           imageSettings={invitation.imageSettings}
           imageKey="sectionImage1"
         />
+            </SectionImageHost>
       )}
 
       <SectionDivider theme={theme} />
@@ -528,14 +546,18 @@ export default function InvitationPage({
       {/* 3b. Nossa História — couple's story                               */}
       {/* ================================================================= */}
       {invitation.ourStory?.enabled && invitation.ourStory.description && (
-        <>
+            <SectionImageHost
+              sectionKey="ourStory"
+              layer={invitation.imageLayer}
+            >
           <AnimatedSection className="px-4 pb-2" isPreview={isPreview}>
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles}>
                 <EditableText elementKey="sectionTitles">
                   <WordReveal
                     text={
-                      invitation.ourStory.title || t("sectionTitle_ourStory")
+                          invitation.ourStory.title ||
+                          t("sectionTitle_ourStory")
                     }
                     isPreview={isPreview}
                   />
@@ -604,22 +626,33 @@ export default function InvitationPage({
           </AnimatedSection>
 
           <SectionDivider theme={theme} />
-        </>
+            </SectionImageHost>
       )}
 
       {/* ================================================================= */}
       {/* Couple Gallery — opt-in photo carousel                            */}
       {/* ================================================================= */}
+          {shouldRenderCoupleGallery(invitation) && (
+            <SectionImageHost
+              sectionKey="coupleGallery"
+              layer={invitation.imageLayer}
+            >
       <CoupleGallery
         invitation={invitation}
         theme={theme}
         isPreview={isPreview}
       />
+            </SectionImageHost>
+          )}
 
       {/* ================================================================= */}
       {/* 4. Schedule                                                       */}
       {/* ================================================================= */}
       {invitation.schedule.length > 0 && (
+            <SectionImageHost
+              sectionKey="schedule"
+              layer={invitation.imageLayer}
+            >
         <ScheduleSection
           schedule={invitation.schedule}
           scheduleStyle={invitation.scheduleStyle}
@@ -629,18 +662,24 @@ export default function InvitationPage({
           customTexts={invitation.customTexts}
           isPreview={isPreview}
         />
+            </SectionImageHost>
       )}
 
       {/* ================================================================= */}
       {/* IMAGE 2 — between schedule and info cards                         */}
       {/* ================================================================= */}
       {invitation.sectionImages?.image2 && (
+            <SectionImageHost
+              sectionKey="sectionImage2"
+              layer={invitation.imageLayer}
+            >
         <SectionImage
           src={invitation.sectionImages.image2}
           theme={theme}
           imageSettings={invitation.imageSettings}
           imageKey="sectionImage2"
         />
+            </SectionImageHost>
       )}
 
       <SectionDivider theme={theme} />
@@ -648,6 +687,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 5b. Location Card Section                                         */}
       {/* ================================================================= */}
+          <SectionImageHost sectionKey="location" layer={invitation.imageLayer}>
       <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
           <span style={ts.sectionTitles}>
@@ -708,28 +748,40 @@ export default function InvitationPage({
           </div>
         )}
       </AnimatedSection>
+          </SectionImageHost>
 
       {/* ================================================================= */}
       {/* IMAGE 3 — between location and guest guide / FAQs                 */}
       {/* ================================================================= */}
       {invitation.sectionImages?.image3 && (
+            <SectionImageHost
+              sectionKey="sectionImage3"
+              layer={invitation.imageLayer}
+            >
         <SectionImage
           src={invitation.sectionImages.image3}
           theme={theme}
           imageSettings={invitation.imageSettings}
           imageKey="sectionImage3"
         />
+            </SectionImageHost>
       )}
 
       {/* ================================================================= */}
       {/* 5. Info Cards — glassmorphism, opposing slide-ins                  */}
       {/* ================================================================= */}
-      {(invitation.dressCode.enabled || invitation.giftRegistry.enabled) && (
-        <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
+          {(invitation.dressCode.enabled ||
+            invitation.giftRegistry.enabled) && (
+            <AnimatedSection className="pb-10" isPreview={isPreview}>
           <SectionDivider theme={theme} />
           <div className={`flex flex-col gap-6`}>
             {/* Dress Code — slides from left */}
             {invitation.dressCode.enabled && (
+                  <SectionImageHost
+                    sectionKey="dressCode"
+                    layer={invitation.imageLayer}
+                    className="px-4"
+                  >
               <EditableCard sectionKey="dressCode">
                 <motion.div
                   variants={slideFromLeft}
@@ -759,7 +811,11 @@ export default function InvitationPage({
                     }}
                     animate={floatAnimation}
                   >
-                    <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
+                          <Shirt
+                            size={20}
+                            color={ts.accent}
+                            strokeWidth={1.5}
+                          />
                   </motion.div>
                   <span style={ts.labels}>
                     <EditableText elementKey="labels">
@@ -810,10 +866,16 @@ export default function InvitationPage({
                   )}
                 </motion.div>
               </EditableCard>
+                  </SectionImageHost>
             )}
 
             {/* Gift Registry — slides from right */}
             {invitation.giftRegistry.enabled && (
+                  <SectionImageHost
+                    sectionKey="giftRegistry"
+                    layer={invitation.imageLayer}
+                    className="px-4"
+                  >
               <EditableCard sectionKey="giftRegistry">
                 <motion.div
                   id="gifts"
@@ -849,6 +911,7 @@ export default function InvitationPage({
                   />
                 </motion.div>
               </EditableCard>
+                  </SectionImageHost>
             )}
           </div>
         </AnimatedSection>
@@ -859,7 +922,10 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {invitation.guestGuide?.enabled &&
         invitation.guestGuide.items.length > 0 && (
-          <>
+              <SectionImageHost
+                sectionKey="guestGuide"
+                layer={invitation.imageLayer}
+              >
             <SectionDivider theme={theme} />
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles} className={"text-center"}>
@@ -901,14 +967,14 @@ export default function InvitationPage({
                 />
               </EditableCard>
             </AnimatedSection>
-          </>
+              </SectionImageHost>
         )}
 
       {/* ================================================================= */}
       {/* 7. FAQs                                                           */}
       {/* ================================================================= */}
       {invitation.faqs && invitation.faqs.length > 0 && (
-        <>
+            <SectionImageHost sectionKey="faqs" layer={invitation.imageLayer}>
           <SectionDivider theme={theme} />
 
           <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
@@ -979,12 +1045,14 @@ export default function InvitationPage({
               </motion.div>
             </EditableCard>
           </AnimatedSection>
-        </>
+            </SectionImageHost>
       )}
 
       {/* ================================================================= */}
       {/* Places — hotels, restaurants, attractions (before RSVP CTA)       */}
       {/* ================================================================= */}
+          {shouldRenderPlaces(invitation) && (
+            <SectionImageHost sectionKey="places" layer={invitation.imageLayer}>
       <EditableCard sectionKey="places">
         <PlacesSection
           invitation={invitation}
@@ -993,6 +1061,8 @@ export default function InvitationPage({
           isPreview={isPreview}
         />
       </EditableCard>
+            </SectionImageHost>
+          )}
 
       {/* ================================================================= */}
       {/* 6. CTA Section                                                    */}
@@ -1086,6 +1156,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 8. Footer — monogram with decorative ring                         */}
       {/* ================================================================= */}
+          <SectionImageHost sectionKey="footer" layer={invitation.imageLayer}>
       <AnimatedSection variants={ambientFade} isPreview={isPreview}>
         <footer className="flex flex-col items-center pb-12 pt-6">
           {/* Decorative accent line */}
@@ -1126,7 +1197,10 @@ export default function InvitationPage({
                 border: `1px solid ${theme.accent}`,
                 opacity: 0.08,
               }}
-              animate={{ scale: [1, 1.08, 1], opacity: [0.08, 0.18, 0.08] }}
+                    animate={{
+                      scale: [1, 1.08, 1],
+                      opacity: [0.08, 0.18, 0.08],
+                    }}
               transition={{
                 duration: 3.6,
                 repeat: Infinity,
@@ -1157,11 +1231,16 @@ export default function InvitationPage({
           </span>
         </footer>
       </AnimatedSection>
+          </SectionImageHost>
 
       {/* ================================================================= */}
       {/* IMAGE 4 — bottom of page                                          */}
       {/* ================================================================= */}
       {invitation.sectionImages?.image4 && (
+            <SectionImageHost
+              sectionKey="sectionImage4"
+              layer={invitation.imageLayer}
+            >
         <SectionImage
           src={invitation.sectionImages.image4}
           theme={theme}
@@ -1170,6 +1249,7 @@ export default function InvitationPage({
           imageSettings={invitation.imageSettings}
           imageKey="sectionImage4"
         />
+            </SectionImageHost>
       )}
 
       {/* ================================================================= */}

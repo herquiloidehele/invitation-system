@@ -93,6 +93,22 @@ describe("CRUD helpers", () => {
     expect(added.opacity).toBe(1);
   });
 
+  it("stores the optional section anchor on a new item", () => {
+    const next = addItem(
+      { items: [] },
+      {
+        id: "dress",
+        src: "/dress.png",
+        naturalAspect: 1,
+        sectionKey: "dressCode",
+        xPct: 50,
+        yPct: 50,
+      },
+    );
+
+    expect(next.items[0].sectionKey).toBe("dressCode");
+  });
+
   it("updateItem patches by id", () => {
     const next = updateItem(base, "i1", { opacity: 0.5 });
     expect(next.items[0].opacity).toBe(0.5);

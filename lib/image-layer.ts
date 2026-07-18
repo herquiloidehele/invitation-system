@@ -117,7 +117,10 @@ export function normalizeImageLayer(value: unknown): ImageLayer {
   return { items };
 }
 
-export function canAddItem(layer: ImageLayer): { ok: boolean; reason?: string } {
+export function canAddItem(layer: ImageLayer): {
+  ok: boolean;
+  reason?: string;
+} {
   if (layer.items.length >= MAX_ITEMS_TOTAL) {
     return {
       ok: false,
@@ -142,6 +145,7 @@ export function addItem(
     id: string;
     src: string;
     naturalAspect: number;
+    sectionKey?: ImageLayerSectionKey;
     xPct?: number;
     yPct?: number;
     widthPct?: number;
@@ -153,6 +157,7 @@ export function addItem(
     src: init.src,
     naturalAspect: init.naturalAspect,
     aspect: init.naturalAspect,
+    ...(init.sectionKey ? { sectionKey: init.sectionKey } : {}),
     xPct: init.xPct ?? DEFAULT_IMAGE_ITEM.xPct,
     yPct: init.yPct ?? DEFAULT_IMAGE_ITEM.yPct,
     widthPct: init.widthPct ?? DEFAULT_IMAGE_ITEM.widthPct,

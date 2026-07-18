@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import type { ImageLayer } from "@/lib/types";
+import type { ImageLayer, ImageLayerSectionKey } from "@/lib/types";
 import ImageLayerOverlay from "./ImageLayerOverlay";
 
 interface ImageCanvasProps {
@@ -12,6 +12,8 @@ interface ImageCanvasProps {
    * hero media but below temporary curtain/cover surfaces.
    */
   frontLayerPosition?: "above-content" | "below-content" | "interleaved";
+  /** Section keys rendered by nested SectionImageHost instances. */
+  hostedSectionKeys?: readonly ImageLayerSectionKey[];
 }
 
 /**
@@ -26,8 +28,12 @@ export default function ImageCanvas({
   layer,
   children,
   frontLayerPosition = "above-content",
+  hostedSectionKeys,
 }: ImageCanvasProps) {
-  const items = layer?.items ?? [];
+  const hosted = new Set(hostedSectionKeys ?? []);
+  const items = (layer?.items ?? []).filter(
+    (item) => !item.sectionKey || !hosted.has(item.sectionKey),
+  );
 
   if (items.length === 0) {
     return (

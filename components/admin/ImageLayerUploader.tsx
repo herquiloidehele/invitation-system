@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import MediaUpload from "@/components/admin/MediaUpload";
 import { EMPTY_IMAGE_LAYER, addItem, canAddItem } from "@/lib/image-layer";
 import {
+  type ImageAnchorRect,
+  clientToCanvasPct,
+  findImageAnchorRect,
   findImageEditorViewport,
-  visibleViewportCenterPct,
 } from "@/lib/image-layer-editor-geometry";
-import type { ImageLayer } from "@/lib/types";
+import type { ImageLayer, ImageLayerSectionKey } from "@/lib/types";
 
 interface ImageLayerUploaderProps {
   value?: ImageLayer;
@@ -54,6 +56,7 @@ export default function ImageLayerUploader({
         img.naturalHeight > 0 ? img.naturalWidth / img.naturalHeight : 1;
       let xPct = 50;
       let yPct = 50;
+      let anchor: ImageAnchorRect | null = null;
       const root = getPreviewRoot();
       const canvasEl = root?.querySelector(
         "[data-image-canvas]",
@@ -65,16 +68,41 @@ export default function ImageLayerUploader({
         });
         const vr = viewport.getBoundingClientRect();
         const cr = canvasEl.getBoundingClientRect();
-        const p = visibleViewportCenterPct(
-          { left: cr.left, top: cr.top, width: cr.width, height: cr.height },
-          { left: vr.left, top: vr.top, width: vr.width, height: vr.height },
-        );
+        const canvasRect = {
+          left: cr.left,
+          top: cr.top,
+          width: cr.width,
+          height: cr.height,
+        };
+        const centerX = vr.left + vr.width / 2;
+        const centerY = vr.top + vr.height / 2;
+        const sections = Array.from(
+          root.querySelectorAll<HTMLElement>("[data-section-key]"),
+        ).map((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            sectionKey: element.dataset.sectionKey as ImageLayerSectionKey,
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+          };
+        });
+        anchor = findImageAnchorRect(sections, centerY);
+        const p = clientToCanvasPct(anchor ?? canvasRect, centerX, centerY);
         xPct = p.xPct;
         yPct = p.yPct;
       }
       const id = newId();
       onChange(
-        addItem(layer, { id, src: url, naturalAspect: aspect, xPct, yPct }),
+        addItem(layer, {
+          id,
+          src: url,
+          naturalAspect: aspect,
+          sectionKey: anchor?.sectionKey,
+          xPct,
+          yPct,
+        }),
       );
       onAdded?.(id);
     };

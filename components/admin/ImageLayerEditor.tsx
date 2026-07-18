@@ -9,11 +9,15 @@ import {
   useState,
 } from "react";
 
-import { EMPTY_IMAGE_LAYER, moveItem, updateItem } from "@/lib/image-layer";
+import { clampPos, EMPTY_IMAGE_LAYER, updateItem } from "@/lib/image-layer";
 import {
+  type ImageAnchorRect,
   type Rect,
-  clientToCanvasPct,
+  findImageAnchorRect,
   findImageEditorViewport,
+  migrateLegacyImageItems,
+  percentGeometryFromPixels,
+  pixelGeometryFromPercent,
   resizeWidthPct,
   rotationFromPointer,
 } from "@/lib/image-layer-editor-geometry";
@@ -21,7 +25,7 @@ import {
   forwardImageEditorWheel,
   observeImageLayerEditor,
 } from "@/lib/image-layer-editor-observer";
-import type { ImageItem, ImageLayer } from "@/lib/types";
+import type { ImageItem, ImageLayer, ImageLayerSectionKey } from "@/lib/types";
 
 const CORNERS: { k: string; pos: CSSProperties }[] = [
   { k: "tl", pos: { left: -5, top: -5 } },
@@ -65,6 +69,17 @@ function viewportOf(root: HTMLElement): HTMLElement {
   });
 }
 
+function rectForItem(
+  item: ImageItem,
+  canvas: Rect,
+  sections: readonly ImageAnchorRect[],
+): Rect {
+  if (!item.sectionKey) return canvas;
+  return (
+    sections.find((section) => section.sectionKey === item.sectionKey) ?? canvas
+  );
+}
+
 /**
  * On-preview interaction overlay for the free-floating image layer: drag to
  * move, corner handles to resize, top handle to rotate. Selection is
@@ -103,6 +118,32 @@ export default function ImageLayerEditor({
     return rectOf(root?.querySelector("[data-image-canvas]"));
   }, [getPreviewRoot]);
 
+  const readSectionRects = useCallback((): ImageAnchorRect[] => {
+    const root = getPreviewRoot();
+    if (!root) return [];
+    return Array.from(root.querySelectorAll<HTMLElement>("[data-section-key]"))
+      .map((element) => {
+        const sectionKey = element.dataset.sectionKey as ImageLayerSectionKey;
+        const rect = rectOf(element);
+        return rect ? { ...rect, sectionKey } : null;
+      })
+      .filter((rect): rect is ImageAnchorRect => rect !== null);
+  }, [getPreviewRoot]);
+
+  useEffect(() => {
+    if (!active || layer.items.every((item) => item.sectionKey)) return;
+    const canvas = readCanvasRect();
+    if (!canvas) return;
+    const migrated = migrateLegacyImageItems(
+      layer.items,
+      canvas,
+      readSectionRects(),
+    );
+    if (migrated !== layer.items) {
+      onChange({ items: [...migrated] });
+    }
+  }, [active, layer.items, onChange, readCanvasRect, readSectionRects]);
+
   const handleWheel = useCallback(
     (e: React.WheelEvent<HTMLDivElement>) => {
       const root = getPreviewRoot();
@@ -120,28 +161,61 @@ export default function ImageLayerEditor({
       const item = layer.items.find((i) => i.id === id);
       const canvas = readCanvasRect();
       if (item && canvas) {
-        const cx = canvas.left + (item.xPct / 100) * canvas.width;
-        const cy = canvas.top + (item.yPct / 100) * canvas.height;
-        dragOffset.current = { dx: e.clientX - cx, dy: e.clientY - cy };
+        const anchor = rectForItem(item, canvas, readSectionRects());
+        const pixels = pixelGeometryFromPercent(
+          anchor,
+          item.xPct,
+          item.yPct,
+          item.widthPct,
+        );
+        dragOffset.current = {
+          dx: e.clientX - pixels.centerX,
+          dy: e.clientY - pixels.centerY,
+        };
       } else {
         dragOffset.current = { dx: 0, dy: 0 };
       }
       e.currentTarget.setPointerCapture(e.pointerId);
     },
-    [layer.items, readCanvasRect, onSelectedIdChange],
+    [layer.items, readCanvasRect, readSectionRects, onSelectedIdChange],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>, id: string) => {
       if (!dragOffset.current) return;
       const canvas = readCanvasRect();
-      if (!canvas) return;
-      const cx = e.clientX - dragOffset.current.dx;
-      const cy = e.clientY - dragOffset.current.dy;
-      const { xPct, yPct } = clientToCanvasPct(canvas, cx, cy);
-      onChange(moveItem(layer, id, xPct, yPct));
+      const item = layer.items.find((candidate) => candidate.id === id);
+      if (!canvas || !item) return;
+
+      const sections = readSectionRects();
+      const currentAnchor = rectForItem(item, canvas, sections);
+      const currentPixels = pixelGeometryFromPercent(
+        currentAnchor,
+        item.xPct,
+        item.yPct,
+        item.widthPct,
+      );
+      const centerX = e.clientX - dragOffset.current.dx;
+      const centerY = e.clientY - dragOffset.current.dy;
+      const target = findImageAnchorRect(sections, centerY);
+      const geometry = percentGeometryFromPixels(
+        target ?? canvas,
+        centerX,
+        centerY,
+        currentPixels.widthPx,
+      );
+      onChange(
+        updateItem(layer, id, {
+          ...(target
+            ? { sectionKey: target.sectionKey }
+            : { sectionKey: undefined }),
+          xPct: clampPos(geometry.xPct),
+          yPct: clampPos(geometry.yPct),
+          widthPct: geometry.widthPct,
+        }),
+      );
     },
-    [layer, onChange, readCanvasRect],
+    [layer, onChange, readCanvasRect, readSectionRects],
   );
 
   const handlePointerUp = useCallback(
@@ -180,20 +254,25 @@ export default function ImageLayerEditor({
       if (handleMode.current !== "resize") return;
       const canvas = readCanvasRect();
       if (!canvas) return;
-      const centerX = canvas.left + (item.xPct / 100) * canvas.width;
-      const centerY = canvas.top + (item.yPct / 100) * canvas.height;
+      const anchor = rectForItem(item, canvas, readSectionRects());
+      const { centerX, centerY } = pixelGeometryFromPercent(
+        anchor,
+        item.xPct,
+        item.yPct,
+        item.widthPct,
+      );
       onChange(
         updateItem(layer, item.id, {
           widthPct: resizeWidthPct(
             { centerX, centerY },
             e.clientX,
             e.clientY,
-            canvas,
+            anchor,
           ),
         }),
       );
     },
-    [layer, onChange, readCanvasRect],
+    [layer, onChange, readCanvasRect, readSectionRects],
   );
 
   const onRotateMove = useCallback(
@@ -201,15 +280,20 @@ export default function ImageLayerEditor({
       if (handleMode.current !== "rotate") return;
       const canvas = readCanvasRect();
       if (!canvas) return;
-      const centerX = canvas.left + (item.xPct / 100) * canvas.width;
-      const centerY = canvas.top + (item.yPct / 100) * canvas.height;
+      const anchor = rectForItem(item, canvas, readSectionRects());
+      const { centerX, centerY } = pixelGeometryFromPercent(
+        anchor,
+        item.xPct,
+        item.yPct,
+        item.widthPct,
+      );
       onChange(
         updateItem(layer, item.id, {
           rotation: rotationFromPointer(centerX, centerY, e.clientX, e.clientY),
         }),
       );
     },
-    [layer, onChange, readCanvasRect],
+    [layer, onChange, readCanvasRect, readSectionRects],
   );
 
   if (!active) return null;
@@ -218,6 +302,7 @@ export default function ImageLayerEditor({
   const preview = rectOf(previewRoot ? viewportOf(previewRoot) : null);
   const canvas = readCanvasRect();
   if (!preview || !canvas) return null;
+  const sections = readSectionRects();
 
   return (
     <div
@@ -237,9 +322,17 @@ export default function ImageLayerEditor({
       {[...layer.items]
         .sort((a, b) => a.z - b.z)
         .map((item) => {
-          const cx = canvas.left + (item.xPct / 100) * canvas.width;
-          const cy = canvas.top + (item.yPct / 100) * canvas.height;
-          const w = (item.widthPct / 100) * canvas.width;
+          const anchor = rectForItem(item, canvas, sections);
+          const {
+            centerX: cx,
+            centerY: cy,
+            widthPx: w,
+          } = pixelGeometryFromPercent(
+            anchor,
+            item.xPct,
+            item.yPct,
+            item.widthPct,
+          );
           const h = w / (item.aspect || 1);
           const left = cx - preview.left - w / 2;
           const top = cy - preview.top - h / 2;
