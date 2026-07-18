@@ -24,7 +24,7 @@ export function CustomInvitationSection({
           <div className="flex justify-center lg:justify-start">
             <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
           </div>
-          <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.03em] sm:text-4xl">
+          <h2 className="mt-5 text-balance text-2xl font-medium tracking-[-0.03em] sm:text-4xl">
             {t("title")}
           </h2>
           <p className="mx-auto mt-4 max-w-md text-pretty text-sm leading-7 text-muted-foreground lg:mx-0">

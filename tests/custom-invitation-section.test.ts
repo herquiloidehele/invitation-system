@@ -45,7 +45,7 @@ describe("CustomInvitationSection", () => {
     const html = renderSection();
 
     expect(html).toContain(
-      "Não gostou dos templates do modelo Dream acima? Quer criar algo novo completamente seu?",
+      "Gostaria de criar o seu modelo Dream 100% personalizado?",
     );
     expect(html).toContain(
       "Não te preocupes, é possível criar o seu modelo totalmente customizado com a estrutura que tu desejares.",
@@ -61,13 +61,13 @@ describe("CustomInvitationSection", () => {
     const spanishHtml = renderSection("es", es);
 
     expect(englishHtml).toContain(
-      "Didn't like the Dream model templates above? Want to create something completely your own?",
+      "Would you like to create your 100% personalized Dream model?",
     );
     expect(englishHtml).toContain(
       "Don't worry, we can create a fully customized model with whatever structure you want.",
     );
     expect(spanishHtml).toContain(
-      "¿No te han gustado las plantillas del modelo Dream de arriba? ¿Quieres crear algo nuevo y completamente tuyo?",
+      "¿Te gustaría crear tu modelo Dream 100% personalizado?",
     );
     expect(spanishHtml).toContain(
       "No te preocupes, podemos crear tu modelo totalmente personalizado con la estructura que quieras.",
