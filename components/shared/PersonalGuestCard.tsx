@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, UserPlus, Users } from "lucide-react";
 
-import type {
-  CustomTexts,
-  ImageSettingsMap,
-  PublicGuestData,
-  TemplateTheme,
-  TextStyleOverrides,
-} from "@/lib/types";
+import type { CustomTexts, ImageSettingsMap, PublicGuestData, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { useCustomText } from "@/lib/custom-texts";
@@ -42,7 +36,7 @@ export const PREVIEW_SAMPLE_GUEST: PublicGuestData = {
   token: "preview-sample",
   name: "Maria",
   companion: "João",
-  tableLabel: "Mesa 5",
+  tableLabel: "",
   note: "Mal podemos esperar para celebrar com você!",
   canInviteOthers: true,
   invitationSlug: "preview",
