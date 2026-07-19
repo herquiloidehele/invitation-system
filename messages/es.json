@@ -377,6 +377,8 @@
     "sectionTitle_location": "Ubicación",
     "sectionTitle_dressCode": "Código de Vestimenta",
     "sectionTitle_giftRegistry": "Regalos",
+    "giftRegistry_listTitle": "Lista de Regalos",
+    "giftRegistry_bankTransferTitle": "Transferencia Bancaria",
     "gifts_eyebrow": "Lista de regalos",
     "gifts_backToInvitation": "Volver a la invitación",
     "gifts_choose": "Elegir este regalo",

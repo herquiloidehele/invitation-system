@@ -4,6 +4,7 @@ import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { Gift } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useTranslations } from "next-intl";
 import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
 import { giftsPagePath, hasBankTransfer, hasGiftItems } from "@/lib/gift-registry";
@@ -27,11 +28,7 @@ interface GiftsSectionProps {
   /** Personal guest token to preserve on the gifts-page link. */
   guestToken?: string;
   title?: string;
-  /** Header for the registry sub-accordion. */
-  label?: string;
   buttonLabel?: string;
-  /** Header for the bank-transfer sub-accordion. */
-  bankLabel?: string;
 }
 
 /** "Presentes" — a card with the gift message on top and up to two confetti
@@ -43,12 +40,11 @@ export default function GiftsSection({
   slug,
   guestToken,
   title = "Presentes",
-  label = "Lista de Presentes",
   buttonLabel = "Ver Lista",
-  bankLabel = "Transferência Bancária",
 }: GiftsSectionProps) {
   const reveal = useRevealProps();
   const router = useRouter();
+  const tInvitation = useTranslations("Invitation");
   const firingRef = useRef(false);
 
   const handleVerLista = useCallback(() => {
@@ -145,7 +141,11 @@ export default function GiftsSection({
           }}
         >
           {showRegistry && (
-            <ConfettiAccordion header={label} theme={theme} textStyles={ts}>
+            <ConfettiAccordion
+              header={tInvitation("giftRegistry_listTitle")}
+              theme={theme}
+              textStyles={ts}
+            >
               <div style={{ marginTop: "0.4rem", textAlign: "center" }}>
                 {hasGiftItems(giftRegistry) ? (
                   <PillButton
@@ -171,7 +171,11 @@ export default function GiftsSection({
           )}
 
           {showBank && (
-            <ConfettiAccordion header={bankLabel} theme={theme} textStyles={ts}>
+            <ConfettiAccordion
+              header={tInvitation("giftRegistry_bankTransferTitle")}
+              theme={theme}
+              textStyles={ts}
+            >
               {giftRegistry.bankTransferText && (
                 <p
                   style={efStyle(

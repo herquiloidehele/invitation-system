@@ -4,6 +4,7 @@ import { type ReactNode, useCallback, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Gift, ExternalLink, ArrowRight } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import type { CustomTexts, GiftRegistry, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
@@ -44,6 +45,7 @@ export default function GiftsSection({
   t,
 }: GiftsSectionProps) {
   const router = useRouter();
+  const tInvitation = useTranslations("Invitation");
   const { navigateToGifts } = useGiftConfettiNavigation(theme);
 
   const handleNavigate = useCallback(() => {
@@ -95,7 +97,7 @@ export default function GiftsSection({
         >
           {hasRegistry && (
             <GiftAccordion
-              header="Lista de Presentes"
+              header={tInvitation("giftRegistry_listTitle")}
               theme={theme}
               cardStyle={cardStyle}
               accent={ts.accent}
@@ -162,7 +164,7 @@ export default function GiftsSection({
 
           {hasBank && (
             <GiftAccordion
-              header="Transferência Bancária"
+              header={tInvitation("giftRegistry_bankTransferTitle")}
               theme={theme}
               cardStyle={cardStyle}
               accent={ts.accent}
