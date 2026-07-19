@@ -10,6 +10,8 @@ import {
   normalizeLandingCustomizationLevel,
   type LandingCustomizationLevel,
 } from "@/lib/landing-customization";
+import { localizeLandingMetadata } from "@/lib/landing-translations";
+import { DEFAULT_LOCALE, type AppLocale } from "@/i18n/locales";
 
 /** Format a template's price for a viewer currency from its base + overrides. */
 function templateLandingPrice(
@@ -81,6 +83,7 @@ export const landingInvitationSelect = {
   landingModelName: true,
   landingDescription: true,
   landingSubtitle: true,
+  landingTranslations: true,
   landingCustomizationLevel: true,
   priceFromCents: true,
   discountPriceFromCents: true,
@@ -96,6 +99,7 @@ export const landingSaveTheDateSelect = {
   landingModelName: true,
   landingDescription: true,
   landingSubtitle: true,
+  landingTranslations: true,
   landingCustomizationLevel: true,
   priceFromCents: true,
   discountPriceFromCents: true,
@@ -188,6 +192,7 @@ export async function getHeroFeature(): Promise<HeroFeature | null> {
 
 export async function getGalleryFeaturesByCategory(
   viewerCurrency: Currency,
+  locale: AppLocale = DEFAULT_LOCALE,
 ): Promise<Record<GalleryCategory, GalleryFeature[]>> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "gallery", enabled: true },
@@ -223,11 +228,12 @@ export async function getGalleryFeaturesByCategory(
     const heroImage = isInvitation
       ? ((target as { heroImage?: string | null }).heroImage ?? null)
       : null;
+    const localizedTarget = localizeLandingMetadata(target, locale);
 
     const metadata = resolveLandingGalleryMetadata({
-      couple: target.couple,
-      landingModelName: target.landingModelName,
-      landingDescription: target.landingDescription,
+      couple: localizedTarget.couple,
+      landingModelName: localizedTarget.landingModelName,
+      landingDescription: localizedTarget.landingDescription,
     });
 
     result[category].push({
@@ -236,7 +242,7 @@ export async function getGalleryFeaturesByCategory(
       href: isInvitation ? invitationHref(slug) : saveTheDateHref(slug),
       imageUrl: target.landingImageUrl ?? heroImage,
       displayDate: readDateDisplay(target.date),
-      subtitle: target.landingSubtitle ?? null,
+      subtitle: localizedTarget.landingSubtitle ?? null,
       description: metadata.description,
       price: templateLandingPrice(target, viewerCurrency),
       category,
@@ -270,6 +276,7 @@ type BestSellerSourceRow = {
     landingModelName: string | null;
     landingDescription: string | null;
     landingSubtitle: string | null;
+    landingTranslations: unknown;
     date: unknown;
     priceFromCents: number | null;
     discountPriceFromCents: number | null;
@@ -284,6 +291,7 @@ type BestSellerSourceRow = {
     landingModelName: string | null;
     landingDescription: string | null;
     landingSubtitle: string | null;
+    landingTranslations: unknown;
     date: unknown;
     priceFromCents: number | null;
     discountPriceFromCents: number | null;
@@ -296,6 +304,7 @@ type BestSellerSourceRow = {
 function mapBestSellerRowToFeature(
   row: BestSellerSourceRow,
   viewerCurrency: Currency,
+  locale: AppLocale,
 ): BestSellerFeature | null {
   const isInvitation = Boolean(row.invitation);
   const target = row.invitation ?? row.saveTheDate;
@@ -303,11 +312,12 @@ function mapBestSellerRowToFeature(
 
   const slug = target.slug;
   const heroImage = isInvitation ? (row.invitation?.heroImage ?? null) : null;
+  const localizedTarget = localizeLandingMetadata(target, locale);
 
   const metadata = resolveLandingGalleryMetadata({
-    couple: target.couple,
-    landingModelName: target.landingModelName,
-    landingDescription: target.landingDescription,
+    couple: localizedTarget.couple,
+    landingModelName: localizedTarget.landingModelName,
+    landingDescription: localizedTarget.landingDescription,
   });
 
   return {
@@ -315,7 +325,7 @@ function mapBestSellerRowToFeature(
     title: metadata.title,
     href: isInvitation ? invitationHref(slug) : saveTheDateHref(slug),
     imageUrl: target.landingImageUrl ?? heroImage,
-    subtitle: target.landingSubtitle ?? null,
+    subtitle: localizedTarget.landingSubtitle ?? null,
     description: metadata.description,
     price: templateLandingPrice(target, viewerCurrency),
     customizationLevel: normalizeLandingCustomizationLevel(
@@ -326,6 +336,7 @@ function mapBestSellerRowToFeature(
 
 export async function getBestSellerFeatures(
   viewerCurrency: Currency,
+  locale: AppLocale = DEFAULT_LOCALE,
 ): Promise<BestSellerFeature[]> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "best_seller", enabled: true },
@@ -334,7 +345,7 @@ export async function getBestSellerFeatures(
   });
 
   return rows
-    .map((row) => mapBestSellerRowToFeature(row, viewerCurrency))
+    .map((row) => mapBestSellerRowToFeature(row, viewerCurrency, locale))
     .filter((feature): feature is BestSellerFeature => feature !== null);
 }
 

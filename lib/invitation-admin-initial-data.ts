@@ -9,6 +9,7 @@ import {
   sanitizeInvitationTranslations,
 } from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -100,6 +101,7 @@ type AdminInvitationInitialDataRow = {
   landingImageUrl: string | null;
   landingDescription: string | null;
   landingSubtitle: string | null;
+  landingTranslations?: unknown;
   landingCustomizationLevel: string;
 };
 
@@ -189,6 +191,8 @@ export function toAdminInvitationInitialData(
     landingImageUrl: row.landingImageUrl,
     landingDescription: row.landingDescription,
     landingSubtitle: row.landingSubtitle,
+    landingTranslations:
+      sanitizeLandingTranslations(row.landingTranslations) ?? null,
     landingCustomizationLevel: normalizeLandingCustomizationLevel(
       row.landingCustomizationLevel,
     ),

@@ -168,6 +168,7 @@ export const sourceInvitationRow = {
   landingImageUrl: "https://cdn.example.com/landing.jpg",
   landingDescription: "Catalogue description",
   landingSubtitle: "Catalogue subtitle",
+  landingTranslations: { en: { landingModelName: "Rose" } },
   landingCustomizationLevel: "pre_designed",
 } satisfies Parameters<typeof toAdminInvitationInitialData>[0];
 

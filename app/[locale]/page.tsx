@@ -56,7 +56,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const viewerCurrency = await getViewerCurrency();
   const [
     heroFeature,
@@ -67,9 +73,9 @@ export default async function Home() {
     faqT,
   ] = await Promise.all([
     getHeroFeature(),
-    getGalleryFeaturesByCategory(viewerCurrency),
+    getGalleryFeaturesByCategory(viewerCurrency, locale),
     getLiveDemoFeatures(),
-    getBestSellerFeatures(viewerCurrency),
+    getBestSellerFeatures(viewerCurrency, locale),
     getLandingGallerySettings(),
     getTranslations("LandingFaq"),
   ]);

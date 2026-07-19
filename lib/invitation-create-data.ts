@@ -9,6 +9,7 @@ import {
 } from "@/lib/invitation-translations";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
 
@@ -128,6 +129,10 @@ export function buildInvitationCreateData(
       typeof body.landingSubtitle === "string" && body.landingSubtitle.length
         ? body.landingSubtitle
         : null,
+    landingTranslations: sanitizeJsonField(
+      sanitizeLandingTranslations(body.landingTranslations),
+      null,
+    ),
     landingCustomizationLevel: normalizeLandingCustomizationLevel(
       body.landingCustomizationLevel,
     ),

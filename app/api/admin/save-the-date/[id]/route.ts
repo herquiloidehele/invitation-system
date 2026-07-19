@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 
 export async function GET(
   _req: NextRequest,
@@ -119,6 +120,12 @@ export async function PUT(
             body.landingSubtitle.length
               ? body.landingSubtitle
               : null,
+        }),
+        ...(body.landingTranslations !== undefined && {
+          landingTranslations: sanitizeJsonField(
+            sanitizeLandingTranslations(body.landingTranslations),
+            null,
+          ),
         }),
         ...(body.landingCustomizationLevel !== undefined && {
           landingCustomizationLevel: normalizeLandingCustomizationLevel(

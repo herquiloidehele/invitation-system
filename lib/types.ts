@@ -1240,6 +1240,9 @@ export interface InvitationData {
   landingImageUrl?: string | null;
   landingDescription?: string | null;
   landingSubtitle?: string | null;
+  landingTranslations?:
+    | import("@/lib/landing-translations").LandingTranslations
+    | null;
   landingCustomizationLevel?: import("@/lib/landing-customization").LandingCustomizationLevel;
 }
 

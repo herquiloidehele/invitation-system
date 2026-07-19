@@ -161,6 +161,7 @@ export async function POST(
         landingImageUrl: null,
         landingDescription: null,
         landingSubtitle: null,
+        landingTranslations: Prisma.JsonNull,
         landingCustomizationLevel: "fully_customizable",
       });
 

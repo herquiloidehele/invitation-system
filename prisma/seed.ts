@@ -8,6 +8,7 @@ import {
   normalizeInvitationLocales,
   sanitizeInvitationTranslations,
 } from "@/lib/invitation-translations";
+import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 
 const connectionString = process.env.DATABASE_URL;
@@ -349,6 +350,10 @@ async function main() {
           sanitizeInvitationTranslations(data.translations),
           null,
         ),
+        landingTranslations: sanitizeJsonField(
+          sanitizeLandingTranslations(data.landingTranslations),
+          null,
+        ),
         textStyles: data.textStyles ?? null,
         cardStyles: data.cardStyles ?? null,
       },
@@ -382,6 +387,10 @@ async function main() {
         enabledLocales: normalizeInvitationLocales(data.enabledLocales),
         translations: sanitizeJsonField(
           sanitizeInvitationTranslations(data.translations),
+          null,
+        ),
+        landingTranslations: sanitizeJsonField(
+          sanitizeLandingTranslations(data.landingTranslations),
           null,
         ),
         textStyles: data.textStyles ?? null,

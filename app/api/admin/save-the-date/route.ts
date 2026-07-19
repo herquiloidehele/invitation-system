@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 
 export async function GET() {
   const items = await prisma.saveTheDate.findMany({
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
       landingImageUrl,
       landingDescription,
       landingSubtitle,
+      landingTranslations,
       landingCustomizationLevel,
     } = body;
 
@@ -89,6 +91,10 @@ export async function POST(req: NextRequest) {
           typeof landingSubtitle === "string" && landingSubtitle.length
             ? landingSubtitle
             : null,
+        landingTranslations: sanitizeJsonField(
+          sanitizeLandingTranslations(landingTranslations),
+          null,
+        ),
         landingCustomizationLevel: normalizeLandingCustomizationLevel(
           landingCustomizationLevel,
         ),

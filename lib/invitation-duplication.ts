@@ -26,6 +26,7 @@ export function buildDuplicateInvitationInitialData(
     landingImageUrl: null,
     landingDescription: null,
     landingSubtitle: null,
+    landingTranslations: null,
     landingCustomizationLevel: "fully_customizable",
   };
 }

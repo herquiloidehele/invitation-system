@@ -1713,6 +1713,8 @@ export default function InvitationForm({
                       landingModelName: form.landingModelName ?? null,
                       landingImageUrl: form.landingImageUrl ?? null,
                       landingDescription: form.landingDescription ?? null,
+                      landingSubtitle: form.landingSubtitle ?? null,
+                      landingTranslations: form.landingTranslations ?? null,
                       landingCustomizationLevel:
                         form.landingCustomizationLevel ?? "fully_customizable",
                     }}
@@ -1727,6 +1729,8 @@ export default function InvitationForm({
                       update("landingModelName", next.landingModelName);
                       update("landingImageUrl", next.landingImageUrl);
                       update("landingDescription", next.landingDescription);
+                      update("landingSubtitle", next.landingSubtitle);
+                      update("landingTranslations", next.landingTranslations);
                       update(
                         "landingCustomizationLevel",
                         next.landingCustomizationLevel,

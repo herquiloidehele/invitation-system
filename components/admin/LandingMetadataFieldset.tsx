@@ -11,6 +11,19 @@ import {
   type PriceOverrides,
 } from "@/lib/currency/template-price";
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";
+import {
+  applyLandingTranslationDraft,
+  buildLandingTranslationDraft,
+  type LandingTranslations,
+} from "@/lib/landing-translations";
+import type { AppLocale } from "@/i18n/locales";
+
+const EDITING_LOCALES = ["pt", "en", "es"] as const;
+const EDITING_LOCALE_LABELS: Record<AppLocale, string> = {
+  pt: "PT",
+  en: "EN",
+  es: "ES",
+};
 
 export type LandingMetadata = {
   priceFromCents: number | null;
@@ -20,6 +33,8 @@ export type LandingMetadata = {
   landingModelName: string | null;
   landingImageUrl: string | null;
   landingDescription: string | null;
+  landingSubtitle: string | null;
+  landingTranslations: LandingTranslations | null;
   landingCustomizationLevel: LandingCustomizationLevel;
 };
 
@@ -31,6 +46,7 @@ export function LandingMetadataFieldset({
   onChange: (next: LandingMetadata) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [editingLocale, setEditingLocale] = useState<AppLocale>("pt");
 
   function update(patch: Partial<LandingMetadata>) {
     onChange({ ...value, ...patch });
@@ -74,6 +90,27 @@ export function LandingMetadataFieldset({
     value.discountPriceFromCents != null &&
     (value.priceFromCents == null ||
       value.discountPriceFromCents >= value.priceFromCents);
+
+  const draft = buildLandingTranslationDraft(value, editingLocale);
+  const portugueseDraft = buildLandingTranslationDraft(value, "pt");
+
+  function updateLandingText(
+    field: "landingModelName" | "landingSubtitle" | "landingDescription",
+    nextValue: string,
+  ) {
+    if (editingLocale === "pt") {
+      update({ [field]: nextValue || null });
+      return;
+    }
+
+    update({
+      landingTranslations:
+        applyLandingTranslationDraft(value.landingTranslations, editingLocale, {
+          ...draft,
+          [field]: nextValue,
+        }) ?? null,
+    });
+  }
 
   return (
     <fieldset className="rounded-lg border border-neutral-200 px-4 pb-4 pt-2">
@@ -250,18 +287,77 @@ export function LandingMetadataFieldset({
             })}
           </div>
 
-          <label className="block text-sm">
-            Nome do modelo (título do cartão)
-            <input
-              type="text"
-              value={value.landingModelName ?? ""}
-              onChange={(event) =>
-                update({ landingModelName: event.target.value || null })
-              }
-              className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-              placeholder="Modelo Editorial"
-            />
-          </label>
+          <div className="space-y-3 rounded-md border border-neutral-200 bg-neutral-50/60 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="text-sm font-medium text-neutral-800">
+                  Texto do cartão
+                </p>
+                <p className="text-xs text-neutral-500">
+                  Campos vazios usam o texto em Português.
+                </p>
+              </div>
+              <div
+                className="inline-flex rounded-md border border-neutral-200 bg-white p-0.5"
+                aria-label="Idioma em edição"
+              >
+                {EDITING_LOCALES.map((locale) => (
+                  <button
+                    key={locale}
+                    type="button"
+                    onClick={() => setEditingLocale(locale)}
+                    aria-pressed={editingLocale === locale}
+                    className={`min-w-10 rounded px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                      editingLocale === locale
+                        ? "bg-neutral-900 text-white shadow-sm"
+                        : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                    }`}
+                  >
+                    {EDITING_LOCALE_LABELS[locale]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <label className="block text-sm">
+              Nome do modelo (título do cartão)
+              <input
+                type="text"
+                value={draft.landingModelName}
+                onChange={(event) =>
+                  updateLandingText("landingModelName", event.target.value)
+                }
+                className="mt-1 block w-full rounded-md border border-neutral-300 bg-white px-3 py-2"
+                placeholder={portugueseDraft.landingModelName}
+              />
+            </label>
+
+            <label className="block text-sm">
+              Subtítulo
+              <input
+                type="text"
+                value={draft.landingSubtitle}
+                onChange={(event) =>
+                  updateLandingText("landingSubtitle", event.target.value)
+                }
+                className="mt-1 block w-full rounded-md border border-neutral-300 bg-white px-3 py-2"
+                placeholder={portugueseDraft.landingSubtitle}
+              />
+            </label>
+
+            <label className="block text-sm">
+              Descrição curta
+              <textarea
+                value={draft.landingDescription}
+                onChange={(event) =>
+                  updateLandingText("landingDescription", event.target.value)
+                }
+                className="mt-1 block w-full rounded-md border border-neutral-300 bg-white px-3 py-2"
+                placeholder={portugueseDraft.landingDescription}
+                rows={2}
+              />
+            </label>
+          </div>
 
           <div className="block text-sm">
             <span className="mb-1 block">Imagem destaque</span>
@@ -274,18 +370,6 @@ export function LandingMetadataFieldset({
               label="Carregar imagem destaque"
             />
           </div>
-
-          <label className="block text-sm">
-            Descrição curta
-            <textarea
-              value={value.landingDescription ?? ""}
-              onChange={(event) =>
-                update({ landingDescription: event.target.value || null })
-              }
-              className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2"
-              rows={2}
-            />
-          </label>
         </div>
       )}
     </fieldset>

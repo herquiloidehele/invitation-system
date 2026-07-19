@@ -145,6 +145,7 @@ describe("POST invitation duplicate", () => {
         currency: "EUR",
         priceOverrides: Prisma.JsonNull,
         landingModelName: null,
+        landingTranslations: Prisma.JsonNull,
         landingCustomizationLevel: "fully_customizable",
       }),
       select: { id: true },

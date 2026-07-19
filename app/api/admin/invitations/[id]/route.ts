@@ -11,6 +11,7 @@ import {
   validateInvitationLanguageSettings,
 } from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
 
@@ -369,6 +370,12 @@ export async function PUT(
             body.landingSubtitle.length
               ? body.landingSubtitle
               : null,
+        }),
+        ...(body.landingTranslations !== undefined && {
+          landingTranslations: sanitizeJsonField(
+            sanitizeLandingTranslations(body.landingTranslations),
+            null,
+          ),
         }),
         ...(body.landingCustomizationLevel !== undefined && {
           landingCustomizationLevel: normalizeLandingCustomizationLevel(

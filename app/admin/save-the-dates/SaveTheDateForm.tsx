@@ -57,6 +57,7 @@ import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import type { PriceOverrides } from "@/lib/currency/template-price";
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";
+import type { LandingTranslations } from "@/lib/landing-translations";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import { OwnerLinkPanel } from "@/app/admin/invitations/OwnerLinkPanel";
@@ -111,6 +112,8 @@ export interface SaveTheDateFormData {
   landingModelName?: string | null;
   landingImageUrl?: string | null;
   landingDescription?: string | null;
+  landingSubtitle?: string | null;
+  landingTranslations?: LandingTranslations | null;
   landingCustomizationLevel?: LandingCustomizationLevel;
 }
 
@@ -605,6 +608,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           landingModelName: data.landingModelName ?? null,
           landingImageUrl: data.landingImageUrl ?? null,
           landingDescription: data.landingDescription ?? null,
+          landingSubtitle: data.landingSubtitle ?? null,
+          landingTranslations: data.landingTranslations ?? null,
           landingCustomizationLevel:
             data.landingCustomizationLevel ?? "fully_customizable",
         }),
@@ -731,6 +736,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     landingModelName: data.landingModelName ?? null,
                     landingImageUrl: data.landingImageUrl ?? null,
                     landingDescription: data.landingDescription ?? null,
+                    landingSubtitle: data.landingSubtitle ?? null,
+                    landingTranslations: data.landingTranslations ?? null,
                     landingCustomizationLevel:
                       data.landingCustomizationLevel ?? "fully_customizable",
                   }}
@@ -744,6 +751,8 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       landingModelName: next.landingModelName,
                       landingImageUrl: next.landingImageUrl,
                       landingDescription: next.landingDescription,
+                      landingSubtitle: next.landingSubtitle,
+                      landingTranslations: next.landingTranslations,
                       landingCustomizationLevel: next.landingCustomizationLevel,
                     }))
                   }

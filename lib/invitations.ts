@@ -4,6 +4,7 @@ import {
   normalizeInvitationLocales,
   sanitizeInvitationTranslations,
 } from "./invitation-translations";
+import { sanitizeLandingTranslations } from "./landing-translations";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -93,6 +94,16 @@ type InvitationWithTheme = {
   ownerCanAddGuests: boolean;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
+  priceFromCents: number | null;
+  discountPriceFromCents: number | null;
+  currency: string | null;
+  priceOverrides: unknown;
+  landingModelName: string | null;
+  landingImageUrl: string | null;
+  landingDescription: string | null;
+  landingSubtitle: string | null;
+  landingTranslations: unknown;
+  landingCustomizationLevel: string;
 };
 
 // Maps a Prisma Invitation row into InvitationData for the PUBLIC rendered page.
@@ -170,6 +181,21 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"]) ?? undefined,
+    priceFromCents: row.priceFromCents,
+    discountPriceFromCents: row.discountPriceFromCents,
+    currency: row.currency,
+    priceOverrides:
+      (row.priceOverrides as InvitationData["priceOverrides"]) ?? null,
+    landingModelName: row.landingModelName,
+    landingImageUrl: row.landingImageUrl,
+    landingDescription: row.landingDescription,
+    landingSubtitle: row.landingSubtitle,
+    landingTranslations:
+      sanitizeLandingTranslations(row.landingTranslations) ?? null,
+    landingCustomizationLevel:
+      row.landingCustomizationLevel === "pre_designed"
+        ? "pre_designed"
+        : "fully_customizable",
   };
 }
 
