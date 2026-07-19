@@ -1568,31 +1568,41 @@ export default function InvitationForm({
               <OwnerLinkPanel ownerUrl={ownerUrl} />
             )}
 
-            {sourceForm.invitationType === "standard" && (
-              <InvitationLanguageSettings
-                enabled={sourceForm.languageSwitcherEnabled === true}
-                enabledLocales={normalizeInvitationLocales(
-                  sourceForm.enabledLocales,
-                )}
-                activeLocale={activeLocale}
-                onEnabledChange={(enabled) => {
-                  if (!enabled) setActiveLocale("pt");
-                  setSourceForm((current) => ({
-                    ...current,
-                    languageSwitcherEnabled: enabled,
-                  }));
-                }}
-                onEnabledLocalesChange={(enabledLocales) =>
-                  setSourceForm((current) => ({
-                    ...current,
-                    enabledLocales,
-                  }))
-                }
-                onActiveLocaleChange={setActiveLocale}
-              />
-            )}
-
             <Accordion defaultValue={[]} className="space-y-2">
+              {sourceForm.invitationType === "standard" && (
+                <AccordionItem
+                  value="languages"
+                  className="border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="text-sm font-medium">
+                    Idiomas
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 pb-4">
+                    <InvitationLanguageSettings
+                      enabled={sourceForm.languageSwitcherEnabled === true}
+                      enabledLocales={normalizeInvitationLocales(
+                        sourceForm.enabledLocales,
+                      )}
+                      activeLocale={activeLocale}
+                      onEnabledChange={(enabled) => {
+                        if (!enabled) setActiveLocale("pt");
+                        setSourceForm((current) => ({
+                          ...current,
+                          languageSwitcherEnabled: enabled,
+                        }));
+                      }}
+                      onEnabledLocalesChange={(enabledLocales) =>
+                        setSourceForm((current) => ({
+                          ...current,
+                          enabledLocales,
+                        }))
+                      }
+                      onActiveLocaleChange={setActiveLocale}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
               {/* ── Couple ── */}
               <AccordionItem value="couple" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">

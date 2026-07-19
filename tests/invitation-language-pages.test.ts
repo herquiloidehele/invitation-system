@@ -71,6 +71,18 @@ describe("admin invitation language editing", () => {
     expect(source).toContain("<InvitationLanguagePreviewProvider");
     expect(source).toContain("<InvitationLanguageSettings");
   });
+
+  it("renders language settings as the first shared accordion item", () => {
+    const languageItem = source.indexOf('value="languages"');
+    const firstExistingItem = source.indexOf('<AccordionItem value="couple"');
+
+    expect(languageItem).toBeGreaterThan(-1);
+    expect(languageItem).toBeLessThan(firstExistingItem);
+    expect(source).toMatch(
+      /<AccordionTrigger className="text-sm font-medium">\s*Idiomas\s*<\/AccordionTrigger>/,
+    );
+    expect(source).toContain("<InvitationLanguageSettings");
+  });
 });
 
 describe("translation-aware repeatable editors", () => {

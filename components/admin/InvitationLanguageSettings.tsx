@@ -47,7 +47,7 @@ export function InvitationLanguageSettings({
   };
 
   return (
-    <section className="rounded-xl border bg-card p-4 shadow-sm">
+    <div className="space-y-4">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <Label htmlFor="invitation-language-switcher">
@@ -65,7 +65,7 @@ export function InvitationLanguageSettings({
         />
       </div>
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-3">
         {LOCALES.map(({ locale, label, detail }) => {
           const locked = locale === "pt";
           return (
@@ -93,13 +93,13 @@ export function InvitationLanguageSettings({
       </div>
 
       {invalid && (
-        <p className="mt-2 text-xs font-medium text-destructive">
+        <p className="text-xs font-medium text-destructive">
           Ative pelo menos um idioma adicional.
         </p>
       )}
 
       {enabled && normalizedLocales.length > 1 && (
-        <div className="mt-4 border-t pt-4">
+        <div className="border-t pt-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium">Idioma em edição</p>
@@ -130,6 +130,6 @@ export function InvitationLanguageSettings({
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }
