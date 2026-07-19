@@ -906,7 +906,6 @@ export default function InvitationPage({
                     cardStyle={cs("giftRegistry", 16)}
                     slug={invitation.slug}
                     guestToken={invitation.guest?.token}
-                    locale={locale}
                     t={t}
                   />
                 </motion.div>

@@ -7,7 +7,6 @@ import confetti from "canvas-confetti";
 import { useRouter } from "@/i18n/routing";
 import type { CustomTexts, GiftRegistry, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
-import { DEFAULT_LOCALE } from "@/i18n/locales";
 import {
   giftsPagePath,
   hasBankTransfer,
@@ -32,7 +31,6 @@ interface GiftsSectionProps {
   cardStyle: CardStyle;
   slug: string;
   guestToken?: string | null;
-  locale: string;
   t: (key: keyof CustomTexts, values?: Record<string, string>) => string;
 }
 
@@ -43,19 +41,15 @@ export default function GiftsSection({
   cardStyle,
   slug,
   guestToken,
-  locale,
   t,
 }: GiftsSectionProps) {
   const router = useRouter();
   const { navigateToGifts } = useGiftConfettiNavigation(theme);
 
   const handleNavigate = useCallback(() => {
-    const href =
-      locale === DEFAULT_LOCALE
-        ? giftsPagePath(slug, guestToken)
-        : `/${locale}${giftsPagePath(slug, guestToken)}`;
+    const href = giftsPagePath(slug, guestToken);
     navigateToGifts(href, () => router.push(href));
-  }, [slug, guestToken, locale, router, navigateToGifts]);
+  }, [slug, guestToken, router, navigateToGifts]);
 
   const hasRegistry =
     hasGiftItems(giftRegistry) || Boolean(giftRegistry.link);
