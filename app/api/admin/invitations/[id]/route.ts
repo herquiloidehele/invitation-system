@@ -4,8 +4,15 @@ import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { isObjectFit } from "@/lib/hero-media-fit";
+import {
+  normalizeInvitationLocales,
+  normalizeTranslationIdFields,
+  sanitizeInvitationTranslations,
+  validateInvitationLanguageSettings,
+} from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
+import type { InvitationData } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/invitations/[id] — Get a single invitation
@@ -70,6 +77,34 @@ export async function PUT(
       );
     }
 
+    const languageError = validateInvitationLanguageSettings({
+      languageSwitcherEnabled:
+        body.languageSwitcherEnabled ?? existing.languageSwitcherEnabled,
+      enabledLocales: body.enabledLocales ?? existing.enabledLocales,
+    });
+    if (languageError) {
+      return NextResponse.json({ error: languageError }, { status: 400 });
+    }
+
+    const normalizedFields = normalizeTranslationIdFields({
+      schedule:
+        body.schedule === undefined
+          ? undefined
+          : (body.schedule as InvitationData["schedule"]),
+      faqs:
+        body.faqs === undefined
+          ? undefined
+          : (body.faqs as InvitationData["faqs"]),
+      dressCode:
+        body.dressCode === undefined
+          ? undefined
+          : (body.dressCode as InvitationData["dressCode"]),
+      coupleGallery:
+        body.coupleGallery === undefined
+          ? undefined
+          : (body.coupleGallery as InvitationData["coupleGallery"]),
+    });
+
     // If slug changed, check uniqueness
     if (body.slug && body.slug !== existing.slug) {
       const slugTaken = await prisma.invitation.findUnique({
@@ -114,13 +149,19 @@ export async function PUT(
           rsvp: sanitizeJsonField(body.rsvp, existing.rsvp),
         }),
         ...(body.schedule !== undefined && {
-          schedule: sanitizeJsonField(body.schedule, existing.schedule),
+          schedule: sanitizeJsonField(
+            normalizedFields.schedule,
+            existing.schedule,
+          ),
         }),
         ...(body.scheduleStyle !== undefined && {
           scheduleStyle: body.scheduleStyle,
         }),
         ...(body.dressCode !== undefined && {
-          dressCode: sanitizeJsonField(body.dressCode, existing.dressCode),
+          dressCode: sanitizeJsonField(
+            normalizedFields.dressCode,
+            existing.dressCode,
+          ),
         }),
         ...(body.giftRegistry !== undefined && {
           giftRegistry: sanitizeJsonField(
@@ -179,7 +220,7 @@ export async function PUT(
           heroTapPrompt: body.heroTapPrompt === true,
         }),
         ...(body.faqs !== undefined && {
-          faqs: sanitizeJsonField(body.faqs, null),
+          faqs: sanitizeJsonField(normalizedFields.faqs, null),
         }),
         ...(body.guestGuide !== undefined && {
           guestGuide: sanitizeJsonField(body.guestGuide, null),
@@ -197,7 +238,10 @@ export async function PUT(
           sectionImages: sanitizeJsonField(body.sectionImages, null),
         }),
         ...(body.coupleGallery !== undefined && {
-          coupleGallery: sanitizeJsonField(body.coupleGallery, null),
+          coupleGallery: sanitizeJsonField(
+            normalizedFields.coupleGallery,
+            null,
+          ),
         }),
         ...(body.coverVideos !== undefined && {
           coverVideos: sanitizeJsonField(body.coverVideos, null),
@@ -249,6 +293,18 @@ export async function PUT(
         }),
         ...(body.customTexts !== undefined && {
           customTexts: sanitizeJsonField(body.customTexts, null),
+        }),
+        ...(body.languageSwitcherEnabled !== undefined && {
+          languageSwitcherEnabled: body.languageSwitcherEnabled === true,
+        }),
+        ...(body.enabledLocales !== undefined && {
+          enabledLocales: normalizeInvitationLocales(body.enabledLocales),
+        }),
+        ...(body.translations !== undefined && {
+          translations: sanitizeJsonField(
+            sanitizeInvitationTranslations(body.translations),
+            null,
+          ),
         }),
         ...(body.eventType !== undefined && {
           eventType: normalizeInvitationEventType(body.eventType),

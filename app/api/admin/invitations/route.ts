@@ -4,6 +4,7 @@ import {
   buildInvitationCreateData,
   type InvitationCreateBody,
 } from "@/lib/invitation-create-data";
+import { validateInvitationLanguageSettings } from "@/lib/invitation-translations";
 
 // ---------------------------------------------------------------------------
 // POST /api/admin/invitations — Create a new invitation
@@ -19,6 +20,11 @@ export async function POST(request: NextRequest) {
         { error: "Missing required fields: slug, couple, date" },
         { status: 400 },
       );
+    }
+
+    const languageError = validateInvitationLanguageSettings(body);
+    if (languageError) {
+      return NextResponse.json({ error: languageError }, { status: 400 });
     }
 
     // Resolve themeId

@@ -44,6 +44,7 @@ export default function CurtainCanvaPage({
         frontLayerPosition="interleaved"
       >
         <CurtainsHero
+          invitation={invitation}
           couple={invitation.couple}
           quote={invitation.quote}
           inviteMessage={invitation.parents?.inviteMessage}

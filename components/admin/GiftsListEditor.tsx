@@ -10,15 +10,22 @@ import type { GiftItem } from "@/lib/types";
 
 export default function GiftsListEditor({
   value,
+  sourceValue,
+  structureLocked = false,
   onChange,
 }: {
   value: GiftItem[] | undefined;
+  sourceValue?: GiftItem[];
+  structureLocked?: boolean;
   onChange: (next: GiftItem[]) => void;
 }) {
   const items = value ?? [];
+  const sourceById = new Map(
+    (sourceValue ?? []).map((item) => [item.id, item]),
+  );
 
   const add = () =>
-    onChange([...items, { id: `gift-${Date.now()}`, name: "" }]);
+    onChange([...items, { id: `gift-${crypto.randomUUID()}`, name: "" }]);
   const remove = (i: number) => onChange(items.filter((_, idx) => idx !== i));
   const update = (i: number, patch: Partial<GiftItem>) =>
     onChange(items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
@@ -33,6 +40,11 @@ export default function GiftsListEditor({
   return (
     <div className="space-y-3">
       <Label className="text-xs">Presentes ({items.length})</Label>
+      {structureLocked && (
+        <p className="text-xs text-muted-foreground">
+          A estrutura é editada em Português.
+        </p>
+      )}
 
       {items.map((it, i) => (
         <div
@@ -49,7 +61,7 @@ export default function GiftsListEditor({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6"
-                disabled={i === 0}
+                disabled={structureLocked || i === 0}
                 onClick={() => move(i, "up")}
                 aria-label="Mover para cima"
               >
@@ -60,7 +72,7 @@ export default function GiftsListEditor({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6"
-                disabled={i === items.length - 1}
+                disabled={structureLocked || i === items.length - 1}
                 onClick={() => move(i, "down")}
                 aria-label="Mover para baixo"
               >
@@ -71,6 +83,7 @@ export default function GiftsListEditor({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 text-destructive"
+                disabled={structureLocked}
                 onClick={() => remove(i)}
                 aria-label="Remover"
               >
@@ -90,7 +103,7 @@ export default function GiftsListEditor({
           <Input
             value={it.name}
             onChange={(e) => update(i, { name: e.target.value })}
-            placeholder="Nome do presente"
+            placeholder={sourceById.get(it.id)?.name || "Nome do presente"}
           />
           <Input
             value={it.price ?? ""}
@@ -105,7 +118,13 @@ export default function GiftsListEditor({
         </div>
       ))}
 
-      <Button type="button" variant="outline" size="sm" onClick={add}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={structureLocked}
+        onClick={add}
+      >
         <Plus size={14} className="mr-1.5" />
         Adicionar presente
       </Button>

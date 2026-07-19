@@ -4,6 +4,10 @@
 // — a new persisted field must be added to BOTH, or it will save to the DB yet
 // vanish from the form on reload. Full checklist: docs/invitation-data-field-checklist.md
 import type { PriceOverrides } from "@/lib/currency/template-price";
+import {
+  normalizeInvitationLocales,
+  sanitizeInvitationTranslations,
+} from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import type {
   CardStyleOverrides,
@@ -77,6 +81,9 @@ type AdminInvitationInitialDataRow = {
   spacingStyles: unknown;
   imageSettings: unknown;
   customTexts: unknown;
+  languageSwitcherEnabled: boolean;
+  enabledLocales: string[];
+  translations: unknown;
   eventType: string | null;
   invitationType: string;
   externalLink: string | null;
@@ -161,6 +168,9 @@ export function toAdminInvitationInitialData(
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     customTexts:
       (row.customTexts as InvitationData["customTexts"] | null) ?? undefined,
+    languageSwitcherEnabled: row.languageSwitcherEnabled,
+    enabledLocales: normalizeInvitationLocales(row.enabledLocales),
+    translations: sanitizeInvitationTranslations(row.translations),
     eventType: (row.eventType as InvitationEventType | null) ?? "wedding",
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     externalLink: row.externalLink ?? undefined,

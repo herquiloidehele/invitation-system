@@ -11,11 +11,18 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
-import type { PlaceItem, PlaceSection, PlacesConfig, PlacesLayout } from "@/lib/types";
+import type {
+  PlaceItem,
+  PlaceSection,
+  PlacesConfig,
+  PlacesLayout,
+} from "@/lib/types";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface PlacesFormSectionProps {
   places: PlacesConfig;
+  sourceValue?: PlacesConfig;
+  structureLocked?: boolean;
   onEnabledChange: (enabled: boolean) => void;
   onLayoutChange: (layout: PlacesLayout) => void;
   onAddSection: () => void;
@@ -38,6 +45,8 @@ interface PlacesFormSectionProps {
 
 export default function PlacesFormSection({
   places,
+  sourceValue,
+  structureLocked = false,
   onEnabledChange,
   onLayoutChange,
   onAddSection,
@@ -50,6 +59,9 @@ export default function PlacesFormSection({
   onReorderItem,
 }: PlacesFormSectionProps) {
   const sectionCount = places.sections.length;
+  const sourceById = new Map(
+    (sourceValue?.sections ?? []).map((section) => [section.id, section]),
+  );
 
   return (
     <AccordionItem value="places" className="border rounded-lg px-4">
@@ -66,6 +78,12 @@ export default function PlacesFormSection({
 
         {places.enabled && (
           <>
+            {structureLocked && (
+              <p className="text-xs text-muted-foreground">
+                A estrutura é editada em Português.
+              </p>
+            )}
+
             {/* Layout switch */}
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -100,6 +118,8 @@ export default function PlacesFormSection({
                 <SectionEditor
                   key={section.id}
                   section={section}
+                  sourceValue={sourceById.get(section.id)}
+                  structureLocked={structureLocked}
                   isFirst={index === 0}
                   isLast={index === places.sections.length - 1}
                   onUpdateTitle={(title) =>
@@ -123,6 +143,7 @@ export default function PlacesFormSection({
               type="button"
               variant="outline"
               size="sm"
+              disabled={structureLocked}
               onClick={onAddSection}
             >
               + Adicionar secção
@@ -136,6 +157,8 @@ export default function PlacesFormSection({
 
 interface SectionEditorProps {
   section: PlaceSection;
+  sourceValue: PlaceSection | undefined;
+  structureLocked: boolean;
   isFirst: boolean;
   isLast: boolean;
   onUpdateTitle: (title: string) => void;
@@ -149,6 +172,8 @@ interface SectionEditorProps {
 
 function SectionEditor({
   section,
+  sourceValue,
+  structureLocked,
   isFirst,
   isLast,
   onUpdateTitle,
@@ -159,6 +184,10 @@ function SectionEditor({
   onRemoveItem,
   onReorderItem,
 }: SectionEditorProps) {
+  const sourceItemsById = new Map(
+    (sourceValue?.items ?? []).map((item) => [item.id, item]),
+  );
+
   return (
     <div className="space-y-3 rounded-lg border border-border p-3">
       {/* Section title row */}
@@ -166,7 +195,7 @@ function SectionEditor({
         <Input
           value={section.title}
           onChange={(e) => onUpdateTitle(e.target.value)}
-          placeholder="Título da secção (ex: Hotéis)"
+          placeholder={sourceValue?.title || "Título da secção (ex: Hotéis)"}
           className="flex-1"
         />
         <div className="flex shrink-0">
@@ -175,7 +204,7 @@ function SectionEditor({
             variant="ghost"
             size="icon"
             className="h-7 w-7"
-            disabled={isFirst}
+            disabled={structureLocked || isFirst}
             onClick={() => onReorder("up")}
             aria-label="Mover secção para cima"
           >
@@ -186,7 +215,7 @@ function SectionEditor({
             variant="ghost"
             size="icon"
             className="h-7 w-7"
-            disabled={isLast}
+            disabled={structureLocked || isLast}
             onClick={() => onReorder("down")}
             aria-label="Mover secção para baixo"
           >
@@ -196,6 +225,7 @@ function SectionEditor({
             type="button"
             variant="ghost"
             size="sm"
+            disabled={structureLocked}
             onClick={onRemove}
             className="text-destructive"
           >
@@ -210,6 +240,8 @@ function SectionEditor({
           <ItemEditor
             key={item.id}
             item={item}
+            sourceValue={sourceItemsById.get(item.id)}
+            structureLocked={structureLocked}
             isFirst={index === 0}
             isLast={index === section.items.length - 1}
             onUpdate={(patch) => onUpdateItem(item.id, patch)}
@@ -219,7 +251,13 @@ function SectionEditor({
         ))}
       </div>
 
-      <Button type="button" variant="outline" size="sm" onClick={onAddItem}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={structureLocked}
+        onClick={onAddItem}
+      >
         + Adicionar local
       </Button>
     </div>
@@ -228,6 +266,8 @@ function SectionEditor({
 
 interface ItemEditorProps {
   item: PlaceItem;
+  sourceValue: PlaceItem | undefined;
+  structureLocked: boolean;
   isFirst: boolean;
   isLast: boolean;
   onUpdate: (patch: Partial<PlaceItem>) => void;
@@ -237,6 +277,8 @@ interface ItemEditorProps {
 
 function ItemEditor({
   item,
+  sourceValue,
+  structureLocked,
   isFirst,
   isLast,
   onUpdate,
@@ -249,7 +291,7 @@ function ItemEditor({
         <Input
           value={item.title}
           onChange={(e) => onUpdate({ title: e.target.value })}
-          placeholder="Nome do local"
+          placeholder={sourceValue?.title || "Nome do local"}
           className="flex-1"
         />
         <div className="flex shrink-0">
@@ -258,7 +300,7 @@ function ItemEditor({
             variant="ghost"
             size="icon"
             className="h-7 w-7"
-            disabled={isFirst}
+            disabled={structureLocked || isFirst}
             onClick={() => onReorder("up")}
             aria-label="Mover local para cima"
           >
@@ -269,7 +311,7 @@ function ItemEditor({
             variant="ghost"
             size="icon"
             className="h-7 w-7"
-            disabled={isLast}
+            disabled={structureLocked || isLast}
             onClick={() => onReorder("down")}
             aria-label="Mover local para baixo"
           >
@@ -279,6 +321,7 @@ function ItemEditor({
             type="button"
             variant="ghost"
             size="sm"
+            disabled={structureLocked}
             onClick={onRemove}
             className="text-destructive"
           >
@@ -292,7 +335,7 @@ function ItemEditor({
         <Textarea
           value={item.description ?? ""}
           onChange={(e) => onUpdate({ description: e.target.value })}
-          placeholder="Breve descrição"
+          placeholder={sourceValue?.description || "Breve descrição"}
           rows={2}
         />
       </div>

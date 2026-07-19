@@ -8,6 +8,7 @@ import {
   resolveLocale,
   SUPPORTED_LOCALES,
 } from "@/i18n/locales";
+import { buildLanguageAlternates } from "@/lib/seo";
 
 describe("i18n locale helpers", () => {
   it("declares Portuguese as the default locale", () => {
@@ -46,5 +47,15 @@ describe("i18n locale helpers", () => {
     expect(buildLocaleHref("/confirmar/demo#rsvp", "es")).toBe(
       "/es/confirmar/demo#rsvp",
     );
+  });
+
+  it("builds invitation-specific language alternates", () => {
+    expect(
+      buildLanguageAlternates("https://example.com", "/ana-joao", ["pt", "en"]),
+    ).toEqual({
+      pt: "https://example.com/ana-joao",
+      en: "https://example.com/en/ana-joao",
+      "x-default": "https://example.com/ana-joao",
+    });
   });
 });

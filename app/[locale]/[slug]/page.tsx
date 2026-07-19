@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import ReactDOM from "react-dom";
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import {
   isValidCoverVideoItem,
@@ -10,6 +10,15 @@ import {
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getInvitation } from "@/lib/invitations";
+import {
+  getInvitationLocaleRedirectPath,
+  getInvitationSearchParam,
+  type InvitationSearchParams,
+} from "@/lib/invitation-language-routing";
+import {
+  getEffectiveInvitationLocales,
+  localizeInvitation,
+} from "@/lib/invitation-translations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
 import InvitationView from "./InvitationView";
@@ -18,7 +27,7 @@ import {
   OG_IMAGE_WIDTH,
   resolveInvitationSocialPreview,
 } from "@/lib/social-preview";
-import { resolveLocale } from "@/i18n/locales";
+import { resolveLocale, SUPPORTED_LOCALES } from "@/i18n/locales";
 import {
   SITE_URL,
   buildEventJsonLd,
@@ -45,18 +54,27 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale: rawLocale, slug } = await params;
   const locale = resolveLocale(rawLocale);
-  const invitation = await getInvitation(slug);
+  const sourceInvitation = await getInvitation(slug);
 
-  if (!invitation) {
+  if (!sourceInvitation) {
     const t = await getTranslations("Metadata");
     return { title: t("invitationNotFound") };
   }
 
+  const effectiveLocales =
+    sourceInvitation.invitationType === "standard"
+      ? getEffectiveInvitationLocales(sourceInvitation)
+      : SUPPORTED_LOCALES;
+  const metadataLocale = effectiveLocales.includes(locale) ? locale : "pt";
+  const invitation =
+    sourceInvitation.invitationType === "standard"
+      ? localizeInvitation(sourceInvitation, metadataLocale)
+      : sourceInvitation;
   const { image, title, description } = resolveInvitationSocialPreview(
     invitation,
     SITE_URL,
   );
-  const path = buildLocalePath(`/${slug}`, locale);
+  const path = buildLocalePath(`/${slug}`, metadataLocale);
   const canonical = buildAbsoluteUrl(SITE_URL, path);
 
   return {
@@ -64,7 +82,11 @@ export async function generateMetadata({
     description,
     alternates: {
       canonical,
-      languages: buildLanguageAlternates(SITE_URL, `/${slug}`),
+      languages: buildLanguageAlternates(
+        SITE_URL,
+        `/${slug}`,
+        effectiveLocales,
+      ),
     },
     robots: createPublicPageRobotsMetadata(invitation.isDemo === true),
     openGraph: {
@@ -73,7 +95,7 @@ export async function generateMetadata({
       images: [{ url: image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
       type: "website",
       url: canonical,
-      locale,
+      locale: metadataLocale,
     },
     twitter: {
       card: "summary_large_image",
@@ -139,24 +161,41 @@ export default async function InvitationSlugPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{
-    g?: string;
-    n?: string;
-    landingPreview?: string;
-    lazyExternalIframe?: string;
-    section?: string;
-  }>;
+  searchParams: Promise<InvitationSearchParams>;
 }) {
-  const { slug } = await params;
-  const { g: guestToken, landingPreview, lazyExternalIframe, section } =
-    await searchParams;
+  const { locale: rawLocale, slug } = await params;
+  const locale = resolveLocale(rawLocale);
+  const resolvedSearchParams = await searchParams;
+  const guestToken = getInvitationSearchParam(resolvedSearchParams, "g");
+  const landingPreview = getInvitationSearchParam(
+    resolvedSearchParams,
+    "landingPreview",
+  );
+  const lazyExternalIframe = getInvitationSearchParam(
+    resolvedSearchParams,
+    "lazyExternalIframe",
+  );
+  const section = getInvitationSearchParam(resolvedSearchParams, "section");
 
-  const invitation = await getInvitation(slug);
+  const sourceInvitation = await getInvitation(slug);
 
-  if (!invitation) {
+  if (!sourceInvitation) {
     notFound();
   }
 
+  const pathname = buildLocalePath(`/${slug}`, locale);
+  const redirectPath = getInvitationLocaleRedirectPath(
+    sourceInvitation,
+    locale,
+    pathname,
+    resolvedSearchParams,
+  );
+  if (redirectPath) redirect(redirectPath);
+
+  const invitation =
+    sourceInvitation.invitationType === "standard"
+      ? localizeInvitation(sourceInvitation, locale)
+      : sourceInvitation;
   const theme = await getTheme(invitation.template);
 
   if (!theme) {
@@ -191,7 +230,10 @@ export default async function InvitationSlugPage({
       }
       ReactDOM.preload(firstClip.url, { as: "video", fetchPriority: "high" });
       if (firstClip.poster) {
-        ReactDOM.preload(firstClip.poster, { as: "image", fetchPriority: "high" });
+        ReactDOM.preload(firstClip.poster, {
+          as: "image",
+          fetchPriority: "high",
+        });
       }
     }
   }
@@ -218,7 +260,7 @@ export default async function InvitationSlugPage({
   // when the token does not exist, belongs to another invitation, or the
   // feature is disabled — the rest of the page still works normally.
   let guest = undefined;
-  if (guestToken && invitation.guestManagementEnabled) {
+  if (guestToken && sourceInvitation.guestManagementEnabled) {
     const found = await getPublicGuestByToken(guestToken);
     if (found && found.invitationSlug === slug) {
       guest = found;
@@ -235,7 +277,10 @@ export default async function InvitationSlugPage({
               buildEventJsonLd({
                 name: title,
                 description,
-                url: buildAbsoluteUrl(SITE_URL, buildLocalePath(`/${slug}`, "pt")),
+                url: buildAbsoluteUrl(
+                  SITE_URL,
+                  buildLocalePath(`/${slug}`, locale),
+                ),
                 startDate: invitation.date.iso,
                 locationName: invitation.location.name,
                 locationAddress: invitation.location.address,

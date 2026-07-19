@@ -43,6 +43,8 @@ interface HeroTextEditorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   value?: HeroTextLayer;
+  sourceValue?: HeroTextLayer;
+  structureLocked?: boolean;
   onChange: (next: HeroTextLayer) => void;
   /** Background still: image URL or video poster. */
   stillUrl?: string;
@@ -75,12 +77,17 @@ export default function HeroTextEditor({
   open,
   onOpenChange,
   value,
+  sourceValue,
+  structureLocked = false,
   onChange,
   stillUrl,
   aspectRatio,
   fonts,
 }: HeroTextEditorProps) {
   const layer = value ?? EMPTY_HERO_TEXT_LAYER;
+  const sourceById = new Map(
+    (sourceValue?.blocks ?? []).map((block) => [block.id, block]),
+  );
   // Load any non-builtin Google Fonts chosen for the blocks so the preview
   // surface renders them.
   useDynamicFonts(heroTextLayerFontStacks(layer));
@@ -159,6 +166,11 @@ export default function HeroTextEditor({
         <DialogHeader>
           <DialogTitle>Textos do hero</DialogTitle>
         </DialogHeader>
+        {structureLocked && (
+          <p className="text-xs text-muted-foreground">
+            A estrutura é editada em Português.
+          </p>
+        )}
 
         <div className="flex flex-col gap-4 sm:flex-row">
           {/* Design surface */}
@@ -204,7 +216,12 @@ export default function HeroTextEditor({
               Arraste os textos para posicioná-los. As posições escalam para
               todos os ecrãs.
             </p>
-            <Button type="button" variant="outline" onClick={handleAdd}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={structureLocked}
+              onClick={handleAdd}
+            >
               + Adicionar texto
             </Button>
           </div>
@@ -225,6 +242,7 @@ export default function HeroTextEditor({
                   <Textarea
                     value={selected.content}
                     rows={2}
+                    placeholder={sourceById.get(selected.id)?.content}
                     onChange={(e) => patch({ content: e.target.value })}
                   />
                 </div>
@@ -311,9 +329,7 @@ export default function HeroTextEditor({
                     onClick={() =>
                       patch({
                         fontStyle:
-                          selected.fontStyle === "italic"
-                            ? "normal"
-                            : "italic",
+                          selected.fontStyle === "italic" ? "normal" : "italic",
                       })
                     }
                   >
@@ -377,6 +393,7 @@ export default function HeroTextEditor({
                   <Button
                     type="button"
                     variant="outline"
+                    disabled={structureLocked}
                     onClick={() => {
                       const id = newId();
                       onChange(duplicateBlock(layer, selected.id, id));
@@ -395,6 +412,7 @@ export default function HeroTextEditor({
                   <Button
                     type="button"
                     variant="destructive"
+                    disabled={structureLocked}
                     onClick={() => {
                       onChange(removeBlock(layer, selected.id));
                       setSelectedId(null);

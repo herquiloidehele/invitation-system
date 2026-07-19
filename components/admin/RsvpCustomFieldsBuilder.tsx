@@ -50,11 +50,22 @@ function createOption(): RsvpCustomFieldOption {
 
 export function RsvpCustomFieldsBuilder({
   fields,
+  sourceValue,
+  structureLocked = false,
   onChange,
 }: {
   fields: RsvpCustomField[];
+  sourceValue?: RsvpCustomField[];
+  structureLocked?: boolean;
   onChange: (fields: RsvpCustomField[]) => void;
 }) {
+  const sourceById = new Map(
+    (sourceValue ?? []).map((field) => [field.id, field]),
+  );
+  const sourceOptionLabel = (fieldId: string, optionId: string) =>
+    sourceById.get(fieldId)?.options?.find((option) => option.id === optionId)
+      ?.label;
+
   const updateField = (id: string, patch: Partial<RsvpCustomField>) => {
     onChange(
       fields.map((field) => {
@@ -108,12 +119,19 @@ export function RsvpCustomFieldsBuilder({
           type="button"
           variant="outline"
           size="sm"
+          disabled={structureLocked}
           onClick={() => onChange([...fields, createField()])}
         >
           <Plus className="mr-1.5 size-4" />
           Adicionar
         </Button>
       </div>
+
+      {structureLocked && (
+        <p className="text-xs text-muted-foreground">
+          A estrutura é editada em Português.
+        </p>
+      )}
 
       {fields.length === 0 && (
         <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
@@ -135,7 +153,7 @@ export function RsvpCustomFieldsBuilder({
                 type="button"
                 variant="ghost"
                 size="icon"
-                disabled={index === 0}
+                disabled={structureLocked || index === 0}
                 onClick={() => moveField(index, -1)}
               >
                 <ArrowUp className="size-4" />
@@ -144,7 +162,7 @@ export function RsvpCustomFieldsBuilder({
                 type="button"
                 variant="ghost"
                 size="icon"
-                disabled={index === fields.length - 1}
+                disabled={structureLocked || index === fields.length - 1}
                 onClick={() => moveField(index, 1)}
               >
                 <ArrowDown className="size-4" />
@@ -154,6 +172,7 @@ export function RsvpCustomFieldsBuilder({
                 variant="ghost"
                 size="icon"
                 className="text-destructive"
+                disabled={structureLocked}
                 onClick={() =>
                   onChange(fields.filter((item) => item.id !== field.id))
                 }
@@ -171,7 +190,10 @@ export function RsvpCustomFieldsBuilder({
                 onChange={(event) =>
                   updateField(field.id, { label: event.target.value })
                 }
-                placeholder="Ex: Vai precisar de transporte?"
+                placeholder={
+                  sourceById.get(field.id)?.label ||
+                  "Ex: Vai precisar de transporte?"
+                }
               />
             </div>
 
@@ -179,6 +201,7 @@ export function RsvpCustomFieldsBuilder({
               <Label>Tipo</Label>
               <Select
                 value={field.type}
+                disabled={structureLocked}
                 onValueChange={(value) =>
                   updateField(field.id, { type: value as RsvpCustomFieldType })
                 }
@@ -244,13 +267,17 @@ export function RsvpCustomFieldsBuilder({
                     onChange={(event) =>
                       updateOption(field.id, option.id, event.target.value)
                     }
-                    placeholder={`Opção ${optionIndex + 1}`}
+                    placeholder={
+                      sourceOptionLabel(field.id, option.id) ||
+                      `Opção ${optionIndex + 1}`
+                    }
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="text-destructive"
+                    disabled={structureLocked}
                     onClick={() =>
                       updateField(field.id, {
                         options: (field.options ?? []).filter(
@@ -267,6 +294,7 @@ export function RsvpCustomFieldsBuilder({
                 type="button"
                 variant="outline"
                 size="sm"
+                disabled={structureLocked}
                 onClick={() =>
                   updateField(field.id, {
                     options: [...(field.options ?? []), createOption()],

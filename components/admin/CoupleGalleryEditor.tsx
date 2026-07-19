@@ -24,7 +24,11 @@ const STYLES: { value: CoupleGalleryStyle; label: string; hint: string }[] = [
     label: "Coverflow 3D",
     hint: "Foto central em destaque com profundidade",
   },
-  { value: "polaroid", label: "Polaroids", hint: "Fotos empilhadas com legenda" },
+  {
+    value: "polaroid",
+    label: "Polaroids",
+    hint: "Fotos empilhadas com legenda",
+  },
   { value: "filmstrip", label: "Tira de Filme", hint: "Rolagem horizontal" },
   {
     value: "grid",
@@ -37,16 +41,27 @@ const EMPTY: CoupleGallery = { enabled: false, style: "kenburns", images: [] };
 
 export default function CoupleGalleryEditor({
   value,
+  sourceValue,
+  structureLocked = false,
   onChange,
 }: {
   value: CoupleGallery | undefined;
+  sourceValue?: CoupleGallery;
+  structureLocked?: boolean;
   onChange: (next: CoupleGallery) => void;
 }) {
   const g = value ?? EMPTY;
+  const sourceById = new Map(
+    (sourceValue?.images ?? []).map((image) => [image.id, image]),
+  );
   const patch = (p: Partial<CoupleGallery>) => onChange({ ...g, ...p });
   const setImages = (images: CoupleGalleryImage[]) => patch({ images });
 
-  const addImage = (url: string) => setImages([...g.images, { src: url }]);
+  const addImage = (url: string) =>
+    setImages([
+      ...g.images,
+      { id: `gallery-image-${crypto.randomUUID()}`, src: url },
+    ]);
   const removeImage = (i: number) =>
     setImages(g.images.filter((_, idx) => idx !== i));
   const updateImage = (i: number, p: Partial<CoupleGalleryImage>) =>
@@ -75,6 +90,12 @@ export default function CoupleGalleryEditor({
 
       {g.enabled && (
         <>
+          {structureLocked && (
+            <p className="text-xs text-muted-foreground">
+              A estrutura é editada em Português.
+            </p>
+          )}
+
           <div className="space-y-1">
             <Label className="text-xs">Estilo</Label>
             <div className="grid grid-cols-1 gap-2">
@@ -115,7 +136,7 @@ export default function CoupleGalleryEditor({
             <Input
               value={g.title ?? ""}
               onChange={(e) => patch({ title: e.target.value })}
-              placeholder="Nossos Momentos"
+              placeholder={sourceValue?.title || "Nossos Momentos"}
             />
           </div>
 
@@ -124,7 +145,7 @@ export default function CoupleGalleryEditor({
 
             {g.images.map((img, i) => (
               <div
-                key={i}
+                key={img.id ?? i}
                 className="rounded-lg border border-border p-3 space-y-2"
               >
                 <div className="flex items-center justify-between">
@@ -137,7 +158,7 @@ export default function CoupleGalleryEditor({
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6"
-                      disabled={i === 0}
+                      disabled={structureLocked || i === 0}
                       onClick={() => move(i, "up")}
                       aria-label="Mover para cima"
                     >
@@ -148,7 +169,7 @@ export default function CoupleGalleryEditor({
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6"
-                      disabled={i === g.images.length - 1}
+                      disabled={structureLocked || i === g.images.length - 1}
                       onClick={() => move(i, "down")}
                       aria-label="Mover para baixo"
                     >
@@ -159,6 +180,7 @@ export default function CoupleGalleryEditor({
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6 text-destructive"
+                      disabled={structureLocked}
                       onClick={() => removeImage(i)}
                       aria-label="Remover"
                     >
@@ -186,7 +208,10 @@ export default function CoupleGalleryEditor({
                 <Input
                   value={img.caption ?? ""}
                   onChange={(e) => updateImage(i, { caption: e.target.value })}
-                  placeholder="Legenda (opcional)"
+                  placeholder={
+                    (img.id ? sourceById.get(img.id)?.caption : undefined) ||
+                    "Legenda (opcional)"
+                  }
                 />
               </div>
             ))}
@@ -197,13 +222,15 @@ export default function CoupleGalleryEditor({
               </p>
             )}
 
-            <MediaUpload
-              kind="image"
-              maxSizeMB={5}
-              onUpload={(url) => addImage(url)}
-              onClear={() => {}}
-              label="Adicionar foto"
-            />
+            {!structureLocked && (
+              <MediaUpload
+                kind="image"
+                maxSizeMB={5}
+                onUpload={(url) => addImage(url)}
+                onClear={() => {}}
+                label="Adicionar foto"
+              />
+            )}
           </div>
         </>
       )}

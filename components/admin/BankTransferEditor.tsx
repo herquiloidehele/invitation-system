@@ -10,17 +10,29 @@ import type { BankTransferDetail } from "@/lib/types";
 
 export default function BankTransferEditor({
   value,
+  sourceValue,
+  structureLocked = false,
   onChange,
 }: {
   value: BankTransferDetail[] | undefined;
+  sourceValue?: BankTransferDetail[];
+  structureLocked?: boolean;
   onChange: (next: BankTransferDetail[]) => void;
 }) {
   const rows = value ?? [];
+  const sourceById = new Map(
+    (sourceValue ?? []).map((item) => [item.id, item]),
+  );
 
   const add = () =>
     onChange([
       ...rows,
-      { id: `bank-${Date.now()}`, label: "", value: "", copyable: true },
+      {
+        id: `bank-${crypto.randomUUID()}`,
+        label: "",
+        value: "",
+        copyable: true,
+      },
     ]);
   const remove = (i: number) => onChange(rows.filter((_, idx) => idx !== i));
   const update = (i: number, patch: Partial<BankTransferDetail>) =>
@@ -36,6 +48,11 @@ export default function BankTransferEditor({
   return (
     <div className="space-y-3">
       <Label className="text-xs">Transferência bancária ({rows.length})</Label>
+      {structureLocked && (
+        <p className="text-xs text-muted-foreground">
+          A estrutura é editada em Português.
+        </p>
+      )}
 
       {rows.map((it, i) => (
         <div
@@ -50,7 +67,7 @@ export default function BankTransferEditor({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6"
-                disabled={i === 0}
+                disabled={structureLocked || i === 0}
                 onClick={() => move(i, "up")}
                 aria-label="Mover para cima"
               >
@@ -61,7 +78,7 @@ export default function BankTransferEditor({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6"
-                disabled={i === rows.length - 1}
+                disabled={structureLocked || i === rows.length - 1}
                 onClick={() => move(i, "down")}
                 aria-label="Mover para baixo"
               >
@@ -72,6 +89,7 @@ export default function BankTransferEditor({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 text-destructive"
+                disabled={structureLocked}
                 onClick={() => remove(i)}
                 aria-label="Remover"
               >
@@ -83,7 +101,7 @@ export default function BankTransferEditor({
           <Input
             value={it.label}
             onChange={(e) => update(i, { label: e.target.value })}
-            placeholder="Rótulo, ex.: IBAN"
+            placeholder={sourceById.get(it.id)?.label || "Rótulo, ex.: IBAN"}
           />
           <Input
             value={it.value}
@@ -91,7 +109,9 @@ export default function BankTransferEditor({
             placeholder="Valor, ex.: GB82 WEST 1234 5698 7654 32"
           />
           <div className="flex items-center justify-between">
-            <Label className="text-xs text-muted-foreground">Botão copiar</Label>
+            <Label className="text-xs text-muted-foreground">
+              Botão copiar
+            </Label>
             <Switch
               checked={it.copyable ?? false}
               onCheckedChange={(v) => update(i, { copyable: v })}
@@ -100,7 +120,13 @@ export default function BankTransferEditor({
         </div>
       ))}
 
-      <Button type="button" variant="outline" size="sm" onClick={add}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={structureLocked}
+        onClick={add}
+      >
         <Plus size={14} className="mr-1.5" />
         Adicionar dado bancário
       </Button>

@@ -46,8 +46,10 @@ import {
   heroScrollIndicatorBottom,
   resolveHeroScrollIndicator,
 } from "@/lib/hero-scroll-indicator";
+import { InvitationLanguageSwitcher } from "@/components/shared/InvitationLanguageSwitcher";
 
 interface VideoEntranceHeroProps {
+  invitation: InvitationData;
   couple: InvitationData["couple"];
   /** Top text shown above the couple names. */
   topText?: string;
@@ -87,6 +89,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export default function VideoEntranceHero({
+  invitation,
   couple,
   topText,
   quote,
@@ -374,6 +377,10 @@ export default function VideoEntranceHero({
           zIndex: 3,
         }}
       />
+
+      {heroInfoVisible && (
+        <InvitationLanguageSwitcher invitation={invitation} />
+      )}
 
       {/* Idle: play affordance + tap hint. Hidden when the admin disables the
           prompt — the cover stays tappable either way. */}

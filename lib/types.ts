@@ -90,6 +90,8 @@ export type ScheduleIcon =
   | "custom";
 
 export interface ScheduleEvent {
+  /** Stable identifier used to attach sparse translations across reordering. */
+  id?: string;
   time: string;
   label: string;
   venue: string;
@@ -98,6 +100,8 @@ export interface ScheduleEvent {
 }
 
 export interface DressColor {
+  /** Stable identifier used to attach sparse translations across reordering. */
+  id?: string;
   /** Color name shown to guests, e.g. "Azul safira". */
   name: string;
   /** Optional swatch color (hex). */
@@ -378,6 +382,8 @@ export interface SocialPreview {
 }
 
 export interface FAQItem {
+  /** Stable identifier used to attach sparse translations across reordering. */
+  id?: string;
   question: string;
   answer: string;
 }
@@ -423,6 +429,8 @@ export type CoupleGalleryStyle =
   | "grid";
 
 export interface CoupleGalleryImage {
+  /** Stable identifier used to attach sparse translations across reordering. */
+  id?: string;
   /** Image URL (same S3 upload pipeline as section images). */
   src: string;
   /** Optional caption — shown by `kenburns` & `polaroid`; ignored by others. */
@@ -1033,6 +1041,65 @@ export interface CustomTexts {
   common_close?: string;
 }
 
+export type TranslationLocale = "en" | "es";
+
+/**
+ * Sparse translated text keyed by stable IDs. Portuguese remains the
+ * canonical source for structure and every non-text value.
+ */
+export interface InvitationTranslationOverlay {
+  quote?: string;
+  heroTopText?: string;
+  location?: { name?: string; address?: string };
+  location2?: { name?: string; address?: string };
+  schedule?: Record<string, { label?: string; venue?: string }>;
+  dressCode?: {
+    text?: string;
+    title?: string;
+    intro?: string;
+    ladies?: { label?: string; note?: string };
+    gentlemen?: { label?: string; note?: string };
+    reservedNote?: string;
+    palette?: Record<string, { name?: string }>;
+  };
+  giftRegistry?: {
+    text?: string;
+    bankTransferText?: string;
+    items?: Record<string, { name?: string }>;
+    bankTransfer?: Record<string, { label?: string }>;
+  };
+  heroTextBlocks?: Record<string, { content?: string }>;
+  faqs?: Record<string, { question?: string; answer?: string }>;
+  guestGuideItems?: Record<string, { label?: string }>;
+  coupleGallery?: {
+    title?: string;
+    images?: Record<string, { caption?: string }>;
+  };
+  places?: {
+    sections?: Record<
+      string,
+      {
+        title?: string;
+        items?: Record<string, { title?: string; description?: string }>;
+      }
+    >;
+  };
+  parents?: { blessingMessage?: string; inviteMessage?: string };
+  ourStory?: { title?: string; description?: string };
+  rsvpCustomFields?: Record<
+    string,
+    {
+      label?: string;
+      options?: Record<string, { label?: string }>;
+    }
+  >;
+  customTexts?: CustomTexts;
+}
+
+export type InvitationTranslations = Partial<
+  Record<TranslationLocale, InvitationTranslationOverlay>
+>;
+
 export interface InvitationData {
   slug: string;
   /** The theme's database id — used when saving/updating invitations. */
@@ -1148,6 +1215,12 @@ export interface InvitationData {
   imageSettings?: ImageSettingsMap;
   /** Per-invitation UI text overrides. Missing keys fall back to built-in Portuguese defaults. */
   customTexts?: CustomTexts;
+  /** Enables locale switching for standard invitations when another locale is selected. */
+  languageSwitcherEnabled?: boolean;
+  /** Locales selected by the admin. Portuguese is normalized as mandatory. */
+  enabledLocales?: import("@/i18n/locales").AppLocale[];
+  /** Sparse English and Spanish text overlays. */
+  translations?: InvitationTranslations;
   /** Whether the guest-management feature is active for this invitation. */
   guestManagementEnabled?: boolean;
   /** Whether the host (owner-link page) may add guests. When false, the "Add guest" button is hidden there and the owner API rejects creation. Defaults to false. */

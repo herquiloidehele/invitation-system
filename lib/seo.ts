@@ -22,17 +22,24 @@ export function buildAbsoluteUrl(origin: string, path: string): string {
   return `${cleanOrigin}/${path.replace(/^\/+/, "")}`;
 }
 
-export function buildLanguageAlternates(origin: string, path: string) {
+export function buildLanguageAlternates(
+  origin: string,
+  path: string,
+  locales: readonly AppLocale[] = SUPPORTED_LOCALES,
+) {
   const entries = Object.fromEntries(
-    SUPPORTED_LOCALES.map((locale) => [
+    locales.map((locale) => [
       locale,
       buildAbsoluteUrl(origin, buildLocalePath(path, locale)),
     ]),
-  ) as Record<AppLocale, string>;
+  ) as Partial<Record<AppLocale, string>>;
 
   return {
     ...entries,
-    "x-default": entries[DEFAULT_LOCALE],
+    "x-default": buildAbsoluteUrl(
+      origin,
+      buildLocalePath(path, DEFAULT_LOCALE),
+    ),
   };
 }
 

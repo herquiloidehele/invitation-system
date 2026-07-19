@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/db";
-import type { CustomTexts, InvitationEventType } from "@/lib/types";
+import { notFound, redirect } from "next/navigation";
+import { resolveLocale } from "@/i18n/locales";
+import {
+  getInvitationLocaleRedirectPath,
+  getInvitationSearchParam,
+  type InvitationSearchParams,
+} from "@/lib/invitation-language-routing";
+import { localizeInvitation } from "@/lib/invitation-translations";
+import { getInvitation } from "@/lib/invitations";
 import {
   getRsvpCustomFields,
   isRsvpClosed,
@@ -11,7 +17,7 @@ import {
   shouldShowRsvpNumAdults,
   shouldShowRsvpNumChildren,
 } from "@/lib/rsvp-config";
-import { createNoIndexMetadata } from "@/lib/seo";
+import { buildLocalePath, createNoIndexMetadata } from "@/lib/seo";
 import { formatLocalizedLongDate } from "@/lib/date-format";
 import { getPublicGuestByToken } from "@/lib/guests";
 import RsvpPage from "./RsvpPage";
@@ -21,7 +27,7 @@ export const metadata: Metadata = createNoIndexMetadata();
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ g?: string }>;
+  searchParams: Promise<InvitationSearchParams>;
 };
 
 // ---------------------------------------------------------------------------
@@ -41,39 +47,28 @@ function isDeadlinePassed(deadline: string | undefined): boolean {
 // ---------------------------------------------------------------------------
 
 export default async function ConfirmarPage({ params, searchParams }: Props) {
-  const { slug, locale } = await params;
-  const { g: guestToken } = await searchParams;
+  const { slug, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
+  const resolvedSearchParams = await searchParams;
+  const guestToken = getInvitationSearchParam(resolvedSearchParams, "g");
 
-  const invitation = await prisma.invitation.findUnique({
-    where: { slug },
-    select: {
-      slug: true,
-      couple: true,
-      date: true,
-      rsvp: true,
-      customTexts: true,
-      eventType: true,
-    },
-  });
+  const sourceInvitation = await getInvitation(slug);
+  if (!sourceInvitation) notFound();
 
-  if (!invitation) notFound();
+  const pathname = buildLocalePath(`/confirmar/${slug}`, locale);
+  const redirectPath = getInvitationLocaleRedirectPath(
+    sourceInvitation,
+    locale,
+    pathname,
+    resolvedSearchParams,
+  );
+  if (redirectPath) redirect(redirectPath);
 
-  const couple = invitation.couple as { bride: string; groom: string };
-  const date = invitation.date as { display: string; iso?: string };
-  const rsvp = invitation.rsvp as {
-    enabled?: boolean;
-    deadline?: string;
-    showEmail?: boolean;
-    showDietaryRestrictions?: boolean;
-    backgroundImageUrl?: string;
-    inputBackgroundColor?: string;
-    inputTextColor?: string;
-    inputPlaceholderColor?: string;
-    inputBorderColor?: string;
-    acceptingResponses?: boolean;
-  };
-  const customTexts =
-    (invitation.customTexts as CustomTexts | null) ?? undefined;
+  const invitation =
+    sourceInvitation.invitationType === "standard"
+      ? localizeInvitation(sourceInvitation, locale)
+      : sourceInvitation;
+  const { couple, date, rsvp, customTexts } = invitation;
 
   const deadlinePassed = isDeadlinePassed(rsvp.deadline);
   const closed = isRsvpClosed(rsvp);
@@ -98,7 +93,7 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       slug={slug}
       guestToken={resolvedGuestToken}
       prefillName={guestName}
-      eventType={(invitation.eventType as InvitationEventType) ?? "wedding"}
+      eventType={invitation.eventType}
       bride={couple.bride}
       groom={couple.groom}
       dateDisplay={dateDisplay}

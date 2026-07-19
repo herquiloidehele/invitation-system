@@ -62,6 +62,7 @@ export default function VideoEntrancePage({
       >
         <div style={{ display: showInitialPageSections ? undefined : "none" }}>
           <VideoEntranceHero
+            invitation={invitation}
             couple={invitation.couple}
             topText={invitation.heroTopText}
             quote={invitation.quote}

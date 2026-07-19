@@ -44,8 +44,10 @@ import {
   isEngagementEventType,
   isWeddingEventType,
 } from "@/lib/invitation-event-types";
+import { InvitationLanguageSwitcher } from "@/components/shared/InvitationLanguageSwitcher";
 
 interface CurtainsHeroProps {
+  invitation: InvitationData;
   couple: InvitationData["couple"];
   quote: string;
   inviteMessage?: string;
@@ -90,6 +92,7 @@ interface CurtainsHeroProps {
 type HeroState = "idle" | "playing" | "revealed";
 
 export default function CurtainsHero({
+  invitation,
   couple,
   quote,
   inviteMessage,
@@ -398,6 +401,10 @@ export default function CurtainsHero({
           heroOverlay={heroOverlay}
           mediaFit={resolveHeroMediaFit(heroMediaFit)}
         />
+      )}
+
+      {heroInfoVisible && (
+        <InvitationLanguageSwitcher invitation={invitation} />
       )}
 
       {/* Hero info (monogram, names, quote). Fades in when the curtain video

@@ -2,6 +2,11 @@ import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { isObjectFit } from "@/lib/hero-media-fit";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
+import {
+  normalizeInvitationLocales,
+  normalizeInvitationTranslationIds,
+  sanitizeInvitationTranslations,
+} from "@/lib/invitation-translations";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
@@ -13,6 +18,8 @@ export function buildInvitationCreateData(
   body: InvitationCreateBody,
   themeId: string,
 ): Prisma.InvitationCreateInput {
+  const invitation = normalizeInvitationTranslationIds(body);
+
   return {
     slug: body.slug,
     theme: { connect: { id: themeId } },
@@ -22,9 +29,9 @@ export function buildInvitationCreateData(
     location: sanitizeJsonField(body.location, {}),
     location2: sanitizeJsonField(body.location2, null),
     rsvp: sanitizeJsonField(body.rsvp, { enabled: true }),
-    schedule: sanitizeJsonField(body.schedule, []),
+    schedule: sanitizeJsonField(invitation.schedule, []),
     scheduleStyle: body.scheduleStyle ?? "default",
-    dressCode: sanitizeJsonField(body.dressCode, {
+    dressCode: sanitizeJsonField(invitation.dressCode, {
       enabled: false,
       text: "",
     }),
@@ -56,13 +63,13 @@ export function buildInvitationCreateData(
     heroTopText: body.heroTopText ?? null,
     heroTapPrompt:
       typeof body.heroTapPrompt === "boolean" ? body.heroTapPrompt : true,
-    faqs: sanitizeJsonField(body.faqs, null),
+    faqs: sanitizeJsonField(invitation.faqs, null),
     guestGuide: sanitizeJsonField(body.guestGuide, null),
     envelope: sanitizeJsonField(body.envelope, null),
     saveDateStyle: body.saveDateStyle ?? null,
     cinematicImageUrl: body.cinematicImageUrl ?? null,
     sectionImages: sanitizeJsonField(body.sectionImages, null),
-    coupleGallery: sanitizeJsonField(body.coupleGallery, null),
+    coupleGallery: sanitizeJsonField(invitation.coupleGallery, null),
     coverVideos: sanitizeJsonField(body.coverVideos, null),
     places: sanitizeJsonField(body.places, null),
     parents: sanitizeJsonField(body.parents, null),
@@ -82,6 +89,12 @@ export function buildInvitationCreateData(
     ),
     imageSettings: sanitizeJsonField(body.imageSettings, null),
     customTexts: sanitizeJsonField(body.customTexts, null),
+    languageSwitcherEnabled: invitation.languageSwitcherEnabled === true,
+    enabledLocales: normalizeInvitationLocales(invitation.enabledLocales),
+    translations: sanitizeJsonField(
+      sanitizeInvitationTranslations(invitation.translations),
+      null,
+    ),
     eventType: normalizeInvitationEventType(body.eventType),
     guestManagementEnabled: body.guestManagementEnabled === true,
     ownerCanAddGuests: body.ownerCanAddGuests === true,

@@ -1,9 +1,18 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type SetStateAction,
+} from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { NextIntlClientProvider } from "next-intl";
+import type { AppLocale } from "@/i18n/locales";
+import { getClientMessages } from "@/i18n/client-messages";
 
 import type {
   CardSectionKey,
@@ -35,6 +44,14 @@ import type {
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
+import {
+  applyInvitationTranslationDraft,
+  buildInvitationTranslationDraft,
+  localizeInvitation,
+  normalizeInvitationLocales,
+  normalizeInvitationTranslationIds,
+  validateInvitationLanguageSettings,
+} from "@/lib/invitation-translations";
 
 import {
   ExternalLink,
@@ -77,7 +94,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
 import ElegantFloralPage from "@/components/elegant-floral/ElegantFloralPage";
+import { InvitationLanguagePreviewProvider } from "@/components/shared/InvitationLanguageSwitcher";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import { InvitationLanguageSettings } from "@/components/admin/InvitationLanguageSettings";
 import MediaUpload from "@/components/admin/MediaUpload";
 import CoverVideosEditor from "@/components/admin/CoverVideosEditor";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
@@ -486,6 +505,9 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     externalLink: "",
     isDemo: false,
     imageSettings: {},
+    languageSwitcherEnabled: false,
+    enabledLocales: ["pt"],
+    translations: undefined,
     guestManagementEnabled: false,
     ownerCanAddGuests: false,
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
@@ -524,9 +546,40 @@ export default function InvitationForm({
     null,
   );
   const clearSubmitError = useCallback(() => setSubmitError(null), []);
-  const [form, setForm] = useState<InvitationData>(
-    initialData ?? getDefaultFormState(themes[0]),
+  const [sourceForm, setSourceForm] = useState<InvitationData>(() =>
+    normalizeInvitationTranslationIds(
+      initialData ?? getDefaultFormState(themes[0]),
+    ),
   );
+  const [activeLocale, setActiveLocaleState] = useState<AppLocale>("pt");
+  const activeLocaleRef = useRef<AppLocale>("pt");
+  activeLocaleRef.current = activeLocale;
+  const setActiveLocale = useCallback((locale: AppLocale) => {
+    activeLocaleRef.current = locale;
+    setActiveLocaleState(locale);
+  }, []);
+  const form = useMemo(
+    () => buildInvitationTranslationDraft(sourceForm, activeLocale),
+    [sourceForm, activeLocale],
+  );
+  const previewInvitation = useMemo(
+    () =>
+      sourceForm.invitationType === "standard"
+        ? localizeInvitation(sourceForm, activeLocale)
+        : sourceForm,
+    [sourceForm, activeLocale],
+  );
+  const setForm = useCallback((next: SetStateAction<InvitationData>) => {
+    setSourceForm((source) => {
+      const locale = activeLocaleRef.current;
+      const current = buildInvitationTranslationDraft(source, locale);
+      const draft = typeof next === "function" ? next(current) : next;
+      return applyInvitationTranslationDraft(source, locale, draft);
+    });
+  }, []);
+  const structureLocked = activeLocale !== "pt";
+  const sourcePlaceholder = (source: string | undefined, ordinary: string) =>
+    structureLocked && source?.trim() ? source : ordinary;
   const isWedding = isWeddingEventType(form.eventType);
   const hasRequiredNames = Boolean(
     form.couple.bride && (!isWedding || form.couple.groom),
@@ -801,7 +854,13 @@ export default function InvitationForm({
       ...prev,
       schedule: [
         ...prev.schedule,
-        { time: "", label: "", venue: "", icon: "neutral" },
+        {
+          id: `schedule-${crypto.randomUUID()}`,
+          time: "",
+          label: "",
+          venue: "",
+          icon: "neutral",
+        },
       ],
     }));
   }, []);
@@ -833,7 +892,14 @@ export default function InvitationForm({
   const addFaq = useCallback(() => {
     setForm((prev) => ({
       ...prev,
-      faqs: [...(prev.faqs ?? []), { question: "", answer: "" }],
+      faqs: [
+        ...(prev.faqs ?? []),
+        {
+          id: `faq-${crypto.randomUUID()}`,
+          question: "",
+          answer: "",
+        },
+      ],
     }));
   }, []);
 
@@ -1376,11 +1442,11 @@ export default function InvitationForm({
 
   // Submit
   async function handleSubmit() {
-    if (!form.slug) {
+    if (!sourceForm.slug) {
       toast.error("O slug é obrigatório");
       return;
     }
-    if (!form.couple.bride || (isWedding && !form.couple.groom)) {
+    if (!sourceForm.couple.bride || (isWedding && !sourceForm.couple.groom)) {
       toast.error(
         isWedding
           ? "Os nomes da noiva e do noivo são obrigatórios"
@@ -1389,20 +1455,28 @@ export default function InvitationForm({
       return;
     }
 
-    const invalidCustomField = (form.rsvp.customFields ?? []).find((field) => {
-      if (!field.label.trim()) return true;
-      if (
-        (field.type === "radio" || field.type === "select") &&
-        !(field.options ?? []).some((option) => option.label.trim())
-      ) {
-        return true;
-      }
-      return false;
-    });
+    const invalidCustomField = (sourceForm.rsvp.customFields ?? []).find(
+      (field) => {
+        if (!field.label.trim()) return true;
+        if (
+          (field.type === "radio" || field.type === "select") &&
+          !(field.options ?? []).some((option) => option.label.trim())
+        ) {
+          return true;
+        }
+        return false;
+      },
+    );
     if (invalidCustomField) {
       toast.error(
         "Preencha as perguntas e opções dos campos personalizados do RSVP.",
       );
+      return;
+    }
+
+    const languageError = validateInvitationLanguageSettings(sourceForm);
+    if (languageError) {
+      toast.error(languageError);
       return;
     }
 
@@ -1414,10 +1488,16 @@ export default function InvitationForm({
         sourceInvitationId,
       );
 
+      const normalized = normalizeInvitationTranslationIds(sourceForm);
+      const payload = {
+        ...normalized,
+        translations: normalized.translations ?? null,
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -1486,6 +1566,30 @@ export default function InvitationForm({
             {/* Owner link — only shown in edit mode */}
             {mode === "edit" && ownerUrl && (
               <OwnerLinkPanel ownerUrl={ownerUrl} />
+            )}
+
+            {sourceForm.invitationType === "standard" && (
+              <InvitationLanguageSettings
+                enabled={sourceForm.languageSwitcherEnabled === true}
+                enabledLocales={normalizeInvitationLocales(
+                  sourceForm.enabledLocales,
+                )}
+                activeLocale={activeLocale}
+                onEnabledChange={(enabled) => {
+                  if (!enabled) setActiveLocale("pt");
+                  setSourceForm((current) => ({
+                    ...current,
+                    languageSwitcherEnabled: enabled,
+                  }));
+                }}
+                onEnabledLocalesChange={(enabledLocales) =>
+                  setSourceForm((current) => ({
+                    ...current,
+                    enabledLocales,
+                  }))
+                }
+                onActiveLocaleChange={setActiveLocale}
+              />
             )}
 
             <Accordion defaultValue={[]} className="space-y-2">
@@ -1650,7 +1754,10 @@ export default function InvitationForm({
                             onChange={(e) =>
                               updateParents("blessingMessage", e.target.value)
                             }
-                            placeholder="Com a bênção dos Pais"
+                            placeholder={sourcePlaceholder(
+                              sourceForm.parents?.blessingMessage,
+                              "Com a bênção dos Pais",
+                            )}
                             rows={2}
                           />
                         </div>
@@ -1709,7 +1816,10 @@ export default function InvitationForm({
                             onChange={(e) =>
                               updateParents("inviteMessage", e.target.value)
                             }
-                            placeholder="Convidam para celebração do seu casamento"
+                            placeholder={sourcePlaceholder(
+                              sourceForm.parents?.inviteMessage,
+                              "Convidam para celebração do seu casamento",
+                            )}
                             rows={2}
                           />
                         </div>
@@ -2269,7 +2379,10 @@ export default function InvitationForm({
                       value={form.quote}
                       onChange={(e) => update("quote", e.target.value)}
                       rows={2}
-                      placeholder="Uma citação romântica..."
+                      placeholder={sourcePlaceholder(
+                        sourceForm.quote,
+                        "Uma citação romântica...",
+                      )}
                     />
                   </div>
                 </AccordionContent>
@@ -2522,7 +2635,10 @@ export default function InvitationForm({
                       id="locName"
                       value={form.location.name}
                       onChange={(e) => updateLocation("name", e.target.value)}
-                      placeholder="e.g. Quinta da Serra"
+                      placeholder={sourcePlaceholder(
+                        sourceForm.location.name,
+                        "e.g. Quinta da Serra",
+                      )}
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -2533,6 +2649,10 @@ export default function InvitationForm({
                       onChange={(e) =>
                         updateLocation("address", e.target.value)
                       }
+                      placeholder={sourcePlaceholder(
+                        sourceForm.location.address,
+                        "Morada do local",
+                      )}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -2648,6 +2768,7 @@ export default function InvitationForm({
                       variant="outline"
                       size="sm"
                       className="w-full"
+                      disabled={structureLocked}
                       onClick={addLocation2}
                     >
                       + Adicionar Segundo Local
@@ -2663,6 +2784,7 @@ export default function InvitationForm({
                           variant="ghost"
                           size="sm"
                           className="text-destructive hover:text-destructive"
+                          disabled={structureLocked}
                           onClick={removeLocation2}
                         >
                           Remover
@@ -2719,7 +2841,10 @@ export default function InvitationForm({
                           onChange={(e) =>
                             updateLocation2("name", e.target.value)
                           }
-                          placeholder="e.g. Quinta da Serra"
+                          placeholder={sourcePlaceholder(
+                            sourceForm.location2?.name,
+                            "e.g. Quinta da Serra",
+                          )}
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -2730,6 +2855,10 @@ export default function InvitationForm({
                           onChange={(e) =>
                             updateLocation2("address", e.target.value)
                           }
+                          placeholder={sourcePlaceholder(
+                            sourceForm.location2?.address,
+                            "Morada do local",
+                          )}
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
@@ -2870,7 +2999,10 @@ export default function InvitationForm({
                           onChange={(e) =>
                             updateDressCode("text", e.target.value)
                           }
-                          placeholder="e.g. Traje Formal"
+                          placeholder={sourcePlaceholder(
+                            sourceForm.dressCode.text,
+                            "e.g. Traje Formal",
+                          )}
                         />
                       </div>
                     )}
@@ -2939,6 +3071,8 @@ export default function InvitationForm({
                     {form.dressCode.enabled && isElegantFloral && (
                       <ElegantFloralDressFields
                         value={form.dressCode}
+                        sourceValue={sourceForm.dressCode}
+                        structureLocked={structureLocked}
                         onChange={patchDressCode}
                       />
                     )}
@@ -3065,6 +3199,8 @@ export default function InvitationForm({
                         />
                         <RsvpCustomFieldsBuilder
                           fields={form.rsvp.customFields ?? []}
+                          sourceValue={sourceForm.rsvp.customFields}
+                          structureLocked={structureLocked}
                           onChange={(customFields) =>
                             updateRsvp("customFields", customFields)
                           }
@@ -3118,6 +3254,10 @@ export default function InvitationForm({
                             onChange={(e) =>
                               updateGiftRegistry("text", e.target.value)
                             }
+                            placeholder={sourcePlaceholder(
+                              sourceForm.giftRegistry.text,
+                              "Mensagem sobre a lista de presentes",
+                            )}
                             rows={2}
                           />
                         </div>
@@ -3135,6 +3275,8 @@ export default function InvitationForm({
                         </div>
                         <GiftsListEditor
                           value={form.giftRegistry.items}
+                          sourceValue={sourceForm.giftRegistry.items}
+                          structureLocked={structureLocked}
                           onChange={updateGiftItems}
                         />
                         <div className="space-y-1.5">
@@ -3150,11 +3292,17 @@ export default function InvitationForm({
                                 e.target.value,
                               )
                             }
+                            placeholder={sourcePlaceholder(
+                              sourceForm.giftRegistry.bankTransferText,
+                              "Informação sobre transferência bancária",
+                            )}
                             rows={2}
                           />
                         </div>
                         <BankTransferEditor
                           value={form.giftRegistry.bankTransfer}
+                          sourceValue={sourceForm.giftRegistry.bankTransfer}
+                          structureLocked={structureLocked}
                           onChange={updateBankTransfer}
                         />
                       </>
@@ -3238,6 +3386,8 @@ export default function InvitationForm({
                 <AccordionContent className="space-y-4 pb-4">
                   <CoupleGalleryEditor
                     value={form.coupleGallery}
+                    sourceValue={sourceForm.coupleGallery}
+                    structureLocked={structureLocked}
                     onChange={updateCoupleGallery}
                   />
                 </AccordionContent>
@@ -3293,7 +3443,10 @@ export default function InvitationForm({
                               },
                             }))
                           }
-                          placeholder="Nossa História"
+                          placeholder={sourcePlaceholder(
+                            sourceForm.ourStory?.title,
+                            "Nossa História",
+                          )}
                         />
                       </div>
 
@@ -3314,7 +3467,10 @@ export default function InvitationForm({
                               },
                             }))
                           }
-                          placeholder="Conte a história do casal..."
+                          placeholder={sourcePlaceholder(
+                            sourceForm.ourStory?.description,
+                            "Conte a história do casal...",
+                          )}
                           rows={5}
                         />
                       </div>
@@ -3409,7 +3565,7 @@ export default function InvitationForm({
                   )}
                   {form.schedule.map((item, i) => (
                     <div
-                      key={i}
+                      key={item.id ?? i}
                       className="grid grid-cols-1 gap-2 md:grid-cols-[0.9fr_1fr_1fr_1fr_auto] md:items-end"
                     >
                       <div className="space-y-1">
@@ -3429,7 +3585,12 @@ export default function InvitationForm({
                           onChange={(e) =>
                             updateScheduleItem(i, "label", e.target.value)
                           }
-                          placeholder="Cerimónia"
+                          placeholder={sourcePlaceholder(
+                            sourceForm.schedule.find(
+                              (source) => source.id === item.id,
+                            )?.label,
+                            "Cerimónia",
+                          )}
                         />
                       </div>
                       <div className="space-y-1">
@@ -3439,7 +3600,12 @@ export default function InvitationForm({
                           onChange={(e) =>
                             updateScheduleItem(i, "venue", e.target.value)
                           }
-                          placeholder="Capela"
+                          placeholder={sourcePlaceholder(
+                            sourceForm.schedule.find(
+                              (source) => source.id === item.id,
+                            )?.venue,
+                            "Capela",
+                          )}
                         />
                       </div>
                       <div className="space-y-1">
@@ -3468,6 +3634,7 @@ export default function InvitationForm({
                       <Button
                         variant="ghost"
                         size="sm"
+                        disabled={structureLocked}
                         onClick={() => removeScheduleItem(i)}
                         className="text-destructive"
                       >
@@ -3493,7 +3660,12 @@ export default function InvitationForm({
                       )}
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" onClick={addScheduleItem}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={structureLocked}
+                    onClick={addScheduleItem}
+                  >
                     + Adicionar Evento
                   </Button>
                 </AccordionContent>
@@ -3506,7 +3678,10 @@ export default function InvitationForm({
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
                   {(form.faqs ?? []).map((faq, i) => (
-                    <div key={i} className="space-y-2 border-l-2 pl-3">
+                    <div
+                      key={faq.id ?? i}
+                      className="space-y-2 border-l-2 pl-3"
+                    >
                       <div className="flex items-start gap-2">
                         <div className="flex-1 space-y-1">
                           <Label className="text-xs">Pergunta</Label>
@@ -3515,11 +3690,18 @@ export default function InvitationForm({
                             onChange={(e) =>
                               updateFaq(i, "question", e.target.value)
                             }
+                            placeholder={sourcePlaceholder(
+                              sourceForm.faqs?.find(
+                                (source) => source.id === faq.id,
+                              )?.question,
+                              "Pergunta",
+                            )}
                           />
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
+                          disabled={structureLocked}
                           onClick={() => removeFaq(i)}
                           className="text-destructive mt-5"
                         >
@@ -3533,12 +3715,23 @@ export default function InvitationForm({
                           onChange={(e) =>
                             updateFaq(i, "answer", e.target.value)
                           }
+                          placeholder={sourcePlaceholder(
+                            sourceForm.faqs?.find(
+                              (source) => source.id === faq.id,
+                            )?.answer,
+                            "Resposta",
+                          )}
                           rows={2}
                         />
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" onClick={addFaq}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={structureLocked}
+                    onClick={addFaq}
+                  >
                     + Adicionar Pergunta
                   </Button>
                 </AccordionContent>
@@ -3547,6 +3740,8 @@ export default function InvitationForm({
               {/* ── Manual do Bom Convidado ── */}
               <GuestGuideFormSection
                 guestGuide={form.guestGuide ?? { enabled: false, items: [] }}
+                sourceValue={sourceForm.guestGuide}
+                structureLocked={structureLocked}
                 onEnabledChange={updateGuestGuideEnabled}
                 onTogglePredefined={togglePredefinedItem}
                 onAddCustom={addCustomGuideItem}
@@ -3558,6 +3753,8 @@ export default function InvitationForm({
               {/* ── Locais (Hotéis, Restaurantes…) ── */}
               <PlacesFormSection
                 places={form.places ?? EMPTY_PLACES}
+                sourceValue={sourceForm.places}
+                structureLocked={structureLocked}
                 onEnabledChange={updatePlacesEnabled}
                 onLayoutChange={updatePlacesLayout}
                 onAddSection={addPlaceSection}
@@ -3603,7 +3800,10 @@ export default function InvitationForm({
                             onChange={(e) =>
                               updateCustomText(field.key, e.target.value)
                             }
-                            placeholder={field.placeholder}
+                            placeholder={sourcePlaceholder(
+                              sourceForm.customTexts?.[field.key],
+                              field.placeholder,
+                            )}
                             className="text-sm"
                           />
                         </div>
@@ -3616,6 +3816,7 @@ export default function InvitationForm({
                     variant="ghost"
                     size="sm"
                     className="text-xs text-muted-foreground"
+                    disabled={structureLocked}
                     onClick={clearCustomTexts}
                   >
                     <RotateCcw size={12} className="mr-1" />
@@ -3874,11 +4075,11 @@ export default function InvitationForm({
               {hasRequiredNames ? (
                 <EnvelopeCover
                   theme={currentTheme}
-                  coverBackground={form.envelope?.coverBackground}
+                  coverBackground={sourceForm.envelope?.coverBackground}
                   onOpen={() => {}}
-                  monogram={form.couple.monogram}
-                  shimmer={form.envelope?.shimmer !== false}
-                  imageSettings={form.imageSettings}
+                  monogram={sourceForm.couple.monogram}
+                  shimmer={sourceForm.envelope?.shimmer !== false}
+                  imageSettings={sourceForm.imageSettings}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
@@ -3914,28 +4115,37 @@ export default function InvitationForm({
                     ref={previewRootRef}
                     className="mx-auto origin-top w-full max-h-165 relative"
                   >
-                    {hasRequiredNames ? (
-                      isElegantFloral ? (
-                        <ElegantFloralPage
-                          invitation={form}
-                          theme={currentTheme}
-                          isPreview
-                          animateHeroText
-                        />
-                      ) : (
-                        <InvitationPage
-                          invitation={form}
-                          theme={currentTheme}
-                          isPreview
-                        />
-                      )
-                    ) : (
-                      <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
-                        {isWedding
-                          ? "Insira os nomes do casal para ver a pré-visualização"
-                          : "Insira o nome para ver a pré-visualização"}
-                      </div>
-                    )}
+                    <NextIntlClientProvider
+                      locale={activeLocale}
+                      messages={getClientMessages(activeLocale)}
+                    >
+                      <InvitationLanguagePreviewProvider
+                        onLocaleChange={setActiveLocale}
+                      >
+                        {hasRequiredNames ? (
+                          isElegantFloral ? (
+                            <ElegantFloralPage
+                              invitation={previewInvitation}
+                              theme={currentTheme}
+                              isPreview
+                              animateHeroText
+                            />
+                          ) : (
+                            <InvitationPage
+                              invitation={previewInvitation}
+                              theme={currentTheme}
+                              isPreview
+                            />
+                          )
+                        ) : (
+                          <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
+                            {isWedding
+                              ? "Insira os nomes do casal para ver a pré-visualização"
+                              : "Insira o nome para ver a pré-visualização"}
+                          </div>
+                        )}
+                      </InvitationLanguagePreviewProvider>
+                    </NextIntlClientProvider>
                   </div>
                 </InlineCardEditProvider>
               </InlineTextEditProvider>
@@ -3948,6 +4158,8 @@ export default function InvitationForm({
         open={heroTextEditorOpen}
         onOpenChange={setHeroTextEditorOpen}
         value={form.heroTextLayer}
+        sourceValue={sourceForm.heroTextLayer}
+        structureLocked={structureLocked}
         onChange={(next) => update("heroTextLayer", next)}
         stillUrl={heroTextStillUrl}
         aspectRatio={heroTextAspect}

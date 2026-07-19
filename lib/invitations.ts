@@ -1,5 +1,9 @@
 import { cache } from "react";
 import { prisma } from "./db";
+import {
+  normalizeInvitationLocales,
+  sanitizeInvitationTranslations,
+} from "./invitation-translations";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -81,6 +85,9 @@ type InvitationWithTheme = {
   spacingStyles: unknown;
   imageSettings: unknown;
   customTexts: unknown;
+  languageSwitcherEnabled: boolean;
+  enabledLocales: string[];
+  translations: unknown;
   eventType: string;
   guestManagementEnabled: boolean;
   ownerCanAddGuests: boolean;
@@ -154,6 +161,9 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
       (row.spacingStyles as SpacingStyleOverrides | null) ?? undefined,
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     customTexts: (row.customTexts as CustomTexts | null) ?? undefined,
+    languageSwitcherEnabled: row.languageSwitcherEnabled,
+    enabledLocales: normalizeInvitationLocales(row.enabledLocales),
+    translations: sanitizeInvitationTranslations(row.translations),
     eventType: (row.eventType as InvitationEventType) ?? "wedding",
     guestManagementEnabled: row.guestManagementEnabled ?? false,
     ownerCanAddGuests: row.ownerCanAddGuests ?? false,

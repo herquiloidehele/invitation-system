@@ -23,6 +23,7 @@ import HeroTextOverlay from "./HeroTextOverlay";
 import type { ResolvedHeroFonts } from "@/lib/hero-text";
 import VideoPosterLayer from "./VideoPosterLayer";
 import { useVideoFrameReady } from "./useVideoFrameReady";
+import { InvitationLanguageSwitcher } from "./InvitationLanguageSwitcher";
 
 // ---------------------------------------------------------------------------
 // Animation variants used by the hero
@@ -212,6 +213,8 @@ export default function InvitationHero({
           background: `linear-gradient(to bottom, transparent ${gradientStart}%, ${theme.bg} 100%)`,
         }}
       />
+
+      <InvitationLanguageSwitcher invitation={invitation} />
 
       {/* Free-positioned custom text layer */}
       <HeroTextOverlay

@@ -24,6 +24,8 @@ const LUCIDE_ICON_DATALIST_ID = "guest-guide-lucide-icons";
 
 interface GuestGuideFormSectionProps {
   guestGuide: GuestGuide;
+  sourceValue?: GuestGuide;
+  structureLocked?: boolean;
   onEnabledChange: (enabled: boolean) => void;
   onTogglePredefined: (item: GuestGuideItem) => void;
   onAddCustom: () => void;
@@ -38,10 +40,15 @@ interface GuestGuideFormSectionProps {
 
 interface PredefinedGridProps {
   selectedIds: Set<string>;
+  structureLocked: boolean;
   onToggle: (item: GuestGuideItem) => void;
 }
 
-function PredefinedGrid({ selectedIds, onToggle }: PredefinedGridProps) {
+function PredefinedGrid({
+  selectedIds,
+  structureLocked,
+  onToggle,
+}: PredefinedGridProps) {
   return (
     <div className="space-y-2">
       <Label className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -54,6 +61,7 @@ function PredefinedGrid({ selectedIds, onToggle }: PredefinedGridProps) {
             <button
               key={preset.id}
               type="button"
+              disabled={structureLocked}
               onClick={() => onToggle(preset)}
               className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
                 isSelected
@@ -93,11 +101,19 @@ function PredefinedGrid({ selectedIds, onToggle }: PredefinedGridProps) {
 
 interface CustomItemRowProps {
   item: GuestGuideItem;
+  sourceValue: GuestGuideItem | undefined;
+  structureLocked: boolean;
   onUpdate: (patch: Partial<GuestGuideItem>) => void;
   onRemove: () => void;
 }
 
-function CustomItemRow({ item, onUpdate, onRemove }: CustomItemRowProps) {
+function CustomItemRow({
+  item,
+  sourceValue,
+  structureLocked,
+  onUpdate,
+  onRemove,
+}: CustomItemRowProps) {
   return (
     <div className="space-y-2 border-l-2 border-muted pl-3">
       <div className="flex items-center gap-2">
@@ -143,13 +159,14 @@ function CustomItemRow({ item, onUpdate, onRemove }: CustomItemRowProps) {
           <Input
             value={item.label}
             onChange={(e) => onUpdate({ label: e.target.value })}
-            placeholder="Texto do item"
+            placeholder={sourceValue?.label || "Texto do item"}
           />
         </div>
 
         <Button
           variant="ghost"
           size="sm"
+          disabled={structureLocked}
           onClick={onRemove}
           className="text-destructive mt-5 shrink-0"
         >
@@ -214,10 +231,11 @@ function CustomItemRow({ item, onUpdate, onRemove }: CustomItemRowProps) {
 
 interface ReorderListProps {
   items: GuestGuideItem[];
+  structureLocked: boolean;
   onReorder: (id: string, direction: "up" | "down") => void;
 }
 
-function ReorderList({ items, onReorder }: ReorderListProps) {
+function ReorderList({ items, structureLocked, onReorder }: ReorderListProps) {
   return (
     <div className="space-y-2">
       <Label className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -251,7 +269,7 @@ function ReorderList({ items, onReorder }: ReorderListProps) {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  disabled={isFirst}
+                  disabled={structureLocked || isFirst}
                   onClick={() => onReorder(item.id, "up")}
                   aria-label="Mover para cima"
                 >
@@ -262,7 +280,7 @@ function ReorderList({ items, onReorder }: ReorderListProps) {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  disabled={isLast}
+                  disabled={structureLocked || isLast}
                   onClick={() => onReorder(item.id, "down")}
                   aria-label="Mover para baixo"
                 >
@@ -283,6 +301,8 @@ function ReorderList({ items, onReorder }: ReorderListProps) {
 
 export default function GuestGuideFormSection({
   guestGuide,
+  sourceValue,
+  structureLocked = false,
   onEnabledChange,
   onTogglePredefined,
   onAddCustom,
@@ -292,6 +312,12 @@ export default function GuestGuideFormSection({
 }: GuestGuideFormSectionProps) {
   const selectedIds = new Set(guestGuide.items.map((i) => i.id));
   const customItems = guestGuide.items.filter((i) => !isPredefinedItem(i.id));
+  const predefinedItems = guestGuide.items.filter((i) =>
+    isPredefinedItem(i.id),
+  );
+  const sourceById = new Map(
+    (sourceValue?.items ?? []).map((item) => [item.id, item]),
+  );
 
   return (
     <AccordionItem value="guest-guide" className="border rounded-lg px-4">
@@ -311,6 +337,12 @@ export default function GuestGuideFormSection({
 
         {guestGuide.enabled && (
           <>
+            {structureLocked && (
+              <p className="text-xs text-muted-foreground">
+                A estrutura é editada em Português.
+              </p>
+            )}
+
             <datalist id={LUCIDE_ICON_DATALIST_ID}>
               {LUCIDE_ICON_INPUT_OPTIONS.map((iconName) => (
                 <option key={iconName} value={iconName} />
@@ -319,8 +351,27 @@ export default function GuestGuideFormSection({
 
             <PredefinedGrid
               selectedIds={selectedIds}
+              structureLocked={structureLocked}
               onToggle={onTogglePredefined}
             />
+
+            {structureLocked && predefinedItems.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground uppercase tracking-wide">
+                  Textos dos itens predefinidos
+                </Label>
+                {predefinedItems.map((item) => (
+                  <Input
+                    key={item.id}
+                    value={item.label}
+                    placeholder={sourceById.get(item.id)?.label || item.id}
+                    onChange={(event) =>
+                      onUpdateCustom(item.id, { label: event.target.value })
+                    }
+                  />
+                ))}
+              </div>
+            )}
 
             <Separator />
 
@@ -334,12 +385,19 @@ export default function GuestGuideFormSection({
                 <CustomItemRow
                   key={item.id}
                   item={item}
+                  sourceValue={sourceById.get(item.id)}
+                  structureLocked={structureLocked}
                   onUpdate={(patch) => onUpdateCustom(item.id, patch)}
                   onRemove={() => onRemoveItem(item.id)}
                 />
               ))}
 
-              <Button variant="outline" size="sm" onClick={onAddCustom}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={structureLocked}
+                onClick={onAddCustom}
+              >
                 + Adicionar item personalizado
               </Button>
             </div>
@@ -349,6 +407,7 @@ export default function GuestGuideFormSection({
                 <Separator />
                 <ReorderList
                   items={guestGuide.items}
+                  structureLocked={structureLocked}
                   onReorder={onReorderItem}
                 />
               </>

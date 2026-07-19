@@ -16,14 +16,21 @@ import type { DressCode, DressColor } from "@/lib/types";
  */
 export default function ElegantFloralDressFields({
   value,
+  sourceValue,
+  structureLocked = false,
   onChange,
 }: {
   value: DressCode;
+  sourceValue?: DressCode;
+  structureLocked?: boolean;
   onChange: (patch: Partial<DressCode>) => void;
 }) {
   const ladies = value.ladies ?? {};
   const gentlemen = value.gentlemen ?? {};
   const palette = ladies.palette ?? [];
+  const sourcePaletteById = new Map(
+    (sourceValue?.ladies?.palette ?? []).map((color) => [color.id, color]),
+  );
 
   const patchLadies = (p: Partial<NonNullable<DressCode["ladies"]>>) =>
     onChange({ ladies: { ...ladies, ...p } });
@@ -36,12 +43,18 @@ export default function ElegantFloralDressFields({
       <p className="text-xs font-medium text-muted-foreground">
         Campos do modelo Elegant Floral
       </p>
+      {structureLocked && (
+        <p className="text-xs text-muted-foreground">
+          A estrutura é editada em Português.
+        </p>
+      )}
 
       <div className="space-y-1.5">
         <Label className="text-xs">Título (ex: LE JARDIN DE PARADIS)</Label>
         <Input
           value={value.title ?? ""}
           onChange={(e) => onChange({ title: e.target.value })}
+          placeholder={sourceValue?.title || "LE JARDIN DE PARADIS"}
         />
       </div>
       <div className="space-y-1.5">
@@ -49,7 +62,10 @@ export default function ElegantFloralDressFields({
         <Textarea
           value={value.intro ?? ""}
           onChange={(e) => onChange({ intro: e.target.value })}
-          placeholder="Uma noite de elegância, romance e sofisticação."
+          placeholder={
+            sourceValue?.intro ||
+            "Uma noite de elegância, romance e sofisticação."
+          }
         />
       </div>
 
@@ -59,18 +75,21 @@ export default function ElegantFloralDressFields({
         <Input
           value={ladies.label ?? ""}
           onChange={(e) => patchLadies({ label: e.target.value })}
-          placeholder="Rótulo (ex: SENHORAS)"
+          placeholder={sourceValue?.ladies?.label || "Rótulo (ex: SENHORAS)"}
         />
         <Textarea
           value={ladies.note ?? ""}
           onChange={(e) => patchLadies({ note: e.target.value })}
-          placeholder="Nota (ex: VESTIDOS LONGOS EM TONS COMO:)"
+          placeholder={
+            sourceValue?.ladies?.note ||
+            "Nota (ex: VESTIDOS LONGOS EM TONS COMO:)"
+          }
         />
 
         <Label className="text-xs">Lista de tons (nomes)</Label>
         <div className="space-y-2">
           {palette.map((c, i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div key={c.id ?? i} className="flex items-center gap-2">
               <Input
                 value={c.name}
                 onChange={(e) =>
@@ -80,12 +99,16 @@ export default function ElegantFloralDressFields({
                     ),
                   )
                 }
-                placeholder="Azul safira"
+                placeholder={
+                  (c.id ? sourcePaletteById.get(c.id)?.name : undefined) ||
+                  "Azul safira"
+                }
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
+                disabled={structureLocked}
                 onClick={() => setPalette(palette.filter((_, j) => j !== i))}
               >
                 <Trash2 size={14} />
@@ -96,7 +119,16 @@ export default function ElegantFloralDressFields({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setPalette([...palette, { name: "" }])}
+            disabled={structureLocked}
+            onClick={() =>
+              setPalette([
+                ...palette,
+                {
+                  id: `dress-color-${crypto.randomUUID()}`,
+                  name: "",
+                },
+              ])
+            }
           >
             <Plus size={14} className="mr-1" /> Adicionar tom
           </Button>
@@ -118,12 +150,14 @@ export default function ElegantFloralDressFields({
         <Input
           value={gentlemen.label ?? ""}
           onChange={(e) => patchGentlemen({ label: e.target.value })}
-          placeholder="Rótulo (ex: SENHORES)"
+          placeholder={sourceValue?.gentlemen?.label || "Rótulo (ex: SENHORES)"}
         />
         <Textarea
           value={gentlemen.note ?? ""}
           onChange={(e) => patchGentlemen({ note: e.target.value })}
-          placeholder="Smoking ou fato escuro elegante…"
+          placeholder={
+            sourceValue?.gentlemen?.note || "Smoking ou fato escuro elegante…"
+          }
         />
         <Label className="text-xs">Ilustração (fatos)</Label>
         <MediaUpload
@@ -141,7 +175,10 @@ export default function ElegantFloralDressFields({
         <Textarea
           value={value.reservedNote ?? ""}
           onChange={(e) => onChange({ reservedNote: e.target.value })}
-          placeholder="Vermelho é reservado às madrinhas e mães…"
+          placeholder={
+            sourceValue?.reservedNote ||
+            "Vermelho é reservado às madrinhas e mães…"
+          }
         />
       </div>
     </div>

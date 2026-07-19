@@ -4,6 +4,11 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import {
+  normalizeInvitationLocales,
+  sanitizeInvitationTranslations,
+} from "@/lib/invitation-translations";
+import { sanitizeJsonField } from "@/lib/json-sanitize";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -11,7 +16,9 @@ if (!connectionString) {
 }
 
 const pool = new pg.Pool({ connectionString });
-const adapter = new PrismaPg(pool as any);
+const adapter = new PrismaPg(
+  pool as unknown as ConstructorParameters<typeof PrismaPg>[0],
+);
 const prisma = new PrismaClient({ adapter });
 
 // ---------------------------------------------------------------------------
@@ -336,6 +343,12 @@ async function main() {
         heroMediaFit: data.heroMediaFit ?? null,
         scheduleStyle: data.scheduleStyle ?? null,
         customTexts: data.customTexts ?? null,
+        languageSwitcherEnabled: data.languageSwitcherEnabled === true,
+        enabledLocales: normalizeInvitationLocales(data.enabledLocales),
+        translations: sanitizeJsonField(
+          sanitizeInvitationTranslations(data.translations),
+          null,
+        ),
         textStyles: data.textStyles ?? null,
         cardStyles: data.cardStyles ?? null,
       },
@@ -365,6 +378,12 @@ async function main() {
         heroMediaFit: data.heroMediaFit ?? null,
         scheduleStyle: data.scheduleStyle ?? null,
         customTexts: data.customTexts ?? null,
+        languageSwitcherEnabled: data.languageSwitcherEnabled === true,
+        enabledLocales: normalizeInvitationLocales(data.enabledLocales),
+        translations: sanitizeJsonField(
+          sanitizeInvitationTranslations(data.translations),
+          null,
+        ),
         textStyles: data.textStyles ?? null,
         cardStyles: data.cardStyles ?? null,
       },

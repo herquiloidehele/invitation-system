@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   OG_IMAGE_HEIGHT,
@@ -10,7 +11,10 @@ import type { SaveTheDateData } from "../lib/save-the-date";
 
 const SITE_ORIGIN = "https://example.com";
 
-function buildOpenGraphFromInvitation(invitation: InvitationData, slug: string) {
+function buildOpenGraphFromInvitation(
+  invitation: InvitationData,
+  slug: string,
+) {
   const r = resolveInvitationSocialPreview(invitation, SITE_ORIGIN);
   return {
     title: r.title,
@@ -18,7 +22,9 @@ function buildOpenGraphFromInvitation(invitation: InvitationData, slug: string) 
     openGraph: {
       title: r.title,
       description: r.description,
-      images: [{ url: r.image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
+      images: [
+        { url: r.image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
+      ],
       type: "website" as const,
       url: `${SITE_ORIGIN}/${slug}`,
     },
@@ -39,7 +45,9 @@ function buildOpenGraphFromSaveTheDate(std: SaveTheDateData, slug: string) {
     openGraph: {
       title: r.title,
       description: r.description,
-      images: [{ url: r.image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
+      images: [
+        { url: r.image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
+      ],
       type: "website" as const,
       url: `${SITE_ORIGIN}/s/${slug}`,
     },
@@ -125,6 +133,16 @@ describe("invitation generateMetadata shape", () => {
     expect(meta.twitter.images).toEqual(["https://cdn.example.com/hero.jpg"]);
     expect(meta.title).toBe("Ana & Bruno");
     expect(meta.description).toBe("Convite de Casamento");
+  });
+
+  it("localizes invitation metadata, rendering, and JSON-LD URLs", () => {
+    const invitationPage = readFileSync("app/[locale]/[slug]/page.tsx", "utf8");
+
+    expect(invitationPage).toContain("getInvitationLocaleRedirectPath");
+    expect(invitationPage).toContain("localizeInvitation");
+    expect(invitationPage).toContain("getEffectiveInvitationLocales");
+    expect(invitationPage).toContain("buildLanguageAlternates(");
+    expect(invitationPage).not.toContain('buildLocalePath(`/${slug}`, "pt")');
   });
 });
 

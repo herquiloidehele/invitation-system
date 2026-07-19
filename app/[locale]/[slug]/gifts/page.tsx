@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import GiftsListView from "@/components/gifts/GiftsListView";
 import {
@@ -7,9 +7,17 @@ import {
 } from "@/lib/gift-registry";
 import { getGiftAvailability } from "@/lib/gift-reservations";
 import { getInvitation } from "@/lib/invitations";
+import {
+  getInvitationLocaleRedirectPath,
+  getInvitationSearchParam,
+  serializeInvitationSearchParams,
+  type InvitationSearchParams,
+} from "@/lib/invitation-language-routing";
+import { localizeInvitation } from "@/lib/invitation-translations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
-import { redirect } from "@/i18n/routing";
+import { resolveLocale } from "@/i18n/locales";
+import { buildLocalePath } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -18,15 +26,30 @@ export default async function GiftsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ g?: string }>;
+  searchParams: Promise<InvitationSearchParams>;
 }) {
-  const { locale, slug } = await params;
-  const { g: guestToken } = await searchParams;
+  const { locale: rawLocale, slug } = await params;
+  const locale = resolveLocale(rawLocale);
+  const resolvedSearchParams = await searchParams;
+  const guestToken = getInvitationSearchParam(resolvedSearchParams, "g");
 
-  const invitation = await getInvitation(slug);
-  if (!invitation) notFound();
+  const sourceInvitation = await getInvitation(slug);
+  if (!sourceInvitation) notFound();
 
-  const theme = await getTheme(invitation.template);
+  const pathname = buildLocalePath(`/${slug}/gifts`, locale);
+  const redirectPath = getInvitationLocaleRedirectPath(
+    sourceInvitation,
+    locale,
+    pathname,
+    resolvedSearchParams,
+  );
+  if (redirectPath) redirect(redirectPath);
+
+  const invitation =
+    sourceInvitation.invitationType === "standard"
+      ? localizeInvitation(sourceInvitation, locale)
+      : sourceInvitation;
+  const theme = await getTheme(sourceInvitation.template);
   if (!theme) notFound();
 
   // Direct-URL guard: nothing to show → bounce back to the invitation.
@@ -34,15 +57,15 @@ export default async function GiftsPage({
     !invitation.giftRegistry?.enabled ||
     !hasGiftItems(invitation.giftRegistry)
   ) {
-    redirect({
-      href: `/${slug}${guestToken ? `?g=${encodeURIComponent(guestToken)}` : ""}`,
-      locale,
-    });
+    const query = serializeInvitationSearchParams(resolvedSearchParams);
+    redirect(
+      `${buildLocalePath(`/${slug}`, locale)}${query ? `?${query}` : ""}`,
+    );
   }
 
   // Resolve the personal guest exactly like the main page (back link + context).
   let guest = undefined;
-  if (guestToken && invitation.guestManagementEnabled) {
+  if (guestToken && sourceInvitation.guestManagementEnabled) {
     const found = await getPublicGuestByToken(guestToken);
     if (found && found.invitationSlug === slug) guest = found;
   }
