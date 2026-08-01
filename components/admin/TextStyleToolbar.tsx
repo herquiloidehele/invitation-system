@@ -10,9 +10,15 @@ import { useInlineTextEdit } from "@/components/shared/EditableText";
 import FontPicker from "@/components/admin/FontPicker";
 import { extractFamilyName } from "@/lib/google-fonts";
 import { useDynamicFont } from "@/hooks/useDynamicFont";
-import { RotateCcw, X } from "lucide-react";
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  RotateCcw,
+  X,
+} from "lucide-react";
 import type { SpacingField } from "@/lib/spacing-styles";
-import type { TextStyle, TextStyleOverrides } from "@/lib/types";
+import type { TextAlign, TextStyle, TextStyleOverrides } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Font weight options
@@ -25,6 +31,12 @@ const WEIGHT_OPTIONS: { label: string; value: string }[] = [
   { label: "Semi-negrito", value: "600" },
   { label: "Negrito", value: "700" },
 ];
+
+const ALIGN_OPTIONS = [
+  { value: "left", Icon: AlignLeft, label: "Alinhar à esquerda" },
+  { value: "center", Icon: AlignCenter, label: "Centrar" },
+  { value: "right", Icon: AlignRight, label: "Alinhar à direita" },
+] satisfies { value: TextAlign; Icon: typeof AlignLeft; label: string }[];
 
 // ---------------------------------------------------------------------------
 // Toolbar positioning
@@ -172,6 +184,12 @@ export default function TextStyleToolbar() {
   const elementKey = ctx.selectedElement as ElementKey;
   const overrides: TextStyle = ctx.getOverrides(elementKey) ?? {};
   const spacing = ctx.getSpacingOverrides(elementKey);
+  const inlineTextAlign = selectedRef?.style.textAlign;
+  const selectedTextAlign: TextAlign =
+    overrides.textAlign ??
+    (inlineTextAlign === "center" || inlineTextAlign === "right"
+      ? inlineTextAlign
+      : "left");
 
   // ---- Handlers ---------------------------------------------------------
   const set = (field: keyof TextStyle, value: string | number | undefined) => {
@@ -282,6 +300,34 @@ export default function TextStyleToolbar() {
       {/* Divider */}
       <div className="h-5 w-px bg-border" />
 
+      {/* Text alignment */}
+      <div
+        className="flex items-center gap-0.5 rounded border bg-background p-0.5"
+        role="group"
+        aria-label="Alinhamento do texto"
+      >
+        {ALIGN_OPTIONS.map(({ value, Icon, label }) => (
+          <button
+            key={value}
+            type="button"
+            title={label}
+            aria-label={label}
+            aria-pressed={selectedTextAlign === value}
+            onClick={() => set("textAlign", value)}
+            className={`flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96] ${
+              selectedTextAlign === value
+                ? "bg-accent text-accent-foreground"
+                : ""
+            }`}
+          >
+            <Icon className="size-3.5" />
+          </button>
+        ))}
+      </div>
+
+      {/* Divider */}
+      <div className="h-5 w-px bg-border" />
+
       {/* Letter spacing */}
       <input
         type="number"
@@ -325,6 +371,7 @@ export default function TextStyleToolbar() {
           set("fontSize", undefined);
           set("fontWeight", undefined);
           set("fontStyle", undefined);
+          set("textAlign", undefined);
           set("color", undefined);
           set("letterSpacing", undefined);
           setSpacing("spaceBefore", undefined);

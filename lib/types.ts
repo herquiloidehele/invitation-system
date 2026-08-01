@@ -694,12 +694,15 @@ export interface SpacingStyleOverrides {
 // ---------------------------------------------------------------------------
 
 /** Style overrides for a single text element (all fields optional). */
+export type TextAlign = "left" | "center" | "right";
+
 export interface TextStyle {
   fontFamily?: string;
   fontSize?: number;
   color?: string;
   fontWeight?: string | number;
   fontStyle?: string;
+  textAlign?: TextAlign;
   letterSpacing?: number;
 }
 
