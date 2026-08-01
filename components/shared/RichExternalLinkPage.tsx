@@ -7,7 +7,6 @@ import type {
   InvitationData,
   TemplateTheme,
 } from "@/lib/types";
-import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
@@ -20,7 +19,6 @@ import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import dynamic from "next/dynamic";
 import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST, PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY } from "./PersonalGuestCard";
-import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
 import CoupleGallery from "./gallery/CoupleGallery";
 import GiftsSection from "./GiftsSection";
@@ -351,7 +349,7 @@ export default function RichExternalLinkPage({
             <>
               <section
                 id="rsvp"
-                className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
+                className="relative mt-8 overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
                 style={
                   invitation.rsvp.backgroundImageUrl
                     ? {
@@ -363,40 +361,19 @@ export default function RichExternalLinkPage({
                 }
               >
                 <div className="max-w-[600px] mx-auto">
-                  <div className="text-center mb-8">
-                    <span
-                      className="uppercase"
-                      style={{
-                        fontFamily: theme.uiFont,
-                        color: theme.textSecondary,
-                        fontSize: 11,
-                        letterSpacing: "0.3em",
-                        ...resolveTextElementOverride(
-                          invitation.textStyles,
-                          "inviteLabel",
-                        ),
-                      }}
-                    >
-                      <EditableText elementKey="inviteLabel">RSVP</EditableText>
-                    </span>
-                    <div
-                      aria-hidden
-                      className="mx-auto mt-3"
-                      style={{
-                        width: 40,
-                        height: 1,
-                        background: theme.accent || "#C9A961",
-                        opacity: 0.7,
-                      }}
+                  <div
+                    data-rsvp-card="true"
+                    className="overflow-hidden"
+                  >
+                    <RSVPForm
+                      inline
+                      inlineSurface
+                      invitation={invitation}
+                      theme={theme}
+                      customTexts={invitation.customTexts}
+                      guest={invitation.guest}
                     />
                   </div>
-                  <RSVPForm
-                    inline
-                    invitation={invitation}
-                    theme={theme}
-                    customTexts={invitation.customTexts}
-                    guest={invitation.guest}
-                  />
                 </div>
               </section>
             </>
