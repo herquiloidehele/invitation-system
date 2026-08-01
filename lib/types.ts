@@ -607,9 +607,13 @@ export interface ExternalCountdownConfig {
  * `backgroundImageUrl` are stored in `InvitationData.imageSettings` under the
  * `scratchRevealBackground` key (mirrors the cinematic image pattern).
  */
+export type ScratchRevealShape = "circle" | "rounded-square";
+
 export interface ScratchRevealConfig {
   /** Whether the section renders at all. */
   enabled: boolean;
+  /** Shape of the scratchable date surfaces. Missing values default to circles. */
+  shape?: ScratchRevealShape;
   /** Optional full-bleed background image URL behind the coins. */
   backgroundImageUrl?: string | null;
   /** Opacity of the dark scrim overlay (0–1). Defaults to 0.45 when an image is set. */

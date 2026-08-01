@@ -18,6 +18,7 @@ import type {
   InvitationData,
   InvitationEventType,
   InvitationType,
+  ScratchRevealShape,
   TemplateTheme,
   EnvelopeConfig,
   CoverVideos,
@@ -89,7 +90,10 @@ import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import VideoEntrancePage from "@/components/video-entrance/VideoEntrancePage";
 import { PREVIEW_SAMPLE_GUEST } from "@/components/shared/PersonalGuestCard";
 import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
-import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
+import {
+  isCurtainCanvaLayout,
+  resolveScratchRevealShape,
+} from "@/lib/curtain-canva";
 import {
   DEFAULT_HERO_REVEAL_SECONDS,
   isVideoEntranceLayout,
@@ -2065,34 +2069,65 @@ export default function ExternalInvitationForm({
                     </div>
 
                     {form.scratchReveal?.enabled === true && (
-                      <SectionBackgroundImageEditor
-                        value={form.scratchReveal?.backgroundImageUrl ?? ""}
-                        label="Imagem de fundo"
-                        description="Fotografia de fundo opcional atrás das moedas raspadinhas. Sem imagem, a secção usa a cor de fundo do tema."
-                        scrimLabel="Escurecimento da imagem"
-                        maxSizeMB={8}
-                        scrimOpacity={form.scratchReveal?.scrimOpacity}
-                        onUpload={(url) =>
-                          updateScratchRevealField("backgroundImageUrl", url)
-                        }
-                        onClear={() => {
-                          updateScratchRevealField("backgroundImageUrl", null);
-                          updateImageSettings(
+                      <>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="ccScratchShape">
+                            Formato das moedas
+                          </Label>
+                          <Select
+                            value={resolveScratchRevealShape(
+                              form.scratchReveal?.shape,
+                            )}
+                            onValueChange={(value) =>
+                              updateScratchRevealField(
+                                "shape",
+                                value as ScratchRevealShape,
+                              )
+                            }
+                          >
+                            <SelectTrigger id="ccScratchShape">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="circle">Círculo</SelectItem>
+                              <SelectItem value="rounded-square">
+                                Quadrado arredondado
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <SectionBackgroundImageEditor
+                          value={form.scratchReveal?.backgroundImageUrl ?? ""}
+                          label="Imagem de fundo"
+                          description="Fotografia de fundo opcional atrás das moedas raspadinhas. Sem imagem, a secção usa a cor de fundo do tema."
+                          scrimLabel="Escurecimento da imagem"
+                          maxSizeMB={8}
+                          scrimOpacity={form.scratchReveal?.scrimOpacity}
+                          onUpload={(url) =>
+                            updateScratchRevealField("backgroundImageUrl", url)
+                          }
+                          onClear={() => {
+                            updateScratchRevealField(
+                              "backgroundImageUrl",
+                              null,
+                            );
+                            updateImageSettings(
+                              "scratchRevealBackground",
+                              DEFAULT_IMAGE_SETTINGS,
+                            );
+                          }}
+                          onScrimChange={(o) =>
+                            updateScratchRevealField("scrimOpacity", o)
+                          }
+                          positionSettings={imgSettings(
                             "scratchRevealBackground",
-                            DEFAULT_IMAGE_SETTINGS,
-                          );
-                        }}
-                        onScrimChange={(o) =>
-                          updateScratchRevealField("scrimOpacity", o)
-                        }
-                        positionSettings={imgSettings(
-                          "scratchRevealBackground",
-                        )}
-                        onPositionChange={(s) =>
-                          updateImageSettings("scratchRevealBackground", s)
-                        }
-                        idPrefix="ccScratch"
-                      />
+                          )}
+                          onPositionChange={(s) =>
+                            updateImageSettings("scratchRevealBackground", s)
+                          }
+                          idPrefix="ccScratch"
+                        />
+                      </>
                     )}
 
                     <Separator />
@@ -2559,34 +2594,65 @@ export default function ExternalInvitationForm({
                     </div>
 
                     {form.scratchReveal?.enabled === true && (
-                      <SectionBackgroundImageEditor
-                        value={form.scratchReveal?.backgroundImageUrl ?? ""}
-                        label="Imagem de fundo"
-                        description="Fotografia de fundo opcional atrás das moedas raspadinhas. Sem imagem, a secção usa a cor de fundo do tema."
-                        scrimLabel="Escurecimento da imagem"
-                        maxSizeMB={8}
-                        scrimOpacity={form.scratchReveal?.scrimOpacity}
-                        onUpload={(url) =>
-                          updateScratchRevealField("backgroundImageUrl", url)
-                        }
-                        onClear={() => {
-                          updateScratchRevealField("backgroundImageUrl", null);
-                          updateImageSettings(
+                      <>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="veScratchShape">
+                            Formato das moedas
+                          </Label>
+                          <Select
+                            value={resolveScratchRevealShape(
+                              form.scratchReveal?.shape,
+                            )}
+                            onValueChange={(value) =>
+                              updateScratchRevealField(
+                                "shape",
+                                value as ScratchRevealShape,
+                              )
+                            }
+                          >
+                            <SelectTrigger id="veScratchShape">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="circle">Círculo</SelectItem>
+                              <SelectItem value="rounded-square">
+                                Quadrado arredondado
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <SectionBackgroundImageEditor
+                          value={form.scratchReveal?.backgroundImageUrl ?? ""}
+                          label="Imagem de fundo"
+                          description="Fotografia de fundo opcional atrás das moedas raspadinhas. Sem imagem, a secção usa a cor de fundo do tema."
+                          scrimLabel="Escurecimento da imagem"
+                          maxSizeMB={8}
+                          scrimOpacity={form.scratchReveal?.scrimOpacity}
+                          onUpload={(url) =>
+                            updateScratchRevealField("backgroundImageUrl", url)
+                          }
+                          onClear={() => {
+                            updateScratchRevealField(
+                              "backgroundImageUrl",
+                              null,
+                            );
+                            updateImageSettings(
+                              "scratchRevealBackground",
+                              DEFAULT_IMAGE_SETTINGS,
+                            );
+                          }}
+                          onScrimChange={(o) =>
+                            updateScratchRevealField("scrimOpacity", o)
+                          }
+                          positionSettings={imgSettings(
                             "scratchRevealBackground",
-                            DEFAULT_IMAGE_SETTINGS,
-                          );
-                        }}
-                        onScrimChange={(o) =>
-                          updateScratchRevealField("scrimOpacity", o)
-                        }
-                        positionSettings={imgSettings(
-                          "scratchRevealBackground",
-                        )}
-                        onPositionChange={(s) =>
-                          updateImageSettings("scratchRevealBackground", s)
-                        }
-                        idPrefix="veScratch"
-                      />
+                          )}
+                          onPositionChange={(s) =>
+                            updateImageSettings("scratchRevealBackground", s)
+                          }
+                          idPrefix="veScratch"
+                        />
+                      </>
                     )}
                   </AccordionContent>
                 </AccordionItem>

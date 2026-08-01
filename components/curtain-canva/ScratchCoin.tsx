@@ -15,6 +15,8 @@ import {
   GOLDEN_GLITTER_PALETTE,
   loadImage,
 } from "@/lib/scratch-texture";
+import type { ScratchRevealShape } from "@/lib/types";
+import { resolveScratchRevealShape } from "@/lib/curtain-canva";
 
 interface ScratchCoinProps {
   /**
@@ -46,17 +48,20 @@ interface ScratchCoinProps {
    * coin falls back to the procedural texture.
    */
   textureUrl?: string;
+  /** Shape of the scratchable surface. Defaults to a circle. */
+  shape?: ScratchRevealShape;
   ariaLabel?: string;
   className?: string;
 }
 
 const SAMPLE_INTERVAL = 8;
+const ROUNDED_SQUARE_RADIUS_RATIO = 0.22;
 
 /**
- * A round canvas-scratch surface with a glitter material identical to the
+ * A canvas-scratch surface with a glitter material identical to the
  * save-the-date `ScratchHeart`. Renders the procedural glitter texture
- * (or an optional real image) clipped to a circle, lit with a soft
- * specular highlight, and given depth via an SVG inner shadow ring.
+ * (or an optional real image) clipped to the selected shape, lit with a
+ * soft specular highlight, and given depth via an SVG inner shadow ring.
  *
  * Keyboard fallback: focusable; Enter or Space immediately reveals.
  * Reduced-motion: clears the canvas instantly instead of fading.
@@ -70,6 +75,7 @@ export default function ScratchCoin({
   onRevealed,
   glitterColors = GOLDEN_GLITTER_PALETTE,
   textureUrl,
+  shape,
   ariaLabel = "Scratch to reveal",
   className,
 }: ScratchCoinProps) {
@@ -90,6 +96,9 @@ export default function ScratchCoin({
   const size = fillParent ? (measuredSize ?? sizeProp) : sizeProp;
   const cw = size * dpr;
   const ch = size * dpr;
+  const resolvedShape = resolveScratchRevealShape(shape);
+  const shapeBorderRadius =
+    resolvedShape === "circle" ? "50%" : `${ROUNDED_SQUARE_RADIUS_RATIO * 100}%`;
 
   // Measure the wrapper when fillParent is on (and re-measure on resize).
   useEffect(() => {
@@ -110,7 +119,7 @@ export default function ScratchCoin({
   }, [fillParent]);
 
   /**
-   * Paints the coin: clip to a circle, draw the glitter texture, then add
+   * Paints the coin: clip to the selected shape, draw the glitter texture, then add
    * a soft specular highlight on top. The rim/inner-shadow is rendered as
    * an SVG sibling so we can avoid any black strokes on the canvas itself.
    */
@@ -132,11 +141,17 @@ export default function ScratchCoin({
       const cx = cw / 2;
       const cy = ch / 2;
       const r = Math.min(cw, ch) / 2;
+      const roundedSquareRadius =
+        size * ROUNDED_SQUARE_RADIUS_RATIO * dpr;
 
-      // Clip to circle so the texture stays within the coin
+      // Clip to the selected shape so the texture stays within the surface.
       ctx.save();
       ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      if (resolvedShape === "rounded-square") {
+        ctx.roundRect(0, 0, cw, ch, roundedSquareRadius);
+      } else {
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      }
       ctx.clip();
 
       // 1. Glitter texture (same procedural material as ScratchHeart).
@@ -160,7 +175,7 @@ export default function ScratchCoin({
 
       ctx.restore();
     },
-    [cw, ch, size],
+    [cw, ch, dpr, resolvedShape, size],
   );
 
   // Initialize: build (or load) the texture, then paint the coin.
@@ -215,13 +230,17 @@ export default function ScratchCoin({
       sampled++;
       if (data[i] > 10) visible++;
     }
-    // Coin covers ~78.5% of the bounding square (πr² / (2r)² = π/4)
-    const coinCoverage = Math.PI / 4;
-    const originalCoinSamples = sampled * coinCoverage;
+    const shapeCoverage =
+      resolvedShape === "rounded-square"
+        ? 1 - (4 - Math.PI) * ROUNDED_SQUARE_RADIUS_RATIO ** 2
+        : Math.PI / 4;
+    const originalShapeSamples = sampled * shapeCoverage;
     const scratched =
-      originalCoinSamples > 0 ? 1 - visible / originalCoinSamples : 0;
+      originalShapeSamples > 0
+        ? 1 - visible / originalShapeSamples
+        : 0;
     if (scratched >= revealThreshold) fireReveal();
-  }, [cw, ch, revealThreshold, fireReveal]);
+  }, [cw, ch, fireReveal, revealThreshold, resolvedShape]);
 
   const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current!;
@@ -314,15 +333,16 @@ export default function ScratchCoin({
           : undefined
       }
     >
-      {/* Post-reveal plate: a subtle grey filled circle with a thin ring.
-          Sits behind the revealed content and fades in once the coin is
+      {/* Post-reveal plate: a subtle grey filled shape with a thin ring.
+          Sits behind the revealed content and fades in once the surface is
           scratched off, giving the date/text a quiet surface to live on. */}
       <div
         aria-hidden
-        className="absolute inset-0 rounded-full pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background: "rgba(0, 0, 0, 0.04)",
           boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.08)",
+          borderRadius: shapeBorderRadius,
           opacity: revealed ? 1 : 0,
           transition: reduceMotion ? "none" : "opacity 0.35s ease-out",
         }}
@@ -333,9 +353,9 @@ export default function ScratchCoin({
         {revealedContent}
       </div>
 
-      {/* SVG inner-shadow overlay — same trick as ScratchHeart, masked to a
-          circle. Adds depth at the rim without painting any visible black
-          strokes onto the gold material. Hidden after the reveal. */}
+      {/* SVG inner-shadow overlay — same trick as ScratchHeart, masked to
+          the selected shape. Adds depth at the rim without painting any
+          visible black strokes onto the glitter material. */}
       {!revealed && (
         <svg
           aria-hidden
@@ -361,13 +381,26 @@ export default function ScratchCoin({
               <feComposite in2="SourceAlpha" operator="in" />
             </filter>
           </defs>
-          <circle
-            cx="50"
-            cy="50"
-            r="50"
-            fill="black"
-            filter={`url(#${innerShadowFilterId})`}
-          />
+          {resolvedShape === "rounded-square" ? (
+            <rect
+              x="0"
+              y="0"
+              width="100"
+              height="100"
+              rx="22"
+              ry="22"
+              fill="black"
+              filter={`url(#${innerShadowFilterId})`}
+            />
+          ) : (
+            <circle
+              cx="50"
+              cy="50"
+              r="50"
+              fill="black"
+              filter={`url(#${innerShadowFilterId})`}
+            />
+          )}
         </svg>
       )}
 
@@ -380,7 +413,7 @@ export default function ScratchCoin({
           style={{
             width: "100%",
             height: "100%",
-            borderRadius: "50%",
+            borderRadius: shapeBorderRadius,
             cursor: revealed ? "default" : "pointer",
             // After the coin is scratched the canvas fades to opacity 0 but
             // stays in the DOM (so its lazy paint/teardown doesn't cause a

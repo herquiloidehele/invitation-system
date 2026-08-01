@@ -11,6 +11,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import type {
   CustomTexts,
   ImageSettingsMap,
+  ScratchRevealShape,
   TemplateTheme,
   TextStyle,
   TextStyleOverrides,
@@ -21,6 +22,7 @@ import { useCustomText } from "@/lib/custom-texts";
 import {
   resolveCelebrationPalette,
   resolveCoinGlitterPalette,
+  resolveScratchRevealShape,
   resolveTextElementOverride,
 } from "@/lib/curtain-canva";
 import { formatLocalizedMonthShort } from "@/lib/date-format";
@@ -46,6 +48,8 @@ interface ScratchDateRevealProps {
    * specific typography defaults.
    */
   textStyles?: TextStyleOverrides;
+  /** Shape used by each scratchable date surface. Defaults to circle. */
+  shape?: ScratchRevealShape;
   /**
    * Optional full-bleed background image rendered behind the coins. When
    * unset (default) the section renders on the page background as before.
@@ -69,6 +73,7 @@ export default function ScratchDateReveal({
   theme,
   customTexts,
   textStyles,
+  shape,
   backgroundImageUrl,
   scrimOpacity,
   imageSettings,
@@ -82,6 +87,7 @@ export default function ScratchDateReveal({
   const dateYearOverride = resolveTextElementOverride(textStyles, "dateYear");
   const monthShort = formatLocalizedMonthShort(date.iso, locale, date.month);
   const reduceMotion = useReducedMotion();
+  const resolvedShape = resolveScratchRevealShape(shape);
 
   // Track which coins have been revealed so we can fire confetti exactly
   // once when all three are done. We use a ref so the callback identity is
@@ -269,6 +275,7 @@ export default function ScratchDateReveal({
             subLabelOverride={labelsOverride}
             theme={theme}
             glitterColors={glitterColors}
+            shape={resolvedShape}
             onRevealed={() => handleCoinRevealed("day")}
           />
           <CoinWithLabel
@@ -282,6 +289,7 @@ export default function ScratchDateReveal({
             subLabelOverride={labelsOverride}
             theme={theme}
             glitterColors={glitterColors}
+            shape={resolvedShape}
             onRevealed={() => handleCoinRevealed("month")}
           />
           <CoinWithLabel
@@ -295,6 +303,7 @@ export default function ScratchDateReveal({
             subLabelOverride={labelsOverride}
             theme={theme}
             glitterColors={glitterColors}
+            shape={resolvedShape}
             onRevealed={() => handleCoinRevealed("year")}
           />
         </div>
@@ -314,6 +323,7 @@ function CoinWithLabel({
   subLabelOverride,
   theme,
   glitterColors,
+  shape,
   onRevealed,
 }: {
   coinSize: string;
@@ -338,6 +348,7 @@ function CoinWithLabel({
    * colors so every coin shares the same memoized array reference.
    */
   glitterColors: string[];
+  shape: ScratchRevealShape;
   onRevealed?: () => void;
 }) {
   return (
@@ -348,6 +359,7 @@ function CoinWithLabel({
           fillParent
           ariaLabel={ariaLabel}
           glitterColors={glitterColors}
+          shape={shape}
           revealedContent={
             <span style={{ ...contentStyle, ...contentOverride }}>
               <EditableText elementKey={contentElementKey}>

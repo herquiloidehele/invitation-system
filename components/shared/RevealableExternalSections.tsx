@@ -123,6 +123,7 @@ export default function RevealableExternalSections({
             theme={theme}
             customTexts={invitation.customTexts}
             textStyles={invitation.textStyles}
+            shape={invitation.scratchReveal?.shape}
             backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}
             scrimOpacity={invitation.scratchReveal?.scrimOpacity}
             imageSettings={invitation.imageSettings}

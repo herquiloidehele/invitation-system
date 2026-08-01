@@ -1,5 +1,6 @@
 import type {
   ScratchRevealConfig,
+  ScratchRevealShape,
   TemplateTheme,
   TextStyle,
   TextStyleOverrides,
@@ -42,6 +43,12 @@ export function shouldRenderScratchReveal(
   scratchReveal: ScratchRevealConfig | null | undefined,
 ): boolean {
   return scratchReveal?.enabled === true;
+}
+
+export function resolveScratchRevealShape(
+  value: unknown,
+): ScratchRevealShape {
+  return value === "rounded-square" ? "rounded-square" : "circle";
 }
 
 // `shortMonthName` moved to `lib/date-format.ts` (`formatLocalizedMonthShort`)

@@ -197,6 +197,37 @@ describe("external invitation helper source", () => {
     );
     expect(source).toContain("imageSettings={invitation.imageSettings}");
   });
+
+  it("offers both ScratchDateReveal shape options in both admin sections", () => {
+    const source = readFileSync(
+      join(process.cwd(), "app/admin/invitations/ExternalInvitationForm.tsx"),
+      "utf8",
+    );
+
+    expect(source.match(/Quadrado arredondado/g)).toHaveLength(2);
+    expect(source.match(/updateScratchRevealField\(\s*"shape"/g)).toHaveLength(
+      2,
+    );
+    expect(source.match(/resolveScratchRevealShape\(/g)).toHaveLength(2);
+  });
+
+  it("forwards ScratchDateReveal shape through both rich page renderers", () => {
+    const richSource = readFileSync(
+      join(process.cwd(), "components/shared/RichExternalLinkPage.tsx"),
+      "utf8",
+    );
+    const revealableSource = readFileSync(
+      join(process.cwd(), "components/shared/RevealableExternalSections.tsx"),
+      "utf8",
+    );
+
+    expect(richSource).toContain(
+      "shape={invitation.scratchReveal?.shape}",
+    );
+    expect(revealableSource).toContain(
+      "shape={invitation.scratchReveal?.shape}",
+    );
+  });
 });
 
 describe("shouldPreloadRichExternalCanva", () => {
