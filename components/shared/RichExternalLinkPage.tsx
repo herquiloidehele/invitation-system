@@ -288,60 +288,51 @@ export default function RichExternalLinkPage({
            />
 
            {shouldRenderCoupleGallery(invitation) && (
-             <>
-               <SectionOrnament theme={theme} />
-               <CoupleGallery
-                 invitation={invitation}
-                 theme={theme}
-                 isPreview={isPreview}
-               />
-             </>
+             <CoupleGallery
+               invitation={invitation}
+               theme={theme}
+               isPreview={isPreview}
+             />
            )}
 
            {invitation.giftRegistry.enabled && (
-             <>
-               <SectionOrnament theme={theme} />
-               <EditableCard sectionKey="giftRegistry">
-                 <div
-                   id="gifts"
-                   className="flex flex-col items-center gap-3 mx-4"
-                   style={{
-                     background: cs("giftRegistry", 16).cardBg,
-                     backdropFilter: "blur(12px)",
-                     WebkitBackdropFilter: "blur(12px)",
-                     borderRadius: cs("giftRegistry", 16).borderRadius,
-                     padding: "24px 14px",
-                     boxShadow:
-                       "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                     border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
-                   }}
-                 >
-                   <GiftsSection
-                     giftRegistry={invitation.giftRegistry}
-                     theme={theme}
-                     ts={ts}
-                     cardStyle={cs("giftRegistry", 16)}
-                     slug={invitation.slug}
-                     guestToken={invitation.guest?.token}
-                     t={t}
-                   />
-                 </div>
-               </EditableCard>
-             </>
+             <EditableCard sectionKey="giftRegistry">
+               <div
+                 id="gifts"
+                 className="flex flex-col items-center gap-3 mx-4"
+                 style={{
+                   background: cs("giftRegistry", 16).cardBg,
+                   backdropFilter: "blur(12px)",
+                   WebkitBackdropFilter: "blur(12px)",
+                   borderRadius: cs("giftRegistry", 16).borderRadius,
+                   padding: "24px 14px",
+                   boxShadow:
+                     "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                   border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
+                 }}
+               >
+                 <GiftsSection
+                   giftRegistry={invitation.giftRegistry}
+                   theme={theme}
+                   ts={ts}
+                   cardStyle={cs("giftRegistry", 16)}
+                   slug={invitation.slug}
+                   guestToken={invitation.guest?.token}
+                   t={t}
+                 />
+               </div>
+             </EditableCard>
            )}
 
            {invitation.faqs && invitation.faqs.length > 0 && (
-             <>
-               <SectionOrnament theme={theme} />
-               <FaqSection
-                 faqs={invitation.faqs}
-                 theme={theme}
-                 textStyles={invitation.textStyles}
-                 customTexts={invitation.customTexts}
-                 cardStyle={cs("faqs", 20)}
-                 isPreview={isPreview}
-               />
-             </>
+             <FaqSection
+               faqs={invitation.faqs}
+               theme={theme}
+               textStyles={invitation.textStyles}
+               customTexts={invitation.customTexts}
+               cardStyle={cs("faqs", 20)}
+               isPreview={isPreview}
+             />
            )}
 
            <PlacesSection
@@ -358,7 +349,6 @@ export default function RichExternalLinkPage({
 
           {showRsvp && (
             <>
-              <SectionOrnament theme={theme} />
               <section
                 id="rsvp"
                 className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
@@ -414,38 +404,5 @@ export default function RichExternalLinkPage({
         </ImageCanvas>
       </main>
     </SpacingStyleProvider>
-  );
-}
-
-/**
- * Subtle decorative break between page sections — a thin gold rule with a
- * small diamond glyph at the center. Mirrors the local SectionOrnament in
- * CurtainCanvaPage to keep the two pages visually consistent without coupling
- * them.
- */
-function SectionOrnament({ theme }: { theme: TemplateTheme }) {
-  const accent = theme.accent || "#C9A961";
-  return (
-    <div
-      aria-hidden
-      className="flex items-center justify-center gap-3 my-2"
-      style={{ color: accent }}
-    >
-      <span
-        style={{ height: 1, width: 60, background: accent, opacity: 0.55 }}
-      />
-      <span
-        style={{
-          width: 6,
-          height: 6,
-          background: accent,
-          transform: "rotate(45deg)",
-          opacity: 0.85,
-        }}
-      />
-      <span
-        style={{ height: 1, width: 60, background: accent, opacity: 0.55 }}
-      />
-    </div>
   );
 }
