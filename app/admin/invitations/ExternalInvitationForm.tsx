@@ -22,6 +22,9 @@ import type {
   TemplateTheme,
   EnvelopeConfig,
   CoverVideos,
+  BankTransferDetail,
+  CoupleGallery,
+  GiftItem,
   TextStyle,
   TextStyleOverrides,
   ImageSettings,
@@ -76,6 +79,9 @@ import HeroTextEditor from "@/components/admin/HeroTextEditor";
 import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
 import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
 import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
+import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
+import GiftsListEditor from "@/components/admin/GiftsListEditor";
+import BankTransferEditor from "@/components/admin/BankTransferEditor";
 import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
 import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
@@ -85,6 +91,7 @@ import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
+import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
@@ -119,6 +126,7 @@ import {
   type InvitationFormMode,
 } from "@/lib/invitation-form-mode";
 import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
+import { setSpacingOverride, type SpacingField } from "@/lib/spacing-styles";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -196,6 +204,8 @@ function getDefaultState(
       text: "",
       exclusiveSelectionEnabled: false,
     },
+    coupleGallery: { enabled: false, style: "kenburns", images: [] },
+    faqs: [],
     audio: { enabled: false, src: "", artist: "", title: "" },
     heroImage: "",
     heroHeight: DEFAULT_HERO_HEIGHT,
@@ -501,6 +511,73 @@ export default function ExternalInvitationForm({
     [],
   );
 
+  const updateCoupleGallery = useCallback((next: CoupleGallery) => {
+    setForm((prev) => ({ ...prev, coupleGallery: next }));
+  }, []);
+
+  const updateGiftRegistry = useCallback(
+    <K extends keyof InvitationData["giftRegistry"]>(
+      field: K,
+      value: InvitationData["giftRegistry"][K],
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        giftRegistry: { ...prev.giftRegistry, [field]: value },
+      }));
+    },
+    [],
+  );
+
+  const updateGiftItems = useCallback((items: GiftItem[]) => {
+    setForm((prev) => ({
+      ...prev,
+      giftRegistry: { ...prev.giftRegistry, items },
+    }));
+  }, []);
+
+  const updateBankTransfer = useCallback(
+    (bankTransfer: BankTransferDetail[]) => {
+      setForm((prev) => ({
+        ...prev,
+        giftRegistry: { ...prev.giftRegistry, bankTransfer },
+      }));
+    },
+    [],
+  );
+
+  const addFaq = useCallback(() => {
+    setForm((prev) => ({
+      ...prev,
+      faqs: [
+        ...(prev.faqs ?? []),
+        {
+          id: `faq-${crypto.randomUUID()}`,
+          question: "",
+          answer: "",
+        },
+      ],
+    }));
+  }, []);
+
+  const updateFaq = useCallback(
+    (index: number, field: "question" | "answer", value: string) => {
+      setForm((prev) => ({
+        ...prev,
+        faqs: (prev.faqs ?? []).map((faq, i) =>
+          i === index ? { ...faq, [field]: value } : faq,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const removeFaq = useCallback((index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      faqs: (prev.faqs ?? []).filter((_, i) => i !== index),
+    }));
+  }, []);
+
   const updateParents = useCallback(
     <K extends keyof NonNullable<InvitationData["parents"]>>(
       field: K,
@@ -575,39 +652,45 @@ export default function ExternalInvitationForm({
     [],
   );
 
-  const countdownCardStyles = useMemo(
-    () => ({
-      countdown: {
-        cardBg: form.countdown?.cardBg,
-        cardBorder: form.countdown?.cardBorder,
-        borderRadius: form.countdown?.cardBorderRadius,
-      },
-    }),
-    [
-      form.countdown?.cardBg,
-      form.countdown?.cardBorder,
-      form.countdown?.cardBorderRadius,
-    ],
-  );
-
-  const updateCountdownCardStyle = useCallback(
+  const updateCardStyle = useCallback(
     (
       section: CardSectionKey,
       field: keyof CardStyle,
       value: string | number | undefined,
     ) => {
-      if (section !== "countdown") return;
-      if (field === "cardBg") {
-        updateCountdown("cardBg", value as string | undefined);
-      }
-      if (field === "cardBorder") {
-        updateCountdown("cardBorder", value as string | undefined);
-      }
-      if (field === "borderRadius") {
-        updateCountdown("cardBorderRadius", value as number | undefined);
-      }
+      setForm((prev) => {
+        const cardStyles = { ...prev.cardStyles };
+        const sectionStyle = { ...cardStyles[section], [field]: value || undefined };
+        cardStyles[section] = Object.values(sectionStyle).some(
+          (v) => v !== undefined,
+        )
+          ? sectionStyle
+          : undefined;
+        return {
+          ...prev,
+          cardStyles: Object.values(cardStyles).some(Boolean)
+            ? cardStyles
+            : undefined,
+        };
+      });
     },
-    [updateCountdown],
+    [],
+  );
+
+  const updateSectionSpacing = useCallback(
+    (section: string, field: SpacingField, value: number | undefined) => {
+      setForm((prev) => ({
+        ...prev,
+        spacingStyles: setSpacingOverride(
+          prev.spacingStyles,
+          "sections",
+          section,
+          field,
+          value,
+        ),
+      }));
+    },
+    [],
   );
 
   // Image position/zoom settings — used by ImagePositionEditor for the hero
@@ -2140,6 +2223,205 @@ export default function ExternalInvitationForm({
                       &ldquo;Confirmação de presença&rdquo; abaixo e aparece no
                       fundo da página.
                     </p>
+
+                    <Separator />
+
+                    {/* COUPLE GALLERY SUBSECTION */}
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium">
+                          Galeria de Fotos
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Mostra uma galeria de fotografias do casal depois do
+                          conteúdo externo.
+                        </p>
+                      </div>
+                      <CoupleGalleryEditor
+                        value={form.coupleGallery}
+                        onChange={updateCoupleGallery}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* GIFT REGISTRY SUBSECTION */}
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium">
+                          Lista de Presentes
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Mostra a lista de presentes, produtos e dados de
+                          transferência bancária depois da galeria.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-4">
+                        <Label>Lista de presentes ativada</Label>
+                        <Switch
+                          checked={form.giftRegistry.enabled}
+                          onCheckedChange={(enabled) =>
+                            updateGiftRegistry("enabled", enabled)
+                          }
+                        />
+                      </div>
+
+                      {form.giftRegistry.enabled && (
+                        <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="space-y-0.5">
+                              <Label>Limitar cada presente a um convidado</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Cada presente poderá ser escolhido apenas uma
+                                vez.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={
+                                form.giftRegistry.exclusiveSelectionEnabled ===
+                                true
+                              }
+                              onCheckedChange={(enabled) =>
+                                updateGiftRegistry(
+                                  "exclusiveSelectionEnabled",
+                                  enabled,
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label htmlFor="externalGiftText">
+                              Texto da Lista de Presentes
+                            </Label>
+                            <Textarea
+                              id="externalGiftText"
+                              value={form.giftRegistry.text}
+                              onChange={(e) =>
+                                updateGiftRegistry("text", e.target.value)
+                              }
+                              placeholder="Mensagem sobre a lista de presentes"
+                              rows={2}
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label htmlFor="externalGiftLink">
+                              Link da Lista de Presentes (opcional)
+                            </Label>
+                            <Input
+                              id="externalGiftLink"
+                              value={form.giftRegistry.link ?? ""}
+                              onChange={(e) =>
+                                updateGiftRegistry("link", e.target.value)
+                              }
+                              placeholder="https://..."
+                            />
+                          </div>
+
+                          <GiftsListEditor
+                            value={form.giftRegistry.items}
+                            onChange={updateGiftItems}
+                          />
+
+                          <div className="space-y-1.5">
+                            <Label htmlFor="externalBankTransferText">
+                              Texto da Transferência Bancária (opcional)
+                            </Label>
+                            <Textarea
+                              id="externalBankTransferText"
+                              value={form.giftRegistry.bankTransferText ?? ""}
+                              onChange={(e) =>
+                                updateGiftRegistry(
+                                  "bankTransferText",
+                                  e.target.value,
+                                )
+                              }
+                              placeholder="Informação sobre transferência bancária"
+                              rows={2}
+                            />
+                          </div>
+
+                          <BankTransferEditor
+                            value={form.giftRegistry.bankTransfer}
+                            onChange={updateBankTransfer}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <Separator />
+
+                    {/* FAQ SUBSECTION */}
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium">
+                          Perguntas Frequentes
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Adiciona perguntas e respostas que aparecem depois da
+                          lista de presentes.
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {(form.faqs ?? []).map((faq, index) => (
+                          <div
+                            key={faq.id ?? index}
+                            className="space-y-2 rounded-lg border-l-2 pl-3"
+                          >
+                            <div className="flex items-start gap-2">
+                              <div className="flex-1 space-y-1.5">
+                                <Label htmlFor={`externalFaqQuestion-${index}`}>
+                                  Pergunta
+                                </Label>
+                                <Input
+                                  id={`externalFaqQuestion-${index}`}
+                                  value={faq.question}
+                                  onChange={(e) =>
+                                    updateFaq(index, "question", e.target.value)
+                                  }
+                                  placeholder="Pergunta"
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeFaq(index)}
+                                className="mt-5 text-destructive"
+                              >
+                                &times;
+                              </Button>
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor={`externalFaqAnswer-${index}`}>
+                                Resposta
+                              </Label>
+                              <Textarea
+                                id={`externalFaqAnswer-${index}`}
+                                value={faq.answer}
+                                onChange={(e) =>
+                                  updateFaq(index, "answer", e.target.value)
+                                }
+                                placeholder="Resposta"
+                                rows={2}
+                              />
+                            </div>
+                          </div>
+                        ))}
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={addFaq}
+                        >
+                          + Adicionar Pergunta
+                        </Button>
+                      </div>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
               )}
@@ -3125,7 +3407,8 @@ export default function ExternalInvitationForm({
           </TabsContent>
 
           <TabsContent value="invite" className="flex-1 overflow-hidden m-0">
-            <div className="relative h-full max-h-165 overflow-hidden bg-black">
+            <SpacingStyleProvider spacingStyles={form.spacingStyles}>
+              <div className="relative h-full max-h-165 overflow-hidden bg-black">
               {isVideoEntrance ? (
                 /* Video-entrance layout: render the actual public-facing page
                    so admins see the entrance video, timed text reveal, and the
@@ -3135,8 +3418,10 @@ export default function ExternalInvitationForm({
                   textStyles={form.textStyles}
                 >
                   <InlineCardEditProvider
-                    updateCardStyle={updateCountdownCardStyle}
-                    cardStyles={countdownCardStyles}
+                    updateCardStyle={updateCardStyle}
+                    updateSectionSpacing={updateSectionSpacing}
+                    cardStyles={form.cardStyles}
+                    spacingStyles={form.spacingStyles}
                   >
                     <TextStyleToolbar />
                     <CardStyleToolbar />
@@ -3168,8 +3453,10 @@ export default function ExternalInvitationForm({
                   textStyles={form.textStyles}
                 >
                   <InlineCardEditProvider
-                    updateCardStyle={updateCountdownCardStyle}
-                    cardStyles={countdownCardStyles}
+                    updateCardStyle={updateCardStyle}
+                    updateSectionSpacing={updateSectionSpacing}
+                    cardStyles={form.cardStyles}
+                    spacingStyles={form.spacingStyles}
                   >
                     <TextStyleToolbar />
                     <CardStyleToolbar />
@@ -3208,8 +3495,10 @@ export default function ExternalInvitationForm({
                   textStyles={form.textStyles}
                 >
                   <InlineCardEditProvider
-                    updateCardStyle={updateCountdownCardStyle}
-                    cardStyles={countdownCardStyles}
+                    updateCardStyle={updateCardStyle}
+                    updateSectionSpacing={updateSectionSpacing}
+                    cardStyles={form.cardStyles}
+                    spacingStyles={form.spacingStyles}
                   >
                     <TextStyleToolbar />
                     <CardStyleToolbar />
@@ -3238,7 +3527,8 @@ export default function ExternalInvitationForm({
                   Introduz o link externo para ver a pré-visualização do convite
                 </div>
               )}
-            </div>
+              </div>
+            </SpacingStyleProvider>
           </TabsContent>
         </Tabs>
       </div>

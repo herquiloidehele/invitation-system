@@ -2,9 +2,16 @@
 
 import { type MutableRefObject, type RefObject, useLayoutEffect, useState } from "react";
 
-import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CardSectionKey,
+  InvitationData,
+  TemplateTheme,
+} from "@/lib/types";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
+import { resolveTextStyles } from "@/lib/text-styles";
+import { useCustomText } from "@/lib/custom-texts";
+import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
 
 import InvitationHero, { InvitationHeroNames } from "./InvitationHero";
 import ImageCanvas from "./ImageCanvas";
@@ -14,6 +21,10 @@ import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import dynamic from "next/dynamic";
 import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST, PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY } from "./PersonalGuestCard";
 import { EditableText } from "./EditableText";
+import { EditableCard } from "./EditableCard";
+import CoupleGallery from "./gallery/CoupleGallery";
+import GiftsSection from "./GiftsSection";
+import FaqSection from "./FaqSection";
 import PlacesSection from "./PlacesSection";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowRichExternalRsvp } from "@/lib/external-invitation-form";
@@ -82,6 +93,16 @@ export default function RichExternalLinkPage({
   const showRsvp = shouldShowRichExternalRsvp({
     rsvpOn,
     isInitialCanvaPage,
+  });
+  const ts = resolveTextStyles(theme, invitation.textStyles);
+  const t = useCustomText(invitation.customTexts);
+  const cs = (section: CardSectionKey, defaultRadius: number) => ({
+    cardBg: invitation.cardStyles?.[section]?.cardBg || theme.cardBg,
+    cardBorder:
+      invitation.cardStyles?.[section]?.cardBorder || theme.cardBorder,
+    borderRadius:
+      invitation.cardStyles?.[section]?.borderRadius ?? defaultRadius,
+    accentColor: invitation.cardStyles?.[section]?.accentColor,
   });
 
   // Defence stack:
@@ -255,18 +276,75 @@ export default function RichExternalLinkPage({
               </div>
             )}
 
-          <CanvaEmbed
-            externalLink={externalLink}
-            theme={theme}
+           <CanvaEmbed
+             externalLink={externalLink}
+             theme={theme}
             title="Convite"
             onInitialPageChange={(isInitialPage) =>
               setCanvaPageState({ externalLink, isInitialPage })
             }
             preloading={canvaPreloading}
-            guest={invitation.guest ?? null}
-          />
+             guest={invitation.guest ?? null}
+           />
 
-          <PlacesSection
+           {shouldRenderCoupleGallery(invitation) && (
+             <>
+               <SectionOrnament theme={theme} />
+               <CoupleGallery
+                 invitation={invitation}
+                 theme={theme}
+                 isPreview={isPreview}
+               />
+             </>
+           )}
+
+           {invitation.giftRegistry.enabled && (
+             <>
+               <SectionOrnament theme={theme} />
+               <EditableCard sectionKey="giftRegistry">
+                 <div
+                   id="gifts"
+                   className="flex flex-col items-center gap-3 mx-4"
+                   style={{
+                     background: cs("giftRegistry", 16).cardBg,
+                     backdropFilter: "blur(12px)",
+                     WebkitBackdropFilter: "blur(12px)",
+                     borderRadius: cs("giftRegistry", 16).borderRadius,
+                     padding: "24px 14px",
+                     boxShadow:
+                       "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                     border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
+                   }}
+                 >
+                   <GiftsSection
+                     giftRegistry={invitation.giftRegistry}
+                     theme={theme}
+                     ts={ts}
+                     cardStyle={cs("giftRegistry", 16)}
+                     slug={invitation.slug}
+                     guestToken={invitation.guest?.token}
+                     t={t}
+                   />
+                 </div>
+               </EditableCard>
+             </>
+           )}
+
+           {invitation.faqs && invitation.faqs.length > 0 && (
+             <>
+               <SectionOrnament theme={theme} />
+               <FaqSection
+                 faqs={invitation.faqs}
+                 theme={theme}
+                 textStyles={invitation.textStyles}
+                 customTexts={invitation.customTexts}
+                 cardStyle={cs("faqs", 20)}
+                 isPreview={isPreview}
+               />
+             </>
+           )}
+
+           <PlacesSection
             invitation={invitation}
             theme={theme}
             cardStyle={{

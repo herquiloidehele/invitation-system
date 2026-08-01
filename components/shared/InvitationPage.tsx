@@ -6,16 +6,15 @@ import {
   useEffect,
   useState,
 } from "react";
-import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { ChevronDown, Heart, Shirt } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
+import { Heart, Shirt } from "lucide-react";
 
 import type {
   CardSectionKey,
-  FAQItem,
   InvitationData,
   TemplateTheme,
 } from "@/lib/types";
-import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
+import { resolveTextStyles } from "@/lib/text-styles";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { useLocale } from "next-intl";
 
@@ -36,6 +35,7 @@ import SectionImage from "./SectionImage";
 import ImageCanvas from "./ImageCanvas";
 import SectionImageHost from "./SectionImageHost";
 import PlacesSection from "./PlacesSection";
+import FaqSection from "./FaqSection";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
@@ -55,7 +55,6 @@ import {
   liftCardProps,
   popIn,
   quickStagger,
-  staggerContainer,
   WordReveal,
 } from "./animations";
 
@@ -209,129 +208,6 @@ function AnimatedSection({
 }
 
 // ---------------------------------------------------------------------------
-// FAQ Accordion Item — redesigned with left accent border
-// ---------------------------------------------------------------------------
-
-function FAQAccordionItem({
-  faq,
-  isOpen,
-  onToggle,
-  theme,
-  ts,
-  isLast,
-}: {
-  faq: FAQItem;
-  index: number;
-  isOpen: boolean;
-  onToggle: () => void;
-  theme: TemplateTheme;
-  ts: ResolvedTextStyles;
-  isLast: boolean;
-}) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      style={{
-        borderLeft: isOpen ? `2px solid ${ts.accent}` : "2px solid transparent",
-        transition: "border-color 0.35s ease",
-      }}
-    >
-      <motion.button
-        onClick={onToggle}
-        whileHover={{ x: 2 }}
-        whileTap={{ scale: 0.995 }}
-        transition={{ duration: 0.2, ease: EASE }}
-        className="flex w-full cursor-pointer items-center gap-3 text-left transition-colors"
-        style={{
-          padding: "20px 22px",
-          paddingBottom: isOpen ? 4 : 20,
-          background: "transparent",
-          border: "none",
-        }}
-      >
-        {/* Question text */}
-        <span
-          className="flex-1"
-          style={{
-            ...ts.faqQuestion,
-            color: isOpen ? ts.textPrimary : ts.textSecondary,
-            transition: "color 0.3s ease",
-          }}
-        >
-          <EditableText elementKey="faqQuestion">{faq.question}</EditableText>
-        </span>
-
-        {/* Chevron */}
-        <motion.span
-          className="flex-shrink-0"
-          animate={isOpen ? { rotate: 180, y: 0 } : { rotate: 0, y: [0, 2, 0] }}
-          transition={
-            isOpen
-              ? { duration: 0.35, ease: EASE }
-              : {
-                  rotate: { duration: 0.35, ease: EASE },
-                  y: {
-                    duration: 2.4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  },
-                }
-          }
-        >
-          <ChevronDown
-            size={16}
-            color={ts.accent}
-            strokeWidth={1.5}
-            style={{
-              opacity: isOpen ? 1 : 0.4,
-              transition: "opacity 0.3s ease",
-            }}
-          />
-        </motion.span>
-      </motion.button>
-
-      {/* Answer */}
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{
-              height: { duration: 0.4, ease: EASE },
-              opacity: { duration: 0.3, delay: 0.05 },
-            }}
-            style={{ overflow: "hidden" }}
-          >
-            <div style={{ padding: "4px 22px 22px" }}>
-              <p
-                style={{
-                  ...ts.faqAnswer,
-                  margin: 0,
-                }}
-              >
-                <EditableText elementKey="faqAnswer">{faq.answer}</EditableText>
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Divider between items */}
-      {!isLast && (
-        <div
-          style={{
-            height: 1,
-            background: theme.cardBorder,
-            margin: "0 22px",
-          }}
-        />
-      )}
-    </motion.div>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Main Component
 // ---------------------------------------------------------------------------
 
@@ -367,7 +243,6 @@ export default function InvitationPage({
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const t = useCustomText(invitation.customTexts);
   const locale = useLocale();
   const footerMonthDisplay = formatLocalizedMonthLong(
@@ -973,78 +848,18 @@ export default function InvitationPage({
       {/* 7. FAQs                                                           */}
       {/* ================================================================= */}
       {invitation.faqs && invitation.faqs.length > 0 && (
-            <SectionImageHost sectionKey="faqs" layer={invitation.imageLayer}>
+        <SectionImageHost sectionKey="faqs" layer={invitation.imageLayer}>
           <SectionDivider theme={theme} />
 
-          <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
-            <div className="flex flex-col items-center">
-              <span style={ts.sectionTitles}>
-                <EditableText elementKey="sectionTitles">
-                  <WordReveal
-                    text={t("sectionTitle_faqs")}
-                    isPreview={isPreview}
-                  />
-                </EditableText>
-              </span>
-
-              <motion.div
-                className="mt-3 mb-6"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-                style={{
-                  width: 28,
-                  height: 1,
-                  background: ts.accent,
-                  opacity: 0.25,
-                  transformOrigin: "center",
-                }}
-              />
-            </div>
-
-            {/* FAQ card */}
-            <EditableCard sectionKey="faqs">
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                {...(isPreview
-                  ? { animate: "visible" }
-                  : {
-                      whileInView: "visible",
-                      viewport: { once: false, margin: "-40px" },
-                    })}
-                whileHover={{ y: -2 }}
-                transition={{ duration: 0.3, ease: EASE }}
-                style={{
-                  background: cs("faqs", 20).cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: cs("faqs", 20).borderRadius,
-                  overflow: "hidden",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                  border: `1px solid ${cs("faqs", 20).cardBorder}`,
-                }}
-              >
-                {invitation.faqs.map((faq, i) => (
-                  <FAQAccordionItem
-                    key={i}
-                    faq={faq}
-                    index={i}
-                    isOpen={openFaqIndex === i}
-                    onToggle={() =>
-                      setOpenFaqIndex(openFaqIndex === i ? null : i)
-                    }
-                    theme={theme}
-                    ts={ts}
-                    isLast={i === (invitation.faqs?.length ?? 0) - 1}
-                  />
-                ))}
-              </motion.div>
-            </EditableCard>
-          </AnimatedSection>
-            </SectionImageHost>
+          <FaqSection
+            faqs={invitation.faqs}
+            theme={theme}
+            textStyles={invitation.textStyles}
+            customTexts={invitation.customTexts}
+            cardStyle={cs("faqs", 20)}
+            isPreview={isPreview}
+          />
+        </SectionImageHost>
       )}
 
       {/* ================================================================= */}

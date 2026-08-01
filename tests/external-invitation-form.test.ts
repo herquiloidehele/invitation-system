@@ -5,12 +5,177 @@ import { describe, expect, it } from "vitest";
 
 import {
   appendCanvaProxyHideScrollbarFlag,
+  hasRichExternalSections,
   isInitialCanvaEmbedPage,
   resolveCanvaEmbedPageState,
   shouldPreloadRichExternalCanva,
   shouldShowRichExternalRsvp,
   shouldShowVideoEntranceInitialSections,
 } from "../lib/external-invitation-form";
+import type { InvitationData } from "../lib/types";
+
+function baseExternalInvitation(
+  overrides: Partial<InvitationData> = {},
+): InvitationData {
+  return {
+    slug: "ana-bruno",
+    themeId: "theme_pink",
+    template: "pink-floral",
+    couple: { bride: "Ana", groom: "Bruno", monogram: "A&B" },
+    date: {
+      iso: "",
+      display: "",
+      dayOfWeek: "",
+      time: "",
+      day: "",
+      month: "",
+      year: "",
+    },
+    quote: "",
+    location: { name: "", address: "", googleMapsUrl: "" },
+    rsvp: { enabled: false, showOnExternalPage: false },
+    schedule: [],
+    dressCode: { enabled: false, text: "" },
+    giftRegistry: { enabled: false, text: "" },
+    audio: { enabled: false, src: "", artist: "", title: "" },
+    heroImage: "",
+    videoUrl: "",
+    eventType: "wedding",
+    invitationType: "external_link",
+    externalLink: "https://example.com/invite",
+    faqs: [],
+    places: { enabled: false, layout: "stacked", sections: [] },
+    ...overrides,
+  } as InvitationData;
+}
+
+describe("hasRichExternalSections", () => {
+  const renderableCases: Array<[string, Partial<InvitationData>]> = [
+    [
+      "gallery",
+      {
+        coupleGallery: {
+          enabled: true,
+          style: "grid",
+          images: [{ src: "gallery.jpg" }],
+        },
+      },
+    ],
+    ["gifts", { giftRegistry: { enabled: true, text: "" } }],
+    ["faqs", { faqs: [{ question: "Q", answer: "A" }] }],
+    [
+      "places",
+      {
+        places: {
+          enabled: true,
+          layout: "stacked",
+          sections: [
+            {
+              id: "hotels",
+              title: "Hotels",
+              items: [{ id: "hotel", title: "Hotel" }],
+            },
+          ],
+        },
+      },
+    ],
+  ];
+
+  it.each(renderableCases)("uses rich layout for %s", (_name, overrides) => {
+    expect(hasRichExternalSections(baseExternalInvitation(overrides))).toBe(
+      true,
+    );
+  });
+
+  const emptyCases: Array<Partial<InvitationData>> = [
+    { coupleGallery: { enabled: true, style: "grid", images: [] } },
+    { giftRegistry: { enabled: false, text: "" } },
+    { faqs: [] },
+    { places: { enabled: true, layout: "stacked", sections: [] } },
+  ];
+
+  it.each(emptyCases)(
+    "does not activate rich layout for empty optional content: %j",
+    (overrides) => {
+      expect(hasRichExternalSections(baseExternalInvitation(overrides))).toBe(
+        false,
+      );
+    },
+  );
+});
+
+describe("shared FAQ section source", () => {
+  it("keeps FAQ rendering editable and stateful", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/shared/FaqSection.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain("EditableCard");
+    expect(source).toContain("EditableText");
+    expect(source).toContain("sectionTitle_faqs");
+    expect(source).toContain("openFaqIndex");
+  });
+});
+
+describe("rich external section composition source", () => {
+  it("composes rich external sections after Canva in the approved order", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/shared/RichExternalLinkPage.tsx"),
+      "utf8",
+    );
+
+    for (const name of [
+      "CanvaEmbed",
+      "CoupleGallery",
+      "GiftsSection",
+      "FaqSection",
+      "PlacesSection",
+      "RSVPForm",
+    ]) {
+      expect(source).toContain(name);
+    }
+
+    expect(source.indexOf("<CanvaEmbed")).toBeLessThan(
+      source.indexOf("<CoupleGallery"),
+    );
+    expect(source.indexOf("<CoupleGallery")).toBeLessThan(
+      source.indexOf("<GiftsSection"),
+    );
+    expect(source.indexOf("<GiftsSection")).toBeLessThan(
+      source.indexOf("<FaqSection"),
+    );
+    expect(source.indexOf("<FaqSection")).toBeLessThan(
+      source.indexOf("<PlacesSection"),
+    );
+    expect(source.indexOf("<PlacesSection")).toBeLessThan(
+      source.indexOf("<RSVPForm"),
+    );
+  });
+});
+
+describe("external invitation editor source", () => {
+  it("exposes full optional-section editing in the external form", () => {
+    const source = readFileSync(
+      join(process.cwd(), "app/admin/invitations/ExternalInvitationForm.tsx"),
+      "utf8",
+    );
+
+    for (const token of [
+      "CoupleGalleryEditor",
+      "GiftsListEditor",
+      "BankTransferEditor",
+      "addFaq",
+      "updateFaq",
+      "removeFaq",
+      "form.cardStyles",
+      "form.spacingStyles",
+      "updateSectionSpacing",
+    ]) {
+      expect(source).toContain(token);
+    }
+  });
+});
 
 describe("isInitialCanvaEmbedPage", () => {
   const initial = "/canva-proxy/brindealstudio.com/sara-e-hugo?disableScroll=1";
