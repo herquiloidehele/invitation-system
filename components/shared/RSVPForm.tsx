@@ -27,6 +27,10 @@ import {
   shouldShowRsvpNumChildren,
 } from "@/lib/rsvp-config";
 import { resolveRsvpInputColors } from "@/lib/rsvp-input-colors";
+import {
+  resolveRsvpInputStyle,
+  resolveRsvpSubmitStyle,
+} from "@/lib/rsvp-input-styles";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
@@ -240,6 +244,24 @@ export default function RSVPForm(props: RSVPFormProps) {
       borderColor: p.border,
     },
   );
+  const rsvpInputStyle = resolveRsvpInputStyle(
+    isIntegration(props) ? props.invitation.rsvp.inputStyle : undefined,
+    rsvpInputColors,
+    p.accent,
+    Boolean(
+      isIntegration(props) &&
+        props.invitation.rsvp.inputBackgroundColor?.trim(),
+    ),
+  );
+  const rsvpSubmitStyle = resolveRsvpSubmitStyle(
+    isIntegration(props) ? props.invitation.rsvp.inputStyle : undefined,
+    {
+      backgroundColor: p.ctaBg,
+      textColor: p.ctaText,
+      radius: p.ctaRadius,
+      accentColor: p.accent,
+    },
+  );
   const rsvpPlaceholderStyle = {
     "--rsvp-placeholder-color": rsvpInputColors.placeholderColor,
   } as React.CSSProperties;
@@ -360,14 +382,12 @@ export default function RSVPForm(props: RSVPFormProps) {
 
   const uiFont = p.uiFont;
 
-  const inputClass =
-    "w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-offset-1";
+  const inputClass = rsvpInputStyle.inputClassName;
 
   const inputStyle = {
     fontFamily: uiFont,
-    backgroundColor: rsvpInputColors.backgroundColor,
-    borderColor: rsvpInputColors.borderColor,
-    color: rsvpInputColors.textColor,
+    ...rsvpInputStyle.inputStyle,
+    ...rsvpInputStyle.focusStyle,
   };
 
   const labelStyle = {
@@ -696,12 +716,9 @@ export default function RSVPForm(props: RSVPFormProps) {
               </label>
               <div className="flex gap-3">
                 <label
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
+                  className={rsvpInputStyle.choiceClassName}
                   style={{
-                    borderColor:
-                      attending === "yes" ? p.accent : rsvpInputColors.borderColor,
-                    backgroundColor:
-                      attending === "yes" ? p.accent + "15" : "transparent",
+                    ...rsvpInputStyle.choiceStyle(attending === "yes"),
                     fontFamily: uiFont,
                     ...bodyTextOverride,
                     color: rsvpInputColors.textColor,
@@ -718,12 +735,9 @@ export default function RSVPForm(props: RSVPFormProps) {
                   </EditableText>
                 </label>
                 <label
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors"
+                  className={rsvpInputStyle.choiceClassName}
                   style={{
-                    borderColor:
-                      attending === "no" ? p.accent : rsvpInputColors.borderColor,
-                    backgroundColor:
-                      attending === "no" ? p.accent + "15" : "transparent",
+                    ...rsvpInputStyle.choiceStyle(attending === "no"),
                     fontFamily: uiFont,
                     ...bodyTextOverride,
                     color: rsvpInputColors.textColor,
@@ -820,6 +834,10 @@ export default function RSVPForm(props: RSVPFormProps) {
               labelStyle={labelStyle}
               inputClassName={inputClass}
               inputStyle={inputStyle}
+              choiceClassName={rsvpInputStyle.choiceClassName}
+              choiceStyle={rsvpInputStyle.choiceStyle}
+              switchClassName={rsvpInputStyle.switchClassName}
+              switchStyle={rsvpInputStyle.switchStyle}
             />
 
             <div className="flex flex-col gap-1.5">
@@ -841,12 +859,10 @@ export default function RSVPForm(props: RSVPFormProps) {
             <button
               type="submit"
               disabled={submitState === "loading"}
-              className="mt-2 flex w-full items-center justify-center gap-2 px-6 py-3 text-sm font-medium transition-opacity disabled:opacity-60"
+              className={rsvpSubmitStyle.className}
               style={{
                 fontFamily: uiFont,
-                background: p.ctaBg,
-                color: p.ctaText,
-                borderRadius: p.ctaRadius,
+                ...rsvpSubmitStyle.style,
                 ...ctaLabelOverride,
               }}
             >

@@ -17,6 +17,11 @@ import {
   resolveRsvpInputColors,
   type RsvpInputColorConfig,
 } from "@/lib/rsvp-input-colors";
+import {
+  resolveRsvpInputStyle,
+  resolveRsvpSubmitStyle,
+  type RsvpInputStyle,
+} from "@/lib/rsvp-input-styles";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
@@ -91,6 +96,7 @@ interface RsvpPageProps {
   customFields?: RsvpCustomField[];
   backgroundImageUrl?: string;
   inputColors?: RsvpInputColorConfig;
+  inputStyle?: RsvpInputStyle;
   customTexts?: CustomTexts;
   /** Guest token from the `?g=` confirm link — links the RSVP to a guest. */
   guestToken?: string;
@@ -144,6 +150,7 @@ export default function RsvpPage({
   customFields = [],
   backgroundImageUrl,
   inputColors,
+  inputStyle: rsvpInputStyleValue,
   customTexts: ct,
   guestToken,
   prefillName,
@@ -247,9 +254,6 @@ export default function RsvpPage({
   };
 
   // Shared input styles
-  const inputBase =
-    "w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors focus:ring-2 focus:ring-offset-1 focus:ring-[#BE8C7A]/30";
-
   const rsvpInputColors = resolveRsvpInputColors(inputColors, {
     backgroundColor: palette.fieldBg,
     textColor: palette.text,
@@ -257,12 +261,32 @@ export default function RsvpPage({
     borderColor: palette.border,
   });
 
+  const rsvpInputStyle = resolveRsvpInputStyle(
+    rsvpInputStyleValue,
+    rsvpInputColors,
+    palette.accent,
+    Boolean(inputColors?.inputBackgroundColor?.trim()),
+    "page",
+  );
+
+  const inputBase = rsvpInputStyle.inputClassName;
+
   const inputStyle: React.CSSProperties = {
-    backgroundColor: rsvpInputColors.backgroundColor,
-    borderColor: rsvpInputColors.borderColor,
-    color: rsvpInputColors.textColor,
     fontFamily: "'Inter', system-ui, sans-serif",
+    ...rsvpInputStyle.inputStyle,
+    ...rsvpInputStyle.focusStyle,
   };
+
+  const rsvpSubmitStyle = resolveRsvpSubmitStyle(
+    rsvpInputStyleValue,
+    {
+      backgroundColor: palette.ctaBg,
+      textColor: palette.ctaText,
+      radius: palette.ctaRadius,
+      accentColor: palette.accent,
+    },
+    "page",
+  );
 
   const labelStyle: React.CSSProperties = {
     fontFamily: "'Inter', system-ui, sans-serif",
@@ -507,14 +531,9 @@ export default function RsvpPage({
                     return (
                       <label
                         key={val}
-                        className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition-all"
+                        className={rsvpInputStyle.choiceClassName}
                         style={{
-                          borderColor: selected
-                            ? palette.accent
-                            : rsvpInputColors.borderColor,
-                          backgroundColor: selected
-                            ? palette.accent + "18"
-                            : "transparent",
+                          ...rsvpInputStyle.choiceStyle(selected),
                           color: rsvpInputColors.textColor,
                           fontFamily: "'Inter', system-ui, sans-serif",
                         }}
@@ -602,6 +621,10 @@ export default function RsvpPage({
                 labelStyle={labelStyle}
                 inputClassName={inputBase}
                 inputStyle={inputStyle}
+                choiceClassName={rsvpInputStyle.choiceClassName}
+                choiceStyle={rsvpInputStyle.choiceStyle}
+                switchClassName={rsvpInputStyle.switchClassName}
+                switchStyle={rsvpInputStyle.switchStyle}
               />
 
               {/* Message */}
@@ -620,11 +643,9 @@ export default function RsvpPage({
               <button
                 type="submit"
                 disabled={submitState === "loading"}
-                className="mt-1 flex w-full items-center justify-center gap-2 py-3.5 text-sm font-medium transition-opacity disabled:opacity-60 hover:opacity-85"
+                className={rsvpSubmitStyle.className}
                 style={{
-                  background: palette.ctaBg,
-                  color: palette.ctaText,
-                  borderRadius: palette.ctaRadius,
+                  ...rsvpSubmitStyle.style,
                   fontFamily: "'Inter', system-ui, sans-serif",
                 }}
               >

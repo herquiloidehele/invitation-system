@@ -77,6 +77,7 @@ import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
 import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
 import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
 import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
+import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
@@ -186,6 +187,7 @@ function getDefaultState(
       inputTextColor: "",
       inputPlaceholderColor: "",
       inputBorderColor: "",
+      inputStyle: "default",
     },
     schedule: [],
     dressCode: { enabled: false, text: "" },
@@ -2875,6 +2877,10 @@ export default function ExternalInvitationForm({
                           onClear={() => updateRsvp("backgroundImageUrl", "")}
                         />
                       </div>
+                      <RsvpInputStyleField
+                        value={form.rsvp.inputStyle}
+                        onChange={(value) => updateRsvp("inputStyle", value)}
+                      />
                       <RsvpInputColorFields
                         rsvp={form.rsvp}
                         onChange={updateRsvp}

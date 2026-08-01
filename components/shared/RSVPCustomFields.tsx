@@ -21,6 +21,10 @@ export function RSVPCustomFields({
   labelStyle,
   inputClassName,
   inputStyle,
+  choiceClassName,
+  choiceStyle,
+  switchClassName,
+  switchStyle,
 }: {
   fields: RsvpCustomField[];
   attending: boolean;
@@ -30,6 +34,10 @@ export function RSVPCustomFields({
   labelStyle: CSSProperties;
   inputClassName: string;
   inputStyle: CSSProperties;
+  choiceClassName: string;
+  choiceStyle: (selected: boolean) => CSSProperties;
+  switchClassName: string;
+  switchStyle: CSSProperties;
 }) {
   const visibleFields = fields.filter((field) =>
     isRsvpCustomFieldVisible(field, attending),
@@ -53,14 +61,7 @@ export function RSVPCustomFields({
               style={inputStyle}
             />
           ) : field.type === "switch" ? (
-            <div
-              className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm"
-              style={{
-                borderColor: inputStyle.borderColor,
-                color: inputStyle.color,
-                backgroundColor: inputStyle.backgroundColor,
-              }}
-            >
+            <div className={switchClassName} style={switchStyle}>
               <span>{values[field.id] === true ? "Sim" : "Não"}</span>
               <Switch
                 checked={values[field.id] === true}
@@ -74,15 +75,9 @@ export function RSVPCustomFields({
                 return (
                 <label
                   key={option.id}
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-center text-sm transition-colors"
+                  className={`${choiceClassName} text-center`}
                   style={{
-                    borderColor: selected
-                      ? String(inputStyle.color)
-                      : inputStyle.borderColor,
-                    backgroundColor: selected
-                      ? `${String(inputStyle.color)}15`
-                      : "transparent",
-                    color: inputStyle.color,
+                    ...choiceStyle(selected),
                     fontFamily: inputStyle.fontFamily,
                   }}
                 >

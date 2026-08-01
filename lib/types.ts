@@ -1,4 +1,5 @@
 import type { PriceOverrides } from "@/lib/currency/template-price";
+import type { RsvpInputStyle } from "./rsvp-input-styles";
 
 /** Theme name / slug identifier (e.g. "pink-floral"). Open-ended — themes are stored in the database. */
 export type TemplateName = string;
@@ -1130,6 +1131,7 @@ export interface InvitationData {
     inputTextColor?: string;
     inputPlaceholderColor?: string;
     inputBorderColor?: string;
+    inputStyle?: RsvpInputStyle;
     customFields?: RsvpCustomField[];
     /**
      * When false, guests can no longer submit confirmations (the invitation

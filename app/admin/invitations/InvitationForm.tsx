@@ -111,6 +111,7 @@ import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
 import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
+import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
@@ -462,6 +463,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       inputTextColor: "",
       inputPlaceholderColor: "",
       inputBorderColor: "",
+      inputStyle: "default",
       customFields: [],
     },
     schedule: [],
@@ -3207,6 +3209,10 @@ export default function InvitationForm({
                             }
                           />
                         </div>
+                        <RsvpInputStyleField
+                          value={form.rsvp.inputStyle}
+                          onChange={(value) => updateRsvp("inputStyle", value)}
+                        />
                         <RsvpInputColorFields
                           rsvp={form.rsvp}
                           onChange={updateRsvp}

@@ -53,6 +53,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
           inputTextColor: "",
           inputPlaceholderColor: "",
           inputBorderColor: "",
+          inputStyle: "default",
         },
         schedule: [],
         dressCode: { enabled: false, text: "" },

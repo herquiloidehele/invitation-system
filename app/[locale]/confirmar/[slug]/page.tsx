@@ -108,6 +108,7 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       customFields={getRsvpCustomFields(rsvp)}
       backgroundImageUrl={rsvp.backgroundImageUrl}
       inputColors={rsvp}
+      inputStyle={rsvp.inputStyle}
       customTexts={customTexts}
     />
   );

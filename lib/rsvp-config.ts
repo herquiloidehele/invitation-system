@@ -1,4 +1,5 @@
 import { normalizeRsvpCustomFields } from "@/lib/rsvp-custom-fields";
+import type { RsvpInputStyle } from "@/lib/rsvp-input-styles";
 import type { RsvpCustomField } from "@/lib/types";
 
 export interface RsvpConfigWithEmail {
@@ -9,6 +10,7 @@ export interface RsvpConfigWithEmail {
   showCompanion?: boolean;
   showNumAdults?: boolean;
   showNumChildren?: boolean;
+  inputStyle?: RsvpInputStyle;
   customFields?: RsvpCustomField[];
   acceptingResponses?: boolean;
 }
