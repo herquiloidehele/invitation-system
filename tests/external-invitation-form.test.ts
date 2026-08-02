@@ -10,7 +10,7 @@ import {
   resolveCanvaEmbedPageState,
   shouldPreloadRichExternalCanva,
   shouldShowRichExternalRsvp,
-  shouldShowVideoEntranceInitialSections
+  shouldShowVideoEntranceInitialSections,
 } from "../lib/external-invitation-form";
 import type { InvitationData } from "../lib/types";
 
