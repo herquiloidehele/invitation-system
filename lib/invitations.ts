@@ -5,6 +5,7 @@ import {
   sanitizeInvitationTranslations,
 } from "./invitation-translations";
 import { sanitizeLandingTranslations } from "./landing-translations";
+import { normalizeCurrency } from "./currency/config";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -183,7 +184,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
       (row.socialPreview as InvitationData["socialPreview"]) ?? undefined,
     priceFromCents: row.priceFromCents,
     discountPriceFromCents: row.discountPriceFromCents,
-    currency: row.currency,
+    currency: normalizeCurrency(row.currency),
     priceOverrides:
       (row.priceOverrides as InvitationData["priceOverrides"]) ?? null,
     landingModelName: row.landingModelName,

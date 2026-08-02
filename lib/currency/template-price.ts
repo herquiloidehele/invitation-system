@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { BASE_CURRENCY, deriveCents, type Currency } from "./config";
 
-// EUR is the base price itself, so only the four non-base currencies are overridable.
-export const OVERRIDE_CURRENCIES = ["MZN", "AOA", "BRL", "USD"] as const;
+// EUR is the base price itself, so only the three non-base active currencies are overridable.
+export const OVERRIDE_CURRENCIES = ["MZN", "BRL", "USD"] as const;
 export type OverrideCurrency = (typeof OVERRIDE_CURRENCIES)[number];
 
 export type PriceOverrideEntry = {
@@ -24,7 +24,6 @@ const entrySchema = z
 export const priceOverridesSchema = z
   .object({
     MZN: entrySchema.optional(),
-    AOA: entrySchema.optional(),
     BRL: entrySchema.optional(),
     USD: entrySchema.optional(),
   })

@@ -18,7 +18,6 @@ describe("CURRENCY_SYMBOL", () => {
     expect(CURRENCY_SYMBOL).toEqual({
       EUR: "€",
       MZN: "MZN",
-      AOA: "Kz",
       BRL: "R$",
       USD: "$",
     });

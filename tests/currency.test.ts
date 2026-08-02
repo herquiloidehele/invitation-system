@@ -139,8 +139,12 @@ describe("priceOverridesSchema", () => {
     expect(priceOverridesSchema.safeParse(undefined).success).toBe(true);
   });
 
-  it("rejects the EUR (base) key and non-positive / non-integer amounts", () => {
+  it("rejects EUR and legacy AOA override keys", () => {
     expect(priceOverridesSchema.safeParse({ EUR: { fromCents: 100 } }).success).toBe(false);
+    expect(priceOverridesSchema.safeParse({ AOA: { fromCents: 100 } }).success).toBe(false);
+  });
+
+  it("rejects non-positive / non-integer amounts", () => {
     expect(priceOverridesSchema.safeParse({ MZN: { fromCents: -1 } }).success).toBe(false);
     expect(priceOverridesSchema.safeParse({ MZN: { fromCents: 1.5 } }).success).toBe(false);
     expect(priceOverridesSchema.safeParse({ MZN: {} }).success).toBe(false);

@@ -5,6 +5,7 @@ import {
   FALLBACK_CURRENCY,
   GEO_CURRENCY_COOKIE,
   isSupportedCurrency,
+  normalizeCurrency,
   type Currency,
 } from "./config";
 
@@ -19,6 +20,7 @@ export async function getViewerCurrency(): Promise<Currency> {
   const jar = await cookies();
 
   const explicit = jar.get(CURRENCY_COOKIE)?.value;
+  if (explicit === "AOA") return normalizeCurrency(explicit);
   if (isSupportedCurrency(explicit)) return explicit;
 
   const geo = jar.get(GEO_CURRENCY_COOKIE)?.value;

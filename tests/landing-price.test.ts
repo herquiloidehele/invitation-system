@@ -104,9 +104,10 @@ describe("resolveLandingPrice currency-native formatting", () => {
     expect(resolveLandingPrice(1040000, null, "MZN", CURRENCY_LOCALE.MZN)?.amount).toBe(
       "10 400 MZN",
     );
-    expect(resolveLandingPrice(14150000, null, "AOA", CURRENCY_LOCALE.AOA)?.amount).toBe(
-      "141 500 Kz",
-    );
+  });
+
+  it("formats a legacy AOA value as EUR", () => {
+    expect(formatLandingPrice(14900, "AOA")).toBe("Desde 149 €");
   });
 
   it("keeps the discount strikethrough valid after currency formatting", () => {

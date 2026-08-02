@@ -30,4 +30,10 @@ describe("getViewerCurrency", () => {
     cookieStore.set("currency", "GBP"); // unsupported
     expect(await getViewerCurrency()).toBe("EUR");
   });
+
+  it("does not preserve a legacy AOA cookie", async () => {
+    cookieStore.set("currency", "AOA");
+    cookieStore.set("geo_currency", "MZN");
+    expect(await getViewerCurrency()).toBe("EUR");
+  });
 });

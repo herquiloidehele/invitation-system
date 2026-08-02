@@ -132,7 +132,7 @@ model Invitation {
   priceFromCents            Int?
   discountPriceFromCents    Int? // sale price in cents; valid only when 0 < discount < priceFromCents
   currency                  String  @default("EUR") // base currency; stays "EUR"
-  priceOverrides            Json? // PriceOverrides: { MZN?, AOA?, BRL?, USD? } in minor units; EUR derives from base
+  priceOverrides            Json? // PriceOverrides: { MZN?, BRL?, USD? } in minor units; EUR derives from base
   landingModelName          String?
   landingImageUrl           String?
   landingDescription        String?
@@ -209,7 +209,7 @@ model SaveTheDate {
   priceFromCents            Int?
   discountPriceFromCents    Int? // sale price in cents; valid only when 0 < discount < priceFromCents
   currency                  String  @default("EUR") // base currency; stays "EUR"
-  priceOverrides            Json? // PriceOverrides: { MZN?, AOA?, BRL?, USD? } in minor units; EUR derives from base
+  priceOverrides            Json? // PriceOverrides: { MZN?, BRL?, USD? } in minor units; EUR derives from base
   landingModelName          String?
   landingImageUrl           String?
   landingDescription        String?
