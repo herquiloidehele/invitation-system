@@ -1,9 +1,10 @@
 import { normalizeRsvpCustomFields } from "@/lib/rsvp-custom-fields";
 import type { RsvpInputStyle } from "@/lib/rsvp-input-styles";
-import type { RsvpCustomField } from "@/lib/types";
+import type { RsvpCtaAction, RsvpCustomField } from "@/lib/types";
 
 export interface RsvpConfigWithEmail {
   enabled?: boolean;
+  ctaAction?: RsvpCtaAction;
   deadline?: string;
   showEmail?: boolean;
   showDietaryRestrictions?: boolean;
@@ -13,6 +14,12 @@ export interface RsvpConfigWithEmail {
   inputStyle?: RsvpInputStyle;
   customFields?: RsvpCustomField[];
   acceptingResponses?: boolean;
+}
+
+export function getRsvpCtaAction(
+  config: { ctaAction?: unknown } | null | undefined,
+): RsvpCtaAction {
+  return config?.ctaAction === "calendar" ? "calendar" : "rsvp";
 }
 
 /**

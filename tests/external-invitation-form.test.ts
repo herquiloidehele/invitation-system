@@ -171,6 +171,8 @@ describe("external invitation editor source", () => {
       "form.cardStyles",
       "form.spacingStyles",
       "updateSectionSpacing",
+      "externalVideoDateIso",
+      "externalVideoTime",
     ]) {
       expect(source).toContain(token);
     }

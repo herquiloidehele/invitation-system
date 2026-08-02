@@ -920,6 +920,8 @@ export interface RsvpCustomAnswerInput {
   value: unknown;
 }
 
+export type RsvpCtaAction = "rsvp" | "calendar";
+
 /** Every guest-visible UI string that can be overridden per invitation.
  *  All fields are optional — missing keys fall back to the built-in defaults
  *  defined in `lib/custom-texts.ts`.
@@ -1122,6 +1124,7 @@ export interface InvitationData {
   location2?: LocationInfo;
   rsvp: {
     enabled: boolean;
+    ctaAction?: RsvpCtaAction;
     deadline?: string;
     showEmail?: boolean;
     showDietaryRestrictions?: boolean;

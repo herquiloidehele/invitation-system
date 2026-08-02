@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import type {
   CoupleInfo,
@@ -23,6 +23,7 @@ interface CalendarButtonProps {
   couple: CoupleInfo;
   eventType: InvitationEventType;
   className?: string;
+  style?: CSSProperties;
   children: ReactNode;
 }
 
@@ -80,6 +81,7 @@ export default function CalendarButton({
   couple,
   eventType,
   className,
+  style,
   children,
 }: CalendarButtonProps) {
   const t = useTranslations("Invitation");
@@ -110,7 +112,12 @@ export default function CalendarButton({
   };
 
   return (
-    <button type="button" onClick={handleClick} className={className}>
+    <button
+      type="button"
+      onClick={handleClick}
+      className={className}
+      style={style}
+    >
       {children}
     </button>
   );

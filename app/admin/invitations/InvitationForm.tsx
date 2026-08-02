@@ -453,6 +453,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     },
     rsvp: {
       enabled: true,
+      ctaAction: "rsvp",
       deadline: "",
       showEmail: false,
       showDietaryRestrictions: true,
@@ -3104,6 +3105,35 @@ export default function InvitationForm({
                         checked={form.rsvp.enabled}
                         onCheckedChange={(v) => updateRsvp("enabled", v)}
                       />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Ação do botão principal</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Escolha se o botão principal abre o formulário de RSVP
+                        ou adiciona o evento ao calendário.
+                      </p>
+                      <Select
+                        value={
+                          form.rsvp.ctaAction === "calendar"
+                            ? "calendar"
+                            : "rsvp"
+                        }
+                        onValueChange={(value) => {
+                          if (value) updateRsvp("ctaAction", value);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="rsvp">
+                            Abrir formulário de RSVP
+                          </SelectItem>
+                          <SelectItem value="calendar">
+                            Adicionar ao calendário
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     {form.rsvp.enabled && (
                       <>

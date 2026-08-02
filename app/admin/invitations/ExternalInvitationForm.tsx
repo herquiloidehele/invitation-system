@@ -184,6 +184,7 @@ function getDefaultState(
     location: { name: "", address: "", googleMapsUrl: "" },
     rsvp: {
       enabled: false,
+      ctaAction: "rsvp",
       showEmail: false,
       showDietaryRestrictions: true,
       showCompanion: false,
@@ -1518,6 +1519,66 @@ export default function ExternalInvitationForm({
                   </AccordionContent>
                 </AccordionItem>
               )}
+
+              {/* ── Date & time for generic video invitations ── */}
+              {subType === "external_video" &&
+                !isCurtainCanva &&
+                !isVideoEntrance && (
+                  <AccordionItem
+                    value="externalVideoDate"
+                    className="border rounded-lg px-4"
+                  >
+                    <AccordionTrigger className="text-sm font-medium">
+                      Data &amp; Hora
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-3 pb-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label
+                            htmlFor="externalVideoDateIso"
+                            className="text-xs text-muted-foreground"
+                          >
+                            Data
+                          </Label>
+                          <Input
+                            id="externalVideoDateIso"
+                            type="date"
+                            value={
+                              form.date.iso ? form.date.iso.split("T")[0] : ""
+                            }
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              updateDate(
+                                "iso",
+                                val ? `${val}T00:00:00.000Z` : "",
+                              );
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label
+                            htmlFor="externalVideoTime"
+                            className="text-xs text-muted-foreground"
+                          >
+                            Hora
+                          </Label>
+                          <Input
+                            id="externalVideoTime"
+                            value={form.date.time}
+                            onChange={(e) =>
+                              updateDate("time", e.target.value)
+                            }
+                            placeholder="16:00"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        A data de exibição, dia da semana, dia, mês e ano são
+                        derivados automaticamente.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
 
               {/* ── External link (conditional) ── */}
               {subType === "external_link" && (
@@ -3034,6 +3095,35 @@ export default function ExternalInvitationForm({
                       checked={form.rsvp.enabled === true}
                       onCheckedChange={(v) => updateRsvp("enabled", v)}
                     />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Ação do botão principal</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Escolha se o botão principal abre o formulário de RSVP ou
+                      adiciona o evento ao calendário.
+                    </p>
+                    <Select
+                      value={
+                        form.rsvp.ctaAction === "calendar"
+                          ? "calendar"
+                          : "rsvp"
+                      }
+                      onValueChange={(value) => {
+                        if (value) updateRsvp("ctaAction", value);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="rsvp">
+                          Abrir formulário de RSVP
+                        </SelectItem>
+                        <SelectItem value="calendar">
+                          Adicionar ao calendário
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   {form.rsvp.enabled && (
                     <>

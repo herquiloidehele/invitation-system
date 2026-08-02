@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { motion, type Variants } from "framer-motion";
-import { Heart, Shirt } from "lucide-react";
+import { CalendarPlus, Heart, Shirt } from "lucide-react";
 
 import type {
   CardSectionKey,
@@ -30,6 +30,7 @@ import LocationCard from "./LocationCard";
 import GiftsSection from "./GiftsSection";
 import GuestGuideSection from "./GuestGuideSection";
 import SaveTheDateSection from "./SaveTheDateSection";
+import CalendarButton from "./CalendarButton";
 import CoupleGallery from "./gallery/CoupleGallery";
 import SectionImage from "./SectionImage";
 import ImageCanvas from "./ImageCanvas";
@@ -45,6 +46,7 @@ import InvitationHero, {
   InvitationHeroNames,
 } from "./InvitationHero";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { getRsvpCtaAction } from "@/lib/rsvp-config";
 import { getStandardInvitationImageSectionKeys } from "@/lib/standard-invitation-image-sections";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
 import { shouldRenderPlaces } from "@/lib/places";
@@ -243,6 +245,7 @@ export default function InvitationPage({
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
+  const isCalendarCta = getRsvpCtaAction(invitation.rsvp) === "calendar";
   const t = useCustomText(invitation.customTexts);
   const locale = useLocale();
   const footerMonthDisplay = formatLocalizedMonthLong(
@@ -253,6 +256,8 @@ export default function InvitationPage({
 
   // Check localStorage on mount (client-only)
   useEffect(() => {
+    if (isCalendarCta) return;
+
     try {
       const slugs: string[] = JSON.parse(
         localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
@@ -261,7 +266,7 @@ export default function InvitationPage({
     } catch {
       // ignore
     }
-  }, [invitation.slug]);
+  }, [invitation.slug, isCalendarCta]);
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
 
@@ -896,74 +901,96 @@ export default function InvitationPage({
 
         <div className="flex flex-col items-center">
           {/* Confirmar Presença */}
-          <motion.button
-            onClick={() => setRsvpOpen(true)}
-            className="relative flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden px-4 py-4 font-medium transition-all"
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 13,
-              fontWeight: 500,
-              letterSpacing: 1,
-              background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
-              color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
-              borderRadius: theme.ctaRadius,
-              cursor: rsvpSubmitted ? "default" : "pointer",
-            }}
-            whileHover={
-              rsvpSubmitted
-                ? undefined
-                : {
-                    scale: 1.015,
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-                  }
-            }
-            whileTap={rsvpSubmitted ? undefined : { scale: 0.98 }}
-            transition={{ duration: 0.25, ease: EASE }}
-          >
-            {/* Shimmer sweep — only when not yet submitted */}
-            {!rsvpSubmitted && (
-              <motion.span
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%)",
-                  mixBlendMode: "overlay",
-                }}
-                initial={{ x: "-120%" }}
-                animate={{ x: "120%" }}
-                transition={{
-                  duration: 2.4,
-                  repeat: Infinity,
-                  repeatDelay: 3.4,
-                  ease: "easeInOut",
-                }}
-              />
-            )}
-
-            <motion.span
-              className="relative flex items-center"
-              animate={
+          {isCalendarCta ? (
+            <CalendarButton
+              date={invitation.date}
+              location={invitation.location}
+              couple={invitation.couple}
+              eventType={invitation.eventType}
+              className="relative flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden px-4 py-4 font-medium transition-transform active:scale-[0.96]"
+              style={{
+                fontFamily: theme.uiFont,
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: 1,
+                background: theme.ctaPrimaryBg,
+                color: theme.ctaPrimaryText,
+                borderRadius: theme.ctaRadius,
+              }}
+            >
+              <CalendarPlus size={17} strokeWidth={1.5} />
+              <span>{t("cta_addToCalendar")}</span>
+            </CalendarButton>
+          ) : (
+            <motion.button
+              onClick={() => setRsvpOpen(true)}
+              className="relative flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden px-4 py-4 font-medium transition-all"
+              style={{
+                fontFamily: theme.uiFont,
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: 1,
+                background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
+                color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
+                borderRadius: theme.ctaRadius,
+                cursor: rsvpSubmitted ? "default" : "pointer",
+              }}
+              whileHover={
                 rsvpSubmitted
                   ? undefined
                   : {
-                      scale: [1, 1.12, 1],
+                      scale: 1.015,
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
                     }
               }
-              transition={{
-                duration: 1.6,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              whileTap={rsvpSubmitted ? undefined : { scale: 0.98 }}
+              transition={{ duration: 0.25, ease: EASE }}
             >
-              <Heart size={17} strokeWidth={1.5} />
-            </motion.span>
-            <span className="relative">
-              {rsvpSubmitted
-                ? t("cta_confirmedButton")
-                : t("cta_confirmButton")}
-            </span>
-          </motion.button>
+              {/* Shimmer sweep — only when not yet submitted */}
+              {!rsvpSubmitted && (
+                <motion.span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%)",
+                    mixBlendMode: "overlay",
+                  }}
+                  initial={{ x: "-120%" }}
+                  animate={{ x: "120%" }}
+                  transition={{
+                    duration: 2.4,
+                    repeat: Infinity,
+                    repeatDelay: 3.4,
+                    ease: "easeInOut",
+                  }}
+                />
+              )}
+
+              <motion.span
+                className="relative flex items-center"
+                animate={
+                  rsvpSubmitted
+                    ? undefined
+                    : {
+                        scale: [1, 1.12, 1],
+                      }
+                }
+                transition={{
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <Heart size={17} strokeWidth={1.5} />
+              </motion.span>
+              <span className="relative">
+                {rsvpSubmitted
+                  ? t("cta_confirmedButton")
+                  : t("cta_confirmButton")}
+              </span>
+            </motion.button>
+          )}
         </div>
       </AnimatedSection>
 
@@ -1069,25 +1096,27 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* RSVP Modal                                                        */}
       {/* ================================================================= */}
-      <RSVPModal
-        open={rsvpOpen}
-        onClose={() => {
-          setRsvpOpen(false);
-          // Refresh submitted state after modal closes
-          try {
-            const slugs: string[] = JSON.parse(
-              localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
-            );
-            setRsvpSubmitted(slugs.includes(invitation.slug));
-          } catch {
-            // ignore
-          }
-        }}
-        invitation={invitation}
-        theme={theme}
-        customTexts={invitation.customTexts}
-        guest={invitation.guest}
-      />
+      {!isCalendarCta && (
+        <RSVPModal
+          open={rsvpOpen}
+          onClose={() => {
+            setRsvpOpen(false);
+            // Refresh submitted state after modal closes
+            try {
+              const slugs: string[] = JSON.parse(
+                localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+              );
+              setRsvpSubmitted(slugs.includes(invitation.slug));
+            } catch {
+              // ignore
+            }
+          }}
+          invitation={invitation}
+          theme={theme}
+          customTexts={invitation.customTexts}
+          guest={invitation.guest}
+        />
+      )}
       </ImageCanvas>
       </div>
     </SpacingStyleProvider>

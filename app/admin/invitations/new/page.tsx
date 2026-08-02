@@ -45,6 +45,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         },
         rsvp: {
           enabled: true,
+          ctaAction: "rsvp",
           deadline: "",
           showEmail: false,
           showDietaryRestrictions: true,

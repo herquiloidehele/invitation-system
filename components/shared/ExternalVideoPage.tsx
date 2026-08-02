@@ -15,15 +15,17 @@ import {
   useEffect,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart } from "lucide-react";
+import { CalendarPlus, Heart } from "lucide-react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import RSVPModal from "@/components/shared/RSVPModal";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
+import { getRsvpCtaAction } from "@/lib/rsvp-config";
 import { useCustomText } from "@/lib/custom-texts";
 import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
 import VideoPosterLayer from "./VideoPosterLayer";
 import { useVideoFrameReady } from "./useVideoFrameReady";
+import CalendarButton from "./CalendarButton";
 
 export interface ExternalVideoPageHandle {
   play: () => void;
@@ -52,15 +54,18 @@ const ExternalVideoPage = forwardRef<
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
+  const isCalendarCta = getRsvpCtaAction(invitation.rsvp) === "calendar";
   const t = useCustomText(invitation.customTexts);
 
   // Check localStorage on mount to update button label
   useEffect(() => {
+    if (isCalendarCta) return;
+
     const slugs: string[] = JSON.parse(
       localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
     );
     setRsvpSubmitted(slugs.includes(invitation.slug));
-  }, [invitation.slug]);
+  }, [invitation.slug, isCalendarCta]);
 
   // Clear timer on unmount
   useEffect(() => {
@@ -146,54 +151,90 @@ const ExternalVideoPage = forwardRef<
                 zIndex: 10,
               }}
             >
-              <button
-                onClick={() => {
-                  if (!rsvpSubmitted) setRsvpOpen(true);
-                }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 32px",
-                  borderRadius: theme.ctaRadius ?? "9999px",
-                  background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
-                  color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
-                  fontFamily: theme.uiFont,
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  letterSpacing: "0.01em",
-                  border: "none",
-                  cursor: rsvpSubmitted ? "default" : "pointer",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-                  width: "100%",
-                  maxWidth: "360px",
-                  justifyContent: "center",
-                }}
-              >
-                <Heart size={17} strokeWidth={1.5} />
-                {rsvpSubmitted
-                  ? t("cta_confirmedButton")
-                  : t("cta_confirmButton")}
-              </button>
+              {isCalendarCta ? (
+                <CalendarButton
+                  date={invitation.date}
+                  location={invitation.location}
+                  couple={invitation.couple}
+                  eventType={invitation.eventType}
+                  className="active:scale-[0.96] transition-transform"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "14px 32px",
+                    borderRadius: theme.ctaRadius ?? "9999px",
+                    background: theme.ctaPrimaryBg,
+                    color: theme.ctaPrimaryText,
+                    fontFamily: theme.uiFont,
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    letterSpacing: "0.01em",
+                    border: "none",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+                    width: "100%",
+                    maxWidth: "360px",
+                    justifyContent: "center",
+                  }}
+                >
+                  <CalendarPlus size={17} strokeWidth={1.5} />
+                  {t("cta_addToCalendar")}
+                </CalendarButton>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (!rsvpSubmitted) setRsvpOpen(true);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "14px 32px",
+                    borderRadius: theme.ctaRadius ?? "9999px",
+                    background: rsvpSubmitted
+                      ? "#22c55e"
+                      : theme.ctaPrimaryBg,
+                    color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
+                    fontFamily: theme.uiFont,
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    letterSpacing: "0.01em",
+                    border: "none",
+                    cursor: rsvpSubmitted ? "default" : "pointer",
+                    boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+                    width: "100%",
+                    maxWidth: "360px",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Heart size={17} strokeWidth={1.5} />
+                  {rsvpSubmitted
+                    ? t("cta_confirmedButton")
+                    : t("cta_confirmButton")}
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       {/* RSVP modal — rendered outside the fixed video container */}
-      <RSVPModal
-        open={rsvpOpen}
-        onClose={() => {
-          setRsvpOpen(false);
-          const slugs: string[] = JSON.parse(
-            localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
-          );
-          setRsvpSubmitted(slugs.includes(invitation.slug));
-        }}
-        invitation={invitation}
-        theme={theme}
-        customTexts={invitation.customTexts}
-      />
+      {!isCalendarCta && (
+        <RSVPModal
+          open={rsvpOpen}
+          onClose={() => {
+            setRsvpOpen(false);
+            const slugs: string[] = JSON.parse(
+              localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+            );
+            setRsvpSubmitted(slugs.includes(invitation.slug));
+          }}
+          invitation={invitation}
+          theme={theme}
+          customTexts={invitation.customTexts}
+        />
+      )}
     </>
   );
 });
