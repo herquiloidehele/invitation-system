@@ -10,7 +10,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatedSection } from "./AnimatedSection";
 import { LandingModelCard } from "./LandingModelCard";
 import { PhoneIframePreview } from "./PhoneIframePreview";
-import { SectionEyebrow } from "./SectionEyebrow";
 
 export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
   const t = useTranslations("LandingBestSellers");
@@ -44,9 +43,6 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
     <AnimatedSection id="destaques" className="bg-muted px-5 py-24 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="flex justify-center">
-            <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>
-          </div>
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
             {t("title")}
           </h2>
@@ -62,7 +58,6 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
             <AnimatePresence mode="popLayout">
               {items.map((item, index) => {
                 const featured = index === 1;
-                const indexLabel = String(index + 1).padStart(2, "0");
                 return (
                   <LandingModelCard
                     key={item.id}
@@ -74,7 +69,6 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                       animate: { opacity: 1, scale: 1 },
                       exit: { opacity: 0, scale: 0.96 },
                     }}
-                    badgeLabel={`${indexLabel} · ${t("badge")}`}
                     labels={{
                       fallbackTitle: t("fallbackTitle"),
                       previewAria: t("previewAria"),
