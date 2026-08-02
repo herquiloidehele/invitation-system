@@ -820,6 +820,10 @@ export default function ExternalInvitationForm({
     [currentTheme],
   );
 
+  const showPageContentAccordion =
+    subType === "external_link" ||
+    (subType === "external_video" && !isCurtainCanva && !isVideoEntrance);
+
   // Inject a sample guest so the personal guest card (and its background image)
   // renders in the live preview for guest-managed video-entrance / curtain-canva
   // invitations — the editor itself has no real per-recipient guest.
@@ -1871,7 +1875,7 @@ export default function ExternalInvitationForm({
                   composed around the embedded iframe. When all toggles are off
                   (and no heroImage / videoUrl is set) the public page renders
                   the bare fullscreen iframe behavior. */}
-              {subType === "external_link" && (
+              {showPageContentAccordion && (
                 <AccordionItem
                   value="externalLinkRich"
                   className="border rounded-lg px-4"

@@ -179,6 +179,17 @@ describe("external invitation editor source", () => {
   });
 });
 
+describe("video invitation page content source", () => {
+  it("shows the existing page-content accordion for generic videos", () => {
+    const source = readFileSync(
+      join(process.cwd(), "app/admin/invitations/ExternalInvitationForm.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain("showPageContentAccordion");
+  });
+});
+
 describe("isInitialCanvaEmbedPage", () => {
   const initial = "/canva-proxy/brindealstudio.com/sara-e-hugo?disableScroll=1";
 
