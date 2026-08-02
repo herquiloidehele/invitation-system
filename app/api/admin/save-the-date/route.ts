@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
+import { normalizeCurrency } from "@/lib/currency/config";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 
@@ -72,8 +73,7 @@ export async function POST(req: NextRequest) {
           typeof discountPriceFromCents === "number"
             ? discountPriceFromCents
             : null,
-        currency:
-          typeof currency === "string" && currency.length ? currency : "EUR",
+        currency: normalizeCurrency(currency),
         priceOverrides: readPriceOverridesInput(priceOverrides),
         landingModelName:
           typeof landingModelName === "string" && landingModelName.length

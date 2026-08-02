@@ -55,7 +55,7 @@ const ROUND_STEP: Record<Currency, number> = {
   MZN: 100,
 };
 
-// Formatting locale per currency → native symbol & grouping (R$, Kz, MTn, …).
+// Formatting locale per currency → native symbol & grouping (R$, MTn, …).
 export const CURRENCY_LOCALE: Record<Currency, string> = {
   EUR: "pt-PT",
   USD: "en-US",

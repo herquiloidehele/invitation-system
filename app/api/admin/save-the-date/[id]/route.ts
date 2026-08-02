@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
+import { normalizeCurrency } from "@/lib/currency/config";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 
@@ -85,10 +86,7 @@ export async function PUT(
               : null,
         }),
         ...(body.currency !== undefined && {
-          currency:
-            typeof body.currency === "string" && body.currency.length
-              ? body.currency
-              : "EUR",
+          currency: normalizeCurrency(body.currency),
         }),
         ...(body.priceOverrides !== undefined && {
           priceOverrides: readPriceOverridesInput(body.priceOverrides),

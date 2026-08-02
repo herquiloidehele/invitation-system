@@ -1,4 +1,5 @@
 import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
+import { normalizeCurrency } from "@/lib/currency/config";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { isObjectFit } from "@/lib/hero-media-fit";
 import { normalizeInvitationEventType } from "@/lib/invitation-event-types";
@@ -107,10 +108,7 @@ export function buildInvitationCreateData(
       typeof body.discountPriceFromCents === "number"
         ? body.discountPriceFromCents
         : null,
-    currency:
-      typeof body.currency === "string" && body.currency.length
-        ? body.currency
-        : "EUR",
+    currency: normalizeCurrency(body.currency),
     priceOverrides: readPriceOverridesInput(body.priceOverrides),
     landingModelName:
       typeof body.landingModelName === "string" && body.landingModelName.length

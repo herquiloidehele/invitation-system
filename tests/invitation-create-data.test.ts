@@ -48,4 +48,10 @@ describe("buildInvitationCreateData", () => {
     expect(data.priceOverrides).toBe(Prisma.JsonNull);
     expect(data.landingCustomizationLevel).toBe("fully_customizable");
   });
+
+  it("stores EUR when a new invitation submits the legacy AOA currency", () => {
+    const body = duplicateForm({ currency: "AOA" });
+    const data = buildInvitationCreateData(body, "theme_copy");
+    expect(data.currency).toBe("EUR");
+  });
 });

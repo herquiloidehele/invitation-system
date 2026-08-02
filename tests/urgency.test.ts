@@ -18,7 +18,6 @@ describe("formatUrgencySurcharge", () => {
   it("formats the fee in each supported currency", () => {
     expect(norm(formatUrgencySurcharge("EUR"))).toBe("25 €");
     expect(norm(formatUrgencySurcharge("MZN"))).toBe("1800 MZN");
-    expect(norm(formatUrgencySurcharge("AOA"))).toBe("24 000 Kz");
     expect(norm(formatUrgencySurcharge("BRL"))).toBe("R$ 155");
     expect(norm(formatUrgencySurcharge("USD"))).toBe("$27");
   });
