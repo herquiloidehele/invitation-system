@@ -94,6 +94,8 @@ interface InvitationHeroProps {
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
   prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
+  videoRef?: RefObject<HTMLVideoElement | null>;
+  autoPlay?: boolean;
   /** Play the hero text blocks' entrance animation (guest reveal only). */
   animateHeroText?: boolean;
 }
@@ -103,6 +105,8 @@ export default function InvitationHero({
   theme,
   audioRef,
   prefetchedVideoRef,
+  videoRef,
+  autoPlay = true,
   animateHeroText = false,
 }: InvitationHeroProps) {
   const ts: ResolvedTextStyles = resolveTextStyles(
@@ -139,8 +143,9 @@ export default function InvitationHero({
     invitation.heroScrollIndicator,
   );
   const directVideoRef = useRef<HTMLVideoElement | null>(null);
+  const activeVideoRef = videoRef ?? directVideoRef;
   const directVideoReady = useVideoFrameReady(
-    directVideoRef,
+    activeVideoRef,
     invitation.videoUrl ?? "",
   );
 
@@ -164,7 +169,7 @@ export default function InvitationHero({
         ) : (
           <div className="absolute inset-0 z-0 h-full w-full">
             <video
-              ref={directVideoRef}
+              ref={activeVideoRef}
               src={invitation.videoUrl}
               poster={invitation.videoPoster}
               muted

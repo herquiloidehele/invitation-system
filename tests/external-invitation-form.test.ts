@@ -10,7 +10,7 @@ import {
   resolveCanvaEmbedPageState,
   shouldPreloadRichExternalCanva,
   shouldShowRichExternalRsvp,
-  shouldShowVideoEntranceInitialSections,
+  shouldShowVideoEntranceInitialSections
 } from "../lib/external-invitation-form";
 import type { InvitationData } from "../lib/types";
 
@@ -388,9 +388,7 @@ describe("external invitation helper source", () => {
       "utf8",
     );
 
-    expect(richSource).toContain(
-      "shape={invitation.scratchReveal?.shape}",
-    );
+    expect(richSource).toContain("shape={invitation.scratchReveal?.shape}");
     expect(revealableSource).toContain(
       "shape={invitation.scratchReveal?.shape}",
     );

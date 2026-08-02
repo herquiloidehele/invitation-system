@@ -97,6 +97,7 @@ import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import CurtainCanvaPage from "@/components/curtain-canva/CurtainCanvaPage";
 import VideoEntrancePage from "@/components/video-entrance/VideoEntrancePage";
 import { PREVIEW_SAMPLE_GUEST } from "@/components/shared/PersonalGuestCard";
+import InvitationHero from "@/components/shared/InvitationHero";
 import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
 import {
   isCurtainCanvaLayout,
@@ -661,7 +662,10 @@ export default function ExternalInvitationForm({
     ) => {
       setForm((prev) => {
         const cardStyles = { ...prev.cardStyles };
-        const sectionStyle = { ...cardStyles[section], [field]: value || undefined };
+        const sectionStyle = {
+          ...cardStyles[section],
+          [field]: value || undefined,
+        };
         cardStyles[section] = Object.values(sectionStyle).some(
           (v) => v !== undefined,
         )
@@ -1565,9 +1569,7 @@ export default function ExternalInvitationForm({
                           <Input
                             id="externalVideoTime"
                             value={form.date.time}
-                            onChange={(e) =>
-                              updateDate("time", e.target.value)
-                            }
+                            onChange={(e) => updateDate("time", e.target.value)}
                             placeholder="16:00"
                           />
                         </div>
@@ -1576,6 +1578,229 @@ export default function ExternalInvitationForm({
                         A data de exibição, dia da semana, dia, mês e ano são
                         derivados automaticamente.
                       </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
+              {/* ── Shared hero controls for generic video invitations ── */}
+              {subType === "external_video" &&
+                !isCurtainCanva &&
+                !isVideoEntrance && (
+                  <AccordionItem
+                    value="externalVideoHero"
+                    className="border rounded-lg px-4"
+                  >
+                    <AccordionTrigger className="text-sm font-medium">
+                      Hero
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-5 pb-4">
+                      <p className="text-xs text-muted-foreground">
+                        Usa o vídeo carregado como fundo do hero e personaliza
+                        os textos, a leitura do vídeo e a indicação de scroll.
+                      </p>
+
+                      {/* Hero overlay */}
+                      <div className="space-y-3">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="extVideoScrimOpacity">
+                              Escurecimento do vídeo
+                            </Label>
+                            <span className="text-xs text-muted-foreground tabular-nums">
+                              {Math.round(
+                                (form.heroOverlay?.scrimOpacity ??
+                                  DEFAULT_SCRIM_OPACITY) * 100,
+                              )}
+                              %
+                            </span>
+                          </div>
+                          <input
+                            id="extVideoScrimOpacity"
+                            type="range"
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={Math.round(
+                              (form.heroOverlay?.scrimOpacity ??
+                                DEFAULT_SCRIM_OPACITY) * 100,
+                            )}
+                            onChange={(e) =>
+                              update("heroOverlay", {
+                                ...(form.heroOverlay ?? {}),
+                                scrimOpacity:
+                                  parseInt(e.target.value, 10) / 100,
+                              })
+                            }
+                            className="w-full accent-foreground cursor-pointer"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="extVideoGradientStart">
+                              Início do gradiente inferior
+                            </Label>
+                            <span className="text-xs text-muted-foreground tabular-nums">
+                              {form.heroOverlay?.gradientStart ??
+                                DEFAULT_GRADIENT_START_VIDEO}
+                              %
+                            </span>
+                          </div>
+                          <input
+                            id="extVideoGradientStart"
+                            type="range"
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={
+                              form.heroOverlay?.gradientStart ??
+                              DEFAULT_GRADIENT_START_VIDEO
+                            }
+                            onChange={(e) =>
+                              update("heroOverlay", {
+                                ...(form.heroOverlay ?? {}),
+                                gradientStart: parseInt(e.target.value, 10),
+                              })
+                            }
+                            className="w-full accent-foreground cursor-pointer"
+                          />
+                        </div>
+                      </div>
+
+                      <HeroScrollIndicatorFields
+                        value={form.heroScrollIndicator}
+                        onChange={(v) => update("heroScrollIndicator", v)}
+                        themeTextPrimary={currentTheme?.textPrimary}
+                        idPrefix="extVideoHeroScrollIndicator"
+                      />
+
+                      {/* Default and free-positioned hero text */}
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label htmlFor="extVideoHideDefaultHeroText">
+                            Ocultar textos predefinidos do hero
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Esconde nomes, &amp; e citação para compor o hero
+                            livremente com textos próprios.
+                          </p>
+                        </div>
+                        <Switch
+                          id="extVideoHideDefaultHeroText"
+                          checked={form.heroTextLayer?.hideDefaultText === true}
+                          onCheckedChange={(checked) =>
+                            update("heroTextLayer", {
+                              ...(form.heroTextLayer ?? EMPTY_HERO_TEXT_LAYER),
+                              hideDefaultText: checked,
+                            })
+                          }
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        id="extVideoHeroTextEditor"
+                        onClick={() => setHeroTextEditorOpen(true)}
+                      >
+                        Editar textos do hero
+                        {form.heroTextLayer?.blocks?.length
+                          ? ` (${form.heroTextLayer.blocks.length})`
+                          : ""}
+                      </Button>
+
+                      {/* Hero copy */}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="extVideoMonogram">Monograma</Label>
+                        <Input
+                          id="extVideoMonogram"
+                          value={form.couple.monogram}
+                          onChange={(e) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              couple: {
+                                ...prev.couple,
+                                monogram: e.target.value,
+                              },
+                            }))
+                          }
+                          placeholder="A & B"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="extVideoQuote">Frase / citação</Label>
+                        <Textarea
+                          id="extVideoQuote"
+                          value={form.quote}
+                          onChange={(e) => update("quote", e.target.value)}
+                          rows={2}
+                          placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                        />
+                      </div>
+
+                      {/* Parents mode */}
+                      <div className="space-y-2 border-t pt-3">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Bênção dos pais</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Mostra a bênção, os nomes dos pais e a mensagem de
+                              convite no hero.
+                            </p>
+                          </div>
+                          <Switch
+                            checked={form.parents?.enabled === true}
+                            onCheckedChange={(v) => updateParents("enabled", v)}
+                          />
+                        </div>
+                        {form.parents?.enabled && (
+                          <div className="space-y-2 pt-2">
+                            <Textarea
+                              placeholder="Mensagem de bênção"
+                              value={form.parents.blessingMessage ?? ""}
+                              onChange={(e) =>
+                                updateParents("blessingMessage", e.target.value)
+                              }
+                              rows={2}
+                            />
+                            <Input
+                              placeholder="Mensagem de convite"
+                              value={form.parents.inviteMessage ?? ""}
+                              onChange={(e) =>
+                                updateParents("inviteMessage", e.target.value)
+                              }
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <Input
+                                placeholder="Pai da noiva"
+                                value={form.parents.bridesFather ?? ""}
+                                onChange={(e) =>
+                                  updateParents("bridesFather", e.target.value)
+                                }
+                              />
+                              <Input
+                                placeholder="Mãe da noiva"
+                                value={form.parents.bridesMother ?? ""}
+                                onChange={(e) =>
+                                  updateParents("bridesMother", e.target.value)
+                                }
+                              />
+                              <Input
+                                placeholder="Pai do noivo"
+                                value={form.parents.groomsFather ?? ""}
+                                onChange={(e) =>
+                                  updateParents("groomsFather", e.target.value)
+                                }
+                              />
+                              <Input
+                                placeholder="Mãe do noivo"
+                                value={form.parents.groomsMother ?? ""}
+                                onChange={(e) =>
+                                  updateParents("groomsMother", e.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 )}
@@ -2332,7 +2557,9 @@ export default function ExternalInvitationForm({
                         <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
                           <div className="flex items-center justify-between gap-4">
                             <div className="space-y-0.5">
-                              <Label>Limitar cada presente a um convidado</Label>
+                              <Label>
+                                Limitar cada presente a um convidado
+                              </Label>
                               <p className="text-xs text-muted-foreground">
                                 Cada presente poderá ser escolhido apenas uma
                                 vez.
@@ -3104,9 +3331,7 @@ export default function ExternalInvitationForm({
                     </p>
                     <Select
                       value={
-                        form.rsvp.ctaAction === "calendar"
-                          ? "calendar"
-                          : "rsvp"
+                        form.rsvp.ctaAction === "calendar" ? "calendar" : "rsvp"
                       }
                       onValueChange={(value) => {
                         if (value) updateRsvp("ctaAction", value);
@@ -3499,35 +3724,35 @@ export default function ExternalInvitationForm({
           <TabsContent value="invite" className="flex-1 overflow-hidden m-0">
             <SpacingStyleProvider spacingStyles={form.spacingStyles}>
               <div className="relative h-full max-h-165 overflow-hidden bg-black">
-              {isVideoEntrance ? (
-                /* Video-entrance layout: render the actual public-facing page
+                {isVideoEntrance ? (
+                  /* Video-entrance layout: render the actual public-facing page
                    so admins see the entrance video, timed text reveal, and the
                    external sections exactly as guests will. */
-                <InlineTextEditProvider
-                  updateTextStyleElement={updateTextStyleElement}
-                  textStyles={form.textStyles}
-                >
-                  <InlineCardEditProvider
-                    updateCardStyle={updateCardStyle}
-                    updateSectionSpacing={updateSectionSpacing}
-                    cardStyles={form.cardStyles}
-                    spacingStyles={form.spacingStyles}
+                  <InlineTextEditProvider
+                    updateTextStyleElement={updateTextStyleElement}
+                    textStyles={form.textStyles}
                   >
-                    <TextStyleToolbar />
-                    <CardStyleToolbar />
-                    <div
-                      ref={previewRootRef}
-                      className="absolute inset-0 overflow-y-auto bg-background"
+                    <InlineCardEditProvider
+                      updateCardStyle={updateCardStyle}
+                      updateSectionSpacing={updateSectionSpacing}
+                      cardStyles={form.cardStyles}
+                      spacingStyles={form.spacingStyles}
                     >
-                      <VideoEntrancePage
-                        invitation={previewInvitation}
-                        theme={currentTheme as TemplateTheme}
-                      />
-                    </div>
-                  </InlineCardEditProvider>
-                </InlineTextEditProvider>
-              ) : isCurtainCanva ? (
-                /* Curtain-Canva layout: render the actual public-facing page
+                      <TextStyleToolbar />
+                      <CardStyleToolbar />
+                      <div
+                        ref={previewRootRef}
+                        className="absolute inset-0 overflow-y-auto bg-background"
+                      >
+                        <VideoEntrancePage
+                          invitation={previewInvitation}
+                          theme={currentTheme as TemplateTheme}
+                        />
+                      </div>
+                    </InlineCardEditProvider>
+                  </InlineTextEditProvider>
+                ) : isCurtainCanva ? (
+                  /* Curtain-Canva layout: render the actual public-facing page
                    so admins see exactly what guests will see (curtains hero,
                    scratch reveal, Canva iframe section, inline RSVP). The
                    preview is scrollable inside the pane.
@@ -3538,85 +3763,104 @@ export default function ExternalInvitationForm({
                    the floating TextStyleToolbar so the admin can adjust per-
                    element font/size/weight/color overrides exactly like in
                    the standard invitation preview. */
-                <InlineTextEditProvider
-                  updateTextStyleElement={updateTextStyleElement}
-                  textStyles={form.textStyles}
-                >
-                  <InlineCardEditProvider
-                    updateCardStyle={updateCardStyle}
-                    updateSectionSpacing={updateSectionSpacing}
-                    cardStyles={form.cardStyles}
-                    spacingStyles={form.spacingStyles}
+                  <InlineTextEditProvider
+                    updateTextStyleElement={updateTextStyleElement}
+                    textStyles={form.textStyles}
                   >
-                    <TextStyleToolbar />
-                    <CardStyleToolbar />
-                    <div
-                      ref={previewRootRef}
-                      className="absolute inset-0 overflow-y-auto bg-background"
+                    <InlineCardEditProvider
+                      updateCardStyle={updateCardStyle}
+                      updateSectionSpacing={updateSectionSpacing}
+                      cardStyles={form.cardStyles}
+                      spacingStyles={form.spacingStyles}
                     >
-                      <CurtainCanvaPage
-                        invitation={previewInvitation}
-                        theme={currentTheme as TemplateTheme}
-                      />
-                    </div>
-                  </InlineCardEditProvider>
-                </InlineTextEditProvider>
-              ) : subType === "external_video" ? (
-                form.videoUrl ? (
-                  <video
-                    src={form.videoUrl}
-                    controls
-                    playsInline
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                    Carrega um vídeo para ver a pré-visualização do convite
-                  </div>
-                )
-              ) : subType === "external_link" &&
-                hasRichExternalSections(form) ? (
-                /* Rich external_link layout: render the actual public-facing
+                      <TextStyleToolbar />
+                      <CardStyleToolbar />
+                      <div
+                        ref={previewRootRef}
+                        className="absolute inset-0 overflow-y-auto bg-background"
+                      >
+                        <CurtainCanvaPage
+                          invitation={previewInvitation}
+                          theme={currentTheme as TemplateTheme}
+                        />
+                      </div>
+                    </InlineCardEditProvider>
+                  </InlineTextEditProvider>
+                ) : subType === "external_video" ? (
+                  <InlineTextEditProvider
+                    updateTextStyleElement={updateTextStyleElement}
+                    textStyles={form.textStyles}
+                  >
+                    <InlineCardEditProvider
+                      updateCardStyle={updateCardStyle}
+                      updateSectionSpacing={updateSectionSpacing}
+                      cardStyles={form.cardStyles}
+                      spacingStyles={form.spacingStyles}
+                    >
+                      <TextStyleToolbar />
+                      <CardStyleToolbar />
+                      <div
+                        ref={previewRootRef}
+                        className="absolute inset-0 overflow-y-auto bg-background"
+                      >
+                        {form.videoUrl ? (
+                          <InvitationHero
+                            invitation={previewInvitation}
+                            theme={currentTheme as TemplateTheme}
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                            Carrega um vídeo para ver a pré-visualização do
+                            convite
+                          </div>
+                        )}
+                      </div>
+                    </InlineCardEditProvider>
+                  </InlineTextEditProvider>
+                ) : subType === "external_link" &&
+                  hasRichExternalSections(form) ? (
+                  /* Rich external_link layout: render the actual public-facing
                    page so admins see hero / scratch / iframe / RSVP composed
                    exactly as guests will. InlineTextEditProvider wires up the
                    TextStyleToolbar for per-element overrides. */
-                <InlineTextEditProvider
-                  updateTextStyleElement={updateTextStyleElement}
-                  textStyles={form.textStyles}
-                >
-                  <InlineCardEditProvider
-                    updateCardStyle={updateCardStyle}
-                    updateSectionSpacing={updateSectionSpacing}
-                    cardStyles={form.cardStyles}
-                    spacingStyles={form.spacingStyles}
+                  <InlineTextEditProvider
+                    updateTextStyleElement={updateTextStyleElement}
+                    textStyles={form.textStyles}
                   >
-                    <TextStyleToolbar />
-                    <CardStyleToolbar />
-                    <div
-                      ref={previewRootRef}
-                      className="absolute inset-0 overflow-y-auto bg-background"
+                    <InlineCardEditProvider
+                      updateCardStyle={updateCardStyle}
+                      updateSectionSpacing={updateSectionSpacing}
+                      cardStyles={form.cardStyles}
+                      spacingStyles={form.spacingStyles}
                     >
-                      <RichExternalLinkPage
-                        invitation={form}
-                        theme={currentTheme as TemplateTheme}
-                        isPreview
-                      />
-                    </div>
-                  </InlineCardEditProvider>
-                </InlineTextEditProvider>
-              ) : form.externalLink ? (
-                <iframe
-                  src={externalEmbedSrc}
-                  title="Convite externo"
-                  allowFullScreen
-                  loading="eager"
-                  className="absolute inset-0 h-full w-full border-0 bg-background"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                  Introduz o link externo para ver a pré-visualização do convite
-                </div>
-              )}
+                      <TextStyleToolbar />
+                      <CardStyleToolbar />
+                      <div
+                        ref={previewRootRef}
+                        className="absolute inset-0 overflow-y-auto bg-background"
+                      >
+                        <RichExternalLinkPage
+                          invitation={form}
+                          theme={currentTheme as TemplateTheme}
+                          isPreview
+                        />
+                      </div>
+                    </InlineCardEditProvider>
+                  </InlineTextEditProvider>
+                ) : form.externalLink ? (
+                  <iframe
+                    src={externalEmbedSrc}
+                    title="Convite externo"
+                    allowFullScreen
+                    loading="eager"
+                    className="absolute inset-0 h-full w-full border-0 bg-background"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                    Introduz o link externo para ver a pré-visualização do
+                    convite
+                  </div>
+                )}
               </div>
             </SpacingStyleProvider>
           </TabsContent>

@@ -3,8 +3,8 @@
 /* ------------------------------------------------------------------ */
 /*  ExternalVideoPage                                                   */
 /*                                                                      */
-/*  Full-screen autoplay video — no controls, no chrome.               */
-/*  Fixed RSVP button at the bottom opens the shared RSVPModal.        */
+/*  Hero-only video invitation — shared hero text/media plus CTA.       */
+/*  Fixed RSVP/calendar button opens the shared RSVP flow.              */
 /* ------------------------------------------------------------------ */
 
 import {
@@ -22,13 +22,23 @@ import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { getRsvpCtaAction } from "@/lib/rsvp-config";
 import { useCustomText } from "@/lib/custom-texts";
-import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
-import VideoPosterLayer from "./VideoPosterLayer";
-import { useVideoFrameReady } from "./useVideoFrameReady";
+import InvitationHero from "./InvitationHero";
 import CalendarButton from "./CalendarButton";
 
 export interface ExternalVideoPageHandle {
   play: () => void;
+}
+
+function readRsvpSubmitted(slug: string, isCalendarCta: boolean): boolean {
+  if (isCalendarCta || typeof window === "undefined") return false;
+  try {
+    const slugs: string[] = JSON.parse(
+      localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
+    );
+    return slugs.includes(slug);
+  } catch {
+    return false;
+  }
 }
 
 interface ExternalVideoPageProps {
@@ -36,6 +46,8 @@ interface ExternalVideoPageProps {
   videoPoster?: string;
   /** When false the wrapper is invisible but still mounted (preloading). */
   visible?: boolean;
+  /** Admin preview uses the hero's normal autoplay behavior. */
+  autoPlay?: boolean;
   invitation: InvitationData;
   theme: TemplateTheme;
 }
@@ -44,28 +56,29 @@ const ExternalVideoPage = forwardRef<
   ExternalVideoPageHandle,
   ExternalVideoPageProps
 >(function ExternalVideoPage(
-  { videoUrl, videoPoster, visible = true, invitation, theme },
+  {
+    videoUrl,
+    videoPoster,
+    visible = true,
+    autoPlay = false,
+    invitation,
+    theme,
+  },
   ref,
 ) {
-  const mediaFit = resolveHeroMediaFit(invitation.heroMediaFit);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const videoReady = useVideoFrameReady(videoRef, videoUrl);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [rsvpOpen, setRsvpOpen] = useState(false);
-  const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const isCalendarCta = getRsvpCtaAction(invitation.rsvp) === "calendar";
+  const [rsvpSubmitted, setRsvpSubmitted] = useState(() =>
+    readRsvpSubmitted(invitation.slug, isCalendarCta),
+  );
   const t = useCustomText(invitation.customTexts);
-
-  // Check localStorage on mount to update button label
-  useEffect(() => {
-    if (isCalendarCta) return;
-
-    const slugs: string[] = JSON.parse(
-      localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
-    );
-    setRsvpSubmitted(slugs.includes(invitation.slug));
-  }, [invitation.slug, isCalendarCta]);
+  const heroInvitation =
+    invitation.videoUrl === videoUrl && invitation.videoPoster === videoPoster
+      ? invitation
+      : { ...invitation, videoUrl, videoPoster };
 
   // Clear timer on unmount
   useEffect(() => {
@@ -104,29 +117,12 @@ const ExternalVideoPage = forwardRef<
           transition: "opacity 0.8s ease",
         }}
       >
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          poster={videoPoster}
-          loop
-          playsInline
-          preload="auto"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: mediaFit,
-            display: "block",
-          }}
-        />
-
-        <VideoPosterLayer
-          posterUrl={videoPoster}
-          visible={!videoReady}
-          mediaFit={mediaFit}
-          zIndex={1}
+        <InvitationHero
+          invitation={heroInvitation}
+          theme={theme}
+          videoRef={videoRef}
+          autoPlay={autoPlay}
+          animateHeroText
         />
 
         {/* Fixed RSVP button — slides up 4 s after video starts */}
@@ -192,9 +188,7 @@ const ExternalVideoPage = forwardRef<
                     gap: "8px",
                     padding: "14px 32px",
                     borderRadius: theme.ctaRadius ?? "9999px",
-                    background: rsvpSubmitted
-                      ? "#22c55e"
-                      : theme.ctaPrimaryBg,
+                    background: rsvpSubmitted ? "#22c55e" : theme.ctaPrimaryBg,
                     color: rsvpSubmitted ? "#fff" : theme.ctaPrimaryText,
                     fontFamily: theme.uiFont,
                     fontSize: "15px",
@@ -225,10 +219,7 @@ const ExternalVideoPage = forwardRef<
           open={rsvpOpen}
           onClose={() => {
             setRsvpOpen(false);
-            const slugs: string[] = JSON.parse(
-              localStorage.getItem(RSVP_SUBMITTED_SLUGS_KEY) ?? "[]",
-            );
-            setRsvpSubmitted(slugs.includes(invitation.slug));
+            setRsvpSubmitted(readRsvpSubmitted(invitation.slug, isCalendarCta));
           }}
           invitation={invitation}
           theme={theme}

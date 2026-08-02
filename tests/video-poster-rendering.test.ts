@@ -35,7 +35,7 @@ describe("VideoPosterLayer", () => {
 });
 
 describe("hero video poster wiring", () => {
-  it("wires standard, prefetched, and external video posters", () => {
+  it("wires standard, prefetched, and shared-hero video posters", () => {
     const prefetchedSlot = readFileSync(
       "components/shared/PrefetchedVideoSlot.tsx",
       "utf8",
@@ -57,15 +57,11 @@ describe("hero video poster wiring", () => {
     expect(prefetchedSlot).toContain(
       'useVideoFrameReady(videoRef, posterUrl ?? "")',
     );
-    expect(invitationHero).toContain(
-      "posterUrl={invitation.videoPoster}",
-    );
+    expect(invitationHero).toContain("posterUrl={invitation.videoPoster}");
     expect(invitationView).toContain("poster={invitation.videoPoster}");
-    expect(invitationView).toContain(
-      "videoPoster={invitation.videoPoster}",
-    );
-    expect(externalVideo).toContain("<VideoPosterLayer");
-    expect(externalVideo).toContain("poster={videoPoster}");
+    expect(invitationView).toContain("videoPoster={invitation.videoPoster}");
+    expect(externalVideo).toContain("<InvitationHero");
+    expect(externalVideo).toContain("videoRef={videoRef}");
   });
 
   it("uses presented-frame readiness in curtain and entrance heroes", () => {

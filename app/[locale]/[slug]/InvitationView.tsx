@@ -12,10 +12,16 @@ import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { isVideoEntranceLayout } from "@/lib/video-entrance";
 import { shouldRenderVideoSequenceCover } from "@/lib/cover-videos";
 import { isElegantFloralLayout } from "@/lib/elegant-floral";
-import { hasRichExternalSections, shouldPreloadRichExternalCanva } from "@/lib/external-invitation-form";
+import {
+  hasRichExternalSections,
+  shouldPreloadRichExternalCanva,
+} from "@/lib/external-invitation-form";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
-import { fireCelebrationConfetti, resolveEnvelopeConfettiColors } from "@/lib/confetti";
+import {
+  fireCelebrationConfetti,
+  resolveEnvelopeConfettiColors,
+} from "@/lib/confetti";
 
 // Each invitation type renders exactly one of these pages. Splitting them
 // behind dynamic imports keeps the per-guest bundle to just the path
@@ -146,11 +152,9 @@ function EnvelopeInvitationView({
     !!effectiveExternalLink &&
     !isRichExternalLink;
 
-  // Standard invitations with a hero video need the bytes pre-buffered
-  // before the invite is opened, so the video plays instantly.
-  // Rich external_link invitations may also have a hero video for their
-  // InvitationHero section — share the same prefetch slot.
-  const isStandardWithVideo =
+  // Standard/rich invitations use a hidden prefetch slot for the shared hero.
+  // Generic external_video invitations preload inside their hero-only page.
+  const isHeroVideoInvitation =
     ((invitation.invitationType ?? "standard") === "standard" ||
       isRichExternalLink) &&
     !!invitation.videoUrl;
@@ -165,9 +169,7 @@ function EnvelopeInvitationView({
   // The video-sequence cover replaces the envelope for every invitation type
   // (standard, external_video, external_link — bare or rich). Each type's
   // existing handoff runs when the last clip ends: standard/rich fade in their
-  // content, bare external_link reveals its preloaded iframe, and external_video
-  // plays imperatively (keeping its own muted-autoplay fallback if iOS blocks
-  // sound after the longer cover).
+  // content and bare external_link reveals its preloaded iframe.
   const usesVideoCover =
     shouldRenderVideoSequenceCover(invitation.coverVideos) && !videoCoverFailed;
 
@@ -358,8 +360,8 @@ function EnvelopeInvitationView({
 
     const type = invitation.invitationType ?? "standard";
 
-    // For external video: play imperatively (within the gesture context) and
-    // reveal the video. The <video> element is already mounted and preloading.
+    // Generic external videos use the hero-only page, which renders the
+    // uploaded video and the existing hero controls without other sections.
     if (type === "external_video") {
       videoRef.current?.play();
       setVideoVisible(true);
@@ -398,8 +400,6 @@ function EnvelopeInvitationView({
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
-    // External link/video are rendered as persistent siblings (outside this
-    // AnimatePresence) so they can prefetch behind the envelope cover.
     // Elegant-floral keeps the envelope shell but swaps the post-envelope page.
     if (isElegantFloralLayout(theme)) {
       return (
@@ -407,7 +407,7 @@ function EnvelopeInvitationView({
           invitation={invitation}
           theme={theme}
           audioRef={audioRef}
-          prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+          prefetchedVideoRef={isHeroVideoInvitation ? heroVideoRef : undefined}
           isLandingPreview={isLandingPreview}
           animateHeroText
         />
@@ -419,7 +419,7 @@ function EnvelopeInvitationView({
         invitation={invitation}
         theme={theme}
         audioRef={audioRef}
-        prefetchedVideoRef={isStandardWithVideo ? heroVideoRef : undefined}
+        prefetchedVideoRef={isHeroVideoInvitation ? heroVideoRef : undefined}
         isLandingPreview={isLandingPreview}
         animateHeroText
       />
@@ -438,7 +438,7 @@ function EnvelopeInvitationView({
         className="relative min-h-dvh w-full overflow-hidden"
         style={{ maxWidth: "500px", backgroundColor: theme.bg }}
       >
-        {/* External video — mounted immediately for preloading, revealed after animation */}
+        {/* Generic external video — hero only, revealed after the envelope. */}
         {isExternalVideo && (
           <ExternalVideoPage
             ref={videoRef}
@@ -485,7 +485,7 @@ function EnvelopeInvitationView({
               theme={theme}
               audioRef={audioRef}
               prefetchedVideoRef={
-                isStandardWithVideo ? heroVideoRef : undefined
+                isHeroVideoInvitation ? heroVideoRef : undefined
               }
               isLandingPreview={isLandingPreview}
               animateHeroText={richExternalLinkVisible}
@@ -497,12 +497,12 @@ function EnvelopeInvitationView({
           </motion.div>
         )}
 
-        {/* Persistent prefetch video — mounted once and reused by InvitationPage
+        {/* Persistent prefetch video — mounted once and reused by InvitationHero
             via ref so the browser never re-downloads the video. `preload`
             stays at "metadata" until the user taps the envelope, at which
             point `handleOpen` upgrades it to a full fetch. This saves
             ~3 MB of mobile data for guests who never tap. */}
-        {isStandardWithVideo && (
+        {isHeroVideoInvitation && (
           <video
             ref={heroVideoRef}
             src={invitation.videoUrl!}
