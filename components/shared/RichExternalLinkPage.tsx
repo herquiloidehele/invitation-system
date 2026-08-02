@@ -2,11 +2,7 @@
 
 import { type MutableRefObject, type RefObject, useLayoutEffect, useState } from "react";
 
-import type {
-  CardSectionKey,
-  InvitationData,
-  TemplateTheme,
-} from "@/lib/types";
+import type { CardSectionKey, InvitationData, TemplateTheme } from "@/lib/types";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
@@ -274,66 +270,66 @@ export default function RichExternalLinkPage({
               </div>
             )}
 
-           <CanvaEmbed
-             externalLink={externalLink}
-             theme={theme}
+          <CanvaEmbed
+            externalLink={externalLink}
+            theme={theme}
             title="Convite"
             onInitialPageChange={(isInitialPage) =>
               setCanvaPageState({ externalLink, isInitialPage })
             }
             preloading={canvaPreloading}
-             guest={invitation.guest ?? null}
-           />
+            guest={invitation.guest ?? null}
+          />
 
-           {shouldRenderCoupleGallery(invitation) && (
-             <CoupleGallery
-               invitation={invitation}
-               theme={theme}
-               isPreview={isPreview}
-             />
-           )}
+          {shouldRenderCoupleGallery(invitation) && (
+            <CoupleGallery
+              invitation={invitation}
+              theme={theme}
+              isPreview={isPreview}
+            />
+          )}
 
-           {invitation.giftRegistry.enabled && (
-             <EditableCard sectionKey="giftRegistry">
-               <div
-                 id="gifts"
-                 className="flex flex-col items-center gap-3 mx-4"
-                 style={{
-                   background: cs("giftRegistry", 16).cardBg,
-                   backdropFilter: "blur(12px)",
-                   WebkitBackdropFilter: "blur(12px)",
-                   borderRadius: cs("giftRegistry", 16).borderRadius,
-                   padding: "24px 14px",
-                   boxShadow:
-                     "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                   border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
-                 }}
-               >
-                 <GiftsSection
-                   giftRegistry={invitation.giftRegistry}
-                   theme={theme}
-                   ts={ts}
-                   cardStyle={cs("giftRegistry", 16)}
-                   slug={invitation.slug}
-                   guestToken={invitation.guest?.token}
-                   t={t}
-                 />
-               </div>
-             </EditableCard>
-           )}
+          {invitation.giftRegistry.enabled && (
+            <EditableCard sectionKey="giftRegistry">
+              <div
+                id="gifts"
+                className="flex flex-col items-center gap-3 mx-4"
+                style={{
+                  background: cs("giftRegistry", 16).cardBg,
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  borderRadius: cs("giftRegistry", 16).borderRadius,
+                  padding: "24px 14px",
+                  boxShadow:
+                    "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                  border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
+                }}
+              >
+                <GiftsSection
+                  giftRegistry={invitation.giftRegistry}
+                  theme={theme}
+                  ts={ts}
+                  cardStyle={cs("giftRegistry", 16)}
+                  slug={invitation.slug}
+                  guestToken={invitation.guest?.token}
+                  t={t}
+                />
+              </div>
+            </EditableCard>
+          )}
 
-           {invitation.faqs && invitation.faqs.length > 0 && (
-             <FaqSection
-               faqs={invitation.faqs}
-               theme={theme}
-               textStyles={invitation.textStyles}
-               customTexts={invitation.customTexts}
-               cardStyle={cs("faqs", 20)}
-               isPreview={isPreview}
-             />
-           )}
+          {invitation.faqs && invitation.faqs.length > 0 && (
+            <FaqSection
+              faqs={invitation.faqs}
+              theme={theme}
+              textStyles={invitation.textStyles}
+              customTexts={invitation.customTexts}
+              cardStyle={cs("faqs", 20)}
+              isPreview={isPreview}
+            />
+          )}
 
-           <PlacesSection
+          <PlacesSection
             invitation={invitation}
             theme={theme}
             cardStyle={{
@@ -361,13 +357,9 @@ export default function RichExternalLinkPage({
                 }
               >
                 <div className="max-w-[600px] mx-auto">
-                  <div
-                    data-rsvp-card="true"
-                    className="overflow-hidden"
-                  >
+                  <div data-rsvp-card="true" className="overflow-hidden">
                     <RSVPForm
                       inline
-                      inlineSurface
                       invitation={invitation}
                       theme={theme}
                       customTexts={invitation.customTexts}
