@@ -1,7 +1,7 @@
 // Pure currency configuration + math. No I/O, no Prisma, no next/* imports —
 // safe to import from both server and client components.
 
-export const SUPPORTED_CURRENCIES = ["EUR", "MZN", "AOA", "BRL", "USD"] as const;
+export const SUPPORTED_CURRENCIES = ["EUR", "MZN", "BRL", "USD"] as const;
 export type Currency = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const BASE_CURRENCY: Currency = "EUR";
@@ -23,7 +23,6 @@ export function isSupportedCurrency(value: unknown): value is Currency {
 // Eurozone) resolves to the EUR fallback, which is exactly the desired behavior.
 const COUNTRY_CURRENCY: Record<string, Currency> = {
   MZ: "MZN",
-  AO: "AOA",
   BR: "BRL",
   US: "USD",
 };
@@ -33,12 +32,17 @@ export function currencyForCountry(country: string | null | undefined): Currency
   return COUNTRY_CURRENCY[country.toUpperCase()] ?? FALLBACK_CURRENCY;
 }
 
+/** Normalize persisted currency values after the legacy AOA market was removed. */
+export function normalizeCurrency(value: unknown): Currency {
+  if (value === "AOA") return FALLBACK_CURRENCY;
+  return isSupportedCurrency(value) ? value : FALLBACK_CURRENCY;
+}
+
 // Hand-maintained EUR-based rates. 1 EUR = N units of the currency. Seeded with
 // current approximate rates; per-template overrides cover any inaccuracy.
 const EUR_RATES: Record<Currency, number> = {
   EUR: 1,
   MZN: 70,
-  AOA: 950,
   BRL: 6.2,
   USD: 1.08,
 };
@@ -49,7 +53,6 @@ const ROUND_STEP: Record<Currency, number> = {
   USD: 1,
   BRL: 5,
   MZN: 100,
-  AOA: 500,
 };
 
 // Formatting locale per currency → native symbol & grouping (R$, Kz, MTn, …).
@@ -58,7 +61,6 @@ export const CURRENCY_LOCALE: Record<Currency, string> = {
   USD: "en-US",
   BRL: "pt-BR",
   MZN: "pt-MZ",
-  AOA: "pt-AO",
 };
 
 /** Convert an EUR amount in cents to `target` minor units, rounded to a clean step. */
@@ -75,7 +77,6 @@ export function deriveCents(baseEurCents: number, target: Currency): number {
 export const CURRENCY_SYMBOL: Record<Currency, string> = {
   EUR: "€",
   MZN: "MZN",
-  AOA: "Kz",
   BRL: "R$",
   USD: "$",
 };

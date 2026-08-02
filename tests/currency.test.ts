@@ -3,6 +3,7 @@ import {
   currencyForCountry,
   deriveCents,
   isSupportedCurrency,
+  normalizeCurrency,
   BASE_CURRENCY,
   FALLBACK_CURRENCY,
 } from "@/lib/currency/config";
@@ -12,9 +13,9 @@ import {
 } from "@/lib/currency/template-price";
 
 describe("currencyForCountry", () => {
-  it("maps the four explicit markets", () => {
+  it("maps Angola to the EUR fallback and keeps other explicit markets", () => {
     expect(currencyForCountry("MZ")).toBe("MZN");
-    expect(currencyForCountry("AO")).toBe("AOA");
+    expect(currencyForCountry("AO")).toBe("EUR");
     expect(currencyForCountry("BR")).toBe("BRL");
     expect(currencyForCountry("US")).toBe("USD");
   });
@@ -33,6 +34,16 @@ describe("currencyForCountry", () => {
   });
 });
 
+describe("normalizeCurrency", () => {
+  it("normalizes legacy and unknown persisted currency values", () => {
+    expect(normalizeCurrency("AOA")).toBe("EUR");
+    expect(normalizeCurrency("EUR")).toBe("EUR");
+    expect(normalizeCurrency("MZN")).toBe("MZN");
+    expect(normalizeCurrency("GBP")).toBe("EUR");
+    expect(normalizeCurrency(null)).toBe("EUR");
+  });
+});
+
 describe("deriveCents", () => {
   it("returns the base unchanged for the base currency", () => {
     expect(BASE_CURRENCY).toBe("EUR");
@@ -40,20 +51,20 @@ describe("deriveCents", () => {
   });
 
   it("converts an EUR base to clean, step-rounded amounts (in minor units)", () => {
-    // 149 € seed: MZN 149*70=10430 -> step 100 -> 10400; AOA 149*950 -> step 500 -> 141500;
+    // 149 € seed: MZN 149*70=10430 -> step 100 -> 10400;
     // BRL 149*6.2=923.8 -> step 5 -> 925; USD 149*1.08=160.92 -> step 1 -> 161.
     expect(deriveCents(14900, "MZN")).toBe(1040000);
-    expect(deriveCents(14900, "AOA")).toBe(14150000);
     expect(deriveCents(14900, "BRL")).toBe(92500);
     expect(deriveCents(14900, "USD")).toBe(16100);
   });
 });
 
 describe("isSupportedCurrency", () => {
-  it("accepts the five supported codes and rejects others", () => {
-    for (const c of ["EUR", "MZN", "AOA", "BRL", "USD"]) {
+  it("accepts only active currency codes", () => {
+    for (const c of ["EUR", "MZN", "BRL", "USD"]) {
       expect(isSupportedCurrency(c)).toBe(true);
     }
+    expect(isSupportedCurrency("AOA")).toBe(false);
     expect(isSupportedCurrency("GBP")).toBe(false);
     expect(isSupportedCurrency("eur")).toBe(false);
     expect(isSupportedCurrency(undefined)).toBe(false);

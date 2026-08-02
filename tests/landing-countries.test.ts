@@ -16,4 +16,8 @@ describe("served countries", () => {
       expect(SUPPORTED_CURRENCIES).toContain(currencyForCountry(code));
     }
   });
+
+  it("keeps Angola on the EUR price display", () => {
+    expect(currencyForCountry("AO")).toBe("EUR");
+  });
 });
