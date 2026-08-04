@@ -21,7 +21,8 @@ export type SaveDateStyle =
   | "countdown"
   | "quad-cards"
   | "cinematic"
-  | "minimal-line";
+  | "minimal-line"
+  | "inline-countdown";
 
 export interface CoupleInfo {
   bride: string;
@@ -519,6 +520,7 @@ export type ImageSettingsKey =
   | "sectionImage3"
   | "sectionImage4"
   | "cinematicImage"
+  | "saveTheDateBackground"
   | "locationImage1"
   | "locationImage2"
   | "envelopeTopFlap"
@@ -1189,6 +1191,8 @@ export interface InvitationData {
   saveDateStyle?: SaveDateStyle;
   /** Background image for the "cinematic" Save the Date style. Falls back to a default Unsplash photo if empty. */
   cinematicImageUrl?: string;
+  /** Shared background image for every Save the Date layout. */
+  saveTheDateBackgroundImageUrl?: string;
   /** Optional decorative images placed between sections and in the footer. Each falls back to a default Unsplash photo if not provided. */
   sectionImages?: SectionImages;
   /** Optional couple-photos gallery section (opt-in carousel). */

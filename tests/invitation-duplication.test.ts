@@ -45,6 +45,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "guestGuide",
       "saveDateStyle",
       "cinematicImageUrl",
+      "saveTheDateBackgroundImageUrl",
       "sectionImages",
       "coupleGallery",
       "coverVideos",

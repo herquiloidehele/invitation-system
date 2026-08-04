@@ -39,6 +39,7 @@ const baseRow = {
   guestGuide: null,
   saveDateStyle: null,
   cinematicImageUrl: null,
+  saveTheDateBackgroundImageUrl: null,
   sectionImages: null,
   coupleGallery: null,
   coverVideos: null,
@@ -93,6 +94,18 @@ describe("toAdminInvitationInitialData — landing customization", () => {
     });
 
     expect(result.landingCustomizationLevel).toBe("fully_customizable");
+  });
+});
+
+describe("toAdminInvitationInitialData — Save the Date background", () => {
+  it("hydrates the shared Save the Date background image", () => {
+    const imageUrl = "https://example.com/save-date-background.jpg";
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      saveTheDateBackgroundImageUrl: imageUrl,
+    });
+
+    expect(result.saveTheDateBackgroundImageUrl).toBe(imageUrl);
   });
 });
 

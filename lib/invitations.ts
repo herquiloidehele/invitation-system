@@ -69,6 +69,7 @@ type InvitationWithTheme = {
   envelope: unknown;
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
+  saveTheDateBackgroundImageUrl: string | null;
   sectionImages: unknown;
   coupleGallery: unknown;
   coverVideos: unknown;
@@ -148,6 +149,8 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     envelope: row.envelope as InvitationData["envelope"],
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
+    saveTheDateBackgroundImageUrl:
+      row.saveTheDateBackgroundImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     coupleGallery: (row.coupleGallery as CoupleGallery | null) ?? undefined,
     coverVideos:

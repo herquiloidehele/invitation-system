@@ -112,6 +112,8 @@ export const sourceInvitationRow = {
   guestGuide: { enabled: true, items: [] },
   saveDateStyle: "cinematic",
   cinematicImageUrl: "https://cdn.example.com/cinematic.jpg",
+  saveTheDateBackgroundImageUrl:
+    "https://cdn.example.com/save-date-background.jpg",
   sectionImages: { image1: "https://cdn.example.com/section.jpg" },
   coupleGallery: {
     enabled: true,

@@ -260,6 +260,22 @@ const SAVE_DATE_STYLE_OPTIONS: {
     ),
   },
   {
+    value: "inline-countdown",
+    label: "Contagem em Linha",
+    description: "Contador horizontal com valores grandes e etiquetas",
+    preview: (
+      <div className="flex flex-col items-center gap-0.5 py-2">
+        <div className="flex items-baseline gap-0.5 text-sm font-light tabular-nums">
+          21:03:12:41
+        </div>
+        <div className="text-[6px] uppercase tracking-wider opacity-60">
+          Dias&nbsp;&nbsp;&nbsp; Horas&nbsp;&nbsp;&nbsp; Minutos&nbsp;&nbsp;&nbsp;
+          Segundos
+        </div>
+      </div>
+    ),
+  },
+  {
     value: "quad-cards",
     label: "4 Cartões",
     description: "Grade 2×2 com dia, mês, ano e dia da semana",
@@ -489,6 +505,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     coverVideos: { enabled: false, items: [] },
     saveDateStyle: "classic",
     cinematicImageUrl: "",
+    saveTheDateBackgroundImageUrl: "",
     sectionImages: {},
     parents: {
       enabled: false,
@@ -2561,6 +2578,37 @@ export default function InvitationForm({
                         );
                       })}
                     </div>
+                  </div>
+
+                  {/* ── Shared Save the Date background ── */}
+                  <div className="space-y-2 pt-1 rounded-lg border border-dashed border-border p-3">
+                    <Label className="text-sm font-medium">
+                      Imagem de Fundo do Save the Date
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Uma única imagem partilhada por todos os estilos do Save
+                      the Date.
+                    </p>
+                    <MediaUpload
+                      kind="image"
+                      maxSizeMB={8}
+                      value={form.saveTheDateBackgroundImageUrl || undefined}
+                      onUpload={(url) =>
+                        update("saveTheDateBackgroundImageUrl", url)
+                      }
+                      onClear={() =>
+                        update("saveTheDateBackgroundImageUrl", "")
+                      }
+                    />
+                    {form.saveTheDateBackgroundImageUrl && (
+                      <ImagePositionEditor
+                        src={form.saveTheDateBackgroundImageUrl}
+                        settings={imgSettings("saveTheDateBackground")}
+                        onChange={(settings) =>
+                          updateImageSettings("saveTheDateBackground", settings)
+                        }
+                      />
+                    )}
                   </div>
 
                   {/* ── Cinematic image upload — shown only when cinematic is selected ── */}

@@ -19,6 +19,9 @@ describe("buildInvitationCreateData", () => {
     expect(data.rsvp).toEqual(body.rsvp);
     expect(data.heroImage).toBe(body.heroImage);
     expect(data.videoUrl).toBe(body.videoUrl);
+    expect(data.saveTheDateBackgroundImageUrl).toBe(
+      body.saveTheDateBackgroundImageUrl,
+    );
     expect(data.giftRegistry).toEqual(body.giftRegistry);
     expect(data.guestManagementEnabled).toBe(true);
     expect(data.ownerCanAddGuests).toBe(true);

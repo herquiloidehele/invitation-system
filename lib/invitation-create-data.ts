@@ -70,6 +70,7 @@ export function buildInvitationCreateData(
     envelope: sanitizeJsonField(body.envelope, null),
     saveDateStyle: body.saveDateStyle ?? null,
     cinematicImageUrl: body.cinematicImageUrl ?? null,
+    saveTheDateBackgroundImageUrl: body.saveTheDateBackgroundImageUrl ?? null,
     sectionImages: sanitizeJsonField(body.sectionImages, null),
     coupleGallery: sanitizeJsonField(invitation.coupleGallery, null),
     coverVideos: sanitizeJsonField(body.coverVideos, null),

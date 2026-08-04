@@ -80,3 +80,14 @@ export function computeCountdownTimeLeft(
 export function formatCountdownValue(value: number): string {
   return String(value).padStart(2, "0");
 }
+
+export function formatInlineCountdownValues(
+  timeLeft: CountdownTimeLeft,
+): [string, string, string, string] {
+  return [
+    formatCountdownValue(timeLeft.days),
+    formatCountdownValue(timeLeft.hours),
+    formatCountdownValue(timeLeft.minutes),
+    formatCountdownValue(timeLeft.seconds),
+  ];
+}

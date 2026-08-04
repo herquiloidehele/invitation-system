@@ -236,6 +236,10 @@ export async function PUT(
         ...(body.cinematicImageUrl !== undefined && {
           cinematicImageUrl: body.cinematicImageUrl,
         }),
+        ...(body.saveTheDateBackgroundImageUrl !== undefined && {
+          saveTheDateBackgroundImageUrl:
+            body.saveTheDateBackgroundImageUrl || null,
+        }),
         ...(body.sectionImages !== undefined && {
           sectionImages: sanitizeJsonField(body.sectionImages, null),
         }),

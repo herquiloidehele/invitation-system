@@ -68,6 +68,7 @@ type AdminInvitationInitialDataRow = {
   guestGuide: unknown;
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
+  saveTheDateBackgroundImageUrl: string | null;
   sectionImages: unknown;
   coupleGallery: unknown;
   coverVideos: unknown;
@@ -148,6 +149,8 @@ export function toAdminInvitationInitialData(
       (row.guestGuide as InvitationData["guestGuide"] | null) ?? undefined,
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
+    saveTheDateBackgroundImageUrl:
+      row.saveTheDateBackgroundImageUrl ?? undefined,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     coupleGallery: (row.coupleGallery as CoupleGallery | null) ?? undefined,
     coverVideos:
