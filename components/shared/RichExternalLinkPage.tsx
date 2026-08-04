@@ -1,8 +1,17 @@
 "use client";
 
-import { type MutableRefObject, type RefObject, useLayoutEffect, useState } from "react";
+import {
+  type MutableRefObject,
+  type RefObject,
+  useLayoutEffect,
+  useState,
+} from "react";
 
-import type { CardSectionKey, InvitationData, TemplateTheme } from "@/lib/types";
+import type {
+  CardSectionKey,
+  InvitationData,
+  TemplateTheme,
+} from "@/lib/types";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
@@ -14,7 +23,10 @@ import ExternalCountdownSection from "./ExternalCountdownSection";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import dynamic from "next/dynamic";
-import PersonalGuestCard, { PREVIEW_SAMPLE_GUEST, PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY } from "./PersonalGuestCard";
+import PersonalGuestCard, {
+  PREVIEW_SAMPLE_GUEST,
+  PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
+} from "./PersonalGuestCard";
 import { EditableCard } from "./EditableCard";
 import CoupleGallery from "./gallery/CoupleGallery";
 import GiftsSection from "./GiftsSection";
@@ -290,7 +302,7 @@ export default function RichExternalLinkPage({
           )}
 
           {invitation.giftRegistry.enabled && (
-            <EditableCard sectionKey="giftRegistry">
+            <EditableCard sectionKey="giftRegistry" className="mb-10">
               <div
                 id="gifts"
                 className="flex flex-col items-center gap-3 mx-4"

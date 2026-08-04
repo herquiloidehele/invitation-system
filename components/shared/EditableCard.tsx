@@ -130,16 +130,21 @@ export function InlineCardEditProvider({
 
 interface EditableCardProps {
   sectionKey: string;
+  className?: string;
   children: ReactNode;
 }
 
 /**
  * Lightweight wrapper that makes a card element selectable in the admin
  * preview. When the InlineCardEditContext is not provided (e.g. on the
- * public-facing invitation page), this renders children as-is with zero
- * overhead — no extra DOM nodes, no event listeners.
+ * public-facing invitation page), this renders children as-is unless layout
+ * classes or spacing overrides require a wrapper.
  */
-export function EditableCard({ sectionKey, children }: EditableCardProps) {
+export function EditableCard({
+  sectionKey,
+  className,
+  children,
+}: EditableCardProps) {
   const ctx = useInlineCardEdit();
   const spacingStyles = useSpacingStyles();
   const ref = useRef<HTMLDivElement>(null);
@@ -150,8 +155,12 @@ export function EditableCard({ sectionKey, children }: EditableCardProps) {
 
   // No context → public page → render children as-is
   if (!ctx) {
-    if (!spacingStyle) return <>{children}</>;
-    return <div style={spacingStyle}>{children}</div>;
+    if (!spacingStyle && !className) return <>{children}</>;
+    return (
+      <div className={className} style={spacingStyle}>
+        {children}
+      </div>
+    );
   }
 
   const isSelected = ctx.selectedCard === sectionKey;
@@ -160,6 +169,7 @@ export function EditableCard({ sectionKey, children }: EditableCardProps) {
     <div
       ref={ref}
       data-card-section={sectionKey}
+      className={className}
       onClick={(e) => {
         // Don't capture clicks that are on text elements (let EditableText handle those)
         if ((e.target as HTMLElement).closest?.("[data-text-element]")) return;
