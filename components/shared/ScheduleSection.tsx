@@ -38,6 +38,7 @@ import type {
 } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { EditableCard } from "./EditableCard";
 import { EditableText } from "./EditableText";
 import ScheduleItem from "./ScheduleItem";
@@ -72,6 +73,7 @@ type ScheduleCardStyle = {
   cardBorder: string;
   borderRadius: number;
   accentColor?: string;
+  plain?: boolean;
 };
 
 interface ScheduleSectionProps {
@@ -161,14 +163,17 @@ function DefaultScheduleCard({
       whileHover={{ y: -3 }}
       transition={{ duration: 0.3, ease: EASE }}
       style={{
-        background: cardStyle.cardBg,
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        borderRadius: cardStyle.borderRadius,
+        ...resolveCardSurfaceStyle(cardStyle, {
+          background: cardStyle.cardBg,
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderRadius: cardStyle.borderRadius,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+          border: `1px solid ${cardStyle.cardBorder}`,
+        }),
         overflow: "hidden",
         padding: "8px 0",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-        border: `1px solid ${cardStyle.cardBorder}`,
       }}
     >
       {schedule.map((event, i) => (
@@ -215,11 +220,14 @@ function IllustratedScheduleCard({
       whileHover={{ y: -3 }}
       transition={{ duration: 0.3, ease: EASE }}
       style={{
-        background: cardStyle.cardBg,
-        borderRadius: cardStyle.borderRadius,
+        ...resolveCardSurfaceStyle(cardStyle, {
+          background: cardStyle.cardBg,
+          borderRadius: cardStyle.borderRadius,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.04), 0 12px 36px rgba(0,0,0,0.06)",
+          border: `1px solid ${cardStyle.cardBorder}`,
+        }),
         padding: "32px 24px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 12px 36px rgba(0,0,0,0.06)",
-        border: `1px solid ${cardStyle.cardBorder}`,
       }}
     >
       <motion.div

@@ -7,9 +7,11 @@ import {
   useState,
 } from "react";
 import { useInlineCardEdit } from "@/components/shared/EditableCard";
+import { Switch } from "@/components/ui/switch";
 import { RotateCcw, X } from "lucide-react";
 import type { SpacingField } from "@/lib/spacing-styles";
 import type { CardSectionKey, CardStyle } from "@/lib/types";
+import type { CardStyleValue } from "@/lib/card-styles";
 
 // ---------------------------------------------------------------------------
 // Toolbar positioning (same logic as TextStyleToolbar)
@@ -153,7 +155,7 @@ export default function CardStyleToolbar() {
   const spacing = ctx.getSpacingOverrides(sectionKey);
 
   // ---- Handlers ---------------------------------------------------------
-  const set = (field: keyof CardStyle, value: string | number | undefined) => {
+  const set = (field: keyof CardStyle, value: CardStyleValue) => {
     ctx.updateStyle(sectionKey, field, value);
   };
   const setSpacing = (field: SpacingField, value: number | undefined) => {
@@ -173,10 +175,27 @@ export default function CardStyleToolbar() {
       }}
       className="flex items-center gap-1.5 rounded-lg border bg-popover px-2 py-1.5 shadow-xl"
     >
+      <label className="flex h-7 items-center gap-1.5 whitespace-nowrap px-1">
+        <span className="text-[10px] text-muted-foreground">Sem cartão</span>
+        <Switch
+          size="sm"
+          checked={overrides.plain === true}
+          onCheckedChange={(checked) => set("plain", checked ? true : undefined)}
+          aria-label="Mostrar esta secção sem cartão"
+        />
+      </label>
+
+      {/* Divider */}
+      <div className="h-5 w-px bg-border" />
+
       {/* Background color */}
       <label
         title="Cor de fundo"
-        className="relative flex h-7 items-center gap-1.5 cursor-pointer rounded border bg-background px-1.5"
+        className={`relative flex h-7 items-center gap-1.5 rounded border bg-background px-1.5 ${
+          overrides.plain === true
+            ? "cursor-not-allowed opacity-50"
+            : "cursor-pointer"
+        }`}
       >
         <span className="text-[10px] text-muted-foreground whitespace-nowrap">
           Fundo
@@ -187,6 +206,7 @@ export default function CardStyleToolbar() {
         />
         <input
           type="color"
+          disabled={overrides.plain === true}
           value={overrides.cardBg ?? "#ffffff"}
           onChange={(e) => set("cardBg", e.target.value)}
           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -199,7 +219,11 @@ export default function CardStyleToolbar() {
       {/* Border color */}
       <label
         title="Cor da borda"
-        className="relative flex h-7 items-center gap-1.5 cursor-pointer rounded border bg-background px-1.5"
+        className={`relative flex h-7 items-center gap-1.5 rounded border bg-background px-1.5 ${
+          overrides.plain === true
+            ? "cursor-not-allowed opacity-50"
+            : "cursor-pointer"
+        }`}
       >
         <span className="text-[10px] text-muted-foreground whitespace-nowrap">
           Borda
@@ -210,6 +234,7 @@ export default function CardStyleToolbar() {
         />
         <input
           type="color"
+          disabled={overrides.plain === true}
           value={overrides.cardBorder ?? "#cccccc"}
           onChange={(e) => set("cardBorder", e.target.value)}
           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -220,12 +245,18 @@ export default function CardStyleToolbar() {
       <div className="h-5 w-px bg-border" />
 
       {/* Border radius */}
-      <div className="flex items-center gap-1" title="Raio da borda (px)">
+      <div
+        className={`flex items-center gap-1 ${
+          overrides.plain === true ? "opacity-50" : ""
+        }`}
+        title="Raio da borda (px)"
+      >
         <span className="text-[10px] text-muted-foreground whitespace-nowrap">
           Raio
         </span>
         <input
           type="number"
+          disabled={overrides.plain === true}
           min={0}
           max={60}
           step={1}
@@ -264,6 +295,7 @@ export default function CardStyleToolbar() {
           set("cardBg", undefined);
           set("cardBorder", undefined);
           set("borderRadius", undefined);
+          set("plain", undefined);
           setSpacing("spaceBefore", undefined);
           setSpacing("spaceAfter", undefined);
         }}

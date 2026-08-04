@@ -19,6 +19,7 @@ import type {
   SpacingStyleOverrides,
   SpacingValue,
 } from "@/lib/types";
+import type { CardStyleValue } from "@/lib/card-styles";
 import { useSpacingStyles } from "./SpacingStyleProvider";
 
 // ---------------------------------------------------------------------------
@@ -33,7 +34,7 @@ interface InlineCardEditContextValue {
   updateStyle: (
     section: CardSectionKey,
     field: keyof CardStyle,
-    value: string | number | undefined,
+    value: CardStyleValue,
   ) => void;
   updateSpacing: (
     section: string,
@@ -62,7 +63,7 @@ interface InlineCardEditProviderProps {
   updateCardStyle: (
     section: CardSectionKey,
     field: keyof CardStyle,
-    value: string | number | undefined,
+    value: CardStyleValue,
   ) => void;
   updateSectionSpacing?: (
     section: string,

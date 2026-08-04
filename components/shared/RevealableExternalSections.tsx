@@ -174,6 +174,7 @@ export default function RevealableExternalSections({
               cardBorder: invitation.cardStyles?.places?.cardBorder,
               borderRadius: invitation.cardStyles?.places?.borderRadius,
               accentColor: invitation.cardStyles?.places?.accentColor,
+              plain: invitation.cardStyles?.places?.plain === true,
             }}
           />
         )}

@@ -70,6 +70,7 @@ type InvitationWithTheme = {
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
   saveTheDateBackgroundImageUrl: string | null;
+  showCalendarCta: boolean;
   sectionImages: unknown;
   coupleGallery: unknown;
   coverVideos: unknown;
@@ -151,6 +152,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,
     saveTheDateBackgroundImageUrl:
       row.saveTheDateBackgroundImageUrl ?? undefined,
+    showCalendarCta: row.showCalendarCta,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     coupleGallery: (row.coupleGallery as CoupleGallery | null) ?? undefined,
     coverVideos:

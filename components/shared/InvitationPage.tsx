@@ -14,6 +14,7 @@ import type {
   InvitationData,
   TemplateTheme,
 } from "@/lib/types";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { useLocale } from "next-intl";
@@ -278,6 +279,7 @@ export default function InvitationPage({
     borderRadius:
       invitation.cardStyles?.[section]?.borderRadius ?? defaultRadius,
     accentColor: invitation.cardStyles?.[section]?.accentColor,
+    plain: invitation.cardStyles?.[section]?.plain === true,
   });
 
   return (
@@ -394,6 +396,7 @@ export default function InvitationPage({
               cardBg={cs("saveTheDate", 20).cardBg}
               cardBorder={cs("saveTheDate", 20).cardBorder}
               cardBorderRadius={cs("saveTheDate", 20).borderRadius}
+              plain={cs("saveTheDate", 20).plain}
               isPreview={isPreview}
               imageSettings={invitation.imageSettings}
               customTexts={invitation.customTexts}
@@ -466,15 +469,17 @@ export default function InvitationPage({
               <motion.div
                 {...liftCardProps}
                 style={{
-                  background: cs("ourStory", 20).cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: cs("ourStory", 20).borderRadius,
+                  ...resolveCardSurfaceStyle(cs("ourStory", 20), {
+                    background: cs("ourStory", 20).cardBg,
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    borderRadius: cs("ourStory", 20).borderRadius,
+                    boxShadow:
+                      "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+                    border: `1px solid ${cs("ourStory", 20).cardBorder}`,
+                  }),
                   overflow: "hidden",
                   padding: "28px 24px",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-                  border: `1px solid ${cs("ourStory", 20).cardBorder}`,
                 }}
               >
                 <div className="flex flex-col items-center gap-4">
@@ -603,6 +608,7 @@ export default function InvitationPage({
             cardBg={cs("location", 16).cardBg}
             cardBorder={cs("location", 16).cardBorder}
             cardBorderRadius={cs("location", 16).borderRadius}
+            plain={cs("location", 16).plain}
             imageSettings={invitation.imageSettings}
             imageKey="locationImage1"
             customTexts={invitation.customTexts}
@@ -620,6 +626,7 @@ export default function InvitationPage({
                 cardBg={cs("location", 16).cardBg}
                 cardBorder={cs("location", 16).cardBorder}
                 cardBorderRadius={cs("location", 16).borderRadius}
+                plain={cs("location", 16).plain}
                 imageSettings={invitation.imageSettings}
                 imageKey="locationImage2"
                 customTexts={invitation.customTexts}
@@ -674,14 +681,16 @@ export default function InvitationPage({
                   }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
-                    background: cs("dressCode", 16).cardBg,
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    borderRadius: cs("dressCode", 16).borderRadius,
+                    ...resolveCardSurfaceStyle(cs("dressCode", 16), {
+                      background: cs("dressCode", 16).cardBg,
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      borderRadius: cs("dressCode", 16).borderRadius,
+                      boxShadow:
+                        "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                      border: `1px solid ${cs("dressCode", 16).cardBorder}`,
+                    }),
                     padding: "24px 14px",
-                    boxShadow:
-                      "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                    border: `1px solid ${cs("dressCode", 16).cardBorder}`,
                   }}
                 >
                   <motion.div
@@ -769,14 +778,16 @@ export default function InvitationPage({
                   }}
                   className="flex flex-col items-center gap-3 text-center"
                   style={{
-                    background: cs("giftRegistry", 16).cardBg,
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    borderRadius: cs("giftRegistry", 16).borderRadius,
+                    ...resolveCardSurfaceStyle(cs("giftRegistry", 16), {
+                      background: cs("giftRegistry", 16).cardBg,
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      borderRadius: cs("giftRegistry", 16).borderRadius,
+                      boxShadow:
+                        "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                      border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
+                    }),
                     padding: "24px 14px",
-                    boxShadow:
-                      "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                    border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
                   }}
                 >
                   <GiftsSection
@@ -842,6 +853,7 @@ export default function InvitationPage({
                   cardBg={cs("guestGuide", 14).cardBg}
                   cardBorder={cs("guestGuide", 14).cardBorder}
                   cardBorderRadius={cs("guestGuide", 14).borderRadius}
+                  plain={cs("guestGuide", 14).plain}
                   isPreview={isPreview}
                 />
               </EditableCard>

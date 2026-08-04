@@ -591,6 +591,8 @@ export interface ParentsInfo {
 
 export interface ExternalCountdownConfig {
   enabled: boolean;
+  /** Layout for the external countdown. Missing values use the card grid. */
+  layout?: "cards" | "inline";
   title?: string;
   subtitle?: string;
   daysLabel?: string;
@@ -655,6 +657,8 @@ export interface CardStyle {
   /** Optional accent color override used by decorations inside the card
    *  (icons, connectors, etc.). Falls back to the resolved text-styles accent. */
   accentColor?: string;
+  /** Removes the section's decorative card surface while preserving content and layout. */
+  plain?: boolean;
 }
 
 /** Identifiers for each card section whose background can be individually overridden. */
@@ -1193,6 +1197,8 @@ export interface InvitationData {
   cinematicImageUrl?: string;
   /** Shared background image for every Save the Date layout. */
   saveTheDateBackgroundImageUrl?: string;
+  /** Shows the Add to calendar CTA in Save the Date and external countdown sections. */
+  showCalendarCta?: boolean;
   /** Optional decorative images placed between sections and in the footer. Each falls back to a default Unsplash photo if not provided. */
   sectionImages?: SectionImages;
   /** Optional couple-photos gallery section (opt-in carousel). */

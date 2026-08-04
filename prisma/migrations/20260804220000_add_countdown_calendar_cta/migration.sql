@@ -1,0 +1,1 @@
+ALTER TABLE "Invitation" ADD COLUMN "showCalendarCta" BOOLEAN NOT NULL DEFAULT true;

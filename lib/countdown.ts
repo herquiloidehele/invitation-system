@@ -91,3 +91,9 @@ export function formatInlineCountdownValues(
     formatCountdownValue(timeLeft.seconds),
   ];
 }
+
+export function normalizeExternalCountdownLayout(
+  value: unknown,
+): "cards" | "inline" {
+  return value === "inline" ? "inline" : "cards";
+}

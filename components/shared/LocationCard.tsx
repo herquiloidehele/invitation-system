@@ -16,6 +16,7 @@ import type {
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { getImageStyle } from "@/lib/image-settings";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { EditableText } from "./EditableText";
 import { useCustomText } from "@/lib/custom-texts";
 
@@ -74,6 +75,8 @@ export interface LocationCardProps {
   cardBorder?: string;
   /** Per-section card border-radius override. Falls back to 16. */
   cardBorderRadius?: number;
+  /** Removes only the outer venue-card decoration. */
+  plain?: boolean;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
   /** Which image key to use for this location. */
@@ -89,6 +92,7 @@ export default function LocationCard({
   cardBg,
   cardBorder,
   cardBorderRadius,
+  plain,
   imageSettings,
   imageKey,
   customTexts: ct,
@@ -104,19 +108,27 @@ export default function LocationCard({
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, margin: "-60px" }}
-      whileHover={{
-        y: -3,
-        boxShadow: "0 2px 4px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.06)",
-      }}
+      whileHover={
+        plain
+          ? { y: -3 }
+          : {
+              y: -3,
+              boxShadow:
+                "0 2px 4px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.06)",
+            }
+      }
       transition={{ duration: 0.5, ease: EASE }}
       className="flex flex-col overflow-hidden"
       style={{
-        background: effectiveCardBg,
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        borderRadius: cardBorderRadius ?? 16,
-        boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-        border: `1px solid ${effectiveCardBorder}`,
+        ...resolveCardSurfaceStyle({ plain }, {
+          background: effectiveCardBg,
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderRadius: cardBorderRadius ?? 16,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+          border: `1px solid ${effectiveCardBorder}`,
+        }),
       }}
     >
       {/* Venue image — shown only if imageUrl is provided */}

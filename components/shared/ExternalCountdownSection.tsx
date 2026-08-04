@@ -7,14 +7,19 @@ import {
   computeCountdownTimeLeft,
   type CountdownTimeLeft,
   formatCountdownValue,
+  formatInlineCountdownValues,
+  normalizeExternalCountdownLayout,
 } from "@/lib/countdown";
 import { useCustomText } from "@/lib/custom-texts";
 import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { resolveTextStyles } from "@/lib/text-styles";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 
 import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
+import CalendarCTA from "./CalendarCTA";
+import InlineCountdown from "./InlineCountdown";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -51,6 +56,7 @@ export default function ExternalCountdownSection({
   const cardBg = config.cardBg || "rgba(255, 252, 244, 0.72)";
   const cardBorder = config.cardBorder || theme.cardBorder;
   const cardBorderRadius = config.cardBorderRadius ?? 12;
+  const countdownCardStyle = invitation.cardStyles?.countdown;
   const hasBackgroundImage =
     typeof config.backgroundImage === "string" &&
     config.backgroundImage.trim() !== "";
@@ -66,6 +72,7 @@ export default function ExternalCountdownSection({
     hours: 0,
     minutes: 0,
     seconds: 0,
+    passed: false,
   };
   const isCelebration =
     timeLeft !== null &&
@@ -92,6 +99,15 @@ export default function ExternalCountdownSection({
       label: config.secondsLabel || t("saveDate_seconds").toUpperCase(),
     },
   ];
+  const inlineValues = formatInlineCountdownValues(displayTimeLeft);
+  const inlineLabels: [string, string, string, string] = [
+    units[0].label,
+    units[1].label,
+    units[2].label,
+    units[3].label,
+  ];
+  const isInlineLayout =
+    normalizeExternalCountdownLayout(config.layout) === "inline";
 
   return (
     <section
@@ -144,7 +160,11 @@ export default function ExternalCountdownSection({
         {isCelebration ? (
           <div
             className="mt-12 rounded-3xl px-8 py-10"
-            style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+            style={resolveCardSurfaceStyle(countdownCardStyle, {
+              background: cardBg,
+              border: `1px solid ${cardBorder}`,
+              borderRadius: 24,
+            })}
           >
             <p style={ts.externalCountdownCelebrationTitle}>
               <EditableText elementKey="externalCountdownCelebrationTitle">
@@ -152,6 +172,24 @@ export default function ExternalCountdownSection({
               </EditableText>
             </p>
           </div>
+        ) : isInlineLayout ? (
+          <InlineCountdown
+            className="mt-12 w-full max-w-[680px]"
+            values={inlineValues}
+            labels={inlineLabels}
+            valueStyle={{
+              ...ts.externalCountdownValue,
+              fontVariantNumeric: "tabular-nums",
+              lineHeight: 0.95,
+            }}
+            labelStyle={ts.externalCountdownLabel}
+            valueElementKey="externalCountdownValue"
+            labelElementKey="externalCountdownLabel"
+            colonStyle={{
+              fontFamily: ts.scriptFont,
+              color: ts.accent,
+            }}
+          />
         ) : (
           <div className="mt-12 grid w-full grid-cols-2 gap-3">
             {units.map((unit, index) => (
@@ -167,9 +205,14 @@ export default function ExternalCountdownSection({
                   }}
                   className="flex min-h-[120px] flex-col items-center justify-center px-5 py-7 shadow-[0_18px_50px_rgba(60,45,30,0.08)] backdrop-blur-md"
                   style={{
-                    background: cardBg,
-                    border: `1px solid ${cardBorder}`,
-                    borderRadius: cardBorderRadius,
+                    ...resolveCardSurfaceStyle(countdownCardStyle, {
+                      background: cardBg,
+                      border: `1px solid ${cardBorder}`,
+                      borderRadius: cardBorderRadius,
+                      boxShadow: "0 18px 50px rgba(60,45,30,0.08)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                    }),
                   }}
                 >
                   <span style={ts.externalCountdownValue}>
@@ -187,6 +230,12 @@ export default function ExternalCountdownSection({
             ))}
           </div>
         )}
+
+        <CalendarCTA
+          invitation={invitation}
+          ts={ts}
+          customTexts={invitation.customTexts}
+        />
       </motion.div>
     </section>
   );

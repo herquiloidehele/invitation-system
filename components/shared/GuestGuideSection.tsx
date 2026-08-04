@@ -9,6 +9,7 @@ import {
   resolveLucideIconName,
 } from "@/lib/lucide-icons";
 import { sanitizeAndNormalizeSvg } from "@/lib/svg-icons";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import type { GuestGuide, GuestGuideItem, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import { EditableText } from "./EditableText";
@@ -135,6 +136,7 @@ interface GuideItemCardProps {
   cardBg?: string;
   cardBorder?: string;
   cardBorderRadius?: number;
+  plain?: boolean;
   isPreview?: boolean;
 }
 
@@ -145,6 +147,7 @@ function GuideItemCard({
   cardBg,
   cardBorder,
   cardBorderRadius,
+  plain,
   isPreview,
 }: GuideItemCardProps) {
   return (
@@ -154,13 +157,16 @@ function GuideItemCard({
         : { variants: fadeInUp })}
       className="flex flex-col items-center gap-2 text-center"
       style={{
-        background: cardBg || theme.cardBg,
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        borderRadius: cardBorderRadius ?? 14,
+        ...resolveCardSurfaceStyle({ plain }, {
+          background: cardBg || theme.cardBg,
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderRadius: cardBorderRadius ?? 14,
+          border: `1px solid ${cardBorder || theme.cardBorder}`,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.02), 0 4px 16px rgba(0,0,0,0.03)",
+        }),
         padding: "18px 12px",
-        border: `1px solid ${cardBorder || theme.cardBorder}`,
-        boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 4px 16px rgba(0,0,0,0.03)",
       }}
     >
       <div
@@ -203,6 +209,8 @@ export interface GuestGuideSectionProps {
   cardBorder?: string;
   /** Per-section card border-radius override. Falls back to 14. */
   cardBorderRadius?: number;
+  /** Removes each repeated guide item's decorative card surface. */
+  plain?: boolean;
   /** When true, all animations use `animate` instead of `whileInView` so
    *  the section is always fully visible (no scroll-trigger dependency).
    *  Use this in the admin live preview. */
@@ -216,6 +224,7 @@ export default function GuestGuideSection({
   cardBg,
   cardBorder,
   cardBorderRadius,
+  plain,
   isPreview = false,
 }: GuestGuideSectionProps) {
   const effectiveCardBg = cardBg || theme.cardBg;
@@ -243,6 +252,7 @@ export default function GuestGuideSection({
             cardBg={effectiveCardBg}
             cardBorder={effectiveCardBorder}
             cardBorderRadius={cardBorderRadius}
+            plain={plain}
             isPreview={isPreview}
           />
         ))}

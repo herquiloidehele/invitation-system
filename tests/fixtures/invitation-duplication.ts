@@ -114,6 +114,7 @@ export const sourceInvitationRow = {
   cinematicImageUrl: "https://cdn.example.com/cinematic.jpg",
   saveTheDateBackgroundImageUrl:
     "https://cdn.example.com/save-date-background.jpg",
+  showCalendarCta: true,
   sectionImages: { image1: "https://cdn.example.com/section.jpg" },
   coupleGallery: {
     enabled: true,
@@ -142,7 +143,7 @@ export const sourceInvitationRow = {
     backgroundImageUrl: "https://cdn.example.com/card.jpg",
   },
   textStyles: { colors: { textPrimary: "#111111" } },
-  cardStyles: { schedule: { cardBg: "#ffffff" } },
+  cardStyles: { schedule: { cardBg: "#ffffff", plain: true } },
   spacingStyles: { sections: { schedule: { spaceBefore: 12 } } },
   imageSettings: {
     heroImage: { positionX: 60, positionY: 40, zoom: 1.2 },

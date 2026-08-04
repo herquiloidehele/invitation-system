@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatInlineCountdownValues,
+  normalizeExternalCountdownLayout,
   type CountdownTimeLeft,
 } from "@/lib/countdown";
 
@@ -21,5 +22,16 @@ describe("formatInlineCountdownValues", () => {
       "12",
       "41",
     ]);
+  });
+});
+
+describe("normalizeExternalCountdownLayout", () => {
+  it("defaults legacy and unknown layouts to cards", () => {
+    expect(normalizeExternalCountdownLayout(undefined)).toBe("cards");
+    expect(normalizeExternalCountdownLayout("tiles")).toBe("cards");
+  });
+
+  it("preserves the inline layout", () => {
+    expect(normalizeExternalCountdownLayout("inline")).toBe("inline");
   });
 });

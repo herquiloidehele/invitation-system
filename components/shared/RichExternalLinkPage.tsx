@@ -12,6 +12,7 @@ import type {
   InvitationData,
   TemplateTheme,
 } from "@/lib/types";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
@@ -109,6 +110,7 @@ export default function RichExternalLinkPage({
     borderRadius:
       invitation.cardStyles?.[section]?.borderRadius ?? defaultRadius,
     accentColor: invitation.cardStyles?.[section]?.accentColor,
+    plain: invitation.cardStyles?.[section]?.plain === true,
   });
 
   // Defence stack:
@@ -307,14 +309,16 @@ export default function RichExternalLinkPage({
                 id="gifts"
                 className="flex flex-col items-center gap-3 mx-4"
                 style={{
-                  background: cs("giftRegistry", 16).cardBg,
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  borderRadius: cs("giftRegistry", 16).borderRadius,
+                  ...resolveCardSurfaceStyle(cs("giftRegistry", 16), {
+                    background: cs("giftRegistry", 16).cardBg,
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    borderRadius: cs("giftRegistry", 16).borderRadius,
+                    boxShadow:
+                      "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                    border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
+                  }),
                   padding: "24px 14px",
-                  boxShadow:
-                    "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                  border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
                 }}
               >
                 <GiftsSection
@@ -349,6 +353,7 @@ export default function RichExternalLinkPage({
               cardBorder: invitation.cardStyles?.places?.cardBorder,
               borderRadius: invitation.cardStyles?.places?.borderRadius,
               accentColor: invitation.cardStyles?.places?.accentColor,
+              plain: invitation.cardStyles?.places?.plain === true,
             }}
             isPreview={isPreview}
           />

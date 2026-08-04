@@ -17,6 +17,7 @@ import {
   shouldRenderPlaces,
 } from "@/lib/places";
 import { useCustomText } from "@/lib/custom-texts";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { EditableText } from "./EditableText";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -57,6 +58,7 @@ export default function PlacesSection({
   const cardBorder = cardStyle.cardBorder || theme.cardBorder;
   const cardRadius = cardStyle.borderRadius ?? 16;
   const accent = cardStyle.accentColor || ts.accent;
+  const plain = cardStyle.plain === true;
 
   return (
     <div className="flex flex-col">
@@ -72,6 +74,7 @@ export default function PlacesSection({
           cardBorder={cardBorder}
           cardRadius={cardRadius}
           accent={accent}
+          plain={plain}
           isPreview={isPreview}
         />
       ))}
@@ -89,6 +92,7 @@ interface BlockProps {
   cardBorder: string;
   cardRadius: number;
   accent: string;
+  plain: boolean;
   isPreview: boolean;
 }
 
@@ -102,6 +106,7 @@ function PlacesBlock({
   cardBorder,
   cardRadius,
   accent,
+  plain,
   isPreview,
 }: BlockProps) {
   const hasTitle = !!section.title?.trim();
@@ -134,6 +139,7 @@ function PlacesBlock({
             cardBg={cardBg}
             cardBorder={cardBorder}
             cardRadius={cardRadius}
+            plain={plain}
           />
         ))}
       </motion.div>
@@ -224,6 +230,7 @@ interface CardProps {
   cardBg: string;
   cardBorder: string;
   cardRadius: number;
+  plain: boolean;
 }
 
 function PlaceCard({
@@ -234,6 +241,7 @@ function PlaceCard({
   cardBg,
   cardBorder,
   cardRadius,
+  plain,
 }: CardProps) {
   const links = (
     <div className="mt-2 flex items-center gap-4">
@@ -279,11 +287,14 @@ function PlaceCard({
   );
 
   const cardShell: React.CSSProperties = {
-    background: cardBg,
-    border: `1px solid ${cardBorder}`,
-    borderRadius: cardRadius,
+    ...resolveCardSurfaceStyle({ plain }, {
+      background: cardBg,
+      border: `1px solid ${cardBorder}`,
+      borderRadius: cardRadius,
+      boxShadow:
+        "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+    }),
     overflow: "hidden",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
   };
 
   if (layout === "rows") {

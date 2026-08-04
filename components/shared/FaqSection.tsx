@@ -13,6 +13,7 @@ import type {
 } from "@/lib/types";
 import { resolveTextStyles, type ResolvedTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { EditableText } from "@/components/shared/EditableText";
 import { EditableCard } from "@/components/shared/EditableCard";
 import { EASE, staggerContainer, WordReveal } from "@/components/shared/animations";
@@ -98,14 +99,16 @@ export default function FaqSection({
           whileHover={{ y: -2 }}
           transition={{ duration: 0.3, ease: EASE }}
           style={{
-            background: cardStyle.cardBg ?? theme.cardBg,
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            borderRadius: cardStyle.borderRadius ?? 20,
+            ...resolveCardSurfaceStyle(cardStyle, {
+              background: cardStyle.cardBg ?? theme.cardBg,
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              borderRadius: cardStyle.borderRadius ?? 20,
+              boxShadow:
+                "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+              border: `1px solid ${cardStyle.cardBorder ?? theme.cardBorder}`,
+            }),
             overflow: "hidden",
-            boxShadow:
-              "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-            border: `1px solid ${cardStyle.cardBorder ?? theme.cardBorder}`,
           }}
         >
           {faqs.map((faq, i) => (

@@ -240,6 +240,9 @@ export async function PUT(
           saveTheDateBackgroundImageUrl:
             body.saveTheDateBackgroundImageUrl || null,
         }),
+        ...(body.showCalendarCta !== undefined && {
+          showCalendarCta: body.showCalendarCta === true,
+        }),
         ...(body.sectionImages !== undefined && {
           sectionImages: sanitizeJsonField(body.sectionImages, null),
         }),

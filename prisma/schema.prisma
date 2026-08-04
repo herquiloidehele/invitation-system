@@ -104,6 +104,7 @@ model Invitation {
   saveDateStyle           String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line" | "inline-countdown"
   cinematicImageUrl       String? // background image for the cinematic Save the Date style
   saveTheDateBackgroundImageUrl String? // shared background image for every Save the Date layout
+  showCalendarCta         Boolean  @default(true) // Add-to-calendar CTA in Save the Date and external countdown sections
   sectionImages           Json? // SectionImages { image1?, image2?, image3?, image4? }
   coupleGallery           Json? // CoupleGallery { enabled, style, images[], title?, autoplay? }
   places                  Json? // PlacesConfig — optional recommended places (hotels, restaurants, attractions) section

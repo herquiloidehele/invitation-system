@@ -9,6 +9,8 @@ describe("buildInvitationCreateData", () => {
       slug: "maria-pedro",
       eventType: "wedding",
       couple: { bride: "Maria", groom: "Pedro", monogram: "M&P" },
+      showCalendarCta: false,
+      countdown: { enabled: true, layout: "inline" },
     });
 
     const data = buildInvitationCreateData(body, "theme_copy");
@@ -22,7 +24,10 @@ describe("buildInvitationCreateData", () => {
     expect(data.saveTheDateBackgroundImageUrl).toBe(
       body.saveTheDateBackgroundImageUrl,
     );
+    expect(data.showCalendarCta).toBe(body.showCalendarCta);
+    expect(data.countdown).toEqual(body.countdown);
     expect(data.giftRegistry).toEqual(body.giftRegistry);
+    expect(data.cardStyles).toEqual(body.cardStyles);
     expect(data.guestManagementEnabled).toBe(true);
     expect(data.ownerCanAddGuests).toBe(true);
     expect(data).not.toHaveProperty("guests");
@@ -48,6 +53,7 @@ describe("buildInvitationCreateData", () => {
     expect(data.heroHeight).toBeNull();
     expect(data.heroMediaFit).toBeNull();
     expect(data.rsvp).toEqual({ enabled: true });
+    expect(data.showCalendarCta).toBe(true);
     expect(data.priceOverrides).toBe(Prisma.JsonNull);
     expect(data.landingCustomizationLevel).toBe("fully_customizable");
   });

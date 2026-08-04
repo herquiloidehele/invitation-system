@@ -149,6 +149,10 @@ import {
   type InvitationFormMode,
 } from "@/lib/invitation-form-mode";
 import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
+import {
+  setCardStyleField,
+  type CardStyleValue,
+} from "@/lib/card-styles";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -506,6 +510,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     saveDateStyle: "classic",
     cinematicImageUrl: "",
     saveTheDateBackgroundImageUrl: "",
+    showCalendarCta: true,
     sectionImages: {},
     parents: {
       enabled: false,
@@ -1318,19 +1323,12 @@ export default function InvitationForm({
     (
       section: CardSectionKey,
       field: keyof CardStyle,
-      value: string | number | undefined,
+      value: CardStyleValue,
     ) => {
-      setForm((prev) => {
-        const cs = { ...prev.cardStyles };
-        const sec = { ...cs[section], [field]: value || undefined };
-        const secHasAny = Object.values(sec).some((v) => v !== undefined);
-        cs[section] = secHasAny ? sec : undefined;
-        const hasAny = Object.values(cs).some(Boolean);
-        return {
-          ...prev,
-          cardStyles: hasAny ? cs : undefined,
-        };
-      });
+      setForm((prev) => ({
+        ...prev,
+        cardStyles: setCardStyleField(prev.cardStyles, section, field, value),
+      }));
     },
     [],
   );
@@ -2609,6 +2607,22 @@ export default function InvitationForm({
                         }
                       />
                     )}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 rounded-lg border border-dashed border-border p-3">
+                    <div className="space-y-0.5">
+                      <Label>Adicionar ao calendário</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Mostra o botão de calendário no Save the Date e na
+                        contagem decrescente externa.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.showCalendarCta !== false}
+                      onCheckedChange={(checked) =>
+                        update("showCalendarCta", checked)
+                      }
+                    />
                   </div>
 
                   {/* ── Cinematic image upload — shown only when cinematic is selected ── */}

@@ -40,6 +40,7 @@ const baseRow = {
   saveDateStyle: null,
   cinematicImageUrl: null,
   saveTheDateBackgroundImageUrl: null,
+  showCalendarCta: false,
   sectionImages: null,
   coupleGallery: null,
   coverVideos: null,
@@ -109,6 +110,19 @@ describe("toAdminInvitationInitialData — Save the Date background", () => {
   });
 });
 
+describe("toAdminInvitationInitialData — countdown controls", () => {
+  it("hydrates the shared calendar CTA visibility and external layout", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      showCalendarCta: false,
+      countdown: { enabled: true, layout: "inline" },
+    });
+
+    expect(result.showCalendarCta).toBe(false);
+    expect(result.countdown).toEqual({ enabled: true, layout: "inline" });
+  });
+});
+
 describe("toAdminInvitationInitialData — heroTextLayer round-trip", () => {
   it("hydrates heroTextLayer into the admin form initial data", () => {
     const heroTextLayer = {
@@ -169,6 +183,16 @@ describe("toAdminInvitationInitialData — spacingStyles round-trip", () => {
     });
 
     expect(result.spacingStyles).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — cardStyles round-trip", () => {
+  it("hydrates the per-section plain-card flag", () => {
+    const cardStyles = {
+      faqs: { cardBg: "#ffffff", borderRadius: 24, plain: true },
+    };
+    const result = toAdminInvitationInitialData({ ...baseRow, cardStyles });
+    expect(result.cardStyles).toEqual(cardStyles);
   });
 });
 

@@ -88,6 +88,10 @@ import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
+import {
+  setCardStyleField,
+  type CardStyleValue,
+} from "@/lib/card-styles";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
@@ -219,6 +223,7 @@ function getDefaultState(
     externalLink: "",
     isDemo: false,
     saveDateStyle: "classic",
+    showCalendarCta: true,
     envelope: {},
     coverVideos: { enabled: false, items: [] },
     parents: {
@@ -232,7 +237,7 @@ function getDefaultState(
     },
     scratchReveal: { enabled: false },
     heroConfetti: { enabled: true },
-    countdown: { enabled: false },
+    countdown: { enabled: false, layout: "cards" },
     imageSettings: {},
     guestManagementEnabled: false,
     ownerCanAddGuests: false,
@@ -658,26 +663,12 @@ export default function ExternalInvitationForm({
     (
       section: CardSectionKey,
       field: keyof CardStyle,
-      value: string | number | undefined,
+      value: CardStyleValue,
     ) => {
-      setForm((prev) => {
-        const cardStyles = { ...prev.cardStyles };
-        const sectionStyle = {
-          ...cardStyles[section],
-          [field]: value || undefined,
-        };
-        cardStyles[section] = Object.values(sectionStyle).some(
-          (v) => v !== undefined,
-        )
-          ? sectionStyle
-          : undefined;
-        return {
-          ...prev,
-          cardStyles: Object.values(cardStyles).some(Boolean)
-            ? cardStyles
-            : undefined,
-        };
-      });
+      setForm((prev) => ({
+        ...prev,
+        cardStyles: setCardStyleField(prev.cardStyles, section, field, value),
+      }));
     },
     [],
   );
@@ -2243,6 +2234,50 @@ export default function ExternalInvitationForm({
 
                       {form.countdown?.enabled && (
                         <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="countdownLayout">Formato</Label>
+                              <Select
+                                value={form.countdown.layout ?? "cards"}
+                                onValueChange={(value) =>
+                                  updateCountdown(
+                                    "layout",
+                                    value as "cards" | "inline",
+                                  )
+                                }
+                              >
+                                <SelectTrigger id="countdownLayout">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="cards">
+                                    Cartões
+                                  </SelectItem>
+                                  <SelectItem value="inline">
+                                    Em linha
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex items-center justify-between gap-4 rounded-md border bg-background/60 px-3 py-2">
+                              <div className="space-y-0.5">
+                                <Label>Adicionar ao calendário</Label>
+                                <p className="text-xs text-muted-foreground">
+                                  Mostrar o botão nesta contagem.
+                                </p>
+                              </div>
+                              <Switch
+                                checked={form.showCalendarCta !== false}
+                                onCheckedChange={(checked) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    showCalendarCta: checked,
+                                  }))
+                                }
+                              />
+                            </div>
+                          </div>
+
                           <div className="grid gap-3 sm:grid-cols-2">
                             <div className="space-y-1.5">
                               <Label htmlFor="countdownTitle">Título</Label>

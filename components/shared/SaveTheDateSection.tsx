@@ -27,9 +27,11 @@ import {
   formatLocalizedMonthLong,
 } from "@/lib/date-format";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
-import CalendarButton from "./CalendarButton";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
+import CalendarCTA from "./CalendarCTA";
 import { EditableText } from "./EditableText";
 import { EASE, WordReveal } from "./animations";
+import InlineCountdown from "./InlineCountdown";
 
 // ---------------------------------------------------------------------------
 // Shared props for all variants
@@ -45,6 +47,8 @@ export interface SaveTheDateProps {
   cardBorder?: string;
   /** Per-section card border-radius override. Falls back to per-variant default. */
   cardBorderRadius?: number;
+  /** Removes card decoration while preserving layout and configured images. */
+  plain?: boolean;
   isPreview?: boolean;
   /** Per-image position & zoom overrides map. */
   imageSettings?: ImageSettingsMap;
@@ -95,45 +99,14 @@ function SaveLabel({
   );
 }
 
-function CalendarCTA({
-  invitation,
-  ts,
-  customTexts: ct,
-}: {
-  invitation: InvitationData;
-  ts: ResolvedTextStyles;
-  customTexts?: CustomTexts;
-}) {
-  const t = useCustomText(ct);
-  return (
-    <CalendarButton
-      date={invitation.date}
-      location={invitation.location}
-      couple={invitation.couple}
-      eventType={invitation.eventType}
-      className="mt-5 flex items-center justify-center gap-2 px-5 py-2 transition-all"
-    >
-      <span style={ts.calendarCta}>
-        <EditableText elementKey="calendarCta">
-          {t("cta_addToCalendar")}
-        </EditableText>
-      </span>
-    </CalendarButton>
-  );
-}
-
-function getSaveTheDateSurfaceBackground(
-  theme: TemplateTheme,
+function getSaveTheDateImageBackground(
   invitation: InvitationData,
   imageSettings?: ImageSettingsMap,
 ) {
-  return {
-    background: theme.cardBg,
-    ...getSaveTheDateBackgroundStyle(
-      invitation.saveTheDateBackgroundImageUrl,
-      imageSettings?.saveTheDateBackground ?? DEFAULT_IMAGE_SETTINGS,
-    ),
-  };
+  return getSaveTheDateBackgroundStyle(
+    invitation.saveTheDateBackgroundImageUrl,
+    imageSettings?.saveTheDateBackground ?? DEFAULT_IMAGE_SETTINGS,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -145,6 +118,7 @@ function SaveTheDateClassic({
   theme,
   ts,
   cardBorderRadius,
+  plain,
   imageSettings,
   customTexts: ct,
   isPreview,
@@ -187,13 +161,17 @@ function SaveTheDateClassic({
             viewport: { once: false, margin: "-60px" },
           })}
       style={{
-        ...getSaveTheDateSurfaceBackground(theme, invitation, imageSettings),
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        borderRadius: cardBorderRadius ?? 20,
+        ...resolveCardSurfaceStyle({ plain }, {
+          background: theme.cardBg,
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          borderRadius: cardBorderRadius ?? 20,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+          border: `1px solid ${theme.cardBorder}`,
+        }),
+        ...getSaveTheDateImageBackground(invitation, imageSettings),
         padding: "36px 28px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-        border: `1px solid ${theme.cardBorder}`,
       }}
     >
       <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
@@ -250,11 +228,13 @@ function CountdownUnit({
   label,
   theme,
   ts,
+  plain,
 }: {
   value: number;
   label: string;
   theme: TemplateTheme;
   ts: ResolvedTextStyles;
+  plain?: boolean;
 }) {
   const formatted = formatCountdownValue(value);
   return (
@@ -263,14 +243,16 @@ function CountdownUnit({
         whileHover={{ scale: 1.05, y: -2 }}
         transition={{ duration: 0.25, ease: EASE }}
         style={{
-          background: theme.cardBg,
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          border: `1px solid ${theme.cardBorder}`,
-          borderRadius: 12,
+          ...resolveCardSurfaceStyle({ plain }, {
+            background: theme.cardBg,
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            border: `1px solid ${theme.cardBorder}`,
+            borderRadius: 12,
+            boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
+          }),
           padding: "14px 10px",
           minWidth: 58,
-          boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
           overflow: "hidden",
           position: "relative",
         }}
@@ -311,6 +293,7 @@ function SaveTheDateCountdown({
   theme,
   ts,
   cardBorderRadius,
+  plain,
   imageSettings,
   customTexts: ct,
   isPreview,
@@ -357,13 +340,17 @@ function SaveTheDateCountdown({
       whileHover={{ y: -3 }}
       transition={{ duration: 0.3, ease: EASE }}
       style={{
-        ...getSaveTheDateSurfaceBackground(theme, invitation, imageSettings),
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        borderRadius: cardBorderRadius ?? 20,
+        ...resolveCardSurfaceStyle({ plain }, {
+          background: theme.cardBg,
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          borderRadius: cardBorderRadius ?? 20,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+          border: `1px solid ${theme.cardBorder}`,
+        }),
+        ...getSaveTheDateImageBackground(invitation, imageSettings),
         padding: "32px 24px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
-        border: `1px solid ${theme.cardBorder}`,
       }}
     >
       <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
@@ -410,6 +397,7 @@ function SaveTheDateCountdown({
             label={t("saveDate_days")}
             theme={theme}
             ts={ts}
+            plain={plain}
           />
           <CountdownColon ts={ts} delay={0} />
           <CountdownUnit
@@ -417,6 +405,7 @@ function SaveTheDateCountdown({
             label={t("saveDate_hours")}
             theme={theme}
             ts={ts}
+            plain={plain}
           />
           <CountdownColon ts={ts} delay={0.3} />
           <CountdownUnit
@@ -424,6 +413,7 @@ function SaveTheDateCountdown({
             label={t("saveDate_minutes")}
             theme={theme}
             ts={ts}
+            plain={plain}
           />
           <CountdownColon ts={ts} delay={0.6} />
           <CountdownUnit
@@ -431,6 +421,7 @@ function SaveTheDateCountdown({
             label={t("saveDate_seconds")}
             theme={theme}
             ts={ts}
+            plain={plain}
           />
         </div>
       )}
@@ -473,52 +464,12 @@ function CountdownColon({
   );
 }
 
-function InlineCountdownUnit({
-  value,
-  label,
-  ts,
-  valueFontSize,
-  labelFontSize,
-}: {
-  value: string;
-  label: string;
-  ts: ResolvedTextStyles;
-  valueFontSize: string | number;
-  labelFontSize: string | number;
-}) {
-  return (
-    <div className="flex min-w-0 flex-col items-center gap-1">
-      <span
-        className="tabular-nums whitespace-nowrap"
-        style={{
-          ...ts.countdownValue,
-          fontFamily: ts.countdownValue.fontFamily ?? ts.displayFont,
-          fontSize: valueFontSize,
-          fontVariantNumeric: "tabular-nums",
-          lineHeight: 0.95,
-          letterSpacing: ts.countdownValue.letterSpacing ?? -1,
-        }}
-      >
-        <EditableText elementKey="countdownValue">{value}</EditableText>
-      </span>
-      <span
-        className="whitespace-nowrap"
-        style={{
-          ...ts.countdownLabel,
-          fontSize: labelFontSize,
-        }}
-      >
-        <EditableText elementKey="countdownLabel">{label}</EditableText>
-      </span>
-    </div>
-  );
-}
-
 function SaveTheDateInlineCountdown({
   invitation,
   theme,
   ts,
   cardBorderRadius,
+  plain,
   imageSettings,
   customTexts: ct,
   isPreview,
@@ -554,7 +505,7 @@ function SaveTheDateInlineCountdown({
   const labelFontSize =
     invitation.textStyles?.elements?.countdownLabel?.fontSize ??
     "clamp(0.55rem, 1.8vw, 0.85rem)";
-  const labels = [
+  const labels: [string, string, string, string] = [
     t("saveDate_days"),
     t("saveDate_hours"),
     t("saveDate_minutes"),
@@ -567,11 +518,15 @@ function SaveTheDateInlineCountdown({
       whileHover={{ y: -3 }}
       transition={{ duration: 0.3, ease: EASE }}
       style={{
-        ...getSaveTheDateSurfaceBackground(theme, invitation, imageSettings),
-        borderRadius: cardBorderRadius ?? 20,
+        ...resolveCardSurfaceStyle({ plain }, {
+          background: theme.cardBg,
+          borderRadius: cardBorderRadius ?? 20,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06)",
+          border: `1px solid ${theme.cardBorder}`,
+        }),
+        ...getSaveTheDateImageBackground(invitation, imageSettings),
         padding: "clamp(28px, 6vw, 48px) clamp(16px, 5vw, 36px)",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06)",
-        border: `1px solid ${theme.cardBorder}`,
       }}
     >
       <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
@@ -590,39 +545,26 @@ function SaveTheDateInlineCountdown({
           </span>
         </div>
       ) : (
-        <div className="mt-6 grid w-full max-w-[680px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-[clamp(0.125rem,1.5vw,0.75rem)]">
-          <InlineCountdownUnit
-            value={values[0]}
-            label={labels[0]}
-            ts={ts}
-            valueFontSize={valueFontSize}
-            labelFontSize={labelFontSize}
-          />
-          <CountdownColon ts={ts} delay={0} />
-          <InlineCountdownUnit
-            value={values[1]}
-            label={labels[1]}
-            ts={ts}
-            valueFontSize={valueFontSize}
-            labelFontSize={labelFontSize}
-          />
-          <CountdownColon ts={ts} delay={0.3} />
-          <InlineCountdownUnit
-            value={values[2]}
-            label={labels[2]}
-            ts={ts}
-            valueFontSize={valueFontSize}
-            labelFontSize={labelFontSize}
-          />
-          <CountdownColon ts={ts} delay={0.6} />
-          <InlineCountdownUnit
-            value={values[3]}
-            label={labels[3]}
-            ts={ts}
-            valueFontSize={valueFontSize}
-            labelFontSize={labelFontSize}
-          />
-        </div>
+        <InlineCountdown
+          className="mt-6 grid w-full max-w-[680px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-[clamp(0.125rem,1.5vw,0.75rem)]"
+          values={values}
+          labels={labels}
+          valueStyle={{
+            ...ts.countdownValue,
+            fontFamily: ts.countdownValue.fontFamily ?? ts.displayFont,
+            fontSize: valueFontSize,
+            fontVariantNumeric: "tabular-nums",
+            lineHeight: 0.95,
+            letterSpacing: ts.countdownValue.letterSpacing ?? -1,
+          }}
+          labelStyle={{ ...ts.countdownLabel, fontSize: labelFontSize }}
+          valueElementKey="countdownValue"
+          labelElementKey="countdownLabel"
+          colonStyle={{
+            fontFamily: ts.scriptFont,
+            color: ts.accent,
+          }}
+        />
       )}
 
       <CalendarCTA invitation={invitation} ts={ts} customTexts={ct} />
@@ -643,6 +585,7 @@ function QuadCard({
   elementKey,
   valueStyle,
   labelStyle,
+  plain,
 }: {
   label: string;
   value: string;
@@ -652,6 +595,7 @@ function QuadCard({
   elementKey: string;
   valueStyle: React.CSSProperties;
   labelStyle: React.CSSProperties;
+  plain?: boolean;
 }) {
   return (
     <motion.div
@@ -662,13 +606,15 @@ function QuadCard({
       transition={{ duration: 0.7, delay, ease: EASE }}
       className="flex flex-col items-center justify-center text-center"
       style={{
-        background: theme.cardBg,
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        borderRadius: 16,
+        ...resolveCardSurfaceStyle({ plain }, {
+          background: theme.cardBg,
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          borderRadius: 16,
+          border: `1px solid ${theme.cardBorder}`,
+          boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
+        }),
         padding: "20px 12px",
-        border: `1px solid ${theme.cardBorder}`,
-        boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
         minHeight: 100,
         cursor: "default",
       }}
@@ -700,6 +646,7 @@ function SaveTheDateQuadCards({
   theme,
   ts,
   cardBorderRadius,
+  plain,
   imageSettings,
   customTexts: ct,
   isPreview,
@@ -725,15 +672,14 @@ function SaveTheDateQuadCards({
       style={
         hasSharedBackground
           ? {
-              ...getSaveTheDateSurfaceBackground(
-                theme,
-                invitation,
-                imageSettings,
-              ),
-              borderRadius: cardBorderRadius ?? 20,
-              border: `1px solid ${theme.cardBorder}`,
-              boxShadow:
-                "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06)",
+              ...resolveCardSurfaceStyle({ plain }, {
+                background: theme.cardBg,
+                borderRadius: cardBorderRadius ?? 20,
+                border: `1px solid ${theme.cardBorder}`,
+                boxShadow:
+                  "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06)",
+              }),
+              ...getSaveTheDateImageBackground(invitation, imageSettings),
               padding: "28px 20px",
               overflow: "hidden",
             }
@@ -761,6 +707,7 @@ function SaveTheDateQuadCards({
           elementKey="quadDay"
           valueStyle={ts.quadDayValue}
           labelStyle={ts.quadDayLabel}
+          plain={plain}
         />
         <QuadCard
           label={t("saveDate_monthLabel")}
@@ -771,6 +718,7 @@ function SaveTheDateQuadCards({
           elementKey="quadMonth"
           valueStyle={ts.quadMonthValue}
           labelStyle={ts.quadMonthLabel}
+          plain={plain}
         />
         <QuadCard
           label={t("saveDate_yearLabel")}
@@ -781,6 +729,7 @@ function SaveTheDateQuadCards({
           elementKey="quadYear"
           valueStyle={ts.quadYearValue}
           labelStyle={ts.quadYearLabel}
+          plain={plain}
         />
         <QuadCard
           label={t("saveDate_dayOfWeekLabel")}
@@ -791,6 +740,7 @@ function SaveTheDateQuadCards({
           elementKey="quadDayOfWeek"
           valueStyle={ts.quadDayOfWeekValue}
           labelStyle={ts.quadDayOfWeekLabel}
+          plain={plain}
         />
       </div>
 
@@ -829,6 +779,7 @@ function SaveTheDateCinematic({
   theme,
   ts,
   cardBorderRadius,
+  plain,
   imageSettings,
   customTexts: ct,
   isPreview,
@@ -860,10 +811,14 @@ function SaveTheDateCinematic({
       whileHover={{ y: -3 }}
       transition={{ duration: 0.3, ease: EASE }}
       style={{
-        ...getSaveTheDateSurfaceBackground(theme, invitation, imageSettings),
-        borderRadius: cardBorderRadius ?? 20,
-        border: `1px solid ${theme.cardBorder}`,
-        boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.08)",
+        ...resolveCardSurfaceStyle({ plain }, {
+          background: theme.cardBg,
+          borderRadius: cardBorderRadius ?? 20,
+          border: `1px solid ${theme.cardBorder}`,
+          boxShadow:
+            "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.08)",
+        }),
+        ...getSaveTheDateImageBackground(invitation, imageSettings),
       }}
     >
       {/* Top half — full-bleed photo with overlay */}
@@ -987,10 +942,12 @@ function SaveTheDateCinematic({
       <div
         className="w-full"
         style={{
-          background: theme.cardBg,
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderTop: `1px solid ${theme.cardBorder}`,
+          ...resolveCardSurfaceStyle({ plain }, {
+            background: theme.cardBg,
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderTop: `1px solid ${theme.cardBorder}`,
+          }),
           padding: "20px 24px",
         }}
       >
@@ -1095,6 +1052,7 @@ function SaveTheDateMinimalLine({
   theme,
   ts,
   cardBorderRadius,
+  plain,
   imageSettings,
   customTexts: ct,
   isPreview,
@@ -1119,15 +1077,14 @@ function SaveTheDateMinimalLine({
       style={
         hasSharedBackground
           ? {
-              ...getSaveTheDateSurfaceBackground(
-                theme,
-                invitation,
-                imageSettings,
-              ),
-              borderRadius: cardBorderRadius ?? 20,
-              border: `1px solid ${theme.cardBorder}`,
-              boxShadow:
-                "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06)",
+              ...resolveCardSurfaceStyle({ plain }, {
+                background: theme.cardBg,
+                borderRadius: cardBorderRadius ?? 20,
+                border: `1px solid ${theme.cardBorder}`,
+                boxShadow:
+                  "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06)",
+              }),
+              ...getSaveTheDateImageBackground(invitation, imageSettings),
               padding: "28px 20px",
               overflow: "hidden",
             }
@@ -1237,6 +1194,7 @@ export default function SaveTheDateSection({
   cardBg,
   cardBorder,
   cardBorderRadius,
+  plain,
   isPreview,
   imageSettings,
   customTexts,
@@ -1257,6 +1215,7 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
+          plain={plain}
           imageSettings={imageSettings}
           isPreview={isPreview}
           customTexts={customTexts}
@@ -1269,6 +1228,7 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
+          plain={plain}
           imageSettings={imageSettings}
           isPreview={isPreview}
           customTexts={customTexts}
@@ -1281,6 +1241,7 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
+          plain={plain}
           imageSettings={imageSettings}
           isPreview={isPreview}
           customTexts={customTexts}
@@ -1293,6 +1254,7 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
+          plain={plain}
           imageSettings={imageSettings}
           isPreview={isPreview}
           customTexts={customTexts}
@@ -1305,6 +1267,7 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
+          plain={plain}
           imageSettings={imageSettings}
           isPreview={isPreview}
           customTexts={customTexts}
@@ -1318,6 +1281,7 @@ export default function SaveTheDateSection({
           theme={theme}
           ts={ts}
           cardBorderRadius={cardBorderRadius}
+          plain={plain}
           imageSettings={imageSettings}
           isPreview={isPreview}
           customTexts={customTexts}
