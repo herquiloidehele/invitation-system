@@ -702,6 +702,7 @@ export interface SpacingStyleOverrides {
 
 /** Style overrides for a single text element (all fields optional). */
 export type TextAlign = "left" | "center" | "right";
+export type TextTransform = "none" | "uppercase" | "lowercase";
 
 export interface TextStyle {
   fontFamily?: string;
@@ -710,6 +711,7 @@ export interface TextStyle {
   fontWeight?: string | number;
   fontStyle?: string;
   textAlign?: TextAlign;
+  textTransform?: TextTransform;
   letterSpacing?: number;
 }
 

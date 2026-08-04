@@ -216,9 +216,10 @@ export function applyOverride(
     result.fontWeight = override.fontWeight;
   if (override.letterSpacing !== undefined)
     result.letterSpacing = override.letterSpacing;
-  if (override.fontStyle !== undefined)
-    result.fontStyle = override.fontStyle;
+  if (override.fontStyle !== undefined) result.fontStyle = override.fontStyle;
   if (override.textAlign !== undefined) result.textAlign = override.textAlign;
+  if (override.textTransform !== undefined)
+    result.textTransform = override.textTransform;
   return result;
 }
 

@@ -1,24 +1,18 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useInlineTextEdit } from "@/components/shared/EditableText";
 import FontPicker from "@/components/admin/FontPicker";
 import { extractFamilyName } from "@/lib/google-fonts";
 import { useDynamicFont } from "@/hooks/useDynamicFont";
-import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  RotateCcw,
-  X,
-} from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, RotateCcw, X } from "lucide-react";
 import type { SpacingField } from "@/lib/spacing-styles";
-import type { TextAlign, TextStyle, TextStyleOverrides } from "@/lib/types";
+import type {
+  TextAlign,
+  TextStyle,
+  TextStyleOverrides,
+  TextTransform,
+} from "@/lib/types";
 import { isInlineEditorFloatingLayerTarget } from "@/lib/inline-editor-floating-layers";
 
 // ---------------------------------------------------------------------------
@@ -38,6 +32,12 @@ const ALIGN_OPTIONS = [
   { value: "center", Icon: AlignCenter, label: "Centrar" },
   { value: "right", Icon: AlignRight, label: "Alinhar à direita" },
 ] satisfies { value: TextAlign; Icon: typeof AlignLeft; label: string }[];
+
+const TEXT_CASE_OPTIONS = [
+  { value: "none", label: "Capitalização normal", text: "Aa" },
+  { value: "uppercase", label: "Converter para maiúsculas", text: "AA" },
+  { value: "lowercase", label: "Converter para minúsculas", text: "aa" },
+] satisfies { value: TextTransform; label: string; text: string }[];
 
 // ---------------------------------------------------------------------------
 // Toolbar positioning
@@ -108,6 +108,38 @@ function SpacingInput({
 // ---------------------------------------------------------------------------
 
 type ElementKey = keyof NonNullable<TextStyleOverrides["elements"]>;
+
+export function TextCaseControl({
+  value,
+  onChange,
+}: {
+  value: TextTransform | undefined;
+  onChange: (value: TextTransform) => void;
+}) {
+  return (
+    <div
+      className="flex items-center gap-0.5 rounded border bg-background p-0.5"
+      role="group"
+      aria-label="Capitalização do texto"
+    >
+      {TEXT_CASE_OPTIONS.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          title={option.label}
+          aria-label={option.label}
+          aria-pressed={value === option.value}
+          onClick={() => onChange(option.value)}
+          className={`flex h-7 min-w-7 items-center justify-center rounded-sm px-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96] ${
+            value === option.value ? "bg-accent text-accent-foreground" : ""
+          }`}
+        >
+          {option.text}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function TextStyleToolbar() {
   const ctx = useInlineTextEdit();
@@ -300,6 +332,15 @@ export default function TextStyleToolbar() {
       {/* Divider */}
       <div className="h-5 w-px bg-border" />
 
+      {/* Text case */}
+      <TextCaseControl
+        value={overrides.textTransform}
+        onChange={(value) => set("textTransform", value)}
+      />
+
+      {/* Divider */}
+      <div className="h-5 w-px bg-border" />
+
       {/* Text alignment */}
       <div
         className="flex items-center gap-0.5 rounded border bg-background p-0.5"
@@ -371,6 +412,7 @@ export default function TextStyleToolbar() {
           set("fontSize", undefined);
           set("fontWeight", undefined);
           set("fontStyle", undefined);
+          set("textTransform", undefined);
           set("textAlign", undefined);
           set("color", undefined);
           set("letterSpacing", undefined);
