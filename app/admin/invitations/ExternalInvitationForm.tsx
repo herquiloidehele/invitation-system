@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useReducer, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ import type {
   BankTransferDetail,
   CoupleGallery,
   GiftItem,
+  ImageLayer,
   TextStyle,
   TextStyleOverrides,
   ImageSettings,
@@ -77,8 +78,13 @@ import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFie
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import HeroTextEditor from "@/components/admin/HeroTextEditor";
 import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
+import ImageLayerEditModeControl from "@/components/admin/ImageLayerEditModeControl";
 import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
 import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
+import {
+  imageLayerEditorModeReducer,
+  isImageLayerEditorActive,
+} from "@/lib/image-layer-editor-mode";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GiftsListEditor from "@/components/admin/GiftsListEditor";
 import BankTransferEditor from "@/components/admin/BankTransferEditor";
@@ -360,8 +366,17 @@ export default function ExternalInvitationForm({
   );
   const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [imageEditing, dispatchImageEditing] = useReducer(
+    imageLayerEditorModeReducer,
+    false,
+  );
   const previewRootRef = useRef<HTMLDivElement | null>(null);
-  const hasImageItems = (form.imageLayer?.items?.length ?? 0) > 0;
+  const imageItemCount = form.imageLayer?.items?.length ?? 0;
+  const hasImageItems = imageItemCount > 0;
+  const imageLayerEditorActive = isImageLayerEditorActive(
+    imageItemCount,
+    imageEditing,
+  );
 
   const isWedding = isWeddingEventType(form.eventType);
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
@@ -383,6 +398,14 @@ export default function ExternalInvitationForm({
     },
     [clearSubmitError],
   );
+
+  const updateImageLayer = (next: ImageLayer) => {
+    update("imageLayer", next);
+    dispatchImageEditing({
+      type: "items-changed",
+      itemCount: next.items.length,
+    });
+  };
 
   // Per-element text style override updater. Mirrors the helper in
   // InvitationForm so the curtain-canva preview supports the same inline
@@ -1174,16 +1197,26 @@ export default function ExternalInvitationForm({
                   </p>
                   <ImageLayerUploader
                     value={form.imageLayer}
-                    onChange={(next) => update("imageLayer", next)}
+                    onChange={updateImageLayer}
                     getPreviewRoot={() => previewRootRef.current}
-                    onAdded={(id) => setSelectedImageId(id)}
+                    onAdded={(id) => {
+                      setSelectedImageId(id);
+                      dispatchImageEditing({ type: "image-added" });
+                    }}
+                  />
+                  <ImageLayerEditModeControl
+                    active={imageLayerEditorActive}
+                    hasImages={hasImageItems}
+                    onActiveChange={(editing) =>
+                      dispatchImageEditing({ type: "set-editing", editing })
+                    }
                   />
                   {(form.imageLayer?.items?.length ?? 0) > 0 && (
                     <div className="space-y-2 rounded-md border p-2">
                       <ImageLayerInspector
                         layer={form.imageLayer}
                         selectedId={selectedImageId}
-                        onChange={(next) => update("imageLayer", next)}
+                        onChange={updateImageLayer}
                         onSelect={setSelectedImageId}
                       />
                     </div>
@@ -3917,9 +3950,9 @@ export default function ExternalInvitationForm({
       />
 
       <ImageLayerEditor
-        active={hasImageItems}
+        active={imageLayerEditorActive}
         value={form.imageLayer}
-        onChange={(next) => update("imageLayer", next)}
+        onChange={updateImageLayer}
         getPreviewRoot={() => previewRootRef.current}
         selectedId={selectedImageId}
         onSelectedIdChange={setSelectedImageId}

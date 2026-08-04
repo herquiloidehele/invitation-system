@@ -4,7 +4,7 @@
 
 **Goal:** Prevent large background-image hitboxes from blocking inline text and card controls by making preview image manipulation an explicit admin mode.
 
-**Architecture:** Both invitation forms will own an `imageEditing` UI flag and will activate `ImageLayerEditor` only when that flag is true and at least one image-layer item exists. A shared admin control will expose the mode consistently, while a pure predicate will encode and test the activation rule without introducing DOM testing into the Node-only Vitest suite.
+**Architecture:** Both invitation forms will own image-editing mode through a shared pure reducer and will activate `ImageLayerEditor` only when that mode is true and at least one image-layer item exists. A shared admin control will expose the mode consistently. Reducer and predicate behavior will be tested directly, and the control's rendered accessibility states will be tested through React's server renderer without introducing a DOM environment.
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript, Base UI button primitives, Tailwind CSS v4, Vitest in Node mode.
 
@@ -23,20 +23,20 @@
 
 ## File Structure
 
-- Create `lib/image-layer-editor-mode.ts`: pure activation predicate shared by both forms.
+- Create `lib/image-layer-editor-mode.ts`: pure mode reducer and activation predicate shared by both forms.
 - Create `components/admin/ImageLayerEditModeControl.tsx`: shared mode button and concise status guidance.
 - Create `tests/image-layer-editor-mode.test.ts`: predicate coverage plus Node-compatible source integration checks.
 - Modify `app/admin/invitations/InvitationForm.tsx`: own the mode state, render the shared control, enable it after upload, and gate `ImageLayerEditor`.
 - Modify `app/admin/invitations/ExternalInvitationForm.tsx`: apply the same state and UI integration to external invitations.
 
-### Task 1: Encode the image-editor activation rule
+### Task 1: Encode image-editor mode transitions and activation
 
 **Files:**
 - Create: `lib/image-layer-editor-mode.ts`
 - Create: `tests/image-layer-editor-mode.test.ts`
 
 **Interfaces:**
-- Produces: `isImageLayerEditorActive(itemCount: number, editing: boolean): boolean`
+- Produces: `imageLayerEditorModeReducer(editing: boolean, action: ImageLayerEditorModeAction): boolean` and `isImageLayerEditorActive(itemCount: number, editing: boolean): boolean`.
 - Consumes: no application state or browser APIs.
 
 - [ ] **Step 1: Write the failing predicate tests**
@@ -46,7 +46,51 @@ Create `tests/image-layer-editor-mode.test.ts` with the following initial conten
 ```ts
 import { describe, expect, it } from "vitest";
 
-import { isImageLayerEditorActive } from "@/lib/image-layer-editor-mode";
+import {
+  imageLayerEditorModeReducer,
+  isImageLayerEditorActive,
+} from "@/lib/image-layer-editor-mode";
+
+describe("imageLayerEditorModeReducer", () => {
+  it("enables editing after an image is added", () => {
+    expect(imageLayerEditorModeReducer(false, { type: "image-added" })).toBe(
+      true,
+    );
+  });
+
+  it("applies an explicit mode change", () => {
+    expect(
+      imageLayerEditorModeReducer(false, {
+        type: "set-editing",
+        editing: true,
+      }),
+    ).toBe(true);
+    expect(
+      imageLayerEditorModeReducer(true, {
+        type: "set-editing",
+        editing: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("disables editing when the last image is removed", () => {
+    expect(
+      imageLayerEditorModeReducer(true, {
+        type: "items-changed",
+        itemCount: 0,
+      }),
+    ).toBe(false);
+  });
+
+  it("preserves editing when images remain", () => {
+    expect(
+      imageLayerEditorModeReducer(true, {
+        type: "items-changed",
+        itemCount: 1,
+      }),
+    ).toBe(true);
+  });
+});
 
 describe("isImageLayerEditorActive", () => {
   it("activates only when images exist and editing was requested", () => {
@@ -78,6 +122,25 @@ Expected: FAIL because `@/lib/image-layer-editor-mode` does not exist.
 Create `lib/image-layer-editor-mode.ts`:
 
 ```ts
+export type ImageLayerEditorModeAction =
+  | { type: "set-editing"; editing: boolean }
+  | { type: "image-added" }
+  | { type: "items-changed"; itemCount: number };
+
+export function imageLayerEditorModeReducer(
+  editing: boolean,
+  action: ImageLayerEditorModeAction,
+): boolean {
+  switch (action.type) {
+    case "set-editing":
+      return action.editing;
+    case "image-added":
+      return true;
+    case "items-changed":
+      return action.itemCount > 0 && editing;
+  }
+}
+
 /** Whether the admin's pointer-capturing image overlay may cover the preview. */
 export function isImageLayerEditorActive(
   itemCount: number,
@@ -95,14 +158,15 @@ Run:
 npx vitest run tests/image-layer-editor-mode.test.ts
 ```
 
-Expected: all three predicate tests PASS.
+Expected: all reducer and predicate tests PASS.
 
-- [ ] **Step 5: Commit the predicate and tests**
+- [ ] **Step 5: Keep the predicate and tests uncommitted**
 
 ```bash
-git add lib/image-layer-editor-mode.ts tests/image-layer-editor-mode.test.ts
-git commit -m "test: define image layer editor activation"
+git status --short
 ```
+
+Expected: the new predicate and test files remain unstaged and uncommitted.
 
 ### Task 2: Add the shared image-edit mode control
 
@@ -114,28 +178,47 @@ git commit -m "test: define image layer editor activation"
 - Consumes: `active: boolean`, `hasImages: boolean`, and `onActiveChange(active: boolean): void`.
 - Produces: `ImageLayerEditModeControl`, a controlled admin button that cannot activate without images.
 
-- [ ] **Step 1: Add failing source-contract coverage for the control**
+- [ ] **Step 1: Add failing server-render coverage for the control**
 
-Append imports and a source fixture to `tests/image-layer-editor-mode.test.ts`:
+Append these imports to `tests/image-layer-editor-mode.test.ts`:
 
 ```ts
-import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
-const controlSource = readFileSync(
-  "components/admin/ImageLayerEditModeControl.tsx",
-  "utf8",
-);
+import ImageLayerEditModeControl from "@/components/admin/ImageLayerEditModeControl";
 ```
 
 Append this suite:
 
 ```ts
-describe("ImageLayerEditModeControl source", () => {
-  it("cannot activate without images and exposes both mode labels", () => {
-    expect(controlSource).toContain("disabled={!hasImages}");
-    expect(controlSource).toContain("Editar imagens na pré-visualização");
-    expect(controlSource).toContain("Concluir edição de imagens");
-    expect(controlSource).toContain("onActiveChange(!active)");
+describe("ImageLayerEditModeControl", () => {
+  it("renders a disabled activation control without images", () => {
+    const html = renderToStaticMarkup(
+      createElement(ImageLayerEditModeControl, {
+        active: false,
+        hasImages: false,
+        onActiveChange: () => undefined,
+      }),
+    );
+
+    expect(html).toContain("disabled");
+    expect(html).toContain('aria-pressed="false"');
+    expect(html).toContain("Editar imagens na pré-visualização");
+  });
+
+  it("renders the active completion control", () => {
+    const html = renderToStaticMarkup(
+      createElement(ImageLayerEditModeControl, {
+        active: true,
+        hasImages: true,
+        onActiveChange: () => undefined,
+      }),
+    );
+
+    expect(html).not.toContain("disabled");
+    expect(html).toContain('aria-pressed="true"');
+    expect(html).toContain("Concluir edição de imagens");
   });
 });
 ```
@@ -202,7 +285,7 @@ Run:
 npx vitest run tests/image-layer-editor-mode.test.ts
 ```
 
-Expected: predicate and control source tests PASS.
+Expected: reducer, predicate, and control render tests PASS.
 
 - [ ] **Step 5: Run ESLint on the new component and test**
 
@@ -214,66 +297,25 @@ npx eslint components/admin/ImageLayerEditModeControl.tsx tests/image-layer-edit
 
 Expected: exit code 0 with no warnings or errors.
 
-- [ ] **Step 6: Commit the shared control**
+- [ ] **Step 6: Keep the shared control uncommitted**
 
 ```bash
-git add components/admin/ImageLayerEditModeControl.tsx tests/image-layer-editor-mode.test.ts
-git commit -m "feat: add image layer edit mode control"
+git status --short
 ```
+
+Expected: the control and its test changes remain unstaged and uncommitted.
 
 ### Task 3: Gate both admin preview overlays
 
 **Files:**
 - Modify: `app/admin/invitations/InvitationForm.tsx:1-10, 115-128, 617-625, 2423-2454, 4281-4288`
 - Modify: `app/admin/invitations/ExternalInvitationForm.tsx:1-4, 77-88, 360-366, 1162-1192, 3919-3926`
-- Modify: `tests/image-layer-editor-mode.test.ts`
 
 **Interfaces:**
-- Consumes: `isImageLayerEditorActive(itemCount, editing)` from Task 1 and `ImageLayerEditModeControl` from Task 2.
+- Consumes: `imageLayerEditorModeReducer`, `isImageLayerEditorActive`, and `ImageLayerEditModeControl` from Tasks 1-2.
 - Produces: identical explicit-mode behavior in `InvitationForm` and `ExternalInvitationForm`.
 
-- [ ] **Step 1: Add failing integration source tests for both forms**
-
-Append these fixtures to `tests/image-layer-editor-mode.test.ts`:
-
-```ts
-const formSources = [
-  "app/admin/invitations/InvitationForm.tsx",
-  "app/admin/invitations/ExternalInvitationForm.tsx",
-].map((path) => [path, readFileSync(path, "utf8")] as const);
-```
-
-Append this suite:
-
-```ts
-describe.each(formSources)("%s image edit mode integration", (_path, source) => {
-  it("starts disabled and gates the pointer-capturing overlay", () => {
-    expect(source).toContain(
-      "const [imageEditing, setImageEditing] = useState(false);",
-    );
-    expect(source).toContain(
-      "isImageLayerEditorActive(imageItemCount, imageEditing)",
-    );
-    expect(source).toContain("active={imageLayerEditorActive}");
-  });
-
-  it("renders the mode control and enables it after upload", () => {
-    expect(source).toContain("<ImageLayerEditModeControl");
-    expect(source).toContain("onActiveChange={setImageEditing}");
-    expect(source).toMatch(
-      /onAdded=\{\(id\) => \{\s*setSelectedImageId\(id\);\s*setImageEditing\(true\);\s*\}\}/,
-    );
-  });
-
-  it("turns the requested mode off after the last image is removed", () => {
-    expect(source).toContain("if (next.items.length === 0)");
-    expect(source).toContain("setImageEditing(false);");
-    expect(source).toContain("onChange={updateImageLayer}");
-  });
-});
-```
-
-- [ ] **Step 2: Run the focused test and verify RED**
+- [ ] **Step 1: Confirm the tested mode units are green before wiring**
 
 Run:
 
@@ -281,22 +323,28 @@ Run:
 npx vitest run tests/image-layer-editor-mode.test.ts
 ```
 
-Expected: the predicate and control suites PASS; both form integration suites FAIL because neither form owns or uses the explicit mode yet.
+Expected: reducer, predicate, and control render tests PASS.
 
-- [ ] **Step 3: Add state, imports, and derived activation to `InvitationForm`**
+- [ ] **Step 2: Add state, imports, and derived activation to `InvitationForm`**
 
-Add `ImageLayer` to the existing `@/lib/types` type import, then add:
+Add `useReducer` to the React import and `ImageLayer` to the existing `@/lib/types` type import, then add:
 
 ```tsx
 import ImageLayerEditModeControl from "@/components/admin/ImageLayerEditModeControl";
-import { isImageLayerEditorActive } from "@/lib/image-layer-editor-mode";
+import {
+  imageLayerEditorModeReducer,
+  isImageLayerEditorActive,
+} from "@/lib/image-layer-editor-mode";
 ```
 
 Replace the current image state derivation with:
 
 ```tsx
 const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
-const [imageEditing, setImageEditing] = useState(false);
+const [imageEditing, dispatchImageEditing] = useReducer(
+  imageLayerEditorModeReducer,
+  false,
+);
 const previewRootRef = useRef<HTMLDivElement | null>(null);
 const imageItemCount = form.imageLayer?.items?.length ?? 0;
 const hasImageItems = imageItemCount > 0;
@@ -307,9 +355,10 @@ const imageLayerEditorActive = isImageLayerEditorActive(
 
 const updateImageLayer = (next: ImageLayer) => {
   update("imageLayer", next);
-  if (next.items.length === 0) {
-    setImageEditing(false);
-  }
+  dispatchImageEditing({
+    type: "items-changed",
+    itemCount: next.items.length,
+  });
 };
 ```
 
@@ -318,7 +367,7 @@ Inside **Imagens de fundo**, replace the uploader's `onAdded` and add the contro
 ```tsx
 onAdded={(id) => {
   setSelectedImageId(id);
-  setImageEditing(true);
+  dispatchImageEditing({ type: "image-added" });
 }}
 ```
 
@@ -332,7 +381,9 @@ onChange={updateImageLayer}
 <ImageLayerEditModeControl
   active={imageLayerEditorActive}
   hasImages={hasImageItems}
-  onActiveChange={setImageEditing}
+  onActiveChange={(editing) =>
+    dispatchImageEditing({ type: "set-editing", editing })
+  }
 />
 ```
 
@@ -342,20 +393,26 @@ Change the overlay prop to:
 active={imageLayerEditorActive}
 ```
 
-- [ ] **Step 4: Apply the identical integration to `ExternalInvitationForm`**
+- [ ] **Step 3: Apply the integration to `ExternalInvitationForm`**
 
-Add `ImageLayer` to the existing `@/lib/types` type import, then add these imports:
+Add `useReducer` to the React import and `ImageLayer` to the existing `@/lib/types` type import, then add these imports:
 
 ```tsx
 import ImageLayerEditModeControl from "@/components/admin/ImageLayerEditModeControl";
-import { isImageLayerEditorActive } from "@/lib/image-layer-editor-mode";
+import {
+  imageLayerEditorModeReducer,
+  isImageLayerEditorActive,
+} from "@/lib/image-layer-editor-mode";
 ```
 
 Replace the current image state derivation with:
 
 ```tsx
 const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
-const [imageEditing, setImageEditing] = useState(false);
+const [imageEditing, dispatchImageEditing] = useReducer(
+  imageLayerEditorModeReducer,
+  false,
+);
 const previewRootRef = useRef<HTMLDivElement | null>(null);
 const imageItemCount = form.imageLayer?.items?.length ?? 0;
 const hasImageItems = imageItemCount > 0;
@@ -366,9 +423,10 @@ const imageLayerEditorActive = isImageLayerEditorActive(
 
 const updateImageLayer = (next: ImageLayer) => {
   update("imageLayer", next);
-  if (next.items.length === 0) {
-    setImageEditing(false);
-  }
+  dispatchImageEditing({
+    type: "items-changed",
+    itemCount: next.items.length,
+  });
 };
 ```
 
@@ -383,7 +441,7 @@ Replace the uploader's `onAdded` callback with:
 ```tsx
 onAdded={(id) => {
   setSelectedImageId(id);
-  setImageEditing(true);
+  dispatchImageEditing({ type: "image-added" });
 }}
 ```
 
@@ -393,7 +451,9 @@ Add the control immediately after the uploader:
 <ImageLayerEditModeControl
   active={imageLayerEditorActive}
   hasImages={hasImageItems}
-  onActiveChange={setImageEditing}
+  onActiveChange={(editing) =>
+    dispatchImageEditing({ type: "set-editing", editing })
+  }
 />
 ```
 
@@ -403,7 +463,7 @@ Change the overlay prop to:
 active={imageLayerEditorActive}
 ```
 
-- [ ] **Step 5: Run the focused test and verify GREEN**
+- [ ] **Step 4: Run the focused behavior tests after wiring**
 
 Run:
 
@@ -411,9 +471,9 @@ Run:
 npx vitest run tests/image-layer-editor-mode.test.ts
 ```
 
-Expected: all predicate, control, and form integration tests PASS.
+Expected: all reducer, predicate, and control render tests PASS.
 
-- [ ] **Step 6: Run relevant regression tests**
+- [ ] **Step 5: Run relevant regression tests**
 
 Run:
 
@@ -423,12 +483,13 @@ npx vitest run tests/image-layer.test.ts tests/image-layer-editor-geometry.test.
 
 Expected: all image-layer tests PASS.
 
-- [ ] **Step 7: Commit both form integrations**
+- [ ] **Step 6: Leave both form integrations uncommitted as requested**
 
 ```bash
-git add app/admin/invitations/InvitationForm.tsx app/admin/invitations/ExternalInvitationForm.tsx tests/image-layer-editor-mode.test.ts
-git commit -m "fix: gate admin background image interactions"
+git status --short
 ```
+
+Expected: the implementation and test files remain unstaged and uncommitted.
 
 ### Task 4: Verify the completed behavior
 

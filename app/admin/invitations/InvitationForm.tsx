@@ -3,6 +3,7 @@
 import {
   useCallback,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type SetStateAction,
@@ -24,6 +25,7 @@ import type {
   EnvelopeConfig,
   GiftItem,
   GuestGuideItem,
+  ImageLayer,
   ImageSettings,
   ImageSettingsKey,
   InvitationData,
@@ -122,8 +124,13 @@ import GuestListEditor from "@/components/admin/GuestListEditor";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import HeroTextEditor from "@/components/admin/HeroTextEditor";
 import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
+import ImageLayerEditModeControl from "@/components/admin/ImageLayerEditModeControl";
 import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
 import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
+import {
+  imageLayerEditorModeReducer,
+  isImageLayerEditorActive,
+} from "@/lib/image-layer-editor-mode";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
@@ -617,8 +624,17 @@ export default function InvitationForm({
   // Google Maps link auto-fill state
   const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [imageEditing, dispatchImageEditing] = useReducer(
+    imageLayerEditorModeReducer,
+    false,
+  );
   const previewRootRef = useRef<HTMLDivElement | null>(null);
-  const hasImageItems = (form.imageLayer?.items?.length ?? 0) > 0;
+  const imageItemCount = form.imageLayer?.items?.length ?? 0;
+  const hasImageItems = imageItemCount > 0;
+  const imageLayerEditorActive = isImageLayerEditorActive(
+    imageItemCount,
+    imageEditing,
+  );
   const [mapsLink1, setMapsLink1] = useState("");
   const [mapsLink2, setMapsLink2] = useState("");
   const [resolvingLoc1, setResolvingLoc1] = useState(false);
@@ -689,6 +705,14 @@ export default function InvitationForm({
     },
     [clearSubmitError],
   );
+
+  const updateImageLayer = (next: ImageLayer) => {
+    update("imageLayer", next);
+    dispatchImageEditing({
+      type: "items-changed",
+      itemCount: next.items.length,
+    });
+  };
 
   // Nested updaters
   const updateCouple = useCallback(
@@ -2436,16 +2460,26 @@ export default function InvitationForm({
                   </p>
                   <ImageLayerUploader
                     value={form.imageLayer}
-                    onChange={(next) => update("imageLayer", next)}
+                    onChange={updateImageLayer}
                     getPreviewRoot={() => previewRootRef.current}
-                    onAdded={(id) => setSelectedImageId(id)}
+                    onAdded={(id) => {
+                      setSelectedImageId(id);
+                      dispatchImageEditing({ type: "image-added" });
+                    }}
+                  />
+                  <ImageLayerEditModeControl
+                    active={imageLayerEditorActive}
+                    hasImages={hasImageItems}
+                    onActiveChange={(editing) =>
+                      dispatchImageEditing({ type: "set-editing", editing })
+                    }
                   />
                   {(form.imageLayer?.items?.length ?? 0) > 0 && (
                     <div className="space-y-2 rounded-md border p-2">
                       <ImageLayerInspector
                         layer={form.imageLayer}
                         selectedId={selectedImageId}
-                        onChange={(next) => update("imageLayer", next)}
+                        onChange={updateImageLayer}
                         onSelect={setSelectedImageId}
                       />
                     </div>
@@ -4279,9 +4313,9 @@ export default function InvitationForm({
       />
 
       <ImageLayerEditor
-        active={hasImageItems}
+        active={imageLayerEditorActive}
         value={form.imageLayer}
-        onChange={(next) => update("imageLayer", next)}
+        onChange={updateImageLayer}
         getPreviewRoot={() => previewRootRef.current}
         selectedId={selectedImageId}
         onSelectedIdChange={setSelectedImageId}
