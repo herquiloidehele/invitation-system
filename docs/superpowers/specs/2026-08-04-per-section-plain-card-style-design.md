@@ -91,6 +91,8 @@ When plain mode is active, the selected section's decorative surface resolves to
 
 The utility does not set padding, margin, width, overflow, positioning, or animation properties. Those remain owned by each component. This prevents plain mode from collapsing content or changing the invitation's vertical rhythm.
 
+Configured section images are content, not card decoration. The utility must not set `backgroundImage`, `backgroundSize`, `backgroundPosition`, or `backgroundRepeat`. Components such as the save-the-date variants apply those image properties separately from, and after, the resolved surface decoration. Plain mode therefore makes the card color transparent without hiding a configured background image.
+
 Some sections have multiple visual variants or repeated surfaces. Every surface that serves as the selected section's card presentation must honor the same `plain` value. Nested interactive elements keep their own affordances. For example, plain FAQ mode removes the FAQ card container while retaining row separators and accordion behavior; plain gift mode removes the section card while retaining gift actions and bank-transfer controls.
 
 ## Admin Editor Behavior
