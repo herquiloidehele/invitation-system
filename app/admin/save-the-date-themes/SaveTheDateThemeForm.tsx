@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ColorArrayField } from "@/components/admin/ColorArrayField";
+import FontPicker from "@/components/admin/FontPicker";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Accordion,
@@ -24,6 +25,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { TemplateTheme } from "@/lib/types";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import { useDynamicFonts } from "@/hooks/useDynamicFont";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -98,6 +100,8 @@ function ColorField({
 // ---------------------------------------------------------------------------
 
 function STDContentPreview({ data }: { data: STDThemeFormData }) {
+  useDynamicFonts([data.titleFont, data.coupleFont, data.dateFont]);
+
   return (
     <div
       className="flex flex-col items-center justify-center gap-6 px-6 py-12 min-h-[500px]"
@@ -413,36 +417,21 @@ export default function SaveTheDateThemeForm({ mode, initialData }: Props) {
                 Tipografia
               </AccordionTrigger>
               <AccordionContent className="space-y-3 pb-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="titleFont">Fonte do Título</Label>
-                  <Input
-                    id="titleFont"
-                    value={data.titleFont}
-                    onChange={(e) => update("titleFont", e.target.value)}
-                    placeholder="'Great Vibes', cursive"
-                    className="font-mono text-xs"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="coupleFont">Fonte do Casal</Label>
-                  <Input
-                    id="coupleFont"
-                    value={data.coupleFont}
-                    onChange={(e) => update("coupleFont", e.target.value)}
-                    placeholder="'Cormorant Garamond', serif"
-                    className="font-mono text-xs"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="dateFont">Fonte da Data</Label>
-                  <Input
-                    id="dateFont"
-                    value={data.dateFont}
-                    onChange={(e) => update("dateFont", e.target.value)}
-                    placeholder="'Cormorant Garamond', serif"
-                    className="font-mono text-xs"
-                  />
-                </div>
+                <FontPicker
+                  label="Fonte do Título"
+                  value={data.titleFont}
+                  onChange={(value) => update("titleFont", value)}
+                />
+                <FontPicker
+                  label="Fonte do Casal"
+                  value={data.coupleFont}
+                  onChange={(value) => update("coupleFont", value)}
+                />
+                <FontPicker
+                  label="Fonte da Data"
+                  value={data.dateFont}
+                  onChange={(value) => update("dateFont", value)}
+                />
               </AccordionContent>
             </AccordionItem>
 

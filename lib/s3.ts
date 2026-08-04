@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
@@ -42,7 +43,7 @@ export interface PresignedUploadResult {
 export async function generatePresignedUploadUrl(
   fileName: string,
   contentType: string,
-  folder: "images" | "videos" | "audio",
+  folder: "images" | "videos" | "audio" | "fonts/pending",
   expiresIn = 600, // 10 minutes
 ): Promise<PresignedUploadResult> {
   const client = getS3Client();
@@ -120,6 +121,68 @@ export async function getObjectBuffer(key: string): Promise<Buffer> {
   // The AWS SDK v3 returns the body as a web ReadableStream in Node 18+.
   const arrayBuffer = await res.Body.transformToByteArray();
   return Buffer.from(arrayBuffer);
+}
+
+export async function getObjectBufferLimited(
+  key: string,
+  maxBytes: number,
+): Promise<Buffer> {
+  const client = getS3Client();
+  const res = await client.send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  if (!res.Body) {
+    throw new Error(`S3 object ${key} returned no body`);
+  }
+  const limiter = createByteLimitTransform(maxBytes);
+  const stream = res.Body.transformToWebStream().pipeThrough(limiter.stream);
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk)));
+}
+
+export async function copyObject(
+  sourceKey: string,
+  destinationKey: string,
+  contentType: string,
+): Promise<void> {
+  const encodedSource = sourceKey
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  await getS3Client().send(
+    new CopyObjectCommand({
+      Bucket: bucket,
+      CopySource: `${bucket}/${encodedSource}`,
+      Key: destinationKey,
+      ContentType: contentType,
+      MetadataDirective: "REPLACE",
+    }),
+  );
+}
+
+export interface S3ObjectStream {
+  body: ReadableStream<Uint8Array>;
+  contentLength: number | null;
+}
+
+export async function getObjectStream(key: string): Promise<S3ObjectStream> {
+  const res = await getS3Client().send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  if (!res.Body) {
+    throw new Error(`S3 object ${key} returned no body`);
+  }
+  return {
+    body: res.Body.transformToWebStream() as ReadableStream<Uint8Array>,
+    contentLength:
+      typeof res.ContentLength === "number" ? res.ContentLength : null,
+  };
 }
 
 export function createByteLimitTransform(maxBytes: number): {

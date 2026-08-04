@@ -1,33 +1,50 @@
 "use client";
 
+import {
+  Check,
+  ChevronDown,
+  Loader2,
+  Plus,
+  Search,
+  Star,
+  X,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import CustomFontUploadDialog from "@/components/admin/CustomFontUploadDialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Check, ChevronDown, Loader2, Search, Star, X } from "lucide-react";
-import type { FontCategory, GoogleFontEntry } from "@/lib/google-fonts";
+import { useDynamicFont } from "@/hooks/useDynamicFont";
 import {
-  buildFontStack,
-  extractFamilyName,
-  isBuiltinFont,
-} from "@/lib/google-fonts";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+  extractCustomFontFamilyId,
+  findSelectedFontCatalogEntry,
+  filterFontCatalog,
+  mergeFontCatalog,
+} from "@/lib/custom-fonts/domain";
+import type {
+  AdminCustomFontFamily,
+  FontCatalogEntry,
+  FontCategory as CatalogCategory,
+} from "@/lib/custom-fonts/types";
+import type { FontCategory, GoogleFontEntry } from "@/lib/google-fonts";
+import { buildFontStack, extractFamilyName } from "@/lib/google-fonts";
+import { isInlineEditorFloatingLayerTarget } from "@/lib/inline-editor-floating-layers";
 
 interface FontPickerProps {
   label: string;
-  value: string; // CSS font-family string e.g. "'Playfair Display', serif"
-  onChange: (v: string) => void;
+  value: string;
+  onChange: (value: string) => void;
   optional?: boolean;
 }
 
-// ---------------------------------------------------------------------------
-// Category tabs
-// ---------------------------------------------------------------------------
+type SourceFilter = "all" | "custom" | "google";
 
-const CATEGORIES: { label: string; value: FontCategory | "all" }[] = [
+const CATEGORIES: Array<{
+  label: string;
+  value: FontCategory | "all";
+}> = [
   { label: "Todos", value: "all" },
   { label: "Serif", value: "serif" },
   { label: "Sans-serif", value: "sans-serif" },
@@ -36,119 +53,117 @@ const CATEGORIES: { label: string; value: FontCategory | "all" }[] = [
   { label: "Mono", value: "monospace" },
 ];
 
-// ---------------------------------------------------------------------------
-// Lazy font preview loader — uses IntersectionObserver to inject the
-// Google Fonts CSS only when a font row scrolls into view.
-// ---------------------------------------------------------------------------
+const SOURCES: Array<{ label: string; value: SourceFilter }> = [
+  { label: "Todas", value: "all" },
+  { label: "Personalizadas", value: "custom" },
+  { label: "Google", value: "google" },
+];
 
-/** Shared set of fonts whose CSS has been requested in this session. */
-const loadedPreviewFonts = new Set<string>();
-
-function useLazyFontPreview(family: string, enabled: boolean) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!enabled) return;
-    if (isBuiltinFont(family)) return; // builtins already loaded
-    if (loadedPreviewFonts.has(family)) return;
-
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && !loadedPreviewFonts.has(family)) {
-            loadedPreviewFonts.add(family);
-            const link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@400&display=swap`;
-            document.head.appendChild(link);
-            observer.disconnect();
-          }
-        }
-      },
-      { rootMargin: "200px" }, // preload fonts 200px before they're visible
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [family, enabled]);
-
-  return ref;
+function adminFamilyToCatalog(family: AdminCustomFontFamily): FontCatalogEntry {
+  return {
+    source: "custom",
+    id: family.id,
+    family: family.family,
+    category: family.category,
+    value: family.value,
+    archived: family.archived,
+    variants: family.variants.map((variant) => ({
+      weight: variant.weight,
+      style: variant.style,
+    })),
+  };
 }
 
-// ---------------------------------------------------------------------------
-// Font row — single item in the dropdown list
-// ---------------------------------------------------------------------------
+function googleToCatalog(font: GoogleFontEntry): FontCatalogEntry {
+  return {
+    source: font.builtin ? "builtin" : "google",
+    family: font.family,
+    category: font.category,
+    value: buildFontStack(font.family, font.category),
+    builtin: font.builtin,
+  };
+}
 
 function FontRow({
   font,
-  isSelected,
+  selected,
   onSelect,
 }: {
-  font: GoogleFontEntry;
-  isSelected: boolean;
+  font: FontCatalogEntry;
+  selected: boolean;
   onSelect: () => void;
 }) {
-  const previewRef = useLazyFontPreview(font.family, true);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [preview, setPreview] = useState(false);
+  useDynamicFont(preview ? font.value : null);
 
-  const sampleText = useMemo(() => {
-    if (font.category === "handwriting") return "Save the Date";
-    if (font.category === "display") return "Sofia & Miguel";
-    if (font.category === "monospace") return "31.12.2025";
-    return "Sofia & Miguel";
-  }, [font.category]);
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPreview(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "180px" },
+    );
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, []);
+
+  const sample =
+    font.category === "handwriting"
+      ? "Save the Date"
+      : font.category === "monospace"
+        ? "31.12.2027"
+        : "Sofia & Miguel";
 
   return (
-    <div ref={previewRef}>
+    <div ref={rowRef}>
       <button
         type="button"
         onClick={onSelect}
-        className={`flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition-colors hover:bg-accent/50 ${
-          isSelected ? "bg-accent/70" : ""
-        }`}
+        className={`flex min-h-16 w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:bg-accent/55 active:bg-accent/75 ${selected ? "bg-accent/70" : ""}`}
       >
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-muted-foreground truncate">
+        <div className="min-w-0 flex-1">
+          <div className="mb-0.5 flex flex-wrap items-center gap-1.5">
+            <span className="truncate text-[11px] text-muted-foreground">
               {font.family}
             </span>
-            {font.builtin && (
-              <Badge
-                variant="secondary"
-                className="h-4 px-1 text-[9px] font-normal gap-0.5"
-              >
-                <Star className="size-2.5" />
-                Otimizada
+            {font.source === "builtin" && (
+              <Badge variant="secondary" className="h-4 gap-0.5 px-1 text-[9px] font-normal">
+                <Star className="size-2.5" /> Otimizada
+              </Badge>
+            )}
+            {font.source === "custom" && font.archived && (
+              <Badge variant="outline" className="h-4 px-1 text-[9px] font-normal">
+                Arquivada
               </Badge>
             )}
           </div>
-          <span
-            className="truncate text-[17px] leading-snug"
-            style={{
-              fontFamily: font.builtin
-                ? `var(--font-${font.family.toLowerCase().replace(/\s+/g, "-")}), '${font.family}', ${font.category === "sans-serif" ? "sans-serif" : font.category === "handwriting" ? "cursive" : "serif"}`
-                : `'${font.family}', ${font.category === "sans-serif" ? "sans-serif" : font.category === "handwriting" ? "cursive" : "serif"}`,
-            }}
-          >
-            {sampleText}
-          </span>
+          <div className="truncate text-[17px] leading-snug" style={{ fontFamily: font.value }}>
+            {sample}
+          </div>
+          {font.source === "custom" && (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {font.variants.map((variant) => (
+                <span
+                  key={`${variant.weight}-${variant.style}`}
+                  className="rounded-md bg-muted px-1.5 py-0.5 text-[9px] tabular-nums text-muted-foreground"
+                >
+                  {variant.weight}{variant.style === "italic" ? " itálico" : ""}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
-        {isSelected && (
-          <Check
-            className="size-4 flex-shrink-0 text-primary"
-            strokeWidth={2.5}
-          />
-        )}
+        {selected && <Check className="size-4 shrink-0 text-primary" strokeWidth={2.5} />}
       </button>
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Main FontPicker component
-// ---------------------------------------------------------------------------
 
 export default function FontPicker({
   label,
@@ -157,244 +172,279 @@ export default function FontPicker({
   optional,
 }: FontPickerProps) {
   const [open, setOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [source, setSource] = useState<SourceFilter>("all");
   const [category, setCategory] = useState<FontCategory | "all">("all");
-  const [fonts, setFonts] = useState<GoogleFontEntry[]>([]);
+  const [customFonts, setCustomFonts] = useState<FontCatalogEntry[]>([]);
+  const [googleFonts, setGoogleFonts] = useState<FontCatalogEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Derive the currently selected family name from the CSS value
+  const selectedCustomId = value ? extractCustomFontFamilyId(value) : null;
   const selectedFamily = value ? extractFamilyName(value) : "";
 
-  // ---- Close on outside click -------------------------------------------
+  const loadCustomFonts = useCallback(async () => {
+    const response = await fetch("/api/admin/custom-fonts?limit=100");
+    if (!response.ok) throw new Error("Não foi possível carregar as fontes personalizadas.");
+    const body = (await response.json()) as { families: AdminCustomFontFamily[] };
+    const active = body.families.map(adminFamilyToCatalog);
+    if (selectedCustomId && !active.some((font) => font.source === "custom" && font.id === selectedCustomId)) {
+      const selectedResponse = await fetch(`/api/admin/custom-fonts/${selectedCustomId}`);
+      if (selectedResponse.ok) {
+        active.push(adminFamilyToCatalog((await selectedResponse.json()) as AdminCustomFontFamily));
+      }
+    }
+    setCustomFonts(active);
+  }, [selectedCustomId]);
+
+  const loadGoogleFonts = useCallback(
+    async (nextPage: number, append: boolean) => {
+      const params = new URLSearchParams({ page: String(nextPage), limit: "60" });
+      if (search.trim()) params.set("search", search.trim());
+      if (category !== "all") params.set("category", category);
+      const response = await fetch(`/api/admin/fonts?${params}`);
+      if (!response.ok) throw new Error("Não foi possível carregar as Google Fonts.");
+      const body = (await response.json()) as {
+        fonts: GoogleFontEntry[];
+        totalPages: number;
+      };
+      const entries = body.fonts.map(googleToCatalog);
+      setGoogleFonts((current) => (append ? [...current, ...entries] : entries));
+      setTotalPages(body.totalPages);
+      setPage(nextPage);
+    },
+    [category, search],
+  );
+
   useEffect(() => {
     if (!open) return;
-    function handler(e: MouseEvent) {
+    Promise.resolve()
+      .then(() => {
+        setLoadError(null);
+        setLoading(true);
+        return loadCustomFonts();
+      })
+      .catch((error) =>
+        setLoadError(error instanceof Error ? error.message : "Erro ao carregar fontes."),
+      )
+      .finally(() => setLoading(false));
+  }, [loadCustomFonts, open]);
+
+  useEffect(() => {
+    if (!open) return;
+    requestAnimationFrame(() => inputRef.current?.focus());
+    const close = (event: MouseEvent) => {
       if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        !containerRef.current?.contains(event.target as Node) &&
+        !isInlineEditorFloatingLayerTarget(event.target)
       ) {
         setOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, [open]);
 
-  // ---- Focus search input on open ---------------------------------------
   useEffect(() => {
-    if (open) {
-      // Small delay to let the DOM mount
-      requestAnimationFrame(() => searchInputRef.current?.focus());
-    }
-  }, [open]);
-
-  // ---- Fetch fonts when search/category changes -------------------------
-  const fetchFonts = useCallback(
-    async (
-      s: string,
-      cat: FontCategory | "all",
-      pg: number,
-      append: boolean,
-    ) => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (s.trim()) params.set("search", s.trim());
-        if (cat !== "all") params.set("category", cat);
-        params.set("page", String(pg));
-        params.set("limit", "60");
-
-        const res = await fetch(`/api/admin/fonts?${params}`);
-        if (!res.ok) throw new Error("Failed to fetch fonts");
-        const data = await res.json();
-
-        setFonts((prev) => (append ? [...prev, ...data.fonts] : data.fonts));
-        setTotalPages(data.totalPages);
-        setTotal(data.total);
-        setPage(pg);
-      } catch (err) {
-        console.error("FontPicker fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
-
-  // Debounced search
-  useEffect(() => {
-    if (!open) return;
-
+    if (!open || source === "custom") return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      fetchFonts(search, category, 1, false);
+      setLoading(true);
+      loadGoogleFonts(1, false)
+        .catch((error) =>
+          setLoadError(error instanceof Error ? error.message : "Erro ao carregar fontes."),
+        )
+        .finally(() => setLoading(false));
     }, 300);
-
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [search, category, open, fetchFonts]);
+  }, [category, loadGoogleFonts, open, search, source]);
 
-  // ---- Infinite scroll via IntersectionObserver on sentinel element ------
   useEffect(() => {
-    if (!open) return;
+    if (!open || source === "custom") return;
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading && page < totalPages) {
-          fetchFonts(search, category, page + 1, true);
-        }
-      },
-      { rootMargin: "200px" },
-    );
-
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !loading && page < totalPages) {
+        setLoading(true);
+        loadGoogleFonts(page + 1, true).finally(() => setLoading(false));
+      }
+    });
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [open, loading, page, totalPages, search, category, fetchFonts]);
+  }, [loadGoogleFonts, loading, open, page, source, totalPages]);
 
-  // ---- Build display name for the trigger button -----------------------
-  const displayName = selectedFamily || "Selecionar fonte...";
-  const displayFontFamily = selectedFamily ? value : undefined;
+  const selectedEntry = useMemo(
+    () => findSelectedFontCatalogEntry([...customFonts, ...googleFonts], value),
+    [customFonts, googleFonts, value],
+  );
+  const catalog = useMemo(
+    () =>
+      filterFontCatalog(
+        mergeFontCatalog({
+          custom: customFonts.filter((font) => font.source === "custom" && !font.archived),
+          google: googleFonts,
+          selected: selectedEntry,
+        }),
+        {
+          source,
+          category: category as CatalogCategory | "all",
+          search,
+        },
+      ),
+    [category, customFonts, googleFonts, search, selectedEntry, source],
+  );
+  const displayName = selectedEntry?.family || selectedFamily || "Selecionar fonte…";
 
   return (
-    <div className="space-y-1.5 relative" ref={containerRef}>
-      <Label className="text-xs">
-        {label}
-        {optional && (
-          <span className="ml-1 text-muted-foreground">(opcional)</span>
-        )}
-      </Label>
-
-      {/* ── Trigger button ─────────────────────────────────────────── */}
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-      >
-        <span
-          className="truncate"
-          style={
-            displayFontFamily
-              ? { fontFamily: displayFontFamily, fontSize: 15 }
-              : { color: "var(--muted-foreground)", fontSize: 13 }
-          }
+    <>
+      <div className="relative space-y-1.5" ref={containerRef}>
+        <Label className="text-xs">
+          {label}
+          {optional && <span className="ml-1 text-muted-foreground">(opcional)</span>}
+        </Label>
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          className="flex h-10 w-full items-center justify-between rounded-lg border border-input bg-background px-3 text-sm shadow-xs transition-[background-color,box-shadow,transform] hover:bg-accent/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.96]"
         >
-          {displayName}
-        </span>
-        <ChevronDown
-          className={`ml-2 size-4 flex-shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
+          <span
+            className={selectedFamily ? "truncate text-[15px]" : "truncate text-sm text-muted-foreground"}
+            style={selectedFamily ? { fontFamily: value } : undefined}
+          >
+            {displayName}
+          </span>
+          <ChevronDown className={`size-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
 
-      {/* ── Dropdown panel ────────────────────────────────────────── */}
-      {open && (
-        <div className="absolute left-0 z-50 mt-1 w-[380px] overflow-hidden rounded-lg border bg-popover shadow-xl">
-          {/* Search bar */}
-          <div className="flex items-center gap-2 border-b px-3 py-2">
-            <Search className="size-4 text-muted-foreground flex-shrink-0" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Pesquisar fontes..."
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-            />
-            {search && (
-              <button
+        {open && (
+          <div
+            data-font-picker-dropdown
+            className="absolute left-0 z-50 mt-1 w-[min(400px,calc(100vw-2rem))] overflow-hidden rounded-xl bg-popover shadow-xl ring-1 ring-foreground/10"
+          >
+            <div className="flex items-center gap-2 px-3 py-2.5">
+              <Search className="size-4 shrink-0 text-muted-foreground" />
+              <input
+                ref={inputRef}
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Pesquisar fontes…"
+                className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              />
+              {search && (
+                <button type="button" onClick={() => setSearch("")} className="flex size-10 items-center justify-center text-muted-foreground hover:text-foreground">
+                  <X className="size-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="flex gap-1 border-t border-foreground/5 px-3 py-2">
+              {SOURCES.map((item) => (
+                <button
+                  type="button"
+                  key={item.value}
+                  onClick={() => setSource(item.value)}
+                  className={`min-h-8 rounded-lg px-3 text-xs font-medium transition-colors ${source === item.value ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground"}`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1 overflow-x-auto border-y border-foreground/5 px-3 py-2">
+              {CATEGORIES.map((item) => (
+                <button
+                  type="button"
+                  key={item.value}
+                  onClick={() => setCategory(item.value)}
+                  className={`min-h-7 whitespace-nowrap rounded-full px-2.5 text-[11px] font-medium transition-colors ${category === item.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center justify-between gap-2 border-b border-foreground/5 px-3 py-2">
+              <span className="text-[11px] text-muted-foreground tabular-nums">
+                {loading ? "A carregar…" : `${catalog.length} fontes visíveis`}
+              </span>
+              <Button
                 type="button"
-                onClick={() => setSearch("")}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="size-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Category tabs */}
-          <div className="flex gap-1 overflow-x-auto border-b px-3 py-1.5 scrollbar-none">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.value}
-                type="button"
-                onClick={() => setCategory(cat.value)}
-                className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
-                  category === cat.value
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Result count */}
-          <div className="flex items-center justify-between px-3 py-1 border-b">
-            <span className="text-[11px] text-muted-foreground">
-              {total > 0
-                ? `${total} fonte${total !== 1 ? "s" : ""} encontrada${total !== 1 ? "s" : ""}`
-                : loading
-                  ? "A carregar..."
-                  : "Nenhuma fonte encontrada"}
-            </span>
-            {loading && (
-              <Loader2 className="size-3 animate-spin text-muted-foreground" />
-            )}
-          </div>
-
-          {/* Font list */}
-          <ScrollArea className="h-[340px]">
-            {/* Clear option for optional fields */}
-            {optional && (
-              <button
-                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 active:scale-[0.96] transition-transform"
                 onClick={() => {
-                  onChange("");
                   setOpen(false);
+                  setUploadOpen(true);
                 }}
-                className="flex w-full items-center gap-3 px-3 py-2 text-xs text-muted-foreground hover:bg-accent/50 border-b"
               >
-                <span className="italic">Nenhuma (desativada)</span>
-              </button>
-            )}
-
-            {fonts.map((font) => {
-              const isSelected =
-                selectedFamily.toLowerCase() === font.family.toLowerCase();
-              return (
+                <Plus /> Adicionar fonte
+              </Button>
+            </div>
+            <ScrollArea className="h-[360px]">
+              {optional && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange("");
+                    setOpen(false);
+                  }}
+                  className="flex min-h-11 w-full items-center px-3 text-xs italic text-muted-foreground hover:bg-accent/50"
+                >
+                  Nenhuma (desativada)
+                </button>
+              )}
+              {loadError && (
+                <div className="mx-3 my-3 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                  {loadError}
+                </div>
+              )}
+              {!loading && !loadError && catalog.length === 0 && (
+                <div className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  Nenhuma fonte corresponde a esta pesquisa.
+                </div>
+              )}
+              {catalog.map((font) => (
                 <FontRow
-                  key={font.family}
+                  key={font.source === "custom" ? font.id : `${font.source}-${font.family}`}
                   font={font}
-                  isSelected={isSelected}
+                  selected={
+                    font.source === "custom"
+                      ? font.id === selectedCustomId
+                      : font.value === value
+                  }
                   onSelect={() => {
-                    onChange(buildFontStack(font.family, font.category));
+                    onChange(font.value);
                     setOpen(false);
                   }}
                 />
-              );
-            })}
-
-            {/* Sentinel for infinite scroll */}
-            <div ref={sentinelRef} className="h-4" />
-
-            {loading && fonts.length > 0 && (
-              <div className="flex items-center justify-center py-3">
-                <Loader2 className="size-4 animate-spin text-muted-foreground" />
+              ))}
+              <div ref={sentinelRef} className="flex h-8 items-center justify-center">
+                {loading && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
               </div>
-            )}
-          </ScrollArea>
-        </div>
-      )}
-    </div>
+            </ScrollArea>
+          </div>
+        )}
+      </div>
+      <CustomFontUploadDialog
+        open={uploadOpen}
+        onOpenChange={setUploadOpen}
+        onSaved={(family) => {
+          const entry = adminFamilyToCatalog(family);
+          setCustomFonts((current) => [
+            entry,
+            ...current.filter(
+              (font) => font.source !== "custom" || font.id !== family.id,
+            ),
+          ]);
+          onChange(family.value);
+        }}
+      />
+    </>
   );
 }

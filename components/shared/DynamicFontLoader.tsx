@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import type { TemplateTheme, TextStyleOverrides } from "@/lib/types";
 
 /**
- * Loads any non-builtin Google Fonts used by the current theme AND any
- * element-level font overrides chosen via the inline text editor.
+ * Loads any non-builtin Google or admin-uploaded custom fonts used by the
+ * current theme and element-level overrides chosen via the inline editor.
  *
  * Drop this component near the top of the invitation page tree. It reads the
  * theme's font roles (displayFont, bodyFont, scriptFont, uiFont,
@@ -23,13 +22,9 @@ export default function DynamicFontLoader({
   theme: TemplateTheme;
   textStyles?: TextStyleOverrides;
 }) {
-  // Collect element-level fontFamily overrides (stable reference via useMemo)
-  const elementFonts = useMemo(() => {
-    if (!textStyles?.elements) return [];
-    return Object.values(textStyles.elements)
-      .map((el) => el?.fontFamily)
-      .filter((f): f is string => !!f);
-  }, [textStyles?.elements]);
+  const elementFonts = Object.values(textStyles?.elements ?? {})
+    .map((element) => element?.fontFamily)
+    .filter((font): font is string => Boolean(font));
 
   useDynamicFonts([
     theme.displayFont,

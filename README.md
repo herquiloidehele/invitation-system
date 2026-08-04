@@ -41,4 +41,13 @@ from the creators of Next.js.
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for
 more details.
 
+## Custom font storage
+
+Administrators can upload WOFF2, WOFF, TTF, and OTF files to a shared font
+library. The feature uses the existing S3 configuration and stores objects
+under `custom-fonts/`; deployments therefore need the same `AWS_*` and
+`S3_BUCKET_NAME` variables used for other media uploads. Font files are served
+through same-origin routes, so no additional public bucket or CORS policy is
+required. Keep the database migrations in sync with the deployed application
+before enabling uploads.
 

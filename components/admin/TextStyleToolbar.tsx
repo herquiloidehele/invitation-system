@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { SpacingField } from "@/lib/spacing-styles";
 import type { TextAlign, TextStyle, TextStyleOverrides } from "@/lib/types";
+import { isInlineEditorFloatingLayerTarget } from "@/lib/inline-editor-floating-layers";
 
 // ---------------------------------------------------------------------------
 // Font weight options
@@ -163,8 +164,7 @@ export default function TextStyleToolbar() {
       if (toolbarRef.current?.contains(target)) return;
       if ((target as HTMLElement).closest?.("[data-text-element]")) return;
       // Don't dismiss if clicking inside a font picker dropdown
-      if ((target as HTMLElement).closest?.("[data-font-picker-dropdown]"))
-        return;
+      if (isInlineEditorFloatingLayerTarget(target)) return;
       ctx.clearSelection();
     };
     // Use setTimeout so the current click event that selected an element
@@ -419,7 +419,8 @@ function ToolbarFontPicker({
     function handler(e: MouseEvent) {
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        !containerRef.current.contains(e.target as Node) &&
+        !isInlineEditorFloatingLayerTarget(e.target)
       ) {
         setOpen(false);
       }

@@ -15,6 +15,7 @@ import {
   PenTool,
   Plus,
   Sparkles,
+  Type,
   Users,
 } from "lucide-react";
 
@@ -70,6 +71,11 @@ const navMain = [
     title: "Landing Page",
     url: "/admin/landing-page",
     icon: LayoutTemplate,
+  },
+  {
+    title: "Fontes",
+    url: "/admin/fonts",
+    icon: Type,
   },
 ];
 
@@ -152,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   render={<Link href={item.url} />}
                   tooltip={item.title}
-                  isActive={pathname === item.url}
+                  isActive={pathname === item.url || pathname.startsWith(`${item.url}/`)}
                 >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>

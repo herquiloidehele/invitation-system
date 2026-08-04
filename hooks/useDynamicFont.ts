@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+
+import {
+  buildCustomFontFaceCss,
+  extractCustomFontFamilyId,
+} from "@/lib/custom-fonts/domain";
+import type { CustomFontManifest } from "@/lib/custom-fonts/types";
 import { BUILTIN_FONT_FAMILIES, buildGoogleFontUrl } from "@/lib/google-fonts";
 
-const builtinSet = new Set(BUILTIN_FONT_FAMILIES.map((f) => f.toLowerCase()));
+const builtinSet = new Set(BUILTIN_FONT_FAMILIES.map((font) => font.toLowerCase()));
 
-/**
- * Module-level reference count of currently-active subscriptions per
- * font family. We append the <link> the first time anyone asks for the
- * family and remove it again when the last subscriber unmounts. This
- * lets long-lived admin sessions that preview many themes recover the
- * font CSS memory instead of accumulating it forever.
- */
-const refCounts = new Map<string, number>();
-const linkElements = new Map<string, HTMLLinkElement>();
+type ClassifiedFont =
+  | { source: "builtin"; family: string }
+  | { source: "google"; family: string }
+  | { source: "custom"; family: string; id: string };
 
 function normalize(family: string): string {
   return family
@@ -22,54 +23,166 @@ function normalize(family: string): string {
     .replace(/^['"]|['"]$/g, "");
 }
 
-function acquireFont(bare: string, weights?: number[]) {
-  if (!bare) return;
-  if (builtinSet.has(bare.toLowerCase())) return;
+export function classifyFontFamily(stack: string): ClassifiedFont {
+  const family = normalize(stack);
+  const id = extractCustomFontFamilyId(stack);
+  if (id) return { source: "custom", family, id };
+  return builtinSet.has(family.toLowerCase())
+    ? { source: "builtin", family }
+    : { source: "google", family };
+}
 
-  const current = refCounts.get(bare) ?? 0;
-  refCounts.set(bare, current + 1);
-  if (current > 0) return; // someone else already injected the <link>
+export function uniqueCustomFontIds(stacks: readonly string[]): string[] {
+  const ids = new Set<string>();
+  for (const stack of stacks) {
+    const classified = classifyFontFamily(stack);
+    if (classified.source === "custom") ids.add(classified.id);
+  }
+  return [...ids];
+}
 
-  const linkId = `dynamic-font-${bare.replace(/\s+/g, "-").toLowerCase()}`;
+export function customFontLoadKey(manifest: CustomFontManifest): string {
+  return [
+    manifest.id,
+    manifest.revision,
+    ...manifest.variants.map(
+      (variant) =>
+        `${variant.id}:${variant.revision}:${variant.weight}:${variant.style}:${variant.format}`,
+    ),
+  ].join("|");
+}
+
+const googleRefCounts = new Map<string, number>();
+const googleLinks = new Map<string, HTMLLinkElement>();
+
+type CustomLoadState = {
+  refs: number;
+  generation: number;
+  loadKey?: string;
+  promise?: Promise<void>;
+  style?: HTMLStyleElement;
+};
+
+const customLoads = new Map<string, CustomLoadState>();
+const manifestCache = new Map<string, CustomFontManifest>();
+
+function acquireGoogleFont(family: string, weights?: number[]) {
+  const current = googleRefCounts.get(family) ?? 0;
+  googleRefCounts.set(family, current + 1);
+  if (current > 0) return;
+
+  const linkId = `dynamic-font-${family.replace(/\s+/g, "-").toLowerCase()}`;
   const existing = document.getElementById(linkId) as HTMLLinkElement | null;
   if (existing) {
-    linkElements.set(bare, existing);
+    googleLinks.set(family, existing);
     return;
   }
-
   const link = document.createElement("link");
   link.id = linkId;
   link.rel = "stylesheet";
-  link.href = buildGoogleFontUrl(bare, weights);
+  link.href = buildGoogleFontUrl(family, weights);
   document.head.appendChild(link);
-  linkElements.set(bare, link);
+  googleLinks.set(family, link);
 }
 
-function releaseFont(bare: string) {
-  if (!bare) return;
-  if (builtinSet.has(bare.toLowerCase())) return;
-
-  const current = refCounts.get(bare) ?? 0;
+function releaseGoogleFont(family: string) {
+  const current = googleRefCounts.get(family) ?? 0;
   if (current <= 1) {
-    refCounts.delete(bare);
-    const link = linkElements.get(bare);
-    if (link && link.parentNode) {
-      link.parentNode.removeChild(link);
+    googleRefCounts.delete(family);
+    googleLinks.get(family)?.remove();
+    googleLinks.delete(family);
+    return;
+  }
+  googleRefCounts.set(family, current - 1);
+}
+
+function customState(id: string): CustomLoadState {
+  const current = customLoads.get(id);
+  if (current) return current;
+  const created: CustomLoadState = { refs: 0, generation: 0 };
+  customLoads.set(id, created);
+  return created;
+}
+
+async function fetchCustomManifest(id: string): Promise<CustomFontManifest> {
+  const cached = manifestCache.get(id);
+  if (cached) return cached;
+  const response = await fetch(`/api/fonts/families/${encodeURIComponent(id)}`);
+  if (!response.ok) {
+    throw new Error(`Custom font manifest returned ${response.status}`);
+  }
+  const manifest = (await response.json()) as CustomFontManifest;
+  manifestCache.set(id, manifest);
+  return manifest;
+}
+
+function ensureCustomFont(id: string): Promise<void> {
+  const state = customState(id);
+  if (state.promise) return state.promise;
+  const generation = state.generation;
+  const promise = (async () => {
+    try {
+      const manifest = await fetchCustomManifest(id);
+      if (state.refs <= 0 || state.generation !== generation) return;
+      const loadKey = customFontLoadKey(manifest);
+      if (state.style && state.loadKey === loadKey) return;
+      const style = document.createElement("style");
+      style.id = `custom-font-style-${id}`;
+      style.textContent = buildCustomFontFaceCss(manifest);
+      state.style?.remove();
+      document.head.appendChild(style);
+      state.style = style;
+      state.loadKey = loadKey;
+    } catch (error) {
+      console.error(`[custom-fonts] Failed to load family ${id}`, error);
     }
-    linkElements.delete(bare);
-  } else {
-    refCounts.set(bare, current - 1);
+  })();
+  state.promise = promise;
+  void promise.finally(() => {
+    if (state.promise === promise) state.promise = undefined;
+  });
+  return promise;
+}
+
+function acquireFont(stack: string, weights?: number[]) {
+  const classified = classifyFontFamily(stack);
+  if (!classified.family || classified.source === "builtin") return;
+  if (classified.source === "google") {
+    acquireGoogleFont(classified.family, weights);
+    return;
+  }
+  const state = customState(classified.id);
+  state.refs += 1;
+  void ensureCustomFont(classified.id);
+}
+
+function releaseFont(stack: string) {
+  const classified = classifyFontFamily(stack);
+  if (!classified.family || classified.source === "builtin") return;
+  if (classified.source === "google") {
+    releaseGoogleFont(classified.family);
+    return;
+  }
+  const state = customState(classified.id);
+  state.refs = Math.max(0, state.refs - 1);
+  if (state.refs === 0) {
+    state.style?.remove();
+    state.style = undefined;
+    state.loadKey = undefined;
   }
 }
 
-/**
- * Dynamically load a Google Font by injecting a <link> into <head>.
- *
- * - Skips fonts that are already loaded as builtins via next/font/google.
- * - Reference-counts subscribers so the <link> is removed when the last
- *   subscriber unmounts.
- * - Uses `display=swap` for instant text rendering.
- */
+export function invalidateCustomFontManifest(id: string): void {
+  manifestCache.delete(id);
+  const state = customState(id);
+  state.generation += 1;
+  state.promise = undefined;
+  state.style?.remove();
+  state.style = undefined;
+  state.loadKey = undefined;
+  if (state.refs > 0) void ensureCustomFont(id);
+}
+
 export function useDynamicFont(
   family: string | undefined | null,
   weights?: number[],
@@ -77,50 +190,29 @@ export function useDynamicFont(
   const acquiredRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!family) return;
-    const bare = normalize(family);
-    if (!bare) return;
-
-    acquireFont(bare, weights);
-    acquiredRef.current = bare;
-
+    if (!family || !normalize(family)) return;
+    acquireFont(family, weights);
+    acquiredRef.current = family;
     return () => {
-      if (acquiredRef.current) {
-        releaseFont(acquiredRef.current);
-        acquiredRef.current = null;
-      }
+      if (acquiredRef.current) releaseFont(acquiredRef.current);
+      acquiredRef.current = null;
     };
   }, [family, weights]);
 }
 
-/**
- * Load multiple Google Fonts at once. Useful for the invitation page where
- * we have 4 font roles (display, body, script, ui). Each family is
- * reference-counted individually so families shared across mounts stay
- * loaded as long as anyone needs them.
- */
 export function useDynamicFonts(families: (string | undefined | null)[]) {
-  const familiesKey = families.filter(Boolean).join("|");
+  const normalizedFamilies = [...new Set(families.filter((font): font is string => !!font))];
+  const familiesKey = normalizedFamilies.join("|");
   const acquiredRef = useRef<string[]>([]);
 
   useEffect(() => {
-    const acquired: string[] = [];
-    for (const raw of families) {
-      if (!raw) continue;
-      const bare = normalize(raw);
-      if (!bare) continue;
-      if (builtinSet.has(bare.toLowerCase())) continue;
-      acquireFont(bare);
-      acquired.push(bare);
-    }
-    acquiredRef.current = acquired;
-
+    for (const family of normalizedFamilies) acquireFont(family);
+    acquiredRef.current = normalizedFamilies;
     return () => {
-      for (const bare of acquiredRef.current) {
-        releaseFont(bare);
-      }
+      for (const family of acquiredRef.current) releaseFont(family);
       acquiredRef.current = [];
     };
+    // The stable key deliberately owns this deduplicated list lifecycle.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [familiesKey]);
 }

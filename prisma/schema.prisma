@@ -67,6 +67,41 @@ model Theme {
   invitations Invitation[]
 }
 
+model CustomFontFamily {
+  id               String    @id @default(uuid())
+  name             String
+  normalizedName   String    @unique
+  cssFamily        String    @unique
+  fallbackCategory String
+  revision         Int       @default(1)
+  archivedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  variants CustomFontVariant[]
+}
+
+model CustomFontVariant {
+  id               String           @id @default(uuid())
+  familyId         String
+  family           CustomFontFamily @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  weight           Int
+  style            String
+  format           String
+  objectKey        String           @unique
+  originalFileName String
+  mimeType         String
+  sizeBytes        Int
+  checksum         String
+  metadata         Json
+  revision         Int              @default(1)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([familyId, weight, style])
+  @@index([familyId])
+}
+
 model Invitation {
   id                      String   @id @default(cuid())
   slug                    String   @unique
