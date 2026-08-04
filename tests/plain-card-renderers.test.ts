@@ -24,10 +24,20 @@ describe("plain card renderer coverage", () => {
     expect(source).toContain('plain={cs("guestGuide", 14).plain}');
   });
 
-  it("does not apply the section feature to the personal guest card", () => {
-    expect(read("components/shared/PersonalGuestCard.tsx")).not.toContain(
-      "resolveCardSurfaceStyle",
+  it("applies plain mode to the personal guest card surface", () => {
+    const source = read("components/shared/PersonalGuestCard.tsx");
+    expect(source).toContain("resolveCardSurfaceStyle");
+    expect(source).toContain("cardStyle?: CardStyle");
+  });
+
+  it("exposes the personal guest card as an editable card section", () => {
+    const page = read("components/shared/InvitationPage.tsx");
+    const types = read("lib/types.ts");
+    expect(types).toContain('| "personalGuestCard"');
+    expect(page).toContain(
+      '<EditableCard sectionKey="personalGuestCard">',
     );
+    expect(page).toContain('cardStyle={cs("personalGuestCard", 24)}');
   });
 
   it.each([

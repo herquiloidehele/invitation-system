@@ -663,6 +663,7 @@ export interface CardStyle {
 
 /** Identifiers for each card section whose background can be individually overridden. */
 export type CardSectionKey =
+  | "personalGuestCard"
   | "saveTheDate"
   | "ourStory"
   | "schedule"

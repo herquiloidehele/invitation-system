@@ -9,6 +9,7 @@ import ExternalCountdownSection from "@/components/shared/ExternalCountdownSecti
 import PersonalGuestCard, {
   PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
 } from "@/components/shared/PersonalGuestCard";
+import { EditableCard } from "@/components/shared/EditableCard";
 import { EditableText } from "@/components/shared/EditableText";
 import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
 import PlacesSection from "@/components/shared/PlacesSection";
@@ -137,18 +138,21 @@ export default function RevealableExternalSections({
         {showInitialPageSections &&
           (invitation.guest || isLandingPreview) &&
           !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
-            <PersonalGuestCard
-              guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY}
-              theme={theme}
-              textStyles={invitation.textStyles}
-              customTexts={invitation.customTexts}
-              backgroundImageUrl={
-                invitation.personalGuestCard?.backgroundImageUrl
-              }
-              scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
-              imageSettings={invitation.imageSettings}
-              className={"pb-12 md:pb-16"}
-            />
+            <EditableCard sectionKey="personalGuestCard">
+              <PersonalGuestCard
+                guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY}
+                theme={theme}
+                textStyles={invitation.textStyles}
+                customTexts={invitation.customTexts}
+                backgroundImageUrl={
+                  invitation.personalGuestCard?.backgroundImageUrl
+                }
+                scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
+                imageSettings={invitation.imageSettings}
+                cardStyle={invitation.cardStyles?.personalGuestCard}
+                className={"pb-12 md:pb-16"}
+              />
+            </EditableCard>
           )}
 
         {showInitialPageSections && (

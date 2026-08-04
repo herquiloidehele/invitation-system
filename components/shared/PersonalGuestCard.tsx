@@ -4,7 +4,15 @@ import { type ReactNode, useState } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, UserPlus, Users } from "lucide-react";
 
-import type { CustomTexts, ImageSettingsMap, PublicGuestData, TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import type {
+  CardStyle,
+  CustomTexts,
+  ImageSettingsMap,
+  PublicGuestData,
+  TemplateTheme,
+  TextStyleOverrides,
+} from "@/lib/types";
+import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { useCustomText } from "@/lib/custom-texts";
@@ -22,6 +30,7 @@ interface PersonalGuestCardProps {
   scrimOpacity?: number;
   /** Position/zoom overrides; reads the `personalGuestCardBackground` key. */
   imageSettings?: ImageSettingsMap;
+  cardStyle?: CardStyle;
   className?: string;
 }
 
@@ -61,6 +70,7 @@ export default function PersonalGuestCard({
   backgroundImageUrl,
   scrimOpacity,
   imageSettings,
+  cardStyle,
   className,
 }: PersonalGuestCardProps) {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
@@ -116,12 +126,19 @@ export default function PersonalGuestCard({
         )}
 
         <div
-          className="mx-auto max-w-md rounded-3xl border px-4 py-8 text-center backdrop-blur-sm shadow"
+          className="mx-auto max-w-md px-4 py-8 text-center"
           style={{
             position: "relative",
             zIndex: 1,
-            background: theme.cardBg,
-            borderColor: theme.cardBorder,
+            ...resolveCardSurfaceStyle(cardStyle, {
+              background: cardStyle?.cardBg ?? theme.cardBg,
+              border: `1px solid ${cardStyle?.cardBorder ?? theme.cardBorder}`,
+              borderRadius: cardStyle?.borderRadius ?? 24,
+              boxShadow:
+                "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+            }),
           }}
         >
           <p

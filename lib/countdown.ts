@@ -97,3 +97,17 @@ export function normalizeExternalCountdownLayout(
 ): "cards" | "inline" {
   return value === "inline" ? "inline" : "cards";
 }
+
+export function getInlineCountdownSeparatorStyle(
+  fontFamily: string | undefined,
+  color: string,
+) {
+  return {
+    fontFamily: fontFamily || "Arial, sans-serif",
+    color,
+    fontSize: 32,
+    fontWeight: 400,
+    lineHeight: 1,
+    marginTop: 4,
+  } as const;
+}

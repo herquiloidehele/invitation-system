@@ -270,17 +270,20 @@ export default function RichExternalLinkPage({
               isLandingPreview,
             ) && (
               <div className="pb-2">
-                <PersonalGuestCard
-                  guest={
-                    invitation.guest ??
-                    (isLandingPreview
-                      ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
-                      : PREVIEW_SAMPLE_GUEST)
-                  }
-                  theme={theme}
-                  textStyles={invitation.textStyles}
-                  customTexts={invitation.customTexts}
-                />
+                <EditableCard sectionKey="personalGuestCard">
+                  <PersonalGuestCard
+                    guest={
+                      invitation.guest ??
+                      (isLandingPreview
+                        ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
+                        : PREVIEW_SAMPLE_GUEST)
+                    }
+                    theme={theme}
+                    textStyles={invitation.textStyles}
+                    customTexts={invitation.customTexts}
+                    cardStyle={cs("personalGuestCard", 24)}
+                  />
+                </EditableCard>
               </div>
             )}
 

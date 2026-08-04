@@ -561,7 +561,7 @@ function SaveTheDateInlineCountdown({
           valueElementKey="countdownValue"
           labelElementKey="countdownLabel"
           colonStyle={{
-            fontFamily: ts.scriptFont,
+            fontFamily: ts.bodyFont,
             color: ts.accent,
           }}
         />

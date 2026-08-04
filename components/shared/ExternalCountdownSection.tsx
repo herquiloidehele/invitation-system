@@ -186,7 +186,7 @@ export default function ExternalCountdownSection({
             valueElementKey="externalCountdownValue"
             labelElementKey="externalCountdownLabel"
             colonStyle={{
-              fontFamily: ts.scriptFont,
+              fontFamily: ts.bodyFont,
               color: ts.accent,
             }}
           />

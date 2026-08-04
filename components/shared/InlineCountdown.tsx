@@ -3,6 +3,8 @@
 import { Fragment, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 
+import { getInlineCountdownSeparatorStyle } from "@/lib/countdown";
+
 import { EditableText } from "./EditableText";
 
 interface InlineCountdownProps {
@@ -52,9 +54,12 @@ export default function InlineCountdown({
   const baseClassName =
     "grid w-full max-w-[680px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-[clamp(0.125rem,1.5vw,0.75rem)]";
   const resolvedColonStyle: CSSProperties = {
-    fontSize: 36,
-    lineHeight: 1,
-    marginTop: 10,
+    ...getInlineCountdownSeparatorStyle(
+      typeof colonStyle?.fontFamily === "string"
+        ? colonStyle.fontFamily
+        : undefined,
+      typeof colonStyle?.color === "string" ? colonStyle.color : "currentColor",
+    ),
     ...colonStyle,
   };
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatInlineCountdownValues,
+  getInlineCountdownSeparatorStyle,
   normalizeExternalCountdownLayout,
   type CountdownTimeLeft,
 } from "@/lib/countdown";
@@ -33,5 +34,18 @@ describe("normalizeExternalCountdownLayout", () => {
 
   it("preserves the inline layout", () => {
     expect(normalizeExternalCountdownLayout("inline")).toBe("inline");
+  });
+});
+
+describe("getInlineCountdownSeparatorStyle", () => {
+  it("uses a regular readable colon aligned with the number row", () => {
+    expect(getInlineCountdownSeparatorStyle("Inter", "#c09020")).toEqual({
+      fontFamily: "Inter",
+      color: "#c09020",
+      fontSize: 32,
+      fontWeight: 400,
+      lineHeight: 1,
+      marginTop: 4,
+    });
   });
 });
