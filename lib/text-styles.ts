@@ -82,6 +82,8 @@ export interface ResolvedTextStyles {
   countdownValue: CSSProperties;
   /** Countdown unit label ("Dias", "Horas", etc.) */
   countdownLabel: CSSProperties;
+  /** Countdown separator between inline values (":") */
+  countdownSeparator: CSSProperties;
   /** Countdown date context ("day · month · year") */
   countdownDate: CSSProperties;
   /** Countdown weekday & time ("Segunda-feira · 16:00") */
@@ -667,6 +669,18 @@ export function resolveTextStyles(
     el?.countdownLabel,
   );
 
+  const countdownSeparator = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: 32,
+      fontWeight: 400,
+      lineHeight: 1,
+      color: accent,
+      marginTop: 4,
+    },
+    el?.countdownSeparator,
+  );
+
   const countdownDate = applyOverride(
     {
       fontFamily: scriptFont,
@@ -1133,6 +1147,7 @@ export function resolveTextStyles(
     calendarCta,
     countdownValue,
     countdownLabel,
+    countdownSeparator,
     countdownDate,
     countdownWeekday,
     externalCountdownTitle,

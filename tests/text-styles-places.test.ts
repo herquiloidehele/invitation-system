@@ -53,3 +53,25 @@ describe("resolveTextStyles — places elements", () => {
     expect(ts.placeLink.color).toBe("#00ff00");
   });
 });
+
+describe("resolveTextStyles — countdown separator", () => {
+  it("provides a customizable separator style shared by countdown layouts", () => {
+    const ts = resolveTextStyles(theme, {
+      elements: {
+        countdownSeparator: {
+          fontFamily: "Cormorant",
+          fontSize: 40,
+          fontWeight: 700,
+          color: "#b8860b",
+        },
+      },
+    });
+
+    expect(ts.countdownSeparator).toMatchObject({
+      fontFamily: "Cormorant",
+      fontSize: 40,
+      fontWeight: 700,
+      color: "#b8860b",
+    });
+  });
+});

@@ -452,14 +452,10 @@ function CountdownColon({
         delay,
       }}
       style={{
-        fontFamily: ts.scriptFont,
-        fontSize: 36,
-        color: ts.accent,
-        lineHeight: 1,
-        marginTop: 10,
+        ...ts.countdownSeparator,
       }}
     >
-      :
+      <EditableText elementKey="countdownSeparator">:</EditableText>
     </motion.span>
   );
 }
@@ -560,10 +556,7 @@ function SaveTheDateInlineCountdown({
           labelStyle={{ ...ts.countdownLabel, fontSize: labelFontSize }}
           valueElementKey="countdownValue"
           labelElementKey="countdownLabel"
-          colonStyle={{
-            fontFamily: ts.bodyFont,
-            color: ts.accent,
-          }}
+          separatorStyle={ts.countdownSeparator}
         />
       )}
 

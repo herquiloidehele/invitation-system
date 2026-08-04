@@ -798,6 +798,8 @@ export interface TextStyleOverrides {
     calendarCta?: TextStyle;
     countdownValue?: TextStyle;
     countdownLabel?: TextStyle;
+    /** Countdown separator between inline values (":") */
+    countdownSeparator?: TextStyle;
     countdownDate?: TextStyle;
     countdownWeekday?: TextStyle;
     /** External invitation countdown section title. */

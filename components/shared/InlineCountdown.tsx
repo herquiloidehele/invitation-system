@@ -3,8 +3,6 @@
 import { Fragment, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 
-import { getInlineCountdownSeparatorStyle } from "@/lib/countdown";
-
 import { EditableText } from "./EditableText";
 
 interface InlineCountdownProps {
@@ -14,7 +12,7 @@ interface InlineCountdownProps {
   labelStyle: CSSProperties;
   valueElementKey: string;
   labelElementKey: string;
-  colonStyle?: CSSProperties;
+  separatorStyle?: CSSProperties;
   className?: string;
 }
 
@@ -36,7 +34,7 @@ function CountdownColon({
       }}
       style={style}
     >
-      :
+      <EditableText elementKey="countdownSeparator">:</EditableText>
     </motion.span>
   );
 }
@@ -48,20 +46,12 @@ export default function InlineCountdown({
   labelStyle,
   valueElementKey,
   labelElementKey,
-  colonStyle,
+  separatorStyle,
   className,
 }: InlineCountdownProps) {
   const baseClassName =
     "grid w-full max-w-[680px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-[clamp(0.125rem,1.5vw,0.75rem)]";
-  const resolvedColonStyle: CSSProperties = {
-    ...getInlineCountdownSeparatorStyle(
-      typeof colonStyle?.fontFamily === "string"
-        ? colonStyle.fontFamily
-        : undefined,
-      typeof colonStyle?.color === "string" ? colonStyle.color : "currentColor",
-    ),
-    ...colonStyle,
-  };
+  const resolvedSeparatorStyle: CSSProperties = separatorStyle ?? {};
 
   return (
     <div className={`${baseClassName}${className ? ` ${className}` : ""}`}>
@@ -69,7 +59,7 @@ export default function InlineCountdown({
         <Fragment key={`${value}-${index}`}>
           {index > 0 && (
             <CountdownColon
-              style={resolvedColonStyle}
+              style={resolvedSeparatorStyle}
               delay={(index - 1) * 0.3}
             />
           )}

@@ -185,10 +185,7 @@ export default function ExternalCountdownSection({
             labelStyle={ts.externalCountdownLabel}
             valueElementKey="externalCountdownValue"
             labelElementKey="externalCountdownLabel"
-            colonStyle={{
-              fontFamily: ts.bodyFont,
-              color: ts.accent,
-            }}
+            separatorStyle={ts.countdownSeparator}
           />
         ) : (
           <div className="mt-12 grid w-full grid-cols-2 gap-3">
