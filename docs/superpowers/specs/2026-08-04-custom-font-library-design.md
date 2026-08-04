@@ -54,7 +54,7 @@ Alternatives rejected:
 
 ### `CustomFontFamily`
 
-- `id`: CUID primary key.
+- `id`: UUID primary key, generated before insertion so `cssFamily` can be derived atomically.
 - `name`: trimmed admin-facing name with the admin's preferred capitalization.
 - `normalizedName`: unique lowercase, whitespace-normalized name for duplicate detection.
 - `cssFamily`: unique immutable identifier in the form `custom-font-<id>`.
@@ -66,7 +66,7 @@ Alternatives rejected:
 
 ### `CustomFontVariant`
 
-- `id`: CUID primary key.
+- `id`: UUID primary key.
 - `familyId`: parent family foreign key.
 - `weight`: integer constrained by application validation to 100 through 900.
 - `style`: `normal` or `italic`.
