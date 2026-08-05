@@ -70,6 +70,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "externalLink",
       "guestManagementEnabled",
       "ownerCanAddGuests",
+      "ownerGuestFormMode",
       "guestMessageTemplate",
       "socialPreview",
     ] as const;

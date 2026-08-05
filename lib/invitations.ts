@@ -5,6 +5,7 @@ import {
   sanitizeInvitationTranslations,
 } from "./invitation-translations";
 import { sanitizeLandingTranslations } from "./landing-translations";
+import { normalizeOwnerGuestFormMode } from "./owner-guest-form-mode";
 import { normalizeCurrency } from "./currency/config";
 import type {
   CardStyleOverrides,
@@ -95,6 +96,7 @@ type InvitationWithTheme = {
   eventType: string;
   guestManagementEnabled: boolean;
   ownerCanAddGuests: boolean;
+  ownerGuestFormMode: string;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
   priceFromCents: number | null;
@@ -184,6 +186,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     eventType: (row.eventType as InvitationEventType) ?? "wedding",
     guestManagementEnabled: row.guestManagementEnabled ?? false,
     ownerCanAddGuests: row.ownerCanAddGuests ?? false,
+    ownerGuestFormMode: normalizeOwnerGuestFormMode(row.ownerGuestFormMode),
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"]) ?? undefined,

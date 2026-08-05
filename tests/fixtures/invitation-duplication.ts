@@ -158,6 +158,7 @@ export const sourceInvitationRow = {
   isDemo: true,
   guestManagementEnabled: true,
   ownerCanAddGuests: true,
+  ownerGuestFormMode: "minimal",
   guestMessageTemplate: "Olá {name}: {link}",
   socialPreview: {
     image: "https://cdn.example.com/social.jpg",

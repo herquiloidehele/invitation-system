@@ -11,6 +11,7 @@ import {
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
 
@@ -102,6 +103,7 @@ export function buildInvitationCreateData(
     eventType: normalizeInvitationEventType(body.eventType),
     guestManagementEnabled: body.guestManagementEnabled === true,
     ownerCanAddGuests: body.ownerCanAddGuests === true,
+    ownerGuestFormMode: normalizeOwnerGuestFormMode(body.ownerGuestFormMode),
     guestMessageTemplate: body.guestMessageTemplate ?? null,
     socialPreview: sanitizeJsonField(body.socialPreview, null),
     priceFromCents:

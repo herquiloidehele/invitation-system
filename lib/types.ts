@@ -1,4 +1,5 @@
 import type { PriceOverrides } from "@/lib/currency/template-price";
+import type { OwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import type { RsvpInputStyle } from "./rsvp-input-styles";
 
 /** Theme name / slug identifier (e.g. "pink-floral"). Open-ended — themes are stored in the database. */
@@ -1252,6 +1253,8 @@ export interface InvitationData {
   guestManagementEnabled?: boolean;
   /** Whether the host (owner-link page) may add guests. When false, the "Add guest" button is hidden there and the owner API rejects creation. Defaults to false. */
   ownerCanAddGuests?: boolean;
+  /** Controls which fields the host sees when adding or editing guests. */
+  ownerGuestFormMode?: OwnerGuestFormMode;
   /** WhatsApp/SMS message template with `{name}` and `{link}` placeholders. */
   guestMessageTemplate?: string;
   /** Override values used only for OG/Twitter meta tags. Image is never rendered on the page. */

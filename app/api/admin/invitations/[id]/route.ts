@@ -13,6 +13,7 @@ import {
 } from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
 
@@ -323,6 +324,11 @@ export async function PUT(
         }),
         ...(body.ownerCanAddGuests !== undefined && {
           ownerCanAddGuests: body.ownerCanAddGuests === true,
+        }),
+        ...(body.ownerGuestFormMode !== undefined && {
+          ownerGuestFormMode: normalizeOwnerGuestFormMode(
+            body.ownerGuestFormMode,
+          ),
         }),
         ...(body.guestMessageTemplate !== undefined && {
           guestMessageTemplate: body.guestMessageTemplate || null,

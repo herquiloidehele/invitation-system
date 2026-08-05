@@ -135,6 +135,10 @@ import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
+import {
+  normalizeOwnerGuestFormMode,
+  OWNER_GUEST_FORM_MODE_OPTIONS,
+} from "@/lib/owner-guest-form-mode";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import {
@@ -156,10 +160,7 @@ import {
   type InvitationFormMode,
 } from "@/lib/invitation-form-mode";
 import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
-import {
-  setCardStyleField,
-  type CardStyleValue,
-} from "@/lib/card-styles";
+import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -280,8 +281,8 @@ const SAVE_DATE_STYLE_OPTIONS: {
           21:03:12:41
         </div>
         <div className="text-[6px] uppercase tracking-wider opacity-60">
-          Dias&nbsp;&nbsp;&nbsp; Horas&nbsp;&nbsp;&nbsp; Minutos&nbsp;&nbsp;&nbsp;
-          Segundos
+          Dias&nbsp;&nbsp;&nbsp; Horas&nbsp;&nbsp;&nbsp;
+          Minutos&nbsp;&nbsp;&nbsp; Segundos
         </div>
       </div>
     ),
@@ -542,6 +543,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     translations: undefined,
     guestManagementEnabled: false,
     ownerCanAddGuests: false,
+    ownerGuestFormMode: "complete",
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
 }
@@ -4047,6 +4049,42 @@ export default function InvitationForm({
                             }))
                           }
                         />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="owner-guest-form-mode">
+                          Formulário do anfitrião
+                        </Label>
+                        <Select
+                          value={normalizeOwnerGuestFormMode(
+                            form.ownerGuestFormMode,
+                          )}
+                          onValueChange={(value) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              ownerGuestFormMode:
+                                normalizeOwnerGuestFormMode(value),
+                            }))
+                          }
+                        >
+                          <SelectTrigger id="owner-guest-form-mode">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {OWNER_GUEST_FORM_MODE_OPTIONS.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Completo mostra todos os campos. Mínimo mostra apenas
+                          nome e mesa.
+                        </p>
                       </div>
 
                       <div className="space-y-1.5">

@@ -94,10 +94,7 @@ import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
-import {
-  setCardStyleField,
-  type CardStyleValue,
-} from "@/lib/card-styles";
+import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
@@ -124,6 +121,10 @@ import {
   shouldShowExternalInvitationAudioControls,
 } from "@/lib/external-invitation-form";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
+import {
+  normalizeOwnerGuestFormMode,
+  OWNER_GUEST_FORM_MODE_OPTIONS,
+} from "@/lib/owner-guest-form-mode";
 import { HERO_VIDEO_UPLOAD_PROFILE } from "@/lib/video-upload";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
@@ -247,6 +248,7 @@ function getDefaultState(
     imageSettings: {},
     guestManagementEnabled: false,
     ownerCanAddGuests: false,
+    ownerGuestFormMode: "complete",
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
 }
@@ -2283,9 +2285,7 @@ export default function ExternalInvitationForm({
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="cards">
-                                    Cartões
-                                  </SelectItem>
+                                  <SelectItem value="cards">Cartões</SelectItem>
                                   <SelectItem value="inline">
                                     Em linha
                                   </SelectItem>
@@ -3629,6 +3629,42 @@ export default function ExternalInvitationForm({
                             }))
                           }
                         />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="external-owner-guest-form-mode">
+                          Formulário do anfitrião
+                        </Label>
+                        <Select
+                          value={normalizeOwnerGuestFormMode(
+                            form.ownerGuestFormMode,
+                          )}
+                          onValueChange={(value) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              ownerGuestFormMode:
+                                normalizeOwnerGuestFormMode(value),
+                            }))
+                          }
+                        >
+                          <SelectTrigger id="external-owner-guest-form-mode">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {OWNER_GUEST_FORM_MODE_OPTIONS.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Completo mostra todos os campos. Mínimo mostra apenas
+                          nome e mesa.
+                        </p>
                       </div>
 
                       <div className="space-y-1.5">

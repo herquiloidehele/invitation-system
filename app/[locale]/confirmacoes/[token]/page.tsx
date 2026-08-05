@@ -26,6 +26,7 @@ import { countAttendingGuests } from "@/lib/rsvp-config";
 import type { RsvpCustomAnswer } from "@/lib/types";
 import { isExclusiveGiftSelectionEnabled } from "@/lib/gift-registry";
 import GiftReservationsTabClient from "./GiftReservationsTabClient";
+import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = createNoIndexMetadata();
@@ -268,6 +269,9 @@ async function InvitationRsvpView({
             invitationSlug={invitation.slug}
             messageTemplate={invitation.guestMessageTemplate ?? ""}
             canAddGuests={invitation.ownerCanAddGuests}
+            ownerGuestFormMode={normalizeOwnerGuestFormMode(
+              invitation.ownerGuestFormMode,
+            )}
           />
         ) : (
           <GiftReservationsTabClient

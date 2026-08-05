@@ -4,6 +4,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
+import type { OwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 
 interface GuestsTabClientProps {
   ownerToken: string;
@@ -11,6 +12,7 @@ interface GuestsTabClientProps {
   messageTemplate: string;
   /** Whether the host is allowed to add guests (Invitation.ownerCanAddGuests). */
   canAddGuests: boolean;
+  ownerGuestFormMode: OwnerGuestFormMode;
 }
 
 /**
@@ -34,6 +36,7 @@ export default function GuestsTabClient({
   invitationSlug,
   messageTemplate,
   canAddGuests,
+  ownerGuestFormMode,
 }: GuestsTabClientProps) {
   const origin = useWindowOrigin();
   const t = useTranslations("OwnerConfirmations");
@@ -50,6 +53,7 @@ export default function GuestsTabClient({
       messageTemplate={messageTemplate || DEFAULT_GUEST_MESSAGE_TEMPLATE}
       title={t("guestsListTitle")}
       canAddGuests={canAddGuests}
+      ownerGuestFormMode={ownerGuestFormMode}
     />
   );
 }

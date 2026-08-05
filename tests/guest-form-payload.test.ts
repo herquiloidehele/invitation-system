@@ -105,3 +105,56 @@ describe("buildGuestUpsertInput — clearing Nº de convidados (number field)", 
     expect(input.totalGuests).toBe(3);
   });
 });
+
+describe("buildGuestUpsertInput — values hidden by minimal mode", () => {
+  it("preserves loaded hidden values when editing", () => {
+    const input = buildGuestUpsertInput(
+      {
+        ...clearedValues(),
+        companion: "João",
+        phoneCountryCode: "+258",
+        phoneNumber: "841234567",
+        totalGuests: "3",
+        canInviteOthers: true,
+        note: "Sem glúten",
+      },
+      { showCustomExternalLink: false },
+    );
+
+    expect(input).toMatchObject({
+      companion: "João",
+      phoneCountryCode: "+258",
+      phoneNumber: "841234567",
+      totalGuests: 3,
+      canInviteOthers: true,
+      note: "Sem glúten",
+    });
+  });
+
+  it("emits safe defaults for a new minimal guest", () => {
+    const input = buildGuestUpsertInput(
+      {
+        name: "Maria",
+        companion: "",
+        phoneCountryCode: "+258",
+        phoneNumber: "",
+        tableLabel: "Mesa 4",
+        totalGuests: "",
+        canInviteOthers: false,
+        note: "",
+      },
+      { showCustomExternalLink: false },
+    );
+
+    expect(input).toEqual({
+      name: "Maria",
+      companion: "",
+      phoneCountryCode: "+258",
+      phoneNumber: "",
+      tableLabel: "Mesa 4",
+      totalGuests: null,
+      canInviteOthers: false,
+      note: "",
+    });
+  });
+});

@@ -20,6 +20,7 @@ import {
 import GuestForm from "./GuestForm";
 import GuestRowActions from "./GuestRowActions";
 import type { GuestData, GuestUpsertInput } from "@/lib/types";
+import type { OwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 
 interface GuestListEditorProps {
   /** Path used for list (GET) and create (POST). E.g. "/api/owner/<token>/guests" */
@@ -33,6 +34,7 @@ interface GuestListEditorProps {
   showCustomExternalLink?: boolean;
   /** When false, hides the "add guest" affordances. Defaults to true — set false on the host page when `ownerCanAddGuests` is off. */
   canAddGuests?: boolean;
+  ownerGuestFormMode?: OwnerGuestFormMode;
 }
 
 export default function GuestListEditor({
@@ -43,6 +45,7 @@ export default function GuestListEditor({
   title = "Convidados",
   showCustomExternalLink = false,
   canAddGuests = true,
+  ownerGuestFormMode = "complete",
 }: GuestListEditorProps) {
   const [guests, setGuests] = useState<GuestData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -164,8 +167,7 @@ export default function GuestListEditor({
 
       {loading ? (
         <div className="flex items-center justify-center py-12 text-muted-foreground">
-          <Loader2 className="mr-2 size-4 animate-spin" />
-          A carregar convidados…
+          <Loader2 className="mr-2 size-4 animate-spin" />A carregar convidados…
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-lg border border-dashed py-12 text-center">
@@ -245,6 +247,7 @@ export default function GuestListEditor({
         onSubmit={handleSubmit}
         saving={saving}
         showCustomExternalLink={showCustomExternalLink}
+        ownerGuestFormMode={ownerGuestFormMode}
       />
 
       <AlertDialog

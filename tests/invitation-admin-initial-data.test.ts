@@ -65,6 +65,7 @@ const baseRow = {
   isDemo: false,
   guestManagementEnabled: false,
   ownerCanAddGuests: false,
+  ownerGuestFormMode: "complete",
   guestMessageTemplate: null,
   socialPreview: null,
   priceFromCents: null,
@@ -207,6 +208,24 @@ describe("toAdminInvitationInitialData — ownerCanAddGuests round-trip", () => 
     const row = { ...baseRow, ownerCanAddGuests: false };
     const result = toAdminInvitationInitialData(row);
     expect(result.ownerCanAddGuests).toBe(false);
+  });
+});
+
+describe("toAdminInvitationInitialData — ownerGuestFormMode", () => {
+  it("hydrates minimal mode", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      ownerGuestFormMode: "minimal",
+    });
+    expect(result.ownerGuestFormMode).toBe("minimal");
+  });
+
+  it("defaults an unknown value to complete", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      ownerGuestFormMode: "legacy",
+    });
+    expect(result.ownerGuestFormMode).toBe("complete");
   });
 });
 

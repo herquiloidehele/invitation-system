@@ -37,6 +37,10 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Loader2 } from "lucide-react";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "@/lib/guest-links";
+import {
+  isOwnerGuestFormFieldVisible,
+  type OwnerGuestFormMode,
+} from "@/lib/owner-guest-form-mode";
 import type { GuestData, GuestUpsertInput } from "@/lib/types";
 import {
   getGuestFormSheetProps,
@@ -78,6 +82,7 @@ interface GuestFormProps {
   onSubmit: (input: GuestUpsertInput) => Promise<void>;
   saving: boolean;
   showCustomExternalLink?: boolean;
+  ownerGuestFormMode?: OwnerGuestFormMode;
 }
 
 export default function GuestForm({
@@ -87,6 +92,7 @@ export default function GuestForm({
   onSubmit,
   saving,
   showCustomExternalLink = false,
+  ownerGuestFormMode = "complete",
 }: GuestFormProps) {
   const isMobile = useIsMobile();
   const shellVariant = getGuestFormShellVariant(isMobile);
@@ -168,52 +174,58 @@ export default function GuestForm({
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="guest-companion">Acompanhante</Label>
-            <Input id="guest-companion" {...register("companion")} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1.5 w-full">
-              <Label htmlFor="guest-cc">Indicativo *</Label>
-              <Select
-                value={countryCode}
-                onValueChange={(value) =>
-                  setValue("phoneCountryCode", value ?? DEFAULT_COUNTRY_CODE, {
-                    shouldDirty: true,
-                  })
-                }
-              >
-                <SelectTrigger id="guest-cc">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {COUNTRY_CODES.map((c) => (
-                    <SelectItem key={c.code} value={c.code}>
-                      <span className="mr-1">{c.flag}</span>
-                      <span className="font-mono text-xs">{c.code}</span>
-                      <span className="ml-1 text-xs text-muted-foreground">
-                        {c.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "companion") && (
             <div className="space-y-1.5">
-              <Label htmlFor="guest-phone">Telefone</Label>
-              <Input
-                id="guest-phone"
-                inputMode="tel"
-                {...register("phoneNumber")}
-              />
-              {formState.errors.phoneNumber && (
-                <p className="text-xs text-destructive">
-                  {formState.errors.phoneNumber.message}
-                </p>
-              )}
+              <Label htmlFor="guest-companion">Acompanhante</Label>
+              <Input id="guest-companion" {...register("companion")} />
             </div>
-          </div>
+          )}
+
+          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "phone") && (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5 w-full">
+                <Label htmlFor="guest-cc">Indicativo *</Label>
+                <Select
+                  value={countryCode}
+                  onValueChange={(value) =>
+                    setValue(
+                      "phoneCountryCode",
+                      value ?? DEFAULT_COUNTRY_CODE,
+                      { shouldDirty: true },
+                    )
+                  }
+                >
+                  <SelectTrigger id="guest-cc">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRY_CODES.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>
+                        <span className="mr-1">{c.flag}</span>
+                        <span className="font-mono text-xs">{c.code}</span>
+                        <span className="ml-1 text-xs text-muted-foreground">
+                          {c.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="guest-phone">Telefone</Label>
+                <Input
+                  id="guest-phone"
+                  inputMode="tel"
+                  {...register("phoneNumber")}
+                />
+                {formState.errors.phoneNumber && (
+                  <p className="text-xs text-destructive">
+                    {formState.errors.phoneNumber.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label htmlFor="guest-table">Mesa</Label>
@@ -224,63 +236,76 @@ export default function GuestForm({
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="guest-total">Nº de convidados</Label>
-            <Input
-              id="guest-total"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              placeholder="Ex: 2"
-              {...register("totalGuests")}
-            />
-          </div>
-
-          <div className="flex items-center justify-between rounded-lg border p-3">
-            <div>
-              <Label className="cursor-pointer">
-                Pode convidar mais pessoas
-              </Label>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Quando activo, este convidado pode adicionar outros à lista a
-                partir do convite pessoal.
-              </p>
-            </div>
-            <Switch
-              checked={canInviteOthers}
-              onCheckedChange={(value) =>
-                setValue("canInviteOthers", value, { shouldDirty: true })
-              }
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="guest-note">Nota</Label>
-            <Textarea
-              id="guest-note"
-              rows={3}
-              placeholder="Ex: Sem glúten, alergia a marisco, etc"
-              {...register("note")}
-            />
-          </div>
-
-          {showCustomExternalLink && (
+          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "totalGuests") && (
             <div className="space-y-1.5">
-              <Label htmlFor="guest-custom-external-link">
-                Link Canva personalizado
-              </Label>
+              <Label htmlFor="guest-total">Nº de convidados</Label>
               <Input
-                id="guest-custom-external-link"
-                type="url"
-                placeholder="https://exemplo.canva.site/convite-maria"
-                {...register("customExternalLink")}
+                id="guest-total"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                placeholder="Ex: 2"
+                {...register("totalGuests")}
               />
-              <p className="text-xs text-muted-foreground">
-                Opcional. Se estiver vazio, este convidado usa o link externo
-                padrão do convite.
-              </p>
             </div>
           )}
+
+          {isOwnerGuestFormFieldVisible(
+            ownerGuestFormMode,
+            "canInviteOthers",
+          ) && (
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div>
+                <Label className="cursor-pointer">
+                  Pode convidar mais pessoas
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Quando activo, este convidado pode adicionar outros à lista a
+                  partir do convite pessoal.
+                </p>
+              </div>
+              <Switch
+                checked={canInviteOthers}
+                onCheckedChange={(value) =>
+                  setValue("canInviteOthers", value, { shouldDirty: true })
+                }
+              />
+            </div>
+          )}
+
+          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "note") && (
+            <div className="space-y-1.5">
+              <Label htmlFor="guest-note">Nota</Label>
+              <Textarea
+                id="guest-note"
+                rows={3}
+                placeholder="Ex: Sem glúten, alergia a marisco, etc"
+                {...register("note")}
+              />
+            </div>
+          )}
+
+          {showCustomExternalLink &&
+            isOwnerGuestFormFieldVisible(
+              ownerGuestFormMode,
+              "customExternalLink",
+            ) && (
+              <div className="space-y-1.5">
+                <Label htmlFor="guest-custom-external-link">
+                  Link Canva personalizado
+                </Label>
+                <Input
+                  id="guest-custom-external-link"
+                  type="url"
+                  placeholder="https://exemplo.canva.site/convite-maria"
+                  {...register("customExternalLink")}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Opcional. Se estiver vazio, este convidado usa o link externo
+                  padrão do convite.
+                </p>
+              </div>
+            )}
         </form>
 
         <div className="sr-only" aria-live="polite">

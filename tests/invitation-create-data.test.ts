@@ -63,4 +63,20 @@ describe("buildInvitationCreateData", () => {
     const data = buildInvitationCreateData(body, "theme_copy");
     expect(data.currency).toBe("EUR");
   });
+
+  it("stores a minimal host guest form mode", () => {
+    const data = buildInvitationCreateData(
+      duplicateForm({ ownerGuestFormMode: "minimal" }),
+      "theme_copy",
+    );
+    expect(data.ownerGuestFormMode).toBe("minimal");
+  });
+
+  it("defaults an invalid host guest form mode to complete", () => {
+    const data = buildInvitationCreateData(
+      duplicateForm({ ownerGuestFormMode: "invalid" as never }),
+      "theme_copy",
+    );
+    expect(data.ownerGuestFormMode).toBe("complete");
+  });
 });

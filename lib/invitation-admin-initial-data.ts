@@ -11,6 +11,7 @@ import {
 } from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -94,6 +95,7 @@ type AdminInvitationInitialDataRow = {
   isDemo: boolean;
   guestManagementEnabled: boolean;
   ownerCanAddGuests: boolean;
+  ownerGuestFormMode: string;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
   priceFromCents: number | null;
@@ -185,6 +187,7 @@ export function toAdminInvitationInitialData(
     isDemo: row.isDemo,
     guestManagementEnabled: row.guestManagementEnabled,
     ownerCanAddGuests: row.ownerCanAddGuests,
+    ownerGuestFormMode: normalizeOwnerGuestFormMode(row.ownerGuestFormMode),
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"] | null) ??
