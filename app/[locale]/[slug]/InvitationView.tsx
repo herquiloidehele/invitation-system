@@ -5,7 +5,11 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { resolveHeroVideoMuted } from "@/lib/hero-video-audio";
+import {
+  playHeroVideo,
+  primeHeroVideoPlayback,
+  resolveHeroVideoMuted,
+} from "@/lib/hero-video-audio";
 import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import VideoSequenceCover from "@/components/shared/VideoSequenceCover";
@@ -236,6 +240,8 @@ function EnvelopeInvitationView({
    *  the background music immediately, within the user gesture. */
   const handleOpen = useCallback(() => {
     upgradeHeroPreload();
+    const heroVideo = heroVideoRef.current;
+    if (heroVideo) void primeHeroVideoPlayback(heroVideo);
     startBackgroundAudio();
   }, [upgradeHeroPreload, startBackgroundAudio]);
 
@@ -348,6 +354,9 @@ function EnvelopeInvitationView({
     // (unsupported codec / stall): it unmutes the primed track now. Idempotent —
     // a no-op if it already started with playback or on the envelope tap.
     startBackgroundAudio();
+
+    const heroVideo = heroVideoRef.current;
+    if (heroVideo) void playHeroVideo(heroVideo);
 
     // Celebratory confetti the moment the envelope finishes opening.
     // Opt-in per invitation (default off); colors fall back to the theme.

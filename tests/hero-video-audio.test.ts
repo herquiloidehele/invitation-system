@@ -16,6 +16,7 @@ import VideoEntranceHero from "@/components/video-entrance/VideoEntranceHero";
 import { applyPrefetchedHeroVideoMuted } from "@/components/shared/PrefetchedVideoSlot";
 import {
   playHeroVideo,
+  primeHeroVideoPlayback,
   resolveHeroVideoMuted,
 } from "@/lib/hero-video-audio";
 import type { TemplateTheme } from "@/lib/types";
@@ -169,5 +170,24 @@ describe("hero video rendering", () => {
 
     await expect(playHeroVideo(video)).resolves.toBeUndefined();
     expect(video.muted).toBe(false);
+  });
+
+  it("primes an unmuted video during the cover tap and resets it", async () => {
+    const events: string[] = [];
+    const video = {
+      muted: false,
+      currentTime: 12,
+      play: async () => {
+        events.push("play");
+      },
+      pause: () => {
+        events.push("pause");
+      },
+    };
+
+    await primeHeroVideoPlayback(video);
+
+    expect(events).toEqual(["play", "pause"]);
+    expect(video.currentTime).toBe(0);
   });
 });
