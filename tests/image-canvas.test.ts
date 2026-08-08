@@ -42,6 +42,20 @@ const mixedLayer: ImageLayer = {
 };
 
 describe("ImageCanvas", () => {
+  it("keeps the invitation content wrapper when fallback images become empty", () => {
+    const render = (imageLayer?: ImageLayer) =>
+      renderToStaticMarkup(
+        createElement(
+          ImageCanvas,
+          { layer: imageLayer },
+          createElement("section", null, "Invitation content"),
+        ),
+      );
+
+    expect(render()).toContain('data-image-canvas-content="true"');
+    expect(render(layer)).toContain('data-image-canvas-content="true"');
+  });
+
   it("leaves hosted section items to SectionImageHost", () => {
     const html = renderToStaticMarkup(
       createElement(
@@ -90,6 +104,14 @@ describe("ImageCanvas", () => {
     expect(html.indexOf('data-image-band="front"')).toBeLessThan(
       html.indexOf("Protected cover"),
     );
+  });
+
+  it("exposes whether legacy migration geometry is ready", () => {
+    const html = renderToStaticMarkup(
+      createElement(ImageCanvas, { layer, migrationReady: false }, null),
+    );
+
+    expect(html).toContain('data-image-migration-ready="false"');
   });
 
   it("can render front images as a middle layer above hero media but below promoted cover surfaces", () => {

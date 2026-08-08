@@ -20,6 +20,7 @@ import {
   pixelGeometryFromPercent,
   resizeWidthPct,
   rotationFromPointer,
+  shouldMigrateLegacyImageItems,
 } from "@/lib/image-layer-editor-geometry";
 import {
   forwardImageEditorWheel,
@@ -97,7 +98,10 @@ export default function ImageLayerEditor({
   const layer = value ?? EMPTY_IMAGE_LAYER;
   const dragOffset = useRef<{ dx: number; dy: number } | null>(null);
   const handleMode = useRef<null | "resize" | "rotate">(null);
-  const [, force] = useReducer((x: number) => x + 1, 0);
+  const [measurementRevision, forceMeasure] = useReducer(
+    (revision: number) => revision + 1,
+    0,
+  );
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Re-measure on scroll/resize so the overlay tracks the preview as the user
@@ -105,12 +109,25 @@ export default function ImageLayerEditor({
   useEffect(() => {
     if (!active) return;
     const root = getPreviewRoot();
-    const onMove = () => force();
+    const onMove = () => forceMeasure();
     return observeImageLayerEditor(
       root ? viewportOf(root) : null,
       window,
       onMove,
     );
+  }, [active, getPreviewRoot]);
+
+  useEffect(() => {
+    if (!active) return;
+    const canvas = getPreviewRoot()?.querySelector("[data-image-canvas]");
+    if (!canvas || typeof MutationObserver === "undefined") return;
+
+    const observer = new MutationObserver(() => forceMeasure());
+    observer.observe(canvas, {
+      attributes: true,
+      attributeFilter: ["data-image-migration-ready"],
+    });
+    return () => observer.disconnect();
   }, [active, getPreviewRoot]);
 
   const readCanvasRect = useCallback((): Rect | null => {
@@ -131,8 +148,15 @@ export default function ImageLayerEditor({
   }, [getPreviewRoot]);
 
   useEffect(() => {
-    if (!active || layer.items.every((item) => item.sectionKey)) return;
-    const canvas = readCanvasRect();
+    const canvasElement = getPreviewRoot()?.querySelector<HTMLElement>(
+      "[data-image-canvas]",
+    );
+    const migrationReady =
+      canvasElement?.dataset.imageMigrationReady !== "false";
+    if (!shouldMigrateLegacyImageItems(active, migrationReady, layer.items)) {
+      return;
+    }
+    const canvas = rectOf(canvasElement);
     if (!canvas) return;
     const migrated = migrateLegacyImageItems(
       layer.items,
@@ -142,7 +166,14 @@ export default function ImageLayerEditor({
     if (migrated !== layer.items) {
       onChange({ items: [...migrated] });
     }
-  }, [active, layer.items, onChange, readCanvasRect, readSectionRects]);
+  }, [
+    active,
+    getPreviewRoot,
+    layer.items,
+    measurementRevision,
+    onChange,
+    readSectionRects,
+  ]);
 
   const handleWheel = useCallback(
     (e: React.WheelEvent<HTMLDivElement>) => {

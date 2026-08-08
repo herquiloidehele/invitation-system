@@ -134,9 +134,7 @@ export function itemsForSection(
   layer: ImageLayer | null | undefined,
   sectionKey: ImageLayerSectionKey,
 ): ImageItem[] {
-  return (layer?.items ?? []).filter(
-    (item) => (item.sectionKey ?? "hero") === sectionKey,
-  );
+  return (layer?.items ?? []).filter((item) => item.sectionKey === sectionKey);
 }
 
 export function addItem(

@@ -1,9 +1,20 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   measureIframeBodyHeight,
   shouldRestoreParentScrollForNavigation,
   shouldResetIframeHeightForNavigation,
 } from "../lib/canva-embed-measurement";
+import * as canvaMeasurement from "../lib/canva-embed-measurement";
+
+const canvaEmbedSource = readFileSync(
+  "components/curtain-canva/CanvaEmbed.tsx",
+  "utf8",
+);
+const revealableSectionsSource = readFileSync(
+  "components/shared/RevealableExternalSections.tsx",
+  "utf8",
+);
 
 describe("measureIframeBodyHeight", () => {
   it("returns the body's content height, ignoring an oversized iframe viewport", () => {
@@ -83,5 +94,33 @@ describe("shouldRestoreParentScrollForNavigation", () => {
         isInternalCanvaNavigation: true,
       }),
     ).toBe(false);
+  });
+});
+
+describe("Canva height readiness", () => {
+  const shouldReportVisibleCanvaHeight = (
+    canvaMeasurement as typeof canvaMeasurement & {
+      shouldReportVisibleCanvaHeight?: (preloading: boolean) => boolean;
+    }
+  ).shouldReportVisibleCanvaHeight;
+
+  it("does not treat an off-screen preload measurement as final", () => {
+    expect(shouldReportVisibleCanvaHeight?.(true)).toBe(false);
+  });
+
+  it("reports measurements taken at the visible embed width", () => {
+    expect(shouldReportVisibleCanvaHeight?.(false)).toBe(true);
+  });
+});
+
+describe("Canva measurement readiness integration", () => {
+  it("reports a successful content-height measurement", () => {
+    expect(canvaEmbedSource).toContain("onContentHeightReady?.();");
+  });
+
+  it("forwards the readiness callback through shared entrance sections", () => {
+    expect(revealableSectionsSource).toContain(
+      "onContentHeightReady={onCanvaContentHeightReady}",
+    );
   });
 });

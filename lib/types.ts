@@ -279,6 +279,10 @@ export interface HeroTextLayer {
 
 export const IMAGE_LAYER_SECTION_KEYS = [
   "hero",
+  "scratchReveal",
+  "personalGuestCard",
+  "canvaDetails",
+  "rsvp",
   "saveTheDate",
   "sectionImage1",
   "sectionImage2",

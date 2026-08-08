@@ -11,6 +11,12 @@ describe("ImageLayerEditor section anchor integration", () => {
     expect(source).toContain("migrateLegacyImageItems(");
   });
 
+  it("waits for the preview canvas to report stable migration geometry", () => {
+    expect(source).toContain("shouldMigrateLegacyImageItems(");
+    expect(source).toContain("data-image-migration-ready");
+    expect(source).toContain("new MutationObserver(");
+  });
+
   it("uses anchor geometry for overlay and handle calculations", () => {
     expect(source).toContain("pixelGeometryFromPercent(");
     expect(source).toContain("rectForItem(");

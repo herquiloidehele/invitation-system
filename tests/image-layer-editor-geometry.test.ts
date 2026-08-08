@@ -12,6 +12,7 @@ import {
   widthPxToPct,
   resizeWidthPct,
   rotationFromPointer,
+  shouldMigrateLegacyImageItems,
 } from "@/lib/image-layer-editor-geometry";
 import type { ImageItem } from "@/lib/types";
 
@@ -20,6 +21,25 @@ const sections: ImageAnchorRect[] = [
   { sectionKey: "schedule", left: 100, top: 200, width: 400, height: 300 },
   { sectionKey: "dressCode", left: 100, top: 600, width: 400, height: 200 },
 ];
+
+const migrationLegacyItem: ImageItem = {
+  id: "legacy",
+  src: "/legacy.png",
+  naturalAspect: 1,
+  xPct: 50,
+  yPct: 50,
+  widthPct: 30,
+  aspect: 1,
+  rotation: 0,
+  flipH: false,
+  flipV: false,
+  opacity: 1,
+  radiusPct: 0,
+  blurPx: 0,
+  shadow: null,
+  crop: { offsetXPct: 50, offsetYPct: 50, zoom: 1 },
+  z: 1,
+};
 
 describe("findImageAnchorRect", () => {
   it("selects the section containing the image centre", () => {
@@ -37,6 +57,43 @@ describe("findImageAnchorRect", () => {
 
   it("returns null when no sections are measurable", () => {
     expect(findImageAnchorRect([], 650)).toBeNull();
+  });
+
+  it("ignores collapsed sections when resolving an anchor", () => {
+    const collapsed: ImageAnchorRect = {
+      sectionKey: "canvaDetails",
+      left: 0,
+      top: 500,
+      width: 400,
+      height: 0,
+    };
+
+    expect(findImageAnchorRect([collapsed, sections[1]], 500)?.sectionKey).toBe(
+      "dressCode",
+    );
+  });
+});
+
+describe("shouldMigrateLegacyImageItems", () => {
+  it("waits for stable layout geometry", () => {
+    expect(
+      shouldMigrateLegacyImageItems(true, false, [migrationLegacyItem]),
+    ).toBe(false);
+    expect(
+      shouldMigrateLegacyImageItems(true, true, [migrationLegacyItem]),
+    ).toBe(true);
+  });
+
+  it("skips inactive and already anchored layers", () => {
+    const anchored = {
+      ...migrationLegacyItem,
+      sectionKey: "hero" as const,
+    };
+
+    expect(
+      shouldMigrateLegacyImageItems(false, true, [migrationLegacyItem]),
+    ).toBe(false);
+    expect(shouldMigrateLegacyImageItems(true, true, [anchored])).toBe(false);
   });
 });
 

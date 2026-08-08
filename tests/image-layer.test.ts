@@ -225,13 +225,11 @@ describe("itemsForSection", () => {
     ]);
   });
 
-  it("treats legacy items without a section as hero items", () => {
+  it("leaves legacy items without a section to the page-wide canvas", () => {
     const legacy = makeItem({ id: "legacy" });
     const schedule = makeItem({ id: "schedule", sectionKey: "schedule" });
 
-    expect(itemsForSection({ items: [legacy, schedule] }, "hero")).toEqual([
-      legacy,
-    ]);
+    expect(itemsForSection({ items: [legacy, schedule] }, "hero")).toEqual([]);
   });
 
   it("returns an empty list for missing layers", () => {

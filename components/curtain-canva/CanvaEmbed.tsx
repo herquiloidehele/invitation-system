@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PublicGuestData, TemplateTheme } from "@/lib/types";
 import {
   measureIframeBodyHeight,
+  shouldReportVisibleCanvaHeight,
   shouldRestoreParentScrollForNavigation,
   shouldResetIframeHeightForNavigation,
 } from "@/lib/canva-embed-measurement";
@@ -23,6 +24,8 @@ interface CanvaEmbedProps {
   /** iframe accessibility title. Defaults to "Convite". */
   title?: string;
   onInitialPageChange?: (isInitialPage: boolean) => void;
+  /** Fires after the iframe body reports its first positive content height. */
+  onContentHeightReady?: () => void;
   /** Real per-recipient guest (NOT the preview sample). Drives the `pz` param. */
   guest?: PublicGuestData | null;
   /**
@@ -43,6 +46,7 @@ export default function CanvaEmbed({
   aspectRatio,
   title,
   onInitialPageChange,
+  onContentHeightReady,
   guest,
   preloading = false,
 }: CanvaEmbedProps) {
@@ -55,6 +59,7 @@ export default function CanvaEmbed({
   const observerRef = useRef<ResizeObserver | null>(null);
   const detachNavigationInterceptorRef = useRef<(() => void) | null>(null);
   const contentHeightRef = useRef<number | null>(null);
+  const preloadingRef = useRef(preloading);
   const scrollRestoreFrameRef = useRef<number | null>(null);
   const [contentHeight, setContentHeight] = useState<number | null>(null);
   const [navigatedProxiedUrl, setNavigatedProxiedUrl] = useState<{
@@ -78,6 +83,10 @@ export default function CanvaEmbed({
     navigatedProxiedUrl?.externalLink === externalLink
       ? navigatedProxiedUrl.src
       : defaultProxiedUrl;
+
+  useEffect(() => {
+    preloadingRef.current = preloading;
+  }, [preloading]);
 
   useEffect(() => {
     contentHeightRef.current = contentHeight;
@@ -163,8 +172,17 @@ export default function CanvaEmbed({
 
     if (nextHeight !== null) {
       setContentHeight(nextHeight);
+      if (shouldReportVisibleCanvaHeight(preloadingRef.current)) {
+        onContentHeightReady?.();
+      }
     }
-  }, []);
+  }, [onContentHeightReady]);
+
+  useEffect(() => {
+    if (preloading) return;
+    const frame = window.requestAnimationFrame(measureIframe);
+    return () => window.cancelAnimationFrame(frame);
+  }, [measureIframe, preloading]);
 
   useEffect(() => {
     const onResize = () => measureIframe();

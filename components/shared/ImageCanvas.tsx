@@ -14,6 +14,8 @@ interface ImageCanvasProps {
   frontLayerPosition?: "above-content" | "below-content" | "interleaved";
   /** Section keys rendered by nested SectionImageHost instances. */
   hostedSectionKeys?: readonly ImageLayerSectionKey[];
+  /** Whether the current layout is stable enough to migrate legacy items. */
+  migrationReady?: boolean;
 }
 
 /**
@@ -29,26 +31,19 @@ export default function ImageCanvas({
   children,
   frontLayerPosition = "above-content",
   hostedSectionKeys,
+  migrationReady = true,
 }: ImageCanvasProps) {
   const hosted = new Set(hostedSectionKeys ?? []);
   const items = (layer?.items ?? []).filter(
     (item) => !item.sectionKey || !hosted.has(item.sectionKey),
   );
-
-  if (items.length === 0) {
-    return (
-      <div data-image-canvas style={{ position: "relative" }}>
-        {children}
-      </div>
-    );
-  }
-
   const behind = items.filter((i) => i.z < 0);
   const front = items.filter((i) => i.z >= 0);
 
   return (
     <div
       data-image-canvas
+      data-image-migration-ready={migrationReady ? "true" : "false"}
       style={{ position: "relative", isolation: "isolate" }}
     >
       <ImageLayerOverlay items={behind} band="behind" />
@@ -56,6 +51,7 @@ export default function ImageCanvas({
         <ImageLayerOverlay items={front} band="front" zIndex={0} />
       )}
       <div
+        data-image-canvas-content="true"
         style={
           frontLayerPosition === "interleaved"
             ? { position: "relative" }

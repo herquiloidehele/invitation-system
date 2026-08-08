@@ -10,6 +10,7 @@ type TestSectionImageHostProps = Omit<
   "children"
 > & {
   children?: ReactNode;
+  frontLayerPosition?: "above-content" | "interleaved";
 };
 
 const TestSectionImageHost = SectionImageHost as (
@@ -50,6 +51,36 @@ const layer: ImageLayer = {
 };
 
 describe("SectionImageHost", () => {
+  it("keeps the content wrapper stable when the first image is assigned", () => {
+    const render = (imageLayer?: ImageLayer) =>
+      renderToStaticMarkup(
+        createElement(
+          TestSectionImageHost,
+          { sectionKey: "canvaDetails", layer: imageLayer },
+          createElement("section", null, "Canva content"),
+        ),
+      );
+
+    expect(render()).toContain('data-section-image-content="true"');
+    expect(
+      render({
+        items: [makeItem("canva", "/canva.png", "canvaDetails")],
+      }),
+    ).toContain('data-section-image-content="true"');
+  });
+
+  it("keeps the host overflow mode stable before the first image", () => {
+    const html = renderToStaticMarkup(
+      createElement(
+        TestSectionImageHost,
+        { sectionKey: "canvaDetails" },
+        createElement("section", null, "Canva content"),
+      ),
+    );
+
+    expect(html).toContain("overflow:visible");
+  });
+
   it("renders only images assigned to its section", () => {
     const html = renderToStaticMarkup(
       createElement(
@@ -80,5 +111,59 @@ describe("SectionImageHost", () => {
     );
 
     expect(html).toContain("overflow:visible");
+  });
+
+  it("does not apply layout containment that resizes embedded sections", () => {
+    const html = renderToStaticMarkup(
+      createElement(
+        TestSectionImageHost,
+        {
+          sectionKey: "canvaDetails",
+          layer: {
+            items: [makeItem("canva", "/canva.png", "canvaDetails")],
+          },
+        },
+        createElement("section", null, "Canva content"),
+      ),
+    );
+
+    expect(html).not.toContain("container-type");
+  });
+
+  it("interleaves hero images below protected cover surfaces", () => {
+    const html = renderToStaticMarkup(
+      createElement(
+        TestSectionImageHost,
+        {
+          sectionKey: "dressCode",
+          layer,
+          frontLayerPosition: "interleaved",
+        },
+        createElement("section", { style: { zIndex: 8 } }, "Curtain cover"),
+      ),
+    );
+
+    expect(html).toContain(
+      'data-section-image-content="true" style="position:relative"',
+    );
+    expect(html).toContain('data-image-band="front"');
+    expect(html).toContain("z-index:4");
+  });
+
+  it("renders an entrance image only in its semantic host", () => {
+    const entranceLayer: ImageLayer = {
+      items: [makeItem("rsvp-bg", "/rsvp.png", "rsvp")],
+    };
+    const html = renderToStaticMarkup(
+      createElement(
+        TestSectionImageHost,
+        { sectionKey: "rsvp", layer: entranceLayer },
+        createElement("section", null, "RSVP content"),
+      ),
+    );
+
+    expect(html).toContain('data-section-key="rsvp"');
+    expect(html).toContain("/rsvp.png");
+    expect(html).toContain("RSVP content");
   });
 });

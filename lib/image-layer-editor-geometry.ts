@@ -21,12 +21,13 @@ export function findImageAnchorRect(
   rects: readonly ImageAnchorRect[],
   clientY: number,
 ): ImageAnchorRect | null {
-  const containing = rects.find(
+  const measurable = rects.filter((rect) => rect.width > 0 && rect.height > 0);
+  const containing = measurable.find(
     (rect) => clientY >= rect.top && clientY <= rect.top + rect.height,
   );
   if (containing) return containing;
 
-  return rects.reduce<ImageAnchorRect | null>((nearest, rect) => {
+  return measurable.reduce<ImageAnchorRect | null>((nearest, rect) => {
     if (!nearest) return rect;
     const distance = Math.min(
       Math.abs(clientY - rect.top),
@@ -38,6 +39,19 @@ export function findImageAnchorRect(
     );
     return distance < nearestDistance ? rect : nearest;
   }, null);
+}
+
+/** Whether editor state is allowed to convert page-wide items into sections. */
+export function shouldMigrateLegacyImageItems(
+  active: boolean,
+  migrationReady: boolean,
+  items: readonly ImageItem[],
+): boolean {
+  return (
+    active &&
+    migrationReady &&
+    items.some((item) => item.sectionKey === undefined)
+  );
 }
 
 /**

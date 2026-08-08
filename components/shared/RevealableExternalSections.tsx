@@ -2,7 +2,7 @@
 
 import { type RefObject, useEffect } from "react";
 import dynamic from "next/dynamic";
-import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { ImageLayer, InvitationData, TemplateTheme } from "@/lib/types";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
 import ExternalCountdownSection from "@/components/shared/ExternalCountdownSection";
@@ -14,6 +14,7 @@ import { EditableText } from "@/components/shared/EditableText";
 import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
 import PlacesSection from "@/components/shared/PlacesSection";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
+import SectionImageHost from "@/components/shared/SectionImageHost";
 import {
   resolveRevealContentStyle,
   resolveTextElementOverride,
@@ -21,6 +22,8 @@ import {
 } from "@/lib/curtain-canva";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
+import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
+import { shouldRenderPlaces } from "@/lib/places";
 
 // Lazy-load RSVPForm so its react-hook-form + zod dependencies only ship when
 // a guest actually scrolls down to the RSVP section.
@@ -35,10 +38,14 @@ interface RevealableExternalSectionsProps {
   revealed: boolean;
   /** Background-audio element ref, owned by the parent page and started by the hero on tap. */
   audioRef: RefObject<HTMLAudioElement | null>;
+  /** Free-floating images owned by semantic lower-section hosts. */
+  imageLayer?: ImageLayer | null;
   /** Initial-page-only sections hide while the Canva iframe is on another page. */
   showInitialPageSections?: boolean;
   /** Mirrors CanvaEmbed's current initial-page state. */
   onCanvaInitialPageChange?: (isInitialPage: boolean) => void;
+  /** Fires after the Canva iframe reports a positive measured height. */
+  onCanvaContentHeightReady?: () => void;
   /** True when shown inside the public landing-page phone preview iframe.
    *  Forces the sample personal guest card to render for display purposes. */
   isLandingPreview?: boolean;
@@ -56,8 +63,10 @@ export default function RevealableExternalSections({
   theme,
   revealed,
   audioRef,
+  imageLayer,
   showInitialPageSections = true,
   onCanvaInitialPageChange,
+  onCanvaContentHeightReady,
   isLandingPreview = false,
 }: RevealableExternalSectionsProps) {
   // Pause audio when the tab is hidden; resume on return.
@@ -97,6 +106,8 @@ export default function RevealableExternalSections({
   });
   const revealContentStyle = resolveRevealContentStyle(revealed);
   const scratchRevealOn = shouldRenderScratchReveal(invitation.scratchReveal);
+  const coupleGalleryOn = shouldRenderCoupleGallery(invitation);
+  const placesOn = shouldRenderPlaces(invitation);
 
   return (
     <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
@@ -119,72 +130,85 @@ export default function RevealableExternalSections({
 
       <div style={revealContentStyle} aria-hidden={!revealed}>
         {showInitialPageSections && scratchRevealOn && (
-          <ScratchDateReveal
-            date={invitation.date}
-            theme={theme}
-            customTexts={invitation.customTexts}
-            textStyles={invitation.textStyles}
-            shape={invitation.scratchReveal?.shape}
-            backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}
-            scrimOpacity={invitation.scratchReveal?.scrimOpacity}
-            imageSettings={invitation.imageSettings}
-          />
+          <SectionImageHost sectionKey="scratchReveal" layer={imageLayer}>
+            <ScratchDateReveal
+              date={invitation.date}
+              theme={theme}
+              customTexts={invitation.customTexts}
+              textStyles={invitation.textStyles}
+              shape={invitation.scratchReveal?.shape}
+              backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}
+              scrimOpacity={invitation.scratchReveal?.scrimOpacity}
+              imageSettings={invitation.imageSettings}
+            />
+          </SectionImageHost>
         )}
 
         {showInitialPageSections && invitation.countdown?.enabled && (
-          <ExternalCountdownSection invitation={invitation} theme={theme} />
+          <SectionImageHost sectionKey="countdown" layer={imageLayer}>
+            <ExternalCountdownSection invitation={invitation} theme={theme} />
+          </SectionImageHost>
         )}
 
         {showInitialPageSections &&
           (invitation.guest || isLandingPreview) &&
           !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
-            <EditableCard sectionKey="personalGuestCard">
-              <PersonalGuestCard
-                guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY}
-                theme={theme}
-                textStyles={invitation.textStyles}
-                customTexts={invitation.customTexts}
-                backgroundImageUrl={
-                  invitation.personalGuestCard?.backgroundImageUrl
-                }
-                scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
-                imageSettings={invitation.imageSettings}
-                cardStyle={invitation.cardStyles?.personalGuestCard}
-                className={"pb-12 md:pb-16"}
-              />
-            </EditableCard>
+            <SectionImageHost sectionKey="personalGuestCard" layer={imageLayer}>
+              <EditableCard sectionKey="personalGuestCard">
+                <PersonalGuestCard
+                  guest={invitation.guest ?? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY}
+                  theme={theme}
+                  textStyles={invitation.textStyles}
+                  customTexts={invitation.customTexts}
+                  backgroundImageUrl={
+                    invitation.personalGuestCard?.backgroundImageUrl
+                  }
+                  scrimOpacity={invitation.personalGuestCard?.scrimOpacity}
+                  imageSettings={invitation.imageSettings}
+                  cardStyle={invitation.cardStyles?.personalGuestCard}
+                  className={"pb-12 md:pb-16"}
+                />
+              </EditableCard>
+            </SectionImageHost>
           )}
 
-        {showInitialPageSections && (
-          <CoupleGallery invitation={invitation} theme={theme} />
+        {showInitialPageSections && coupleGalleryOn && (
+          <SectionImageHost sectionKey="coupleGallery" layer={imageLayer}>
+            <CoupleGallery invitation={invitation} theme={theme} />
+          </SectionImageHost>
         )}
 
         {externalLink && (
-          <CanvaEmbed
-            externalLink={externalLink}
-            theme={theme}
-            preloading={!revealed}
-            onInitialPageChange={onCanvaInitialPageChange}
-            guest={invitation.guest ?? null}
-          />
+          <SectionImageHost sectionKey="canvaDetails" layer={imageLayer}>
+            <CanvaEmbed
+              externalLink={externalLink}
+              theme={theme}
+              preloading={!revealed}
+              onInitialPageChange={onCanvaInitialPageChange}
+              onContentHeightReady={onCanvaContentHeightReady}
+              guest={invitation.guest ?? null}
+            />
+          </SectionImageHost>
         )}
 
-        {showInitialPageSections && (
-          <PlacesSection
-            invitation={invitation}
-            theme={theme}
-            cardStyle={{
-              cardBg: invitation.cardStyles?.places?.cardBg,
-              cardBorder: invitation.cardStyles?.places?.cardBorder,
-              borderRadius: invitation.cardStyles?.places?.borderRadius,
-              accentColor: invitation.cardStyles?.places?.accentColor,
-              plain: invitation.cardStyles?.places?.plain === true,
-            }}
-          />
+        {showInitialPageSections && placesOn && (
+          <SectionImageHost sectionKey="places" layer={imageLayer}>
+            <PlacesSection
+              invitation={invitation}
+              theme={theme}
+              cardStyle={{
+                cardBg: invitation.cardStyles?.places?.cardBg,
+                cardBorder: invitation.cardStyles?.places?.cardBorder,
+                borderRadius: invitation.cardStyles?.places?.borderRadius,
+                accentColor: invitation.cardStyles?.places?.accentColor,
+                plain: invitation.cardStyles?.places?.plain === true,
+              }}
+            />
+          </SectionImageHost>
         )}
 
         {showInitialPageSections && invitation.rsvp.enabled && (
-          <>
+          <SectionImageHost sectionKey="rsvp" layer={imageLayer}>
             <section
               id="rsvp"
               className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
@@ -235,7 +259,7 @@ export default function RevealableExternalSections({
                 />
               </div>
             </section>
-          </>
+          </SectionImageHost>
         )}
       </div>
     </SpacingStyleProvider>

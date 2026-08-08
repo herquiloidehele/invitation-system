@@ -29,11 +29,18 @@ export interface IframeBodyMetrics {
 export function measureIframeBodyHeight(
   metrics: IframeBodyMetrics,
 ): number | null {
-  const candidates = [metrics.bodyScrollHeight, metrics.bodyOffsetHeight]
-    .filter((n) => Number.isFinite(n) && n > 0);
+  const candidates = [
+    metrics.bodyScrollHeight,
+    metrics.bodyOffsetHeight,
+  ].filter((n) => Number.isFinite(n) && n > 0);
 
   if (candidates.length === 0) return null;
   return Math.max(...candidates);
+}
+
+/** Only visible-width measurements are stable enough for image migration. */
+export function shouldReportVisibleCanvaHeight(preloading: boolean): boolean {
+  return !preloading;
 }
 
 export function shouldResetIframeHeightForNavigation({
