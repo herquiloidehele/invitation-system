@@ -28,6 +28,7 @@ const baseRow = {
   imageLayer: null,
   videoUrl: null,
   videoPoster: null,
+  heroVideoMuted: true,
   heroMediaFit: null,
   curtainVideoUrl: null,
   curtainVideoPoster: null,
@@ -240,6 +241,17 @@ describe("toAdminInvitationInitialData — heroMediaFit round-trip", () => {
     const row = { ...baseRow, heroMediaFit: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.heroMediaFit).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — hero video audio", () => {
+  it("hydrates an explicit unmuted setting", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      heroVideoMuted: false,
+    });
+
+    expect(result.heroVideoMuted).toBe(false);
   });
 });
 

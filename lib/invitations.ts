@@ -59,6 +59,7 @@ type InvitationWithTheme = {
   imageLayer: unknown;
   videoUrl: string | null;
   videoPoster: string | null;
+  heroVideoMuted: boolean;
   heroMediaFit: string | null;
   curtainVideoUrl: string | null;
   curtainVideoPoster: string | null;
@@ -115,7 +116,7 @@ type InvitationWithTheme = {
 // NOTE: the admin edit form uses a SEPARATE mapper, `toAdminInvitationInitialData`
 // in `lib/invitation-admin-initial-data.ts`. A new persisted field must be added to
 // BOTH. Full checklist: docs/invitation-data-field-checklist.md
-function toInvitationData(row: InvitationWithTheme): InvitationData {
+export function toInvitationData(row: InvitationWithTheme): InvitationData {
   return {
     slug: row.slug,
     themeId: row.themeId,
@@ -141,6 +142,7 @@ function toInvitationData(row: InvitationWithTheme): InvitationData {
     imageLayer: (row.imageLayer as ImageLayer | null) ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
+    heroVideoMuted: row.heroVideoMuted,
     heroMediaFit: (row.heroMediaFit as ObjectFit | null) ?? undefined,
     curtainVideoUrl: row.curtainVideoUrl ?? undefined,
     curtainVideoPoster: row.curtainVideoPoster ?? undefined,

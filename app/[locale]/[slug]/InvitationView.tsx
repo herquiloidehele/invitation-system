@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
+import { resolveHeroVideoMuted } from "@/lib/hero-video-audio";
 import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import VideoSequenceCover from "@/components/shared/VideoSequenceCover";
@@ -508,7 +509,7 @@ function EnvelopeInvitationView({
             src={invitation.videoUrl!}
             poster={invitation.videoPoster}
             preload="auto"
-            muted
+            muted={resolveHeroVideoMuted(invitation.heroVideoMuted)}
             loop
             playsInline
             aria-hidden

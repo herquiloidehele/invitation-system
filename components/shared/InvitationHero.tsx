@@ -9,6 +9,7 @@ import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { getImageStyle } from "@/lib/image-settings";
 import { resolveHeroMediaFit } from "@/lib/hero-media-fit";
 import { getHeroSectionHeight } from "@/lib/hero-section-height";
+import { resolveHeroVideoMuted } from "@/lib/hero-video-audio";
 import {
   heroScrollIndicatorBottom,
   resolveHeroScrollIndicator,
@@ -139,6 +140,7 @@ export default function InvitationHero({
     100,
   );
   const mediaFit = resolveHeroMediaFit(invitation.heroMediaFit);
+  const heroVideoMuted = resolveHeroVideoMuted(invitation.heroVideoMuted);
   const scrollIndicator = resolveHeroScrollIndicator(
     invitation.heroScrollIndicator,
   );
@@ -165,6 +167,7 @@ export default function InvitationHero({
             videoRef={prefetchedVideoRef}
             posterUrl={invitation.videoPoster}
             mediaFit={mediaFit}
+            muted={heroVideoMuted}
           />
         ) : (
           <div className="absolute inset-0 z-0 h-full w-full">
@@ -172,7 +175,7 @@ export default function InvitationHero({
               ref={activeVideoRef}
               src={invitation.videoUrl}
               poster={invitation.videoPoster}
-              muted
+              muted={heroVideoMuted}
               loop
               playsInline
               autoPlay

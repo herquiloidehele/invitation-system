@@ -101,6 +101,7 @@ export const sourceInvitationRow = {
   imageLayer: { items: [] },
   videoUrl: "https://cdn.example.com/hero.mp4",
   videoPoster: "https://cdn.example.com/poster.jpg",
+  heroVideoMuted: false,
   heroMediaFit: "cover",
   curtainVideoUrl: "https://cdn.example.com/curtain.mp4",
   curtainVideoPoster: "https://cdn.example.com/curtain.jpg",

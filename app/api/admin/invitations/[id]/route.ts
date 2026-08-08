@@ -199,6 +199,9 @@ export async function PUT(
         ...(body.videoPoster !== undefined && {
           videoPoster: body.videoPoster,
         }),
+        ...(typeof body.heroVideoMuted === "boolean" && {
+          heroVideoMuted: body.heroVideoMuted,
+        }),
         ...(body.heroMediaFit !== undefined && {
           heroMediaFit: isObjectFit(body.heroMediaFit)
             ? body.heroMediaFit

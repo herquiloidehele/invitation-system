@@ -47,6 +47,7 @@ import {
   resolveHeroScrollIndicator,
 } from "@/lib/hero-scroll-indicator";
 import { InvitationLanguageSwitcher } from "@/components/shared/InvitationLanguageSwitcher";
+import { resolveHeroVideoMuted } from "@/lib/hero-video-audio";
 
 interface VideoEntranceHeroProps {
   invitation: InvitationData;
@@ -229,8 +230,8 @@ export default function VideoEntranceHero({
     setState("playing");
     onTapped?.();
 
-    // Background music starts in the same gesture so iOS allows it. The video
-    // stays muted (per spec). Mirror the curtain-canva fade-in.
+    // Background music starts in the same gesture so iOS allows it. The hero
+    // video's own mute state is controlled independently by the invitation.
     const audio = audioRef.current;
     if (audio) {
       audio.loop = true;
@@ -349,7 +350,7 @@ export default function VideoEntranceHero({
           ref={videoRef}
           src={videoUrl}
           poster={videoPoster}
-          muted
+          muted={resolveHeroVideoMuted(invitation.heroVideoMuted)}
           playsInline
           preload="auto"
           onEnded={handleVideoEnded}

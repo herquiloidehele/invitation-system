@@ -25,6 +25,8 @@ interface CurtainHeroVideoProps {
   heroOverlay?: HeroOverlayConfig;
   /** Resolved hero media object-fit (defaults to "cover"). */
   mediaFit?: ObjectFit;
+  /** Whether the hero background video starts muted. */
+  muted?: boolean;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -46,6 +48,7 @@ export default function CurtainHeroVideo({
   backgroundColor,
   heroOverlay,
   mediaFit = "cover",
+  muted = true,
 }: CurtainHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const videoReady = useVideoFrameReady(videoRef, videoUrl);
@@ -70,7 +73,7 @@ export default function CurtainHeroVideo({
         ref={videoRef}
         src={videoUrl}
         poster={videoPoster}
-        muted
+        muted={muted}
         loop
         playsInline
         autoPlay

@@ -103,6 +103,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import CoverVideosEditor from "@/components/admin/CoverVideosEditor";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
+import HeroVideoMutedField from "@/components/admin/HeroVideoMutedField";
 import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFields";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GiftsListEditor from "@/components/admin/GiftsListEditor";
@@ -510,6 +511,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     heroHeight: DEFAULT_HERO_HEIGHT,
     videoUrl: "",
     videoPoster: "",
+    heroVideoMuted: true,
     faqs: [],
     guestGuide: { enabled: false, items: [] },
     places: { enabled: false, layout: "stacked", sections: [] },
@@ -2329,6 +2331,11 @@ export default function InvitationForm({
                         update("videoUrl", undefined);
                         update("videoPoster", undefined);
                       }}
+                    />
+                    <HeroVideoMutedField
+                      id="standardHeroVideoMuted"
+                      value={form.heroVideoMuted}
+                      onChange={(value) => update("heroVideoMuted", value)}
                     />
                   </div>
 

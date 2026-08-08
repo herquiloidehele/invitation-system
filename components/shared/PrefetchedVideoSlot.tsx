@@ -6,6 +6,13 @@ import type { ObjectFit } from "@/lib/types";
 import VideoPosterLayer from "./VideoPosterLayer";
 import { useVideoFrameReady } from "./useVideoFrameReady";
 
+export function applyPrefetchedHeroVideoMuted(
+  video: HTMLVideoElement,
+  muted: boolean,
+) {
+  video.muted = muted;
+}
+
 // ---------------------------------------------------------------------------
 // PrefetchedVideoSlot — adopts an already-buffered <video> DOM element into
 // the hero section so the browser reuses the same element (avoiding a
@@ -16,10 +23,12 @@ export function PrefetchedVideoSlot({
   videoRef,
   posterUrl,
   mediaFit = "cover",
+  muted,
 }: {
   videoRef: RefObject<HTMLVideoElement | null>;
   posterUrl?: string;
   mediaFit?: ObjectFit;
+  muted: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoReady = useVideoFrameReady(videoRef, posterUrl ?? "");
@@ -40,12 +49,13 @@ export function PrefetchedVideoSlot({
     video.removeAttribute("aria-hidden");
     video.autoplay = true;
     video.poster = posterUrl ?? "";
+    applyPrefetchedHeroVideoMuted(video, muted);
     video.dataset.invitationVideo = "";
 
     // Move the existing DOM node into this container
     container.appendChild(video);
     video.play().catch(() => {});
-  }, [videoRef, mediaFit, posterUrl]);
+  }, [videoRef, mediaFit, muted, posterUrl]);
 
   return (
     <div ref={containerRef} className="absolute inset-0 z-0 h-full w-full">

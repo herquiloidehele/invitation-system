@@ -45,6 +45,7 @@ import {
   isWeddingEventType,
 } from "@/lib/invitation-event-types";
 import { InvitationLanguageSwitcher } from "@/components/shared/InvitationLanguageSwitcher";
+import { resolveHeroVideoMuted } from "@/lib/hero-video-audio";
 
 interface CurtainsHeroProps {
   invitation: InvitationData;
@@ -400,6 +401,7 @@ export default function CurtainsHero({
           backgroundColor={theme.bg}
           heroOverlay={heroOverlay}
           mediaFit={resolveHeroMediaFit(heroMediaFit)}
+          muted={resolveHeroVideoMuted(invitation.heroVideoMuted)}
         />
       )}
 

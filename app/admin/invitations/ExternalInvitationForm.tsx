@@ -74,6 +74,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import CoverVideosEditor from "@/components/admin/CoverVideosEditor";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
+import HeroVideoMutedField from "@/components/admin/HeroVideoMutedField";
 import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFields";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import HeroTextEditor from "@/components/admin/HeroTextEditor";
@@ -224,6 +225,7 @@ function getDefaultState(
     heroHeight: DEFAULT_HERO_HEIGHT,
     videoUrl: "",
     videoPoster: "",
+    heroVideoMuted: true,
     curtainVideoUrl: "",
     curtainVideoPoster: "",
     invitationType: invType,
@@ -1545,6 +1547,11 @@ export default function ExternalInvitationForm({
                         update("videoPoster", "");
                       }}
                     />
+                    <HeroVideoMutedField
+                      id="externalVideoHeroMuted"
+                      value={form.heroVideoMuted}
+                      onChange={(value) => update("heroVideoMuted", value)}
+                    />
                     <HeroMediaFitSelect
                       id="extVideoMediaFit"
                       value={form.heroMediaFit}
@@ -2054,6 +2061,11 @@ export default function ExternalInvitationForm({
                             update("videoUrl", "");
                             update("videoPoster", "");
                           }}
+                        />
+                        <HeroVideoMutedField
+                          id="richExternalHeroVideoMuted"
+                          value={form.heroVideoMuted}
+                          onChange={(value) => update("heroVideoMuted", value)}
                         />
                       </div>
 
@@ -2984,6 +2996,11 @@ export default function ExternalInvitationForm({
                           update("videoUrl", "");
                           update("videoPoster", "");
                         }}
+                      />
+                      <HeroVideoMutedField
+                        id="videoEntranceHeroMuted"
+                        value={form.heroVideoMuted}
+                        onChange={(value) => update("heroVideoMuted", value)}
                       />
                       <HeroMediaFitSelect
                         id="veHeroMediaFit"

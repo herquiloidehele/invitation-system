@@ -24,6 +24,7 @@ import { getRsvpCtaAction } from "@/lib/rsvp-config";
 import { useCustomText } from "@/lib/custom-texts";
 import InvitationHero from "./InvitationHero";
 import CalendarButton from "./CalendarButton";
+import { playHeroVideo } from "@/lib/hero-video-audio";
 
 export interface ExternalVideoPageHandle {
   play: () => void;
@@ -91,10 +92,7 @@ const ExternalVideoPage = forwardRef<
     play() {
       const v = videoRef.current;
       if (!v) return;
-      v.play().catch(() => {
-        v.muted = true;
-        v.play().catch(() => {});
-      });
+      void playHeroVideo(v);
       // Show the RSVP button 4 seconds after playback starts
       timerRef.current = setTimeout(() => setButtonVisible(true), 4000);
     },

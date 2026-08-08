@@ -34,6 +34,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "imageLayer",
       "videoUrl",
       "videoPoster",
+      "heroVideoMuted",
       "heroMediaFit",
       "curtainVideoUrl",
       "curtainVideoPoster",
@@ -83,6 +84,7 @@ describe("buildDuplicateInvitationInitialData", () => {
     expect(result.location2).toBeUndefined();
     expect(result.heroImage).toBe("https://cdn.example.com/hero.jpg");
     expect(result.videoUrl).toBe("https://cdn.example.com/hero.mp4");
+    expect(result.heroVideoMuted).toBe(false);
   });
 
   it("clears public identity and catalogue fields", () => {

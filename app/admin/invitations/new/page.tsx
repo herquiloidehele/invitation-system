@@ -68,6 +68,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         heroImage: "",
         videoUrl: "",
         videoPoster: "",
+        heroVideoMuted: true,
         faqs: [],
         saveDateStyle: "classic",
         cinematicImageUrl: "",
