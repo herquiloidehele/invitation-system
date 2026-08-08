@@ -7,6 +7,7 @@ import type {
   TemplateTheme,
   TextStyleOverrides,
 } from "./types";
+import { normalizeHeroTextTimes } from "./hero-text-timing";
 import { resolveTextStyles } from "./text-styles";
 
 /** Minimum rendered font size (px) so blocks stay legible on tiny screens. */
@@ -164,6 +165,7 @@ function normalizeBlock(raw: unknown, index: number): HeroTextBlock | null {
     b.textAlign === "left" || b.textAlign === "right"
       ? (b.textAlign as "left" | "right")
       : "center";
+  const timing = normalizeHeroTextTimes(b.startSeconds, b.endSeconds);
   return {
     id: typeof b.id === "string" && b.id ? b.id : `block-${index}`,
     content: typeof b.content === "string" ? b.content : "",
@@ -184,6 +186,7 @@ function normalizeBlock(raw: unknown, index: number): HeroTextBlock | null {
     lineHeight: clampNumber(b.lineHeight, 0.8, 3, 1.15),
     shadow: b.shadow !== false,
     rotation: clampNumber(b.rotation, -180, 180, 0),
+    ...timing,
     z: clampNumber(b.z, 0, 9999, index + 1),
   };
 }

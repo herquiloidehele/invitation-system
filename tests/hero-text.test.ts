@@ -86,6 +86,33 @@ describe("normalizeHeroTextLayer", () => {
     expect(result.blocks).toHaveLength(1);
     expect(result.blocks[0].id).toBe("ok");
   });
+
+  it("normalizes optional video timing without changing legacy blocks", () => {
+    const legacy = normalizeHeroTextLayer({ blocks: [{ id: "legacy" }] });
+    expect(legacy.blocks[0].startSeconds).toBeUndefined();
+    expect(legacy.blocks[0].endSeconds).toBeUndefined();
+
+    const timed = normalizeHeroTextLayer({
+      blocks: [{ id: "timed", startSeconds: 65, endSeconds: 90 }],
+    });
+    expect(timed.blocks[0]).toMatchObject({
+      startSeconds: 65,
+      endSeconds: 90,
+    });
+  });
+
+  it("drops invalid timing while retaining a valid start", () => {
+    const result = normalizeHeroTextLayer({
+      blocks: [
+        { id: "end-only", endSeconds: 10 },
+        { id: "bad-end", startSeconds: 10, endSeconds: 5 },
+      ],
+    });
+    expect(result.blocks[0].startSeconds).toBeUndefined();
+    expect(result.blocks[0].endSeconds).toBeUndefined();
+    expect(result.blocks[1].startSeconds).toBe(10);
+    expect(result.blocks[1].endSeconds).toBeUndefined();
+  });
 });
 
 const FONTS: ResolvedHeroFonts = {

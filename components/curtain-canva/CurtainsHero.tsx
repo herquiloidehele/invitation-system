@@ -135,6 +135,7 @@ export default function CurtainsHero({
     "inviteMessage",
   );
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const [state, setState] = useState<HeroState>("idle");
   const [heroInfoVisible, setHeroInfoVisible] = useState(false);
   // Tracks whether the celebratory confetti has already fired in this play
@@ -396,6 +397,7 @@ export default function CurtainsHero({
           above it. */}
       {heroVideoOn && heroVideoUrl && (
         <CurtainHeroVideo
+          videoRef={heroVideoRef}
           videoUrl={heroVideoUrl}
           videoPoster={heroVideoPoster}
           backgroundColor={theme.bg}
@@ -514,7 +516,13 @@ export default function CurtainsHero({
 
       {/* Free-positioned custom text layer (revealed state). */}
       {heroInfoVisible && (
-        <HeroTextOverlay layer={heroTextLayer} fonts={heroFonts} play />
+        <HeroTextOverlay
+          layer={heroTextLayer}
+          fonts={heroFonts}
+          play
+          videoRef={heroVideoOn ? heroVideoRef : undefined}
+          timingEnabled={heroVideoOn}
+        />
       )}
 
       <AnimatePresence>

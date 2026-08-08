@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { type RefObject, useRef } from "react";
 
 import {
   DEFAULT_HERO_GRADIENT_START_VIDEO,
@@ -11,6 +11,8 @@ import VideoPosterLayer from "@/components/shared/VideoPosterLayer";
 import { useVideoFrameReady } from "@/components/shared/useVideoFrameReady";
 
 interface CurtainHeroVideoProps {
+  /** Optional shared ref used by timed hero text to observe this video. */
+  videoRef?: RefObject<HTMLVideoElement | null>;
   /** Hero background video URL (invitation.videoUrl). */
   videoUrl: string;
   /** Poster for the hero video (invitation.videoPoster). */
@@ -43,6 +45,7 @@ function clamp(value: number, min: number, max: number) {
  * `muted` + `playsInline` + `autoPlay` is the canonical mobile autoplay combo.
  */
 export default function CurtainHeroVideo({
+  videoRef,
   videoUrl,
   videoPoster,
   backgroundColor,
@@ -50,8 +53,9 @@ export default function CurtainHeroVideo({
   mediaFit = "cover",
   muted = true,
 }: CurtainHeroVideoProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const videoReady = useVideoFrameReady(videoRef, videoUrl);
+  const internalVideoRef = useRef<HTMLVideoElement | null>(null);
+  const activeVideoRef = videoRef ?? internalVideoRef;
+  const videoReady = useVideoFrameReady(activeVideoRef, videoUrl);
   const scrimOpacity = clamp(
     heroOverlay?.scrimOpacity ?? DEFAULT_HERO_SCRIM_OPACITY,
     0,
@@ -70,7 +74,7 @@ export default function CurtainHeroVideo({
       style={{ zIndex: 0, backgroundColor }}
     >
       <video
-        ref={videoRef}
+        ref={activeVideoRef}
         src={videoUrl}
         poster={videoPoster}
         muted={muted}

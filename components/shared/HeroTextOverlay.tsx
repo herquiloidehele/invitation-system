@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { type RefObject, useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import {
   heroTextBlockStyle,
@@ -14,7 +15,15 @@ import {
   heroTextBlockItem,
 } from "@/components/shared/animations";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
-import type { HeroTextLayer } from "@/lib/types";
+import {
+  advanceHeroTextPlaybackState,
+  initialHeroTextPlaybackState,
+  subscribeToHeroTextVideoTime,
+  type HeroTextPlaybackState,
+} from "@/lib/hero-text-timing";
+import type { HeroTextBlock, HeroTextLayer } from "@/lib/types";
+
+const EMPTY_BLOCKS: HeroTextBlock[] = [];
 
 interface HeroTextOverlayProps {
   layer?: HeroTextLayer | null;
@@ -26,6 +35,48 @@ interface HeroTextOverlayProps {
    * the blocks statically. Ignored when the user prefers reduced motion.
    */
   play?: boolean;
+  /** The displayed hero video's clock. Omit for image/static hero media. */
+  videoRef?: RefObject<HTMLVideoElement | null>;
+  /** Enables per-block timing without reading the mutable ref during render. */
+  timingEnabled?: boolean;
+}
+
+function initialPlaybackStates(
+  blocks: HeroTextBlock[],
+  hasVideoClock: boolean,
+): Record<string, HeroTextPlaybackState> {
+  return Object.fromEntries(
+    blocks.map((block) => [
+      block.id,
+      hasVideoClock ? initialHeroTextPlaybackState(block) : "visible",
+    ]),
+  );
+}
+
+export function AnimatedHeroTextBlock({
+  block,
+  fonts,
+  timed,
+}: {
+  block: HeroTextBlock;
+  fonts: ResolvedHeroFonts;
+  timed: boolean;
+}) {
+  return (
+    <motion.div
+      style={heroTextBlockPositionStyle(block)}
+      exit={{ opacity: 0, transition: { duration: 0.25 } }}
+    >
+      <motion.div
+        style={heroTextBlockTextStyle(block, fonts)}
+        variants={heroTextBlockItem}
+        initial={timed ? "hidden" : undefined}
+        animate={timed ? "visible" : undefined}
+      >
+        {block.content}
+      </motion.div>
+    </motion.div>
+  );
 }
 
 /**
@@ -44,15 +95,52 @@ export default function HeroTextOverlay({
   layer,
   fonts,
   play = false,
+  videoRef,
+  timingEnabled = false,
 }: HeroTextOverlayProps) {
   // Load any non-builtin Google Fonts chosen for blocks (ref-counted, no-op
   // for builtins). Called unconditionally to satisfy the rules of hooks.
   useDynamicFonts(heroTextLayerFontStacks(layer));
   const reduceMotion = useReducedMotion();
+  const blocks = layer?.blocks ?? EMPTY_BLOCKS;
+  const [playbackStates, setPlaybackStates] = useState(() =>
+    initialPlaybackStates(blocks, timingEnabled),
+  );
 
-  const blocks = layer?.blocks ?? [];
+  useEffect(() => {
+    if (!timingEnabled) return;
+    const video = videoRef?.current;
+    if (!video) return;
+
+    return subscribeToHeroTextVideoTime(video, (currentTime) => {
+      setPlaybackStates((previous) => {
+        let changed = false;
+        const next: Record<string, HeroTextPlaybackState> = {};
+        for (const block of blocks) {
+          const previousState =
+            previous[block.id] ?? initialHeroTextPlaybackState(block);
+          const nextState = advanceHeroTextPlaybackState(
+            block,
+            previousState,
+            currentTime,
+          );
+          next[block.id] = nextState;
+          if (nextState !== previousState) changed = true;
+        }
+        if (Object.keys(previous).length !== blocks.length) changed = true;
+        return changed ? next : previous;
+      });
+    });
+  }, [blocks, timingEnabled, videoRef]);
+
   if (blocks.length === 0) return null;
 
+  const visibleBlocks = blocks.filter((block) => {
+    const fallback = timingEnabled
+      ? initialHeroTextPlaybackState(block)
+      : "visible";
+    return (playbackStates[block.id] ?? fallback) === "visible";
+  });
   const animate = play && !reduceMotion;
 
   if (!animate) {
@@ -62,7 +150,7 @@ export default function HeroTextOverlay({
         style={{ zIndex: 20 }}
         data-hero-text-overlay
       >
-        {blocks.map((block) => (
+        {visibleBlocks.map((block) => (
           <div key={block.id} style={heroTextBlockStyle(block, fonts)}>
             {block.content}
           </div>
@@ -80,16 +168,19 @@ export default function HeroTextOverlay({
       initial="hidden"
       animate="visible"
     >
-      {blocks.map((block) => (
-        <div key={block.id} style={heroTextBlockPositionStyle(block)}>
-          <motion.div
-            style={heroTextBlockTextStyle(block, fonts)}
-            variants={heroTextBlockItem}
-          >
-            {block.content}
-          </motion.div>
-        </div>
-      ))}
+      <AnimatePresence>
+        {visibleBlocks.map((block) => (
+          <AnimatedHeroTextBlock
+            key={block.id}
+            block={block}
+            fonts={fonts}
+            timed={
+              timingEnabled &&
+              initialHeroTextPlaybackState(block) === "waiting"
+            }
+          />
+        ))}
+      </AnimatePresence>
     </motion.div>
   );
 }

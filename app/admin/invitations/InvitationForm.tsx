@@ -4355,6 +4355,7 @@ export default function InvitationForm({
         stillUrl={heroTextStillUrl}
         aspectRatio={heroTextAspect}
         fonts={heroTextFonts}
+        isVideo={Boolean(form.videoUrl?.trim())}
       />
 
       <ImageLayerEditor

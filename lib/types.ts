@@ -257,6 +257,10 @@ export interface HeroTextBlock {
   shadow: boolean;
   /** Rotation in degrees (default 0). */
   rotation?: number;
+  /** Video-only: elapsed seconds at which this block first appears. */
+  startSeconds?: number;
+  /** Video-only: elapsed seconds at which this block disappears permanently. */
+  endSeconds?: number;
   /** Stacking order. */
   z: number;
 }

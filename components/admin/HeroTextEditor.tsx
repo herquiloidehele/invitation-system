@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FontPicker from "@/components/admin/FontPicker";
+import HeroTextTimingFields from "@/components/admin/HeroTextTimingFields";
 import { useDynamicFonts } from "@/hooks/useDynamicFont";
 import {
   EMPTY_HERO_TEXT_LAYER,
@@ -52,6 +53,8 @@ interface HeroTextEditorProps {
   aspectRatio: number;
   /** Resolved fonts for WYSIWYG preview. */
   fonts: ResolvedHeroFonts;
+  /** Whether the edited hero media is a video. */
+  isVideo?: boolean;
 }
 
 const SURFACE_WIDTH = 340;
@@ -83,6 +86,7 @@ export default function HeroTextEditor({
   stillUrl,
   aspectRatio,
   fonts,
+  isVideo = false,
 }: HeroTextEditorProps) {
   const layer = value ?? EMPTY_HERO_TEXT_LAYER;
   const sourceById = new Map(
@@ -246,6 +250,14 @@ export default function HeroTextEditor({
                     onChange={(e) => patch({ content: e.target.value })}
                   />
                 </div>
+
+                {isVideo && (
+                  <HeroTextTimingFields
+                    key={selected.id}
+                    block={selected}
+                    onChange={patch}
+                  />
+                )}
 
                 <FontPicker
                   label="Fonte"

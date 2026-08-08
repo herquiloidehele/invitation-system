@@ -146,8 +146,9 @@ export default function InvitationHero({
   );
   const directVideoRef = useRef<HTMLVideoElement | null>(null);
   const activeVideoRef = videoRef ?? directVideoRef;
+  const renderedVideoRef = prefetchedVideoRef ?? activeVideoRef;
   const directVideoReady = useVideoFrameReady(
-    activeVideoRef,
+    renderedVideoRef,
     invitation.videoUrl ?? "",
   );
 
@@ -172,7 +173,7 @@ export default function InvitationHero({
         ) : (
           <div className="absolute inset-0 z-0 h-full w-full">
             <video
-              ref={activeVideoRef}
+              ref={renderedVideoRef}
               src={invitation.videoUrl}
               poster={invitation.videoPoster}
               muted={heroVideoMuted}
@@ -229,6 +230,8 @@ export default function InvitationHero({
         layer={invitation.heroTextLayer}
         fonts={heroFonts}
         play={animateHeroText}
+        videoRef={invitation.videoUrl ? renderedVideoRef : undefined}
+        timingEnabled={Boolean(invitation.videoUrl)}
       />
 
       {/* Couple names overlay (video mode) */}

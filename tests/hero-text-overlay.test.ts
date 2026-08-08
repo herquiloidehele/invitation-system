@@ -82,4 +82,45 @@ describe("HeroTextOverlay", () => {
     // …but they are NOT in the same style attribute any more.
     expect(html).not.toMatch(/left:50%[^"]*color:/);
   });
+
+  it("keeps timing metadata inert when there is no video clock", () => {
+    const timedLayer: HeroTextLayer = {
+      ...layer,
+      blocks: [{ ...layer.blocks[0], startSeconds: 5 }],
+    };
+    const html = renderToStaticMarkup(
+      createElement(HeroTextOverlay, { layer: timedLayer, fonts }),
+    );
+    expect(html).toContain("Ana &amp; João");
+  });
+
+  it("starts a timed block hidden when a video clock is supplied", () => {
+    const timedLayer: HeroTextLayer = {
+      ...layer,
+      blocks: [{ ...layer.blocks[0], startSeconds: 5 }],
+    };
+    const html = renderToStaticMarkup(
+      createElement(HeroTextOverlay, {
+        layer: timedLayer,
+        fonts,
+        play: true,
+        videoRef: { current: null },
+        timingEnabled: true,
+      }),
+    );
+    expect(html).not.toContain("Ana &amp; João");
+  });
+
+  it("keeps untimed blocks visible when a video clock is supplied", () => {
+    const html = renderToStaticMarkup(
+      createElement(HeroTextOverlay, {
+        layer,
+        fonts,
+        play: true,
+        videoRef: { current: null },
+        timingEnabled: true,
+      }),
+    );
+    expect(html).toContain("Ana &amp; João");
+  });
 });

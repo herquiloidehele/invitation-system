@@ -50,4 +50,21 @@ describe("HeroTextOverlay (reduced motion)", () => {
     // Reduced motion => static path => position + colour in one style attr.
     expect(html).toMatch(/left:50%[^"]*color:/);
   });
+
+  it("still starts timed text hidden when motion is reduced", () => {
+    const timedLayer: HeroTextLayer = {
+      ...layer,
+      blocks: [{ ...layer.blocks[0], startSeconds: 5 }],
+    };
+    const html = renderToStaticMarkup(
+      createElement(HeroTextOverlay, {
+        layer: timedLayer,
+        fonts,
+        play: true,
+        videoRef: { current: null },
+        timingEnabled: true,
+      }),
+    );
+    expect(html).not.toContain("Ana &amp; João");
+  });
 });
