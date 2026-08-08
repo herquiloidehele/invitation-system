@@ -113,6 +113,44 @@ describe("Canva height readiness", () => {
   });
 });
 
+describe("Canva preload layout", () => {
+  const resolveCanvaPreloadLayout = (
+    canvaMeasurement as typeof canvaMeasurement & {
+      resolveCanvaPreloadLayout?: (options: {
+        preloading: boolean;
+        containerWidth: number | null;
+      }) => { renderIframe: boolean; wrapperWidth: string | undefined };
+    }
+  ).resolveCanvaPreloadLayout;
+
+  it("waits for the real host width before loading off-screen", () => {
+    expect(
+      resolveCanvaPreloadLayout?.({
+        preloading: true,
+        containerWidth: null,
+      }),
+    ).toEqual({ renderIframe: false, wrapperWidth: undefined });
+  });
+
+  it("preloads at the narrow preview width instead of the browser width", () => {
+    expect(
+      resolveCanvaPreloadLayout?.({
+        preloading: true,
+        containerWidth: 379,
+      }),
+    ).toEqual({ renderIframe: true, wrapperWidth: "379px" });
+  });
+
+  it("renders immediately when the embed is already visible", () => {
+    expect(
+      resolveCanvaPreloadLayout?.({
+        preloading: false,
+        containerWidth: null,
+      }),
+    ).toEqual({ renderIframe: true, wrapperWidth: undefined });
+  });
+});
+
 describe("Canva measurement readiness integration", () => {
   it("reports a successful content-height measurement", () => {
     expect(canvaEmbedSource).toContain("onContentHeightReady?.();");

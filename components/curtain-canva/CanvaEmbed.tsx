@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PublicGuestData, TemplateTheme } from "@/lib/types";
 import {
   measureIframeBodyHeight,
+  resolveCanvaPreloadLayout,
   shouldReportVisibleCanvaHeight,
   shouldRestoreParentScrollForNavigation,
   shouldResetIframeHeightForNavigation,
@@ -50,6 +51,7 @@ export default function CanvaEmbed({
   guest,
   preloading = false,
 }: CanvaEmbedProps) {
+  const sectionRef = useRef<HTMLElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const measureTimerRef = useRef<number[]>([]);
   // ResizeObserver instance created in handleLoad and disconnected
@@ -61,6 +63,7 @@ export default function CanvaEmbed({
   const contentHeightRef = useRef<number | null>(null);
   const preloadingRef = useRef(preloading);
   const scrollRestoreFrameRef = useRef<number | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const [contentHeight, setContentHeight] = useState<number | null>(null);
   const [navigatedProxiedUrl, setNavigatedProxiedUrl] = useState<{
     externalLink: string;
@@ -83,6 +86,40 @@ export default function CanvaEmbed({
     navigatedProxiedUrl?.externalLink === externalLink
       ? navigatedProxiedUrl.src
       : defaultProxiedUrl;
+  const preloadLayout = resolveCanvaPreloadLayout({
+    preloading,
+    containerWidth,
+  });
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const updateWidth = () => {
+      const nextWidth = section.getBoundingClientRect().width;
+      setContainerWidth((currentWidth) =>
+        nextWidth > 0 &&
+        (currentWidth === null || Math.abs(currentWidth - nextWidth) >= 0.5)
+          ? nextWidth
+          : currentWidth,
+      );
+    };
+    const frame = window.requestAnimationFrame(updateWidth);
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateWidth);
+      return () => {
+        window.cancelAnimationFrame(frame);
+        window.removeEventListener("resize", updateWidth);
+      };
+    }
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(section);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     preloadingRef.current = preloading;
@@ -380,7 +417,7 @@ export default function CanvaEmbed({
         position: "fixed",
         top: 0,
         left: 0,
-        width: "100vw",
+        width: preloadLayout.wrapperWidth,
         // Leave the wrapper tall enough that the iframe can render its full
         // content during preload. The exact value doesn't matter as long as
         // it's larger than the eventual measured height — Canva embeds top
@@ -406,32 +443,35 @@ export default function CanvaEmbed({
 
   return (
     <section
+      ref={sectionRef}
       id="details"
       className={preloading ? undefined : "relative w-full"}
       aria-hidden={preloading || undefined}
       style={sectionStyle}
     >
       <div style={wrapperStyle} aria-hidden={preloading}>
-        <iframe
-          ref={iframeRef}
-          src={proxiedUrl}
-          title={title ?? "Convite"}
-          loading="eager"
-          onLoad={handleLoad}
-          allow="autoplay; fullscreen; clipboard-write"
-          referrerPolicy="no-referrer"
-          scrolling="no"
-          style={{
-            border: "none",
-            display: "block",
-            width: "100%",
-            height: preloading
-              ? contentHeight
-                ? `${contentHeight}px`
-                : "100%"
-              : "100%",
-          }}
-        />
+        {preloadLayout.renderIframe && (
+          <iframe
+            ref={iframeRef}
+            src={proxiedUrl}
+            title={title ?? "Convite"}
+            loading="eager"
+            onLoad={handleLoad}
+            allow="autoplay; fullscreen; clipboard-write"
+            referrerPolicy="no-referrer"
+            scrolling="no"
+            style={{
+              border: "none",
+              display: "block",
+              width: "100%",
+              height: preloading
+                ? contentHeight
+                  ? `${contentHeight}px`
+                  : "100%"
+                : "100%",
+            }}
+          />
+        )}
       </div>
     </section>
   );

@@ -43,6 +43,26 @@ export function shouldReportVisibleCanvaHeight(preloading: boolean): boolean {
   return !preloading;
 }
 
+export function resolveCanvaPreloadLayout({
+  preloading,
+  containerWidth,
+}: {
+  preloading: boolean;
+  containerWidth: number | null;
+}): { renderIframe: boolean; wrapperWidth: string | undefined } {
+  if (!preloading) {
+    return { renderIframe: true, wrapperWidth: undefined };
+  }
+  if (
+    containerWidth === null ||
+    !Number.isFinite(containerWidth) ||
+    containerWidth <= 0
+  ) {
+    return { renderIframe: false, wrapperWidth: undefined };
+  }
+  return { renderIframe: true, wrapperWidth: `${containerWidth}px` };
+}
+
 export function shouldResetIframeHeightForNavigation({
   currentHeight,
   isInternalCanvaNavigation,
