@@ -367,8 +367,8 @@ describe("external invitation helper source", () => {
       "utf8",
     );
 
-    expect(source).toContain(
-      "backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}",
+    expect(source).toMatch(
+      /backgroundImageUrl=\{\s*invitation\.scratchReveal\?\.backgroundImageUrl\s*\}/,
     );
     expect(source).toContain(
       "scrimOpacity={invitation.scratchReveal?.scrimOpacity}",

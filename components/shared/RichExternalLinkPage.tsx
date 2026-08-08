@@ -3,6 +3,7 @@
 import {
   type MutableRefObject,
   type RefObject,
+  useCallback,
   useLayoutEffect,
   useState,
 } from "react";
@@ -17,9 +18,15 @@ import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
+import { shouldRenderPlaces } from "@/lib/places";
+import {
+  getRichExternalInvitationImageSectionKeys,
+  isRichExternalImageMigrationReady,
+} from "@/lib/rich-external-image-sections";
 
 import InvitationHero, { InvitationHeroNames } from "./InvitationHero";
 import ImageCanvas from "./ImageCanvas";
+import SectionImageHost from "./SectionImageHost";
 import ExternalCountdownSection from "./ExternalCountdownSection";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
 import CanvaEmbed from "@/components/curtain-canva/CanvaEmbed";
@@ -93,6 +100,9 @@ export default function RichExternalLinkPage({
     externalLink: string;
     isInitialPage: boolean;
   } | null>(null);
+  const [measuredExternalLink, setMeasuredExternalLink] = useState<
+    string | null
+  >(null);
   const isInitialCanvaPage =
     canvaPageState?.externalLink === externalLink
       ? canvaPageState.isInitialPage
@@ -101,6 +111,19 @@ export default function RichExternalLinkPage({
     rsvpOn,
     isInitialCanvaPage,
   });
+  const handleCanvaContentHeightReady = useCallback(
+    () => setMeasuredExternalLink(externalLink),
+    [externalLink],
+  );
+  const hostedSectionKeys = getRichExternalInvitationImageSectionKeys(
+    invitation,
+    { showRsvp, isLandingPreview },
+  );
+  const imageMigrationReady = isRichExternalImageMigrationReady({
+    externalLink,
+    measuredExternalLink,
+  });
+  const placesOn = shouldRenderPlaces(invitation);
   const ts = resolveTextStyles(theme, invitation.textStyles);
   const t = useCustomText(invitation.customTexts);
   const cs = (section: CardSectionKey, defaultRadius: number) => ({
@@ -225,11 +248,15 @@ export default function RichExternalLinkPage({
           overflowAnchor: "none",
         }}
       >
-        <ImageCanvas layer={invitation.imageLayer}>
+        <ImageCanvas
+          layer={invitation.imageLayer}
+          hostedSectionKeys={hostedSectionKeys}
+          migrationReady={imageMigrationReady}
+        >
           <DynamicFontLoader theme={theme} textStyles={invitation.textStyles} />
 
           {heroOn && (
-            <>
+            <SectionImageHost sectionKey="hero" layer={invitation.imageLayer}>
               <InvitationHero
                 invitation={invitation}
                 theme={theme}
@@ -244,24 +271,36 @@ export default function RichExternalLinkPage({
                   isPreview={isPreview}
                 />
               )}
-            </>
+            </SectionImageHost>
           )}
 
           {scratchOn && (
-            <ScratchDateReveal
-              date={invitation.date}
-              theme={theme}
-              customTexts={invitation.customTexts}
-              textStyles={invitation.textStyles}
-              shape={invitation.scratchReveal?.shape}
-              backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}
-              scrimOpacity={invitation.scratchReveal?.scrimOpacity}
-              imageSettings={invitation.imageSettings}
-            />
+            <SectionImageHost
+              sectionKey="scratchReveal"
+              layer={invitation.imageLayer}
+            >
+              <ScratchDateReveal
+                date={invitation.date}
+                theme={theme}
+                customTexts={invitation.customTexts}
+                textStyles={invitation.textStyles}
+                shape={invitation.scratchReveal?.shape}
+                backgroundImageUrl={
+                  invitation.scratchReveal?.backgroundImageUrl
+                }
+                scrimOpacity={invitation.scratchReveal?.scrimOpacity}
+                imageSettings={invitation.imageSettings}
+              />
+            </SectionImageHost>
           )}
 
           {countdownOn && (
-            <ExternalCountdownSection invitation={invitation} theme={theme} />
+            <SectionImageHost
+              sectionKey="countdown"
+              layer={invitation.imageLayer}
+            >
+              <ExternalCountdownSection invitation={invitation} theme={theme} />
+            </SectionImageHost>
           )}
 
           {(invitation.guestManagementEnabled || isLandingPreview) &&
@@ -269,100 +308,129 @@ export default function RichExternalLinkPage({
               invitation,
               isLandingPreview,
             ) && (
-              <div className="pb-2">
-                <EditableCard sectionKey="personalGuestCard">
-                  <PersonalGuestCard
-                    guest={
-                      invitation.guest ??
-                      (isLandingPreview
-                        ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
-                        : PREVIEW_SAMPLE_GUEST)
-                    }
-                    theme={theme}
-                    textStyles={invitation.textStyles}
-                    customTexts={invitation.customTexts}
-                    cardStyle={cs("personalGuestCard", 24)}
-                  />
-                </EditableCard>
-              </div>
+              <SectionImageHost
+                sectionKey="personalGuestCard"
+                layer={invitation.imageLayer}
+              >
+                <div className="pb-2">
+                  <EditableCard sectionKey="personalGuestCard">
+                    <PersonalGuestCard
+                      guest={
+                        invitation.guest ??
+                        (isLandingPreview
+                          ? PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY
+                          : PREVIEW_SAMPLE_GUEST)
+                      }
+                      theme={theme}
+                      textStyles={invitation.textStyles}
+                      customTexts={invitation.customTexts}
+                      cardStyle={cs("personalGuestCard", 24)}
+                    />
+                  </EditableCard>
+                </div>
+              </SectionImageHost>
             )}
 
-          <CanvaEmbed
-            externalLink={externalLink}
-            theme={theme}
-            title="Convite"
-            onInitialPageChange={(isInitialPage) =>
-              setCanvaPageState({ externalLink, isInitialPage })
-            }
-            preloading={canvaPreloading}
-            guest={invitation.guest ?? null}
-          />
+          {externalLink && (
+            <SectionImageHost
+              sectionKey="canvaDetails"
+              layer={invitation.imageLayer}
+            >
+              <CanvaEmbed
+                externalLink={externalLink}
+                theme={theme}
+                title="Convite"
+                onInitialPageChange={(isInitialPage) =>
+                  setCanvaPageState({ externalLink, isInitialPage })
+                }
+                onContentHeightReady={handleCanvaContentHeightReady}
+                preloading={canvaPreloading}
+                guest={invitation.guest ?? null}
+              />
+            </SectionImageHost>
+          )}
 
           {shouldRenderCoupleGallery(invitation) && (
-            <CoupleGallery
-              invitation={invitation}
-              theme={theme}
-              isPreview={isPreview}
-            />
+            <SectionImageHost
+              sectionKey="coupleGallery"
+              layer={invitation.imageLayer}
+            >
+              <CoupleGallery
+                invitation={invitation}
+                theme={theme}
+                isPreview={isPreview}
+              />
+            </SectionImageHost>
           )}
 
           {invitation.giftRegistry.enabled && (
-            <EditableCard sectionKey="giftRegistry" className="mb-10">
-              <div
-                id="gifts"
-                className="flex flex-col items-center gap-3 mx-4"
-                style={{
-                  ...resolveCardSurfaceStyle(cs("giftRegistry", 16), {
-                    background: cs("giftRegistry", 16).cardBg,
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    borderRadius: cs("giftRegistry", 16).borderRadius,
-                    boxShadow:
-                      "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
-                    border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
-                  }),
-                  padding: "24px 14px",
-                }}
-              >
-                <GiftsSection
-                  giftRegistry={invitation.giftRegistry}
-                  theme={theme}
-                  ts={ts}
-                  cardStyle={cs("giftRegistry", 16)}
-                  slug={invitation.slug}
-                  guestToken={invitation.guest?.token}
-                  t={t}
-                />
-              </div>
-            </EditableCard>
+            <SectionImageHost
+              sectionKey="giftRegistry"
+              layer={invitation.imageLayer}
+            >
+              <EditableCard sectionKey="giftRegistry" className="mb-10">
+                <div
+                  id="gifts"
+                  className="flex flex-col items-center gap-3 mx-4"
+                  style={{
+                    ...resolveCardSurfaceStyle(cs("giftRegistry", 16), {
+                      background: cs("giftRegistry", 16).cardBg,
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      borderRadius: cs("giftRegistry", 16).borderRadius,
+                      boxShadow:
+                        "0 1px 2px rgba(0,0,0,0.02), 0 6px 24px rgba(0,0,0,0.03)",
+                      border: `1px solid ${cs("giftRegistry", 16).cardBorder}`,
+                    }),
+                    padding: "24px 14px",
+                  }}
+                >
+                  <GiftsSection
+                    giftRegistry={invitation.giftRegistry}
+                    theme={theme}
+                    ts={ts}
+                    cardStyle={cs("giftRegistry", 16)}
+                    slug={invitation.slug}
+                    guestToken={invitation.guest?.token}
+                    t={t}
+                  />
+                </div>
+              </EditableCard>
+            </SectionImageHost>
           )}
 
           {invitation.faqs && invitation.faqs.length > 0 && (
-            <FaqSection
-              faqs={invitation.faqs}
-              theme={theme}
-              textStyles={invitation.textStyles}
-              customTexts={invitation.customTexts}
-              cardStyle={cs("faqs", 20)}
-              isPreview={isPreview}
-            />
+            <SectionImageHost sectionKey="faqs" layer={invitation.imageLayer}>
+              <FaqSection
+                faqs={invitation.faqs}
+                theme={theme}
+                textStyles={invitation.textStyles}
+                customTexts={invitation.customTexts}
+                cardStyle={cs("faqs", 20)}
+                isPreview={isPreview}
+              />
+            </SectionImageHost>
           )}
 
-          <PlacesSection
-            invitation={invitation}
-            theme={theme}
-            cardStyle={{
-              cardBg: invitation.cardStyles?.places?.cardBg,
-              cardBorder: invitation.cardStyles?.places?.cardBorder,
-              borderRadius: invitation.cardStyles?.places?.borderRadius,
-              accentColor: invitation.cardStyles?.places?.accentColor,
-              plain: invitation.cardStyles?.places?.plain === true,
-            }}
-            isPreview={isPreview}
-          />
+          {placesOn && (
+            <SectionImageHost sectionKey="places" layer={invitation.imageLayer}>
+              <PlacesSection
+                invitation={invitation}
+                theme={theme}
+                cardStyle={{
+                  cardBg: invitation.cardStyles?.places?.cardBg,
+                  cardBorder: invitation.cardStyles?.places?.cardBorder,
+                  borderRadius: invitation.cardStyles?.places?.borderRadius,
+                  accentColor: invitation.cardStyles?.places?.accentColor,
+                  plain: invitation.cardStyles?.places?.plain === true,
+                }}
+                isPreview={isPreview}
+              />
+            </SectionImageHost>
+          )}
 
           {showRsvp && (
-            <>
+            <SectionImageHost sectionKey="rsvp" layer={invitation.imageLayer}>
               <section
                 id="rsvp"
                 className="relative mt-8 overflow-hidden pt-12 pb-24 md:pt-16 md:pb-28 px-6"
@@ -388,7 +456,7 @@ export default function RichExternalLinkPage({
                   </div>
                 </div>
               </section>
-            </>
+            </SectionImageHost>
           )}
         </ImageCanvas>
       </main>
