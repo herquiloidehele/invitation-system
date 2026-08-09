@@ -1,19 +1,13 @@
 import { prisma } from "@/lib/db";
-import { CURRENCY_LOCALE, type Currency } from "@/lib/currency/config";
-import {
-  getTemplatePriceCents,
-  type PriceOverrides,
-} from "@/lib/currency/template-price";
-import {
-  normalizeLandingCustomizationLevel,
-  type LandingCustomizationLevel,
-} from "@/lib/landing-customization";
+import { type Currency, CURRENCY_LOCALE } from "@/lib/currency/config";
+import { getTemplatePriceCents, type PriceOverrides } from "@/lib/currency/template-price";
+import { type LandingCustomizationLevel, normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { resolveLandingGalleryMetadata } from "@/lib/landing-gallery-metadata";
-import { resolveLandingPrice, type LandingPrice } from "@/lib/landing-price";
+import { type LandingPrice, resolveLandingPrice } from "@/lib/landing-price";
 import {
   buildLandingProductDetailsPath,
-  resolveLandingDetailImages,
   type LandingProductKind,
+  resolveLandingDetailImages
 } from "@/lib/landing-product-details";
 import { localizeLandingMetadata } from "@/lib/landing-translations";
 import { buildPurchaseMessage, buildWhatsappUrl } from "@/lib/landing-whatsapp";
@@ -95,32 +89,6 @@ type PublicFeatureRow = {
   saveTheDate: SaveTheDateProductRow | null;
 };
 
-function readCoupleGalleryUrls(value: unknown): string[] {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return [];
-  const images = (value as { images?: unknown }).images;
-  if (!Array.isArray(images)) return [];
-
-  return images.flatMap((image) => {
-    if (!image || typeof image !== "object" || Array.isArray(image)) return [];
-    const src = (image as { src?: unknown }).src;
-    return typeof src === "string" ? [src] : [];
-  });
-}
-
-function readSaveTheDateBottomImage(value: unknown): string | undefined {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return;
-  const hero = value as {
-    enabled?: unknown;
-    mediaType?: unknown;
-    mediaUrl?: unknown;
-  };
-  return hero.enabled === true &&
-    hero.mediaType === "image" &&
-    typeof hero.mediaUrl === "string"
-    ? hero.mediaUrl
-    : undefined;
-}
-
 function resolvePrice(target: ProductRow, viewerCurrency: Currency) {
   const { fromCents, discountCents } = getTemplatePriceCents(
     target,
@@ -159,19 +127,7 @@ export async function getLandingProductDetails(
     landingModelName: localized.landingModelName,
     landingDescription: localized.landingDescription,
   });
-  const fallbackUrls =
-    kind === "convite"
-      ? [
-          (target as InvitationProductRow).heroImage,
-          ...readCoupleGalleryUrls(
-            (target as InvitationProductRow).coupleGallery,
-          ),
-        ]
-      : [
-          readSaveTheDateBottomImage(
-            (target as SaveTheDateProductRow).bottomHero,
-          ),
-        ];
+
   const title = metadata.title;
 
   return {
@@ -187,7 +143,6 @@ export async function getLandingProductDetails(
     images: resolveLandingDetailImages({
       dedicated: target.landingDetailImages,
       landingImageUrl: target.landingImageUrl,
-      fallbackUrls,
     }),
     previewHref: kind === "convite" ? `/${slug}` : `/s/${slug}`,
     detailsHref: buildLandingProductDetailsPath(kind, slug),

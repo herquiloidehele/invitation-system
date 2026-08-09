@@ -73,12 +73,10 @@ export function sanitizeLandingDetailImages(value: unknown): string[] | null {
 export function resolveLandingDetailImages(input: {
   dedicated: unknown;
   landingImageUrl?: unknown;
-  fallbackUrls?: unknown[];
 }): string[] {
   const candidates = [
-    ...(sanitizeLandingDetailImages(input.dedicated) ?? []),
     input.landingImageUrl,
-    ...(input.fallbackUrls ?? []),
+    ...(sanitizeLandingDetailImages(input.dedicated) ?? []),
   ];
 
   return [
@@ -124,4 +122,5 @@ export function moveLandingDetailImage(
   [next[index], next[target]] = [next[target], next[index]];
   return next;
 }
+
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";
