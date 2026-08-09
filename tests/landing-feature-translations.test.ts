@@ -75,7 +75,7 @@ describe("localized landing features", () => {
       title: "Classic",
       subtitle: "Elegante",
       description: "Paper invitation",
-      href: "/ana-rui",
+      href: "/modelos/convite/ana-rui",
     });
   });
 
@@ -107,7 +107,7 @@ describe("localized landing features", () => {
       title: "Romántico",
       subtitle: "Reserva la fecha",
       description: "Anuncio digital",
-      href: "/s/ana-rui-save",
+      href: "/modelos/save-the-date/ana-rui-save",
     });
   });
 

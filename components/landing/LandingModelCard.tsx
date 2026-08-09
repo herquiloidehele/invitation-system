@@ -23,8 +23,7 @@ export type LandingModelCardItem = {
 
 type LandingModelCardLabels = {
   fallbackTitle: string;
-  previewAria: string;
-  clickToPreview: string;
+  viewDetails: string;
   showMore: string;
   showLess: string;
   buyCta: string;
@@ -34,20 +33,18 @@ export function LandingModelCard({
   item,
   variant,
   labels,
-  onPreviewClick,
   badgeLabel,
   motionProps,
 }: {
   item: LandingModelCardItem;
   variant: LandingModelCardVariant;
   labels: LandingModelCardLabels;
-  onPreviewClick: (event: React.MouseEvent<HTMLAnchorElement>) => void;
   badgeLabel?: string;
   motionProps?: HTMLMotionProps<"article">;
 }) {
   const config = getLandingModelCardVariantConfig(variant);
   const title = item.title || labels.fallbackTitle;
-  const previewLabel = `${labels.previewAria}: ${title}`;
+  const detailsLabel = `${labels.viewDetails}: ${title}`;
   const whatsappHref = buildWhatsappUrl(
     buildPurchaseMessage(title, labels.fallbackTitle),
   );
@@ -60,8 +57,7 @@ export function LandingModelCard({
       <a
         href={item.href}
         rel="noreferrer"
-        aria-label={previewLabel}
-        onClick={onPreviewClick}
+        aria-label={detailsLabel}
         className="flex flex-1 cursor-pointer flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
       >
         <div className="relative h-72 overflow-hidden bg-[linear-gradient(135deg,var(--border),var(--primary-soft))]">
@@ -79,7 +75,7 @@ export function LandingModelCard({
             <div className="flex items-center gap-2 rounded-full bg-background/90 py-2 pr-4 pl-3 shadow-lg backdrop-blur-sm">
               <MousePointerClickIcon className="h-4 w-4 text-foreground" />
               <span className="text-xs font-medium text-foreground">
-                {labels.clickToPreview}
+                {labels.viewDetails}
               </span>
             </div>
           </div>
@@ -111,8 +107,7 @@ export function LandingModelCard({
           <a
             href={item.href}
             rel="noreferrer"
-            aria-label={previewLabel}
-            onClick={onPreviewClick}
+            aria-label={detailsLabel}
             className="flex min-w-0 flex-wrap items-baseline gap-2 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {item.price.originalLabel ? (

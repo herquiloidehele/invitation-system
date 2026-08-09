@@ -11,6 +11,7 @@ import {
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
@@ -123,6 +124,10 @@ export function buildInvitationCreateData(
       typeof body.landingImageUrl === "string" && body.landingImageUrl.length
         ? body.landingImageUrl
         : null,
+    landingDetailImages: sanitizeJsonField(
+      sanitizeLandingDetailImages(body.landingDetailImages),
+      null,
+    ),
     landingDescription:
       typeof body.landingDescription === "string" &&
       body.landingDescription.length
