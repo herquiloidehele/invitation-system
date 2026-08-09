@@ -17,6 +17,7 @@ import type {
   TextStyle,
   TextStyleOverrides,
 } from "@/lib/types";
+import type { RsvpInputStyle } from "@/lib/rsvp-input-styles";
 import { useLocale } from "next-intl";
 
 import { useCustomText } from "@/lib/custom-texts";
@@ -33,6 +34,7 @@ import {
   type ScratchDatePart,
 } from "@/lib/scratch-rsvp";
 import { EditableText } from "@/components/shared/EditableText";
+import RsvpActionButton from "@/components/shared/RsvpActionButton";
 import ScratchCoin from "./ScratchCoin";
 
 const DEFAULT_SCRATCH_SCRIM_OPACITY = 0.45;
@@ -73,6 +75,8 @@ interface ScratchDateRevealProps {
   imageSettings?: ImageSettingsMap;
   /** Opens RSVP after all three scratch surfaces are revealed. */
   onRsvpClick?: () => void;
+  /** Existing RSVP field/button style shared with the RSVP form. */
+  inputStyle?: RsvpInputStyle;
 }
 
 export default function ScratchDateReveal({
@@ -85,6 +89,7 @@ export default function ScratchDateReveal({
   scrimOpacity,
   imageSettings,
   onRsvpClick,
+  inputStyle,
 }: ScratchDateRevealProps) {
   const t = useCustomText(customTexts);
   const locale = useLocale();
@@ -321,29 +326,32 @@ export default function ScratchDateReveal({
         </div>
 
         {onRsvpClick && rsvpButtonVisible && (
-          <motion.button
-            type="button"
-            onClick={onRsvpClick}
-            className="mx-auto mt-10 flex min-h-12 w-full max-w-xs cursor-pointer items-center justify-center px-5 py-4 font-medium shadow-[0_8px_24px_rgba(0,0,0,0.12)] outline-none transition-transform focus-visible:outline-2 focus-visible:outline-offset-2"
-            style={{
-              fontFamily: theme.uiFont,
-              fontSize: 13,
-              fontWeight: 500,
-              letterSpacing: 1,
-              background: theme.ctaPrimaryBg,
-              color: theme.ctaPrimaryText,
-              borderRadius: theme.ctaRadius,
-              // Keep the focus ring aligned with the invitation palette.
-              outlineColor: theme.accent,
-            }}
+          <motion.div
+            className="mx-auto mt-10 w-full max-w-xs"
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
             whileHover={reduceMotion ? undefined : { scale: 1.015 }}
             whileTap={reduceMotion ? undefined : { scale: 0.96 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            {t("cta_confirmButton")}
-          </motion.button>
+            <RsvpActionButton
+              type="button"
+              onClick={onRsvpClick}
+              inputStyle={inputStyle}
+              backgroundColor={theme.ctaPrimaryBg}
+              textColor={theme.ctaPrimaryText}
+              radius={theme.ctaRadius}
+              accentColor={theme.accent}
+              fontFamily={theme.uiFont}
+              textStyles={textStyles}
+              className="mt-0 min-h-12 cursor-pointer px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.12)] outline-none transition-[transform,background-color,border-color,box-shadow,opacity] focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ outlineColor: theme.accent }}
+            >
+              <EditableText elementKey="ctaLabel">
+                {t("cta_confirmButton")}
+              </EditableText>
+            </RsvpActionButton>
+          </motion.div>
         )}
       </div>
     </motion.section>

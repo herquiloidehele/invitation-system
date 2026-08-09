@@ -17,6 +17,7 @@ import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { useCustomText } from "@/lib/custom-texts";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { EditableText } from "@/components/shared/EditableText";
+import RsvpActionButton from "@/components/shared/RsvpActionButton";
 import {
   getRsvpCustomFields,
   isRsvpClosed,
@@ -27,10 +28,7 @@ import {
   shouldShowRsvpNumChildren,
 } from "@/lib/rsvp-config";
 import { resolveRsvpInputColors } from "@/lib/rsvp-input-colors";
-import {
-  resolveRsvpInputStyle,
-  resolveRsvpSubmitStyle,
-} from "@/lib/rsvp-input-styles";
+import { resolveRsvpInputStyle } from "@/lib/rsvp-input-styles";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
@@ -250,17 +248,8 @@ export default function RSVPForm(props: RSVPFormProps) {
     p.accent,
     Boolean(
       isIntegration(props) &&
-        props.invitation.rsvp.inputBackgroundColor?.trim(),
+      props.invitation.rsvp.inputBackgroundColor?.trim(),
     ),
-  );
-  const rsvpSubmitStyle = resolveRsvpSubmitStyle(
-    isIntegration(props) ? props.invitation.rsvp.inputStyle : undefined,
-    {
-      backgroundColor: p.ctaBg,
-      textColor: p.ctaText,
-      radius: p.ctaRadius,
-      accentColor: p.accent,
-    },
   );
   const rsvpPlaceholderStyle = {
     "--rsvp-placeholder-color": rsvpInputColors.placeholderColor,
@@ -856,15 +845,20 @@ export default function RSVPForm(props: RSVPFormProps) {
               />
             </div>
 
-            <button
+            <RsvpActionButton
               type="submit"
               disabled={submitState === "loading"}
-              className={rsvpSubmitStyle.className}
-              style={{
-                fontFamily: uiFont,
-                ...rsvpSubmitStyle.style,
-                ...ctaLabelOverride,
-              }}
+              inputStyle={
+                isIntegration(props)
+                  ? props.invitation.rsvp.inputStyle
+                  : undefined
+              }
+              backgroundColor={p.ctaBg}
+              textColor={p.ctaText}
+              radius={p.ctaRadius}
+              accentColor={p.accent}
+              fontFamily={uiFont}
+              textStyles={textStyles}
             >
               {submitState === "loading" ? (
                 <>
@@ -878,7 +872,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                   {resolveText("rsvp_submitButton")}
                 </EditableText>
               )}
-            </button>
+            </RsvpActionButton>
           </form>
         )}
       </div>

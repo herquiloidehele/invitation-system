@@ -301,6 +301,7 @@ export default function RichExternalLinkPage({
                 }
                 scrimOpacity={invitation.scratchReveal?.scrimOpacity}
                 imageSettings={invitation.imageSettings}
+                inputStyle={invitation.rsvp.inputStyle}
                 onRsvpClick={
                   postScratchRsvpEnabled ? () => setRsvpOpen(true) : undefined
                 }
