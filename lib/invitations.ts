@@ -5,6 +5,7 @@ import {
   sanitizeInvitationTranslations,
 } from "./invitation-translations";
 import { sanitizeLandingTranslations } from "./landing-translations";
+import { sanitizeLandingDetailImages } from "./landing-product-details";
 import { normalizeOwnerGuestFormMode } from "./owner-guest-form-mode";
 import { normalizeCurrency } from "./currency/config";
 import type {
@@ -106,6 +107,7 @@ type InvitationWithTheme = {
   priceOverrides: unknown;
   landingModelName: string | null;
   landingImageUrl: string | null;
+  landingDetailImages: unknown;
   landingDescription: string | null;
   landingSubtitle: string | null;
   landingTranslations: unknown;
@@ -199,6 +201,8 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
       (row.priceOverrides as InvitationData["priceOverrides"]) ?? null,
     landingModelName: row.landingModelName,
     landingImageUrl: row.landingImageUrl,
+    landingDetailImages:
+      sanitizeLandingDetailImages(row.landingDetailImages) ?? null,
     landingDescription: row.landingDescription,
     landingSubtitle: row.landingSubtitle,
     landingTranslations:

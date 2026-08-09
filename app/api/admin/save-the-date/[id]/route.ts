@@ -5,6 +5,7 @@ import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { normalizeCurrency } from "@/lib/currency/config";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 
 export async function GET(
   _req: NextRequest,
@@ -104,6 +105,12 @@ export async function PUT(
             body.landingImageUrl.length
               ? body.landingImageUrl
               : null,
+        }),
+        ...(body.landingDetailImages !== undefined && {
+          landingDetailImages: sanitizeJsonField(
+            sanitizeLandingDetailImages(body.landingDetailImages),
+            null,
+          ),
         }),
         ...(body.landingDescription !== undefined && {
           landingDescription:

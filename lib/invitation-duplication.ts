@@ -24,6 +24,7 @@ export function buildDuplicateInvitationInitialData(
     priceOverrides: null,
     landingModelName: null,
     landingImageUrl: null,
+    landingDetailImages: null,
     landingDescription: null,
     landingSubtitle: null,
     landingTranslations: null,

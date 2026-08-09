@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 import { SUPPORTED_LOCALES } from "@/i18n/locales";
 import { prisma } from "@/lib/db";
+import { getPublicLandingProductPaths } from "@/lib/landing-product-details-data";
+import { buildLandingProductDetailsPath } from "@/lib/landing-product-details";
 import {
   SITE_URL,
   buildAbsoluteUrl,
@@ -14,7 +16,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [invitations, saveTheDates] = await Promise.all([
+  const [invitations, saveTheDates, landingProducts] = await Promise.all([
     prisma.invitation.findMany({
       where: { isDemo: true },
       select: { slug: true, updatedAt: true, isDemo: true },
@@ -25,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true, updatedAt: true, isDemo: true },
       orderBy: { updatedAt: "desc" },
     }),
+    getPublicLandingProductPaths(),
   ]);
 
   const staticEntries = SUPPORTED_LOCALES.map((locale) => ({
@@ -62,5 +65,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })),
     );
 
-  return [...staticEntries, ...invitationEntries, ...saveTheDateEntries];
+  const landingProductEntries = landingProducts.flatMap((item) =>
+    SUPPORTED_LOCALES.map((locale) => ({
+      url: buildAbsoluteUrl(
+        SITE_URL,
+        buildLocalePath(
+          buildLandingProductDetailsPath(item.kind, item.slug),
+          locale,
+        ),
+      ),
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+  );
+
+  return [
+    ...staticEntries,
+    ...invitationEntries,
+    ...saveTheDateEntries,
+    ...landingProductEntries,
+  ];
 }

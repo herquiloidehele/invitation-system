@@ -12,6 +12,7 @@ import {
 } from "@/lib/landing-customization";
 import { localizeLandingMetadata } from "@/lib/landing-translations";
 import { DEFAULT_LOCALE, type AppLocale } from "@/i18n/locales";
+import { buildLandingProductDetailsPath } from "@/lib/landing-product-details";
 
 /** Format a template's price for a viewer currency from its base + overrides. */
 function templateLandingPrice(
@@ -239,7 +240,10 @@ export async function getGalleryFeaturesByCategory(
     result[category].push({
       id: row.id,
       title: metadata.title,
-      href: isInvitation ? invitationHref(slug) : saveTheDateHref(slug),
+      href: buildLandingProductDetailsPath(
+        isInvitation ? "convite" : "save-the-date",
+        slug,
+      ),
       imageUrl: target.landingImageUrl ?? heroImage,
       displayDate: readDateDisplay(target.date),
       subtitle: localizedTarget.landingSubtitle ?? null,
@@ -323,7 +327,10 @@ function mapBestSellerRowToFeature(
   return {
     id: row.id,
     title: metadata.title,
-    href: isInvitation ? invitationHref(slug) : saveTheDateHref(slug),
+    href: buildLandingProductDetailsPath(
+      isInvitation ? "convite" : "save-the-date",
+      slug,
+    ),
     imageUrl: target.landingImageUrl ?? heroImage,
     subtitle: localizedTarget.landingSubtitle ?? null,
     description: metadata.description,

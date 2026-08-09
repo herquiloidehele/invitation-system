@@ -1280,6 +1280,7 @@ export interface InvitationData {
   priceOverrides?: PriceOverrides | null;
   landingModelName?: string | null;
   landingImageUrl?: string | null;
+  landingDetailImages?: string[] | null;
   landingDescription?: string | null;
   landingSubtitle?: string | null;
   landingTranslations?:

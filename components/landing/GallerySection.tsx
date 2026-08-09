@@ -3,16 +3,16 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import type { GalleryCategory as DbGalleryCategory, GalleryFeature } from "@/lib/landing-features";
-import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { XIcon } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import type {
+  GalleryCategory as DbGalleryCategory,
+  GalleryFeature,
+} from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
 import {
   dbCategoryToTabKey,
   type GalleryCategoryKey,
   getVisibleGalleryCategories,
-  groupGalleryByCustomization
+  groupGalleryByCustomization,
 } from "./landing-data";
 import {
   getMotionProps,
@@ -20,17 +20,14 @@ import {
   landingCardVariants,
   landingFastTransition,
   landingStaggerVariants,
-  shouldReduceMotion
+  shouldReduceMotion,
 } from "./landing-motion";
 import { LandingModelCard } from "./LandingModelCard";
-import { PhoneIframePreview } from "./PhoneIframePreview";
 import { GalleryFeatureList } from "./GalleryFeatureList";
 import {
   getFeaturesForCustomizationLevel,
   type LandingGallerySettings,
 } from "@/lib/landing-gallery-settings";
-
-type GalleryCard = GalleryFeature & { tab: GalleryCategoryKey };
 
 export function GallerySection({
   itemsByCategory,
@@ -40,10 +37,8 @@ export function GallerySection({
   settings: LandingGallerySettings;
 }) {
   const t = useTranslations("LandingGallery");
-  const isMobile = useIsMobile();
   const reduceMotion = useReducedMotion();
   const reduced = shouldReduceMotion(reduceMotion);
-  const [previewItem, setPreviewItem] = useState<GalleryCard | null>(null);
   const [activeFullyCustomizableCategory, setActiveFullyCustomizableCategory] =
     useState<GalleryCategoryKey>("all");
   const [activePreDesignedCategory, setActivePreDesignedCategory] =
@@ -82,31 +77,6 @@ export function GallerySection({
     groups.preDesigned,
     activePreDesignedCategory,
   );
-
-  function handleCardClick(
-    event: React.MouseEvent<HTMLAnchorElement>,
-    item: GalleryCard,
-  ) {
-    // On mobile, allow the anchor to open the invitation in a new page.
-    if (isMobile) return;
-
-    // Respect modifier keys / middle clicks so users can still open in a new tab.
-    if (
-      event.defaultPrevented ||
-      event.button !== 0 ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey
-    ) {
-      return;
-    }
-
-    event.preventDefault();
-    setPreviewItem(item);
-  }
-
-  const previewTitle = previewItem?.title || t("fallbackTitle");
 
   function renderCollection({
     id,
@@ -183,13 +153,11 @@ export function GallerySection({
                 }}
                 labels={{
                   fallbackTitle: t("fallbackTitle"),
-                  previewAria: t("previewAria"),
-                  clickToPreview: t("clickToPreview"),
+                  viewDetails: t("viewDetails"),
                   showMore: t("showMore"),
                   showLess: t("showLess"),
                   buyCta: t("buyCta"),
                 }}
-                onPreviewClick={(event) => handleCardClick(event, item)}
               />
             ))}
           </AnimatePresence>
@@ -238,39 +206,6 @@ export function GallerySection({
           })}
         </div>
       </div>
-
-      <DialogPrimitive.Root
-        open={!!previewItem}
-        onOpenChange={(open) => {
-          if (!open) setPreviewItem(null);
-        }}
-      >
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-ink/70 backdrop-blur-md duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
-          <DialogPrimitive.Popup className="fixed top-1/2 left-1/2 z-50 w-[min(22rem,calc(100vw-2.5rem))] max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-visible outline-none duration-200 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
-            <DialogPrimitive.Title className="sr-only">
-              {previewTitle}
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Close
-              aria-label="Close"
-              className="absolute -top-10 -right-10 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/95 text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition hover:bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-            >
-              <XIcon className="h-5 w-5" />
-            </DialogPrimitive.Close>
-            {previewItem ? (
-              <div className="flex flex-col items-center gap-6">
-                <div className="w-full">
-                  <PhoneIframePreview
-                    title={previewTitle}
-                    src={previewItem.href}
-                    showCaption={false}
-                  />
-                </div>
-              </div>
-            ) : null}
-          </DialogPrimitive.Popup>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
     </AnimatedSection>
   );
 }

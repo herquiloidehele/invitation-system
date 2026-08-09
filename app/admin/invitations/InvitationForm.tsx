@@ -1758,6 +1758,7 @@ export default function InvitationForm({
                       priceOverrides: form.priceOverrides ?? null,
                       landingModelName: form.landingModelName ?? null,
                       landingImageUrl: form.landingImageUrl ?? null,
+                      landingDetailImages: form.landingDetailImages ?? null,
                       landingDescription: form.landingDescription ?? null,
                       landingSubtitle: form.landingSubtitle ?? null,
                       landingTranslations: form.landingTranslations ?? null,
@@ -1774,6 +1775,7 @@ export default function InvitationForm({
                       update("priceOverrides", next.priceOverrides);
                       update("landingModelName", next.landingModelName);
                       update("landingImageUrl", next.landingImageUrl);
+                      update("landingDetailImages", next.landingDetailImages);
                       update("landingDescription", next.landingDescription);
                       update("landingSubtitle", next.landingSubtitle);
                       update("landingTranslations", next.landingTranslations);

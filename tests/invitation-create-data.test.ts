@@ -83,4 +83,23 @@ describe("buildInvitationCreateData", () => {
     );
     expect(data.ownerGuestFormMode).toBe("complete");
   });
+
+  it("stores a normalized ordered landing detail gallery", () => {
+    const data = buildInvitationCreateData(
+      duplicateForm({
+        landingDetailImages: [
+          " https://cdn.example.com/detail-a.jpg ",
+          "",
+          "https://cdn.example.com/detail-a.jpg",
+          "https://cdn.example.com/detail-b.jpg",
+        ],
+      }),
+      "theme_copy",
+    );
+
+    expect(data.landingDetailImages).toEqual([
+      "https://cdn.example.com/detail-a.jpg",
+      "https://cdn.example.com/detail-b.jpg",
+    ]);
+  });
 });
