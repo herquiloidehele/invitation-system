@@ -38,7 +38,7 @@ export function ProductMediaGallery({
           : "grid"
       }
     >
-      <div className="relative min-h-[30rem] overflow-hidden rounded-[2rem] bg-muted shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 lg:min-h-[44rem]">
+      <div className="relative min-h-120 overflow-hidden rounded-[2rem] bg-muted shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 lg:min-h-[44rem]">
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
             key={activeImage}
@@ -64,7 +64,7 @@ export function ProductMediaGallery({
       </div>
 
       {showThumbnails ? (
-        <div className="flex gap-2 flex-col overflow-x-auto pb-1 lg:grid lg:max-h-176 lg:grid-cols-1 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0">
+        <div className="flex gap-2 lg:flex-col overflow-x-auto pb-1 lg:max-h-176 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 p-2">
           {images.map((image, index) => (
             <button
               key={`${image}-${index}`}
@@ -72,7 +72,7 @@ export function ProductMediaGallery({
               onClick={() => setActiveIndex(index)}
               aria-label={selectImageLabel(index + 1)}
               aria-current={index === resolvedActiveIndex ? "true" : undefined}
-              className="relative min-h-20 min-w-20 shrink-0 overflow-hidden rounded-2xl bg-muted shadow-[0_8px_24px_color-mix(in_srgb,var(--foreground)_7%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 transition-[opacity,transform,box-shadow] duration-200 hover:opacity-90 active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 aria-current:ring-2 aria-current:ring-primary aria-current:ring-offset-2 lg:aspect-[4/3] lg:min-h-36 lg:w-full"
+              className="relative min-h-20 min-w-20 shrink-0 overflow-hidden rounded-xl lg:rounded-2xl bg-muted shadow-[0_8px_24px_color-mix(in_srgb,var(--foreground)_7%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 transition-[opacity,transform,box-shadow] duration-200 hover:opacity-90 active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 aria-current:ring-2 aria-current:ring-primary aria-current:ring-offset-2 lg:aspect-[1/1] lg:min-h-20 lg:w-full"
             >
               <Image
                 src={image}
