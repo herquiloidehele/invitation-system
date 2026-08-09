@@ -77,7 +77,7 @@
   "LandingBestSellers": {
     "eyebrow": "Best sellers",
     "title": "Save The Date",
-    "body": "The models couples reach for the most. Tap one to preview. Models marked pre-designed retain the structure shown.",
+    "body": "The designs couples reach for most. Explore every detail and open the live invitation whenever you’re ready.",
     "empty": "Coming soon.",
     "fallbackTitle": "Invitation",
     "previewAria": "Preview invitation",
@@ -85,6 +85,7 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
+    "viewDetails": "View details",
     "buyCta": "Send Message"
   },
   "LandingGallery": {
@@ -98,6 +99,7 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
+    "viewDetails": "View details",
     "buyCta": "Send Message",
     "fullyCustomizable": {
       "title": "Fully customizable invitations",
@@ -369,6 +371,34 @@
     "giftsReleaseDescription": "The gift will become available to guests again.",
     "giftsCancel": "Cancel",
     "giftsError": "The gift list could not be updated. Try again."
+  },
+  "LandingProductDetails": {
+    "backToModels": "Back to designs",
+    "invitationEyebrow": "Digital invitation",
+    "saveTheDateEyebrow": "Save the Date",
+    "requestViaWhatsapp": "Request this invitation",
+    "viewLive": "View live invitation",
+    "viewDetails": "View details",
+    "selectImage": "View image {position}",
+    "previewTitle": "Preview of {title}",
+    "closePreview": "Close preview",
+    "openFullScreen": "Open full screen",
+    "includedTitle": "What’s included",
+    "customizationTitle": "Customization",
+    "orderingTitle": "How ordering works",
+    "madeForYouTitle": "Made around your story",
+    "madeForYouBody": "Names, colours, photographs, wording and details shaped around your celebration.",
+    "shareTitle": "Shared in one tap",
+    "shareBody": "An elegant experience prepared for every phone.",
+    "fullyCustomizableTag": "Fully customizable",
+    "preDesignedTag": "Pre-designed",
+    "rsvpTag": "Online RSVP",
+    "mapsTag": "Maps",
+    "invitationIncludedBody": "A digital invitation, RSVP, event information and a shareable link.",
+    "saveTheDateIncludedBody": "A digital date announcement, an interactive experience and a shareable link.",
+    "fullyCustomizableBody": "The structure, colours, wording, images and details can be adapted to your event.",
+    "preDesignedBody": "We personalize the content and visual identity while keeping this design’s structure.",
+    "orderingBody": "Message us on WhatsApp. We confirm the details, collect your content and prepare the first version for review."
   },
   "Invitation": {
     "sectionTitle_ourStory": "Our Story",

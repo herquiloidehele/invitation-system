@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * Flag appended to the embedded invitation URL so it knows it is being shown
  * inside the public landing showcase. The invitation reads this to render the
@@ -20,18 +22,26 @@ function withLandingPreviewFlag(
 export function PhoneIframePreview({
   title,
   src,
+  iframeTitle,
+  openLabel,
   showCaption = true,
   loading,
   lazyExternalIframe = false,
 }: {
   title: string;
   src: string;
+  iframeTitle?: string;
+  openLabel?: string;
   showCaption?: boolean;
   loading?: "eager" | "lazy";
   lazyExternalIframe?: boolean;
 }) {
+  const t = useTranslations("LandingProductDetails");
+  const resolvedIframeTitle = iframeTitle ?? t("previewTitle", { title });
+  const resolvedOpenLabel = openLabel ?? t("openFullScreen");
+
   return (
-    <article className="text-center">
+    <article aria-label={title} className="text-center">
       <div className="relative mx-auto aspect-9/17 w-full max-w-88 rounded-[2rem] border-8 border-primary-hover bg-background shadow-[0_30px_80px_color-mix(in_srgb,var(--foreground)_22%,transparent),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
         <span
           aria-hidden="true"
@@ -39,7 +49,7 @@ export function PhoneIframePreview({
         />
         <div className="absolute inset-0 overflow-hidden rounded-[1.4rem]">
           <iframe
-            title={`Pré-visualização do convite ${title}`}
+            title={resolvedIframeTitle}
             src={withLandingPreviewFlag(src, { lazyExternalIframe })}
             className="h-full w-full border-0 [scrollbar-width:none]"
             loading={loading}
@@ -57,7 +67,7 @@ export function PhoneIframePreview({
           rel="noreferrer"
           className="md:hidden mt-4 inline-flex rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-4"
         >
-          Abrir convite →
+          {resolvedOpenLabel} →
         </a>
       ) : null}
     </article>

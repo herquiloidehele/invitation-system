@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import MediaUpload from "@/components/admin/MediaUpload";
+import { LandingDetailGalleryEditor } from "@/components/admin/LandingDetailGalleryEditor";
 import { deriveCents } from "@/lib/currency/config";
 import {
   OVERRIDE_CURRENCIES,
@@ -32,6 +33,7 @@ export type LandingMetadata = {
   priceOverrides: PriceOverrides | null;
   landingModelName: string | null;
   landingImageUrl: string | null;
+  landingDetailImages: string[] | null;
   landingDescription: string | null;
   landingSubtitle: string | null;
   landingTranslations: LandingTranslations | null;
@@ -370,6 +372,11 @@ export function LandingMetadataFieldset({
               label="Carregar imagem destaque"
             />
           </div>
+
+          <LandingDetailGalleryEditor
+            value={value.landingDetailImages}
+            onChange={(landingDetailImages) => update({ landingDetailImages })}
+          />
         </div>
       )}
     </fieldset>

@@ -75,12 +75,26 @@ const baseRow = {
   priceOverrides: null,
   landingModelName: null,
   landingImageUrl: null,
+  landingDetailImages: null,
   landingDescription: null,
   landingSubtitle: null,
   landingCustomizationLevel: "fully_customizable",
 };
 
 describe("toAdminInvitationInitialData — landing customization", () => {
+  it("hydrates the ordered detail gallery", () => {
+    const images = [
+      "https://cdn.example.com/detail-a.jpg",
+      "https://cdn.example.com/detail-b.jpg",
+    ];
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      landingDetailImages: images,
+    });
+
+    expect(result.landingDetailImages).toEqual(images);
+  });
+
   it("hydrates an explicit pre-designed level", () => {
     const result = toAdminInvitationInitialData({
       ...baseRow,

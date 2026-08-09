@@ -8,6 +8,7 @@ import type {
 } from "@/lib/types";
 import type { PriceOverrides } from "@/lib/currency/template-price";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import SaveTheDateForm from "../../SaveTheDateForm";
 import type { SaveTheDateFormData } from "../../SaveTheDateForm";
 
@@ -88,6 +89,7 @@ export default async function EditSaveTheDatePage({
       (item.priceOverrides as unknown as PriceOverrides | null) ?? null,
     landingModelName: item.landingModelName,
     landingImageUrl: item.landingImageUrl,
+    landingDetailImages: sanitizeLandingDetailImages(item.landingDetailImages),
     landingDescription: item.landingDescription,
     landingSubtitle: item.landingSubtitle,
     landingTranslations:

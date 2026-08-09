@@ -77,7 +77,7 @@
   "LandingBestSellers": {
     "eyebrow": "Más vendidos",
     "title": "Save The Date",
-    "body": "Los modelos que más entusiasman a nuestras parejas. Toca uno para previsualizar. Los modelos marcados como prediseñados mantienen la estructura mostrada.",
+    "body": "Los diseños que más eligen nuestras parejas. Explora cada detalle y abre la invitación en vivo cuando quieras.",
     "empty": "Próximamente.",
     "fallbackTitle": "Invitación",
     "previewAria": "Previsualizar invitación",
@@ -85,6 +85,7 @@
     "showMore": "Ver más",
     "showLess": "Ver menos",
     "clickToPreview": "Haz clic para visualizar",
+    "viewDetails": "Ver detalles",
     "buyCta": "Enviar Mensaje"
   },
   "LandingGallery": {
@@ -98,6 +99,7 @@
     "showMore": "Ver más",
     "showLess": "Ver menos",
     "clickToPreview": "Haz clic para visualizar",
+    "viewDetails": "Ver detalles",
     "buyCta": "Enviar Mensaje",
     "fullyCustomizable": {
       "title": "Invitaciones totalmente personalizables",
@@ -369,6 +371,34 @@
     "giftsReleaseDescription": "El regalo volverá a estar disponible para los invitados.",
     "giftsCancel": "Cancelar",
     "giftsError": "No se pudo actualizar la lista de regalos. Inténtalo de nuevo."
+  },
+  "LandingProductDetails": {
+    "backToModels": "Volver a los diseños",
+    "invitationEyebrow": "Invitación digital",
+    "saveTheDateEyebrow": "Save the Date",
+    "requestViaWhatsapp": "Solicitar esta invitación",
+    "viewLive": "Ver invitación en vivo",
+    "viewDetails": "Ver detalles",
+    "selectImage": "Ver imagen {position}",
+    "previewTitle": "Vista previa de {title}",
+    "closePreview": "Cerrar vista previa",
+    "openFullScreen": "Abrir a pantalla completa",
+    "includedTitle": "Qué incluye",
+    "customizationTitle": "Personalización",
+    "orderingTitle": "Cómo hacer el pedido",
+    "madeForYouTitle": "Creado alrededor de vuestra historia",
+    "madeForYouBody": "Nombres, colores, fotografías, textos y detalles adaptados a vuestra celebración.",
+    "shareTitle": "Compartido en un instante",
+    "shareBody": "Una experiencia elegante y preparada para cualquier móvil.",
+    "fullyCustomizableTag": "Totalmente personalizable",
+    "preDesignedTag": "Diseño predefinido",
+    "rsvpTag": "Confirmación online",
+    "mapsTag": "Mapas",
+    "invitationIncludedBody": "Invitación digital, confirmación de asistencia, información del evento y enlace para compartir.",
+    "saveTheDateIncludedBody": "Anuncio digital de la fecha, experiencia interactiva y enlace para compartir.",
+    "fullyCustomizableBody": "La estructura, los colores, los textos, las imágenes y los detalles se pueden adaptar a vuestro evento.",
+    "preDesignedBody": "Personalizamos el contenido y la identidad visual manteniendo la estructura de este diseño.",
+    "orderingBody": "Escríbenos por WhatsApp. Confirmamos los detalles, recibimos el contenido y preparamos la primera versión para revisión."
   },
   "Invitation": {
     "sectionTitle_ourStory": "Nuestra Historia",

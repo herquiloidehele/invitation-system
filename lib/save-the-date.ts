@@ -7,6 +7,7 @@ import type {
   SocialPreview,
   TextStyleOverrides,
 } from "./types";
+import { sanitizeLandingDetailImages } from "./landing-product-details";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -97,6 +98,8 @@ export interface SaveTheDateData {
   socialPreview: SocialPreview | null;
   /** Admin-only marker for public demo pages that can be indexed. */
   isDemo?: boolean;
+  /** Ordered dedicated marketing images for the public details page. */
+  landingDetailImages?: string[] | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -182,6 +185,8 @@ export async function getSaveTheDate(
       ? (row.socialPreview as unknown as SocialPreview)
       : null,
     isDemo: row.isDemo,
+    landingDetailImages:
+      sanitizeLandingDetailImages(row.landingDetailImages) ?? null,
   };
 }
 

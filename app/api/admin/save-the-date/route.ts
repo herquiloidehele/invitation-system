@@ -5,6 +5,7 @@ import { readPriceOverridesInput } from "@/lib/currency/price-overrides-input";
 import { normalizeCurrency } from "@/lib/currency/config";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 
 export async function GET() {
   const items = await prisma.saveTheDate.findMany({
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
       priceOverrides,
       landingModelName,
       landingImageUrl,
+      landingDetailImages,
       landingDescription,
       landingSubtitle,
       landingTranslations,
@@ -83,6 +85,10 @@ export async function POST(req: NextRequest) {
           typeof landingImageUrl === "string" && landingImageUrl.length
             ? landingImageUrl
             : null,
+        landingDetailImages: sanitizeJsonField(
+          sanitizeLandingDetailImages(landingDetailImages),
+          null,
+        ),
         landingDescription:
           typeof landingDescription === "string" && landingDescription.length
             ? landingDescription

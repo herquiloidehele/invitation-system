@@ -11,6 +11,7 @@ import {
 } from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import type {
   CardStyleOverrides,
@@ -105,6 +106,7 @@ type AdminInvitationInitialDataRow = {
   priceOverrides: unknown;
   landingModelName: string | null;
   landingImageUrl: string | null;
+  landingDetailImages: unknown;
   landingDescription: string | null;
   landingSubtitle: string | null;
   landingTranslations?: unknown;
@@ -200,6 +202,8 @@ export function toAdminInvitationInitialData(
     priceOverrides: (row.priceOverrides as PriceOverrides | null) ?? null,
     landingModelName: row.landingModelName,
     landingImageUrl: row.landingImageUrl,
+    landingDetailImages:
+      sanitizeLandingDetailImages(row.landingDetailImages) ?? null,
     landingDescription: row.landingDescription,
     landingSubtitle: row.landingSubtitle,
     landingTranslations:

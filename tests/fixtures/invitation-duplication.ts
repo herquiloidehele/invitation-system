@@ -171,6 +171,7 @@ export const sourceInvitationRow = {
   priceOverrides: { USD: { fromCents: 12000 } },
   landingModelName: "Rose",
   landingImageUrl: "https://cdn.example.com/landing.jpg",
+  landingDetailImages: ["https://cdn.example.com/detail.jpg"],
   landingDescription: "Catalogue description",
   landingSubtitle: "Catalogue subtitle",
   landingTranslations: { en: { landingModelName: "Rose" } },

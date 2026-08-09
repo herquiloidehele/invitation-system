@@ -13,6 +13,7 @@ import {
 } from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
+import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
@@ -370,6 +371,12 @@ export async function PUT(
             body.landingImageUrl.length
               ? body.landingImageUrl
               : null,
+        }),
+        ...(body.landingDetailImages !== undefined && {
+          landingDetailImages: sanitizeJsonField(
+            sanitizeLandingDetailImages(body.landingDetailImages),
+            null,
+          ),
         }),
         ...(body.landingDescription !== undefined && {
           landingDescription:

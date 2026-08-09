@@ -99,6 +99,7 @@ describe("buildDuplicateInvitationInitialData", () => {
     expect(result.currency).toBe("EUR");
     expect(result.landingModelName).toBeNull();
     expect(result.landingImageUrl).toBeNull();
+    expect(result.landingDetailImages).toBeNull();
     expect(result.landingDescription).toBeNull();
     expect(result.landingSubtitle).toBeNull();
     expect(result.landingCustomizationLevel).toBe("fully_customizable");

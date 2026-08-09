@@ -111,6 +111,7 @@ export interface SaveTheDateFormData {
   priceOverrides?: PriceOverrides | null;
   landingModelName?: string | null;
   landingImageUrl?: string | null;
+  landingDetailImages?: string[] | null;
   landingDescription?: string | null;
   landingSubtitle?: string | null;
   landingTranslations?: LandingTranslations | null;
@@ -607,6 +608,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           priceOverrides: data.priceOverrides ?? null,
           landingModelName: data.landingModelName ?? null,
           landingImageUrl: data.landingImageUrl ?? null,
+          landingDetailImages: data.landingDetailImages ?? null,
           landingDescription: data.landingDescription ?? null,
           landingSubtitle: data.landingSubtitle ?? null,
           landingTranslations: data.landingTranslations ?? null,
@@ -735,6 +737,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                     priceOverrides: data.priceOverrides ?? null,
                     landingModelName: data.landingModelName ?? null,
                     landingImageUrl: data.landingImageUrl ?? null,
+                    landingDetailImages: data.landingDetailImages ?? null,
                     landingDescription: data.landingDescription ?? null,
                     landingSubtitle: data.landingSubtitle ?? null,
                     landingTranslations: data.landingTranslations ?? null,
@@ -750,6 +753,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                       priceOverrides: next.priceOverrides,
                       landingModelName: next.landingModelName,
                       landingImageUrl: next.landingImageUrl,
+                      landingDetailImages: next.landingDetailImages,
                       landingDescription: next.landingDescription,
                       landingSubtitle: next.landingSubtitle,
                       landingTranslations: next.landingTranslations,
