@@ -49,8 +49,9 @@ The same flow applies to full invitations and Save the Date products.
 
 Use an explicit localized details route under the public design namespace so it cannot collide with the existing public invitation slug routes. The route includes the product kind and slug, for example:
 
-- `/pt/modelos/convite/amalfi`
-- `/pt/modelos/save-the-date/golden-heart`
+- `/modelos/convite/amalfi` (Portuguese, the unprefixed default locale)
+- `/en/modelos/convite/amalfi`
+- `/es/modelos/save-the-date/golden-heart`
 
 Only a product referenced by an enabled public landing feature may resolve to a details page. A missing, invalid, or unpublished product returns the standard not-found page.
 
