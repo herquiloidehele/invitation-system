@@ -117,7 +117,6 @@ export function LandingProductDetailsPage({
         previewHref={details.previewHref}
         previewTitle={t("previewTitle", { title: details.title })}
         closeLabel={t("closePreview")}
-        openFullScreenLabel={t("openFullScreen")}
       />
     </main>
   );
