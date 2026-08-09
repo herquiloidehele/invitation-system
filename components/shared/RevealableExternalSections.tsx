@@ -1,6 +1,6 @@
 "use client";
 
-import { type RefObject, useEffect } from "react";
+import { type RefObject, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import type { ImageLayer, InvitationData, TemplateTheme } from "@/lib/types";
 import ScratchDateReveal from "@/components/curtain-canva/ScratchDateReveal";
@@ -24,6 +24,11 @@ import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
 import { shouldRenderPlaces } from "@/lib/places";
+import {
+  shouldEnablePostScratchRsvp,
+  shouldShowInlineRsvp,
+} from "@/lib/scratch-rsvp";
+import RSVPModal from "@/components/shared/RSVPModal";
 
 // Lazy-load RSVPForm so its react-hook-form + zod dependencies only ship when
 // a guest actually scrolls down to the RSVP section.
@@ -106,6 +111,12 @@ export default function RevealableExternalSections({
   });
   const revealContentStyle = resolveRevealContentStyle(revealed);
   const scratchRevealOn = shouldRenderScratchReveal(invitation.scratchReveal);
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+  const postScratchRsvpEnabled = shouldEnablePostScratchRsvp(invitation);
+  const showInlineRsvp = shouldShowInlineRsvp({
+    inlineEligible: showInitialPageSections && invitation.rsvp.enabled,
+    postScratchRsvpEnabled,
+  });
   const coupleGalleryOn = shouldRenderCoupleGallery(invitation);
   const placesOn = shouldRenderPlaces(invitation);
 
@@ -140,6 +151,9 @@ export default function RevealableExternalSections({
               backgroundImageUrl={invitation.scratchReveal?.backgroundImageUrl}
               scrimOpacity={invitation.scratchReveal?.scrimOpacity}
               imageSettings={invitation.imageSettings}
+              onRsvpClick={
+                postScratchRsvpEnabled ? () => setRsvpOpen(true) : undefined
+              }
             />
           </SectionImageHost>
         )}
@@ -207,7 +221,7 @@ export default function RevealableExternalSections({
           </SectionImageHost>
         )}
 
-        {showInitialPageSections && invitation.rsvp.enabled && (
+        {showInlineRsvp && (
           <SectionImageHost sectionKey="rsvp" layer={imageLayer}>
             <section
               id="rsvp"
@@ -262,6 +276,17 @@ export default function RevealableExternalSections({
           </SectionImageHost>
         )}
       </div>
+
+      {postScratchRsvpEnabled && (
+        <RSVPModal
+          open={rsvpOpen}
+          onClose={() => setRsvpOpen(false)}
+          invitation={invitation}
+          theme={theme}
+          customTexts={invitation.customTexts}
+          guest={invitation.guest}
+        />
+      )}
     </SpacingStyleProvider>
   );
 }

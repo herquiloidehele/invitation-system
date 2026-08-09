@@ -2551,6 +2551,28 @@ export default function ExternalInvitationForm({
                             </SelectContent>
                           </Select>
                         </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Mostrar RSVP após raspar</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Mostra o botão de confirmação depois de revelar a
+                              data completa e abre o modal RSVP.
+                            </p>
+                          </div>
+                          <Switch
+                            checked={
+                              form.scratchReveal?.showRsvpButtonAfterReveal ===
+                              true
+                            }
+                            onCheckedChange={(value) =>
+                              updateScratchRevealField(
+                                "showRsvpButtonAfterReveal",
+                                value,
+                              )
+                            }
+                            disabled={!form.rsvp.enabled}
+                          />
+                        </div>
                         <SectionBackgroundImageEditor
                           value={form.scratchReveal?.backgroundImageUrl ?? ""}
                           label="Imagem de fundo"
@@ -3281,6 +3303,28 @@ export default function ExternalInvitationForm({
                               </SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Mostrar RSVP após raspar</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Mostra o botão de confirmação depois de revelar a
+                              data completa e abre o modal RSVP.
+                            </p>
+                          </div>
+                          <Switch
+                            checked={
+                              form.scratchReveal?.showRsvpButtonAfterReveal ===
+                              true
+                            }
+                            onCheckedChange={(value) =>
+                              updateScratchRevealField(
+                                "showRsvpButtonAfterReveal",
+                                value,
+                              )
+                            }
+                            disabled={!form.rsvp.enabled}
+                          />
                         </div>
                         <SectionBackgroundImageEditor
                           value={form.scratchReveal?.backgroundImageUrl ?? ""}

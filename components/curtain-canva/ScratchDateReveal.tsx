@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type {
@@ -27,6 +28,10 @@ import {
 } from "@/lib/curtain-canva";
 import { formatLocalizedMonthShort } from "@/lib/date-format";
 import { getBackgroundImageStyle } from "@/lib/image-settings";
+import {
+  registerRevealedScratchPart,
+  type ScratchDatePart,
+} from "@/lib/scratch-rsvp";
 import { EditableText } from "@/components/shared/EditableText";
 import ScratchCoin from "./ScratchCoin";
 
@@ -66,6 +71,8 @@ interface ScratchDateRevealProps {
    * Only the `scratchRevealBackground` key is read.
    */
   imageSettings?: ImageSettingsMap;
+  /** Opens RSVP after all three scratch surfaces are revealed. */
+  onRsvpClick?: () => void;
 }
 
 export default function ScratchDateReveal({
@@ -77,6 +84,7 @@ export default function ScratchDateReveal({
   backgroundImageUrl,
   scrimOpacity,
   imageSettings,
+  onRsvpClick,
 }: ScratchDateRevealProps) {
   const t = useCustomText(customTexts);
   const locale = useLocale();
@@ -92,7 +100,8 @@ export default function ScratchDateReveal({
   // Track which coins have been revealed so we can fire confetti exactly
   // once when all three are done. We use a ref so the callback identity is
   // stable across renders.
-  const revealedCoinsRef = useRef<Set<string>>(new Set());
+  const revealedCoinsRef = useRef<Set<ScratchDatePart>>(new Set());
+  const [rsvpButtonVisible, setRsvpButtonVisible] = useState(false);
   const celebratedRef = useRef(false);
   const followupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -145,13 +154,16 @@ export default function ScratchDateReveal({
   }, []);
 
   const handleCoinRevealed = useCallback(
-    (key: "day" | "month" | "year") => {
-      revealedCoinsRef.current.add(key);
-      if (revealedCoinsRef.current.size === 3) {
+    (key: ScratchDatePart) => {
+      const result = registerRevealedScratchPart(revealedCoinsRef.current, key);
+      revealedCoinsRef.current = result.parts;
+
+      if (result.complete) {
         fireCelebration();
+        if (onRsvpClick) setRsvpButtonVisible(true);
       }
     },
-    [fireCelebration],
+    [fireCelebration, onRsvpClick],
   );
 
   const datePartStyle: CSSProperties = {
@@ -307,6 +319,32 @@ export default function ScratchDateReveal({
             onRevealed={() => handleCoinRevealed("year")}
           />
         </div>
+
+        {onRsvpClick && rsvpButtonVisible && (
+          <motion.button
+            type="button"
+            onClick={onRsvpClick}
+            className="mx-auto mt-10 flex min-h-12 w-full max-w-xs cursor-pointer items-center justify-center px-5 py-4 font-medium shadow-[0_8px_24px_rgba(0,0,0,0.12)] outline-none transition-transform focus-visible:outline-2 focus-visible:outline-offset-2"
+            style={{
+              fontFamily: theme.uiFont,
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: 1,
+              background: theme.ctaPrimaryBg,
+              color: theme.ctaPrimaryText,
+              borderRadius: theme.ctaRadius,
+              // Keep the focus ring aligned with the invitation palette.
+              outlineColor: theme.accent,
+            }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            whileHover={reduceMotion ? undefined : { scale: 1.015 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.96 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            {t("cta_confirmButton")}
+          </motion.button>
+        )}
       </div>
     </motion.section>
   );

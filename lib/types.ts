@@ -626,6 +626,8 @@ export type ScratchRevealShape = "circle" | "rounded-square";
 export interface ScratchRevealConfig {
   /** Whether the section renders at all. */
   enabled: boolean;
+  /** Show an RSVP modal CTA after every date surface has been revealed. */
+  showRsvpButtonAfterReveal?: boolean;
   /** Shape of the scratchable date surfaces. Missing values default to circles. */
   shape?: ScratchRevealShape;
   /** Optional full-bleed background image URL behind the coins. */

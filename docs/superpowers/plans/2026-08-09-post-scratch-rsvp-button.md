@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add an opt-in admin setting that reveals a themed RSVP button after all three scratch-date coins are complete and opens the existing RSVP modal without removing the inline form.
+**Goal:** Add an opt-in admin setting that replaces inline RSVP with a themed button after all three scratch-date coins are complete and opens the existing RSVP modal.
 
-**Architecture:** Put pure option-gating and unique-date-part completion rules in a small domain helper. Keep `ScratchDateReveal` responsible for visual completion and the CTA, while `RichExternalLinkPage` and `RevealableExternalSections` own modal state and pass an action callback only when configuration permits it.
+**Architecture:** Put pure option-gating, mutually exclusive presentation, and unique-date-part completion rules in a small domain helper. Keep `ScratchDateReveal` responsible for visual completion and the CTA, while `RichExternalLinkPage` and `RevealableExternalSections` own modal state, pass an action callback only when configuration permits it, and suppress their inline forms in that mode.
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript, Framer Motion, next-intl/custom text resolution, Vitest in Node, ESLint.
 
@@ -16,9 +16,10 @@
 - Use the existing `cta_confirmButton` custom text and the theme's primary CTA styles.
 - Honor reduced-motion preferences.
 - Open the existing shared `RSVPModal`; do not put modal or submission ownership in `ScratchDateReveal`.
-- Keep the existing inline RSVP form unchanged.
+- Hide inline RSVP immediately while the post-scratch modal flow is enabled; disabling the option must restore the existing inline render rules.
 - Do not add dependencies or database migrations; `scratchReveal` is already stored as JSON.
 - Run `npm run build`, never `next build` directly.
+- For this execution, leave all implementation and documentation changes uncommitted; skip the commit checkpoints below.
 
 ## File Structure
 
@@ -289,15 +290,37 @@ git commit -m "feat: reveal RSVP action after scratching date"
 ### Task 3: Wire the CTA to the Existing Modal in Both Page Compositions
 
 **Files:**
+- Modify: `lib/scratch-rsvp.ts`
 - Modify: `components/shared/RichExternalLinkPage.tsx:3-390`
 - Modify: `components/shared/RevealableExternalSections.tsx:3-330`
+- Modify: `tests/scratch-rsvp.test.ts`
 - Modify: `tests/scratch-rsvp-ui-wiring.test.ts`
 
 **Interfaces:**
 - Consumes: `shouldEnablePostScratchRsvp(invitation)`, `ScratchDateReveal.onRsvpClick`, and the integration form of `RSVPModal`.
-- Produces: modal ownership and open/close behavior for rich external-link, curtain-canva, and video-entrance invitation paths.
+- Produces: `shouldShowInlineRsvp({ inlineEligible, postScratchRsvpEnabled })` plus mutually exclusive inline/modal rendering for rich external-link, curtain-canva, and video-entrance invitation paths.
 
 - [ ] **Step 1: Extend the failing integration test**
+
+Append to `tests/scratch-rsvp.test.ts`:
+
+```ts
+describe("shouldShowInlineRsvp", () => {
+  it.each([
+    [false, false, false],
+    [false, true, false],
+    [true, false, true],
+    [true, true, false],
+  ])(
+    "returns %s for inlineEligible=%s and postScratchRsvpEnabled=%s",
+    (inlineEligible, postScratchRsvpEnabled, expected) => {
+      expect(
+        shouldShowInlineRsvp({ inlineEligible, postScratchRsvpEnabled }),
+      ).toBe(expected);
+    },
+  );
+});
+```
 
 Append inside the existing `describe` in `tests/scratch-rsvp-ui-wiring.test.ts`:
 
@@ -321,8 +344,12 @@ it.each([
 it.each([
   "components/shared/RichExternalLinkPage.tsx",
   "components/shared/RevealableExternalSections.tsx",
-])("keeps the existing inline RSVP form in %s", (path) => {
+])("uses a mutually exclusive inline RSVP gate in %s", (path) => {
   const source = readSource(path);
+
+  expect(source).toContain("shouldShowInlineRsvp({");
+  expect(source).toContain("postScratchRsvpEnabled");
+  expect(source).toContain("{showInlineRsvp && (");
   expect(source).toContain("<RSVPForm");
   expect(source).toContain("inline");
 });
@@ -332,18 +359,41 @@ it.each([
 
 Run: `npx vitest run tests/scratch-rsvp-ui-wiring.test.ts`
 
-Expected: FAIL because neither composition imports or renders `RSVPModal`.
+Expected: FAIL because `shouldShowInlineRsvp` does not exist and both compositions still render inline RSVP while the post-scratch modal flow is enabled.
 
-- [ ] **Step 3: Add modal ownership to `RichExternalLinkPage`**
+- [ ] **Step 3: Add the pure mutually exclusive inline gate**
+
+Add to `lib/scratch-rsvp.ts`:
+
+```ts
+export function shouldShowInlineRsvp({
+  inlineEligible,
+  postScratchRsvpEnabled,
+}: {
+  inlineEligible: boolean;
+  postScratchRsvpEnabled: boolean;
+}): boolean {
+  return inlineEligible && !postScratchRsvpEnabled;
+}
+```
+
+- [ ] **Step 4: Add modal ownership and exclusive inline rendering to `RichExternalLinkPage`**
 
 Import the gate and modal, then add state:
 
 ```ts
 import RSVPModal from "./RSVPModal";
-import { shouldEnablePostScratchRsvp } from "@/lib/scratch-rsvp";
+import {
+  shouldEnablePostScratchRsvp,
+  shouldShowInlineRsvp,
+} from "@/lib/scratch-rsvp";
 
 const [rsvpOpen, setRsvpOpen] = useState(false);
 const postScratchRsvpEnabled = shouldEnablePostScratchRsvp(invitation);
+const showInlineRsvp = shouldShowInlineRsvp({
+  inlineEligible: showRsvp,
+  postScratchRsvpEnabled,
+});
 ```
 
 Pass the action to `ScratchDateReveal`:
@@ -354,7 +404,7 @@ onRsvpClick={
 }
 ```
 
-Before the closing `ImageCanvas`, keep the inline RSVP section as-is and add:
+Change the inline form condition from `showRsvp` to `showInlineRsvp`. Before the closing `ImageCanvas`, add:
 
 ```tsx
 {postScratchRsvpEnabled && (
@@ -369,29 +419,32 @@ Before the closing `ImageCanvas`, keep the inline RSVP section as-is and add:
 )}
 ```
 
-- [ ] **Step 4: Add the same modal ownership to `RevealableExternalSections`**
+- [ ] **Step 5: Add the same modal ownership and exclusive gate to `RevealableExternalSections`**
 
 Change the React import to include `useState`, import the gate and modal, then add:
 
 ```ts
 const [rsvpOpen, setRsvpOpen] = useState(false);
 const postScratchRsvpEnabled = shouldEnablePostScratchRsvp(invitation);
+const showInlineRsvp = shouldShowInlineRsvp({
+  inlineEligible: showInitialPageSections && invitation.rsvp.enabled,
+  postScratchRsvpEnabled,
+});
 ```
 
-Pass the same conditional `onRsvpClick` to `ScratchDateReveal`. Render the same `RSVPModal` block after the reveal-gated content `div`, so an open modal is never nested beneath `aria-hidden={!revealed}`.
+Pass the same conditional `onRsvpClick` to `ScratchDateReveal`. Change the inline form condition to `showInlineRsvp`. Render the same `RSVPModal` block after the reveal-gated content `div`, so an open modal is never nested beneath `aria-hidden={!revealed}`.
 
-- [ ] **Step 5: Run focused tests and verify GREEN**
+- [ ] **Step 6: Run focused tests and verify GREEN**
 
 Run: `npx vitest run tests/scratch-rsvp.test.ts tests/scratch-rsvp-ui-wiring.test.ts tests/external-invitation-form.test.ts`
 
-Expected: all focused tests PASS, including the pre-existing inline RSVP and scratch prop coverage.
+Expected: all focused tests PASS, including proof that inline RSVP remains available only when eligible and the post-scratch modal flow is disabled.
 
-- [ ] **Step 6: Commit modal integration**
+- [ ] **Step 7: Preserve the verified changes without committing**
 
-```bash
-git add components/shared/RichExternalLinkPage.tsx components/shared/RevealableExternalSections.tsx tests/scratch-rsvp-ui-wiring.test.ts
-git commit -m "feat: open RSVP modal from scratch reveal"
-```
+Run: `git status --short`
+
+Expected: the helper, both page compositions, and both focused test files remain modified or untracked; do not stage or commit them.
 
 ---
 

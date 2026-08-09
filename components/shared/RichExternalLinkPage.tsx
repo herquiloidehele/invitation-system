@@ -42,7 +42,12 @@ import FaqSection from "./FaqSection";
 import PlacesSection from "./PlacesSection";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { shouldShowRichExternalRsvp } from "@/lib/external-invitation-form";
+import {
+  shouldEnablePostScratchRsvp,
+  shouldShowInlineRsvp,
+} from "@/lib/scratch-rsvp";
 import DynamicFontLoader from "./DynamicFontLoader";
+import RSVPModal from "./RSVPModal";
 import { SpacingStyleProvider } from "./SpacingStyleProvider";
 
 // Lazy-load RSVPForm so its react-hook-form + zod dependencies only
@@ -91,6 +96,8 @@ export default function RichExternalLinkPage({
   const countdownOn = Boolean(invitation.countdown?.enabled);
   const scratchOn = Boolean(invitation.scratchReveal?.enabled);
   const rsvpOn = Boolean(invitation.rsvp?.enabled);
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+  const postScratchRsvpEnabled = shouldEnablePostScratchRsvp(invitation);
   const externalLink = getEffectiveExternalLink({
     invitationType: invitation.invitationType,
     externalLink: invitation.externalLink,
@@ -110,6 +117,10 @@ export default function RichExternalLinkPage({
   const showRsvp = shouldShowRichExternalRsvp({
     rsvpOn,
     isInitialCanvaPage,
+  });
+  const showInlineRsvp = shouldShowInlineRsvp({
+    inlineEligible: showRsvp,
+    postScratchRsvpEnabled,
   });
   const handleCanvaContentHeightReady = useCallback(
     () => setMeasuredExternalLink(externalLink),
@@ -290,6 +301,9 @@ export default function RichExternalLinkPage({
                 }
                 scrimOpacity={invitation.scratchReveal?.scrimOpacity}
                 imageSettings={invitation.imageSettings}
+                onRsvpClick={
+                  postScratchRsvpEnabled ? () => setRsvpOpen(true) : undefined
+                }
               />
             </SectionImageHost>
           )}
@@ -429,7 +443,7 @@ export default function RichExternalLinkPage({
             </SectionImageHost>
           )}
 
-          {showRsvp && (
+          {showInlineRsvp && (
             <SectionImageHost sectionKey="rsvp" layer={invitation.imageLayer}>
               <section
                 id="rsvp"
@@ -457,6 +471,17 @@ export default function RichExternalLinkPage({
                 </div>
               </section>
             </SectionImageHost>
+          )}
+
+          {postScratchRsvpEnabled && (
+            <RSVPModal
+              open={rsvpOpen}
+              onClose={() => setRsvpOpen(false)}
+              invitation={invitation}
+              theme={theme}
+              customTexts={invitation.customTexts}
+              guest={invitation.guest}
+            />
           )}
         </ImageCanvas>
       </main>
