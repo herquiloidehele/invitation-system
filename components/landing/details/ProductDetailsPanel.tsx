@@ -23,18 +23,10 @@ export function ProductDetailsPanel({
   onPreview: () => void;
 }) {
   return (
-    <aside className="lg:sticky lg:top-8 lg:self-start lg:px-5 lg:py-6 xl:px-10">
-      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-primary">
-        {eyebrow}
-      </p>
-      <h1 className="mt-3 max-w-xl font-[var(--font-cormorant-garamond)] text-5xl font-light leading-[0.92] tracking-[-0.045em] text-foreground [text-wrap:balance] sm:text-6xl lg:text-7xl">
+    <aside className="lg:sticky lg:self-start lg:px-5 xl:px-10">
+      <h1 className="max-w-xl font-[var(--font-cormorant-garamond)] text-5xl font-light leading-[0.92] tracking-[-0.045em] text-foreground [text-wrap:balance] sm:text-6xl lg:text-7xl">
         {details.title}
       </h1>
-      {details.subtitle ? (
-        <p className="mt-4 font-[var(--font-cormorant-garamond)] text-xl italic text-muted-foreground">
-          {details.subtitle}
-        </p>
-      ) : null}
 
       {details.price ? (
         <div className="mt-5 flex items-baseline gap-3 tabular-nums">

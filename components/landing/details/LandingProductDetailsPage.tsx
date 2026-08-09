@@ -97,25 +97,6 @@ export function LandingProductDetailsPage({
             onPreview={() => setPreviewOpen(true)}
           />
         </div>
-
-        <section className="mt-8 grid gap-3 lg:grid-cols-2">
-          <article className="rounded-[1.5rem] bg-muted/70 p-7 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_4%,transparent)] sm:p-9">
-            <h2 className="font-[var(--font-cormorant-garamond)] text-3xl font-light tracking-[-0.035em] [text-wrap:balance]">
-              {t("madeForYouTitle")}
-            </h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground [text-wrap:pretty]">
-              {t("madeForYouBody")}
-            </p>
-          </article>
-          <article className="rounded-[1.5rem] bg-primary text-primary-foreground p-7 shadow-[0_18px_50px_color-mix(in_srgb,var(--primary)_16%,transparent)] sm:p-9">
-            <h2 className="font-[var(--font-cormorant-garamond)] text-3xl font-light tracking-[-0.035em] [text-wrap:balance]">
-              {t("shareTitle")}
-            </h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-primary-foreground/75 [text-wrap:pretty]">
-              {t("shareBody")}
-            </p>
-          </article>
-        </section>
       </div>
 
       <MobileRequestBar
