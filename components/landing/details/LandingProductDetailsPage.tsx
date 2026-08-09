@@ -86,6 +86,13 @@ export function LandingProductDetailsPage({
             title={details.title}
             images={details.images}
             selectImageLabel={(position) => t("selectImage", { position })}
+            openImageLabel={t("openImage")}
+            previousImageLabel={t("previousImage")}
+            nextImageLabel={t("nextImage")}
+            closeImageLabel={t("closeImage")}
+            imageCounterLabel={(current, total) =>
+              t("imageCounter", { current, total })
+            }
           />
           <ProductDetailsPanel
             details={details}

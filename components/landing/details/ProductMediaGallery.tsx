@@ -4,16 +4,29 @@ import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
+import { ProductLightbox } from "./ProductLightbox";
+
 export function ProductMediaGallery({
   title,
   images,
   selectImageLabel,
+  openImageLabel,
+  previousImageLabel,
+  nextImageLabel,
+  closeImageLabel,
+  imageCounterLabel,
 }: {
   title: string;
   images: string[];
   selectImageLabel: (position: number) => string;
+  openImageLabel: string;
+  previousImageLabel: string;
+  nextImageLabel: string;
+  closeImageLabel: string;
+  imageCounterLabel: (current: number, total: number) => string;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const reduceMotion = useReducedMotion();
 
   if (images.length === 0) {
@@ -38,7 +51,12 @@ export function ProductMediaGallery({
           : "grid"
       }
     >
-      <div className="relative min-h-120 overflow-hidden rounded-[2rem] bg-muted shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 lg:min-h-[44rem]">
+      <button
+        type="button"
+        onClick={() => setLightboxOpen(true)}
+        aria-label={openImageLabel}
+        className="group relative min-h-120 cursor-zoom-in overflow-hidden rounded-[2rem] bg-muted shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:min-h-[44rem]"
+      >
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
             key={activeImage}
@@ -57,11 +75,11 @@ export function ProductMediaGallery({
               fill
               priority={resolvedActiveIndex === 0}
               sizes="(min-width: 1024px) 58vw, 100vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </motion.div>
         </AnimatePresence>
-      </div>
+      </button>
 
       {showThumbnails ? (
         <div className="flex gap-2 lg:flex-col overflow-x-auto pb-1 lg:max-h-176 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 p-2">
@@ -85,6 +103,20 @@ export function ProductMediaGallery({
           ))}
         </div>
       ) : null}
+
+      <ProductLightbox
+        open={lightboxOpen}
+        onOpenChange={setLightboxOpen}
+        images={images}
+        title={title}
+        activeIndex={resolvedActiveIndex}
+        onActiveIndexChange={setActiveIndex}
+        closeLabel={closeImageLabel}
+        previousLabel={previousImageLabel}
+        nextLabel={nextImageLabel}
+        selectImageLabel={selectImageLabel}
+        imageCounterLabel={imageCounterLabel}
+      />
     </div>
   );
 }

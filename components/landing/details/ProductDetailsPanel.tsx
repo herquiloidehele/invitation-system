@@ -71,10 +71,19 @@ export function ProductDetailsPanel({
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
           {requestLabel}
         </a>
+        <a
+          href={details.previewHref}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_16%,transparent)] transition-[transform,box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_35%,transparent)] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:hidden"
+        >
+          <Eye className="h-4 w-4" aria-hidden="true" />
+          {previewLabel}
+        </a>
         <button
           type="button"
           onClick={onPreview}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_16%,transparent)] transition-[transform,box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_35%,transparent)] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
+          className="hidden min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_16%,transparent)] transition-[transform,box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_35%,transparent)] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:inline-flex"
         >
           <Eye className="h-4 w-4" aria-hidden="true" />
           {previewLabel}
