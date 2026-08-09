@@ -130,8 +130,14 @@ export default function MediaUpload({
       try {
         let fileToUpload = file;
 
-        // Compress images client-side before uploading
-        if (kind === "image" && file.type !== "image/svg+xml") {
+        // Compress images client-side before uploading.
+        // SVGs are vector and GIFs are (often) animated: compressing either
+        // via canvas would rasterise/flatten them, so upload those as-is.
+        if (
+          kind === "image" &&
+          file.type !== "image/svg+xml" &&
+          file.type !== "image/gif"
+        ) {
           setUploadState({ status: "compressing" });
           fileToUpload = await imageCompression(file, {
             maxSizeMB: Math.min(maxSizeMB, 2),
