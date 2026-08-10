@@ -3487,6 +3487,17 @@ export default function ExternalInvitationForm({
                   </div>
                   {form.rsvp.enabled && (
                     <>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="rsvpDeadline">Prazo (opcional)</Label>
+                        <Input
+                          id="rsvpDeadline"
+                          value={form.rsvp.deadline ?? ""}
+                          onChange={(e) =>
+                            updateRsvp("deadline", e.target.value)
+                          }
+                          placeholder="e.g. 15 de Agosto de 2026"
+                        />
+                      </div>
                       <div className="flex items-center justify-between gap-4">
                         <div className="space-y-0.5">
                           <Label>Pedir email no RSVP</Label>
