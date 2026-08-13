@@ -18,23 +18,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { useIsMobile } from "@/hooks/use-mobile";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "@/lib/guest-links";
 import {
@@ -42,10 +32,7 @@ import {
   type OwnerGuestFormMode,
 } from "@/lib/owner-guest-form-mode";
 import type { GuestData, GuestUpsertInput } from "@/lib/types";
-import {
-  getGuestFormSheetProps,
-  getGuestFormShellVariant,
-} from "./guest-form-sheet";
+import { getGuestFormSheetProps } from "./guest-form-sheet";
 import { buildGuestUpsertInput } from "./guest-form-payload";
 
 const formSchema = z.object({
@@ -94,8 +81,6 @@ export default function GuestForm({
   showCustomExternalLink = false,
   ownerGuestFormMode = "complete",
 }: GuestFormProps) {
-  const isMobile = useIsMobile();
-  const shellVariant = getGuestFormShellVariant(isMobile);
   const sheetProps = getGuestFormSheetProps();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -158,217 +143,184 @@ export default function GuestForm({
 
   const formContent = (
     <>
-      <div className={sheetProps.bodyClassName}>
-        <form
-          onSubmit={handleSubmit(submit)}
-          className={sheetProps.formClassName}
-          id="guest-form"
-        >
+      <form
+        onSubmit={handleSubmit(submit)}
+        className={sheetProps.formClassName}
+        id="guest-form"
+      >
+        <div className="space-y-1.5">
+          <Label htmlFor="guest-name">Nome *</Label>
+          <Input id="guest-name" {...register("name")} />
+          {formState.errors.name && (
+            <p className="text-xs text-destructive">
+              {formState.errors.name.message}
+            </p>
+          )}
+        </div>
+
+        {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "companion") && (
           <div className="space-y-1.5">
-            <Label htmlFor="guest-name">Nome *</Label>
-            <Input id="guest-name" {...register("name")} />
-            {formState.errors.name && (
-              <p className="text-xs text-destructive">
-                {formState.errors.name.message}
-              </p>
-            )}
+            <Label htmlFor="guest-companion">Acompanhante</Label>
+            <Input id="guest-companion" {...register("companion")} />
           </div>
+        )}
 
-          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "companion") && (
+        {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "phone") && (
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5 w-full">
+              <Label htmlFor="guest-cc">Indicativo *</Label>
+              <Select
+                value={countryCode}
+                onValueChange={(value) =>
+                  setValue("phoneCountryCode", value ?? DEFAULT_COUNTRY_CODE, {
+                    shouldDirty: true,
+                  })
+                }
+              >
+                <SelectTrigger id="guest-cc">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRY_CODES.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>
+                      <span className="mr-1">{c.flag}</span>
+                      <span className="font-mono text-xs">{c.code}</span>
+                      <span className="ml-1 text-xs text-muted-foreground">
+                        {c.label}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-1.5">
-              <Label htmlFor="guest-companion">Acompanhante</Label>
-              <Input id="guest-companion" {...register("companion")} />
+              <Label htmlFor="guest-phone">Telefone</Label>
+              <Input
+                id="guest-phone"
+                inputMode="tel"
+                {...register("phoneNumber")}
+              />
+              {formState.errors.phoneNumber && (
+                <p className="text-xs text-destructive">
+                  {formState.errors.phoneNumber.message}
+                </p>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "phone") && (
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1.5 w-full">
-                <Label htmlFor="guest-cc">Indicativo *</Label>
-                <Select
-                  value={countryCode}
-                  onValueChange={(value) =>
-                    setValue(
-                      "phoneCountryCode",
-                      value ?? DEFAULT_COUNTRY_CODE,
-                      { shouldDirty: true },
-                    )
-                  }
-                >
-                  <SelectTrigger id="guest-cc">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COUNTRY_CODES.map((c) => (
-                      <SelectItem key={c.code} value={c.code}>
-                        <span className="mr-1">{c.flag}</span>
-                        <span className="font-mono text-xs">{c.code}</span>
-                        <span className="ml-1 text-xs text-muted-foreground">
-                          {c.label}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="guest-phone">Telefone</Label>
-                <Input
-                  id="guest-phone"
-                  inputMode="tel"
-                  {...register("phoneNumber")}
-                />
-                {formState.errors.phoneNumber && (
-                  <p className="text-xs text-destructive">
-                    {formState.errors.phoneNumber.message}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+        <div className="space-y-1.5">
+          <Label htmlFor="guest-table">Mesa</Label>
+          <Input
+            id="guest-table"
+            placeholder="Ex: Mesa 7 ou Os Amigos do Pedro"
+            {...register("tableLabel")}
+          />
+        </div>
 
+        {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "totalGuests") && (
           <div className="space-y-1.5">
-            <Label htmlFor="guest-table">Mesa</Label>
+            <Label htmlFor="guest-total">Nº de convidados</Label>
             <Input
-              id="guest-table"
-              placeholder="Ex: Mesa 7 ou Os Amigos do Pedro"
-              {...register("tableLabel")}
+              id="guest-total"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              placeholder="Ex: 2"
+              {...register("totalGuests")}
             />
           </div>
+        )}
 
-          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "totalGuests") && (
-            <div className="space-y-1.5">
-              <Label htmlFor="guest-total">Nº de convidados</Label>
-              <Input
-                id="guest-total"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                placeholder="Ex: 2"
-                {...register("totalGuests")}
-              />
+        {isOwnerGuestFormFieldVisible(
+          ownerGuestFormMode,
+          "canInviteOthers",
+        ) && (
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <Label className="cursor-pointer">
+                Pode convidar mais pessoas
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Quando activo, este convidado pode adicionar outros à lista a
+                partir do convite pessoal.
+              </p>
             </div>
-          )}
+            <Switch
+              checked={canInviteOthers}
+              onCheckedChange={(value) =>
+                setValue("canInviteOthers", value, { shouldDirty: true })
+              }
+            />
+          </div>
+        )}
 
-          {isOwnerGuestFormFieldVisible(
+        {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "note") && (
+          <div className="space-y-1.5">
+            <Label htmlFor="guest-note">Nota</Label>
+            <Textarea
+              id="guest-note"
+              rows={3}
+              placeholder="Ex: Sem glúten, alergia a marisco, etc"
+              {...register("note")}
+            />
+          </div>
+        )}
+
+        {showCustomExternalLink &&
+          isOwnerGuestFormFieldVisible(
             ownerGuestFormMode,
-            "canInviteOthers",
+            "customExternalLink",
           ) && (
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div>
-                <Label className="cursor-pointer">
-                  Pode convidar mais pessoas
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Quando activo, este convidado pode adicionar outros à lista a
-                  partir do convite pessoal.
-                </p>
-              </div>
-              <Switch
-                checked={canInviteOthers}
-                onCheckedChange={(value) =>
-                  setValue("canInviteOthers", value, { shouldDirty: true })
-                }
-              />
-            </div>
-          )}
-
-          {isOwnerGuestFormFieldVisible(ownerGuestFormMode, "note") && (
             <div className="space-y-1.5">
-              <Label htmlFor="guest-note">Nota</Label>
-              <Textarea
-                id="guest-note"
-                rows={3}
-                placeholder="Ex: Sem glúten, alergia a marisco, etc"
-                {...register("note")}
+              <Label htmlFor="guest-custom-external-link">
+                Link Canva personalizado
+              </Label>
+              <Input
+                id="guest-custom-external-link"
+                type="url"
+                placeholder="https://exemplo.canva.site/convite-maria"
+                {...register("customExternalLink")}
               />
+              <p className="text-xs text-muted-foreground">
+                Opcional. Se estiver vazio, este convidado usa o link externo
+                padrão do convite.
+              </p>
             </div>
           )}
+      </form>
 
-          {showCustomExternalLink &&
-            isOwnerGuestFormFieldVisible(
-              ownerGuestFormMode,
-              "customExternalLink",
-            ) && (
-              <div className="space-y-1.5">
-                <Label htmlFor="guest-custom-external-link">
-                  Link Canva personalizado
-                </Label>
-                <Input
-                  id="guest-custom-external-link"
-                  type="url"
-                  placeholder="https://exemplo.canva.site/convite-maria"
-                  {...register("customExternalLink")}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Opcional. Se estiver vazio, este convidado usa o link externo
-                  padrão do convite.
-                </p>
-              </div>
-            )}
-        </form>
-
-        <div className="sr-only" aria-live="polite">
-          {title}
-        </div>
+      <div className="sr-only" aria-live="polite">
+        {title}
       </div>
     </>
   );
 
-  if (shellVariant === "drawer") {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{title}</DrawerTitle>
-            <DrawerDescription>{description}</DrawerDescription>
-          </DrawerHeader>
-
-          {formContent}
-
-          <DrawerFooter className={sheetProps.footerClassName}>
-            <DrawerClose asChild>
-              <Button type="button" variant="outline" disabled={saving}>
-                Cancelar
-              </Button>
-            </DrawerClose>
-            <Button type="submit" form="guest-form" disabled={saving}>
-              {saving && <Loader2 className="mr-1 size-3.5 animate-spin" />}
-              {guest ? "Guardar" : "Adicionar"}
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side={sheetProps.side} className={sheetProps.className}>
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
-        </SheetHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className={sheetProps.className}>
+        <DialogHeader className={sheetProps.headerClassName}>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
 
         {formContent}
 
-        <div className={sheetProps.bodyClassName}>
-          <SheetFooter className={sheetProps.footerClassName}>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={saving}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" form="guest-form" disabled={saving}>
-              {saving && <Loader2 className="mr-1 size-3.5 animate-spin" />}
-              {guest ? "Guardar" : "Adicionar"}
-            </Button>
-          </SheetFooter>
-        </div>
-      </SheetContent>
-    </Sheet>
+        <DialogFooter className={sheetProps.footerClassName}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" form="guest-form" disabled={saving}>
+            {saving && <Loader2 className="mr-1 size-3.5 animate-spin" />}
+            {guest ? "Guardar" : "Adicionar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
