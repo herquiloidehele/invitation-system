@@ -6,6 +6,7 @@ import { MousePointerClickIcon } from "lucide-react";
 import { WhatsAppIcon } from "@/components/shared/icons/WhatsAppIcon";
 import type { LandingPrice } from "@/lib/landing-features";
 import { buildPurchaseMessage, buildWhatsappUrl } from "@/lib/landing-whatsapp";
+import { cn } from "@/lib/utils";
 import { ExpandableDescription } from "./ExpandableDescription";
 import {
   getLandingModelCardVariantConfig,
@@ -35,12 +36,14 @@ export function LandingModelCard({
   labels,
   badgeLabel,
   motionProps,
+  className,
 }: {
   item: LandingModelCardItem;
   variant: LandingModelCardVariant;
   labels: LandingModelCardLabels;
   badgeLabel?: string;
   motionProps?: HTMLMotionProps<"article">;
+  className?: string;
 }) {
   const config = getLandingModelCardVariantConfig(variant);
   const title = item.title || labels.fallbackTitle;
@@ -52,7 +55,11 @@ export function LandingModelCard({
   return (
     <motion.article
       {...motionProps}
-      className={`group flex h-full flex-col overflow-hidden rounded-[1.5rem] transition ${config.cardClassName}`}
+      className={cn(
+        "group flex h-full flex-col overflow-hidden rounded-[1.5rem] transition",
+        config.cardClassName,
+        className,
+      )}
     >
       <a
         href={item.href}
@@ -66,7 +73,7 @@ export function LandingModelCard({
               src={item.imageUrl}
               alt={title}
               fill
-              sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw"
+              sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 85vw"
               className="object-cover transition duration-500 group-hover:scale-[1.03]"
             />
           ) : null}

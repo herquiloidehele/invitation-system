@@ -1,10 +1,13 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { BestSellerFeature } from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
 import { LandingModelCard } from "./LandingModelCard";
+import {
+  ModelCarousel,
+  MODEL_CAROUSEL_SLIDE_CLASS_NAME,
+} from "./ModelCarousel";
 
 export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
   const t = useTranslations("LandingBestSellers");
@@ -24,33 +27,34 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
             {t("empty")}
           </p>
         ) : (
-          <motion.div layout className="mt-14 grid gap-5 lg:grid-cols-3">
-            <AnimatePresence mode="popLayout">
-              {items.map((item, index) => {
-                const featured = index === 1;
-                return (
-                  <LandingModelCard
-                    key={item.id}
-                    item={item}
-                    variant={featured ? "featuredBestSeller" : "bestSeller"}
-                    motionProps={{
-                      layout: true,
-                      initial: { opacity: 0, scale: 0.96 },
-                      animate: { opacity: 1, scale: 1 },
-                      exit: { opacity: 0, scale: 0.96 },
-                    }}
-                    labels={{
-                      fallbackTitle: t("fallbackTitle"),
-                      viewDetails: t("viewDetails"),
-                      showMore: t("showMore"),
-                      showLess: t("showLess"),
-                      buyCta: t("buyCta"),
-                    }}
-                  />
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
+          <div className="mt-14">
+            <ModelCarousel
+              items={items}
+              label={t("title")}
+              contentClassName="gap-4 md:grid md:grid-cols-2 md:gap-5 lg:grid-cols-3"
+              renderItem={(item, { index, isMobile }) => (
+                <LandingModelCard
+                  key={item.id}
+                  item={item}
+                  variant={index === 1 ? "featuredBestSeller" : "bestSeller"}
+                  className={MODEL_CAROUSEL_SLIDE_CLASS_NAME}
+                  motionProps={{
+                    layout: isMobile ? undefined : true,
+                    initial: { opacity: 0, scale: 0.96 },
+                    animate: { opacity: 1, scale: 1 },
+                    exit: { opacity: 0, scale: 0.96 },
+                  }}
+                  labels={{
+                    fallbackTitle: t("fallbackTitle"),
+                    viewDetails: t("viewDetails"),
+                    showMore: t("showMore"),
+                    showLess: t("showLess"),
+                    buyCta: t("buyCta"),
+                  }}
+                />
+              )}
+            />
+          </div>
         )}
       </div>
     </AnimatedSection>

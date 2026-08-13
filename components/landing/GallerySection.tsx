@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type {
   GalleryCategory as DbGalleryCategory,
@@ -15,14 +15,16 @@ import {
   groupGalleryByCustomization,
 } from "./landing-data";
 import {
-  getMotionProps,
   landingCardTap,
   landingCardVariants,
   landingFastTransition,
-  landingStaggerVariants,
   shouldReduceMotion,
 } from "./landing-motion";
 import { LandingModelCard } from "./LandingModelCard";
+import {
+  ModelCarousel,
+  MODEL_CAROUSEL_SLIDE_CLASS_NAME,
+} from "./ModelCarousel";
 import { GalleryFeatureList } from "./GalleryFeatureList";
 import {
   getFeaturesForCustomizationLevel,
@@ -132,19 +134,21 @@ export function GallerySection({
             ))}
           </div>
         ) : null}
-        <motion.div
-          layout
-          {...getMotionProps(reduceMotion, landingStaggerVariants)}
-          className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-3"
-        >
-          <AnimatePresence mode="popLayout" initial={false}>
-            {data.visibleItems.map((item) => (
+        <div className="mt-10">
+          <ModelCarousel
+            items={data.visibleItems}
+            label={title}
+            resetKey={activeCategory}
+            animateOnMount={false}
+            contentClassName="gap-3 md:grid md:grid-cols-2 lg:grid-cols-3"
+            renderItem={(item, { isMobile }) => (
               <LandingModelCard
                 key={item.id}
                 item={item}
                 variant="gallery"
+                className={MODEL_CAROUSEL_SLIDE_CLASS_NAME}
                 motionProps={{
-                  layout: true,
+                  layout: isMobile ? undefined : true,
                   variants: landingCardVariants,
                   initial: reduced ? false : "hidden",
                   animate: reduced ? undefined : "visible",
@@ -159,9 +163,9 @@ export function GallerySection({
                   buyCta: t("buyCta"),
                 }}
               />
-            ))}
-          </AnimatePresence>
-        </motion.div>
+            )}
+          />
+        </div>
       </section>
     );
   }
