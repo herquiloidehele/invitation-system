@@ -123,4 +123,34 @@ export function moveLandingDetailImage(
   return next;
 }
 
+type CrossSellCandidate = {
+  id: string;
+  title: string;
+  href: string;
+  imageUrl: string | null;
+  description: string | null;
+  price: unknown;
+};
+
+/**
+ * Pick sibling models to show at the bottom of a details page. The current
+ * model is located by its details href, which every gallery feature already
+ * carries, so this needs no category lookup of its own.
+ */
+export function selectCrossSellModels<T extends CrossSellCandidate>(
+  byCategory: Record<string, T[]>,
+  currentDetailsHref: string,
+  limit: number,
+): T[] {
+  const owningCategory = Object.values(byCategory).find((features) =>
+    features.some((feature) => feature.href === currentDetailsHref),
+  );
+
+  if (!owningCategory) return [];
+
+  return owningCategory
+    .filter((feature) => feature.href !== currentDetailsHref)
+    .slice(0, limit);
+}
+
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";

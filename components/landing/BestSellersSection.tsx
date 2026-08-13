@@ -32,11 +32,11 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
               items={items}
               label={t("title")}
               contentClassName="gap-4 md:grid md:grid-cols-2 md:gap-5 lg:grid-cols-3"
-              renderItem={(item, { index, isMobile }) => (
+              renderItem={(item, { isMobile }) => (
                 <LandingModelCard
                   key={item.id}
                   item={item}
-                  variant={index === 1 ? "featuredBestSeller" : "bestSeller"}
+                  variant="bestSeller"
                   className={MODEL_CAROUSEL_SLIDE_CLASS_NAME}
                   motionProps={{
                     layout: isMobile ? undefined : true,

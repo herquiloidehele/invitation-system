@@ -1,7 +1,4 @@
-export type LandingModelCardVariant =
-  | "gallery"
-  | "bestSeller"
-  | "featuredBestSeller";
+export type LandingModelCardVariant = "gallery" | "bestSeller";
 
 type LandingModelCardVariantConfig = {
   cardClassName: string;
@@ -49,21 +46,6 @@ const VARIANT_CONFIG: Record<
     priceAmountClassName: "text-foreground",
     buyButtonClassName: "bg-primary text-primary-foreground hover:bg-primary-hover",
     badgeClassName: "bg-background/95 text-primary",
-  },
-  featuredBestSeller: {
-    cardClassName:
-      "bg-primary text-primary-foreground shadow-[0_24px_80px_color-mix(in_srgb,var(--primary)_24%,transparent)]",
-    bodyClassName: "p-6 pb-0",
-    footerClassName: "p-6 pt-3",
-    titleClassName: "text-xl font-semibold tracking-[-0.02em]",
-    descriptionClassName: "mt-3 text-sm leading-6 text-primary-soft",
-    toggleClassName: "text-primary-foreground",
-    priceOriginalClassName: "text-primary-foreground/50",
-    pricePrefixClassName: "text-primary-foreground/70",
-    priceAmountClassName: "text-primary-foreground",
-    buyButtonClassName:
-      "bg-primary-foreground text-primary hover:bg-primary-soft",
-    badgeClassName: "bg-white/20 text-white backdrop-blur",
   },
 };
 
