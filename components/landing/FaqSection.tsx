@@ -32,7 +32,7 @@ export function FaqSection({
   const faqs = getFaqs(t, formatUrgencySurcharge(currentCurrency));
 
   return (
-    <AnimatedSection id="faq" className="bg-background px-5 py-24 sm:px-8">
+    <AnimatedSection id="faq" className="bg-background px-5 py-14 sm:px-8 sm:py-24">
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1fr]">
         <div>
           <SectionEyebrow>{t("eyebrow")}</SectionEyebrow>

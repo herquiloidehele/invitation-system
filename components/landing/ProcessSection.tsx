@@ -42,7 +42,7 @@ export function ProcessSection() {
   return (
     <AnimatedSection
       id="processo"
-      className="bg-muted px-5 py-24 sm:px-8 lg:py-28"
+      className="bg-muted px-5 py-14 sm:px-8 sm:py-24 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">

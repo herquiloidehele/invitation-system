@@ -100,7 +100,7 @@ export function GallerySection({
     if (data.allItems.length === 0) return null;
 
     return (
-      <section id={id} className="scroll-mt-24 pt-20 first:pt-0">
+      <section id={id} className="scroll-mt-24 pt-12 first:pt-0 sm:pt-20">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-4xl font-medium tracking-[-0.025em] sm:text-4xl">
             {title}
@@ -173,7 +173,7 @@ export function GallerySection({
   return (
     <AnimatedSection
       id="modelos"
-      className="bg-background px-5 py-24 sm:px-8 lg:py-28"
+      className="bg-background px-5 py-14 sm:px-8 sm:py-24 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         {/* Header content is rendered per customization collection below. */}
@@ -183,7 +183,7 @@ export function GallerySection({
             {t("empty")}
           </p>
         ) : null}
-        <div className="mt-14">
+        <div className="mt-6 sm:mt-14">
           {renderCollection({
             id: "modelos-personalizaveis",
             title: t("fullyCustomizable.title"),

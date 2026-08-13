@@ -13,7 +13,7 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
   const t = useTranslations("LandingBestSellers");
 
   return (
-    <AnimatedSection id="destaques" className="bg-muted px-5 py-24 sm:px-8">
+    <AnimatedSection id="destaques" className="bg-muted px-5 py-14 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
