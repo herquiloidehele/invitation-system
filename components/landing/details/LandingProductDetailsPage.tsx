@@ -139,7 +139,7 @@ export function LandingProductDetailsPage({
         whatsappHref={details.whatsappHref}
         previewHref={details.previewHref}
         requestLabel={t("requestViaWhatsapp")}
-        previewLabel={t("viewLiveShort")}
+        previewLabel={t("viewLive")}
       />
       <ProductPreviewDialog
         open={previewOpen}
