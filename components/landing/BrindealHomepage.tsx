@@ -46,11 +46,11 @@ export function BrindealHomepage({
       <LandingNav currentCurrency={currentCurrency} />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
       <BestSellersSection items={bestSellerFeatures} />
+      <CustomInvitationSection currentCurrency={currentCurrency} />
       <GallerySection
         itemsByCategory={galleryByCategory}
         settings={gallerySettings}
       />
-      <CustomInvitationSection currentCurrency={currentCurrency} />
       <ProcessSection />
       <FeaturesSection />
       <InvitationConstellationSection
