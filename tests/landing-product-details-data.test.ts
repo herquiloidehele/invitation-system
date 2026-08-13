@@ -104,14 +104,17 @@ describe("getLandingProductDetails", () => {
       subtitle: "Editorial collection",
       description: "A quiet invitation.",
       customizationLevel: "fully_customizable",
-      images: ["detail", "landing", "hero", "gallery"],
-      price: { amount: "89 €" },
+      images: ["landing", "detail"],
+      offer: { priceCents: 8900, currency: "EUR" },
     });
+    // Intl separates the amount from the symbol with U+00A0, so match on \s
+    // rather than embedding an invisible non-breaking space in this file.
+    expect(result?.price?.amount).toMatch(/^89\s€$/);
     expect(result?.whatsappHref).toContain("https://wa.me/");
     expect(result?.whatsappHref).toContain("Amalfi");
   });
 
-  it("uses image-based Save the Date bottom media as a fallback", async () => {
+  it("resolves Save the Date media from the landing image alone", async () => {
     findFirst.mockResolvedValue(saveTheDateFeature);
 
     const result = await getLandingProductDetails(
@@ -125,7 +128,7 @@ describe("getLandingProductDetails", () => {
       kind: "save-the-date",
       previewHref: "/s/golden-heart",
       detailsHref: "/modelos/save-the-date/golden-heart",
-      images: ["landing", "bottom-image"],
+      images: ["landing"],
       customizationLevel: "pre_designed",
     });
   });

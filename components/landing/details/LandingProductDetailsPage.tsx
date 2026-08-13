@@ -10,8 +10,16 @@ import { LocaleCurrencyMenu } from "@/components/landing/LocaleCurrencyMenu";
 import { getLandingProductDetailContentKeys } from "@/lib/landing-product-details";
 import type { LandingProductDetails } from "@/lib/landing-product-details-data";
 import type { Currency } from "@/lib/currency/config";
-import { MobileRequestBar } from "./MobileRequestBar";
+import { ProductActionBar } from "./ProductActionBar";
+import {
+  type CrossSellItem,
+  ProductCrossSellStrip,
+} from "./ProductCrossSellStrip";
 import { ProductDetailsPanel } from "./ProductDetailsPanel";
+import {
+  PRODUCT_LIVE_PREVIEW_ID,
+  ProductLivePreviewSection,
+} from "./ProductLivePreviewSection";
 import { ProductMediaGallery } from "./ProductMediaGallery";
 import { ProductPreviewDialog } from "./ProductPreviewDialog";
 
@@ -19,10 +27,12 @@ export function LandingProductDetailsPage({
   details,
   currentCurrency,
   modelsHref,
+  crossSellItems,
 }: {
   details: LandingProductDetails;
   currentCurrency: Currency;
   modelsHref: string;
+  crossSellItems: CrossSellItem[];
 }) {
   const t = useTranslations("LandingProductDetails");
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -44,12 +54,12 @@ export function LandingProductDetailsPage({
   ];
 
   return (
-    <main className="min-h-screen bg-background pb-24 font-[var(--font-outfit)] text-foreground lg:pb-0">
-      <header className="border-b border-border/70 bg-background/95">
-        <nav className="mx-auto flex h-[76px] max-w-[94rem] items-center justify-between px-5 sm:px-8 lg:px-10">
+    <main className="flex min-h-screen flex-col bg-background font-[var(--font-outfit)] text-foreground">
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur-md">
+        <nav className="relative mx-auto flex h-14 max-w-[94rem] items-center justify-between px-4 sm:px-8 lg:px-10">
           <a
             href={modelsHref}
-            className="group inline-flex min-h-10 items-center gap-2 rounded-full text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
+            className="group inline-flex min-h-10 items-center gap-2 rounded-full text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <ArrowLeft
               className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5"
@@ -61,17 +71,17 @@ export function LandingProductDetailsPage({
           <a
             href={modelsHref.split("#")[0] || "/"}
             aria-label="Brindeal"
-            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
+            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Image
               src={logo}
               alt=""
-              width={40}
-              height={40}
+              width={32}
+              height={32}
               priority
               className="rounded-full shadow-[0_8px_24px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10"
             />
-            <span className="hidden text-lg font-semibold tracking-[-0.04em] sm:inline">
+            <span className="hidden text-base font-semibold tracking-[-0.04em] sm:inline">
               brindeal
             </span>
           </a>
@@ -80,7 +90,7 @@ export function LandingProductDetailsPage({
         </nav>
       </header>
 
-      <div className="mx-auto max-w-[94rem] px-4 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+      <div className="mx-auto w-full max-w-[94rem] flex-1 px-4 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,.65fr)] lg:gap-6 xl:gap-10">
           <ProductMediaGallery
             title={details.title}
@@ -101,14 +111,35 @@ export function LandingProductDetailsPage({
             accordionItems={accordionItems}
             requestLabel={t("requestViaWhatsapp")}
             previewLabel={t("viewLive")}
-            onPreview={() => setPreviewOpen(true)}
+            onPreview={() => {
+              document
+                .getElementById(PRODUCT_LIVE_PREVIEW_ID)
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
           />
         </div>
       </div>
 
-      <MobileRequestBar
+      <ProductLivePreviewSection
+        title={details.title}
+        previewHref={details.previewHref}
+        previewTitle={t("previewTitle", { title: details.title })}
+        sectionTitle={t("previewSectionTitle")}
+        sectionBody={t("previewSectionBody")}
+        expandLabel={t("expandPreview")}
+        onExpand={() => setPreviewOpen(true)}
+      />
+
+      <ProductCrossSellStrip
+        items={crossSellItems}
+        heading={t("crossSellTitle")}
+      />
+
+      <ProductActionBar
         whatsappHref={details.whatsappHref}
-        label={t("requestViaWhatsapp")}
+        previewHref={details.previewHref}
+        requestLabel={t("requestViaWhatsapp")}
+        previewLabel={t("viewLiveShort")}
       />
       <ProductPreviewDialog
         open={previewOpen}

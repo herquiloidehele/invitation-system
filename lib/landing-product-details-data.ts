@@ -21,6 +21,11 @@ export type LandingProductDetails = {
   description: string | null;
   customizationLevel: LandingCustomizationLevel;
   price: LandingPrice | null;
+  /**
+   * Raw effective price for structured data. `price` above holds only
+   * formatted display strings, which schema.org cannot consume.
+   */
+  offer: { priceCents: number; currency: Currency } | null;
   images: string[];
   previewHref: string;
   detailsHref: string;
@@ -89,18 +94,34 @@ type PublicFeatureRow = {
   saveTheDate: SaveTheDateProductRow | null;
 };
 
-function resolvePrice(target: ProductRow, viewerCurrency: Currency) {
+function resolvePricing(target: ProductRow, viewerCurrency: Currency) {
   const { fromCents, discountCents } = getTemplatePriceCents(
     target,
     target.priceOverrides as PriceOverrides | null,
     viewerCurrency,
   );
-  return resolveLandingPrice(
+
+  const price = resolveLandingPrice(
     fromCents,
     discountCents,
     viewerCurrency,
     CURRENCY_LOCALE[viewerCurrency],
   );
+
+  // The effective price is the discount when it is a real reduction, matching
+  // the rule resolveLandingPrice applies for the struck-through original.
+  const effectiveCents =
+    discountCents != null && fromCents != null && discountCents < fromCents
+      ? discountCents
+      : fromCents;
+
+  return {
+    price,
+    offer:
+      effectiveCents != null && effectiveCents > 0
+        ? { priceCents: effectiveCents, currency: viewerCurrency }
+        : null,
+  };
 }
 
 export async function getLandingProductDetails(
@@ -129,6 +150,7 @@ export async function getLandingProductDetails(
   });
 
   const title = metadata.title;
+  const pricing = resolvePricing(target, viewerCurrency);
 
   return {
     kind,
@@ -139,7 +161,8 @@ export async function getLandingProductDetails(
     customizationLevel: normalizeLandingCustomizationLevel(
       target.landingCustomizationLevel,
     ),
-    price: resolvePrice(target, viewerCurrency),
+    price: pricing.price,
+    offer: pricing.offer,
     images: resolveLandingDetailImages({
       dedicated: target.landingDetailImages,
       landingImageUrl: target.landingImageUrl,

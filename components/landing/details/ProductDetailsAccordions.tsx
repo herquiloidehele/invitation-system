@@ -6,9 +6,13 @@ export function ProductDetailsAccordions({
   items: Array<{ title: string; body: string }>;
 }) {
   return (
-    <div className="mt-8 border-t border-border/80">
-      {items.map((item) => (
-        <details key={item.title} className="group border-b border-border/80">
+    <div className="mt-7 border-t border-border/80">
+      {items.map((item, index) => (
+        <details
+          key={item.title}
+          open={index === 0}
+          className="group border-b border-border/80"
+        >
           <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 py-3 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
             <span>{item.title}</span>
             <ChevronDown
@@ -16,7 +20,7 @@ export function ProductDetailsAccordions({
               aria-hidden="true"
             />
           </summary>
-          <p className="pb-5 pr-8 text-sm leading-6 text-muted-foreground [text-wrap:pretty]">
+          <p className="pb-5 pr-8 text-sm leading-[1.6] text-muted-foreground [text-wrap:pretty]">
             {item.body}
           </p>
         </details>

@@ -5,13 +5,18 @@ import { notFound } from "next/navigation";
 import { LandingProductDetailsPage } from "@/components/landing/details/LandingProductDetailsPage";
 import { resolveLocale } from "@/i18n/locales";
 import { getViewerCurrency } from "@/lib/currency/viewer-currency";
+import { getGalleryFeaturesByCategory } from "@/lib/landing-features";
 import { getLandingProductDetails } from "@/lib/landing-product-details-data";
-import { parseLandingProductKind } from "@/lib/landing-product-details";
+import {
+  parseLandingProductKind,
+  selectCrossSellModels,
+} from "@/lib/landing-product-details";
 import {
   SITE_URL,
   buildAbsoluteUrl,
   buildLanguageAlternates,
   buildLocalePath,
+  buildProductJsonLd,
   createPublicPageRobotsMetadata,
 } from "@/lib/seo";
 
@@ -95,11 +100,48 @@ export default async function LandingProductDetailsRoute({
   );
   if (!details) notFound();
 
+  const galleryByCategory = await getGalleryFeaturesByCategory(
+    viewerCurrency,
+    locale,
+  );
+  const crossSellItems = selectCrossSellModels(
+    galleryByCategory,
+    details.detailsHref,
+    8,
+  ).map((feature) => ({
+    id: feature.id,
+    title: feature.title,
+    href: buildLocalePath(feature.href, locale),
+    imageUrl: feature.imageUrl,
+    price: feature.price
+      ? { prefix: feature.price.prefix, amount: feature.price.amount }
+      : null,
+  }));
+
+  const canonical = buildAbsoluteUrl(
+    SITE_URL,
+    buildLocalePath(details.detailsHref, locale),
+  );
+  const productJsonLd = buildProductJsonLd({
+    name: details.title,
+    description: details.description,
+    url: canonical,
+    image: details.images[0] ?? null,
+    offer: details.offer,
+  });
+
   return (
-    <LandingProductDetailsPage
-      details={details}
-      currentCurrency={viewerCurrency}
-      modelsHref={`${buildLocalePath("/", locale)}#modelos`}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <LandingProductDetailsPage
+        details={details}
+        currentCurrency={viewerCurrency}
+        modelsHref={`${buildLocalePath("/", locale)}#modelos`}
+        crossSellItems={crossSellItems}
+      />
+    </>
   );
 }

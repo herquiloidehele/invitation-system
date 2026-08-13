@@ -151,6 +151,43 @@ export function buildFaqJsonLd(items: FaqJsonLdItem[]) {
   };
 }
 
+export type ProductJsonLdOffer = {
+  /** Effective (post-discount) price in minor units. */
+  priceCents: number;
+  /** ISO 4217 code, e.g. "EUR". */
+  currency: string;
+};
+
+export type ProductJsonLdInput = {
+  name: string;
+  description: string | null;
+  url: string;
+  image: string | null;
+  offer: ProductJsonLdOffer | null;
+};
+
+export function buildProductJsonLd(input: ProductJsonLdInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: input.name,
+    ...(input.description ? { description: input.description } : {}),
+    ...(input.image ? { image: [input.image] } : {}),
+    url: input.url,
+    ...(input.offer
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: (input.offer.priceCents / 100).toFixed(2),
+            priceCurrency: input.offer.currency,
+            url: input.url,
+            availability: "https://schema.org/InStock",
+          },
+        }
+      : {}),
+  };
+}
+
 export function buildEventJsonLd(input: EventJsonLdInput) {
   return {
     "@context": "https://schema.org",

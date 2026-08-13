@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 /**
@@ -25,7 +26,7 @@ export function PhoneIframePreview({
   iframeTitle,
   openLabel,
   showCaption = true,
-  loading,
+  loading = "lazy",
   lazyExternalIframe = false,
 }: {
   title: string;
@@ -37,6 +38,7 @@ export function PhoneIframePreview({
   lazyExternalIframe?: boolean;
 }) {
   const t = useTranslations("LandingProductDetails");
+  const [loaded, setLoaded] = useState(false);
   const resolvedIframeTitle = iframeTitle ?? t("previewTitle", { title });
   const resolvedOpenLabel = openLabel ?? t("openFullScreen");
 
@@ -48,11 +50,18 @@ export function PhoneIframePreview({
           className="absolute left-1/2 top-3 z-20 h-3.5 w-16 -translate-x-1/2 rounded-full bg-ink shadow-[0_2px_6px_rgba(0,0,0,0.45)]"
         />
         <div className="absolute inset-0 overflow-hidden rounded-[1.4rem]">
+          {!loaded ? (
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 z-10 animate-pulse bg-[linear-gradient(110deg,var(--muted),var(--surface-warm)_45%,var(--muted))]"
+            />
+          ) : null}
           <iframe
             title={resolvedIframeTitle}
             src={withLandingPreviewFlag(src, { lazyExternalIframe })}
             className="h-full w-full border-0 [scrollbar-width:none]"
             loading={loading}
+            onLoad={() => setLoaded(true)}
           />
           <span
             aria-hidden="true"

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { ProductLightbox } from "./ProductLightbox";
 
@@ -27,12 +26,43 @@ export function ProductMediaGallery({
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const reduceMotion = useReducedMotion();
+  const pagerRef = useRef<HTMLDivElement | null>(null);
+
+  // Keep the dots and the desktop thumbnails in sync with a swipe.
+  useEffect(() => {
+    const pager = pagerRef.current;
+    if (!pager) return;
+
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const width = pager.clientWidth;
+        if (width > 0) {
+          setActiveIndex(Math.round(pager.scrollLeft / width));
+        }
+      });
+    };
+
+    pager.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      pager.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  function goTo(index: number) {
+    setActiveIndex(index);
+    const pager = pagerRef.current;
+    if (pager) {
+      pager.scrollTo({ left: pager.clientWidth * index, behavior: "smooth" });
+    }
+  }
 
   if (images.length === 0) {
     return (
-      <div className="grid min-h-[30rem] place-items-center overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_28%_20%,color-mix(in_srgb,var(--primary)_12%,transparent),transparent_44%),linear-gradient(145deg,var(--muted),var(--background))] px-8 text-center shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 lg:min-h-[44rem]">
-        <span className="max-w-md font-[var(--font-cormorant-garamond)] text-5xl font-light italic tracking-[-0.045em] text-foreground/75 sm:text-7xl">
+      <div className="grid aspect-4/5 place-items-center overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_28%_20%,color-mix(in_srgb,var(--primary)_12%,transparent),transparent_44%),linear-gradient(145deg,var(--muted),var(--background))] px-8 text-center shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 lg:aspect-5/4">
+        <span className="max-w-md text-2xl font-medium tracking-[-0.025em] text-foreground/70 sm:text-3xl">
           {title}
         </span>
       </div>
@@ -40,7 +70,6 @@ export function ProductMediaGallery({
   }
 
   const resolvedActiveIndex = Math.min(activeIndex, images.length - 1);
-  const activeImage = images[resolvedActiveIndex];
   const showThumbnails = images.length > 1;
 
   return (
@@ -51,53 +80,72 @@ export function ProductMediaGallery({
           : "grid"
       }
     >
-      <button
-        type="button"
-        onClick={() => setLightboxOpen(true)}
-        aria-label={openImageLabel}
-        className="group relative min-h-120 cursor-zoom-in overflow-hidden rounded-[2rem] bg-muted shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:min-h-[44rem]"
-      >
-        <AnimatePresence initial={false} mode="popLayout">
-          <motion.div
-            key={activeImage}
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.985 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={reduceMotion ? undefined : { opacity: 0, scale: 0.99 }}
-            transition={{
-              duration: reduceMotion ? 0 : 0.28,
-              ease: [0.2, 0, 0, 1],
-            }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={activeImage}
-              alt={title}
-              fill
-              priority={resolvedActiveIndex === 0}
-              sizes="(min-width: 1024px) 58vw, 100vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-            />
-          </motion.div>
-        </AnimatePresence>
-      </button>
-
-      {showThumbnails ? (
-        <div className="flex gap-2 lg:flex-col overflow-x-auto pb-1 lg:max-h-176 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 p-2">
+      <div className="min-w-0">
+        <div
+          ref={pagerRef}
+          className="flex aspect-4/5 snap-x snap-mandatory overflow-x-auto overflow-y-hidden rounded-[2rem] bg-surface-warm shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 [scrollbar-width:none] lg:aspect-5/4 [&::-webkit-scrollbar]:hidden"
+        >
           {images.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
-              onClick={() => setActiveIndex(index)}
+              onClick={() => setLightboxOpen(true)}
+              aria-label={openImageLabel}
+              className="relative w-full shrink-0 snap-center cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+            >
+              <Image
+                src={image}
+                alt={title}
+                fill
+                priority={index === 0}
+                sizes="(min-width: 1024px) 58vw, 100vw"
+                className="object-contain"
+              />
+            </button>
+          ))}
+        </div>
+
+        {showThumbnails ? (
+          <div className="mt-3 flex justify-center gap-1.5 lg:hidden">
+            {images.map((image, index) => (
+              <button
+                key={`dot-${image}-${index}`}
+                type="button"
+                onClick={() => goTo(index)}
+                aria-label={selectImageLabel(index + 1)}
+                aria-current={index === resolvedActiveIndex ? "true" : undefined}
+                className="h-6 w-6 rounded-full p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span
+                  className={`block h-full w-full rounded-full transition-colors duration-200 ${
+                    index === resolvedActiveIndex
+                      ? "bg-foreground"
+                      : "bg-foreground/25"
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      {showThumbnails ? (
+        <div className="hidden gap-2 p-2 lg:flex lg:max-h-176 lg:flex-col lg:content-start lg:overflow-y-auto">
+          {images.map((image, index) => (
+            <button
+              key={`thumb-${image}-${index}`}
+              type="button"
+              onClick={() => goTo(index)}
               aria-label={selectImageLabel(index + 1)}
               aria-current={index === resolvedActiveIndex ? "true" : undefined}
-              className="relative min-h-20 min-w-20 shrink-0 overflow-hidden rounded-xl lg:rounded-2xl bg-muted shadow-[0_8px_24px_color-mix(in_srgb,var(--foreground)_7%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 transition-[opacity,transform,box-shadow] duration-200 hover:opacity-90 active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 aria-current:ring-2 aria-current:ring-primary aria-current:ring-offset-2 lg:aspect-[1/1] lg:min-h-20 lg:w-full"
+              className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl bg-surface-warm shadow-[0_8px_24px_color-mix(in_srgb,var(--foreground)_7%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 aria-current:ring-2 aria-current:ring-primary aria-current:ring-offset-2"
             >
               <Image
                 src={image}
                 alt=""
                 fill
-                sizes="(min-width: 1024px) 18vw, 80px"
-                className="object-cover"
+                sizes="18vw"
+                className="object-contain"
               />
             </button>
           ))}
@@ -110,7 +158,7 @@ export function ProductMediaGallery({
         images={images}
         title={title}
         activeIndex={resolvedActiveIndex}
-        onActiveIndexChange={setActiveIndex}
+        onActiveIndexChange={goTo}
         closeLabel={closeImageLabel}
         previousLabel={previousImageLabel}
         nextLabel={nextImageLabel}

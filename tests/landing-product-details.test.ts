@@ -65,14 +65,13 @@ describe("landing detail images", () => {
     expect(sanitizeLandingDetailImages({ src: "x" })).toBeNull();
   });
 
-  it("orders dedicated, landing, and fallback media without duplicates", () => {
+  it("leads with the landing image, then dedicated media, without duplicates", () => {
     expect(
       resolveLandingDetailImages({
-        dedicated: ["dedicated-a", "shared"],
+        dedicated: ["dedicated-a", "shared", "landing"],
         landingImageUrl: "landing",
-        fallbackUrls: ["shared", "hero", undefined, ""],
       }),
-    ).toEqual(["dedicated-a", "shared", "landing", "hero"]);
+    ).toEqual(["landing", "dedicated-a", "shared"]);
   });
 
   it("returns one complete image without manufacturing slots", () => {
@@ -80,7 +79,6 @@ describe("landing detail images", () => {
       resolveLandingDetailImages({
         dedicated: null,
         landingImageUrl: "landing-only",
-        fallbackUrls: [],
       }),
     ).toEqual(["landing-only"]);
   });

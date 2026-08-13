@@ -23,67 +23,62 @@ export function ProductDetailsPanel({
   onPreview: () => void;
 }) {
   return (
-    <aside className="lg:sticky lg:self-start lg:px-5 xl:px-10">
-      <h1 className="max-w-xl font-[var(--font-cormorant-garamond)] text-5xl font-light leading-[0.92] tracking-[-0.045em] text-foreground [text-wrap:balance] sm:text-6xl lg:text-7xl">
+    <aside className="lg:sticky lg:top-20 lg:self-start lg:px-5 xl:px-10">
+      <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--brindel-brown)]">
+        {eyebrow}
+      </p>
+
+      <h1 className="mt-3 max-w-xl text-[1.75rem] font-medium leading-[1.15] tracking-[-0.025em] text-foreground [text-wrap:balance] sm:text-[2.125rem] lg:text-[2.75rem]">
         {details.title}
       </h1>
 
       {details.price ? (
-        <div className="mt-5 flex items-baseline gap-3 tabular-nums">
-          {details.price.originalLabel ? (
-            <span className="text-sm text-muted-foreground/70 line-through">
-              {details.price.originalLabel}
-            </span>
-          ) : null}
-          <span className="text-sm text-muted-foreground">
+        <div className="mt-4 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 tabular-nums">
+          <span className="text-[13px] text-muted-foreground">
             {details.price.prefix}
           </span>
-          <span className="text-xl font-semibold tracking-[-0.03em] text-foreground">
+          <span className="text-xl font-semibold tracking-[-0.03em] text-foreground lg:text-[1.375rem]">
             {details.price.amount}
           </span>
+          {details.price.originalLabel ? (
+            <s className="text-[13px] text-faint-foreground">
+              {details.price.originalLabel}
+            </s>
+          ) : null}
         </div>
       ) : null}
 
       {details.description ? (
-        <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground [text-wrap:pretty]">
+        <p className="mt-5 max-w-lg text-[15px] leading-[1.65] text-muted-foreground [text-wrap:pretty] lg:text-base lg:leading-[1.7]">
           {details.description}
         </p>
       ) : null}
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="rounded-full bg-muted px-3 py-2 text-xs font-medium text-foreground/80 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_5%,transparent)]"
+            className="rounded-full bg-surface-warm px-3 py-2 text-[11px] font-medium text-foreground/80 shadow-[inset_0_0_0_1px_var(--brindel-border-light)]"
           >
             {tag}
           </span>
         ))}
       </div>
 
-      <div className="mt-8 grid gap-3">
+      <div className="mt-7 hidden gap-3 lg:grid">
         <a
           href={details.whatsappHref}
           target="_blank"
           rel="noreferrer"
-          className="hidden min-h-12 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-sm font-semibold text-background shadow-[0_14px_34px_color-mix(in_srgb,var(--foreground)_18%,transparent)] transition-[transform,background-color] duration-200 hover:bg-foreground/90 active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:flex"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-[13px] font-semibold text-background shadow-[0_14px_34px_color-mix(in_srgb,var(--foreground)_18%,transparent)] transition-[transform,background-color] duration-200 hover:bg-foreground/90 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
           {requestLabel}
         </a>
-        <a
-          href={details.previewHref}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_16%,transparent)] transition-[transform,box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_35%,transparent)] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:hidden"
-        >
-          <Eye className="h-4 w-4" aria-hidden="true" />
-          {previewLabel}
-        </a>
         <button
           type="button"
           onClick={onPreview}
-          className="hidden min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-sm font-semibold text-foreground shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_16%,transparent)] transition-[transform,box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_35%,transparent)] active:scale-[0.96] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:inline-flex"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-[13px] font-semibold text-foreground shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--foreground)_16%,transparent)] transition-[transform,box-shadow] duration-200 hover:shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--foreground)_35%,transparent)] active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Eye className="h-4 w-4" aria-hidden="true" />
           {previewLabel}
