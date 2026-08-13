@@ -3,33 +3,19 @@
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import type {
-  GalleryCategory as DbGalleryCategory,
-  GalleryFeature,
-} from "@/lib/landing-features";
+import type { GalleryCategory as DbGalleryCategory, GalleryFeature } from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
 import {
   dbCategoryToTabKey,
   type GalleryCategoryKey,
   getVisibleGalleryCategories,
-  groupGalleryByCustomization,
+  groupGalleryByCustomization
 } from "./landing-data";
-import {
-  landingCardTap,
-  landingCardVariants,
-  landingFastTransition,
-  shouldReduceMotion,
-} from "./landing-motion";
+import { landingCardTap, landingCardVariants, landingFastTransition, shouldReduceMotion } from "./landing-motion";
 import { LandingModelCard } from "./LandingModelCard";
-import {
-  ModelCarousel,
-  MODEL_CAROUSEL_SLIDE_CLASS_NAME,
-} from "./ModelCarousel";
+import { MODEL_CAROUSEL_SLIDE_CLASS_NAME, ModelCarousel } from "./ModelCarousel";
 import { GalleryFeatureList } from "./GalleryFeatureList";
-import {
-  getFeaturesForCustomizationLevel,
-  type LandingGallerySettings,
-} from "@/lib/landing-gallery-settings";
+import { getFeaturesForCustomizationLevel, type LandingGallerySettings } from "@/lib/landing-gallery-settings";
 
 export function GallerySection({
   itemsByCategory,
@@ -185,18 +171,6 @@ export function GallerySection({
         ) : null}
         <div className="mt-6 sm:mt-14">
           {renderCollection({
-            id: "modelos-personalizaveis",
-            title: t("fullyCustomizable.title"),
-            description: t("fullyCustomizable.description"),
-            features: getFeaturesForCustomizationLevel(
-              settings,
-              "fully_customizable",
-            ),
-            data: fullyCustomizable,
-            activeCategory: activeFullyCustomizableCategory,
-            onCategoryChange: setActiveFullyCustomizableCategory,
-          })}
-          {renderCollection({
             id: "modelos-predefinidos",
             title: t("preDesigned.title"),
             description: t("preDesigned.description"),
@@ -207,6 +181,18 @@ export function GallerySection({
             data: preDesigned,
             activeCategory: activePreDesignedCategory,
             onCategoryChange: setActivePreDesignedCategory,
+          })}
+          {renderCollection({
+            id: "modelos-personalizaveis",
+            title: t("fullyCustomizable.title"),
+            description: t("fullyCustomizable.description"),
+            features: getFeaturesForCustomizationLevel(
+              settings,
+              "fully_customizable",
+            ),
+            data: fullyCustomizable,
+            activeCategory: activeFullyCustomizableCategory,
+            onCategoryChange: setActiveFullyCustomizableCategory,
           })}
         </div>
       </div>

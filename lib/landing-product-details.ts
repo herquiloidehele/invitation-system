@@ -133,24 +133,39 @@ type CrossSellCandidate = {
 };
 
 /**
- * Pick sibling models to show at the bottom of a details page. The current
- * model is located by its details href, which every gallery feature already
- * carries, so this needs no category lookup of its own.
+ * Pick models to recommend at the bottom of a details page.
+ *
+ * Same-category siblings come first because they are the most relevant, then
+ * the remaining gallery models top the list up towards `limit`. Topping up
+ * matters because a category often holds only one or two models, which would
+ * otherwise leave the strip nearly empty.
+ *
+ * The current model is located by its details href, which every gallery
+ * feature already carries, so this needs no category lookup of its own. A
+ * model that is not in the gallery at all still gets recommendations.
  */
 export function selectCrossSellModels<T extends CrossSellCandidate>(
   byCategory: Record<string, T[]>,
   currentDetailsHref: string,
   limit: number,
 ): T[] {
-  const owningCategory = Object.values(byCategory).find((features) =>
-    features.some((feature) => feature.href === currentDetailsHref),
-  );
+  const groups = Object.values(byCategory);
+  const sameCategory =
+    groups.find((features) =>
+      features.some((feature) => feature.href === currentDetailsHref),
+    ) ?? [];
 
-  if (!owningCategory) return [];
+  const seen = new Set<string>([currentDetailsHref]);
+  const picked: T[] = [];
 
-  return owningCategory
-    .filter((feature) => feature.href !== currentDetailsHref)
-    .slice(0, limit);
+  for (const feature of [...sameCategory, ...groups.flat()]) {
+    if (picked.length >= limit) break;
+    if (seen.has(feature.href)) continue;
+    seen.add(feature.href);
+    picked.push(feature);
+  }
+
+  return picked;
 }
 
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";

@@ -76,7 +76,7 @@ export function ProductMediaGallery({
     <div
       className={
         showThumbnails
-          ? "grid gap-3 lg:grid-cols-[minmax(0,1.45fr)_minmax(9rem,.55fr)]"
+          ? "grid gap-3 lg:grid-cols-[minmax(0,1fr)_6rem]"
           : "grid"
       }
     >
@@ -99,7 +99,7 @@ export function ProductMediaGallery({
                 fill
                 priority={index === 0}
                 sizes="(min-width: 1024px) 58vw, 100vw"
-                className="object-contain"
+                className="object-cover"
               />
             </button>
           ))}
@@ -130,7 +130,7 @@ export function ProductMediaGallery({
       </div>
 
       {showThumbnails ? (
-        <div className="hidden gap-2 p-2 lg:flex lg:max-h-176 lg:flex-col lg:content-start lg:overflow-y-auto">
+        <div className="hidden gap-2 lg:flex lg:max-h-176 lg:flex-col lg:content-start lg:overflow-y-auto">
           {images.map((image, index) => (
             <button
               key={`thumb-${image}-${index}`}
@@ -138,14 +138,14 @@ export function ProductMediaGallery({
               onClick={() => goTo(index)}
               aria-label={selectImageLabel(index + 1)}
               aria-current={index === resolvedActiveIndex ? "true" : undefined}
-              className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl bg-surface-warm shadow-[0_8px_24px_color-mix(in_srgb,var(--foreground)_7%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 aria-current:ring-2 aria-current:ring-primary aria-current:ring-offset-2"
+              className="relative aspect-square w-full shrink-0 overflow-hidden rounded-xl bg-surface-warm outline outline-1 -outline-offset-1 outline-black/10 transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 aria-current:ring-2 aria-current:ring-primary aria-current:ring-offset-1"
             >
               <Image
                 src={image}
                 alt=""
                 fill
-                sizes="18vw"
-                className="object-contain"
+                sizes="96px"
+                className="object-cover"
               />
             </button>
           ))}

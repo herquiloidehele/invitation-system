@@ -27,16 +27,18 @@ const byCategory = {
     feature("/modelos/convite/amalfi", "Amalfi"),
     feature("/modelos/convite/dream", "Dream"),
     feature("/modelos/convite/lisboa", "Lisboa"),
-    feature("/modelos/convite/porto", "Porto"),
   ],
-  save_the_date: [feature("/modelos/save-the-date/golden", "Golden")],
-  baptism: [],
+  save_the_date: [
+    feature("/modelos/save-the-date/golden", "Golden"),
+    feature("/modelos/save-the-date/silver", "Silver"),
+  ],
+  baptism: [feature("/modelos/convite/batismo", "Batismo")],
   anniversary: [],
   engagement: [],
 };
 
 describe("selectCrossSellModels", () => {
-  it("returns same-category siblings with the current model excluded", () => {
+  it("leads with same-category siblings before topping up from other categories", () => {
     const result = selectCrossSellModels(
       byCategory,
       "/modelos/convite/dream",
@@ -44,31 +46,78 @@ describe("selectCrossSellModels", () => {
     );
 
     expect(result.map((item) => item.href)).toEqual([
+      // same category first, current excluded
       "/modelos/convite/amalfi",
       "/modelos/convite/lisboa",
-      "/modelos/convite/porto",
+      // then everything else, in category order
+      "/modelos/save-the-date/golden",
+      "/modelos/save-the-date/silver",
+      "/modelos/convite/batismo",
     ]);
   });
 
   it("respects the limit", () => {
+    expect(
+      selectCrossSellModels(byCategory, "/modelos/convite/dream", 2),
+    ).toHaveLength(2);
+  });
+
+  it("keeps same-category siblings when the limit is tight", () => {
+    expect(
+      selectCrossSellModels(byCategory, "/modelos/convite/dream", 2).map(
+        (item) => item.href,
+      ),
+    ).toEqual(["/modelos/convite/amalfi", "/modelos/convite/lisboa"]);
+  });
+
+  it("still recommends when the current model is alone in its category", () => {
     const result = selectCrossSellModels(
-      byCategory,
-      "/modelos/convite/dream",
-      2,
+      { ...byCategory, baptism: [feature("/modelos/convite/solo", "Solo")] },
+      "/modelos/convite/solo",
+      4,
     );
 
-    expect(result).toHaveLength(2);
+    expect(result.map((item) => item.href)).toEqual([
+      "/modelos/convite/amalfi",
+      "/modelos/convite/dream",
+      "/modelos/convite/lisboa",
+      "/modelos/save-the-date/golden",
+    ]);
   });
 
-  it("returns an empty list when the category holds only the current model", () => {
-    expect(
-      selectCrossSellModels(byCategory, "/modelos/save-the-date/golden", 6),
-    ).toEqual([]);
+  it("still recommends when the current model is in no category at all", () => {
+    const result = selectCrossSellModels(
+      byCategory,
+      "/modelos/convite/unlisted",
+      3,
+    );
+
+    expect(result.map((item) => item.href)).toEqual([
+      "/modelos/convite/amalfi",
+      "/modelos/convite/dream",
+      "/modelos/convite/lisboa",
+    ]);
   });
 
-  it("returns an empty list when the current model is in no category", () => {
+  it("never repeats a model that appears in two categories", () => {
+    const shared = feature("/modelos/convite/amalfi", "Amalfi");
+    const result = selectCrossSellModels(
+      { ...byCategory, engagement: [shared] },
+      "/modelos/convite/dream",
+      9,
+    );
+
+    const hrefs = result.map((item) => item.href);
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+  });
+
+  it("returns an empty list when the gallery holds nothing else", () => {
     expect(
-      selectCrossSellModels(byCategory, "/modelos/convite/unknown", 6),
+      selectCrossSellModels(
+        { wedding: [feature("/modelos/convite/only", "Only")] },
+        "/modelos/convite/only",
+        6,
+      ),
     ).toEqual([]);
   });
 });

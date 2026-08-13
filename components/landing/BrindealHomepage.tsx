@@ -7,7 +7,7 @@ import type {
   GalleryCategory as DbGalleryCategory,
   GalleryFeature,
   HeroFeature,
-  LiveDemoFeature
+  LiveDemoFeature,
 } from "@/lib/landing-features";
 import { BestSellersSection } from "./BestSellersSection";
 import { CustomInvitationSection } from "./CustomInvitationSection";
@@ -16,10 +16,8 @@ import { FeaturesSection } from "./FeaturesSection";
 import { Footer } from "./Footer";
 import { GallerySection } from "./GallerySection";
 import { HeroSection } from "./HeroSection";
-import { InvitationConstellationSection } from "./InvitationConstellationSection";
 import { LandingNav } from "./LandingNav";
 import { ProcessSection } from "./ProcessSection";
-import { getConstellationPreview } from "./landing-constellation-data";
 import { type Currency } from "@/lib/currency/config";
 import type { LandingGallerySettings } from "@/lib/landing-gallery-settings";
 
@@ -46,16 +44,13 @@ export function BrindealHomepage({
       <LandingNav currentCurrency={currentCurrency} />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
       <BestSellersSection items={bestSellerFeatures} />
-      <CustomInvitationSection currentCurrency={currentCurrency} />
       <GallerySection
         itemsByCategory={galleryByCategory}
         settings={gallerySettings}
       />
+      <CustomInvitationSection currentCurrency={currentCurrency} />
       <ProcessSection />
       <FeaturesSection />
-      <InvitationConstellationSection
-        preview={getConstellationPreview(liveDemoFeatures)}
-      />
       <FaqSection
         openIndex={openFaqIndex}
         setOpenIndex={setOpenFaqIndex}

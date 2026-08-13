@@ -107,7 +107,7 @@ export default async function LandingProductDetailsRoute({
   const crossSellItems = selectCrossSellModels(
     galleryByCategory,
     details.detailsHref,
-    8,
+    10,
   ).map((feature) => ({
     id: feature.id,
     title: feature.title,
