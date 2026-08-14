@@ -124,17 +124,32 @@ describe("stable translation IDs", () => {
 });
 
 describe("switcher visibility", () => {
-  it("requires a standard invitation and two effective locales", () => {
+  it("requires a translatable invitation type and two effective locales", () => {
     const enabled = duplicateForm({
       invitationType: "standard",
       languageSwitcherEnabled: true,
       enabledLocales: ["pt", "en"],
     });
     expect(shouldShowInvitationLanguageSwitcher(enabled)).toBe(true);
+    // external_link participates in the translation pipeline too.
     expect(
       shouldShowInvitationLanguageSwitcher({
         ...enabled,
         invitationType: "external_link",
+      }),
+    ).toBe(true);
+    // external_video has no locale-specific content to swap.
+    expect(
+      shouldShowInvitationLanguageSwitcher({
+        ...enabled,
+        invitationType: "external_video",
+      }),
+    ).toBe(false);
+    // A single effective locale hides the switcher regardless of type.
+    expect(
+      shouldShowInvitationLanguageSwitcher({
+        ...enabled,
+        languageSwitcherEnabled: false,
       }),
     ).toBe(false);
   });

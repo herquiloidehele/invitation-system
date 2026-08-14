@@ -59,11 +59,21 @@ describe("admin invitation language editing", () => {
   );
 
   it("keeps canonical form state and submits it", () => {
-    expect(source).toContain("const [sourceForm, setSourceForm]");
-    expect(source).toContain("buildInvitationTranslationDraft");
-    expect(source).toContain("applyInvitationTranslationDraft");
+    // The draft machinery itself lives in the shared hook; the form only has to
+    // consume it and post the canonical record rather than the locale draft.
+    expect(source).toContain("useInvitationTranslationDraft");
+    expect(source).toContain("sourceForm");
     expect(source).toContain("translations: normalized.translations ?? null");
     expect(source).toContain("body: JSON.stringify(payload)");
+  });
+
+  it("delegates the draft projection to the shared hook", () => {
+    const hook = readFileSync(
+      "hooks/use-invitation-translation-draft.ts",
+      "utf8",
+    );
+    expect(hook).toContain("buildInvitationTranslationDraft");
+    expect(hook).toContain("applyInvitationTranslationDraft");
   });
 
   it("localizes preview messages and switcher callbacks", () => {
@@ -102,4 +112,99 @@ describe("translation-aware repeatable editors", () => {
       expect(source).toContain("sourceValue");
     });
   }
+});
+
+describe("translation gating uses the shared predicate", () => {
+  for (const file of [
+    "app/[locale]/[slug]/page.tsx",
+    "app/[locale]/confirmar/[slug]/page.tsx",
+    "app/[locale]/[slug]/gifts/page.tsx",
+    "lib/invitation-language-routing.ts",
+  ]) {
+    it(`${file} delegates to supportsInvitationTranslations`, () => {
+      const source = readFileSync(file, "utf8");
+      expect(source).toContain("supportsInvitationTranslations");
+      expect(source).not.toContain('invitationType === "standard"');
+      expect(source).not.toContain('invitationType !== "standard"');
+    });
+  }
+});
+
+describe("external pages carry no hardcoded Portuguese chrome", () => {
+  const cases: Array<[string, string]> = [
+    ["components/shared/RevealableExternalSections.tsx", ">RSVP<"],
+    ["components/curtain-canva/CanvaEmbed.tsx", '"Convite"'],
+    ["components/shared/ExternalLinkPage.tsx", '"Convite externo"'],
+    ["components/curtain-canva/ScratchDateReveal.tsx", "Raspe para revelar"],
+    ["components/curtain-canva/CurtainsHero.tsx", '"Scroll to next section"'],
+    [
+      "components/video-entrance/VideoEntranceHero.tsx",
+      '"Scroll to next section"',
+    ],
+  ];
+
+  for (const [file, literal] of cases) {
+    it(`${file} no longer contains ${literal}`, () => {
+      expect(readFileSync(file, "utf8")).not.toContain(literal);
+    });
+  }
+});
+
+describe("admin translation draft state is shared", () => {
+  for (const file of [
+    "app/admin/invitations/InvitationForm.tsx",
+    "app/admin/invitations/ExternalInvitationForm.tsx",
+  ]) {
+    it(`${file} consumes useInvitationTranslationDraft`, () => {
+      expect(readFileSync(file, "utf8")).toContain(
+        "useInvitationTranslationDraft",
+      );
+    });
+  }
+
+  it("keeps the stale-closure guard in the hook", () => {
+    const source = readFileSync(
+      "hooks/use-invitation-translation-draft.ts",
+      "utf8",
+    );
+    expect(source).toContain("activeLocaleRef");
+    expect(source).toContain("supportsInvitationTranslations");
+  });
+});
+
+describe("external admin form language settings", () => {
+  const source = readFileSync(
+    "app/admin/invitations/ExternalInvitationForm.tsx",
+    "utf8",
+  );
+
+  it("renders the Idiomas accordion", () => {
+    expect(source).toContain('value="languages"');
+    expect(source).toContain("<InvitationLanguageSettings");
+  });
+
+  it("drives the active locale from the shared hook", () => {
+    expect(source).toContain("setActiveLocale");
+    expect(source).toContain("normalizeInvitationLocales");
+  });
+
+  it("renders the custom texts editor", () => {
+    expect(source).toContain('value="customTexts"');
+    expect(source).toContain("CUSTOM_TEXT_GROUPS");
+  });
+
+  it("locks structural edits outside Portuguese", () => {
+    expect(source).toContain("structureLocked");
+  });
+
+  it("posts the canonical record, never the locale draft", () => {
+    expect(source).toContain("normalizeInvitationTranslationIds(sourceForm)");
+    expect(source).toContain("validateInvitationLanguageSettings(sourceForm)");
+    expect(source).not.toContain("JSON.stringify(form)");
+  });
+
+  it("wraps the preview in a locale provider", () => {
+    expect(source).toContain("NextIntlClientProvider");
+    expect(source).toContain("InvitationLanguagePreviewProvider");
+  });
 });

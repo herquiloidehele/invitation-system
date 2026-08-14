@@ -13,7 +13,10 @@ import {
   serializeInvitationSearchParams,
   type InvitationSearchParams,
 } from "@/lib/invitation-language-routing";
-import { localizeInvitation } from "@/lib/invitation-translations";
+import {
+  localizeInvitation,
+  supportsInvitationTranslations,
+} from "@/lib/invitation-translations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
 import { resolveLocale } from "@/i18n/locales";
@@ -45,10 +48,9 @@ export default async function GiftsPage({
   );
   if (redirectPath) redirect(redirectPath);
 
-  const invitation =
-    sourceInvitation.invitationType === "standard"
-      ? localizeInvitation(sourceInvitation, locale)
-      : sourceInvitation;
+  const invitation = supportsInvitationTranslations(sourceInvitation)
+    ? localizeInvitation(sourceInvitation, locale)
+    : sourceInvitation;
   const theme = await getTheme(sourceInvitation.template);
   if (!theme) notFound();
 

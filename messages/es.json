@@ -1,5 +1,9 @@
 {
-  "Locale": { "pt": "Português", "en": "English", "es": "Español" },
+  "Locale": {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
   "LocaleCurrencyMenu": {
     "menuAriaLabel": "Idioma y moneda",
     "language": "Idioma",
@@ -224,10 +228,18 @@
     "title": "Todos los detalles, en una sola invitación",
     "body": "Desde el primer toque hasta el recuento final de invitados, cada detalle convive en una única experiencia.",
     "groups": {
-      "entrance": { "title": "Causad una primera impresión" },
-      "story": { "title": "Contad vuestra historia" },
-      "guide": { "title": "Guiad a cada invitado" },
-      "organize": { "title": "Organizadlo todo con facilidad" }
+      "entrance": {
+        "title": "Causad una primera impresión"
+      },
+      "story": {
+        "title": "Contad vuestra historia"
+      },
+      "guide": {
+        "title": "Guiad a cada invitado"
+      },
+      "organize": {
+        "title": "Organizadlo todo con facilidad"
+      }
     },
     "features": {
       "animatedEntrance": "Sobre animado o entrada en vídeo",
@@ -522,6 +534,12 @@
     "rsvp_deadlineDatePrefix": " el {deadline}",
     "rsvp_closedTitle": "Confirmaciones cerradas",
     "rsvp_closedMessage": "Las confirmaciones de asistencia están cerradas.",
-    "common_close": "Cerrar"
+    "common_close": "Cerrar",
+    "sectionTitle_rsvp": "RSVP",
+    "scratch_revealDayAria": "Rasca para revelar el día",
+    "scratch_revealMonthAria": "Rasca para revelar el mes",
+    "scratch_revealYearAria": "Rasca para revelar el año",
+    "nav_scrollToNextAria": "Ir a la siguiente sección",
+    "embed_iframeTitle": "Invitación"
   }
 }

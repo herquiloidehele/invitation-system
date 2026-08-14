@@ -1,5 +1,9 @@
 {
-  "Locale": { "pt": "Português", "en": "English", "es": "Español" },
+  "Locale": {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
   "LocaleCurrencyMenu": {
     "menuAriaLabel": "Language and currency",
     "language": "Language",
@@ -224,10 +228,18 @@
     "title": "Every detail, in one invitation",
     "body": "From the first tap to the final guest count, every detail lives in one thoughtful experience.",
     "groups": {
-      "entrance": { "title": "Make an entrance" },
-      "story": { "title": "Tell your story" },
-      "guide": { "title": "Guide every guest" },
-      "organize": { "title": "Stay effortlessly organized" }
+      "entrance": {
+        "title": "Make an entrance"
+      },
+      "story": {
+        "title": "Tell your story"
+      },
+      "guide": {
+        "title": "Guide every guest"
+      },
+      "organize": {
+        "title": "Stay effortlessly organized"
+      }
     },
     "features": {
       "animatedEntrance": "Animated envelope or video entrance",
@@ -522,6 +534,12 @@
     "rsvp_deadlineDatePrefix": " on {deadline}",
     "rsvp_closedTitle": "Confirmations closed",
     "rsvp_closedMessage": "RSVP confirmations are closed.",
-    "common_close": "Close"
+    "common_close": "Close",
+    "sectionTitle_rsvp": "RSVP",
+    "scratch_revealDayAria": "Scratch to reveal the day",
+    "scratch_revealMonthAria": "Scratch to reveal the month",
+    "scratch_revealYearAria": "Scratch to reveal the year",
+    "nav_scrollToNextAria": "Scroll to next section",
+    "embed_iframeTitle": "Invitation"
   }
 }

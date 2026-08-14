@@ -1,6 +1,9 @@
 import type { AppLocale } from "@/i18n/locales";
 import { buildLocaleHref } from "@/i18n/locales";
-import { getEffectiveInvitationLocales } from "@/lib/invitation-translations";
+import {
+  getEffectiveInvitationLocales,
+  supportsInvitationTranslations,
+} from "@/lib/invitation-translations";
 import type { InvitationData } from "@/lib/types";
 
 export type InvitationSearchParams = Record<
@@ -54,7 +57,7 @@ export function getInvitationLocaleRedirectPath(
   pathname: string,
   searchParams: InvitationSearchParams,
 ): string | null {
-  if (invitation.invitationType !== "standard") return null;
+  if (!supportsInvitationTranslations(invitation)) return null;
   if (getEffectiveInvitationLocales(invitation).includes(locale)) return null;
 
   const query = serializeInvitationSearchParams(searchParams);

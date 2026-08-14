@@ -6,13 +6,11 @@ import {
   useReducer,
   useRef,
   useState,
-  type SetStateAction,
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { NextIntlClientProvider } from "next-intl";
-import type { AppLocale } from "@/i18n/locales";
 import { getClientMessages } from "@/i18n/client-messages";
 
 import type {
@@ -48,13 +46,11 @@ import type {
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
 import {
-  applyInvitationTranslationDraft,
-  buildInvitationTranslationDraft,
-  localizeInvitation,
   normalizeInvitationLocales,
   normalizeInvitationTranslationIds,
   validateInvitationLanguageSettings,
 } from "@/lib/invitation-translations";
+import { useInvitationTranslationDraft } from "@/hooks/use-invitation-translation-draft";
 
 import {
   ExternalLink,
@@ -587,40 +583,20 @@ export default function InvitationForm({
     null,
   );
   const clearSubmitError = useCallback(() => setSubmitError(null), []);
-  const [sourceForm, setSourceForm] = useState<InvitationData>(() =>
-    normalizeInvitationTranslationIds(
-      initialData ?? getDefaultFormState(themes[0]),
-    ),
+  const {
+    sourceForm,
+    setSourceForm,
+    activeLocale,
+    setActiveLocale,
+    form,
+    setForm,
+    localizedPreview,
+    structureLocked,
+    sourcePlaceholder,
+  } = useInvitationTranslationDraft(
+    () => initialData ?? getDefaultFormState(themes[0]),
   );
-  const [activeLocale, setActiveLocaleState] = useState<AppLocale>("pt");
-  const activeLocaleRef = useRef<AppLocale>("pt");
-  activeLocaleRef.current = activeLocale;
-  const setActiveLocale = useCallback((locale: AppLocale) => {
-    activeLocaleRef.current = locale;
-    setActiveLocaleState(locale);
-  }, []);
-  const form = useMemo(
-    () => buildInvitationTranslationDraft(sourceForm, activeLocale),
-    [sourceForm, activeLocale],
-  );
-  const previewInvitation = useMemo(
-    () =>
-      sourceForm.invitationType === "standard"
-        ? localizeInvitation(sourceForm, activeLocale)
-        : sourceForm,
-    [sourceForm, activeLocale],
-  );
-  const setForm = useCallback((next: SetStateAction<InvitationData>) => {
-    setSourceForm((source) => {
-      const locale = activeLocaleRef.current;
-      const current = buildInvitationTranslationDraft(source, locale);
-      const draft = typeof next === "function" ? next(current) : next;
-      return applyInvitationTranslationDraft(source, locale, draft);
-    });
-  }, []);
-  const structureLocked = activeLocale !== "pt";
-  const sourcePlaceholder = (source: string | undefined, ordinary: string) =>
-    structureLocked && source?.trim() ? source : ordinary;
+  const previewInvitation = localizedPreview;
   const isWedding = isWeddingEventType(form.eventType);
   const hasRequiredNames = Boolean(
     form.couple.bride && (!isWedding || form.couple.groom),
@@ -703,7 +679,7 @@ export default function InvitationForm({
         setResolving(false);
       }
     },
-    [],
+    [setForm],
   );
 
   const personalGuestCardVisibility = resolvePersonalGuestCardVisibility(
@@ -716,7 +692,7 @@ export default function InvitationForm({
       clearSubmitError();
       setForm((prev) => ({ ...prev, [key]: value }));
     },
-    [clearSubmitError],
+    [clearSubmitError, setForm],
   );
 
   const updateImageLayer = (next: ImageLayer) => {

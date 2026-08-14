@@ -6,7 +6,10 @@ import {
   getInvitationSearchParam,
   type InvitationSearchParams,
 } from "@/lib/invitation-language-routing";
-import { localizeInvitation } from "@/lib/invitation-translations";
+import {
+  localizeInvitation,
+  supportsInvitationTranslations,
+} from "@/lib/invitation-translations";
 import { getInvitation } from "@/lib/invitations";
 import {
   getRsvpCustomFields,
@@ -64,10 +67,9 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
   );
   if (redirectPath) redirect(redirectPath);
 
-  const invitation =
-    sourceInvitation.invitationType === "standard"
-      ? localizeInvitation(sourceInvitation, locale)
-      : sourceInvitation;
+  const invitation = supportsInvitationTranslations(sourceInvitation)
+    ? localizeInvitation(sourceInvitation, locale)
+    : sourceInvitation;
   const { couple, date, rsvp, customTexts } = invitation;
 
   const deadlinePassed = isDeadlinePassed(rsvp.deadline);

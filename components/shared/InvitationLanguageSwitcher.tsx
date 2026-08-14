@@ -97,7 +97,9 @@ export function InvitationLanguageSwitcher({
             {...commonProps}
             href={buildInvitationLocaleSwitchHref(
               pathname,
-              searchParams.toString(),
+              // `useSearchParams()` is null outside a router context (and
+              // during static rendering), so never dereference it directly.
+              searchParams?.toString() ?? "",
               locale,
             )}
             onClick={stopPropagation}

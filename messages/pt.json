@@ -1,5 +1,9 @@
 {
-  "Locale": { "pt": "Português", "en": "English", "es": "Español" },
+  "Locale": {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
   "LocaleCurrencyMenu": {
     "menuAriaLabel": "Idioma e moeda",
     "language": "Idioma",
@@ -224,10 +228,18 @@
     "title": "Todos os detalhes, num só convite",
     "body": "Do primeiro toque à contagem final de convidados, cada detalhe vive numa única experiência.",
     "groups": {
-      "entrance": { "title": "Cause uma primeira impressão" },
-      "story": { "title": "Conte a vossa história" },
-      "guide": { "title": "Oriente cada convidado" },
-      "organize": { "title": "Organize tudo com facilidade" }
+      "entrance": {
+        "title": "Cause uma primeira impressão"
+      },
+      "story": {
+        "title": "Conte a vossa história"
+      },
+      "guide": {
+        "title": "Oriente cada convidado"
+      },
+      "organize": {
+        "title": "Organize tudo com facilidade"
+      }
     },
     "features": {
       "animatedEntrance": "Envelope ou entrada em vídeo",
@@ -522,6 +534,12 @@
     "rsvp_deadlineDatePrefix": " em {deadline}",
     "rsvp_closedTitle": "Confirmações encerradas",
     "rsvp_closedMessage": "As confirmações de presença estão encerradas.",
-    "common_close": "Fechar"
+    "common_close": "Fechar",
+    "sectionTitle_rsvp": "RSVP",
+    "scratch_revealDayAria": "Raspe para revelar o dia",
+    "scratch_revealMonthAria": "Raspe para revelar o mês",
+    "scratch_revealYearAria": "Raspe para revelar o ano",
+    "nav_scrollToNextAria": "Ir para a próxima secção",
+    "embed_iframeTitle": "Convite"
   }
 }

@@ -16,6 +16,7 @@ import type {
   InvitationData,
   InvitationTranslationOverlay,
   InvitationTranslations,
+  InvitationType,
   LocationInfo,
   OurStory,
   ParentsInfo,
@@ -197,6 +198,19 @@ function sanitizeOurStory(value: unknown) {
   });
 }
 
+function sanitizeCountdown(value: unknown) {
+  const input = readObject(value);
+  if (!input) return undefined;
+  return compact({
+    title: readString(input.title),
+    subtitle: readString(input.subtitle),
+    daysLabel: readString(input.daysLabel),
+    hoursLabel: readString(input.hoursLabel),
+    minutesLabel: readString(input.minutesLabel),
+    secondsLabel: readString(input.secondsLabel),
+  });
+}
+
 function sanitizeRsvpCustomFields(value: unknown) {
   return readRecord(value, (entry) => {
     const field = readObject(entry);
@@ -249,6 +263,7 @@ function sanitizeOverlay(
   return compact({
     quote: readString(input.quote),
     heroTopText: readString(input.heroTopText),
+    externalLink: readString(input.externalLink),
     location: sanitizeLocation(input.location),
     location2: sanitizeLocation(input.location2),
     schedule: sanitizeSchedule(input.schedule),
@@ -268,6 +283,7 @@ function sanitizeOverlay(
     places: sanitizePlaces(input.places),
     parents: sanitizeParents(input.parents),
     ourStory: sanitizeOurStory(input.ourStory),
+    countdown: sanitizeCountdown(input.countdown),
     rsvpCustomFields: sanitizeRsvpCustomFields(input.rsvpCustomFields),
     customTexts: sanitizeCustomTexts(input.customTexts),
   });
@@ -510,6 +526,24 @@ function transformOurStory(
   };
 }
 
+function transformCountdown(
+  source: InvitationData["countdown"],
+  overlay: InvitationTranslationOverlay["countdown"],
+  behavior: MissingTranslationBehavior,
+): InvitationData["countdown"] {
+  if (!source) return undefined;
+  const blank = behavior === "blank";
+  return {
+    ...source,
+    title: overlay?.title ?? (blank ? "" : source.title),
+    subtitle: overlay?.subtitle ?? (blank ? "" : source.subtitle),
+    daysLabel: overlay?.daysLabel ?? (blank ? "" : source.daysLabel),
+    hoursLabel: overlay?.hoursLabel ?? (blank ? "" : source.hoursLabel),
+    minutesLabel: overlay?.minutesLabel ?? (blank ? "" : source.minutesLabel),
+    secondsLabel: overlay?.secondsLabel ?? (blank ? "" : source.secondsLabel),
+  };
+}
+
 function transformRsvp(
   source: InvitationData["rsvp"],
   overlay: InvitationTranslationOverlay["rsvpCustomFields"],
@@ -543,6 +577,9 @@ function transformInvitationText(
     quote: overlay?.quote ?? (behavior === "blank" ? "" : source.quote),
     heroTopText:
       overlay?.heroTopText ?? (behavior === "blank" ? "" : source.heroTopText),
+    // `||` not `??`: an empty locale link means "inherit the Portuguese one".
+    externalLink:
+      overlay?.externalLink || (behavior === "blank" ? "" : source.externalLink),
     location: transformLocation(source.location, overlay?.location, behavior),
     location2: source.location2
       ? transformLocation(source.location2, overlay?.location2, behavior)
@@ -577,6 +614,11 @@ function transformInvitationText(
     places: transformPlaces(source.places, overlay?.places, behavior),
     parents: transformParents(source.parents, overlay?.parents, behavior),
     ourStory: transformOurStory(source.ourStory, overlay?.ourStory, behavior),
+    countdown: transformCountdown(
+      source.countdown,
+      overlay?.countdown,
+      behavior,
+    ),
     rsvp: transformRsvp(source.rsvp, overlay?.rsvpCustomFields, behavior),
     customTexts: transformCustomTexts(
       source.customTexts,
@@ -816,6 +858,7 @@ function restorePortugueseText(
     ...draft,
     quote: source.quote,
     heroTopText: source.heroTopText,
+    externalLink: source.externalLink,
     location: {
       ...source.location,
       ...draft.location,
@@ -860,6 +903,18 @@ function restorePortugueseText(
           description: source.ourStory.description,
         }
       : undefined,
+    countdown: source.countdown
+      ? {
+          ...source.countdown,
+          ...draft.countdown,
+          title: source.countdown.title,
+          subtitle: source.countdown.subtitle,
+          daysLabel: source.countdown.daysLabel,
+          hoursLabel: source.countdown.hoursLabel,
+          minutesLabel: source.countdown.minutesLabel,
+          secondsLabel: source.countdown.secondsLabel,
+        }
+      : undefined,
     rsvp: restoreRsvpText(source.rsvp, draft.rsvp),
     customTexts: source.customTexts,
     translations: source.translations,
@@ -882,6 +937,7 @@ function extractOverlay(draft: InvitationData): InvitationTranslationOverlay {
   return {
     quote: draft.quote,
     heroTopText: draft.heroTopText,
+    externalLink: draft.externalLink,
     location: {
       name: draft.location.name,
       address: draft.location.address,
@@ -965,6 +1021,16 @@ function extractOverlay(draft: InvitationData): InvitationTranslationOverlay {
           description: draft.ourStory.description,
         }
       : undefined,
+    countdown: draft.countdown
+      ? {
+          title: draft.countdown.title,
+          subtitle: draft.countdown.subtitle,
+          daysLabel: draft.countdown.daysLabel,
+          hoursLabel: draft.countdown.hoursLabel,
+          minutesLabel: draft.countdown.minutesLabel,
+          secondsLabel: draft.countdown.secondsLabel,
+        }
+      : undefined,
     rsvpCustomFields: recordById(draft.rsvp.customFields, (field) => ({
       label: field.label,
       options: recordById(field.options, (option) => ({
@@ -1006,11 +1072,31 @@ export function validateInvitationLanguageSettings(
   return null;
 }
 
+/**
+ * Which invitation types participate in the translation pipeline.
+ *
+ * `external_video` is excluded deliberately: its page is driven entirely by a
+ * video asset, so there is nothing locale-specific to swap. Adding it here is
+ * the only change required if that ever stops being true.
+ */
+const TRANSLATABLE_INVITATION_TYPES = new Set<InvitationType>([
+  "standard",
+  "external_link",
+]);
+
+export function supportsInvitationTranslations(
+  invitation: Partial<Pick<InvitationData, "invitationType">>,
+): boolean {
+  return TRANSLATABLE_INVITATION_TYPES.has(
+    invitation.invitationType ?? "standard",
+  );
+}
+
 export function shouldShowInvitationLanguageSwitcher(
   invitation: InvitationData,
 ): boolean {
   return (
-    invitation.invitationType === "standard" &&
+    supportsInvitationTranslations(invitation) &&
     getEffectiveInvitationLocales(invitation).length > 1
   );
 }

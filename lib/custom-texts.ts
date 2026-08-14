@@ -15,6 +15,25 @@ import type { CustomTexts } from "./types";
 
 type IntlT = (key: string, values?: Record<string, string>) => string;
 
+/**
+ * Applies `{placeholder}` substitution to a per-invitation override.
+ *
+ * next-intl performs this for message defaults, but an override short-circuits
+ * next-intl entirely — without this, overriding an interpolated key such as
+ * `calendar_weddingTitle` would render the literal `{names}`. Unknown
+ * placeholders are left in place so a typo is visible rather than silently
+ * blanked.
+ */
+export function applyCustomTextValues(
+  text: string,
+  values?: Record<string, string>,
+): string {
+  if (!values) return text;
+  return text.replace(/\{(\w+)\}/g, (match, key: string) =>
+    Object.prototype.hasOwnProperty.call(values, key) ? values[key] : match,
+  );
+}
+
 /** Client hook — returns a resolver bound to the current request locale. */
 export function useCustomText(
   customTexts: CustomTexts | undefined | null,
@@ -22,7 +41,7 @@ export function useCustomText(
   const tn = useTranslations("Invitation");
   return (key, values) => {
     const override = customTexts?.[key];
-    if (override) return override;
+    if (override) return applyCustomTextValues(override, values);
     return tn(key, values);
   };
 }
@@ -38,7 +57,7 @@ export function getCustomText(
   values?: Record<string, string>,
 ): string {
   const override = customTexts?.[key];
-  if (override) return override;
+  if (override) return applyCustomTextValues(override, values);
   return tn(key, values);
 }
 
@@ -106,6 +125,7 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         label: "Galeria de Fotos",
         placeholder: "Nossos Momentos",
       },
+      { key: "sectionTitle_rsvp", label: "RSVP", placeholder: "RSVP" },
     ],
   },
   {
@@ -408,6 +428,225 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         key: "places_callLabel",
         label: "Botão de telefone",
         placeholder: "Ligar",
+      },
+    ],
+  },
+  {
+    id: "curtainCanva",
+    label: "Curtain & Canva",
+    fields: [
+      {
+        key: "curtain_tapToOpen",
+        label: "Convite para abrir",
+        placeholder: "Toque para abrir",
+      },
+      {
+        key: "scratch_title",
+        label: "Título da raspadinha",
+        placeholder: "Data",
+      },
+      {
+        key: "scratch_subtitle",
+        label: "Subtítulo da raspadinha",
+        placeholder: "Raspe para descobrir",
+      },
+    ],
+  },
+  {
+    id: "countdownDefaults",
+    label: "Contagem Decrescente (padrões)",
+    fields: [
+      {
+        key: "countdown_defaultTitle",
+        label: "Título padrão",
+        placeholder: "Contagem Decrescente",
+      },
+      {
+        key: "countdown_defaultSubtitle",
+        label: "Subtítulo padrão",
+        placeholder: "Até ao nosso grande dia",
+      },
+    ],
+  },
+  {
+    id: "calendar",
+    label: "Evento no Calendário",
+    fields: [
+      {
+        key: "calendar_weddingTitle",
+        label: "Título (casamento)",
+        placeholder: "Casamento {names}",
+      },
+      {
+        key: "calendar_genericTitle",
+        label: "Título (outro evento)",
+        placeholder: "Evento {name}",
+      },
+      {
+        key: "calendar_weddingDetails",
+        label: "Descrição (casamento)",
+        placeholder: "Cerimónia de casamento de {bride} e {groom}.",
+      },
+      {
+        key: "calendar_genericDetails",
+        label: "Descrição (outro evento)",
+        placeholder: "Celebração de {name}.",
+      },
+    ],
+  },
+  {
+    id: "inviteOthers",
+    label: "Convidar Mais Pessoas",
+    fields: [
+      {
+        key: "invite_modalTitle",
+        label: "Título da janela",
+        placeholder: "Convidar mais pessoas",
+      },
+      {
+        key: "invite_modalSubtitle",
+        label: "Subtítulo da janela",
+        placeholder:
+          "Adiciona o nome dos convidados extra. Receberás um link pessoal para partilhar com cada um.",
+      },
+      {
+        key: "invite_nameLabel",
+        label: "Etiqueta do nome",
+        placeholder: "Nome *",
+      },
+      {
+        key: "invite_companionLabel",
+        label: "Etiqueta do acompanhante",
+        placeholder: "Acompanhante",
+      },
+      {
+        key: "invite_submitButton",
+        label: "Botão de submissão",
+        placeholder: "Adicionar convidado",
+      },
+      {
+        key: "invite_successTitle",
+        label: "Título de sucesso",
+        placeholder: "Convidado adicionado!",
+      },
+      {
+        key: "invite_shareLinkPrefix",
+        label: "Prefixo do link de partilha",
+        placeholder: "Partilha este link pessoal com",
+      },
+      {
+        key: "invite_addAnother",
+        label: "Adicionar outro",
+        placeholder: "Adicionar outro convidado",
+      },
+      {
+        key: "invite_nameRequired",
+        label: "Erro: nome obrigatório",
+        placeholder: "Nome é obrigatório",
+      },
+      {
+        key: "invite_genericError",
+        label: "Erro genérico",
+        placeholder: "Falha ao registar convidado",
+      },
+      {
+        key: "invite_unknownError",
+        label: "Erro desconhecido",
+        placeholder: "Erro desconhecido",
+      },
+      {
+        key: "invite_linkCopied",
+        label: "Link copiado",
+        placeholder: "Link copiado!",
+      },
+      {
+        key: "invite_copyFailed",
+        label: "Falha ao copiar",
+        placeholder: "Não foi possível copiar.",
+      },
+    ],
+  },
+  {
+    id: "rsvpValidation",
+    label: "RSVP — Validação e Prazos",
+    fields: [
+      {
+        key: "rsvp_nameRequired",
+        label: "Erro: nome obrigatório",
+        placeholder: "Nome é obrigatório",
+      },
+      {
+        key: "rsvp_invalidEmail",
+        label: "Erro: email inválido",
+        placeholder: "Email inválido",
+      },
+      {
+        key: "rsvp_selectOption",
+        label: "Erro: opção obrigatória",
+        placeholder: "Selecione uma opção",
+      },
+      {
+        key: "rsvp_deadlineClosedTitle",
+        label: "Título: prazo encerrado",
+        placeholder: "Prazo encerrado",
+      },
+      {
+        key: "rsvp_deadlineClosedMessage",
+        label: "Mensagem: prazo encerrado",
+        placeholder: "O prazo para confirmação de presença terminou{deadline}.",
+      },
+      {
+        key: "rsvp_deadlineDatePrefix",
+        label: "Prefixo da data do prazo",
+        placeholder: " em {deadline}",
+      },
+      {
+        key: "rsvp_closedTitle",
+        label: "Título: confirmações encerradas",
+        placeholder: "Confirmações encerradas",
+      },
+      {
+        key: "rsvp_closedMessage",
+        label: "Mensagem: confirmações encerradas",
+        placeholder: "As confirmações de presença estão encerradas.",
+      },
+    ],
+  },
+  {
+    id: "systemMisc",
+    label: "Diversos (sistema)",
+    fields: [
+      {
+        key: "envelope_topFlapAlt",
+        label: "Texto alternativo da aba do envelope",
+        placeholder: "Aba superior do envelope",
+      },
+      { key: "common_close", label: "Fechar", placeholder: "Fechar" },
+    ],
+  },
+  {
+    id: "accessibility",
+    label: "Acessibilidade (leitores de ecrã)",
+    fields: [
+      {
+        key: "scratch_revealDayAria",
+        label: "Raspadinha — dia",
+        placeholder: "Raspe para revelar o dia",
+      },
+      {
+        key: "scratch_revealMonthAria",
+        label: "Raspadinha — mês",
+        placeholder: "Raspe para revelar o mês",
+      },
+      {
+        key: "scratch_revealYearAria",
+        label: "Raspadinha — ano",
+        placeholder: "Raspe para revelar o ano",
+      },
+      {
+        key: "nav_scrollToNextAria",
+        label: "Botão de rolar para a próxima secção",
+        placeholder: "Ir para a próxima secção",
       },
     ],
   },

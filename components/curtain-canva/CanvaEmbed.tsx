@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PublicGuestData, TemplateTheme } from "@/lib/types";
 import {
@@ -22,7 +24,7 @@ interface CanvaEmbedProps {
   theme: TemplateTheme;
   /** Defaults to 9/16 (portrait — typical Canva wedding format). */
   aspectRatio?: number;
-  /** iframe accessibility title. Defaults to "Convite". */
+  /** iframe accessibility title. Defaults to the localized embed title. */
   title?: string;
   onInitialPageChange?: (isInitialPage: boolean) => void;
   /** Fires after the iframe body reports its first positive content height. */
@@ -51,6 +53,7 @@ export default function CanvaEmbed({
   guest,
   preloading = false,
 }: CanvaEmbedProps) {
+  const tn = useTranslations("Invitation");
   const sectionRef = useRef<HTMLElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const measureTimerRef = useRef<number[]>([]);
@@ -454,7 +457,7 @@ export default function CanvaEmbed({
           <iframe
             ref={iframeRef}
             src={proxiedUrl}
-            title={title ?? "Convite"}
+            title={title ?? tn("embed_iframeTitle")}
             loading="eager"
             onLoad={handleLoad}
             allow="autoplay; fullscreen; clipboard-write"

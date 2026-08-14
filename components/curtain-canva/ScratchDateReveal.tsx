@@ -287,7 +287,7 @@ export default function ScratchDateReveal({
         <div className="mt-10 flex justify-center items-end gap-3 sm:gap-5">
           <CoinWithLabel
             coinSize={coinSize}
-            ariaLabel="Raspe para revelar o dia"
+            ariaLabel={t("scratch_revealDayAria")}
             contentStyle={datePartStyle}
             contentOverride={dateDayOverride}
             content={date.day || "—"}
@@ -301,7 +301,7 @@ export default function ScratchDateReveal({
           />
           <CoinWithLabel
             coinSize={coinSize}
-            ariaLabel="Raspe para revelar o mês"
+            ariaLabel={t("scratch_revealMonthAria")}
             contentStyle={datePartStyle}
             contentOverride={dateMonthOverride}
             content={monthShort || "—"}
@@ -315,7 +315,7 @@ export default function ScratchDateReveal({
           />
           <CoinWithLabel
             coinSize={coinSize}
-            ariaLabel="Raspe para revelar o ano"
+            ariaLabel={t("scratch_revealYearAria")}
             contentStyle={datePartStyle}
             contentOverride={dateYearOverride}
             content={date.year || "—"}

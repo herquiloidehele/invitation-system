@@ -18,6 +18,7 @@ import {
 import {
   getEffectiveInvitationLocales,
   localizeInvitation,
+  supportsInvitationTranslations,
 } from "@/lib/invitation-translations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
@@ -61,15 +62,14 @@ export async function generateMetadata({
     return { title: t("invitationNotFound") };
   }
 
-  const effectiveLocales =
-    sourceInvitation.invitationType === "standard"
-      ? getEffectiveInvitationLocales(sourceInvitation)
-      : SUPPORTED_LOCALES;
+  const translatable = supportsInvitationTranslations(sourceInvitation);
+  const effectiveLocales = translatable
+    ? getEffectiveInvitationLocales(sourceInvitation)
+    : SUPPORTED_LOCALES;
   const metadataLocale = effectiveLocales.includes(locale) ? locale : "pt";
-  const invitation =
-    sourceInvitation.invitationType === "standard"
-      ? localizeInvitation(sourceInvitation, metadataLocale)
-      : sourceInvitation;
+  const invitation = translatable
+    ? localizeInvitation(sourceInvitation, metadataLocale)
+    : sourceInvitation;
   const { image, title, description } = resolveInvitationSocialPreview(
     invitation,
     SITE_URL,
@@ -192,10 +192,9 @@ export default async function InvitationSlugPage({
   );
   if (redirectPath) redirect(redirectPath);
 
-  const invitation =
-    sourceInvitation.invitationType === "standard"
-      ? localizeInvitation(sourceInvitation, locale)
-      : sourceInvitation;
+  const invitation = supportsInvitationTranslations(sourceInvitation)
+    ? localizeInvitation(sourceInvitation, locale)
+    : sourceInvitation;
   const theme = await getTheme(invitation.template);
 
   if (!theme) {

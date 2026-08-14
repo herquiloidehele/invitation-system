@@ -1093,6 +1093,15 @@ export interface CustomTexts {
   places_mapLabel?: string;
   places_callLabel?: string;
 
+  // -- External page section titles --
+  sectionTitle_rsvp?: string;
+
+  // -- Accessibility labels --
+  scratch_revealDayAria?: string;
+  scratch_revealMonthAria?: string;
+  scratch_revealYearAria?: string;
+  nav_scrollToNextAria?: string;
+
   // -- Common --
   common_close?: string;
 }
@@ -1142,6 +1151,23 @@ export interface InvitationTranslationOverlay {
   };
   parents?: { blessingMessage?: string; inviteMessage?: string };
   ourStory?: { title?: string; description?: string };
+  /**
+   * Per-locale Canva URL. Empty or missing means "inherit the Portuguese
+   * link" — which is why the merge uses `||` rather than `??`.
+   */
+  externalLink?: string;
+  /**
+   * External-page countdown copy. Text only — `enabled`, `layout` and every
+   * colour/radius value stay canonical on the Portuguese record.
+   */
+  countdown?: {
+    title?: string;
+    subtitle?: string;
+    daysLabel?: string;
+    hoursLabel?: string;
+    minutesLabel?: string;
+    secondsLabel?: string;
+  };
   rsvpCustomFields?: Record<
     string,
     {

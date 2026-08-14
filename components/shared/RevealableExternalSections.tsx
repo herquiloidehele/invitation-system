@@ -20,6 +20,7 @@ import {
   resolveTextElementOverride,
   shouldRenderScratchReveal,
 } from "@/lib/curtain-canva";
+import { useCustomText } from "@/lib/custom-texts";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
 import { isPersonalGuestCardHidden } from "@/lib/personal-guest-card";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
@@ -112,6 +113,7 @@ export default function RevealableExternalSections({
   const revealContentStyle = resolveRevealContentStyle(revealed);
   const scratchRevealOn = shouldRenderScratchReveal(invitation.scratchReveal);
   const [rsvpOpen, setRsvpOpen] = useState(false);
+  const t = useCustomText(invitation.customTexts);
   const postScratchRsvpEnabled = shouldEnablePostScratchRsvp(invitation);
   const showInlineRsvp = shouldShowInlineRsvp({
     inlineEligible: showInitialPageSections && invitation.rsvp.enabled,
@@ -252,7 +254,9 @@ export default function RevealableExternalSections({
                       ),
                     }}
                   >
-                    <EditableText elementKey="inviteLabel">RSVP</EditableText>
+                    <EditableText elementKey="inviteLabel">
+                      {t("sectionTitle_rsvp")}
+                    </EditableText>
                   </span>
                   <div
                     aria-hidden

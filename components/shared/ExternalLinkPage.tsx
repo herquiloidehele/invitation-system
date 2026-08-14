@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
   appendCanvaPersonalizationParams,
   appendCanvaProxyHideScrollbarFlag,
@@ -54,6 +56,8 @@ export default function ExternalLinkPage({
   lazyLoadIframe = false,
   guest,
 }: ExternalLinkPageProps) {
+  const tn = useTranslations("Invitation");
+
   // Hide the iframe document's scrollbar while keeping its internal scroll
   // working. The proxy injects the scrollbar-hiding CSS server-side (it
   // serves the Canva HTML same-origin), so no content is clipped — see
@@ -91,7 +95,7 @@ export default function ExternalLinkPage({
     >
       <iframe
         src={src}
-        title="Convite externo"
+        title={tn("embed_iframeTitle")}
         allowFullScreen
         loading={lazyLoadIframe ? "lazy" : "eager"}
         style={{

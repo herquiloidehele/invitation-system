@@ -39,14 +39,50 @@ describe("invitation locale routing", () => {
     ).toBeNull();
   });
 
-  it("does not change existing external invitation locale behavior", () => {
+});
+
+const externalLink = duplicateForm({
+  invitationType: "external_link",
+  languageSwitcherEnabled: true,
+  enabledLocales: ["pt", "en"],
+});
+
+const externalVideo = duplicateForm({
+  invitationType: "external_video",
+  languageSwitcherEnabled: true,
+  enabledLocales: ["pt", "en"],
+});
+
+describe("external invitation locale routing", () => {
+  it("redirects a disabled locale on an external_link invitation", () => {
+    expect(
+      getInvitationLocaleRedirectPath(externalLink, "es", "/es/ana-joao", {}),
+    ).toBe("/ana-joao");
+  });
+
+  it("renders an enabled locale on an external_link invitation", () => {
+    expect(
+      getInvitationLocaleRedirectPath(externalLink, "en", "/en/ana-joao", {}),
+    ).toBeNull();
+  });
+
+  it("redirects an external_link invitation that never enabled the switcher", () => {
     expect(
       getInvitationLocaleRedirectPath(
-        { ...invitation, invitationType: "external_link" },
-        "es",
-        "/es/ana-joao",
-        { g: "abc" },
+        duplicateForm({
+          invitationType: "external_link",
+          languageSwitcherEnabled: false,
+        }),
+        "en",
+        "/en/ana-joao",
+        {},
       ),
+    ).toBe("/ana-joao");
+  });
+
+  it("leaves external_video invitations unrouted", () => {
+    expect(
+      getInvitationLocaleRedirectPath(externalVideo, "es", "/es/ana-joao", {}),
     ).toBeNull();
   });
 });

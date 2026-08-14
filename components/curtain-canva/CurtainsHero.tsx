@@ -529,7 +529,7 @@ export default function CurtainsHero({
         {heroInfoVisible && scrollIndicator.enabled && (
           <motion.button
             type="button"
-            aria-label="Scroll to next section"
+            aria-label={t("nav_scrollToNextAria")}
             className="absolute left-1/2 z-20 flex -translate-x-1/2 items-center justify-center rounded-full bg-white/70 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{
               width: scrollIndicator.buttonSize,

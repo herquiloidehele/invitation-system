@@ -4,6 +4,9 @@ import { useState, useCallback, useMemo, useReducer, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { NextIntlClientProvider } from "next-intl";
+import { getClientMessages } from "@/i18n/client-messages";
+import { InvitationLanguagePreviewProvider } from "@/components/shared/InvitationLanguageSwitcher";
 import {
   Video,
   Link2,
@@ -32,6 +35,7 @@ import type {
   ImageSettingsKey,
   CardSectionKey,
   CardStyle,
+  CustomTexts,
   PersonalGuestCardVisibility,
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
@@ -40,6 +44,14 @@ import {
   buildInvitationSlug,
   isWeddingEventType,
 } from "@/lib/invitation-event-types";
+import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
+import {
+  normalizeInvitationLocales,
+  normalizeInvitationTranslationIds,
+  validateInvitationLanguageSettings,
+} from "@/lib/invitation-translations";
+import { useInvitationTranslationDraft } from "@/hooks/use-invitation-translation-draft";
+import { InvitationLanguageSettings } from "@/components/admin/InvitationLanguageSettings";
 
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -370,8 +382,18 @@ export default function ExternalInvitationForm({
   );
   const clearSubmitError = useCallback(() => setSubmitError(null), []);
 
-  const [form, setForm] = useState<InvitationData>(
-    initialData ?? getDefaultState(themes[0]),
+  const {
+    sourceForm,
+    setSourceForm,
+    activeLocale,
+    setActiveLocale,
+    form,
+    setForm,
+    localizedPreview,
+    structureLocked,
+    sourcePlaceholder,
+  } = useInvitationTranslationDraft(
+    () => initialData ?? getDefaultState(themes[0]),
   );
   const [heroTextEditorOpen, setHeroTextEditorOpen] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
@@ -406,6 +428,22 @@ export default function ExternalInvitationForm({
       setForm((prev) => ({ ...prev, [key]: value }));
     },
     [clearSubmitError],
+  );
+
+  const updateCustomText = useCallback(
+    (key: keyof CustomTexts, value: string) => {
+      setForm((prev) => {
+        const ct = { ...prev.customTexts };
+        if (value.trim()) {
+          ct[key] = value;
+        } else {
+          delete ct[key];
+        }
+        const hasAny = Object.keys(ct).length > 0;
+        return { ...prev, customTexts: hasAny ? ct : undefined };
+      });
+    },
+    [setForm],
   );
 
   const updateImageLayer = (next: ImageLayer) => {
@@ -856,11 +894,22 @@ export default function ExternalInvitationForm({
   // invitations — the editor itself has no real per-recipient guest.
   const previewInvitation = useMemo(
     () =>
-      form.guestManagementEnabled
-        ? { ...form, guest: form.guest ?? PREVIEW_SAMPLE_GUEST }
-        : form,
-    [form],
+      localizedPreview.guestManagementEnabled
+        ? {
+            ...localizedPreview,
+            guest: localizedPreview.guest ?? PREVIEW_SAMPLE_GUEST,
+          }
+        : localizedPreview,
+    [localizedPreview],
   );
+
+  // The form edits a per-locale projection; the API must receive the canonical
+  // Portuguese record with the translations overlay attached. Posting `form`
+  // here would write the active locale's draft over the Portuguese values.
+  const canonicalPayload = () => {
+    const normalized = normalizeInvitationTranslationIds(sourceForm);
+    return { ...normalized, translations: normalized.translations ?? null };
+  };
 
   // Submit
   async function handleSubmit() {
@@ -881,6 +930,12 @@ export default function ExternalInvitationForm({
       return;
     }
 
+    const languageError = validateInvitationLanguageSettings(sourceForm);
+    if (languageError) {
+      toast.error(languageError);
+      return;
+    }
+
     setSaving(true);
     try {
       const { url, method } = invitationFormRequest(
@@ -892,7 +947,7 @@ export default function ExternalInvitationForm({
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(canonicalPayload()),
       });
 
       const data = await res.json();
@@ -1029,6 +1084,39 @@ export default function ExternalInvitationForm({
 
             {/* ── Accordion: all settings ── */}
             <Accordion defaultValue={[]} className="space-y-2">
+              {/* ── Languages ── */}
+              <AccordionItem
+                value="languages"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Idiomas
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <InvitationLanguageSettings
+                    enabled={sourceForm.languageSwitcherEnabled === true}
+                    enabledLocales={normalizeInvitationLocales(
+                      sourceForm.enabledLocales,
+                    )}
+                    activeLocale={activeLocale}
+                    onEnabledChange={(enabled) => {
+                      if (!enabled) setActiveLocale("pt");
+                      setSourceForm((current) => ({
+                        ...current,
+                        languageSwitcherEnabled: enabled,
+                      }));
+                    }}
+                    onEnabledLocalesChange={(enabledLocales) =>
+                      setSourceForm((current) => ({
+                        ...current,
+                        enabledLocales,
+                      }))
+                    }
+                    onActiveLocaleChange={setActiveLocale}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+
               {/* ── Couple ── */}
               <AccordionItem value="couple" className="border rounded-lg px-4">
                 <AccordionTrigger className="text-sm font-medium">
@@ -1872,8 +1960,16 @@ export default function ExternalInvitationForm({
                       type="url"
                       value={form.externalLink ?? ""}
                       onChange={(e) => update("externalLink", e.target.value)}
-                      placeholder="https://..."
+                      placeholder={sourcePlaceholder(
+                        sourceForm.externalLink,
+                        "https://...",
+                      )}
                     />
+                    {structureLocked && !form.externalLink?.trim() && (
+                      <p className="text-xs text-amber-600">
+                        Sem link próprio — usará o link em português.
+                      </p>
+                    )}
                     <div className="mt-3 rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground space-y-1">
                       <p className="font-medium text-foreground">
                         Personalização no design Canva
@@ -2643,6 +2739,7 @@ export default function ExternalInvitationForm({
                       <CoupleGalleryEditor
                         value={form.coupleGallery}
                         onChange={updateCoupleGallery}
+                        structureLocked={structureLocked}
                       />
                     </div>
 
@@ -2728,6 +2825,7 @@ export default function ExternalInvitationForm({
                           <GiftsListEditor
                             value={form.giftRegistry.items}
                             onChange={updateGiftItems}
+                            structureLocked={structureLocked}
                           />
 
                           <div className="space-y-1.5">
@@ -2751,6 +2849,7 @@ export default function ExternalInvitationForm({
                           <BankTransferEditor
                             value={form.giftRegistry.bankTransfer}
                             onChange={updateBankTransfer}
+                            structureLocked={structureLocked}
                           />
                         </div>
                       )}
@@ -2790,15 +2889,17 @@ export default function ExternalInvitationForm({
                                   placeholder="Pergunta"
                                 />
                               </div>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeFaq(index)}
-                                className="mt-5 text-destructive"
-                              >
-                                &times;
-                              </Button>
+                              {!structureLocked && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeFaq(index)}
+                                  className="mt-5 text-destructive"
+                                >
+                                  &times;
+                                </Button>
+                              )}
                             </div>
                             <div className="space-y-1.5">
                               <Label htmlFor={`externalFaqAnswer-${index}`}>
@@ -2817,14 +2918,16 @@ export default function ExternalInvitationForm({
                           </div>
                         ))}
 
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={addFaq}
-                        >
-                          + Adicionar Pergunta
-                        </Button>
+                        {!structureLocked && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addFaq}
+                          >
+                            + Adicionar Pergunta
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </AccordionContent>
@@ -3889,6 +3992,52 @@ export default function ExternalInvitationForm({
                     : undefined
                 }
               />
+              {/* ── Custom texts ── */}
+              <AccordionItem
+                value="customTexts"
+                className="border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium">
+                  Textos Personalizados
+                </AccordionTrigger>
+                <AccordionContent className="space-y-5 pb-4">
+                  <p className="text-xs text-muted-foreground">
+                    Personalize os textos exibidos no convite. Deixe em branco
+                    para usar o texto padrão.
+                  </p>
+
+                  {CUSTOM_TEXT_GROUPS.map((group) => (
+                    <div key={group.id} className="space-y-3">
+                      <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {group.label}
+                      </h4>
+                      {group.fields.map((field) => (
+                        <div key={field.key} className="space-y-1">
+                          <Label
+                            htmlFor={`ext-ct-${field.key}`}
+                            className="text-xs"
+                          >
+                            {field.label}
+                          </Label>
+                          <Input
+                            id={`ext-ct-${field.key}`}
+                            value={form.customTexts?.[field.key] ?? ""}
+                            onChange={(e) =>
+                              updateCustomText(field.key, e.target.value)
+                            }
+                            placeholder={sourcePlaceholder(
+                              sourceForm.customTexts?.[field.key],
+                              field.placeholder,
+                            )}
+                            className="text-sm"
+                          />
+                        </div>
+                      ))}
+                      <Separator />
+                    </div>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </div>
         </ScrollArea>
@@ -3948,36 +4097,43 @@ export default function ExternalInvitationForm({
 
           <TabsContent value="invite" className="flex-1 overflow-hidden m-0">
             <SpacingStyleProvider spacingStyles={form.spacingStyles}>
-              <div className="relative h-full max-h-165 overflow-hidden bg-black">
-                {isVideoEntrance ? (
-                  /* Video-entrance layout: render the actual public-facing page
+              <NextIntlClientProvider
+                locale={activeLocale}
+                messages={getClientMessages(activeLocale)}
+              >
+                <InvitationLanguagePreviewProvider
+                  onLocaleChange={setActiveLocale}
+                >
+                  <div className="relative h-full max-h-165 overflow-hidden bg-black">
+                    {isVideoEntrance ? (
+                      /* Video-entrance layout: render the actual public-facing page
                    so admins see the entrance video, timed text reveal, and the
                    external sections exactly as guests will. */
-                  <InlineTextEditProvider
-                    updateTextStyleElement={updateTextStyleElement}
-                    textStyles={form.textStyles}
-                  >
-                    <InlineCardEditProvider
-                      updateCardStyle={updateCardStyle}
-                      updateSectionSpacing={updateSectionSpacing}
-                      cardStyles={form.cardStyles}
-                      spacingStyles={form.spacingStyles}
-                    >
-                      <TextStyleToolbar />
-                      <CardStyleToolbar />
-                      <div
-                        ref={previewRootRef}
-                        className="absolute inset-0 overflow-y-auto bg-background"
+                      <InlineTextEditProvider
+                        updateTextStyleElement={updateTextStyleElement}
+                        textStyles={form.textStyles}
                       >
-                        <VideoEntrancePage
-                          invitation={previewInvitation}
-                          theme={currentTheme as TemplateTheme}
-                        />
-                      </div>
-                    </InlineCardEditProvider>
-                  </InlineTextEditProvider>
-                ) : isCurtainCanva ? (
-                  /* Curtain-Canva layout: render the actual public-facing page
+                        <InlineCardEditProvider
+                          updateCardStyle={updateCardStyle}
+                          updateSectionSpacing={updateSectionSpacing}
+                          cardStyles={form.cardStyles}
+                          spacingStyles={form.spacingStyles}
+                        >
+                          <TextStyleToolbar />
+                          <CardStyleToolbar />
+                          <div
+                            ref={previewRootRef}
+                            className="absolute inset-0 overflow-y-auto bg-background"
+                          >
+                            <VideoEntrancePage
+                              invitation={previewInvitation}
+                              theme={currentTheme as TemplateTheme}
+                            />
+                          </div>
+                        </InlineCardEditProvider>
+                      </InlineTextEditProvider>
+                    ) : isCurtainCanva ? (
+                      /* Curtain-Canva layout: render the actual public-facing page
                    so admins see exactly what guests will see (curtains hero,
                    scratch reveal, Canva iframe section, inline RSVP). The
                    preview is scrollable inside the pane.
@@ -3988,105 +4144,107 @@ export default function ExternalInvitationForm({
                    the floating TextStyleToolbar so the admin can adjust per-
                    element font/size/weight/color overrides exactly like in
                    the standard invitation preview. */
-                  <InlineTextEditProvider
-                    updateTextStyleElement={updateTextStyleElement}
-                    textStyles={form.textStyles}
-                  >
-                    <InlineCardEditProvider
-                      updateCardStyle={updateCardStyle}
-                      updateSectionSpacing={updateSectionSpacing}
-                      cardStyles={form.cardStyles}
-                      spacingStyles={form.spacingStyles}
-                    >
-                      <TextStyleToolbar />
-                      <CardStyleToolbar />
-                      <div
-                        ref={previewRootRef}
-                        className="absolute inset-0 overflow-y-auto bg-background"
+                      <InlineTextEditProvider
+                        updateTextStyleElement={updateTextStyleElement}
+                        textStyles={form.textStyles}
                       >
-                        <CurtainCanvaPage
-                          invitation={previewInvitation}
-                          theme={currentTheme as TemplateTheme}
-                        />
-                      </div>
-                    </InlineCardEditProvider>
-                  </InlineTextEditProvider>
-                ) : subType === "external_video" ? (
-                  <InlineTextEditProvider
-                    updateTextStyleElement={updateTextStyleElement}
-                    textStyles={form.textStyles}
-                  >
-                    <InlineCardEditProvider
-                      updateCardStyle={updateCardStyle}
-                      updateSectionSpacing={updateSectionSpacing}
-                      cardStyles={form.cardStyles}
-                      spacingStyles={form.spacingStyles}
-                    >
-                      <TextStyleToolbar />
-                      <CardStyleToolbar />
-                      <div
-                        ref={previewRootRef}
-                        className="absolute inset-0 overflow-y-auto bg-background"
-                      >
-                        {form.videoUrl ? (
-                          <InvitationHero
-                            invitation={previewInvitation}
-                            theme={currentTheme as TemplateTheme}
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                            Carrega um vídeo para ver a pré-visualização do
-                            convite
+                        <InlineCardEditProvider
+                          updateCardStyle={updateCardStyle}
+                          updateSectionSpacing={updateSectionSpacing}
+                          cardStyles={form.cardStyles}
+                          spacingStyles={form.spacingStyles}
+                        >
+                          <TextStyleToolbar />
+                          <CardStyleToolbar />
+                          <div
+                            ref={previewRootRef}
+                            className="absolute inset-0 overflow-y-auto bg-background"
+                          >
+                            <CurtainCanvaPage
+                              invitation={previewInvitation}
+                              theme={currentTheme as TemplateTheme}
+                            />
                           </div>
-                        )}
-                      </div>
-                    </InlineCardEditProvider>
-                  </InlineTextEditProvider>
-                ) : subType === "external_link" &&
-                  hasRichExternalSections(form) ? (
-                  /* Rich external_link layout: render the actual public-facing
+                        </InlineCardEditProvider>
+                      </InlineTextEditProvider>
+                    ) : subType === "external_video" ? (
+                      <InlineTextEditProvider
+                        updateTextStyleElement={updateTextStyleElement}
+                        textStyles={form.textStyles}
+                      >
+                        <InlineCardEditProvider
+                          updateCardStyle={updateCardStyle}
+                          updateSectionSpacing={updateSectionSpacing}
+                          cardStyles={form.cardStyles}
+                          spacingStyles={form.spacingStyles}
+                        >
+                          <TextStyleToolbar />
+                          <CardStyleToolbar />
+                          <div
+                            ref={previewRootRef}
+                            className="absolute inset-0 overflow-y-auto bg-background"
+                          >
+                            {form.videoUrl ? (
+                              <InvitationHero
+                                invitation={previewInvitation}
+                                theme={currentTheme as TemplateTheme}
+                              />
+                            ) : (
+                              <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                                Carrega um vídeo para ver a pré-visualização do
+                                convite
+                              </div>
+                            )}
+                          </div>
+                        </InlineCardEditProvider>
+                      </InlineTextEditProvider>
+                    ) : subType === "external_link" &&
+                      hasRichExternalSections(form) ? (
+                      /* Rich external_link layout: render the actual public-facing
                    page so admins see hero / scratch / iframe / RSVP composed
                    exactly as guests will. InlineTextEditProvider wires up the
                    TextStyleToolbar for per-element overrides. */
-                  <InlineTextEditProvider
-                    updateTextStyleElement={updateTextStyleElement}
-                    textStyles={form.textStyles}
-                  >
-                    <InlineCardEditProvider
-                      updateCardStyle={updateCardStyle}
-                      updateSectionSpacing={updateSectionSpacing}
-                      cardStyles={form.cardStyles}
-                      spacingStyles={form.spacingStyles}
-                    >
-                      <TextStyleToolbar />
-                      <CardStyleToolbar />
-                      <div
-                        ref={previewRootRef}
-                        className="absolute inset-0 overflow-y-auto bg-background"
+                      <InlineTextEditProvider
+                        updateTextStyleElement={updateTextStyleElement}
+                        textStyles={form.textStyles}
                       >
-                        <RichExternalLinkPage
-                          invitation={form}
-                          theme={currentTheme as TemplateTheme}
-                          isPreview
-                        />
+                        <InlineCardEditProvider
+                          updateCardStyle={updateCardStyle}
+                          updateSectionSpacing={updateSectionSpacing}
+                          cardStyles={form.cardStyles}
+                          spacingStyles={form.spacingStyles}
+                        >
+                          <TextStyleToolbar />
+                          <CardStyleToolbar />
+                          <div
+                            ref={previewRootRef}
+                            className="absolute inset-0 overflow-y-auto bg-background"
+                          >
+                            <RichExternalLinkPage
+                              invitation={form}
+                              theme={currentTheme as TemplateTheme}
+                              isPreview
+                            />
+                          </div>
+                        </InlineCardEditProvider>
+                      </InlineTextEditProvider>
+                    ) : form.externalLink ? (
+                      <iframe
+                        src={externalEmbedSrc}
+                        title="Convite externo"
+                        allowFullScreen
+                        loading="eager"
+                        className="absolute inset-0 h-full w-full border-0 bg-background"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                        Introduz o link externo para ver a pré-visualização do
+                        convite
                       </div>
-                    </InlineCardEditProvider>
-                  </InlineTextEditProvider>
-                ) : form.externalLink ? (
-                  <iframe
-                    src={externalEmbedSrc}
-                    title="Convite externo"
-                    allowFullScreen
-                    loading="eager"
-                    className="absolute inset-0 h-full w-full border-0 bg-background"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                    Introduz o link externo para ver a pré-visualização do
-                    convite
+                    )}
                   </div>
-                )}
-              </div>
+                </InvitationLanguagePreviewProvider>
+              </NextIntlClientProvider>
             </SpacingStyleProvider>
           </TabsContent>
         </Tabs>
