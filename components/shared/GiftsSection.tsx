@@ -73,8 +73,8 @@ export default function GiftsSection({
         <Gift size={20} color={ts.accent} strokeWidth={1.5} />
       </motion.div>
 
-      <span style={ts.labels}>
-        <EditableText elementKey="labels">
+      <span style={ts.sectionLabel}>
+        <EditableText elementKey="sectionLabel">
           {t("sectionTitle_giftRegistry")}
         </EditableText>
       </span>

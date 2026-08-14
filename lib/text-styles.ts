@@ -24,8 +24,8 @@ export interface ResolvedTextStyles {
   bodyText: CSSProperties;
   /** Dress code description text */
   dressCodeText: CSSProperties;
-  /** Small labels ("Dress Code", "Presentes", "Localização") */
-  labels: CSSProperties;
+  /** Small section titles ("Dress Code", "Presentes") */
+  sectionLabel: CSSProperties;
   /** "Convidam para o casamento de" label — normal */
   inviteLabel: CSSProperties;
   /** "Convidam para o casamento de" label — video */
@@ -360,17 +360,16 @@ export function resolveTextStyles(
     el?.dressCodeText ?? el?.bodyText,
   );
 
-  const labels = applyOverride(
-    {
-      fontFamily: uiFont,
-      fontSize: 9,
-      fontWeight: 500,
-      letterSpacing: 3,
-      textTransform: "uppercase" as const,
-      color: textMuted,
-    },
-    el?.labels,
-  );
+  const labelBase = {
+    fontFamily: uiFont,
+    fontSize: 9,
+    fontWeight: 500,
+    letterSpacing: 3,
+    textTransform: "uppercase" as const,
+    color: textMuted,
+  };
+
+  const sectionLabel = applyOverride(labelBase, el?.sectionLabel ?? el?.labels);
 
   const inviteLabel = applyOverride(
     {
@@ -1119,7 +1118,7 @@ export function resolveTextStyles(
     sectionTitles,
     bodyText,
     dressCodeText,
-    labels,
+    sectionLabel,
     inviteLabel,
     inviteLabelVideo,
     faqQuestion,

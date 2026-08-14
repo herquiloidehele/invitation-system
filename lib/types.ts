@@ -787,7 +787,20 @@ export interface TextStyleOverrides {
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
     dressCodeText?: TextStyle;
+    /**
+     * Legacy shared slot. Until the label split it styled the gifts and
+     * dress-code section titles, the RSVP field labels and the curtain scratch
+     * labels all at once. Nothing writes it anymore — it is only read as a
+     * fallback by `sectionLabel`, `rsvpFieldLabel` and `scratchLabel` so
+     * invitations saved before the split keep rendering as they did.
+     */
     labels?: TextStyle;
+    /** Small section titles ("Presentes", "Dress Code"). */
+    sectionLabel?: TextStyle;
+    /** RSVP form field labels ("Nome(s)", "Irá comparecer?", "Mensagem"). */
+    rsvpFieldLabel?: TextStyle;
+    /** Curtain scratch-reveal labels and sub-labels. */
+    scratchLabel?: TextStyle;
     inviteLabel?: TextStyle;
     faqQuestion?: TextStyle;
     faqAnswer?: TextStyle;

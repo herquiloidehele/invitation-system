@@ -94,7 +94,11 @@ export default function ScratchDateReveal({
   const t = useCustomText(customTexts);
   const locale = useLocale();
   const titleOverride = resolveTextElementOverride(textStyles, "sectionTitles");
-  const labelsOverride = resolveTextElementOverride(textStyles, "labels");
+  const labelsOverride = resolveTextElementOverride(
+    textStyles,
+    "scratchLabel",
+    "labels",
+  );
   const dateDayOverride = resolveTextElementOverride(textStyles, "dateDay");
   const dateMonthOverride = resolveTextElementOverride(textStyles, "dateMonth");
   const dateYearOverride = resolveTextElementOverride(textStyles, "dateYear");
@@ -275,7 +279,7 @@ export default function ScratchDateReveal({
             ...labelsOverride,
           }}
         >
-          <EditableText elementKey="labels">
+          <EditableText elementKey="scratchLabel">
             {t("scratch_subtitle")}
           </EditableText>
         </p>
@@ -426,7 +430,7 @@ function CoinWithLabel({
           ...subLabelOverride,
         }}
       >
-        <EditableText elementKey="labels">{subLabel}</EditableText>
+        <EditableText elementKey="scratchLabel">{subLabel}</EditableText>
       </span>
     </div>
   );

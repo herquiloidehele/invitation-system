@@ -12,19 +12,30 @@ type CurtainElementKey = keyof NonNullable<TextStyleOverrides["elements"]>;
 
 /**
  * Returns the per-element text style override stored on an invitation for
- * the given element key, or an empty object when nothing has been set.
+ * the first of the given element keys that has one, or an empty object when
+ * none do.
  *
  * Curtain-canva components apply this on top of their own inline styles so
  * the admin's element-level overrides (font, size, weight, color, letter
  * spacing) win without us having to plug into the larger `resolveTextStyles`
  * pipeline used by the standard invitation. The empty-object fallback lets
  * callers spread it unconditionally: `style={{ ...defaults, ...override }}`.
+ *
+ * Extra keys act as fallbacks, mirroring the `el?.a ?? el?.b` precedence used
+ * by `resolveTextStyles`: the first key with an override wins outright, it is
+ * not merged field-by-field with the later ones. This is how the split label
+ * keys read the legacy shared `labels` slot, e.g.
+ * `resolveTextElementOverride(textStyles, "rsvpFieldLabel", "labels")`.
  */
 export function resolveTextElementOverride(
   overrides: TextStyleOverrides | undefined | null,
-  element: CurtainElementKey,
+  ...elements: CurtainElementKey[]
 ): TextStyle {
-  return overrides?.elements?.[element] ?? {};
+  for (const element of elements) {
+    const override = overrides?.elements?.[element];
+    if (override) return override;
+  }
+  return {};
 }
 
 const DEFAULT_CURTAIN_VIDEO_SRC = "/videos/curtains.mp4";

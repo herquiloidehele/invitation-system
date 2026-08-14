@@ -709,8 +709,8 @@ export default function InvitationPage({
                             strokeWidth={1.5}
                           />
                   </motion.div>
-                  <span style={ts.labels}>
-                    <EditableText elementKey="labels">
+                  <span style={ts.sectionLabel}>
+                    <EditableText elementKey="sectionLabel">
                       {t("sectionTitle_dressCode")}
                     </EditableText>
                   </span>

@@ -263,7 +263,11 @@ export default function RSVPForm(props: RSVPFormProps) {
     ? props.invitation.textStyles
     : undefined;
   const titleOverride = resolveTextElementOverride(textStyles, "sectionTitles");
-  const labelsOverride = resolveTextElementOverride(textStyles, "labels");
+  const labelsOverride = resolveTextElementOverride(
+    textStyles,
+    "rsvpFieldLabel",
+    "labels",
+  );
   const bodyTextOverride = resolveTextElementOverride(textStyles, "bodyText");
   const ctaLabelOverride = resolveTextElementOverride(textStyles, "ctaLabel");
 
@@ -640,7 +644,7 @@ export default function RSVPForm(props: RSVPFormProps) {
 
             <div className="flex flex-col gap-1.5">
               <label style={labelStyle}>
-                <EditableText elementKey="labels">
+                <EditableText elementKey="rsvpFieldLabel">
                   {resolveText("rsvp_nameLabel")}
                 </EditableText>
               </label>
@@ -662,7 +666,7 @@ export default function RSVPForm(props: RSVPFormProps) {
             {showCompanion && (
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
-                  <EditableText elementKey="labels">
+                  <EditableText elementKey="rsvpFieldLabel">
                     {resolveText("rsvp_companionLabel")}
                   </EditableText>
                 </label>
@@ -678,7 +682,7 @@ export default function RSVPForm(props: RSVPFormProps) {
             {showEmail && (
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
-                  <EditableText elementKey="labels">
+                  <EditableText elementKey="rsvpFieldLabel">
                     {resolveText("rsvp_emailLabel")}
                   </EditableText>
                 </label>
@@ -699,7 +703,7 @@ export default function RSVPForm(props: RSVPFormProps) {
 
             <div className="flex flex-col gap-2">
               <label style={labelStyle}>
-                <EditableText elementKey="labels">
+                <EditableText elementKey="rsvpFieldLabel">
                   {resolveText("rsvp_attendingLabel")}
                 </EditableText>
               </label>
@@ -753,7 +757,7 @@ export default function RSVPForm(props: RSVPFormProps) {
             {attending === "yes" && showDietaryRestrictions && (
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
-                  <EditableText elementKey="labels">
+                  <EditableText elementKey="rsvpFieldLabel">
                     {resolveText("rsvp_dietaryLabel")}
                   </EditableText>
                 </label>
@@ -769,7 +773,7 @@ export default function RSVPForm(props: RSVPFormProps) {
             {attending === "yes" && showNumAdults && (
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
-                  <EditableText elementKey="labels">
+                  <EditableText elementKey="rsvpFieldLabel">
                     {resolveText("rsvp_adultsLabel")}
                   </EditableText>
                 </label>
@@ -792,7 +796,7 @@ export default function RSVPForm(props: RSVPFormProps) {
             {attending === "yes" && showNumChildren && (
               <div className="flex flex-col gap-1.5">
                 <label style={labelStyle}>
-                  <EditableText elementKey="labels">
+                  <EditableText elementKey="rsvpFieldLabel">
                     {resolveText("rsvp_childrenLabel")}
                   </EditableText>
                 </label>
@@ -831,7 +835,7 @@ export default function RSVPForm(props: RSVPFormProps) {
 
             <div className="flex flex-col gap-1.5">
               <label style={labelStyle}>
-                <EditableText elementKey="labels">
+                <EditableText elementKey="rsvpFieldLabel">
                   {resolveText("rsvp_messageLabel")}
                 </EditableText>
               </label>
