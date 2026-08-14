@@ -32,6 +32,7 @@ import type {
   ImageSettingsKey,
   CardSectionKey,
   CardStyle,
+  PersonalGuestCardVisibility,
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import {
@@ -126,6 +127,10 @@ import {
   normalizeOwnerGuestFormMode,
   OWNER_GUEST_FORM_MODE_OPTIONS,
 } from "@/lib/owner-guest-form-mode";
+import {
+  PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS,
+  resolvePersonalGuestCardVisibility,
+} from "@/lib/personal-guest-card";
 import { HERO_VIDEO_UPLOAD_PROFILE } from "@/lib/video-upload";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
@@ -664,6 +669,10 @@ export default function ExternalInvitationForm({
       }));
     },
     [],
+  );
+
+  const personalGuestCardVisibility = resolvePersonalGuestCardVisibility(
+    form.personalGuestCard,
   );
 
   const updateHeroConfetti = useCallback((enabled: boolean) => {
@@ -3662,23 +3671,53 @@ export default function ExternalInvitationForm({
                     />
                   </div>
 
-                  <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
-                    <div>
-                      <Label className="cursor-pointer">
-                        Ocultar cartão do convidado nas pré-visualizações
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Quando activo, o cartão pessoal do convidado não aparece
-                        nas pré-visualizações da página inicial. Continua
-                        visível para os convidados reais.
-                      </p>
-                    </div>
-                    <Switch
-                      checked={form.personalGuestCard?.hideInPreview === true}
-                      onCheckedChange={(value) =>
-                        updatePersonalGuestCard("hideInPreview", value)
+                  <div className="space-y-1.5 rounded-lg border p-3">
+                    <Label htmlFor="external-personal-guest-card-visibility">
+                      Cartão do convidado
+                    </Label>
+                    <Select
+                      value={personalGuestCardVisibility}
+                      onValueChange={(value) =>
+                        updatePersonalGuestCard(
+                          "visibility",
+                          value as PersonalGuestCardVisibility,
+                        )
                       }
-                    />
+                    >
+                      <SelectTrigger id="external-personal-guest-card-visibility">
+                        <SelectValue>
+                          {(value: string | null) =>
+                            PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS.find(
+                              (option) => option.value === value,
+                            )?.label ?? value
+                          }
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS.map(
+                          (option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      &ldquo;Ocultar nas pré-visualizações&rdquo; esconde o
+                      cartão apenas nas pré-visualizações da página inicial.
+                      &ldquo;Nunca mostrar&rdquo; esconde-o também para os
+                      convidados reais — a gestão de convidados continua a
+                      funcionar (links pessoais, RSVP, presentes).
+                    </p>
+                    {personalGuestCardVisibility === "never" && (
+                      <p className="text-xs text-amber-600 dark:text-amber-500">
+                        Atenção: o botão &ldquo;convidar mais pessoas&rdquo;
+                        vive dentro deste cartão. Com &ldquo;Nunca
+                        mostrar&rdquo;, os convidados com &ldquo;Pode convidar
+                        outros&rdquo; não terão como registar acompanhantes.
+                      </p>
+                    )}
                   </div>
 
                   {form.guestManagementEnabled && (
@@ -3790,41 +3829,45 @@ export default function ExternalInvitationForm({
                         </p>
                       )}
 
-                      {(isVideoEntrance || isCurtainCanva) && (
-                        <SectionBackgroundImageEditor
-                          value={
-                            form.personalGuestCard?.backgroundImageUrl ?? ""
-                          }
-                          label="Imagem de fundo do cartão do convidado"
-                          description="Fotografia de fundo opcional atrás do cartão pessoal do convidado. Sem imagem, a secção usa a cor de fundo do tema."
-                          scrimLabel="Escurecimento da imagem"
-                          maxSizeMB={8}
-                          scrimOpacity={form.personalGuestCard?.scrimOpacity}
-                          onUpload={(url) =>
-                            updatePersonalGuestCard("backgroundImageUrl", url)
-                          }
-                          onClear={() => {
-                            updatePersonalGuestCard("backgroundImageUrl", null);
-                            updateImageSettings(
+                      {(isVideoEntrance || isCurtainCanva) &&
+                        personalGuestCardVisibility !== "never" && (
+                          <SectionBackgroundImageEditor
+                            value={
+                              form.personalGuestCard?.backgroundImageUrl ?? ""
+                            }
+                            label="Imagem de fundo do cartão do convidado"
+                            description="Fotografia de fundo opcional atrás do cartão pessoal do convidado. Sem imagem, a secção usa a cor de fundo do tema."
+                            scrimLabel="Escurecimento da imagem"
+                            maxSizeMB={8}
+                            scrimOpacity={form.personalGuestCard?.scrimOpacity}
+                            onUpload={(url) =>
+                              updatePersonalGuestCard("backgroundImageUrl", url)
+                            }
+                            onClear={() => {
+                              updatePersonalGuestCard(
+                                "backgroundImageUrl",
+                                null,
+                              );
+                              updateImageSettings(
+                                "personalGuestCardBackground",
+                                DEFAULT_IMAGE_SETTINGS,
+                              );
+                            }}
+                            onScrimChange={(o) =>
+                              updatePersonalGuestCard("scrimOpacity", o)
+                            }
+                            positionSettings={imgSettings(
                               "personalGuestCardBackground",
-                              DEFAULT_IMAGE_SETTINGS,
-                            );
-                          }}
-                          onScrimChange={(o) =>
-                            updatePersonalGuestCard("scrimOpacity", o)
-                          }
-                          positionSettings={imgSettings(
-                            "personalGuestCardBackground",
-                          )}
-                          onPositionChange={(s) =>
-                            updateImageSettings(
-                              "personalGuestCardBackground",
-                              s,
-                            )
-                          }
-                          idPrefix="pgcBg"
-                        />
-                      )}
+                            )}
+                            onPositionChange={(s) =>
+                              updateImageSettings(
+                                "personalGuestCardBackground",
+                                s,
+                              )
+                            }
+                            idPrefix="pgcBg"
+                          />
+                        )}
                     </>
                   )}
                 </AccordionContent>

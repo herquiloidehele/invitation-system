@@ -21,7 +21,7 @@ import {
   shouldRenderScratchReveal,
 } from "@/lib/curtain-canva";
 import { getEffectiveExternalLink } from "@/lib/invitation-external-link";
-import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
+import { isPersonalGuestCardHidden } from "@/lib/personal-guest-card";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
 import { shouldRenderPlaces } from "@/lib/places";
 import {
@@ -167,7 +167,7 @@ export default function RevealableExternalSections({
 
         {showInitialPageSections &&
           (invitation.guest || isLandingPreview) &&
-          !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview) && (
+          !isPersonalGuestCardHidden(invitation, isLandingPreview) && (
             <SectionImageHost sectionKey="personalGuestCard" layer={imageLayer}>
               <EditableCard sectionKey="personalGuestCard">
                 <PersonalGuestCard

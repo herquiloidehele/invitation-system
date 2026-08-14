@@ -33,6 +33,7 @@ import type {
   LocationInfo,
   ParentsInfo,
   PlaceItem,
+  PersonalGuestCardVisibility,
   PlaceSection,
   PlacesConfig,
   PlacesLayout,
@@ -140,6 +141,10 @@ import {
   normalizeOwnerGuestFormMode,
   OWNER_GUEST_FORM_MODE_OPTIONS,
 } from "@/lib/owner-guest-form-mode";
+import {
+  PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS,
+  resolvePersonalGuestCardVisibility,
+} from "@/lib/personal-guest-card";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import {
@@ -699,6 +704,10 @@ export default function InvitationForm({
       }
     },
     [],
+  );
+
+  const personalGuestCardVisibility = resolvePersonalGuestCardVisibility(
+    form.personalGuestCard,
   );
 
   // Generic updater
@@ -4011,29 +4020,56 @@ export default function InvitationForm({
                     />
                   </div>
 
-                  <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
-                    <div>
-                      <Label className="cursor-pointer">
-                        Ocultar cartão do convidado nas pré-visualizações
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Quando activo, o cartão pessoal do convidado não aparece
-                        nas pré-visualizações da página inicial. Continua
-                        visível para os convidados reais.
-                      </p>
-                    </div>
-                    <Switch
-                      checked={form.personalGuestCard?.hideInPreview === true}
-                      onCheckedChange={(value) =>
+                  <div className="space-y-1.5 rounded-lg border p-3">
+                    <Label htmlFor="personal-guest-card-visibility">
+                      Cartão do convidado
+                    </Label>
+                    <Select
+                      value={personalGuestCardVisibility}
+                      onValueChange={(value) =>
                         setForm((prev) => ({
                           ...prev,
                           personalGuestCard: {
                             ...(prev.personalGuestCard ?? {}),
-                            hideInPreview: value,
+                            visibility: value as PersonalGuestCardVisibility,
                           },
                         }))
                       }
-                    />
+                    >
+                      <SelectTrigger id="personal-guest-card-visibility">
+                        <SelectValue>
+                          {(value: string | null) =>
+                            PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS.find(
+                              (option) => option.value === value,
+                            )?.label ?? value
+                          }
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS.map(
+                          (option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      &ldquo;Ocultar nas pré-visualizações&rdquo; esconde o
+                      cartão apenas nas pré-visualizações da página inicial.
+                      &ldquo;Nunca mostrar&rdquo; esconde-o também para os
+                      convidados reais — a gestão de convidados continua a
+                      funcionar (links pessoais, RSVP, presentes).
+                    </p>
+                    {personalGuestCardVisibility === "never" && (
+                      <p className="text-xs text-amber-600 dark:text-amber-500">
+                        Atenção: o botão &ldquo;convidar mais pessoas&rdquo;
+                        vive dentro deste cartão. Com &ldquo;Nunca
+                        mostrar&rdquo;, os convidados com &ldquo;Pode convidar
+                        outros&rdquo; não terão como registar acompanhantes.
+                      </p>
+                    )}
                   </div>
 
                   {form.guestManagementEnabled && (

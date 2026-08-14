@@ -14,7 +14,7 @@ import type {
   TemplateTheme,
 } from "@/lib/types";
 import { resolveCardSurfaceStyle } from "@/lib/card-styles";
-import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
+import { isPersonalGuestCardHidden } from "@/lib/personal-guest-card";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
@@ -319,7 +319,7 @@ export default function RichExternalLinkPage({
           )}
 
           {(invitation.guestManagementEnabled || isLandingPreview) &&
-            !isPersonalGuestCardHiddenInPreview(
+            !isPersonalGuestCardHidden(
               invitation,
               isLandingPreview,
             ) && (

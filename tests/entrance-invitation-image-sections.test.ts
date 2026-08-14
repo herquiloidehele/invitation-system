@@ -53,6 +53,31 @@ describe("getEntranceInvitationImageSectionKeys", () => {
     ]);
   });
 
+  it("omits personalGuestCard when visibility is never, even with a real guest", () => {
+    const invitation: InvitationData = {
+      ...MOCK_INVITATION,
+      invitationType: "external_link",
+      externalLink: "https://example.com/invitation",
+      scratchReveal: { enabled: false },
+      countdown: { enabled: false },
+      guest: {
+        token: "guest",
+        name: "Guest",
+        totalGuests: 1,
+        canInviteOthers: false,
+        invitationSlug: "preview",
+      },
+      personalGuestCard: { visibility: "never" },
+      coupleGallery: { enabled: false, style: "grid", images: [] },
+      places: { enabled: false, layout: "stacked", sections: [] },
+      rsvp: { ...MOCK_INVITATION.rsvp, enabled: false },
+    };
+
+    expect(getEntranceInvitationImageSectionKeys(invitation)).not.toContain(
+      "personalGuestCard",
+    );
+  });
+
   it("omits initial-page sections after internal Canva navigation", () => {
     const invitation: InvitationData = {
       ...MOCK_INVITATION,

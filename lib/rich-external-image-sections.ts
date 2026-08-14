@@ -1,6 +1,6 @@
 import { shouldRenderCoupleGallery } from "./couple-gallery";
 import { getEffectiveExternalLink } from "./invitation-external-link";
-import { isPersonalGuestCardHiddenInPreview } from "./personal-guest-card";
+import { isPersonalGuestCardHidden } from "./personal-guest-card";
 import { shouldRenderPlaces } from "./places";
 import type { ImageLayerSectionKey, InvitationData } from "./types";
 
@@ -21,7 +21,7 @@ export function getRichExternalInvitationImageSectionKeys(
   if (invitation.countdown?.enabled) keys.push("countdown");
   if (
     (invitation.guestManagementEnabled || isLandingPreview) &&
-    !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview)
+    !isPersonalGuestCardHidden(invitation, isLandingPreview)
   ) {
     keys.push("personalGuestCard");
   }

@@ -1,7 +1,7 @@
 import { shouldRenderCoupleGallery } from "./couple-gallery";
 import { shouldRenderScratchReveal } from "./curtain-canva";
 import { getEffectiveExternalLink } from "./invitation-external-link";
-import { isPersonalGuestCardHiddenInPreview } from "./personal-guest-card";
+import { isPersonalGuestCardHidden } from "./personal-guest-card";
 import { shouldRenderPlaces } from "./places";
 import type { ImageLayerSectionKey, InvitationData } from "./types";
 
@@ -40,7 +40,7 @@ export function getEntranceInvitationImageSectionKeys(
     if (invitation.countdown?.enabled) keys.push("countdown");
     if (
       (invitation.guest || isLandingPreview) &&
-      !isPersonalGuestCardHiddenInPreview(invitation, isLandingPreview)
+      !isPersonalGuestCardHidden(invitation, isLandingPreview)
     ) {
       keys.push("personalGuestCard");
     }

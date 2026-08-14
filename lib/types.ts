@@ -642,15 +642,26 @@ export interface ScratchRevealConfig {
  * `backgroundImageUrl` are stored in `InvitationData.imageSettings` under the
  * `personalGuestCardBackground` key (mirrors the scratch-reveal pattern).
  */
+/**
+ * How visible the personal guest card is:
+ *  - `always`        — shown wherever the layout renders it (default)
+ *  - `hideInPreview` — hidden in home-page (landing) previews only
+ *  - `never`         — hidden everywhere, including for real guests
+ */
+export type PersonalGuestCardVisibility = "always" | "hideInPreview" | "never";
+
 export interface PersonalGuestCardConfig {
   /** Optional full-bleed background image URL behind the card. */
   backgroundImageUrl?: string | null;
   /** Opacity of the dark scrim overlay (0–1). Defaults to 0.45 when an image is set. */
   scrimOpacity?: number;
-  /** When true, hide the personal guest card in home-page (landing) previews
-   *  only. Real guests and the admin live preview are unaffected. Unset/false
-   *  preserves today's behavior (card shown). */
+  /**
+   * @deprecated Superseded by `visibility`. Still read as a fallback for rows
+   * written before `visibility` existed; `visibility` wins when both are set.
+   */
   hideInPreview?: boolean;
+  /** Unset is treated as `always` (or `hideInPreview` for legacy rows). */
+  visibility?: PersonalGuestCardVisibility;
 }
 
 // ---------------------------------------------------------------------------

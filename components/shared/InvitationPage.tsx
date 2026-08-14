@@ -16,7 +16,7 @@ import type {
 } from "@/lib/types";
 import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { resolveTextStyles } from "@/lib/text-styles";
-import { isPersonalGuestCardHiddenInPreview } from "@/lib/personal-guest-card";
+import { isPersonalGuestCardHidden } from "@/lib/personal-guest-card";
 import { useLocale } from "next-intl";
 
 import { useCustomText } from "@/lib/custom-texts";
@@ -353,7 +353,7 @@ export default function InvitationPage({
       {/* (sample guest, for display only)                                  */}
       {/* ================================================================= */}
       {(invitation.guest || isPreview || isLandingPreview) &&
-            !isPersonalGuestCardHiddenInPreview(
+            !isPersonalGuestCardHidden(
               invitation,
               isLandingPreview,
             ) && (
