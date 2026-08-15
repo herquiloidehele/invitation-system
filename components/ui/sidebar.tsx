@@ -307,7 +307,13 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        // `min-w-0` is required: as a flex item this element defaults to
+        // `min-width: auto`, so intrinsically-wide content (e.g. the horizontally
+        // scrolling filmstrip gallery in the invitation preview) forces it up to
+        // its `w-full` width. Sitting after the sidebar, that pushes it off-screen
+        // by exactly the sidebar width and `body { overflow-x: clip }` silently
+        // cuts the right edge with no scrollbar.
+        "relative flex w-full min-w-0 flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className,
       )}
       {...props}
