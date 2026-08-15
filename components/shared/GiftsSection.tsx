@@ -13,6 +13,7 @@ import {
   hasBankTransfer,
   hasGiftItems,
 } from "@/lib/gift-registry";
+import { isSectionIconHidden } from "@/lib/section-icons";
 import { EASE } from "@/components/shared/animations";
 import { EditableText } from "@/components/shared/EditableText";
 import { useGiftConfettiNavigation } from "@/components/gifts/useGiftConfettiNavigation";
@@ -59,19 +60,23 @@ export default function GiftsSection({
 
   return (
     <>
-      <motion.div
-        className="flex h-10 w-10 items-center justify-center rounded-full"
-        style={{ background: `${ts.accent}12` }}
-        animate={{ y: [0, -3, 0] }}
-        transition={{
-          duration: 4.2,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 0.8,
-        }}
-      >
-        <Gift size={20} color={ts.accent} strokeWidth={1.5} />
-      </motion.div>
+      {isSectionIconHidden(giftRegistry) ? (
+        <div className="h-10 w-10" aria-hidden="true" />
+      ) : (
+        <motion.div
+          className="flex h-10 w-10 items-center justify-center rounded-full"
+          style={{ background: `${ts.accent}12` }}
+          animate={{ y: [0, -3, 0] }}
+          transition={{
+            duration: 4.2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.8,
+          }}
+        >
+          <Gift size={20} color={ts.accent} strokeWidth={1.5} />
+        </motion.div>
+      )}
 
       <span style={ts.sectionLabel}>
         <EditableText elementKey="sectionLabel">

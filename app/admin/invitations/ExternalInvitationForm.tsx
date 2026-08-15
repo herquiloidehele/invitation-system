@@ -2832,6 +2832,21 @@ export default function ExternalInvitationForm({
                             />
                           </div>
 
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="space-y-0.5">
+                              <Label>Ocultar ícone</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Esconde o ícone no topo do cartão.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={form.giftRegistry.hideIcon === true}
+                              onCheckedChange={(enabled) =>
+                                updateGiftRegistry("hideIcon", enabled)
+                              }
+                            />
+                          </div>
+
                           <div className="space-y-1.5">
                             <Label htmlFor="externalGiftText">
                               Texto da Lista de Presentes

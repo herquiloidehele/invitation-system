@@ -115,6 +115,8 @@ export interface DressCode {
   enabled: boolean;
   text: string;
   colors?: string[]; // 1-6 hex color values, e.g. ["#000000", "#FFFFFF"]
+  /** When true, hides the Shirt icon chip at the top of the dress code card. */
+  hideIcon?: boolean;
   /** Elegant-floral rich fields (all optional; older invitations unaffected). */
   title?: string; // "LE JARDIN DE PARADIS"
   intro?: string; // "Uma noite de elegância, romance e sofisticação."
@@ -161,6 +163,8 @@ export interface GiftRegistry {
   text: string;
   /** When true, each product item can have only one active guest reservation. */
   exclusiveSelectionEnabled?: boolean;
+  /** When true, hides the Gift icon chip at the top of the gifts card. */
+  hideIcon?: boolean;
   /** Legacy external registry link (kept for backwards-compat; non-breaking). */
   link?: string;
   /** Product grid shown on /{slug}/gifts. */

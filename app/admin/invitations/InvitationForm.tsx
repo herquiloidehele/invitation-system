@@ -3111,6 +3111,22 @@ export default function InvitationForm({
                       </div>
                     )}
                     {form.dressCode.enabled && (
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Ocultar ícone</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Esconde o ícone no topo do cartão.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.dressCode.hideIcon === true}
+                          onCheckedChange={(value) =>
+                            updateDressCode("hideIcon", value)
+                          }
+                        />
+                      </div>
+                    )}
+                    {form.dressCode.enabled && (
                       <div className="space-y-1.5">
                         <Label>Paleta de Cores</Label>
                         <div className="flex flex-wrap items-center gap-2">
@@ -3378,6 +3394,20 @@ export default function InvitationForm({
                                 "exclusiveSelectionEnabled",
                                 value,
                               )
+                            }
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-0.5">
+                            <Label>Ocultar ícone</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Esconde o ícone no topo do cartão.
+                            </p>
+                          </div>
+                          <Switch
+                            checked={form.giftRegistry.hideIcon === true}
+                            onCheckedChange={(value) =>
+                              updateGiftRegistry("hideIcon", value)
                             }
                           />
                         </div>

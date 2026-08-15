@@ -17,6 +17,7 @@ import type {
 import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { isPersonalGuestCardHidden } from "@/lib/personal-guest-card";
+import { isSectionIconHidden } from "@/lib/section-icons";
 import { useLocale } from "next-intl";
 
 import { useCustomText } from "@/lib/custom-texts";
@@ -696,19 +697,19 @@ export default function InvitationPage({
                     padding: "24px 14px",
                   }}
                 >
-                  <motion.div
-                    className="flex h-10 w-10 items-center justify-center rounded-full"
-                    style={{
-                      background: `${ts.accent}12`,
-                    }}
-                    animate={floatAnimation}
-                  >
-                          <Shirt
-                            size={20}
-                            color={ts.accent}
-                            strokeWidth={1.5}
-                          />
-                  </motion.div>
+                  {isSectionIconHidden(invitation.dressCode) ? (
+                    <div className="h-10 w-10" aria-hidden="true" />
+                  ) : (
+                    <motion.div
+                      className="flex h-10 w-10 items-center justify-center rounded-full"
+                      style={{
+                        background: `${ts.accent}12`,
+                      }}
+                      animate={floatAnimation}
+                    >
+                      <Shirt size={20} color={ts.accent} strokeWidth={1.5} />
+                    </motion.div>
+                  )}
                   <span style={ts.sectionLabel}>
                     <EditableText elementKey="sectionLabel">
                       {t("sectionTitle_dressCode")}
