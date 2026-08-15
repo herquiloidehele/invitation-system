@@ -47,9 +47,9 @@ import {
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
 import {
   normalizeInvitationLocales,
-  normalizeInvitationTranslationIds,
   validateInvitationLanguageSettings,
 } from "@/lib/invitation-translations";
+import { buildInvitationFormPayload } from "@/lib/invitation-form-payload";
 import { useInvitationTranslationDraft } from "@/hooks/use-invitation-translation-draft";
 import { InvitationLanguageSettings } from "@/components/admin/InvitationLanguageSettings";
 
@@ -907,10 +907,7 @@ export default function ExternalInvitationForm({
   // The form edits a per-locale projection; the API must receive the canonical
   // Portuguese record with the translations overlay attached. Posting `form`
   // here would write the active locale's draft over the Portuguese values.
-  const canonicalPayload = () => {
-    const normalized = normalizeInvitationTranslationIds(sourceForm);
-    return { ...normalized, translations: normalized.translations ?? null };
-  };
+  const canonicalPayload = () => buildInvitationFormPayload(sourceForm);
 
   // Submit
   async function handleSubmit() {

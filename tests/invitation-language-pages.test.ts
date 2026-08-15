@@ -63,7 +63,7 @@ describe("admin invitation language editing", () => {
     // consume it and post the canonical record rather than the locale draft.
     expect(source).toContain("useInvitationTranslationDraft");
     expect(source).toContain("sourceForm");
-    expect(source).toContain("translations: normalized.translations ?? null");
+    expect(source).toContain("buildInvitationFormPayload(sourceForm)");
     expect(source).toContain("body: JSON.stringify(payload)");
   });
 
@@ -198,7 +198,7 @@ describe("external admin form language settings", () => {
   });
 
   it("posts the canonical record, never the locale draft", () => {
-    expect(source).toContain("normalizeInvitationTranslationIds(sourceForm)");
+    expect(source).toContain("buildInvitationFormPayload(sourceForm)");
     expect(source).toContain("validateInvitationLanguageSettings(sourceForm)");
     expect(source).not.toContain("JSON.stringify(form)");
   });

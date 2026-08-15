@@ -41,9 +41,9 @@ import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
 import {
   normalizeInvitationLocales,
-  normalizeInvitationTranslationIds,
   validateInvitationLanguageSettings,
 } from "@/lib/invitation-translations";
+import { buildInvitationFormPayload } from "@/lib/invitation-form-payload";
 import { useInvitationTranslationDraft } from "@/hooks/use-invitation-translation-draft";
 
 import {
@@ -1514,11 +1514,7 @@ export default function InvitationForm({
         sourceInvitationId,
       );
 
-      const normalized = normalizeInvitationTranslationIds(sourceForm);
-      const payload = {
-        ...normalized,
-        translations: normalized.translations ?? null,
-      };
+      const payload = buildInvitationFormPayload(sourceForm);
 
       const res = await fetch(url, {
         method,
