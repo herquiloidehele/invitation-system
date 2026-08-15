@@ -147,6 +147,7 @@ import { HERO_VIDEO_UPLOAD_PROFILE } from "@/lib/video-upload";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
+import { EditingLocaleNotice } from "@/components/admin/EditingLocaleNotice";
 import {
   invitationFormCopy,
   invitationFormRequest,
@@ -1006,6 +1007,10 @@ export default function ExternalInvitationForm({
                     Cancelar
                   </Link>
                 )}
+                <EditingLocaleNotice
+                  activeLocale={activeLocale}
+                  onReset={() => setActiveLocale("pt")}
+                />
                 <Button onClick={handleSubmit} disabled={saving}>
                   {saving ? "A guardar..." : formCopy.submitLabel}
                 </Button>
@@ -1868,7 +1873,10 @@ export default function ExternalInvitationForm({
                           value={form.quote}
                           onChange={(e) => update("quote", e.target.value)}
                           rows={2}
-                          placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                          placeholder={sourcePlaceholder(
+                            sourceForm.quote,
+                            'ex: "O amor é paciente, o amor é bondoso."',
+                          )}
                         />
                       </div>
 
@@ -1890,7 +1898,10 @@ export default function ExternalInvitationForm({
                         {form.parents?.enabled && (
                           <div className="space-y-2 pt-2">
                             <Textarea
-                              placeholder="Mensagem de bênção"
+                              placeholder={sourcePlaceholder(
+                                sourceForm.parents?.blessingMessage,
+                                "Mensagem de bênção",
+                              )}
                               value={form.parents.blessingMessage ?? ""}
                               onChange={(e) =>
                                 updateParents("blessingMessage", e.target.value)
@@ -1898,7 +1909,10 @@ export default function ExternalInvitationForm({
                               rows={2}
                             />
                             <Input
-                              placeholder="Mensagem de convite"
+                              placeholder={sourcePlaceholder(
+                                sourceForm.parents?.inviteMessage,
+                                "Mensagem de convite",
+                              )}
                               value={form.parents.inviteMessage ?? ""}
                               onChange={(e) =>
                                 updateParents("inviteMessage", e.target.value)
@@ -2250,7 +2264,10 @@ export default function ExternalInvitationForm({
                           id="ellQuote"
                           value={form.quote}
                           onChange={(e) => update("quote", e.target.value)}
-                          placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                          placeholder={sourcePlaceholder(
+                            sourceForm.quote,
+                            'ex: "O amor é paciente, o amor é bondoso."',
+                          )}
                         />
                       </div>
 
@@ -2317,7 +2334,10 @@ export default function ExternalInvitationForm({
                         {form.parents?.enabled && (
                           <div className="space-y-2 pt-2">
                             <Textarea
-                              placeholder="Mensagem de bênção"
+                              placeholder={sourcePlaceholder(
+                                sourceForm.parents?.blessingMessage,
+                                "Mensagem de bênção",
+                              )}
                               value={form.parents.blessingMessage ?? ""}
                               onChange={(e) =>
                                 updateParents("blessingMessage", e.target.value)
@@ -2325,7 +2345,10 @@ export default function ExternalInvitationForm({
                               rows={2}
                             />
                             <Input
-                              placeholder="Mensagem de convite"
+                              placeholder={sourcePlaceholder(
+                                sourceForm.parents?.inviteMessage,
+                                "Mensagem de convite",
+                              )}
                               value={form.parents.inviteMessage ?? ""}
                               onChange={(e) =>
                                 updateParents("inviteMessage", e.target.value)
@@ -2439,7 +2462,10 @@ export default function ExternalInvitationForm({
                                 onChange={(e) =>
                                   updateCountdown("title", e.target.value)
                                 }
-                                placeholder="Contagem Decrescente"
+                                placeholder={sourcePlaceholder(
+                                  sourceForm.countdown?.title,
+                                  "Contagem Decrescente",
+                                )}
                               />
                             </div>
                             <div className="space-y-1.5">
@@ -2452,7 +2478,10 @@ export default function ExternalInvitationForm({
                                 onChange={(e) =>
                                   updateCountdown("subtitle", e.target.value)
                                 }
-                                placeholder="Até ao nosso grande dia"
+                                placeholder={sourcePlaceholder(
+                                  sourceForm.countdown?.subtitle,
+                                  "Até ao nosso grande dia",
+                                )}
                               />
                             </div>
                           </div>
@@ -2468,7 +2497,10 @@ export default function ExternalInvitationForm({
                                 onChange={(e) =>
                                   updateCountdown("daysLabel", e.target.value)
                                 }
-                                placeholder="DIAS"
+                                placeholder={sourcePlaceholder(
+                                  sourceForm.countdown?.daysLabel,
+                                  "DIAS",
+                                )}
                               />
                             </div>
                             <div className="space-y-1.5">
@@ -2481,7 +2513,10 @@ export default function ExternalInvitationForm({
                                 onChange={(e) =>
                                   updateCountdown("hoursLabel", e.target.value)
                                 }
-                                placeholder="HORAS"
+                                placeholder={sourcePlaceholder(
+                                  sourceForm.countdown?.hoursLabel,
+                                  "HORAS",
+                                )}
                               />
                             </div>
                             <div className="space-y-1.5">
@@ -2497,7 +2532,10 @@ export default function ExternalInvitationForm({
                                     e.target.value,
                                   )
                                 }
-                                placeholder="MINUTOS"
+                                placeholder={sourcePlaceholder(
+                                  sourceForm.countdown?.minutesLabel,
+                                  "MINUTOS",
+                                )}
                               />
                             </div>
                             <div className="space-y-1.5">
@@ -2513,7 +2551,10 @@ export default function ExternalInvitationForm({
                                     e.target.value,
                                   )
                                 }
-                                placeholder="SEGUNDOS"
+                                placeholder={sourcePlaceholder(
+                                  sourceForm.countdown?.secondsLabel,
+                                  "SEGUNDOS",
+                                )}
                               />
                             </div>
                           </div>
@@ -2804,7 +2845,10 @@ export default function ExternalInvitationForm({
                               onChange={(e) =>
                                 updateGiftRegistry("text", e.target.value)
                               }
-                              placeholder="Mensagem sobre a lista de presentes"
+                              placeholder={sourcePlaceholder(
+                                sourceForm.giftRegistry.text,
+                                "Mensagem sobre a lista de presentes",
+                              )}
                               rows={2}
                             />
                           </div>
@@ -2843,7 +2887,10 @@ export default function ExternalInvitationForm({
                                   e.target.value,
                                 )
                               }
-                              placeholder="Informação sobre transferência bancária"
+                              placeholder={sourcePlaceholder(
+                                sourceForm.giftRegistry.bankTransferText,
+                                "Informação sobre transferência bancária",
+                              )}
                               rows={2}
                             />
                           </div>
@@ -2889,7 +2936,10 @@ export default function ExternalInvitationForm({
                                   onChange={(e) =>
                                     updateFaq(index, "question", e.target.value)
                                   }
-                                  placeholder="Pergunta"
+                                  placeholder={sourcePlaceholder(
+                                    sourceForm.faqs?.[index]?.question,
+                                    "Pergunta",
+                                  )}
                                 />
                               </div>
                               {!structureLocked && (
@@ -2914,7 +2964,10 @@ export default function ExternalInvitationForm({
                                 onChange={(e) =>
                                   updateFaq(index, "answer", e.target.value)
                                 }
-                                placeholder="Resposta"
+                                placeholder={sourcePlaceholder(
+                                  sourceForm.faqs?.[index]?.answer,
+                                  "Resposta",
+                                )}
                                 rows={2}
                               />
                             </div>
@@ -3013,7 +3066,10 @@ export default function ExternalInvitationForm({
                         id="ccQuote"
                         value={form.quote}
                         onChange={(e) => update("quote", e.target.value)}
-                        placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                        placeholder={sourcePlaceholder(
+                          sourceForm.quote,
+                          'ex: "O amor é paciente, o amor é bondoso."',
+                        )}
                       />
                     </div>
 
@@ -3197,7 +3253,10 @@ export default function ExternalInvitationForm({
                         id="veTopText"
                         value={form.heroTopText ?? ""}
                         onChange={(e) => update("heroTopText", e.target.value)}
-                        placeholder="ex: Vão casar-se"
+                        placeholder={sourcePlaceholder(
+                          sourceForm.heroTopText,
+                          "ex: Vão casar-se",
+                        )}
                       />
                     </div>
 
@@ -3213,7 +3272,10 @@ export default function ExternalInvitationForm({
                         id="veQuote"
                         value={form.quote}
                         onChange={(e) => update("quote", e.target.value)}
-                        placeholder='ex: "O amor é paciente, o amor é bondoso."'
+                        placeholder={sourcePlaceholder(
+                          sourceForm.quote,
+                          'ex: "O amor é paciente, o amor é bondoso."',
+                        )}
                       />
                     </div>
 

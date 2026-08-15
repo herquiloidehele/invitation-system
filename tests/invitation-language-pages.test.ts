@@ -208,3 +208,47 @@ describe("external admin form language settings", () => {
     expect(source).toContain("InvitationLanguagePreviewProvider");
   });
 });
+
+// A translator editing in en/es sees an empty input; without the Portuguese
+// value as its placeholder they are translating blind. This is the guard that
+// would have caught the hero-text case.
+describe("external form shows the Portuguese source while translating", () => {
+  const source = readFileSync(
+    "app/admin/invitations/ExternalInvitationForm.tsx",
+    "utf8",
+  );
+
+  // Prettier wraps long calls across lines, so compare whitespace-insensitively.
+  const flat = source.replace(/\s+/g, "");
+
+  function count(needle: string): number {
+    return flat.split(needle.replace(/\s+/g, "")).length - 1;
+  }
+
+  // [label, how the draft value is bound, the matching canonical reference]
+  const translatable: Array<[string, string, string]> = [
+    ["quote", "value={form.quote", "sourcePlaceholder(sourceForm.quote"],
+    ["heroTopText", "value={form.heroTopText", "sourcePlaceholder(sourceForm.heroTopText"],
+    ["parents.blessingMessage", "form.parents.blessingMessage ??", "sourcePlaceholder(sourceForm.parents?.blessingMessage"],
+    ["parents.inviteMessage", "form.parents.inviteMessage ??", "sourcePlaceholder(sourceForm.parents?.inviteMessage"],
+    ["countdown.title", "form.countdown.title ??", "sourcePlaceholder(sourceForm.countdown?.title"],
+    ["countdown.subtitle", "form.countdown.subtitle ??", "sourcePlaceholder(sourceForm.countdown?.subtitle"],
+    ["countdown.daysLabel", "form.countdown.daysLabel ??", "sourcePlaceholder(sourceForm.countdown?.daysLabel"],
+    ["countdown.hoursLabel", "form.countdown.hoursLabel ??", "sourcePlaceholder(sourceForm.countdown?.hoursLabel"],
+    ["countdown.minutesLabel", "form.countdown.minutesLabel ??", "sourcePlaceholder(sourceForm.countdown?.minutesLabel"],
+    ["countdown.secondsLabel", "form.countdown.secondsLabel ??", "sourcePlaceholder(sourceForm.countdown?.secondsLabel"],
+    ["giftRegistry.text", "value={form.giftRegistry.text}", "sourcePlaceholder(sourceForm.giftRegistry.text,"],
+    ["giftRegistry.bankTransferText", "form.giftRegistry.bankTransferText ??", "sourcePlaceholder(sourceForm.giftRegistry.bankTransferText"],
+    ["faqs[].question", "value={faq.question}", "sourcePlaceholder(sourceForm.faqs?.[index]?.question"],
+    ["faqs[].answer", "value={faq.answer}", "sourcePlaceholder(sourceForm.faqs?.[index]?.answer"],
+  ];
+
+  for (const [label, binding, reference] of translatable) {
+    it(`${label} offers the Portuguese value as its placeholder`, () => {
+      const bindings = count(binding);
+      expect(bindings).toBeGreaterThan(0);
+      // One canonical placeholder per bound input, so no variant is missed.
+      expect(count(reference)).toBe(bindings);
+    });
+  }
+});

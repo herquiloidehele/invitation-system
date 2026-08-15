@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useMemo, useReducer, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -132,6 +126,7 @@ import {
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
+import { EditingLocaleNotice } from "@/components/admin/EditingLocaleNotice";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
 import {
   normalizeOwnerGuestFormMode,
@@ -1582,6 +1577,10 @@ export default function InvitationForm({
                     Cancelar
                   </Link>
                 )}
+                <EditingLocaleNotice
+                  activeLocale={activeLocale}
+                  onReset={() => setActiveLocale("pt")}
+                />
                 <Button onClick={handleSubmit} disabled={saving}>
                   {saving ? "A guardar..." : formCopy.submitLabel}
                 </Button>
