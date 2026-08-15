@@ -1,10 +1,11 @@
+import { readFileSync } from "node:fs";
 import { createElement, type ComponentType, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
 
 import { InvitationLanguageSwitcher } from "@/components/shared/InvitationLanguageSwitcher";
-import type { InvitationData } from "@/lib/types";
+import type { HeroTextBlock, InvitationData } from "@/lib/types";
 import pt from "../messages/pt.json";
 
 import { duplicateForm } from "./fixtures/invitation-duplication";
@@ -268,4 +269,101 @@ describe("switcher rendering on external invitations", () => {
   it("renders nothing when the switcher is disabled", () => {
     expect(render({ ...base, languageSwitcherEnabled: false })).toBe("");
   });
+});
+
+// ---------------------------------------------------------------------------
+// Structure is Portuguese-canonical. Anything added while a non-Portuguese
+// locale is active is discarded on the way back into the canonical record, so
+// the admin UI must disable those controls rather than silently no-op.
+// ---------------------------------------------------------------------------
+
+describe("structural edits outside Portuguese", () => {
+  const heroBlock = (id: string, content: string): HeroTextBlock => ({
+    id,
+    content,
+    xPct: 50,
+    yPct: 40,
+    widthPct: 80,
+    fontKey: "display",
+    fontSizeCqw: 6,
+    color: "#ffffff",
+    fontWeight: 400,
+    fontStyle: "normal",
+    textAlign: "center",
+    letterSpacing: 0,
+    lineHeight: 1.2,
+    shadow: false,
+    z: 1,
+  });
+
+  const withHero = duplicateForm({
+    invitationType: "external_link",
+    languageSwitcherEnabled: true,
+    enabledLocales: ["pt", "en"],
+    heroTextLayer: {
+      hideDefaultText: false,
+      blocks: [heroBlock("block-1", "Vamos casar")],
+    },
+  });
+
+  it("discards a hero block added while editing English", () => {
+    const draft = buildInvitationTranslationDraft(withHero, "en");
+    const next = applyInvitationTranslationDraft(withHero, "en", {
+      ...draft,
+      heroTextLayer: {
+        ...draft.heroTextLayer!,
+        blocks: [
+          ...(draft.heroTextLayer?.blocks ?? []),
+          heroBlock("block-2", "New"),
+        ],
+      },
+    });
+
+    expect(next.heroTextLayer?.blocks.map((b) => b.id)).toEqual(["block-1"]);
+  });
+
+  it("keeps translating the content of an existing hero block", () => {
+    const draft = buildInvitationTranslationDraft(withHero, "en");
+    const next = applyInvitationTranslationDraft(withHero, "en", {
+      ...draft,
+      heroTextLayer: {
+        ...draft.heroTextLayer!,
+        blocks: [
+          {
+            ...draft.heroTextLayer!.blocks[0],
+            content: "We're getting married",
+          },
+        ],
+      },
+    });
+
+    expect(next.heroTextLayer?.blocks[0].content).toBe("Vamos casar");
+    expect(next.translations?.en?.heroTextBlocks?.["block-1"]?.content).toBe(
+      "We're getting married",
+    );
+  });
+});
+
+describe("external admin form wires the translation guards", () => {
+  const source = readFileSync(
+    "app/admin/invitations/ExternalInvitationForm.tsx",
+    "utf8",
+  );
+
+  // Each of these editors can add/remove items, which is Portuguese-only, and
+  // shows the Portuguese value as a placeholder while translating.
+  for (const editor of [
+    "HeroTextEditor",
+    "CoupleGalleryEditor",
+    "GiftsListEditor",
+    "BankTransferEditor",
+  ]) {
+    it(`${editor} receives structureLocked and sourceValue`, () => {
+      const start = source.indexOf(`<${editor}`);
+      expect(start).toBeGreaterThan(-1);
+      const block = source.slice(start, source.indexOf("/>", start));
+      expect(block).toContain("structureLocked=");
+      expect(block).toContain("sourceValue=");
+    });
+  }
 });

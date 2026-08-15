@@ -2738,6 +2738,7 @@ export default function ExternalInvitationForm({
                       </div>
                       <CoupleGalleryEditor
                         value={form.coupleGallery}
+                        sourceValue={sourceForm.coupleGallery}
                         onChange={updateCoupleGallery}
                         structureLocked={structureLocked}
                       />
@@ -2824,6 +2825,7 @@ export default function ExternalInvitationForm({
 
                           <GiftsListEditor
                             value={form.giftRegistry.items}
+                            sourceValue={sourceForm.giftRegistry.items}
                             onChange={updateGiftItems}
                             structureLocked={structureLocked}
                           />
@@ -2848,6 +2850,7 @@ export default function ExternalInvitationForm({
 
                           <BankTransferEditor
                             value={form.giftRegistry.bankTransfer}
+                            sourceValue={sourceForm.giftRegistry.bankTransfer}
                             onChange={updateBankTransfer}
                             structureLocked={structureLocked}
                           />
@@ -4254,6 +4257,8 @@ export default function ExternalInvitationForm({
         open={heroTextEditorOpen}
         onOpenChange={setHeroTextEditorOpen}
         value={form.heroTextLayer}
+        sourceValue={sourceForm.heroTextLayer}
+        structureLocked={structureLocked}
         onChange={(next) => update("heroTextLayer", next)}
         stillUrl={heroTextStillUrl}
         aspectRatio={heroTextAspect}

@@ -6,6 +6,7 @@ import {
   duplicateBlock,
   moveBlock,
   removeBlock,
+  resolveHeroTextBlockDisplay,
   updateBlock,
 } from "@/lib/hero-text-editor";
 import { EMPTY_HERO_TEXT_LAYER } from "@/lib/hero-text";
@@ -81,5 +82,37 @@ describe("bringToFront", () => {
     const layer = addBlock(addBlock(EMPTY_HERO_TEXT_LAYER, "a"), "b");
     const next = bringToFront(layer, "a");
     expect(next.blocks.find((b) => b.id === "a")!.z).toBe(3);
+  });
+});
+
+describe("resolveHeroTextBlockDisplay", () => {
+  it("shows the block's own content when it is set", () => {
+    expect(resolveHeroTextBlockDisplay("We are getting married", "Vamos casar")).toEqual({
+      text: "We are getting married",
+      isSourceFallback: false,
+    });
+  });
+
+  // Without this, an untranslated block renders as a single space, collapses to
+  // an invisible sliver, and cannot be clicked to select and translate it.
+  it("falls back to the source text when the block is untranslated", () => {
+    expect(resolveHeroTextBlockDisplay("", "Vamos casar")).toEqual({
+      text: "Vamos casar",
+      isSourceFallback: true,
+    });
+  });
+
+  it("treats whitespace-only content as untranslated", () => {
+    expect(resolveHeroTextBlockDisplay("   ", "Vamos casar")).toEqual({
+      text: "Vamos casar",
+      isSourceFallback: true,
+    });
+  });
+
+  it("keeps a non-empty box when neither content nor source exist", () => {
+    expect(resolveHeroTextBlockDisplay("", undefined)).toEqual({
+      text: " ",
+      isSourceFallback: false,
+    });
   });
 });

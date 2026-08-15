@@ -67,3 +67,31 @@ export function moveBlock(
 export function bringToFront(layer: HeroTextLayer, id: string): HeroTextLayer {
   return updateBlock(layer, id, { z: nextZ(layer) });
 }
+
+export interface HeroTextBlockDisplay {
+  /** Text to paint on the editor's design surface. */
+  text: string;
+  /** True when `text` came from the Portuguese source, not the block itself. */
+  isSourceFallback: boolean;
+}
+
+/**
+ * Decides what a block shows on the editor surface.
+ *
+ * While translating, a block's own `content` is blank until the translator
+ * fills it in. Painting that blank directly collapses the block to an
+ * invisible sliver, so it cannot be clicked to select and translate it. Fall
+ * back to the Portuguese source so every block stays visible and selectable;
+ * the caller dims the text when `isSourceFallback` is true.
+ */
+export function resolveHeroTextBlockDisplay(
+  content: string,
+  sourceContent: string | undefined,
+): HeroTextBlockDisplay {
+  if (content.trim()) return { text: content, isSourceFallback: false };
+  if (sourceContent?.trim()) {
+    return { text: sourceContent, isSourceFallback: true };
+  }
+  // Never return an empty string: a zero-height box cannot be grabbed.
+  return { text: " ", isSourceFallback: false };
+}

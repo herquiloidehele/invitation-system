@@ -37,6 +37,7 @@ import {
   moveBlock,
   removeBlock,
   updateBlock,
+  resolveHeroTextBlockDisplay,
 } from "@/lib/hero-text-editor";
 import type { HeroTextBlock, HeroTextLayer } from "@/lib/types";
 
@@ -172,7 +173,8 @@ export default function HeroTextEditor({
         </DialogHeader>
         {structureLocked && (
           <p className="text-xs text-muted-foreground">
-            A estrutura é editada em Português.
+            A estrutura é editada em Português. Mude para Português para
+            adicionar, duplicar ou remover textos.
           </p>
         )}
 
@@ -195,26 +197,42 @@ export default function HeroTextEditor({
                 backgroundPosition: "center",
               }}
             >
-              {layer.blocks.map((block) => (
-                <div
-                  key={block.id}
-                  onPointerDown={(e) => handlePointerDown(e, block)}
-                  onPointerMove={(e) => handlePointerMove(e, block)}
-                  onPointerUp={handlePointerUp}
-                  style={{
-                    ...heroTextBlockStyle(block, fonts),
-                    cursor: "move",
-                    outline:
-                      block.id === selectedId
-                        ? "1.5px dashed #85B7EB"
-                        : "1px solid rgba(255,255,255,0.25)",
-                    outlineOffset: 3,
-                    touchAction: "none",
-                  }}
-                >
-                  {block.content || " "}
-                </div>
-              ))}
+              {layer.blocks.map((block) => {
+                const display = resolveHeroTextBlockDisplay(
+                  block.content,
+                  sourceById.get(block.id)?.content,
+                );
+                return (
+                  <div
+                    key={block.id}
+                    onPointerDown={(e) => handlePointerDown(e, block)}
+                    onPointerMove={(e) => handlePointerMove(e, block)}
+                    onPointerUp={handlePointerUp}
+                    title={
+                      display.isSourceFallback
+                        ? "Ainda por traduzir — a mostrar o texto em Português"
+                        : undefined
+                    }
+                    style={{
+                      ...heroTextBlockStyle(block, fonts),
+                      // Untranslated blocks show the Portuguese text dimmed, so
+                      // they stay visible and selectable without looking done.
+                      opacity: display.isSourceFallback ? 0.45 : undefined,
+                      cursor: "move",
+                      outline:
+                        block.id === selectedId
+                          ? "1.5px dashed #85B7EB"
+                          : display.isSourceFallback
+                            ? "1px dashed rgba(255,255,255,0.55)"
+                            : "1px solid rgba(255,255,255,0.25)",
+                      outlineOffset: 3,
+                      touchAction: "none",
+                    }}
+                  >
+                    {display.text}
+                  </div>
+                );
+              })}
             </div>
             <p className="w-full text-center text-xs text-muted-foreground">
               Arraste os textos para posicioná-los. As posições escalam para
@@ -234,8 +252,9 @@ export default function HeroTextEditor({
           <div className="min-w-0 flex-1 space-y-3">
             {!selected && (
               <p className="text-sm text-muted-foreground">
-                Selecione um texto na pré-visualização para editar, ou adicione
-                um novo.
+                {structureLocked
+                  ? "Selecione um texto na pré-visualização para o traduzir."
+                  : "Selecione um texto na pré-visualização para editar, ou adicione um novo."}
               </p>
             )}
 
