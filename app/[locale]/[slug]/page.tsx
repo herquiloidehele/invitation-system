@@ -22,7 +22,7 @@ import {
 } from "@/lib/invitation-translations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
-import InvitationView from "./InvitationView";
+import InvitationLocaleController from "./InvitationLocaleController";
 import {
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
@@ -290,8 +290,9 @@ export default async function InvitationSlugPage({
         />
       )}
       <BrowserUiColorStyle color={browserUiColor} />
-      <InvitationView
-        invitation={{ ...invitation, guest }}
+      <InvitationLocaleController
+        sourceInvitation={{ ...sourceInvitation, guest }}
+        initialLocale={locale}
         theme={theme}
         isLandingPreview={landingPreview === "1"}
         lazyExternalIframe={lazyExternalIframe === "1"}

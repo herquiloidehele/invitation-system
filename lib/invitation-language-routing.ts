@@ -51,6 +51,47 @@ export function buildInvitationLocaleSwitchHref(
   return buildLocaleHref(`${pathname}?${next.toString()}`, locale);
 }
 
+/**
+ * URL for an in-place locale swap, used with `history.replaceState`.
+ *
+ * Identical to `buildInvitationLocaleSwitchHref` except it does not inject
+ * `section=hero`. That flag exists to skip the envelope after a real
+ * navigation; an in-place swap never unmounts the envelope, so forcing it
+ * would put a stale param in the address bar for no reason.
+ */
+export function buildInvitationLocaleReplaceUrl(
+  pathname: string,
+  searchParams: InvitationSearchParamsInput,
+  locale: AppLocale,
+): string {
+  const query = serializeInvitationSearchParams(searchParams);
+  return buildLocaleHref(`${pathname}${query ? `?${query}` : ""}`, locale);
+}
+
+/** The subset of a mouse event that decides whether we hijack a locale link. */
+export interface LocaleClickIntent {
+  button: number;
+  metaKey: boolean;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  defaultPrevented: boolean;
+}
+
+/**
+ * Whether a click on a locale link should be swapped in place.
+ *
+ * The switcher stays an `<a href>` so it remains crawlable and works without
+ * JavaScript. That means we must honour the browser's own intents —
+ * Cmd/Ctrl/Shift/Alt click and middle click all mean "open elsewhere", and
+ * hijacking them would be a bug.
+ */
+export function shouldInterceptLocaleClick(event: LocaleClickIntent): boolean {
+  if (event.defaultPrevented) return false;
+  if (event.button !== 0) return false;
+  return !(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey);
+}
+
 export function getInvitationLocaleRedirectPath(
   invitation: InvitationData,
   locale: AppLocale,

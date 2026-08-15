@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useMemo,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -10,17 +11,52 @@ import { useLocale } from "next-intl";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { AppLocale } from "@/i18n/locales";
 import { resolveLocale } from "@/i18n/locales";
-import { buildInvitationLocaleSwitchHref } from "@/lib/invitation-language-routing";
+import {
+  buildInvitationLocaleSwitchHref,
+  shouldInterceptLocaleClick,
+} from "@/lib/invitation-language-routing";
 import {
   getEffectiveInvitationLocales,
   shouldShowInvitationLanguageSwitcher,
 } from "@/lib/invitation-translations";
 import type { InvitationData } from "@/lib/types";
 
-const PreviewLocaleChangeContext = createContext<
-  ((locale: AppLocale) => void) | null
->(null);
+export type InvitationLocaleChangeMode = "preview" | "inline";
 
+interface InvitationLocaleChange {
+  onLocaleChange: (locale: AppLocale) => void;
+  /**
+   * `preview` renders buttons — the admin form has no meaningful URL and must
+   * never navigate away. `inline` keeps the anchor and intercepts plain clicks,
+   * so the link stays crawlable and works without JavaScript.
+   */
+  mode: InvitationLocaleChangeMode;
+}
+
+const InvitationLocaleChangeContext =
+  createContext<InvitationLocaleChange | null>(null);
+
+export function InvitationLocaleChangeProvider({
+  mode,
+  onLocaleChange,
+  children,
+}: {
+  mode: InvitationLocaleChangeMode;
+  onLocaleChange: (locale: AppLocale) => void;
+  children?: ReactNode;
+}) {
+  const value = useMemo(
+    () => ({ mode, onLocaleChange }),
+    [mode, onLocaleChange],
+  );
+  return (
+    <InvitationLocaleChangeContext.Provider value={value}>
+      {children}
+    </InvitationLocaleChangeContext.Provider>
+  );
+}
+
+/** Admin preview alias — keeps existing call sites untouched. */
 export function InvitationLanguagePreviewProvider({
   onLocaleChange,
   children,
@@ -29,9 +65,12 @@ export function InvitationLanguagePreviewProvider({
   children: ReactNode;
 }) {
   return (
-    <PreviewLocaleChangeContext.Provider value={onLocaleChange}>
+    <InvitationLocaleChangeProvider
+      mode="preview"
+      onLocaleChange={onLocaleChange}
+    >
       {children}
-    </PreviewLocaleChangeContext.Provider>
+    </InvitationLocaleChangeProvider>
   );
 }
 
@@ -52,7 +91,7 @@ export function InvitationLanguageSwitcher({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentLocale = resolveLocale(useLocale());
-  const onPreviewLocaleChange = useContext(PreviewLocaleChangeContext);
+  const localeChange = useContext(InvitationLocaleChangeContext);
 
   if (!shouldShowInvitationLanguageSwitcher(invitation)) return null;
 
@@ -79,14 +118,14 @@ export function InvitationLanguageSwitcher({
           className,
         };
 
-        return onPreviewLocaleChange ? (
+        return localeChange?.mode === "preview" ? (
           <button
             key={locale}
             type="button"
             {...commonProps}
             onClick={(event) => {
               event.stopPropagation();
-              onPreviewLocaleChange(locale);
+              localeChange.onLocaleChange(locale);
             }}
           >
             {locale}
@@ -102,7 +141,13 @@ export function InvitationLanguageSwitcher({
               searchParams?.toString() ?? "",
               locale,
             )}
-            onClick={stopPropagation}
+            onClick={(event) => {
+              event.stopPropagation();
+              if (localeChange?.mode !== "inline") return;
+              if (!shouldInterceptLocaleClick(event)) return;
+              event.preventDefault();
+              localeChange.onLocaleChange(locale);
+            }}
           >
             {locale}
           </a>

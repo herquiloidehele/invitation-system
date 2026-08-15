@@ -72,6 +72,12 @@ export default function CanvaEmbed({
     externalLink: string;
     src: string;
   } | null>(null);
+  // Which `externalLink` the currently-loaded document belongs to. Set from the
+  // iframe's own `load` event, so `swapping` below is derived rather than
+  // synced — no effect, no cascading render.
+  const [loadedExternalLink, setLoadedExternalLink] = useState<string | null>(
+    null,
+  );
   // We size the iframe element to the proxied document's full content
   // height, so the embedded page must not scroll independently. The
   // proxy honours `?disableScroll=1` to inject the no-scroll style block;
@@ -89,6 +95,15 @@ export default function CanvaEmbed({
     navigatedProxiedUrl?.externalLink === externalLink
       ? navigatedProxiedUrl.src
       : defaultProxiedUrl;
+  // A per-locale link change is the one case where the embedded document must
+  // actually reload. Internal Canva navigation keeps `externalLink` constant, so
+  // it never triggers this. Deliberately nothing resets `contentHeight`: keeping
+  // the stale height holds the section's size while the new document loads,
+  // avoiding the placeholder -> measured jump that `overflowAnchor: "none"`
+  // exists to guard against. `navigatedProxiedUrl` needs no reset either — it is
+  // keyed by `externalLink` and falls back on its own.
+  const swapping =
+    loadedExternalLink !== null && loadedExternalLink !== externalLink;
   const preloadLayout = resolveCanvaPreloadLayout({
     preloading,
     containerWidth,
@@ -332,6 +347,7 @@ export default function CanvaEmbed({
   ]);
 
   const handleLoad = useCallback(() => {
+    setLoadedExternalLink(externalLink);
     stopParentScrollRestore();
     attachNavigationInterceptor();
     syncPageStateFromIframe();
@@ -372,6 +388,7 @@ export default function CanvaEmbed({
     );
   }, [
     attachNavigationInterceptor,
+    externalLink,
     measureIframe,
     stopParentScrollRestore,
     syncPageStateFromIframe,
@@ -476,6 +493,31 @@ export default function CanvaEmbed({
           />
         )}
       </div>
+      {swapping && (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 2,
+            background: theme.bg,
+            opacity: 0.9,
+            display: "grid",
+            placeItems: "center",
+          }}
+        >
+          <span
+            className="animate-spin"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              border: `2px solid ${theme.textMuted}`,
+              borderTopColor: "transparent",
+            }}
+          />
+        </div>
+      )}
     </section>
   );
 }
