@@ -26,7 +26,7 @@ function intlFormat(
   try {
     return new Intl.DateTimeFormat(
       getDateFormatLocale(resolveLocale(locale)),
-      options,
+      { ...options, timeZone: "UTC" },
     ).format(d);
   } catch {
     return fallback;
