@@ -151,3 +151,54 @@ describe("applyCanvaPersonalization — Canva compact length metadata", () => {
     expect(out).toContain('"B":[6]'); // 25 - 5 - 14
   });
 });
+
+describe("applyCanvaPersonalization — Canva run-length (D) metadata", () => {
+  // Faithful "export_website" text element: text in "A", element char count in
+  // "B", a style palette in "C", and per-run char lengths in
+  // "D":[lead, ...runLengths] mapping character ranges to styles. Both "B" AND
+  // the run in "D" that covers the token must grow/shrink with the value, or the
+  // characters beyond the old run render in the default font and the line's
+  // position breaks.
+  const el = (text: string, b: number, d: string) =>
+    `"C":{"A":["${text}"],"B":[${b}],` +
+    `"C":[{"C":"F,0","G":"85px","M":"#445129","c":"center"},{"BG":"none"},{"D":true}],` +
+    `"D":[${d}],"E":{}}`;
+
+  const farAttributed =
+    `"A":[{"A?":"A","A":"x"}],` +
+    `"B":[{"A?":"A","A":{"color":{"B":"#000"}}},{"A?":"B","A":9}],"b":{"A":[9]}`;
+
+  it("grows the covering run in D (token as its own element) and updates B", () => {
+    // {{nome}}\n → 9 chars; run0=8 (the token), run1=1 (the newline).
+    const html = el("{{nome}}\\n", 9, "0,8,1");
+    const out = applyCanvaPersonalization(html, null); // {{nome}} → Convidado(a) (12)
+    expect(out).toContain('"A":["Convidado(a)\\n"]');
+    expect(out).toContain('"B":[13]'); // 9 + (12 - 8)
+    expect(out).toContain('"D":[0,12,1]'); // run0: 8 → 12, newline run untouched
+  });
+
+  it("shrinks the covering run in D for a shorter value", () => {
+    const html = el("{{nome}}\\n", 9, "0,8,1");
+    const out = applyCanvaPersonalization(html, { ...SAMPLE, name: "Ana" });
+    expect(out).toContain('"A":["Ana\\n"]');
+    expect(out).toContain('"B":[4]'); // 9 + (3 - 8)
+    expect(out).toContain('"D":[0,3,1]');
+  });
+
+  it("adjusts the correct run when the token is not at the element start", () => {
+    // "Olá {{nome}}\n": run0=4 ("Olá "), run1=8 (token), run2=1 (newline).
+    const html = el("Olá {{nome}}\\n", 13, "0,4,8,1");
+    const out = applyCanvaPersonalization(html, { ...SAMPLE, name: "Ana" });
+    expect(out).toContain('"A":["Olá Ana\\n"]');
+    expect(out).toContain('"B":[8]'); // 13 + (3 - 8)
+    expect(out).toContain('"D":[0,4,3,1]'); // only run1 changes
+  });
+
+  it("never touches an unrelated element's B or D", () => {
+    const html = el("{{nome}}\\n", 9, "0,8,1") + "," + farAttributed;
+    const out = applyCanvaPersonalization(html, null);
+    expect(out).toContain('"D":[0,12,1]');
+    expect(out).toContain('{"A?":"B","A":9}');
+    expect(out).toContain('"b":{"A":[9]}');
+  });
+});

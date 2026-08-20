@@ -108,53 +108,161 @@ function isDigit(ch: string | undefined): boolean {
 }
 
 /**
+ * Canva counts an escape sequence (`\n`, `\t`, `\"`, …) as a single character,
+ * so measure a decoded text string by collapsing each escape to one char.
+ */
+function canvaCharLength(decoded: string): number {
+  return decoded.replace(/\\./g, "X").length;
+}
+
+/**
+ * Returns the index just past the `{`/`[` that matches the opener at `openIdx`,
+ * skipping over string contents (where brackets/braces may appear literally).
+ */
+function matchBracket(str: string, openIdx: number): number | null {
+  const opener = str[openIdx];
+  if (opener !== "{" && opener !== "[") return null;
+  let depth = 0;
+  let inString = false;
+  for (let j = openIdx; j < str.length; j++) {
+    const c = str[j];
+    if (inString) {
+      if (c === "\\") j++;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') inString = true;
+    else if (c === "{" || c === "[") depth++;
+    else if (c === "}" || c === "]") {
+      depth--;
+      if (depth === 0) return j + 1;
+    }
+  }
+  return null;
+}
+
+/**
+ * The token's character offset within its text element, or null if it can't be
+ * resolved. `aOpen` points at the element's `"A":[` key and `aClose` at the `]`
+ * that ends the text array (i.e. the `]` of `],"B":[`).
+ */
+function tokenOffsetInElement(
+  str: string,
+  aOpen: number,
+  aClose: number,
+  token: string,
+): number | null {
+  try {
+    const arr: unknown = JSON.parse(str.slice(aOpen + '"A":'.length, aClose + 1));
+    if (!Array.isArray(arr)) return null;
+    let offset = 0;
+    for (const piece of arr) {
+      if (typeof piece !== "string") return null;
+      const idx = piece.indexOf(token);
+      if (idx !== -1) return offset + canvaCharLength(piece.slice(0, idx));
+      offset += canvaCharLength(piece);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Given a `"D":[lead, ...runLengths]` array (`nums`) and a character `offset`,
+ * returns the index in `nums` of the run that covers `offset`, or -1 when there
+ * are no runs. `nums[0]` is a leading style marker, not a length.
+ */
+function coveringRunIndex(nums: number[], offset: number): number {
+  if (nums.length < 2) return -1;
+  let cum = 0;
+  for (let k = 1; k < nums.length; k++) {
+    if (offset < cum + nums[k]) return k;
+    cum += nums[k];
+  }
+  return nums.length - 1;
+}
+
+/**
  * Bumps the length metadata of the text element that contains a token by
- * `delta`, choosing the right serialization by inspecting the element's own
- * length field — never reaching across into an unrelated element.
+ * `delta`, never reaching across into an unrelated element.
  *
- * Canva "export_website" HTML uses two shapes for a text element's length:
+ * Canva "export_website" HTML serializes each text element as JSON:
  *
- *  - Compact (uniform style):  `"A":["text"],"B":[N]` — `N` is the element's
- *    character count. This is what current exports use.
- *  - Attributed (mixed style): `"A":[{"A?":"A","A":"text"}],"B":[…,{"A?":"B",
- *    "A":retain},…],…,"b":{"A":[total]}` — a run-length list plus a separate
- *    element total.
+ *   `{"A":[text…],"B":[total],"C":[styles…],"D":[lead,…runLengths],"E":…}`
  *
- * We locate the first `],"B":[` at/after the token (which closes the token's
- * own text array) and dispatch on what it opens: a digit → compact, a `{` →
- * attributed. Anything else (empty `"B":[]`, or no marker at all — a plain
- * text/URL context) is left untouched so we degrade to a plain replace.
+ * `"B"` is the element's character count and `"D"` maps character ranges to the
+ * styles in `"C"` via consecutive run lengths. A value that differs in length
+ * from its token must update BOTH the total AND the single run that covers the
+ * token — otherwise the extra/missing characters fall outside the styled run
+ * and render in the default font with broken positioning.
+ *
+ * An older shape uses an attributed run list instead
+ * (`"A":[{"A?":"A","A":"text"}],"B":[…,{"A?":"B","A":retain},…],"b":{"A":[total]}`);
+ * we dispatch on what the `],"B":[` marker opens (a digit → JSON element, a `{`
+ * → attributed). Anything else is left untouched (plain replace).
  */
 function patchCanvaLengthsAfterToken(
   str: string,
-  fromIdx: number,
+  token: string,
+  tokenStart: number,
+  tokenEnd: number,
   delta: number,
 ): string {
   if (delta === 0) return str;
 
-  const marker = str.indexOf(LEN_FIELD_MARKER, fromIdx);
+  const marker = str.indexOf(LEN_FIELD_MARKER, tokenEnd);
   if (marker === -1) return str;
   const bStart = marker + LEN_FIELD_MARKER.length;
   const charBeforeClose = str[marker - 1];
   const firstBChar = str[bStart];
 
-  // Compact: `"A":["…"],"B":[N]` — the array closes on a string (`"`) and the
-  // `"B"` array holds a single character count. Bump that count.
-  if (charBeforeClose === '"' && isDigit(firstBChar)) {
-    let j = bStart;
-    while (isDigit(str[j])) j++;
-    const newCount = Math.max(0, parseInt(str.slice(bStart, j), 10) + delta);
-    return str.slice(0, bStart) + String(newCount) + str.slice(j);
-  }
-
-  // Attributed: `"A":[{…}],"B":[{…}]` — the array closes on an object (`}`) and
-  // the `"B"` array holds style/retain ops. Bump the first retain then the
-  // element total.
+  // Attributed: `"A":[{…}],"B":[{…}]` — closes on an object, `"B"` holds ops.
   if (charBeforeClose === "}" && firstBChar === "{") {
-    return patchCanvaAttributedLengths(str, fromIdx, delta);
+    return patchCanvaAttributedLengths(str, tokenEnd, delta);
   }
 
-  return str;
+  // JSON element: `"A":["…"],"B":[N],…,"D":[lead,…runs]` — closes on a string
+  // and `"B"` holds a single count. Bump the total AND the covering run in "D".
+  if (charBeforeClose !== '"' || !isDigit(firstBChar)) return str;
+
+  let bEnd = bStart;
+  while (isDigit(str[bEnd])) bEnd++;
+  const newTotal = Math.max(0, parseInt(str.slice(bStart, bEnd), 10) + delta);
+
+  let out = str;
+  // Patch "D" first (it sits after "B", so its indices stay valid while we then
+  // patch "B" which is earlier in the string). Scope everything to this element.
+  const aOpen = str.lastIndexOf('"A":[', marker);
+  const objStart = aOpen === -1 ? -1 : str.lastIndexOf("{", aOpen);
+  const objEnd = objStart === -1 ? null : matchBracket(str, objStart);
+  if (aOpen !== -1 && objEnd !== null) {
+    // Styles store `"D"` as a scalar, so `"D":[` is unique to the element.
+    const dKey = str.indexOf('"D":[', bEnd);
+    if (dKey !== -1 && dKey < objEnd) {
+      const dArrOpen = dKey + '"D":'.length;
+      const dArrEnd = matchBracket(str, dArrOpen);
+      if (dArrEnd !== null && dArrEnd <= objEnd) {
+        const offset = tokenOffsetInElement(str, aOpen, marker, token);
+        if (offset !== null) {
+          const nums = str
+            .slice(dArrOpen + 1, dArrEnd - 1)
+            .split(",")
+            .map((n) => parseInt(n, 10));
+          const runIdx = coveringRunIndex(nums, offset);
+          if (runIdx !== -1 && nums.every((n) => Number.isFinite(n))) {
+            nums[runIdx] = Math.max(0, nums[runIdx] + delta);
+            out =
+              str.slice(0, dArrOpen) +
+              `[${nums.join(",")}]` +
+              str.slice(dArrEnd);
+          }
+        }
+      }
+    }
+  }
+
+  return out.slice(0, bStart) + String(newTotal) + out.slice(bEnd);
 }
 
 /**
@@ -189,16 +297,17 @@ function patchCanvaAttributedLengths(
 }
 
 /**
- * Replaces a token with its value inside Canva's run-length-encoded attributed
- * text. Canva keeps the visible text in an `"A"` run but its per-character
- * styling lives in a sibling `"B"` array as alternating {set-style} and
- * {"A?":"B","A":N} "retain N chars" ops, with the element length in
- * `"b":{"A":[total]}`. A plain replace changes the text length without updating
- * those counts, so a value longer than the token spills past its styled retain
- * and renders in the default font/size (and breaks the line's positioning).
+ * Replaces a token with its value inside Canva's serialized text state. Canva
+ * keeps the visible text in an `"A"` array, the element's character count in
+ * `"B"`, its style palette in `"C"`, and per-run character lengths in `"D"`. A
+ * plain replace changes the text length without updating those counts, so the
+ * value spills past its styled run and renders in the default font/size (and
+ * breaks the line's positioning) — or, if the total no longer matches, Canva
+ * rejects the whole state as `invalid state`.
  *
- * For each occurrence we replace the text AND bump the covering retain + the
- * element total by the char-length delta. If the surrounding RLE structure
+ * For each occurrence we bump the element total and the covering run by the
+ * char-length delta (both sit after the token, so they're patched before the
+ * text is spliced in), then replace the text. If the surrounding structure
  * isn't found, we degrade to a plain replace.
  */
 function replaceCanvaTextToken(
@@ -215,7 +324,13 @@ function replaceCanvaTextToken(
   for (;;) {
     const i = result.indexOf(token, from);
     if (i === -1) break;
-    result = patchCanvaLengthsAfterToken(result, i + token.length, delta);
+    result = patchCanvaLengthsAfterToken(
+      result,
+      token,
+      i,
+      i + token.length,
+      delta,
+    );
     result = result.slice(0, i) + escaped + result.slice(i + token.length);
     from = i + escaped.length;
   }
