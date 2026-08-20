@@ -107,3 +107,47 @@ describe("applyCanvaPersonalization — Canva RLE length metadata", () => {
     expect(out).toBe('"A":"Olá Maria Sá!"');
   });
 });
+
+describe("applyCanvaPersonalization — Canva compact length metadata", () => {
+  // Real "export_website" format: text lives in a plain string array `"A":[...]`
+  // and the element's character count is the single number in the sibling
+  // `"B":[N]` array (styling is in `"C":[...]`). This is what current Canva
+  // exports use; the token's own `"B"` count MUST be updated, and no unrelated
+  // structure elsewhere in the document may be touched.
+  const compact = (text: string, count: number) =>
+    `"C":{"A":["${text}"],"B":[${count}],"C":[{"M":"#445129"}]}`;
+
+  // An unrelated attributed-format element placed AFTER the token, to prove the
+  // patcher never reaches across into a different element's length metadata.
+  const farAttributed =
+    `"A":[{"A?":"A","A":"Confirmar"}],` +
+    `"B":[{"A?":"A","A":{"color":{"B":"#000"}}},{"A?":"B","A":9}],"b":{"A":[9]}`;
+
+  it("shrinks the covering count for a shorter value and leaves other elements intact", () => {
+    const html = compact("{{num_total}}\\n", 14) + "," + farAttributed;
+    const out = applyCanvaPersonalization(html, { ...SAMPLE, totalGuests: "150" });
+    expect(out).toContain('"A":["150\\n"]');
+    expect(out).toContain('"B":[4]'); // 14 + (3 - 13)
+    // The unrelated element's retain and total are untouched.
+    expect(out).toContain('{"A?":"B","A":9}');
+    expect(out).toContain('"b":{"A":[9]}');
+  });
+
+  it("grows the covering count for a longer value", () => {
+    const html = compact("{{nome}}\\n", 9);
+    const out = applyCanvaPersonalization(html, { ...SAMPLE, name: "Herquilóide" });
+    expect(out).toContain('"A":["Herquilóide\\n"]');
+    expect(out).toContain('"B":[12]'); // 9 + (11 - 8)
+  });
+
+  it("adjusts a single count once per token in the same element", () => {
+    const html = compact("{{nome}} {{acompanhante}}\\n", 25);
+    const out = applyCanvaPersonalization(html, {
+      ...SAMPLE,
+      name: "Ana", // 8 -> 3  (delta -5)
+      companion: "Bo", // 16 -> 2 (delta -14)
+    });
+    expect(out).toContain('"A":["Ana Bo\\n"]');
+    expect(out).toContain('"B":[6]'); // 25 - 5 - 14
+  });
+});

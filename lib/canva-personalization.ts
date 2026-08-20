@@ -96,10 +96,34 @@ const CANVA_RETAIN_RE = /\{"A\?":"B","A":(\d+)\}/g;
 const CANVA_TOTAL_RE = /"b":\{"A":\[(\d+)/g;
 
 /**
- * Bumps the first `{"A?":"B","A":N}` retain at/after `fromIdx`, then the first
- * `"b":{"A":[total]}` after it, by `delta`. No-op when `delta` is 0 or the
- * structure isn't present (plain-text contexts). Synchronous, so the shared
- * `lastIndex` on the module-level regexes is safe.
+ * The character sequence that closes an element's text array and opens its
+ * length-metadata `"B"` array. A bare `"` can only appear here as JSON
+ * structure (any `"` inside text is escaped as `\"`), so this is a reliable
+ * anchor for finding the length field that belongs to the token's own element.
+ */
+const LEN_FIELD_MARKER = '],"B":[';
+
+function isDigit(ch: string | undefined): boolean {
+  return ch !== undefined && ch >= "0" && ch <= "9";
+}
+
+/**
+ * Bumps the length metadata of the text element that contains a token by
+ * `delta`, choosing the right serialization by inspecting the element's own
+ * length field — never reaching across into an unrelated element.
+ *
+ * Canva "export_website" HTML uses two shapes for a text element's length:
+ *
+ *  - Compact (uniform style):  `"A":["text"],"B":[N]` — `N` is the element's
+ *    character count. This is what current exports use.
+ *  - Attributed (mixed style): `"A":[{"A?":"A","A":"text"}],"B":[…,{"A?":"B",
+ *    "A":retain},…],…,"b":{"A":[total]}` — a run-length list plus a separate
+ *    element total.
+ *
+ * We locate the first `],"B":[` at/after the token (which closes the token's
+ * own text array) and dispatch on what it opens: a digit → compact, a `{` →
+ * attributed. Anything else (empty `"B":[]`, or no marker at all — a plain
+ * text/URL context) is left untouched so we degrade to a plain replace.
  */
 function patchCanvaLengthsAfterToken(
   str: string,
@@ -108,6 +132,41 @@ function patchCanvaLengthsAfterToken(
 ): string {
   if (delta === 0) return str;
 
+  const marker = str.indexOf(LEN_FIELD_MARKER, fromIdx);
+  if (marker === -1) return str;
+  const bStart = marker + LEN_FIELD_MARKER.length;
+  const charBeforeClose = str[marker - 1];
+  const firstBChar = str[bStart];
+
+  // Compact: `"A":["…"],"B":[N]` — the array closes on a string (`"`) and the
+  // `"B"` array holds a single character count. Bump that count.
+  if (charBeforeClose === '"' && isDigit(firstBChar)) {
+    let j = bStart;
+    while (isDigit(str[j])) j++;
+    const newCount = Math.max(0, parseInt(str.slice(bStart, j), 10) + delta);
+    return str.slice(0, bStart) + String(newCount) + str.slice(j);
+  }
+
+  // Attributed: `"A":[{…}],"B":[{…}]` — the array closes on an object (`}`) and
+  // the `"B"` array holds style/retain ops. Bump the first retain then the
+  // element total.
+  if (charBeforeClose === "}" && firstBChar === "{") {
+    return patchCanvaAttributedLengths(str, fromIdx, delta);
+  }
+
+  return str;
+}
+
+/**
+ * Bumps the first `{"A?":"B","A":N}` retain at/after `fromIdx`, then the first
+ * `"b":{"A":[total]}` after it, by `delta`. Synchronous, so the shared
+ * `lastIndex` on the module-level regexes is safe.
+ */
+function patchCanvaAttributedLengths(
+  str: string,
+  fromIdx: number,
+  delta: number,
+): string {
   CANVA_RETAIN_RE.lastIndex = fromIdx;
   const retainMatch = CANVA_RETAIN_RE.exec(str);
   if (!retainMatch) return str;
