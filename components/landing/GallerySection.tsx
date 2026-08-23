@@ -15,7 +15,7 @@ import { landingCardTap, landingCardVariants, landingFastTransition, shouldReduc
 import { LandingModelCard } from "./LandingModelCard";
 import { MODEL_CAROUSEL_SLIDE_CLASS_NAME, ModelCarousel } from "./ModelCarousel";
 import { GalleryFeatureList } from "./GalleryFeatureList";
-import { getFeaturesForCustomizationLevel, type LandingGallerySettings } from "@/lib/landing-gallery-settings";
+import { type LandingGallerySettings } from "@/lib/landing-gallery-settings";
 
 export function GallerySection({
   itemsByCategory,
@@ -159,7 +159,7 @@ export function GallerySection({
   return (
     <AnimatedSection
       id="modelos"
-      className="bg-background px-5 py-14 sm:px-8 sm:py-24 lg:py-28"
+      className="bg-background px-5 py-14 sm:px-8 sm:py-24 lg:py-14"
     >
       <div className="mx-auto max-w-7xl">
         {/* Header content is rendered per customization collection below. */}
@@ -169,30 +169,27 @@ export function GallerySection({
             {t("empty")}
           </p>
         ) : null}
-        <div className="mt-6 sm:mt-14">
-          {renderCollection({
-            id: "modelos-predefinidos",
-            title: t("preDesigned.title"),
-            description: t("preDesigned.description"),
-            features: getFeaturesForCustomizationLevel(
-              settings,
-              "pre_designed",
-            ),
-            data: preDesigned,
-            activeCategory: activePreDesignedCategory,
-            onCategoryChange: setActivePreDesignedCategory,
-          })}
+        <div className="mt-6 sm:mt-14 ">
           {renderCollection({
             id: "modelos-personalizaveis",
             title: t("fullyCustomizable.title"),
             description: t("fullyCustomizable.description"),
-            features: getFeaturesForCustomizationLevel(
-              settings,
-              "fully_customizable",
-            ),
+            features: [],
             data: fullyCustomizable,
             activeCategory: activeFullyCustomizableCategory,
             onCategoryChange: setActiveFullyCustomizableCategory,
+          })}
+        </div>
+
+        <div className="pt-10 sm:mt-14">
+          {renderCollection({
+            id: "modelos-predefinidos",
+            title: t("preDesigned.title"),
+            description: t("preDesigned.description"),
+            features: [],
+            data: preDesigned,
+            activeCategory: activePreDesignedCategory,
+            onCategoryChange: setActivePreDesignedCategory,
           })}
         </div>
       </div>

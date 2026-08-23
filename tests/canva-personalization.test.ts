@@ -38,7 +38,9 @@ describe("applyCanvaPersonalization — text tokens", () => {
 
   it("applies fallbacks when payload is null (no guest)", () => {
     const html = `{{nome}}|{{acompanhante}}|{{mesa}}|{{num_total}}`;
-    expect(applyCanvaPersonalization(html, null)).toBe(`Convidado(a)|||`);
+    expect(applyCanvaPersonalization(html, null)).toBe(
+      `Convidado(a)|Acompanhante|Mesa|0`,
+    );
   });
 
   it("escapes quotes/backslashes and neutralizes angle brackets", () => {

@@ -21,6 +21,13 @@ export interface CanvaPersonalization {
 /** Fallback rendered for {{nome}} when there is no guest (generic/preview). */
 const NAME_FALLBACK = "Convidado(a)";
 
+/** Fallback rendered for {{mesa}} when there is no guest (generic/preview). */
+const TABLE_FALLBACK = "Mesa";
+
+const NUM_TOTAL_FALLBACK = "0";
+
+const COMPANION_FALLBACK = "Acompanhante";
+
 /** Upper bound on the encoded payload length (defensive — public route). */
 const MAX_PZ_LENGTH = 4096;
 
@@ -153,7 +160,9 @@ function tokenOffsetInElement(
   token: string,
 ): number | null {
   try {
-    const arr: unknown = JSON.parse(str.slice(aOpen + '"A":'.length, aClose + 1));
+    const arr: unknown = JSON.parse(
+      str.slice(aOpen + '"A":'.length, aClose + 1),
+    );
     if (!Array.isArray(arr)) return null;
     let offset = 0;
     for (const piece of arr) {
@@ -378,9 +387,9 @@ export function applyCanvaPersonalization(
       }
     : {
         "{{nome}}": NAME_FALLBACK,
-        "{{acompanhante}}": "",
-        "{{mesa}}": "",
-        "{{num_total}}": "",
+        "{{acompanhante}}": COMPANION_FALLBACK,
+        "{{mesa}}": TABLE_FALLBACK,
+        "{{num_total}}": NUM_TOTAL_FALLBACK,
       };
 
   let out = html;
