@@ -78,7 +78,7 @@ export function ProductDetailsPanel({
         <button
           type="button"
           onClick={onPreview}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-[13px] font-semibold text-foreground shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--foreground)_16%,transparent)] transition-[transform,box-shadow] duration-200 hover:shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--foreground)_35%,transparent)] active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[13px] font-semibold text-primary-foreground shadow-[0_14px_34px_color-mix(in_srgb,var(--primary)_28%,transparent)] transition-[transform,background-color] duration-200 hover:bg-primary-hover active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Eye className="h-4 w-4" aria-hidden="true" />
           {previewLabel}
