@@ -19,7 +19,7 @@ export function ProductActionBar({
         href={previewHref}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex min-h-[46px] basis-2/5 items-center justify-center gap-2 rounded-full bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-[transform,background-color] duration-200 hover:bg-primary-hover active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-full bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-[transform,background-color] duration-200 hover:bg-primary-hover active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <Eye className="h-4 w-4 shrink-0" aria-hidden="true" />
         {previewLabel}
