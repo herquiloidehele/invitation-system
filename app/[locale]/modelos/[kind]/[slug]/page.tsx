@@ -113,9 +113,7 @@ export default async function LandingProductDetailsRoute({
     title: feature.title,
     href: buildLocalePath(feature.href, locale),
     imageUrl: feature.imageUrl,
-    price: feature.price
-      ? { prefix: feature.price.prefix, amount: feature.price.amount }
-      : null,
+    price: feature.price ? { amount: feature.price.amount } : null,
   }));
 
   const canonical = buildAbsoluteUrl(

@@ -124,15 +124,10 @@ export function LandingModelCard({
                 {item.price.originalLabel}
               </span>
             ) : null}
-            <span className="flex items-baseline gap-1.5">
-              <span className={`text-xs ${config.pricePrefixClassName}`}>
-                {item.price.prefix}
-              </span>
-              <span
-                className={`text-base font-semibold ${config.priceAmountClassName}`}
-              >
-                {item.price.amount}
-              </span>
+            <span
+              className={`text-base font-semibold ${config.priceAmountClassName}`}
+            >
+              {item.price.amount}
             </span>
           </a>
         ) : (

@@ -34,9 +34,6 @@ export function ProductDetailsPanel({
 
       {details.price ? (
         <div className="mt-4 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 tabular-nums">
-          <span className="text-[13px] text-muted-foreground">
-            {details.price.prefix}
-          </span>
           <span className="text-xl font-semibold tracking-[-0.03em] text-foreground lg:text-[1.375rem]">
             {details.price.amount}
           </span>

@@ -8,8 +8,8 @@ import { CURRENCY_LOCALE } from "@/lib/currency/config";
 // (6900 -> "6900"), while 10 400 is.
 
 describe("formatLandingPrice", () => {
-  it("formats a whole-euro amount with the Desde prefix and no decimals", () => {
-    expect(formatLandingPrice(14900, "EUR")).toBe("Desde 149 €");
+  it("formats a whole-euro amount with no prefix and no decimals", () => {
+    expect(formatLandingPrice(14900, "EUR")).toBe("149 €");
   });
 
   it("returns null for null, zero, or negative amounts", () => {
@@ -22,7 +22,7 @@ describe("formatLandingPrice", () => {
 describe("resolveLandingPrice", () => {
   it("returns base-only price when there is no discount", () => {
     expect(resolveLandingPrice(14900, null, "EUR")).toMatchObject({
-      amountLabel: "Desde 149 €",
+      amount: "149 €",
       originalLabel: null,
       discountPercent: null,
     });
@@ -30,7 +30,7 @@ describe("resolveLandingPrice", () => {
 
   it("returns struck original + sale price + percent for a valid discount", () => {
     expect(resolveLandingPrice(20000, 15000, "EUR")).toMatchObject({
-      amountLabel: "Desde 150 €",
+      amount: "150 €",
       originalLabel: "200 €",
       discountPercent: 25,
     });
@@ -45,12 +45,12 @@ describe("resolveLandingPrice", () => {
 
   it("ignores a discount greater than or equal to the base", () => {
     expect(resolveLandingPrice(10000, 10000, "EUR")).toMatchObject({
-      amountLabel: "Desde 100 €",
+      amount: "100 €",
       originalLabel: null,
       discountPercent: null,
     });
     expect(resolveLandingPrice(10000, 12000, "EUR")).toMatchObject({
-      amountLabel: "Desde 100 €",
+      amount: "100 €",
       originalLabel: null,
       discountPercent: null,
     });
@@ -70,23 +70,13 @@ describe("resolveLandingPrice", () => {
     expect(resolveLandingPrice(null, null, "EUR")).toBeNull();
   });
 
-  it("exposes the prefix and bare amount for typographic styling", () => {
-    const discounted = resolveLandingPrice(20000, 15000, "EUR");
-    expect(discounted?.prefix).toBe("Desde");
-    expect(discounted?.amount).toBe(
-      discounted?.amountLabel.replace("Desde ", ""),
-    );
-    expect(discounted?.amountLabel).toBe(`Desde ${discounted?.amount}`);
-
-    const base = resolveLandingPrice(14900, null, "EUR");
-    expect(base?.prefix).toBe("Desde");
-    expect(base?.amount).toBe(base?.amountLabel.replace("Desde ", ""));
+  it("exposes the bare amount for typographic styling", () => {
+    expect(resolveLandingPrice(20000, 15000, "EUR")?.amount).toBe("150 €");
+    expect(resolveLandingPrice(14900, null, "EUR")?.amount).toBe("149 €");
   });
 
   it("keeps two decimals for fractional amounts", () => {
-    expect(resolveLandingPrice(14950, null, "EUR")?.amountLabel).toBe(
-      "Desde 149,50 €",
-    );
+    expect(resolveLandingPrice(14950, null, "EUR")?.amount).toBe("149,50 €");
   });
 });
 
@@ -107,7 +97,7 @@ describe("resolveLandingPrice currency-native formatting", () => {
   });
 
   it("formats a legacy AOA value as EUR", () => {
-    expect(formatLandingPrice(14900, "AOA")).toBe("Desde 149 €");
+    expect(formatLandingPrice(14900, "AOA")).toBe("149 €");
   });
 
   it("keeps the discount strikethrough valid after currency formatting", () => {

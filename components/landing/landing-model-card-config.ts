@@ -8,7 +8,6 @@ type LandingModelCardVariantConfig = {
   descriptionClassName: string;
   toggleClassName: string;
   priceOriginalClassName: string;
-  pricePrefixClassName: string;
   priceAmountClassName: string;
   buyButtonClassName: string;
   badgeClassName: string;
@@ -28,7 +27,6 @@ const VARIANT_CONFIG: Record<
     descriptionClassName: "mt-2 text-sm leading-5 text-muted-foreground",
     toggleClassName: "text-foreground",
     priceOriginalClassName: "text-subtle-foreground/60",
-    pricePrefixClassName: "text-muted-foreground",
     priceAmountClassName: "text-foreground",
     buyButtonClassName: "bg-primary text-primary-foreground hover:bg-primary-hover",
     badgeClassName: "bg-background/95 text-primary",
@@ -42,7 +40,6 @@ const VARIANT_CONFIG: Record<
     descriptionClassName: "mt-3 text-sm leading-6 text-muted-foreground",
     toggleClassName: "text-foreground",
     priceOriginalClassName: "text-subtle-foreground/60",
-    pricePrefixClassName: "text-muted-foreground",
     priceAmountClassName: "text-foreground",
     buyButtonClassName: "bg-primary text-primary-foreground hover:bg-primary-hover",
     badgeClassName: "bg-background/95 text-primary",

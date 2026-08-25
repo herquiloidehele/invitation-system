@@ -7,7 +7,7 @@ export type CrossSellItem = {
   title: string;
   href: string;
   imageUrl: string | null;
-  price: { prefix: string; amount: string } | null;
+  price: { amount: string } | null;
 };
 
 export function ProductCrossSellStrip({
@@ -52,7 +52,7 @@ export function ProductCrossSellStrip({
                 </p>
                 {item.price ? (
                   <p className="mt-1 text-[12px] tabular-nums text-muted-foreground">
-                    {item.price.prefix} {item.price.amount}
+                    {item.price.amount}
                   </p>
                 ) : null}
               </a>
