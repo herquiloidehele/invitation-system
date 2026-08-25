@@ -238,7 +238,7 @@ export function resolveCanvaEmbedPageState({
 /**
  * Returns true if an external_link invitation has any optional rich section
  * enabled (hero — implicit via heroImage/videoUrl presence, countdown,
- * scratch reveal, or an end-of-page RSVP form via rsvp.showOnExternalPage).
+ * scratch reveal, or an end-of-page RSVP form via rsvp.enabled).
  * Used by the public renderer to choose between the bare fullscreen-iframe
  * layout and the scrollable rich-sections layout.
  */
@@ -248,11 +248,11 @@ export function hasRichExternalSections(invitation: InvitationData): boolean {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
   const countdownOn = Boolean(invitation.countdown?.enabled);
   const scratchOn = Boolean(invitation.scratchReveal?.enabled);
-  // Opt a bare external link into the scrollable rich layout when the RSVP
-  // form is enabled and configured to render at the end of the page.
-  const rsvpAtEndOn = Boolean(
-    invitation.rsvp?.enabled && invitation.rsvp?.showOnExternalPage,
-  );
+  // Opt a bare external link into the scrollable rich layout whenever the RSVP
+  // form is enabled — independent of any other section (e.g. the gallery). This
+  // matches RichExternalLinkPage, which shows the RSVP form based solely on
+  // rsvp.enabled, so enabling RSVP is enough to make it appear.
+  const rsvpAtEndOn = Boolean(invitation.rsvp?.enabled);
   const galleryOn = shouldRenderCoupleGallery(invitation);
   const giftsOn = invitation.giftRegistry.enabled === true;
   const faqsOn = (invitation.faqs?.length ?? 0) > 0;

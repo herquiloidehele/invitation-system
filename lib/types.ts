@@ -1207,7 +1207,6 @@ export interface InvitationData {
     showCompanion?: boolean;
     showNumAdults?: boolean;
     showNumChildren?: boolean;
-    showOnExternalPage?: boolean;
     backgroundImageUrl?: string;
     inputBackgroundColor?: string;
     inputTextColor?: string;
