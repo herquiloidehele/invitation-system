@@ -35,4 +35,24 @@ describe("buildInvitationFormPayload", () => {
 
     expect(payload.translations).toBeNull();
   });
+
+  it("survives JSON serialization when all custom texts were cleared", () => {
+    const form = duplicateForm({ customTexts: undefined });
+
+    const payload = buildInvitationFormPayload(form);
+    const wire = JSON.parse(JSON.stringify(payload)) as Record<string, unknown>;
+
+    // Clearing the last custom text sets `customTexts` to `undefined`, which
+    // JSON.stringify drops, so the admin PUT route would skip the column and
+    // keep the stale text forever.
+    expect("customTexts" in wire).toBe(true);
+    expect(wire.customTexts).toBeNull();
+  });
+
+  it("keeps custom texts when they are set", () => {
+    const customTexts = { sectionTitle_schedule: "Programa" };
+    const payload = buildInvitationFormPayload(duplicateForm({ customTexts }));
+
+    expect(payload.customTexts).toEqual(customTexts);
+  });
 });

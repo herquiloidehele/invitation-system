@@ -16,5 +16,6 @@ export function buildInvitationFormPayload(sourceForm: InvitationData) {
     ...normalized,
     translations: normalized.translations ?? null,
     location2: normalized.location2 ?? null,
+    customTexts: normalized.customTexts ?? null,
   };
 }
