@@ -3684,7 +3684,7 @@ export default function ExternalInvitationForm({
                           onChange={(e) =>
                             updateRsvp("deadline", e.target.value)
                           }
-                          placeholder="e.g. 15 de Agosto de 2026"
+                          placeholder="e.g. Confirme até 15 de Agosto de 2026"
                         />
                       </div>
                       <div className="flex items-center justify-between gap-4">

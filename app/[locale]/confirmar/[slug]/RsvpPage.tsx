@@ -465,7 +465,7 @@ export default function RsvpPage({
                     className="mt-1 text-xs"
                     style={{ color: palette.textMuted }}
                   >
-                    {resolveText("rsvp_deadlinePrefix")} {deadline}
+                    {deadline}
                   </p>
                 )}
               </div>

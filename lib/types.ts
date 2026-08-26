@@ -1029,7 +1029,6 @@ export interface CustomTexts {
   rsvp_messagePlaceholder?: string;
 
   // -- RSVP Modal: States & Actions --
-  rsvp_deadlinePrefix?: string;
   rsvp_submitButton?: string;
   rsvp_submitting?: string;
   rsvp_successTitle?: string;

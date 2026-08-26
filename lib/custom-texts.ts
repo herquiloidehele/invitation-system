@@ -322,11 +322,6 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
     label: "RSVP — Estados e Ações",
     fields: [
       {
-        key: "rsvp_deadlinePrefix",
-        label: "Prefixo do prazo",
-        placeholder: "Confirme até",
-      },
-      {
         key: "rsvp_submitButton",
         label: "Botão enviar",
         placeholder: "Confirmar",

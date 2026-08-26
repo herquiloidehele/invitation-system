@@ -636,9 +636,7 @@ export default function RSVPForm(props: RSVPFormProps) {
                   ...bodyTextOverride,
                 }}
               >
-                <EditableText elementKey="bodyText">
-                  {resolveText("rsvp_deadlinePrefix")} {deadline}
-                </EditableText>
+                <EditableText elementKey="bodyText">{deadline}</EditableText>
               </p>
             )}
 
