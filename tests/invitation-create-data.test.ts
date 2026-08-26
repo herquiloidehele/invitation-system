@@ -32,6 +32,7 @@ describe("buildInvitationCreateData", () => {
     expect(data.cardStyles).toEqual(body.cardStyles);
     expect(data.guestManagementEnabled).toBe(true);
     expect(data.ownerCanAddGuests).toBe(true);
+    expect(data.checkInEnabled).toBe(true);
     expect(data).not.toHaveProperty("guests");
     expect(data).not.toHaveProperty("rsvpResponses");
     expect(data).not.toHaveProperty("giftReservations");

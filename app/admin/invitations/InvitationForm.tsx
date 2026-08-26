@@ -541,6 +541,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     translations: undefined,
     guestManagementEnabled: false,
     ownerCanAddGuests: false,
+    checkInEnabled: false,
     ownerGuestFormMode: "complete",
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
@@ -4017,6 +4018,24 @@ export default function InvitationForm({
                           ...prev,
                           guestManagementEnabled: value,
                         }))
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                    <div>
+                      <Label className="cursor-pointer">
+                        Activar check-in por QR code
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Mostra um QR code de entrada aos convidados e permite
+                        validar a entrada no evento com um leitor.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.checkInEnabled === true}
+                      onCheckedChange={(value) =>
+                        setForm((prev) => ({ ...prev, checkInEnabled: value }))
                       }
                     />
                   </div>

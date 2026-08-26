@@ -71,6 +71,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "externalLink",
       "guestManagementEnabled",
       "ownerCanAddGuests",
+      "checkInEnabled",
       "ownerGuestFormMode",
       "guestMessageTemplate",
       "socialPreview",

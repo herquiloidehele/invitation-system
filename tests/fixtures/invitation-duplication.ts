@@ -159,6 +159,7 @@ export const sourceInvitationRow = {
   isDemo: true,
   guestManagementEnabled: true,
   ownerCanAddGuests: true,
+  checkInEnabled: true,
   ownerGuestFormMode: "minimal",
   guestMessageTemplate: "Olá {name}: {link}",
   socialPreview: {

@@ -1034,6 +1034,7 @@ export interface CustomTexts {
   rsvp_successTitle?: string;
   rsvp_successMessage?: string;
   rsvp_alreadyTitle?: string;
+  rsvp_entryPassTitle?: string;
   rsvp_alreadyMessage?: string;
   rsvp_errorTitle?: string;
   rsvp_errorMessage?: string;
@@ -1053,6 +1054,9 @@ export interface CustomTexts {
   guestCard_tableLabel?: string;
   guestCard_noteLabel?: string;
   guestCard_inviteButton?: string;
+  guestCard_entryPassTitle?: string;
+  guestCard_entryPassCaption?: string; // supports {name}
+  entryPass_downloadButton?: string;
 
   // -- Calendar event copy --
   calendar_weddingTitle?: string;
@@ -1318,6 +1322,8 @@ export interface InvitationData {
   guestManagementEnabled?: boolean;
   /** Whether the host (owner-link page) may add guests. When false, the "Add guest" button is hidden there and the owner API rejects creation. Defaults to false. */
   ownerCanAddGuests?: boolean;
+  /** Master toggle for the QR check-in feature. Defaults to false. */
+  checkInEnabled?: boolean;
   /** Controls which fields the host sees when adding or editing guests. */
   ownerGuestFormMode?: OwnerGuestFormMode;
   /** WhatsApp/SMS message template with `{name}` and `{link}` placeholders. */

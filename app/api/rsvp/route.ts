@@ -7,6 +7,7 @@ import {
   validateRsvpCustomAnswers,
 } from "@/lib/rsvp-custom-fields";
 import { isRsvpClosed, type RsvpConfigWithEmail } from "@/lib/rsvp-config";
+import { generateCheckInToken } from "@/lib/checkin";
 
 // ---------------------------------------------------------------------------
 // Validation schema
@@ -124,8 +125,13 @@ export async function POST(request: NextRequest) {
         ? (customValidation.answers as unknown as Prisma.InputJsonValue)
         : Prisma.JsonNull;
 
+    // Issue a check-in token only for attending, non-personalized RSVPs
+    // (personalized guests carry their own guest token for the QR).
+    const checkInToken =
+      data.attending && guestId === null ? generateCheckInToken() : null;
+
     // Persist to database
-    await prisma.rsvpResponse.create({
+    const created = await prisma.rsvpResponse.create({
       data: {
         invitationSlug: data.invitationSlug,
         guestName: data.guestName,
@@ -138,6 +144,7 @@ export async function POST(request: NextRequest) {
         message: data.message ?? null,
         customAnswers: customAnswersJson,
         guestId,
+        checkInToken,
       },
     });
 
@@ -152,6 +159,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "RSVP confirmado!",
+      checkInToken: created.checkInToken,
     });
   } catch (error) {
     console.error("[RSVP] Error processing request:", error);

@@ -97,6 +97,7 @@ type AdminInvitationInitialDataRow = {
   isDemo: boolean;
   guestManagementEnabled: boolean;
   ownerCanAddGuests: boolean;
+  checkInEnabled: boolean;
   ownerGuestFormMode: string;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
@@ -191,6 +192,7 @@ export function toAdminInvitationInitialData(
     isDemo: row.isDemo,
     guestManagementEnabled: row.guestManagementEnabled,
     ownerCanAddGuests: row.ownerCanAddGuests,
+    checkInEnabled: row.checkInEnabled,
     ownerGuestFormMode: normalizeOwnerGuestFormMode(row.ownerGuestFormMode),
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:

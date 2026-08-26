@@ -184,6 +184,7 @@ export default function RevealableExternalSections({
                   imageSettings={invitation.imageSettings}
                   cardStyle={invitation.cardStyles?.personalGuestCard}
                   className={"pb-12 md:pb-16"}
+                  checkInEnabled={invitation.checkInEnabled}
                 />
               </EditableCard>
             </SectionImageHost>

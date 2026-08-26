@@ -26,6 +26,7 @@ import { countAttendingGuests } from "@/lib/rsvp-config";
 import type { RsvpCustomAnswer } from "@/lib/types";
 import { isExclusiveGiftSelectionEnabled } from "@/lib/gift-registry";
 import GiftReservationsTabClient from "./GiftReservationsTabClient";
+import CheckinTabClient from "./CheckinTabClient";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +55,7 @@ type OwnerLabels = {
   rsvpsTab: string;
   guestsTab: string;
   giftsTab: string;
+  checkinTab: string;
   responses: string;
   attending: string;
   declined: string;
@@ -80,7 +82,7 @@ type OwnerLabels = {
   giftsError: string;
 };
 
-type OwnerTab = "rsvps" | "guests" | "gifts";
+type OwnerTab = "rsvps" | "guests" | "gifts" | "checkin";
 
 // ---------------------------------------------------------------------------
 // Tab navigation (server-rendered, link-based)
@@ -91,12 +93,14 @@ function TabNav({
   token,
   showGuests,
   showGifts,
+  showCheckin,
   labels,
 }: {
   active: OwnerTab;
   token: string;
   showGuests: boolean;
   showGifts: boolean;
+  showCheckin: boolean;
   labels: OwnerLabels;
 }) {
   return (
@@ -134,6 +138,18 @@ function TabNav({
             }`}
           >
             {labels.giftsTab}
+          </Link>
+        )}
+        {showCheckin && (
+          <Link
+            href={`/confirmacoes/${token}?tab=checkin`}
+            className={`pb-3 -mb-px text-sm font-medium border-b-2 transition-colors ${
+              active === "checkin"
+                ? "border-stone-800 text-stone-800"
+                : "border-transparent text-stone-500 hover:text-stone-700"
+            }`}
+          >
+            {labels.checkinTab}
           </Link>
         )}
       </nav>
@@ -181,6 +197,7 @@ async function InvitationRsvpView({
   );
   const totalDeclined = responses.filter((r) => !r.attending).length;
   const showGuests = invitation.guestManagementEnabled === true;
+  const showCheckin = invitation.checkInEnabled === true;
   const showGifts = isExclusiveGiftSelectionEnabled(
     invitation.giftRegistry as Parameters<
       typeof isExclusiveGiftSelectionEnabled
@@ -189,9 +206,11 @@ async function InvitationRsvpView({
   const activeTab: OwnerTab =
     showGifts && tab === "gifts"
       ? "gifts"
-      : showGuests && tab === "guests"
-        ? "guests"
-        : "rsvps";
+      : showCheckin && tab === "checkin"
+        ? "checkin"
+        : showGuests && tab === "guests"
+          ? "guests"
+          : "rsvps";
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -233,6 +252,7 @@ async function InvitationRsvpView({
           token={token}
           showGuests={showGuests}
           showGifts={showGifts}
+          showCheckin={showCheckin}
           labels={labels}
         />
 
@@ -272,6 +292,11 @@ async function InvitationRsvpView({
             ownerGuestFormMode={normalizeOwnerGuestFormMode(
               invitation.ownerGuestFormMode,
             )}
+          />
+        ) : activeTab === "checkin" ? (
+          <CheckinTabClient
+            ownerToken={token}
+            checkinTitle={labels.checkinTab}
           />
         ) : (
           <GiftReservationsTabClient
@@ -558,13 +583,20 @@ export default async function OwnerRsvpPage({ params, searchParams }: Props) {
   const { locale: rawLocale, token } = await params;
   const { tab } = await searchParams;
   const activeTab: OwnerTab =
-    tab === "guests" ? "guests" : tab === "gifts" ? "gifts" : "rsvps";
+    tab === "guests"
+      ? "guests"
+      : tab === "gifts"
+        ? "gifts"
+        : tab === "checkin"
+          ? "checkin"
+          : "rsvps";
   const locale = resolveLocale(rawLocale);
   const t = await getTranslations("OwnerConfirmations");
   const labels: OwnerLabels = {
     rsvpsTab: t("rsvpsTab"),
     guestsTab: t("guestsTab"),
     giftsTab: t("giftsTab"),
+    checkinTab: t("checkinTab"),
     responses: t("responses"),
     attending: t("attending"),
     declined: t("declined"),

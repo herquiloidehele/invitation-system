@@ -98,6 +98,7 @@ type InvitationWithTheme = {
   eventType: string;
   guestManagementEnabled: boolean;
   ownerCanAddGuests: boolean;
+  checkInEnabled: boolean;
   ownerGuestFormMode: string;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
@@ -190,6 +191,7 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     eventType: (row.eventType as InvitationEventType) ?? "wedding",
     guestManagementEnabled: row.guestManagementEnabled ?? false,
     ownerCanAddGuests: row.ownerCanAddGuests ?? false,
+    checkInEnabled: row.checkInEnabled ?? false,
     ownerGuestFormMode: normalizeOwnerGuestFormMode(row.ownerGuestFormMode),
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:

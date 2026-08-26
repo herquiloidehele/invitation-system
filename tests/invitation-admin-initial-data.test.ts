@@ -66,6 +66,7 @@ const baseRow = {
   isDemo: false,
   guestManagementEnabled: false,
   ownerCanAddGuests: false,
+  checkInEnabled: false,
   ownerGuestFormMode: "complete",
   guestMessageTemplate: null,
   socialPreview: null,
@@ -223,6 +224,20 @@ describe("toAdminInvitationInitialData — ownerCanAddGuests round-trip", () => 
     const row = { ...baseRow, ownerCanAddGuests: false };
     const result = toAdminInvitationInitialData(row);
     expect(result.ownerCanAddGuests).toBe(false);
+  });
+});
+
+describe("toAdminInvitationInitialData — checkInEnabled round-trip", () => {
+  it("hydrates a stored checkInEnabled=true into the admin form initial data", () => {
+    const row = { ...baseRow, checkInEnabled: true };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.checkInEnabled).toBe(true);
+  });
+
+  it("preserves checkInEnabled=false (the default)", () => {
+    const row = { ...baseRow, checkInEnabled: false };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.checkInEnabled).toBe(false);
   });
 });
 

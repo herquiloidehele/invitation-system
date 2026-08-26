@@ -164,6 +164,7 @@ model Invitation {
   isDemo                  Boolean  @default(false)
   guestManagementEnabled  Boolean  @default(false)
   ownerCanAddGuests       Boolean  @default(false) // When true, the host (owner-link page) may add guests; otherwise the "Add guest" button is hidden and the owner API rejects creation.
+  checkInEnabled          Boolean  @default(false) // Master toggle for QR check-in.
   ownerGuestFormMode      String   @default("complete") // "complete" | "minimal"; controls only the host-facing guest form.
   guestMessageTemplate    String?
   socialPreview           Json? // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
@@ -284,6 +285,10 @@ model RsvpResponse {
   customAnswers       Json?
   submittedAt         DateTime @default(now())
 
+  checkInToken String?   @unique // Issued for non-personalized attending RSVPs (guestId == null).
+  checkedInAt  DateTime?
+  arrivedCount Int?
+
   invitation Invitation @relation(fields: [invitationSlug], references: [slug], onDelete: Cascade)
 
   guestId String?
@@ -323,6 +328,9 @@ model Guest {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  checkedInAt  DateTime?
+  arrivedCount Int?
 
   rsvpResponses    RsvpResponse[]
   giftReservations GiftReservation[]

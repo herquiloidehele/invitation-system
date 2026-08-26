@@ -13,6 +13,9 @@ import type {
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
 import { useCustomText } from "@/lib/custom-texts";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
+import { buildPersonalInviteUrl } from "@/lib/guest-links";
+import { buildPassUrl } from "@/lib/checkin-links";
+import EntryPassQr from "@/components/shared/EntryPassQr";
 import {
   resolveRsvpInputColors,
   type RsvpInputColorConfig,
@@ -102,6 +105,8 @@ interface RsvpPageProps {
   guestToken?: string;
   /** Display name to prefill, resolved from the guest token server-side. */
   prefillName?: string;
+  /** When true, shows a downloadable QR entry pass after an attending RSVP. */
+  checkInEnabled?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -154,10 +159,16 @@ export default function RsvpPage({
   customTexts: ct,
   guestToken,
   prefillName,
+  checkInEnabled = false,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [customValues, setCustomValues] = useState<RsvpCustomValues>({});
   const [customErrors, setCustomErrors] = useState<RsvpCustomErrors>({});
+  const [passInfo, setPassInfo] = useState<{
+    attending: boolean;
+    checkInToken: string | null;
+    name: string;
+  } | null>(null);
   const resolveText = useCustomText(ct);
   const rsvpSchema = createRsvpSchema(resolveText);
 
@@ -244,7 +255,15 @@ export default function RsvpPage({
         }),
       });
       if (!res.ok) throw new Error("Failed to submit");
+      const json = (await res.json().catch(() => ({}))) as {
+        checkInToken?: string | null;
+      };
       markRsvpSubmitted(slug);
+      setPassInfo({
+        attending: data.attending === "yes",
+        checkInToken: json.checkInToken ?? null,
+        name: data.name,
+      });
       setSubmitState("success");
       reset();
       setCustomValues({});
@@ -415,6 +434,35 @@ export default function RsvpPage({
               <p className="text-sm" style={{ color: palette.textSoft }}>
                 {resolveText("rsvp_successMessage")}
               </p>
+              {checkInEnabled &&
+              passInfo?.attending &&
+              typeof window !== "undefined"
+                ? (() => {
+                    const passValue = guestToken
+                      ? buildPersonalInviteUrl({
+                          origin: window.location.origin,
+                          slug,
+                          token: guestToken,
+                          name: passInfo.name || prefillName || "",
+                        })
+                      : passInfo.checkInToken
+                        ? buildPassUrl(
+                            window.location.origin,
+                            slug,
+                            passInfo.checkInToken,
+                          )
+                        : "";
+                    return passValue ? (
+                      <div className="mt-2 flex justify-center">
+                        <EntryPassQr
+                          value={passValue}
+                          title={resolveText("rsvp_entryPassTitle")}
+                          downloadLabel={resolveText("entryPass_downloadButton")}
+                        />
+                      </div>
+                    ) : null;
+                  })()
+                : null}
             </div>
           ) : submitState === "error" ? (
             /* ── Error ── */
