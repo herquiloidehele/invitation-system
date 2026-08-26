@@ -221,6 +221,7 @@ function getDefaultState(
       showCompanion: false,
       showNumAdults: false,
       showNumChildren: false,
+      showOnExternalPage: false,
       backgroundImageUrl: "",
       inputBackgroundColor: "",
       inputTextColor: "",
@@ -3637,8 +3638,8 @@ export default function ExternalInvitationForm({
                     <div className="space-y-0.5">
                       <Label>Ativar formulário de RSVP</Label>
                       <p className="text-xs text-muted-foreground">
-                        Quando ativo, o formulário aparece no fundo da página,
-                        independentemente das outras secções.
+                        Quando ativo, o formulário aparece no fundo da página
+                        (Curtain-Canva e link externo com secções extra).
                       </p>
                     </div>
                     <Switch
@@ -3772,6 +3773,22 @@ export default function ExternalInvitationForm({
                           checked={form.rsvp.acceptingResponses !== false}
                           onCheckedChange={(v) =>
                             updateRsvp("acceptingResponses", v)
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <Label>Mostrar RSVP no fim do convite externo</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Quando ativo, a página externa (link Canva sem
+                            secções extra) passa a ser rolável e mostra o
+                            formulário após o conteúdo.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={form.rsvp.showOnExternalPage === true}
+                          onCheckedChange={(v) =>
+                            updateRsvp("showOnExternalPage", v)
                           }
                         />
                       </div>

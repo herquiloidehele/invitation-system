@@ -33,7 +33,7 @@ function baseExternalInvitation(
     },
     quote: "",
     location: { name: "", address: "", googleMapsUrl: "" },
-    rsvp: { enabled: false },
+    rsvp: { enabled: false, showOnExternalPage: false },
     schedule: [],
     dressCode: { enabled: false, text: "" },
     giftRegistry: { enabled: false, text: "" },
@@ -102,22 +102,6 @@ describe("hasRichExternalSections", () => {
       );
     },
   );
-
-  it("uses rich layout when RSVP is enabled, independent of the gallery", () => {
-    expect(
-      hasRichExternalSections(
-        baseExternalInvitation({ rsvp: { enabled: true } }),
-      ),
-    ).toBe(true);
-  });
-
-  it("does not activate rich layout when RSVP is disabled and nothing else is on", () => {
-    expect(
-      hasRichExternalSections(
-        baseExternalInvitation({ rsvp: { enabled: false } }),
-      ),
-    ).toBe(false);
-  });
 });
 
 describe("shared FAQ section source", () => {
