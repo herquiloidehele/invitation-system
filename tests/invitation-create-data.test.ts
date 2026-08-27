@@ -33,6 +33,7 @@ describe("buildInvitationCreateData", () => {
     expect(data.guestManagementEnabled).toBe(true);
     expect(data.ownerCanAddGuests).toBe(true);
     expect(data.checkInEnabled).toBe(true);
+    expect(data.qrCodeStyle).toEqual({ fgColor: "#aa0000", bgColor: "#ffeeee" });
     expect(data).not.toHaveProperty("guests");
     expect(data).not.toHaveProperty("rsvpResponses");
     expect(data).not.toHaveProperty("giftReservations");

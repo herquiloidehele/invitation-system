@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle, Clock, Loader2, Lock } from "lucide-react";
 import type {
   CustomTexts,
   InvitationEventType,
+  QrCodeStyle,
   RsvpCustomField,
 } from "@/lib/types";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
@@ -107,6 +108,8 @@ interface RsvpPageProps {
   prefillName?: string;
   /** When true, shows a downloadable QR entry pass after an attending RSVP. */
   checkInEnabled?: boolean;
+  /** Colors for the entry-pass QR. */
+  qrStyle?: QrCodeStyle;
 }
 
 // ---------------------------------------------------------------------------
@@ -160,6 +163,7 @@ export default function RsvpPage({
   guestToken,
   prefillName,
   checkInEnabled = false,
+  qrStyle,
 }: RsvpPageProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [customValues, setCustomValues] = useState<RsvpCustomValues>({});
@@ -458,6 +462,8 @@ export default function RsvpPage({
                           value={passValue}
                           title={resolveText("rsvp_entryPassTitle")}
                           downloadLabel={resolveText("entryPass_downloadButton")}
+                          fgColor={qrStyle?.fgColor}
+                          bgColor={qrStyle?.bgColor}
                         />
                       </div>
                     ) : null;

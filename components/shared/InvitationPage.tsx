@@ -372,6 +372,7 @@ export default function InvitationPage({
                 customTexts={invitation.customTexts}
                 cardStyle={cs("personalGuestCard", 24)}
                 checkInEnabled={invitation.checkInEnabled}
+                qrStyle={invitation.qrCodeStyle}
               />
             </EditableCard>
           </div>

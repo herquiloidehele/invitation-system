@@ -9,6 +9,7 @@ import type {
   CustomTexts,
   ImageSettingsMap,
   PublicGuestData,
+  QrCodeStyle,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
@@ -36,6 +37,8 @@ interface PersonalGuestCardProps {
   className?: string;
   /** When true, renders the guest's downloadable QR entry pass. */
   checkInEnabled?: boolean;
+  /** Colors for the entry-pass QR. */
+  qrStyle?: QrCodeStyle;
 }
 
 /** Default scrim opacity applied over the background image when one is set. */
@@ -77,6 +80,7 @@ export default function PersonalGuestCard({
   cardStyle,
   className,
   checkInEnabled,
+  qrStyle,
 }: PersonalGuestCardProps) {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const t = useCustomText(customTexts);
@@ -263,6 +267,8 @@ export default function PersonalGuestCard({
                 title={t("guestCard_entryPassTitle")}
                 downloadLabel={t("entryPass_downloadButton")}
                 downloadFileName={`passe-${slugifyName(guest.name) || "convidado"}`}
+                fgColor={qrStyle?.fgColor}
+                bgColor={qrStyle?.bgColor}
               />
             </div>
           ) : null}

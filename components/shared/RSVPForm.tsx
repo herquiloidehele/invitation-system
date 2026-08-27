@@ -288,6 +288,9 @@ export default function RSVPForm(props: RSVPFormProps) {
 
   const checkInEnabled =
     isIntegration(props) && props.invitation.checkInEnabled === true;
+  const qrStyle = isIntegration(props)
+    ? props.invitation.qrCodeStyle
+    : undefined;
 
   const {
     register,
@@ -599,6 +602,8 @@ export default function RSVPForm(props: RSVPFormProps) {
                         value={passValue}
                         title={resolveText("rsvp_entryPassTitle")}
                         downloadLabel={resolveText("entryPass_downloadButton")}
+                        fgColor={qrStyle?.fgColor}
+                        bgColor={qrStyle?.bgColor}
                       />
                     </div>
                   ) : null;

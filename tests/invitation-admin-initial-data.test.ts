@@ -67,6 +67,7 @@ const baseRow = {
   guestManagementEnabled: false,
   ownerCanAddGuests: false,
   checkInEnabled: false,
+  qrCodeStyle: null,
   ownerGuestFormMode: "complete",
   guestMessageTemplate: null,
   socialPreview: null,
@@ -238,6 +239,19 @@ describe("toAdminInvitationInitialData — checkInEnabled round-trip", () => {
     const row = { ...baseRow, checkInEnabled: false };
     const result = toAdminInvitationInitialData(row);
     expect(result.checkInEnabled).toBe(false);
+  });
+});
+
+describe("toAdminInvitationInitialData — qrCodeStyle round-trip", () => {
+  it("hydrates a stored qrCodeStyle object", () => {
+    const row = { ...baseRow, qrCodeStyle: { fgColor: "#123456" } };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.qrCodeStyle).toEqual({ fgColor: "#123456" });
+  });
+  it("maps a null qrCodeStyle to undefined", () => {
+    const row = { ...baseRow, qrCodeStyle: null };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.qrCodeStyle).toBeUndefined();
   });
 });
 

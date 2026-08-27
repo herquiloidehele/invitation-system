@@ -160,6 +160,7 @@ export const sourceInvitationRow = {
   guestManagementEnabled: true,
   ownerCanAddGuests: true,
   checkInEnabled: true,
+  qrCodeStyle: { fgColor: "#aa0000", bgColor: "#ffeeee" },
   ownerGuestFormMode: "minimal",
   guestMessageTemplate: "Olá {name}: {link}",
   socialPreview: {

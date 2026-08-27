@@ -332,6 +332,9 @@ export async function PUT(
         ...(body.checkInEnabled !== undefined && {
           checkInEnabled: body.checkInEnabled === true,
         }),
+        ...(body.qrCodeStyle !== undefined && {
+          qrCodeStyle: sanitizeJsonField(body.qrCodeStyle, null),
+        }),
         ...(body.ownerGuestFormMode !== undefined && {
           ownerGuestFormMode: normalizeOwnerGuestFormMode(
             body.ownerGuestFormMode,

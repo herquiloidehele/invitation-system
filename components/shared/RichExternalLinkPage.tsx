@@ -341,6 +341,7 @@ export default function RichExternalLinkPage({
                       customTexts={invitation.customTexts}
                       cardStyle={cs("personalGuestCard", 24)}
                       checkInEnabled={invitation.checkInEnabled}
+                      qrStyle={invitation.qrCodeStyle}
                     />
                   </EditableCard>
                 </div>

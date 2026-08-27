@@ -86,6 +86,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
+import EntryPassQr from "@/components/shared/EntryPassQr";
 import ElegantFloralPage from "@/components/elegant-floral/ElegantFloralPage";
 import { InvitationLanguagePreviewProvider } from "@/components/shared/InvitationLanguageSwitcher";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
@@ -542,6 +543,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     guestManagementEnabled: false,
     ownerCanAddGuests: false,
     checkInEnabled: false,
+    qrCodeStyle: undefined,
     ownerGuestFormMode: "complete",
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
@@ -4039,6 +4041,66 @@ export default function InvitationForm({
                       }
                     />
                   </div>
+
+                  {form.checkInEnabled && (
+                    <div className="space-y-3 rounded-lg border p-3">
+                      <Label>Estilo do QR code</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Cores do QR code de entrada mostrado aos convidados.
+                      </p>
+                      <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={form.qrCodeStyle?.fgColor ?? "#111111"}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                qrCodeStyle: {
+                                  ...prev.qrCodeStyle,
+                                  fgColor: e.target.value,
+                                },
+                              }))
+                            }
+                            className="h-9 w-9 shrink-0 cursor-pointer rounded border"
+                            title="Cor"
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            Cor
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={form.qrCodeStyle?.bgColor ?? "#ffffff"}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                qrCodeStyle: {
+                                  ...prev.qrCodeStyle,
+                                  bgColor: e.target.value,
+                                },
+                              }))
+                            }
+                            className="h-9 w-9 shrink-0 cursor-pointer rounded border"
+                            title="Fundo"
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            Fundo
+                          </span>
+                        </div>
+                        <div className="ml-auto">
+                          <EntryPassQr
+                            value="https://example.com/preview"
+                            fgColor={form.qrCodeStyle?.fgColor}
+                            bgColor={form.qrCodeStyle?.bgColor}
+                            size={96}
+                            hideDownload
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-1.5 rounded-lg border p-3">
                     <Label htmlFor="personal-guest-card-visibility">

@@ -1188,6 +1188,14 @@ export type InvitationTranslations = Partial<
   Record<TranslationLocale, InvitationTranslationOverlay>
 >;
 
+/** Per-invitation entry-pass QR colors. Missing fields fall back to defaults. */
+export interface QrCodeStyle {
+  /** Module (foreground) color. Defaults to "#111111". */
+  fgColor?: string;
+  /** Background color. Defaults to "#ffffff". */
+  bgColor?: string;
+}
+
 export interface InvitationData {
   slug: string;
   /** The theme's database id — used when saving/updating invitations. */
@@ -1323,6 +1331,8 @@ export interface InvitationData {
   ownerCanAddGuests?: boolean;
   /** Master toggle for the QR check-in feature. Defaults to false. */
   checkInEnabled?: boolean;
+  /** Guest entry-pass QR colors. */
+  qrCodeStyle?: QrCodeStyle;
   /** Controls which fields the host sees when adding or editing guests. */
   ownerGuestFormMode?: OwnerGuestFormMode;
   /** WhatsApp/SMS message template with `{name}` and `{link}` placeholders. */

@@ -72,6 +72,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "guestManagementEnabled",
       "ownerCanAddGuests",
       "checkInEnabled",
+      "qrCodeStyle",
       "ownerGuestFormMode",
       "guestMessageTemplate",
       "socialPreview",

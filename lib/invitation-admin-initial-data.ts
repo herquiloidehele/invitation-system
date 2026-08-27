@@ -98,6 +98,7 @@ type AdminInvitationInitialDataRow = {
   guestManagementEnabled: boolean;
   ownerCanAddGuests: boolean;
   checkInEnabled: boolean;
+  qrCodeStyle: unknown;
   ownerGuestFormMode: string;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
@@ -193,6 +194,8 @@ export function toAdminInvitationInitialData(
     guestManagementEnabled: row.guestManagementEnabled,
     ownerCanAddGuests: row.ownerCanAddGuests,
     checkInEnabled: row.checkInEnabled,
+    qrCodeStyle:
+      (row.qrCodeStyle as InvitationData["qrCodeStyle"] | null) ?? undefined,
     ownerGuestFormMode: normalizeOwnerGuestFormMode(row.ownerGuestFormMode),
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:

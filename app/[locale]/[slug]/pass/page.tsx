@@ -18,7 +18,7 @@ export default async function PassPage({ params, searchParams }: Props) {
 
   const invitation = await prisma.invitation.findUnique({
     where: { slug },
-    select: { slug: true, checkInEnabled: true },
+    select: { slug: true, checkInEnabled: true, qrCodeStyle: true },
   });
   if (!invitation || !invitation.checkInEnabled) notFound();
 
@@ -33,6 +33,10 @@ export default async function PassPage({ params, searchParams }: Props) {
       slug={slug}
       checkInToken={rsvp.checkInToken}
       guestName={rsvp.guestName}
+      qrStyle={
+        (invitation.qrCodeStyle as import("@/lib/types").QrCodeStyle | null) ??
+        undefined
+      }
     />
   );
 }

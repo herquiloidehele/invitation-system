@@ -2,15 +2,18 @@
 
 import EntryPassQr from "@/components/shared/EntryPassQr";
 import { buildPassUrl } from "@/lib/checkin-links";
+import type { QrCodeStyle } from "@/lib/types";
 
 export default function PassView({
   slug,
   checkInToken,
   guestName,
+  qrStyle,
 }: {
   slug: string;
   checkInToken: string;
   guestName: string;
+  qrStyle?: QrCodeStyle;
 }) {
   const value =
     typeof window !== "undefined"
@@ -26,6 +29,8 @@ export default function PassView({
           caption={guestName}
           downloadLabel="Descarregar"
           downloadFileName={`passe-${slug}`}
+          fgColor={qrStyle?.fgColor}
+          bgColor={qrStyle?.bgColor}
         />
       ) : null}
       <p className="text-sm text-stone-500">Apresenta este código à entrada.</p>
