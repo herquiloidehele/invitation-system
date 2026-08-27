@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +16,11 @@ import { useCustomText } from "@/lib/custom-texts";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import { buildPersonalInviteUrl } from "@/lib/guest-links";
 import { buildPassUrl } from "@/lib/checkin-links";
-import { storeGuestPassToken } from "@/lib/entry-pass";
+import {
+  buildEntryPassValue,
+  readGuestPassToken,
+  storeGuestPassToken,
+} from "@/lib/entry-pass";
 import EntryPassQr from "@/components/shared/EntryPassQr";
 import {
   resolveRsvpInputColors,
@@ -176,6 +180,25 @@ export default function RsvpPage({
   } | null>(null);
   const resolveText = useCustomText(ct);
   const rsvpSchema = createRsvpSchema(resolveText);
+
+  // Rebuild the guest's entry pass so the already-confirmed state (shown on
+  // reload) can display it: personalized guests use their `?g=` token, others
+  // use the check-in token stored at confirmation. Read via useSyncExternalStore
+  // to avoid setState in an effect.
+  const alreadyPassValue = useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (!checkInEnabled) return null;
+      return buildEntryPassValue({
+        origin: window.location.origin,
+        slug,
+        guestToken: guestToken || undefined,
+        guestName: prefillName,
+        checkInToken: guestToken ? null : readGuestPassToken(slug),
+      });
+    },
+    () => null,
+  );
 
   // Check localStorage on mount
   useEffect(() => {
@@ -424,6 +447,15 @@ export default function RsvpPage({
               <p className="text-sm" style={{ color: palette.textSoft }}>
                 {resolveText("rsvp_alreadyMessage")}
               </p>
+              {alreadyPassValue ? (
+                <EntryPassQr
+                  value={alreadyPassValue}
+                  title={resolveText("rsvp_entryPassTitle")}
+                  downloadLabel={resolveText("entryPass_downloadButton")}
+                  fgColor={qrStyle?.fgColor}
+                  bgColor={qrStyle?.bgColor}
+                />
+              ) : null}
             </div>
           ) : submitState === "success" ? (
             /* ── Success ── */
