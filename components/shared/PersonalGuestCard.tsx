@@ -261,10 +261,6 @@ export default function PersonalGuestCard({
                   name: guest.name,
                 })}
                 title={t("guestCard_entryPassTitle")}
-                caption={t("guestCard_entryPassCaption").replace(
-                  "{name}",
-                  guest.name,
-                )}
                 downloadLabel={t("entryPass_downloadButton")}
                 downloadFileName={`passe-${slugifyName(guest.name) || "convidado"}`}
               />

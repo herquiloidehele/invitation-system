@@ -419,11 +419,6 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "O teu passe de entrada",
       },
       {
-        key: "guestCard_entryPassCaption",
-        label: "Legenda do passe (usa {name})",
-        placeholder: "{name}",
-      },
-      {
         key: "entryPass_downloadButton",
         label: "Botão descarregar passe",
         placeholder: "Descarregar",

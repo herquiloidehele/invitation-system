@@ -1055,7 +1055,6 @@ export interface CustomTexts {
   guestCard_noteLabel?: string;
   guestCard_inviteButton?: string;
   guestCard_entryPassTitle?: string;
-  guestCard_entryPassCaption?: string; // supports {name}
   entryPass_downloadButton?: string;
 
   // -- Calendar event copy --
