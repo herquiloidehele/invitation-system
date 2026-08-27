@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import { X, Loader2, CheckCircle, AlertCircle, Lock } from "lucide-react";
 import { useForm, type Resolver } from "react-hook-form";
@@ -31,6 +31,11 @@ import { resolveRsvpInputColors } from "@/lib/rsvp-input-colors";
 import { resolveRsvpInputStyle } from "@/lib/rsvp-input-styles";
 import { buildPersonalInviteUrl } from "@/lib/guest-links";
 import { buildPassUrl } from "@/lib/checkin-links";
+import {
+  buildEntryPassValue,
+  readGuestPassToken,
+  storeGuestPassToken,
+} from "@/lib/entry-pass";
 import EntryPassQr from "@/components/shared/EntryPassQr";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
@@ -291,6 +296,22 @@ export default function RSVPForm(props: RSVPFormProps) {
   const qrStyle = isIntegration(props)
     ? props.invitation.qrCodeStyle
     : undefined;
+  // Rebuild a non-personalized guest's stored pass so the already-confirmed
+  // state (shown on reload for inline layouts) can display it. Read via
+  // useSyncExternalStore to avoid setState in an effect.
+  const alreadyPassValue = useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (!checkInEnabled || guest) return null;
+      const token = readGuestPassToken(slug);
+      return buildEntryPassValue({
+        origin: window.location.origin,
+        slug,
+        checkInToken: token,
+      });
+    },
+    () => null,
+  );
 
   const {
     register,
@@ -379,6 +400,9 @@ export default function RSVPForm(props: RSVPFormProps) {
         attending: data.attending === "yes",
         checkInToken: json.checkInToken ?? null,
       });
+      if (json.checkInToken) {
+        storeGuestPassToken(slug, json.checkInToken);
+      }
       setSubmitState("success");
       reset();
       setCustomValues({});
@@ -531,6 +555,17 @@ export default function RSVPForm(props: RSVPFormProps) {
                 {resolveText("rsvp_alreadyMessage")}
               </EditableText>
             </p>
+            {alreadyPassValue ? (
+              <div className="mt-4 flex justify-center">
+                <EntryPassQr
+                  value={alreadyPassValue}
+                  title={resolveText("rsvp_entryPassTitle")}
+                  downloadLabel={resolveText("entryPass_downloadButton")}
+                  fgColor={qrStyle?.fgColor}
+                  bgColor={qrStyle?.bgColor}
+                />
+              </div>
+            ) : null}
             {!inline && (
               <button
                 onClick={handleCloseInModal}

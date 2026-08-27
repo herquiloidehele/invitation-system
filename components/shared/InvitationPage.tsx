@@ -5,6 +5,7 @@ import {
   type RefObject,
   useEffect,
   useState,
+  useSyncExternalStore,
 } from "react";
 import { motion, type Variants } from "framer-motion";
 import { CalendarPlus, Heart, Shirt } from "lucide-react";
@@ -24,6 +25,8 @@ import { useCustomText } from "@/lib/custom-texts";
 import { formatLocalizedMonthLong } from "@/lib/date-format";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
+import EntryPassQr from "@/components/shared/EntryPassQr";
+import { buildEntryPassValue, readGuestPassToken } from "@/lib/entry-pass";
 import PersonalGuestCard, {
   PREVIEW_SAMPLE_GUEST,
   PREVIEW_SAMPLE_GUEST_DISPLAY_ONLY,
@@ -269,6 +272,27 @@ export default function InvitationPage({
       // ignore
     }
   }, [invitation.slug, isCalendarCta]);
+
+  // Non-personalized guests: rebuild their entry pass from the stored token so
+  // it can render inline in the RSVP area across reloads. Personalized guests
+  // already see their pass on the personal guest card, so skip them here.
+  // Read via useSyncExternalStore (server snapshot null) to avoid setState in
+  // an effect; the localStorage value is stable during a session.
+  const inlinePassValue = useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (isCalendarCta) return null;
+      if (invitation.guest) return null;
+      if (invitation.checkInEnabled !== true) return null;
+      const token = readGuestPassToken(invitation.slug);
+      return buildEntryPassValue({
+        origin: window.location.origin,
+        slug: invitation.slug,
+        checkInToken: token,
+      });
+    },
+    () => null,
+  );
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
 
@@ -939,6 +963,16 @@ export default function InvitationPage({
               <CalendarPlus size={17} strokeWidth={1.5} />
               <span>{t("cta_addToCalendar")}</span>
             </CalendarButton>
+          ) : rsvpSubmitted && inlinePassValue ? (
+            <div className="flex w-full flex-col items-center">
+              <EntryPassQr
+                value={inlinePassValue}
+                title={t("rsvp_entryPassTitle")}
+                downloadLabel={t("entryPass_downloadButton")}
+                fgColor={invitation.qrCodeStyle?.fgColor}
+                bgColor={invitation.qrCodeStyle?.bgColor}
+              />
+            </div>
           ) : (
             <motion.button
               onClick={() => setRsvpOpen(true)}

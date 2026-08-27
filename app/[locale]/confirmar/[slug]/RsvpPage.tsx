@@ -16,6 +16,7 @@ import { useCustomText } from "@/lib/custom-texts";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import { buildPersonalInviteUrl } from "@/lib/guest-links";
 import { buildPassUrl } from "@/lib/checkin-links";
+import { storeGuestPassToken } from "@/lib/entry-pass";
 import EntryPassQr from "@/components/shared/EntryPassQr";
 import {
   resolveRsvpInputColors,
@@ -268,6 +269,9 @@ export default function RsvpPage({
         checkInToken: json.checkInToken ?? null,
         name: data.name,
       });
+      if (json.checkInToken) {
+        storeGuestPassToken(slug, json.checkInToken);
+      }
       setSubmitState("success");
       reset();
       setCustomValues({});
