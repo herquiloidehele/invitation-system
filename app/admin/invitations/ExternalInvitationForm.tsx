@@ -110,6 +110,7 @@ import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { resolveInvitationSocialPreview } from "@/lib/social-preview";
 import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
+import EntryPassQr from "@/components/shared/EntryPassQr";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
 import { InlineCardEditProvider } from "@/components/shared/EditableCard";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
@@ -268,6 +269,8 @@ function getDefaultState(
     imageSettings: {},
     guestManagementEnabled: false,
     ownerCanAddGuests: false,
+    checkInEnabled: false,
+    qrCodeStyle: undefined,
     ownerGuestFormMode: "complete",
     guestMessageTemplate: DEFAULT_GUEST_MESSAGE_TEMPLATE,
   };
@@ -3850,6 +3853,84 @@ export default function ExternalInvitationForm({
                       }
                     />
                   </div>
+
+                  <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                    <div>
+                      <Label className="cursor-pointer">
+                        Activar check-in por QR code
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Mostra um QR code de entrada aos convidados e permite
+                        validar a entrada no evento com um leitor.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.checkInEnabled === true}
+                      onCheckedChange={(value) =>
+                        setForm((prev) => ({ ...prev, checkInEnabled: value }))
+                      }
+                    />
+                  </div>
+
+                  {form.checkInEnabled && (
+                    <div className="space-y-3 rounded-lg border p-3">
+                      <Label>Estilo do QR code</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Cores do QR code de entrada mostrado aos convidados.
+                      </p>
+                      <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={form.qrCodeStyle?.fgColor ?? "#111111"}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                qrCodeStyle: {
+                                  ...prev.qrCodeStyle,
+                                  fgColor: e.target.value,
+                                },
+                              }))
+                            }
+                            className="h-9 w-9 shrink-0 cursor-pointer rounded border"
+                            title="Cor"
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            Cor
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={form.qrCodeStyle?.bgColor ?? "#ffffff"}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                qrCodeStyle: {
+                                  ...prev.qrCodeStyle,
+                                  bgColor: e.target.value,
+                                },
+                              }))
+                            }
+                            className="h-9 w-9 shrink-0 cursor-pointer rounded border"
+                            title="Fundo"
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            Fundo
+                          </span>
+                        </div>
+                        <div className="ml-auto">
+                          <EntryPassQr
+                            value="https://example.com/preview"
+                            fgColor={form.qrCodeStyle?.fgColor}
+                            bgColor={form.qrCodeStyle?.bgColor}
+                            size={96}
+                            hideDownload
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-1.5 rounded-lg border p-3">
                     <Label htmlFor="external-personal-guest-card-visibility">

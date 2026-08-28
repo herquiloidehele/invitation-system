@@ -66,6 +66,8 @@ const baseRow = {
   isDemo: false,
   guestManagementEnabled: false,
   ownerCanAddGuests: false,
+  checkInEnabled: false,
+  qrCodeStyle: null,
   ownerGuestFormMode: "complete",
   guestMessageTemplate: null,
   socialPreview: null,
@@ -223,6 +225,33 @@ describe("toAdminInvitationInitialData — ownerCanAddGuests round-trip", () => 
     const row = { ...baseRow, ownerCanAddGuests: false };
     const result = toAdminInvitationInitialData(row);
     expect(result.ownerCanAddGuests).toBe(false);
+  });
+});
+
+describe("toAdminInvitationInitialData — checkInEnabled round-trip", () => {
+  it("hydrates a stored checkInEnabled=true into the admin form initial data", () => {
+    const row = { ...baseRow, checkInEnabled: true };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.checkInEnabled).toBe(true);
+  });
+
+  it("preserves checkInEnabled=false (the default)", () => {
+    const row = { ...baseRow, checkInEnabled: false };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.checkInEnabled).toBe(false);
+  });
+});
+
+describe("toAdminInvitationInitialData — qrCodeStyle round-trip", () => {
+  it("hydrates a stored qrCodeStyle object", () => {
+    const row = { ...baseRow, qrCodeStyle: { fgColor: "#123456" } };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.qrCodeStyle).toEqual({ fgColor: "#123456" });
+  });
+  it("maps a null qrCodeStyle to undefined", () => {
+    const row = { ...baseRow, qrCodeStyle: null };
+    const result = toAdminInvitationInitialData(row);
+    expect(result.qrCodeStyle).toBeUndefined();
   });
 });
 

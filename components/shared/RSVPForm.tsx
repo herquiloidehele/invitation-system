@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import { X, Loader2, CheckCircle, AlertCircle, Lock } from "lucide-react";
 import { useForm, type Resolver } from "react-hook-form";
@@ -29,6 +29,14 @@ import {
 } from "@/lib/rsvp-config";
 import { resolveRsvpInputColors } from "@/lib/rsvp-input-colors";
 import { resolveRsvpInputStyle } from "@/lib/rsvp-input-styles";
+import { buildPersonalInviteUrl } from "@/lib/guest-links";
+import { buildPassUrl } from "@/lib/checkin-links";
+import {
+  buildEntryPassValue,
+  readGuestPassToken,
+  storeGuestPassToken,
+} from "@/lib/entry-pass";
+import EntryPassQr from "@/components/shared/EntryPassQr";
 import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
@@ -276,6 +284,34 @@ export default function RSVPForm(props: RSVPFormProps) {
   );
   const [customValues, setCustomValues] = useState<RsvpCustomValues>({});
   const [customErrors, setCustomErrors] = useState<RsvpCustomErrors>({});
+  // Snapshot of the just-submitted pass, captured before the form is reset so
+  // the success screen can render the guest's QR entry pass.
+  const [passInfo, setPassInfo] = useState<{
+    attending: boolean;
+    checkInToken: string | null;
+  } | null>(null);
+
+  const checkInEnabled =
+    isIntegration(props) && props.invitation.checkInEnabled === true;
+  const qrStyle = isIntegration(props)
+    ? props.invitation.qrCodeStyle
+    : undefined;
+  // Rebuild a non-personalized guest's stored pass so the already-confirmed
+  // state (shown on reload for inline layouts) can display it. Read via
+  // useSyncExternalStore to avoid setState in an effect.
+  const alreadyPassValue = useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (!checkInEnabled || guest) return null;
+      const token = readGuestPassToken(slug);
+      return buildEntryPassValue({
+        origin: window.location.origin,
+        slug,
+        checkInToken: token,
+      });
+    },
+    () => null,
+  );
 
   const {
     register,
@@ -356,7 +392,17 @@ export default function RSVPForm(props: RSVPFormProps) {
         }),
       });
       if (!res.ok) throw new Error("Failed to submit");
+      const json = (await res.json().catch(() => ({}))) as {
+        checkInToken?: string | null;
+      };
       markRsvpSubmitted(slug);
+      setPassInfo({
+        attending: data.attending === "yes",
+        checkInToken: json.checkInToken ?? null,
+      });
+      if (json.checkInToken) {
+        storeGuestPassToken(slug, json.checkInToken);
+      }
       setSubmitState("success");
       reset();
       setCustomValues({});
@@ -509,6 +555,17 @@ export default function RSVPForm(props: RSVPFormProps) {
                 {resolveText("rsvp_alreadyMessage")}
               </EditableText>
             </p>
+            {alreadyPassValue ? (
+              <div className="mt-4 flex justify-center">
+                <EntryPassQr
+                  value={alreadyPassValue}
+                  title={resolveText("rsvp_entryPassTitle")}
+                  downloadLabel={resolveText("entryPass_downloadButton")}
+                  fgColor={qrStyle?.fgColor}
+                  bgColor={qrStyle?.bgColor}
+                />
+              </div>
+            ) : null}
             {!inline && (
               <button
                 onClick={handleCloseInModal}
@@ -556,6 +613,37 @@ export default function RSVPForm(props: RSVPFormProps) {
                 {resolveText("rsvp_successMessage")}
               </EditableText>
             </p>
+            {checkInEnabled &&
+            passInfo?.attending &&
+            typeof window !== "undefined"
+              ? (() => {
+                  const passValue = guest?.token
+                    ? buildPersonalInviteUrl({
+                        origin: window.location.origin,
+                        slug,
+                        token: guest.token,
+                        name: guest.name,
+                      })
+                    : passInfo.checkInToken
+                      ? buildPassUrl(
+                          window.location.origin,
+                          slug,
+                          passInfo.checkInToken,
+                        )
+                      : "";
+                  return passValue ? (
+                    <div className="mt-4 flex justify-center">
+                      <EntryPassQr
+                        value={passValue}
+                        title={resolveText("rsvp_entryPassTitle")}
+                        downloadLabel={resolveText("entryPass_downloadButton")}
+                        fgColor={qrStyle?.fgColor}
+                        bgColor={qrStyle?.bgColor}
+                      />
+                    </div>
+                  ) : null;
+                })()
+              : null}
             {!inline && (
               <button
                 onClick={handleCloseInModal}

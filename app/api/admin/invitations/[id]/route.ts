@@ -329,6 +329,12 @@ export async function PUT(
         ...(body.ownerCanAddGuests !== undefined && {
           ownerCanAddGuests: body.ownerCanAddGuests === true,
         }),
+        ...(body.checkInEnabled !== undefined && {
+          checkInEnabled: body.checkInEnabled === true,
+        }),
+        ...(body.qrCodeStyle !== undefined && {
+          qrCodeStyle: sanitizeJsonField(body.qrCodeStyle, null),
+        }),
         ...(body.ownerGuestFormMode !== undefined && {
           ownerGuestFormMode: normalizeOwnerGuestFormMode(
             body.ownerGuestFormMode,

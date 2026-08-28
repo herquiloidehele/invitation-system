@@ -9,6 +9,7 @@ import type {
   CustomTexts,
   ImageSettingsMap,
   PublicGuestData,
+  QrCodeStyle,
   TemplateTheme,
   TextStyleOverrides,
 } from "@/lib/types";
@@ -16,7 +17,9 @@ import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { resolveTextElementOverride } from "@/lib/curtain-canva";
 import { getBackgroundImageStyle } from "@/lib/image-settings";
 import { useCustomText } from "@/lib/custom-texts";
+import { buildPersonalInviteUrl, slugifyName } from "@/lib/guest-links";
 import InviteOthersModal from "./InviteOthersModal";
+import EntryPassQr from "./EntryPassQr";
 import { EditableText } from "./EditableText";
 
 interface PersonalGuestCardProps {
@@ -32,6 +35,10 @@ interface PersonalGuestCardProps {
   imageSettings?: ImageSettingsMap;
   cardStyle?: CardStyle;
   className?: string;
+  /** When true, renders the guest's downloadable QR entry pass. */
+  checkInEnabled?: boolean;
+  /** Colors for the entry-pass QR. */
+  qrStyle?: QrCodeStyle;
 }
 
 /** Default scrim opacity applied over the background image when one is set. */
@@ -72,6 +79,8 @@ export default function PersonalGuestCard({
   imageSettings,
   cardStyle,
   className,
+  checkInEnabled,
+  qrStyle,
 }: PersonalGuestCardProps) {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const t = useCustomText(customTexts);
@@ -242,6 +251,27 @@ export default function PersonalGuestCard({
               </EditableText>
             </button>
           )}
+
+          {checkInEnabled &&
+          guest.token &&
+          guest.token !== "preview-sample" &&
+          typeof window !== "undefined" ? (
+            <div className="mt-6 flex justify-center">
+              <EntryPassQr
+                value={buildPersonalInviteUrl({
+                  origin: window.location.origin,
+                  slug: guest.invitationSlug,
+                  token: guest.token,
+                  name: guest.name,
+                })}
+                title={t("guestCard_entryPassTitle")}
+                downloadLabel={t("entryPass_downloadButton")}
+                downloadFileName={`passe-${slugifyName(guest.name) || "convidado"}`}
+                fgColor={qrStyle?.fgColor}
+                bgColor={qrStyle?.bgColor}
+              />
+            </div>
+          ) : null}
         </div>
       </motion.section>
 

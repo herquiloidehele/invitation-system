@@ -347,6 +347,11 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "Presença já confirmada!",
       },
       {
+        key: "rsvp_entryPassTitle",
+        label: "Título passe (sucesso RSVP)",
+        placeholder: "Apresenta este código à entrada",
+      },
+      {
         key: "rsvp_alreadyMessage",
         label: "Mensagem já confirmado",
         placeholder: "Você já enviou sua confirmação para este evento.",
@@ -407,6 +412,16 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         key: "guestCard_inviteButton",
         label: "Botão convidar mais",
         placeholder: "Convidar mais pessoas",
+      },
+      {
+        key: "guestCard_entryPassTitle",
+        label: "Título do passe de entrada",
+        placeholder: "O teu passe de entrada",
+      },
+      {
+        key: "entryPass_downloadButton",
+        label: "Botão descarregar passe",
+        placeholder: "Descarregar",
       },
     ],
   },

@@ -112,6 +112,8 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       inputColors={rsvp}
       inputStyle={rsvp.inputStyle}
       customTexts={customTexts}
+      checkInEnabled={invitation.checkInEnabled}
+      qrStyle={invitation.qrCodeStyle}
     />
   );
 }

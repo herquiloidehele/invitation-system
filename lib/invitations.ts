@@ -98,6 +98,8 @@ type InvitationWithTheme = {
   eventType: string;
   guestManagementEnabled: boolean;
   ownerCanAddGuests: boolean;
+  checkInEnabled: boolean;
+  qrCodeStyle: unknown;
   ownerGuestFormMode: string;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
@@ -190,6 +192,9 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     eventType: (row.eventType as InvitationEventType) ?? "wedding",
     guestManagementEnabled: row.guestManagementEnabled ?? false,
     ownerCanAddGuests: row.ownerCanAddGuests ?? false,
+    checkInEnabled: row.checkInEnabled ?? false,
+    qrCodeStyle:
+      (row.qrCodeStyle as InvitationData["qrCodeStyle"]) ?? undefined,
     ownerGuestFormMode: normalizeOwnerGuestFormMode(row.ownerGuestFormMode),
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:

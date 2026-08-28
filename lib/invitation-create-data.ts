@@ -105,6 +105,8 @@ export function buildInvitationCreateData(
     eventType: normalizeInvitationEventType(body.eventType),
     guestManagementEnabled: body.guestManagementEnabled === true,
     ownerCanAddGuests: body.ownerCanAddGuests === true,
+    checkInEnabled: body.checkInEnabled === true,
+    qrCodeStyle: sanitizeJsonField(body.qrCodeStyle, null),
     ownerGuestFormMode: normalizeOwnerGuestFormMode(body.ownerGuestFormMode),
     guestMessageTemplate: body.guestMessageTemplate ?? null,
     socialPreview: sanitizeJsonField(body.socialPreview, null),
