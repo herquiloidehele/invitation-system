@@ -12,6 +12,9 @@ import {
 /** Path to the bundled default OG image (relative to the site origin). */
 export const DEFAULT_OG_IMAGE_PATH = "/og-default.jpg";
 
+/** Default OG image for the private owner (confirmacoes) page. */
+export const DEFAULT_OWNER_OG_IMAGE_PATH = "/og-confirmacoes.jpg";
+
 /** Recommended image dimensions for OG images. */
 export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;
@@ -173,7 +176,7 @@ export function resolveOwnerSocialPreview(
     image = sp.image;
     imageSource = "custom";
   } else {
-    image = defaultImageUrl(siteOrigin);
+    image = `${siteOrigin}${DEFAULT_OWNER_OG_IMAGE_PATH}`;
     imageSource = "default";
   }
 

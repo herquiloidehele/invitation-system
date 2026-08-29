@@ -281,13 +281,13 @@ describe("resolveOwnerSocialPreview", () => {
     });
   });
 
-  it("falls back to the default OG image when image is empty", () => {
+  it("falls back to the confirmacoes default OG image when image is empty", () => {
     const result = resolveOwnerSocialPreview(
       { title: "T", description: "D" },
       fallback,
       "https://site.test",
     );
-    expect(result.image).toBe("https://site.test/og-default.jpg");
+    expect(result.image).toBe("https://site.test/og-confirmacoes.jpg");
     expect(result.imageSource).toBe("default");
   });
 
@@ -308,7 +308,7 @@ describe("resolveOwnerSocialPreview", () => {
       fallback,
       "https://site.test",
     );
-    expect(result.image).toBe("https://site.test/og-default.jpg");
+    expect(result.image).toBe("https://site.test/og-confirmacoes.jpg");
     expect(result.title).toBe(fallback.title);
     expect(result.description).toBe(fallback.description);
   });

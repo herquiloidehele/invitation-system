@@ -218,7 +218,7 @@ describe("owner confirmacoes metadata shape", () => {
     );
     expect(meta.title).toBe("fallback title");
     expect(meta.openGraph.images[0].url).toBe(
-      "https://site.test/og-default.jpg",
+      "https://site.test/og-confirmacoes.jpg",
     );
   });
 });
