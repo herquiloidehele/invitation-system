@@ -1339,6 +1339,8 @@ export interface InvitationData {
   guestMessageTemplate?: string;
   /** Override values used only for OG/Twitter meta tags. Image is never rendered on the page. */
   socialPreview?: SocialPreview;
+  /** Override values used only for OG/Twitter meta tags on the private owner (confirmacoes) page. */
+  ownerSocialPreview?: SocialPreview;
   /** When the page was opened with `?g=<token>`, the matched guest. */
   guest?: PublicGuestData;
   /** Landing page listing metadata. */

@@ -80,6 +80,8 @@ export default async function EditSaveTheDatePage({
     audio: audio || undefined,
     bottomHero: bottomHero || undefined,
     socialPreview: (item.socialPreview as SocialPreview | null) ?? undefined,
+    ownerSocialPreview:
+      (item.ownerSocialPreview as SocialPreview | null) ?? undefined,
     isDemo: item.isDemo,
     ownerToken: item.ownerToken,
     priceFromCents: item.priceFromCents,

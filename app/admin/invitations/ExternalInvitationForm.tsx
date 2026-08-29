@@ -107,7 +107,10 @@ import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
-import { resolveInvitationSocialPreview } from "@/lib/social-preview";
+import {
+  resolveInvitationSocialPreview,
+  resolveOwnerSocialPreview,
+} from "@/lib/social-preview";
 import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import EntryPassQr from "@/components/shared/EntryPassQr";
@@ -417,6 +420,14 @@ export default function ExternalInvitationForm({
   const subType = (form.invitationType ?? "external_video") as ExternalSubType;
   const resolvedSocialPreview = resolveInvitationSocialPreview(
     form,
+    typeof window !== "undefined" ? window.location.origin : "",
+  );
+  const resolvedOwnerSocialPreview = resolveOwnerSocialPreview(
+    form.ownerSocialPreview,
+    {
+      title: `Confirmações — ${form.couple.bride} & ${form.couple.groom}`,
+      description: "Acompanhe as confirmações de presença em tempo real.",
+    },
     typeof window !== "undefined" ? window.location.origin : "",
   );
   const showAudioControls = shouldShowExternalInvitationAudioControls(subType);
@@ -4149,6 +4160,20 @@ export default function ExternalInvitationForm({
                     ? `${typeof window !== "undefined" ? window.location.origin : ""}/${form.slug}`
                     : undefined
                 }
+              />
+
+              <SocialPreviewSection
+                accordionValue="ownerSocialPreview"
+                heading="Pré-visualização do link de confirmações"
+                helpText="Esta imagem aparece quando o link privado de confirmações (/confirmacoes) é partilhado. Recomendado: 1200×630 pixels."
+                value={form.ownerSocialPreview}
+                onChange={(next) =>
+                  setForm((prev) => ({ ...prev, ownerSocialPreview: next }))
+                }
+                resolvedImage={resolvedOwnerSocialPreview.image}
+                resolvedTitle={resolvedOwnerSocialPreview.title}
+                resolvedDescription={resolvedOwnerSocialPreview.description}
+                publicUrl={ownerUrl}
               />
               {/* ── Custom texts ── */}
               <AccordionItem

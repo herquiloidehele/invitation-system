@@ -138,7 +138,10 @@ import {
   resolvePersonalGuestCardVisibility,
 } from "@/lib/personal-guest-card";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
-import { resolveInvitationSocialPreview } from "@/lib/social-preview";
+import {
+  resolveInvitationSocialPreview,
+  resolveOwnerSocialPreview,
+} from "@/lib/social-preview";
 import {
   buildInvitationMonogram,
   buildInvitationSlug,
@@ -601,6 +604,14 @@ export default function InvitationForm({
   );
   const resolvedSocialPreview = resolveInvitationSocialPreview(
     form,
+    typeof window !== "undefined" ? window.location.origin : "",
+  );
+  const resolvedOwnerSocialPreview = resolveOwnerSocialPreview(
+    form.ownerSocialPreview,
+    {
+      title: `Confirmações — ${form.couple.bride} & ${form.couple.groom}`,
+      description: "Acompanhe as confirmações de presença em tempo real.",
+    },
     typeof window !== "undefined" ? window.location.origin : "",
   );
 
@@ -4280,6 +4291,20 @@ export default function InvitationForm({
                     ? `${typeof window !== "undefined" ? window.location.origin : ""}/${form.slug}`
                     : undefined
                 }
+              />
+
+              <SocialPreviewSection
+                accordionValue="ownerSocialPreview"
+                heading="Pré-visualização do link de confirmações"
+                helpText="Esta imagem aparece quando o link privado de confirmações (/confirmacoes) é partilhado. Recomendado: 1200×630 pixels."
+                value={form.ownerSocialPreview}
+                onChange={(next) =>
+                  setForm((prev) => ({ ...prev, ownerSocialPreview: next }))
+                }
+                resolvedImage={resolvedOwnerSocialPreview.image}
+                resolvedTitle={resolvedOwnerSocialPreview.title}
+                resolvedDescription={resolvedOwnerSocialPreview.description}
+                publicUrl={ownerUrl}
               />
             </Accordion>
           </div>

@@ -96,6 +96,8 @@ export interface SaveTheDateData {
   bottomHero: BottomHeroConfig | null;
   /** Override values used only for OG/Twitter meta tags. Image is never rendered on the page. */
   socialPreview: SocialPreview | null;
+  /** Override values used only for OG/Twitter meta tags on the private owner (confirmacoes) page. */
+  ownerSocialPreview: SocialPreview | null;
   /** Admin-only marker for public demo pages that can be indexed. */
   isDemo?: boolean;
   /** Ordered dedicated marketing images for the public details page. */
@@ -183,6 +185,9 @@ export async function getSaveTheDate(
       : null,
     socialPreview: row.socialPreview
       ? (row.socialPreview as unknown as SocialPreview)
+      : null,
+    ownerSocialPreview: row.ownerSocialPreview
+      ? (row.ownerSocialPreview as unknown as SocialPreview)
       : null,
     isDemo: row.isDemo,
     landingDetailImages:

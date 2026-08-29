@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       audio,
       bottomHero,
       socialPreview,
+      ownerSocialPreview,
       isDemo,
       priceFromCents,
       discountPriceFromCents,
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
         audio: sanitizeJsonField(audio, null),
         bottomHero: sanitizeJsonField(bottomHero, null),
         socialPreview: sanitizeJsonField(socialPreview, null),
+        ownerSocialPreview: sanitizeJsonField(ownerSocialPreview, null),
         isDemo: isDemo === true,
         priceFromCents:
           typeof priceFromCents === "number" ? priceFromCents : null,

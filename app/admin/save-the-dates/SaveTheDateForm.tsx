@@ -48,7 +48,10 @@ import {
   type ResolvedLocation,
 } from "@/lib/location-resolver";
 import { getSaveTheDateEnvelopeCoverBackground } from "@/lib/save-the-date-envelope";
-import { resolveSaveTheDateSocialPreview } from "@/lib/social-preview";
+import {
+  resolveSaveTheDateSocialPreview,
+  resolveOwnerSocialPreview,
+} from "@/lib/social-preview";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
@@ -103,6 +106,7 @@ export interface SaveTheDateFormData {
     description: string;
   };
   socialPreview?: SocialPreview;
+  ownerSocialPreview?: SocialPreview;
   isDemo?: boolean;
   ownerToken?: string;
   priceFromCents?: number | null;
@@ -395,6 +399,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
       audio: data.audio || { enabled: false, src: "", artist: "", title: "" },
       bottomHero: data.bottomHero || null,
       socialPreview: data.socialPreview ?? null,
+      ownerSocialPreview: data.ownerSocialPreview ?? null,
       isDemo: data.isDemo === true,
     }),
     [data, selectedTheme],
@@ -402,6 +407,14 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
 
   const resolvedSocialPreview = resolveSaveTheDateSocialPreview(
     previewData,
+    typeof window !== "undefined" ? window.location.origin : "",
+  );
+  const resolvedOwnerSocialPreview = resolveOwnerSocialPreview(
+    data.ownerSocialPreview,
+    {
+      title: `Confirmações — ${data.couple.bride} & ${data.couple.groom}`,
+      description: "Acompanhe as confirmações de presença em tempo real.",
+    },
     typeof window !== "undefined" ? window.location.origin : "",
   );
 
@@ -601,6 +614,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
           audio: data.audio || null,
           bottomHero: data.bottomHero || null,
           socialPreview: data.socialPreview ?? null,
+          ownerSocialPreview: data.ownerSocialPreview ?? null,
           isDemo: data.isDemo === true,
           priceFromCents: data.priceFromCents ?? null,
           discountPriceFromCents: data.discountPriceFromCents ?? null,
@@ -1636,6 +1650,24 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
               publicUrl={
                 data.slug
                   ? `${typeof window !== "undefined" ? window.location.origin : ""}/s/${data.slug}`
+                  : undefined
+              }
+            />
+
+            <SocialPreviewSection
+              accordionValue="ownerSocialPreview"
+              heading="Pré-visualização do link de confirmações"
+              helpText="Esta imagem aparece quando o link privado de confirmações (/confirmacoes) é partilhado. Recomendado: 1200×630 pixels."
+              value={data.ownerSocialPreview}
+              onChange={(next) =>
+                setData((p) => ({ ...p, ownerSocialPreview: next }))
+              }
+              resolvedImage={resolvedOwnerSocialPreview.image}
+              resolvedTitle={resolvedOwnerSocialPreview.title}
+              resolvedDescription={resolvedOwnerSocialPreview.description}
+              publicUrl={
+                data.ownerToken
+                  ? `${typeof window !== "undefined" ? window.location.origin : ""}/confirmacoes/${data.ownerToken}`
                   : undefined
               }
             />

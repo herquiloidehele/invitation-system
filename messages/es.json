@@ -383,7 +383,9 @@
     "giftsReleaseTitle": "¿Liberar este regalo?",
     "giftsReleaseDescription": "El regalo volverá a estar disponible para los invitados.",
     "giftsCancel": "Cancelar",
-    "giftsError": "No se pudo actualizar la lista de regalos. Inténtalo de nuevo."
+    "giftsError": "No se pudo actualizar la lista de regalos. Inténtalo de nuevo.",
+    "ogTitle": "Confirmaciones — {couple}",
+    "ogDescription": "Sigue las confirmaciones de asistencia en tiempo real."
   },
   "LandingProductDetails": {
     "backToModels": "Volver a los diseños",

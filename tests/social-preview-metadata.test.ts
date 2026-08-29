@@ -4,8 +4,10 @@ import {
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
   resolveInvitationSocialPreview,
+  resolveOwnerSocialPreview,
   resolveSaveTheDateSocialPreview,
 } from "../lib/social-preview";
+import { createNoIndexMetadata } from "../lib/seo";
 import type { InvitationData } from "../lib/types";
 import type { SaveTheDateData } from "../lib/save-the-date";
 
@@ -120,6 +122,7 @@ const stdFixture: SaveTheDateData = {
   audio: { enabled: false, src: "", artist: "", title: "" },
   bottomHero: null,
   socialPreview: null,
+  ownerSocialPreview: null,
 };
 
 describe("invitation generateMetadata shape", () => {
@@ -157,6 +160,65 @@ describe("save the date generateMetadata shape", () => {
     expect(meta.title).toBe("Ana & Bruno — Save the Date");
     expect(meta.description).toBe(
       "Ana & Bruno invite you to save the date: 14 de Setembro de 2027",
+    );
+  });
+});
+
+function buildOwnerMetadata(
+  ownerSocialPreview: Parameters<typeof resolveOwnerSocialPreview>[0],
+  fallback: { title: string; description: string },
+  siteOrigin: string,
+) {
+  const { image, title, description } = resolveOwnerSocialPreview(
+    ownerSocialPreview,
+    fallback,
+    siteOrigin,
+  );
+  return {
+    ...createNoIndexMetadata(),
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
+      type: "website" as const,
+    },
+    twitter: {
+      card: "summary_large_image" as const,
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
+
+describe("owner confirmacoes metadata shape", () => {
+  it("emits OG/Twitter tags while staying noindex", () => {
+    const meta = buildOwnerMetadata(
+      { image: "https://cdn.example.com/o.jpg", title: "T", description: "D" },
+      { title: "fallback title", description: "fallback desc" },
+      "https://site.test",
+    );
+    expect(meta.robots).toMatchObject({ index: false, follow: false });
+    expect(meta.openGraph.images[0]).toEqual({
+      url: "https://cdn.example.com/o.jpg",
+      width: 1200,
+      height: 630,
+    });
+    expect(meta.twitter.card).toBe("summary_large_image");
+    expect(meta.title).toBe("T");
+  });
+
+  it("uses fallbacks and default image when unset", () => {
+    const meta = buildOwnerMetadata(
+      undefined,
+      { title: "fallback title", description: "fallback desc" },
+      "https://site.test",
+    );
+    expect(meta.title).toBe("fallback title");
+    expect(meta.openGraph.images[0].url).toBe(
+      "https://site.test/og-default.jpg",
     );
   });
 });

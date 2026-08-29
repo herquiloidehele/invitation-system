@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_OG_IMAGE_PATH,
   resolveInvitationSocialPreview,
+  resolveOwnerSocialPreview,
   resolveSaveTheDateSocialPreview,
 } from "../lib/social-preview";
 import type { InvitationData } from "../lib/types";
@@ -80,6 +81,7 @@ function baseSaveTheDate(overrides: Partial<SaveTheDateData> = {}): SaveTheDateD
     audio: { enabled: false, src: "", artist: "", title: "" },
     bottomHero: null,
     socialPreview: null,
+    ownerSocialPreview: null,
     ...overrides,
   };
 }
@@ -252,5 +254,67 @@ describe("resolveSaveTheDateSocialPreview", () => {
     expect(r.description).toBe(
       "Ana & Bruno invite you to save the date: 14 de Setembro de 2027",
     );
+  });
+});
+
+describe("resolveOwnerSocialPreview", () => {
+  const fallback = {
+    title: "Confirmações — Ana & Rui",
+    description: "Veja as confirmações",
+  };
+
+  it("uses explicit custom values when present", () => {
+    const result = resolveOwnerSocialPreview(
+      {
+        image: "https://cdn.example.com/owner.jpg",
+        title: "Meu título",
+        description: "Minha descrição",
+      },
+      fallback,
+      "https://site.test",
+    );
+    expect(result).toEqual({
+      image: "https://cdn.example.com/owner.jpg",
+      title: "Meu título",
+      description: "Minha descrição",
+      imageSource: "custom",
+    });
+  });
+
+  it("falls back to the default OG image when image is empty", () => {
+    const result = resolveOwnerSocialPreview(
+      { title: "T", description: "D" },
+      fallback,
+      "https://site.test",
+    );
+    expect(result.image).toBe("https://site.test/og-default.jpg");
+    expect(result.imageSource).toBe("default");
+  });
+
+  it("falls back per field to the provided fallback strings", () => {
+    const result = resolveOwnerSocialPreview(
+      undefined,
+      fallback,
+      "https://site.test",
+    );
+    expect(result.title).toBe("Confirmações — Ana & Rui");
+    expect(result.description).toBe("Veja as confirmações");
+    expect(result.imageSource).toBe("default");
+  });
+
+  it("treats whitespace-only fields as empty", () => {
+    const result = resolveOwnerSocialPreview(
+      { image: "  ", title: "  ", description: "  " },
+      fallback,
+      "https://site.test",
+    );
+    expect(result.image).toBe("https://site.test/og-default.jpg");
+    expect(result.title).toBe(fallback.title);
+    expect(result.description).toBe(fallback.description);
+  });
+
+  it("accepts null (JsonNull from the DB)", () => {
+    const result = resolveOwnerSocialPreview(null, fallback, "https://site.test");
+    expect(result.title).toBe(fallback.title);
   });
 });

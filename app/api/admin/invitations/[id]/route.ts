@@ -346,6 +346,9 @@ export async function PUT(
         ...(body.socialPreview !== undefined && {
           socialPreview: sanitizeJsonField(body.socialPreview, null),
         }),
+        ...(body.ownerSocialPreview !== undefined && {
+          ownerSocialPreview: sanitizeJsonField(body.ownerSocialPreview, null),
+        }),
         ...(body.priceFromCents !== undefined && {
           priceFromCents:
             typeof body.priceFromCents === "number"

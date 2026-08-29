@@ -154,3 +154,33 @@ export function resolveSaveTheDateSocialPreview(
 
   return { image, title, description, imageSource };
 }
+
+/**
+ * Resolve the social preview for the private owner (confirmacoes) page.
+ * Image falls back only to the default OG image; title and description fall
+ * back to the caller-provided strings (computed with the request locale).
+ */
+export function resolveOwnerSocialPreview(
+  ownerSocialPreview: SocialPreview | null | undefined,
+  fallback: { title: string; description: string },
+  siteOrigin: string,
+): ResolvedSocialPreview {
+  const sp: SocialPreview = ownerSocialPreview ?? {};
+
+  let image: string;
+  let imageSource: ResolvedSocialPreview["imageSource"];
+  if (nonEmpty(sp.image)) {
+    image = sp.image;
+    imageSource = "custom";
+  } else {
+    image = defaultImageUrl(siteOrigin);
+    imageSource = "default";
+  }
+
+  const title = nonEmpty(sp.title) ? sp.title : fallback.title;
+  const description = nonEmpty(sp.description)
+    ? sp.description
+    : fallback.description;
+
+  return { image, title, description, imageSource };
+}

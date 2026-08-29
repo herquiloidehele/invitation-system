@@ -383,7 +383,9 @@
     "giftsReleaseTitle": "Release this gift?",
     "giftsReleaseDescription": "The gift will become available to guests again.",
     "giftsCancel": "Cancel",
-    "giftsError": "The gift list could not be updated. Try again."
+    "giftsError": "The gift list could not be updated. Try again.",
+    "ogTitle": "RSVPs — {couple}",
+    "ogDescription": "Track your guests' RSVPs in real time."
   },
   "LandingProductDetails": {
     "backToModels": "Back to designs",

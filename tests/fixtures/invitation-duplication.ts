@@ -167,6 +167,7 @@ export const sourceInvitationRow = {
     image: "https://cdn.example.com/social.jpg",
     title: "Ana & João",
   },
+  ownerSocialPreview: null,
   priceFromCents: 10000,
   discountPriceFromCents: 8000,
   currency: "USD",

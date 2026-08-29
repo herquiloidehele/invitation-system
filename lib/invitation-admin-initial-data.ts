@@ -102,6 +102,7 @@ type AdminInvitationInitialDataRow = {
   ownerGuestFormMode: string;
   guestMessageTemplate: string | null;
   socialPreview: unknown;
+  ownerSocialPreview: unknown;
   priceFromCents: number | null;
   discountPriceFromCents: number | null;
   currency: string | null;
@@ -200,6 +201,9 @@ export function toAdminInvitationInitialData(
     guestMessageTemplate: row.guestMessageTemplate ?? undefined,
     socialPreview:
       (row.socialPreview as InvitationData["socialPreview"] | null) ??
+      undefined,
+    ownerSocialPreview:
+      (row.ownerSocialPreview as InvitationData["ownerSocialPreview"] | null) ??
       undefined,
     priceFromCents: row.priceFromCents,
     discountPriceFromCents: row.discountPriceFromCents,

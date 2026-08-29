@@ -71,6 +71,7 @@ const baseRow = {
   ownerGuestFormMode: "complete",
   guestMessageTemplate: null,
   socialPreview: null,
+  ownerSocialPreview: null,
   priceFromCents: null,
   discountPriceFromCents: null,
   currency: null,

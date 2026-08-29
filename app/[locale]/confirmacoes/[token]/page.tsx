@@ -14,13 +14,18 @@ import {
 import { ExportButton } from "./ExportButton";
 import GuestsTabClient from "./GuestsTabClient";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
-import type { InvitationEventType } from "@/lib/types";
+import type { InvitationEventType, SocialPreview } from "@/lib/types";
 import {
   getDateFormatLocale,
   resolveLocale,
   type AppLocale,
 } from "@/i18n/locales";
-import { createNoIndexMetadata } from "@/lib/seo";
+import { SITE_URL, createNoIndexMetadata } from "@/lib/seo";
+import {
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+  resolveOwnerSocialPreview,
+} from "@/lib/social-preview";
 import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
 import { countAttendingGuests } from "@/lib/rsvp-config";
 import type { RsvpCustomAnswer } from "@/lib/types";
@@ -30,7 +35,64 @@ import CheckinTabClient from "./CheckinTabClient";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = createNoIndexMetadata();
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; token: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale, token } = await params;
+  const locale = resolveLocale(rawLocale);
+  const base = createNoIndexMetadata();
+  const t = await getTranslations({ locale, namespace: "OwnerConfirmations" });
+
+  // Invitation first (most common), then save-the-date.
+  const invitation = await prisma.invitation.findUnique({
+    where: { ownerToken: token },
+    select: { couple: true, ownerSocialPreview: true },
+  });
+  const std = invitation
+    ? null
+    : await prisma.saveTheDate.findUnique({
+        where: { ownerToken: token },
+        select: { couple: true, ownerSocialPreview: true },
+      });
+
+  const row = invitation ?? std;
+  if (!row) return base;
+
+  const couple = row.couple as { bride?: string; groom?: string };
+  const coupleLabel = [couple.bride, couple.groom].filter(Boolean).join(" & ");
+  const fallback = {
+    title: t("ogTitle", { couple: coupleLabel }),
+    description: t("ogDescription"),
+  };
+
+  const { image, title, description } = resolveOwnerSocialPreview(
+    row.ownerSocialPreview as SocialPreview | null,
+    fallback,
+    SITE_URL,
+  );
+
+  return {
+    ...base,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: image, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT }],
+      type: "website",
+      locale,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
 
 type Props = {
   params: Promise<{ locale: string; token: string }>;

@@ -25,6 +25,10 @@ interface SocialPreviewSectionProps {
   publicUrl?: string;
   /** Accordion item value (must be unique within the parent accordion). */
   accordionValue: string;
+  /** Accordion heading. Defaults to the public-share label. */
+  heading?: string;
+  /** Help text shown at the top of the section. Defaults to the public-share help. */
+  helpText?: string;
 }
 
 /**
@@ -39,6 +43,8 @@ export default function SocialPreviewSection({
   resolvedDescription,
   publicUrl,
   accordionValue,
+  heading = "Pré-visualização de partilha",
+  helpText = "Esta imagem aparece quando o link é partilhado em apps como WhatsApp, Facebook ou iMessage. Recomendado: 1200×630 pixels.",
 }: SocialPreviewSectionProps) {
   function patch(patchValue: Partial<SocialPreview>) {
     const next: SocialPreview = {
@@ -60,13 +66,10 @@ export default function SocialPreviewSection({
   return (
     <AccordionItem value={accordionValue} className="border rounded-lg px-4">
       <AccordionTrigger className="text-sm font-medium">
-        Pré-visualização de partilha
+        {heading}
       </AccordionTrigger>
       <AccordionContent className="space-y-4 pb-4">
-        <p className="text-xs text-muted-foreground">
-          Esta imagem aparece quando o link é partilhado em apps como WhatsApp,
-          Facebook ou iMessage. Recomendado: 1200×630 pixels.
-        </p>
+        <p className="text-xs text-muted-foreground">{helpText}</p>
 
         <div className="space-y-1.5">
           <Label>Imagem</Label>
@@ -80,9 +83,9 @@ export default function SocialPreviewSection({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="socialPreviewTitle">Título</Label>
+          <Label htmlFor={`${accordionValue}-title`}>Título</Label>
           <Input
-            id="socialPreviewTitle"
+            id={`${accordionValue}-title`}
             value={title}
             placeholder={resolvedTitle}
             onChange={(e) => patch({ title: e.target.value || undefined })}
@@ -90,9 +93,9 @@ export default function SocialPreviewSection({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="socialPreviewDescription">Descrição</Label>
+          <Label htmlFor={`${accordionValue}-description`}>Descrição</Label>
           <Textarea
-            id="socialPreviewDescription"
+            id={`${accordionValue}-description`}
             value={description}
             placeholder={resolvedDescription}
             rows={2}

@@ -169,6 +169,7 @@ model Invitation {
   ownerGuestFormMode      String   @default("complete") // "complete" | "minimal"; controls only the host-facing guest form.
   guestMessageTemplate    String?
   socialPreview           Json? // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
+  ownerSocialPreview      Json? // SocialPreview { image?, title?, description? } — OG/Twitter meta for the private /confirmacoes owner page
 
   priceFromCents            Int?
   discountPriceFromCents    Int? // sale price in cents; valid only when 0 < discount < priceFromCents
@@ -246,6 +247,7 @@ model SaveTheDate {
   audio         Json? // { enabled: boolean, src: string, artist: string, title: string }
   bottomHero    Json? // { enabled: boolean, mediaUrl: string, mediaType: "image"|"video", title: string, description: string }
   socialPreview Json? // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
+  ownerSocialPreview Json? // SocialPreview { image?, title?, description? } — OG/Twitter meta for the private /confirmacoes owner page
   isDemo        Boolean @default(false)
 
   priceFromCents            Int?
