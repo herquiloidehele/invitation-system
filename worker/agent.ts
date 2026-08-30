@@ -56,7 +56,7 @@ export async function runBuildAgent(args: {
         "Bash(curl*)",
         "Bash(wget*)",
       ],
-      model: args.model ?? "claude-opus-5",
+      model: args.model ?? "claude-sonnet-5",
       maxBudgetUsd: args.maxBudgetUsd ?? 5,
       ...(args.resume ? { resume: args.resume } : {}),
       env: {
