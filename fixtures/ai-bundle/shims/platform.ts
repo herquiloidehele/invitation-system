@@ -13,3 +13,4 @@ export const guest = platform.guest;
 export const useGifts = platform.useGifts;
 export const useGuest = platform.useGuest;
 export const useLocale = platform.useLocale;
+export const useRsvp = platform.useRsvp;

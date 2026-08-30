@@ -9,6 +9,8 @@ import { mergeGiftItems, pickLocaleValue } from "@/lib/ai-platform";
 import type { GiftsApi, LocaleApi } from "@/lib/ai-platform-types";
 import { usePlatformContext } from "./PlatformContext";
 
+export { useRsvp } from "./useRsvp";
+
 const FALLBACK_LOCALE = "pt";
 
 /** `{ guest }` — the personalized guest resolved from the URL token, or null. */

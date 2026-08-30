@@ -1,5 +1,11 @@
 import { motion } from "framer-motion";
-import { invitation, useGifts, useGuest, useLocale } from "@platform";
+import {
+  invitation,
+  useGifts,
+  useGuest,
+  useLocale,
+  useRsvp,
+} from "@platform";
 
 import { hostRuntime } from "./runtime";
 
@@ -97,8 +103,147 @@ function FixtureInvitation({ coverOpened }: BundleProps) {
             error: {gifts.error}
           </p>
         ) : null}
+
+        <RsvpSection />
       </motion.div>
     </main>
+  );
+}
+
+function RsvpSection() {
+  const rsvp = useRsvp();
+  const { fields, values, setValue, errors, status } = rsvp;
+
+  if (status === "closed") {
+    return (
+      <p data-testid="ai-fixture-rsvp-closed" style={{ marginTop: "2rem" }}>
+        RSVP is closed.
+      </p>
+    );
+  }
+
+  if (status === "success") {
+    return (
+      <p
+        data-testid="ai-fixture-rsvp-success"
+        style={{ marginTop: "2rem", color: "#9ec8a0" }}
+      >
+        Thank you — your RSVP is confirmed.
+      </p>
+    );
+  }
+
+  const inputStyle = {
+    display: "block",
+    width: "100%",
+    margin: "0.4rem 0",
+    padding: "0.5rem",
+    background: "#1c1915",
+    color: "#f3ece1",
+    border: "1px solid #2a2620",
+    borderRadius: "0.25rem",
+  } as const;
+
+  return (
+    <section data-testid="ai-fixture-rsvp" style={{ marginTop: "2.5rem" }}>
+      <h2 style={{ fontSize: "1.5rem" }}>RSVP</h2>
+
+      {status === "already_submitted" ? (
+        <p data-testid="ai-fixture-rsvp-already" style={{ opacity: 0.7 }}>
+          You have already responded — submit again to update.
+        </p>
+      ) : null}
+
+      <input
+        data-testid="rsvp-name"
+        placeholder="Name"
+        value={values.name}
+        onChange={(e) => setValue("name", e.target.value)}
+        style={inputStyle}
+      />
+      {errors.name ? (
+        <p data-testid="rsvp-error-name" style={{ color: "#e2a0a0" }}>
+          {errors.name}
+        </p>
+      ) : null}
+
+      {fields.email ? (
+        <input
+          data-testid="rsvp-email"
+          placeholder="Email"
+          value={values.email}
+          onChange={(e) => setValue("email", e.target.value)}
+          style={inputStyle}
+        />
+      ) : null}
+
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          justifyContent: "center",
+          margin: "0.75rem 0",
+        }}
+      >
+        <button
+          type="button"
+          data-testid="rsvp-attending-yes"
+          onClick={() => setValue("attending", true)}
+          style={{
+            padding: "0.4rem 1rem",
+            borderRadius: "999px",
+            border: "1px solid #c8a96a",
+            background: values.attending === true ? "#c8a96a" : "transparent",
+            color: values.attending === true ? "#12100e" : "#c8a96a",
+          }}
+        >
+          Attending
+        </button>
+        <button
+          type="button"
+          data-testid="rsvp-attending-no"
+          onClick={() => setValue("attending", false)}
+          style={{
+            padding: "0.4rem 1rem",
+            borderRadius: "999px",
+            border: "1px solid #8a8078",
+            background: values.attending === false ? "#8a8078" : "transparent",
+            color: values.attending === false ? "#12100e" : "#8a8078",
+          }}
+        >
+          Can&apos;t make it
+        </button>
+      </div>
+      {errors.attending ? (
+        <p data-testid="rsvp-error-attending" style={{ color: "#e2a0a0" }}>
+          {errors.attending}
+        </p>
+      ) : null}
+
+      <button
+        type="button"
+        data-testid="rsvp-submit"
+        disabled={status === "submitting"}
+        onClick={() => rsvp.submit()}
+        style={{
+          marginTop: "0.75rem",
+          padding: "0.5rem 1.5rem",
+          borderRadius: "999px",
+          border: "none",
+          background: "#c8a96a",
+          color: "#12100e",
+          cursor: "pointer",
+        }}
+      >
+        {status === "submitting" ? "Sending…" : "Send RSVP"}
+      </button>
+
+      {status === "error" ? (
+        <p data-testid="rsvp-error" style={{ color: "#e2a0a0" }}>
+          Something went wrong. Please try again.
+        </p>
+      ) : null}
+    </section>
   );
 }
 

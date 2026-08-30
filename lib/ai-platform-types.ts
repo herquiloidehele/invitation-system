@@ -1,4 +1,5 @@
 import type { GiftItem, InvitationData, PublicGuestData } from "./types";
+import type { RsvpApi } from "./ai-rsvp-types";
 
 /** A gift registry item annotated with its live reservation status. */
 export interface GiftWithStatus extends GiftItem {
@@ -36,4 +37,5 @@ export interface PlatformApi {
   useGifts: () => GiftsApi;
   useGuest: () => { guest: PublicGuestData | null };
   useLocale: () => LocaleApi;
+  useRsvp: () => RsvpApi;
 }
