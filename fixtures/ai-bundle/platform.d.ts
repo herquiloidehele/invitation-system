@@ -97,7 +97,14 @@ declare module "@platform" {
   export function useGuest(): { guest: PublicGuest | null };
   export function useLocale(): LocaleApi;
   export function useRsvp(): RsvpApi;
+  export interface AudioApi {
+    playing: boolean;
+    ready: boolean;
+    toggle: () => void;
+  }
+
   export function useCountdown(iso: string, time?: string): CountdownApi;
   export function useCalendar(): CalendarApi;
   export function useEntryPass(): EntryPassApi;
+  export function useAudio(): AudioApi;
 }

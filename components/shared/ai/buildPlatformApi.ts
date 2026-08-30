@@ -1,6 +1,7 @@
 import type { PlatformApi } from "@/lib/ai-platform-types";
 import type { InvitationData, PublicGuestData } from "@/lib/types";
 import {
+  useAudio,
   useCalendar,
   useCountdown,
   useEntryPass,
@@ -40,5 +41,6 @@ export function buildPlatformApi(): PlatformApi {
     useCountdown,
     useCalendar,
     useEntryPass,
+    useAudio,
   };
 }

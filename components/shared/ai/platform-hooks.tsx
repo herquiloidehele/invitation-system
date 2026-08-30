@@ -14,6 +14,7 @@ export { useRsvp } from "./useRsvp";
 export { useCountdown } from "./useCountdown";
 export { useCalendar } from "./useCalendar";
 export { useEntryPass } from "./useEntryPass";
+export { useAudio } from "./useAudio";
 
 const FALLBACK_LOCALE = "pt";
 

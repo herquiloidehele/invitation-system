@@ -17,3 +17,4 @@ export const useRsvp = platform.useRsvp;
 export const useCountdown = platform.useCountdown;
 export const useCalendar = platform.useCalendar;
 export const useEntryPass = platform.useEntryPass;
+export const useAudio = platform.useAudio;

@@ -5,6 +5,7 @@ import type {
   CountdownApi,
   EntryPassApi,
 } from "./ai-secondary-types";
+import type { AudioApi } from "./ai-audio-types";
 
 /** A gift registry item annotated with its live reservation status. */
 export interface GiftWithStatus extends GiftItem {
@@ -48,4 +49,5 @@ export interface PlatformApi {
   useCountdown: (iso: string, time?: string) => CountdownApi;
   useCalendar: () => CalendarApi;
   useEntryPass: () => EntryPassApi;
+  useAudio: () => AudioApi;
 }

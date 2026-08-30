@@ -9,6 +9,7 @@ import {
   fireCelebrationConfetti,
   resolveEnvelopeConfettiColors,
 } from "@/lib/confetti";
+import { useAiAudio } from "@/components/shared/ai/AiAudioContext";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 
 interface AiCoverGateProps {
@@ -64,8 +65,12 @@ export default function AiCoverGate({
     requestAnimationFrame(() => setCoverVisible(false));
   }, [invitation.envelope, theme]);
 
-  // No-op today: audio and hero-video priming arrive with the SDK in Phase 2.
-  const handleOpen = useCallback(() => {}, []);
+  const audio = useAiAudio();
+  // The cover tap is the browser's gesture grant for audio playback — prime the
+  // background music here, within the tap, exactly as the standard renderer does.
+  const handleOpen = useCallback(() => {
+    audio?.start();
+  }, [audio]);
 
   return (
     <>

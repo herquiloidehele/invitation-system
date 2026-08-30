@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import {
   invitation,
+  useAudio,
   useCalendar,
   useCountdown,
   useEntryPass,
@@ -29,6 +30,7 @@ function FixtureInvitation({ coverOpened }: BundleProps) {
   const countdown = useCountdown(dateIso);
   const calendar = useCalendar();
   const entryPass = useEntryPass();
+  const audio = useAudio();
 
   const couple = (invitation as { couple?: { bride?: string; groom?: string } })
     .couple;
@@ -125,6 +127,28 @@ function FixtureInvitation({ coverOpened }: BundleProps) {
             EN
           </button>
         </div>
+
+        {audio.ready ? (
+          <button
+            type="button"
+            data-testid="audio-toggle"
+            onClick={() => audio.toggle()}
+            style={{
+              marginTop: "0.5rem",
+              padding: "0.3rem 1rem",
+              borderRadius: "999px",
+              border: "1px solid #c8a96a",
+              background: "transparent",
+              color: "#c8a96a",
+            }}
+          >
+            {audio.playing ? "Pause music" : "Play music"}
+          </button>
+        ) : (
+          <p data-testid="audio-none" style={{ opacity: 0.5, fontSize: "0.8rem" }}>
+            no background audio
+          </p>
+        )}
 
         <h2 style={{ marginTop: "2rem", fontSize: "1.5rem" }}>{heading}</h2>
 
