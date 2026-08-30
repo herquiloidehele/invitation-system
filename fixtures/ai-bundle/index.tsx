@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import {
   invitation,
+  useCalendar,
+  useCountdown,
+  useEntryPass,
   useGifts,
   useGuest,
   useLocale,
@@ -18,8 +21,14 @@ interface BundleProps {
 
 function FixtureInvitation({ coverOpened }: BundleProps) {
   const { guest } = useGuest();
-  const { locale, t } = useLocale();
+  const { locale, t, switchTo } = useLocale();
   const gifts = useGifts();
+
+  const dateIso =
+    (invitation as { date?: { iso?: string } }).date?.iso ?? "";
+  const countdown = useCountdown(dateIso);
+  const calendar = useCalendar();
+  const entryPass = useEntryPass();
 
   const couple = (invitation as { couple?: { bride?: string; groom?: string } })
     .couple;
@@ -53,6 +62,69 @@ function FixtureInvitation({ coverOpened }: BundleProps) {
         <p data-testid="ai-fixture-guest" style={{ opacity: 0.7 }}>
           guest: {guest?.name ?? "none"}
         </p>
+
+        <p data-testid="ai-fixture-countdown" style={{ opacity: 0.8 }}>
+          {countdown.done
+            ? "The day has arrived"
+            : `${countdown.days}d ${countdown.hours}h ${countdown.minutes}m ${countdown.seconds}s`}
+        </p>
+
+        <p style={{ margin: "0.5rem 0" }}>
+          <a
+            data-testid="ai-fixture-calendar"
+            href={calendar.googleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#c8a96a" }}
+          >
+            Add to calendar
+          </a>
+        </p>
+
+        <p
+          data-testid="ai-fixture-entrypass"
+          style={{ opacity: 0.6, fontSize: "0.8rem", wordBreak: "break-all" }}
+        >
+          pass: {entryPass.ready ? (entryPass.value ?? "none") : "…"}
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            justifyContent: "center",
+            margin: "0.5rem 0",
+          }}
+        >
+          <button
+            type="button"
+            data-testid="switch-pt"
+            onClick={() => switchTo("pt")}
+            style={{
+              color: "#c8a96a",
+              background: "transparent",
+              border: "1px solid #c8a96a",
+              borderRadius: "6px",
+              padding: "0.15rem 0.6rem",
+            }}
+          >
+            PT
+          </button>
+          <button
+            type="button"
+            data-testid="switch-en"
+            onClick={() => switchTo("en")}
+            style={{
+              color: "#c8a96a",
+              background: "transparent",
+              border: "1px solid #c8a96a",
+              borderRadius: "6px",
+              padding: "0.15rem 0.6rem",
+            }}
+          >
+            EN
+          </button>
+        </div>
 
         <h2 style={{ marginTop: "2rem", fontSize: "1.5rem" }}>{heading}</h2>
 

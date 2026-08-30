@@ -14,3 +14,6 @@ export const useGifts = platform.useGifts;
 export const useGuest = platform.useGuest;
 export const useLocale = platform.useLocale;
 export const useRsvp = platform.useRsvp;
+export const useCountdown = platform.useCountdown;
+export const useCalendar = platform.useCalendar;
+export const useEntryPass = platform.useEntryPass;

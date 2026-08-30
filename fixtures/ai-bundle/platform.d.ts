@@ -21,6 +21,23 @@ declare module "@platform" {
   export interface LocaleApi {
     locale: string;
     t: (map: Partial<Record<string, string>>) => string;
+    switchTo: (locale: string) => void;
+  }
+
+  export interface CountdownApi {
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    done: boolean;
+  }
+  export interface CalendarApi {
+    googleUrl: string;
+  }
+  export interface EntryPassApi {
+    value: string | null;
+    token: string | null;
+    ready: boolean;
   }
 
   export interface PublicGuest {
@@ -80,4 +97,7 @@ declare module "@platform" {
   export function useGuest(): { guest: PublicGuest | null };
   export function useLocale(): LocaleApi;
   export function useRsvp(): RsvpApi;
+  export function useCountdown(iso: string, time?: string): CountdownApi;
+  export function useCalendar(): CalendarApi;
+  export function useEntryPass(): EntryPassApi;
 }

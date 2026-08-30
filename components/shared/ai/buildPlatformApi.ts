@@ -1,6 +1,14 @@
 import type { PlatformApi } from "@/lib/ai-platform-types";
 import type { InvitationData, PublicGuestData } from "@/lib/types";
-import { useGifts, useGuest, useLocale, useRsvp } from "./platform-hooks";
+import {
+  useCalendar,
+  useCountdown,
+  useEntryPass,
+  useGifts,
+  useGuest,
+  useLocale,
+  useRsvp,
+} from "./platform-hooks";
 
 /**
  * Per-request holder for the invitation + guest. The provider writes it on
@@ -29,5 +37,8 @@ export function buildPlatformApi(): PlatformApi {
     useGuest,
     useLocale,
     useRsvp,
+    useCountdown,
+    useCalendar,
+    useEntryPass,
   };
 }

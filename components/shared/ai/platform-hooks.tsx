@@ -4,12 +4,16 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale as useNextIntlLocale } from "next-intl";
 
 import { useGiftReservations } from "@/components/gifts/useGiftReservations";
+import { useInvitationLocaleChange } from "@/components/shared/InvitationLanguageSwitcher";
 import type { GiftAvailability } from "@/lib/gift-reservation-domain";
 import { mergeGiftItems, pickLocaleValue } from "@/lib/ai-platform";
 import type { GiftsApi, LocaleApi } from "@/lib/ai-platform-types";
 import { usePlatformContext } from "./PlatformContext";
 
 export { useRsvp } from "./useRsvp";
+export { useCountdown } from "./useCountdown";
+export { useCalendar } from "./useCalendar";
+export { useEntryPass } from "./useEntryPass";
 
 const FALLBACK_LOCALE = "pt";
 
@@ -21,15 +25,23 @@ export function useGuest(): {
   return { guest };
 }
 
-/** `{ locale, t }` — active locale plus a per-locale string picker. */
+/** `{ locale, t, switchTo }` — active locale, a per-locale string picker, and
+ *  an in-place language switch that drives InvitationLocaleController. */
 export function useLocale(): LocaleApi {
   const locale = useNextIntlLocale();
+  const localeChange = useInvitationLocaleChange();
   const t = useCallback(
     (map: Partial<Record<string, string>>) =>
       pickLocaleValue(map, locale, FALLBACK_LOCALE),
     [locale],
   );
-  return { locale, t };
+  const switchTo = useCallback(
+    (next: string) => {
+      localeChange?.onLocaleChange(next as never);
+    },
+    [localeChange],
+  );
+  return { locale, t, switchTo };
 }
 
 /**
