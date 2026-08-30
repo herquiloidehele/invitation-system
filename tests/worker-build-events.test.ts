@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { toBuildEvent } from "@/worker/lib/build-events";
+import type { BuildEvent } from "@/worker/lib/build-events";
 
 describe("toBuildEvent", () => {
   it("maps an assistant text message to a progress event", () => {
@@ -30,5 +31,12 @@ describe("toBuildEvent", () => {
 
   it("returns null for messages with no user-facing content", () => {
     expect(toBuildEvent({ type: "system" })).toBeNull();
+  });
+});
+
+describe("BuildEvent union", () => {
+  it("includes a draft variant carrying revisionId + slug", () => {
+    const e: BuildEvent = { kind: "draft", revisionId: "r1", slug: "sofia-pedro" };
+    expect(e.kind).toBe("draft");
   });
 });

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getThemes } from "@/lib/themes";
@@ -24,6 +24,11 @@ export default async function EditInvitationPage({
 
   if (!row) {
     notFound();
+  }
+
+  // AI invitations own their editing surface (builder + AI-specific settings).
+  if (row.renderMode === "ai") {
+    redirect(`/admin/invitations/${id}/ai`);
   }
 
   // Build absolute owner URL

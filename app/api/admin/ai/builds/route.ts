@@ -39,14 +39,11 @@ export async function POST(req: NextRequest) {
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
+      // The tsx binary directly, not via `npx`: npx resolution measured at
+      // 0.12–0.47s of pure overhead per build.
       const child = spawn(
-        "npx",
-        [
-          "tsx",
-          path.join("worker", "build-invitation-ndjson.ts"),
-          slug,
-          prompt,
-        ],
+        path.join(repoRoot, "node_modules", ".bin", "tsx"),
+        [path.join("worker", "build-invitation-ndjson.ts"), slug, prompt],
         { cwd: repoRoot, env: process.env },
       );
 

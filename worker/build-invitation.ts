@@ -63,6 +63,7 @@ async function main() {
     workspaceDir: workspace,
     prompt,
     bundleId,
+    dts,
     onMessage: (m) => {
       const line = compactMessage(m);
       if (line) console.log(line);

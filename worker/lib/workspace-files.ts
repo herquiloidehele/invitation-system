@@ -19,6 +19,10 @@ export function workspaceTsconfig(): string {
         noEmit: true,
         esModuleInterop: true,
         skipLibCheck: true,
+        // The agent re-runs `tsc --noEmit` on every build retry; caching the
+        // program cuts a warm re-check roughly in half (0.56s -> 0.30s here).
+        incremental: true,
+        tsBuildInfoFile: ".tsbuildinfo",
       },
       include: ["index.tsx", "platform.d.ts"],
     },

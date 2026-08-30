@@ -12,6 +12,8 @@ export type InvitationRow = {
   isDemo: boolean;
   date: { display: string; iso?: string };
   rsvp: { enabled: boolean };
+  /** "standard" | "ai" — AI invitations route to their own builder page. */
+  renderMode: string;
   createdAt: Date | string;
   _count: { rsvpResponses: number };
 };
@@ -28,6 +30,7 @@ export default async function AdminInvitationsPage() {
       isDemo: true,
       date: true,
       rsvp: true,
+      renderMode: true,
       createdAt: true,
       _count: { select: { rsvpResponses: true } },
     },

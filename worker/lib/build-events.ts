@@ -3,7 +3,7 @@ export type BuildEvent =
   | { kind: "progress"; text: string }
   | { kind: "tool"; name: string }
   | { kind: "result"; ok: boolean; costUsd: number | null }
-  | { kind: "published"; revisionId: string; bundleUrl: string; slug: string }
+  | { kind: "draft"; revisionId: string; slug: string }
   | { kind: "error"; message: string };
 
 /** Map a raw Agent SDK message to a compact BuildEvent, or null to drop it. */

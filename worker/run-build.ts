@@ -11,7 +11,8 @@ import { toBuildEvent, type BuildEvent } from "./lib/build-events";
 import {
   getOrCreateBuild,
   latestRevisionSource,
-  publishRevision,
+  createDraftRevision,
+  appendMessage,
   saveSessionId,
 } from "./persistence";
 
@@ -38,6 +39,7 @@ export async function runInvitationBuild(args: {
   const invitationId = invRow!.id;
 
   const build = await getOrCreateBuild(invitationId);
+  await appendMessage({ buildId: build.id, role: "user", content: prompt });
   const priorSource = await latestRevisionSource(build.id);
   const fullPrompt = `${buildInvitationBrief(invitation)}\n\n${prompt}`;
 
@@ -50,14 +52,22 @@ export async function runInvitationBuild(args: {
   await mkdir(workspace, { recursive: true });
   await provisionWorkspace(workspace, dts, priorSource);
 
+  // Keep the agent's last prose turn + final cost so the thread survives reload.
+  let lastAssistantText = "";
+  let costUsd: number | null = null;
+
   const { sessionId } = await runBuildAgent({
     workspaceDir: workspace,
     prompt: fullPrompt,
     bundleId: slug,
+    dts,
     resume: build.agentSessionId ?? undefined,
     onMessage: (m) => {
       const e = toBuildEvent(m);
-      if (e) onEvent(e);
+      if (!e) return;
+      if (e.kind === "progress") lastAssistantText = e.text;
+      if (e.kind === "result") costUsd = e.costUsd;
+      onEvent(e);
     },
   });
   if (sessionId) await saveSessionId(build.id, sessionId);
@@ -71,17 +81,34 @@ export async function runInvitationBuild(args: {
     "utf8",
   ).catch(() => "");
   if (!bundleCode || !bundleRegistersComponent(bundleCode, slug)) {
-    onEvent({ kind: "error", message: "Build did not produce a valid bundle." });
+    const message = "Build did not produce a valid bundle.";
+    // Record the failure too — otherwise the thread shows a user turn with no
+    // reply on reload, which reads as "still running".
+    await appendMessage({
+      buildId: build.id,
+      role: "assistant",
+      content: lastAssistantText
+        ? `${message}\n\n${lastAssistantText}`
+        : message,
+      costUsd,
+    });
+    onEvent({ kind: "error", message });
     return { ok: false };
   }
 
-  const { revisionId, bundleUrl } = await publishRevision({
+  const { revisionId } = await createDraftRevision({
     buildId: build.id,
     invitationId,
     prompt,
     sourceFiles: { "index.tsx": indexTsx },
-    bundleCode,
   });
-  onEvent({ kind: "published", revisionId, bundleUrl, slug });
+  await appendMessage({
+    buildId: build.id,
+    role: "assistant",
+    content: lastAssistantText || "Draft ready.",
+    revisionId,
+    costUsd,
+  });
+  onEvent({ kind: "draft", revisionId, slug });
   return { ok: true };
 }

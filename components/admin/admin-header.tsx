@@ -71,6 +71,11 @@ function getBreadcrumbs(pathname: string) {
           label: "Editar",
           href: `/admin/invitations/${segments[2]}/edit`,
         });
+      } else if (segments[2] && segments[3] === "ai") {
+        crumbs.push({
+          label: "AI Builder",
+          href: `/admin/invitations/${segments[2]}/ai`,
+        });
       }
     } else if (segments[1] === "save-the-dates") {
       crumbs.push({ label: "Save the Date", href: "/admin/save-the-dates" });

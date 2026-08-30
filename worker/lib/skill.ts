@@ -44,3 +44,13 @@ ${dtsContent}
 After writing \`index.tsx\`, run \`npm run build\` in the workspace. It runs \`tsc --noEmit\` then \`esbuild\`. Fix any type or build errors and re-run until it succeeds and writes \`dist/bundle.js\`.
 `;
 }
+
+/**
+ * The same contract, without the SKILL.md frontmatter, for inlining into the
+ * agent's system prompt. The file is still written to the workspace for
+ * discoverability, but the agent no longer has to spend a turn reading it
+ * before it can start — and a system prompt sits in the cacheable prefix.
+ */
+export function platformContract(dtsContent: string): string {
+  return buildPlatformSkill(dtsContent).replace(/^---\n[\s\S]*?\n---\n/, "");
+}

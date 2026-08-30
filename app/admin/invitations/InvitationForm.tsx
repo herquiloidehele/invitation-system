@@ -565,6 +565,12 @@ interface InvitationFormProps {
   ownerUrl?: string;
   /** All available themes (fetched by the server parent and passed down). */
   themes: TemplateTheme[];
+  /**
+   * "ai" hides design-only controls (theme picker, hero sizing, background
+   * image layers) that a generated bundle ignores — it authors its own design.
+   * Content, media and cover sections stay: the bundle reads them from props.
+   */
+  variant?: "standard" | "ai";
 }
 
 export default function InvitationForm({
@@ -575,7 +581,9 @@ export default function InvitationForm({
   sourceCustomerName,
   ownerUrl,
   themes,
+  variant = "standard",
 }: InvitationFormProps) {
+  const isAi = variant === "ai";
   const router = useRouter();
   const formCopy = invitationFormCopy(mode, false);
   const createLike = isCreateLikeInvitationMode(mode);
@@ -2126,35 +2134,38 @@ export default function InvitationForm({
                 className="border rounded-lg px-4"
               >
                 <AccordionTrigger className="text-sm font-medium">
-                  Modelo & Mídia
+                  {isAi ? "Mídia" : "Modelo & Mídia"}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
-                  <div className="space-y-1.5">
-                    <Label>Modelo</Label>
-                    <Select
-                      value={form.template}
-                      onValueChange={(v) => {
-                        if (!v) return;
-                        const selected = themes.find((t) => t.name === v);
-                        setForm((prev) => ({
-                          ...prev,
-                          template: v,
-                          themeId: selected?.id ?? v,
-                        }));
-                      }}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {themes.map((t) => (
-                          <SelectItem key={t.name} value={t.name}>
-                            {t.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {/* Theme picker: design-only, meaningless for AI bundles. */}
+                  {!isAi && (
+                    <div className="space-y-1.5">
+                      <Label>Modelo</Label>
+                      <Select
+                        value={form.template}
+                        onValueChange={(v) => {
+                          if (!v) return;
+                          const selected = themes.find((t) => t.name === v);
+                          setForm((prev) => ({
+                            ...prev,
+                            template: v,
+                            themeId: selected?.id ?? v,
+                          }));
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {themes.map((t) => (
+                            <SelectItem key={t.name} value={t.name}>
+                              {t.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div className="space-y-1.5">
                     <Label>Imagem Principal</Label>
                     <MediaUpload
@@ -2171,31 +2182,37 @@ export default function InvitationForm({
                         onChange={(s) => updateImageSettings("heroImage", s)}
                       />
                     )}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="heroHeight">Altura do hero</Label>
-                        <span className="text-xs text-muted-foreground tabular-nums">
-                          {form.heroHeight ?? DEFAULT_HERO_HEIGHT}px
-                        </span>
-                      </div>
-                      <input
-                        id="heroHeight"
-                        type="range"
-                        min={MIN_HERO_HEIGHT}
-                        max={MAX_HERO_HEIGHT}
-                        step={HERO_HEIGHT_STEP}
-                        value={form.heroHeight ?? DEFAULT_HERO_HEIGHT}
-                        onChange={(e) =>
-                          update("heroHeight", parseInt(e.target.value, 10))
-                        }
-                        className="w-full accent-foreground cursor-pointer"
-                      />
-                    </div>
-                    <HeroMediaFitSelect
-                      id="heroMediaFit"
-                      value={form.heroMediaFit}
-                      onChange={(v) => update("heroMediaFit", v)}
-                    />
+                    {/* Hero sizing/fit: the generated bundle lays out its own
+                        hero, so these do nothing for an AI invitation. */}
+                    {!isAi && (
+                      <>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="heroHeight">Altura do hero</Label>
+                            <span className="text-xs text-muted-foreground tabular-nums">
+                              {form.heroHeight ?? DEFAULT_HERO_HEIGHT}px
+                            </span>
+                          </div>
+                          <input
+                            id="heroHeight"
+                            type="range"
+                            min={MIN_HERO_HEIGHT}
+                            max={MAX_HERO_HEIGHT}
+                            step={HERO_HEIGHT_STEP}
+                            value={form.heroHeight ?? DEFAULT_HERO_HEIGHT}
+                            onChange={(e) =>
+                              update("heroHeight", parseInt(e.target.value, 10))
+                            }
+                            className="w-full accent-foreground cursor-pointer"
+                          />
+                        </div>
+                        <HeroMediaFitSelect
+                          id="heroMediaFit"
+                          value={form.heroMediaFit}
+                          onChange={(v) => update("heroMediaFit", v)}
+                        />
+                      </>
+                    )}
                     {/* Hero overlay controls */}
                     <div className="space-y-3 pt-2">
                       {form.videoUrl ? (
@@ -2449,7 +2466,8 @@ export default function InvitationForm({
                 </AccordionContent>
               </AccordionItem>
 
-              {/* ── Imagens de fundo ── */}
+              {/* ── Imagens de fundo (design-only: hidden for AI) ── */}
+              {!isAi && (
               <AccordionItem
                 value="imageLayer"
                 className="border rounded-lg px-4"
@@ -2491,6 +2509,7 @@ export default function InvitationForm({
                   )}
                 </AccordionContent>
               </AccordionItem>
+              )}
 
               {/* ── Date & Time ── */}
               <AccordionItem value="date" className="border rounded-lg px-4">

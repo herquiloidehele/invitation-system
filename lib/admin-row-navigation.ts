@@ -1,5 +1,11 @@
-export const getInvitationEditPath = (id: string) =>
-  `/admin/invitations/${id}/edit`;
+/**
+ * Where a row in the admin invitations table navigates. AI invitations have
+ * their own console + settings page; everything else uses the classic form.
+ */
+export const getInvitationEditPath = (id: string, renderMode?: string | null) =>
+  renderMode === "ai"
+    ? `/admin/invitations/${id}/ai`
+    : `/admin/invitations/${id}/edit`;
 
 export const getInvitationDuplicatePath = (id: string) =>
   `/admin/invitations/${id}/duplicate`;

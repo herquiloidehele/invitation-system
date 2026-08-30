@@ -458,8 +458,27 @@ model AiBuild {
   updatedAt DateTime @updatedAt
 
   revisions AiRevision[]
+  messages  AiMessage[]
 
   @@index([invitationId])
+}
+
+model AiMessage {
+  id      String  @id @default(cuid())
+  buildId String
+  build   AiBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+
+  // "user" | "assistant"
+  role    String
+  content String
+
+  // Set on the assistant turn that produced a revision.
+  revisionId String?
+  costUsd    Float?
+
+  createdAt DateTime @default(now())
+
+  @@index([buildId])
 }
 
 model AiRevision {

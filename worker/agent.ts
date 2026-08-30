@@ -2,19 +2,32 @@ import path from "node:path";
 
 import { query } from "@anthropic-ai/claude-agent-sdk";
 
+import { platformContract } from "./lib/skill";
+
 export interface BuildAgentResult {
   messages: unknown[];
   costUsd: number | null;
   sessionId: string | null;
 }
 
-const SYSTEM_PROMPT = `You are an expert frontend designer building a single, self-contained wedding-invitation component.
+/**
+ * The agent's system prompt, with the `@platform` contract inlined.
+ *
+ * The contract used to live only in `.claude/skills/platform/SKILL.md`, which
+ * cost a full round-trip on every run just to re-orient. Inlining it here is
+ * ~6KB in the stable, cacheable prefix and removes that turn entirely.
+ */
+export function buildSystemPrompt(dtsContent: string): string {
+  return `You are an expert frontend designer building a single, self-contained wedding-invitation component.
 
-You are working inside a workspace. Load and follow the "platform" skill in .claude/skills before writing any code — it defines the @platform SDK you must build against and the mount contract.
+You are working inside a workspace. Write your component to index.tsx. Import only from react, framer-motion, and @platform. Then run \`npm run build\` and fix any errors until it succeeds and writes dist/bundle.js.
 
-Write your component to index.tsx. Import only from react, framer-motion, and @platform. Then run \`npm run build\` and fix any errors until it succeeds and writes dist/bundle.js.
+The design must be distinctive and production-grade — never generic. When you are done and the build passes, stop.
 
-The design must be distinctive and production-grade — never generic. When you are done and the build passes, stop.`;
+The full @platform contract you must build against follows. It is authoritative; you do not need to look it up anywhere else.
+
+${platformContract(dtsContent)}`;
+}
 
 /**
  * Run the builder agent in `workspaceDir` for one prompt. Returns the collected
@@ -28,8 +41,11 @@ export async function runBuildAgent(args: {
   workspaceDir: string;
   prompt: string;
   bundleId: string;
+  /** The `@platform` .d.ts, inlined into the system prompt. */
+  dts: string;
   model?: string;
   maxBudgetUsd?: number;
+  maxTurns?: number;
   resume?: string;
   onMessage?: (message: unknown) => void;
 }): Promise<BuildAgentResult> {
@@ -45,7 +61,7 @@ export async function runBuildAgent(args: {
     prompt: args.prompt,
     options: {
       cwd: args.workspaceDir,
-      systemPrompt: SYSTEM_PROMPT,
+      systemPrompt: buildSystemPrompt(args.dts),
       settingSources: ["project"],
       permissionMode: "bypassPermissions",
       allowDangerouslySkipPermissions: true,
@@ -58,12 +74,25 @@ export async function runBuildAgent(args: {
       ],
       model: args.model ?? "claude-sonnet-5",
       maxBudgetUsd: args.maxBudgetUsd ?? 5,
+      // Without a turn cap the $5 budget permits dozens of turns, which is the
+      // dominant source of wall-clock time. Raise it if a complex first build
+      // stops early — the terminal result surfaces in the admin chat.
+      maxTurns: args.maxTurns ?? 15,
       ...(args.resume ? { resume: args.resume } : {}),
+      // Deliberately NOT `...process.env`. This env reaches the agent's Bash
+      // tool, so it must not carry DATABASE_URL or the AWS credentials —
+      // generated code has no business touching the database or the bucket.
+      //
+      // ANTHROPIC_API_KEY *is* required: the SDK spawns a CLI subprocess that
+      // authenticates with it (dropping it fails the run with "Not logged in").
+      // So the key remains reachable from the agent's shell; isolating it needs
+      // a real sandbox (container), not an env allow-list.
       env: {
-        ...process.env,
         BUNDLE_ID: args.bundleId,
         PATH: `${repoBin}${path.delimiter}${process.env.PATH ?? ""}`,
         NODE_PATH: repoModules,
+        HOME: process.env.HOME ?? "",
+        ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? "",
       },
     },
   });

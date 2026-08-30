@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
 
-describe("invitation admin navigation", () => {
-  it("builds the duplicate draft path", () => {
-    expect(getInvitationDuplicatePath("inv_123")).toBe(
-      "/admin/invitations/inv_123/duplicate",
+import { getInvitationEditPath } from "@/lib/admin-row-navigation";
+
+describe("getInvitationEditPath", () => {
+  it("sends standard invitations to the classic edit form", () => {
+    expect(getInvitationEditPath("abc")).toBe("/admin/invitations/abc/edit");
+    expect(getInvitationEditPath("abc", "standard")).toBe(
+      "/admin/invitations/abc/edit",
     );
+  });
+
+  it("sends AI invitations straight to the AI builder", () => {
+    expect(getInvitationEditPath("abc", "ai")).toBe("/admin/invitations/abc/ai");
   });
 });

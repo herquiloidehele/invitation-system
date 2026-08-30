@@ -5,7 +5,7 @@ async function main() {
   const designPrompt = rest.join(" ").trim();
   if (!slug || !designPrompt) {
     console.error(
-      'Usage: npx tsx worker/build-for-invitation.ts <slug> "<design prompt>"',
+      'Usage: npx tsx worker/build-for-invitation.ts <slug> "<design prompt>"  (produces a draft; publish from the admin console)',
     );
     process.exit(1);
   }
