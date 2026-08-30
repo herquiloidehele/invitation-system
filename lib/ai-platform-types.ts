@@ -6,6 +6,11 @@ import type {
   EntryPassApi,
 } from "./ai-secondary-types";
 import type { AudioApi } from "./ai-audio-types";
+import type {
+  FontComponent,
+  MediaComponent,
+  QrCodeComponent,
+} from "./ai-primitive-types";
 
 /** A gift registry item annotated with its live reservation status. */
 export interface GiftWithStatus extends GiftItem {
@@ -50,4 +55,7 @@ export interface PlatformApi {
   useCalendar: () => CalendarApi;
   useEntryPass: () => EntryPassApi;
   useAudio: () => AudioApi;
+  Media: MediaComponent;
+  QrCode: QrCodeComponent;
+  Font: FontComponent;
 }

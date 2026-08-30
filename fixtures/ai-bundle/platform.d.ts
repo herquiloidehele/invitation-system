@@ -107,4 +107,30 @@ declare module "@platform" {
   export function useCalendar(): CalendarApi;
   export function useEntryPass(): EntryPassApi;
   export function useAudio(): AudioApi;
+
+  export interface MediaProps {
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+    fill?: boolean;
+    objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
+    rounded?: number | boolean;
+    className?: string;
+    style?: import("react").CSSProperties;
+  }
+  export interface QrCodeProps {
+    value: string;
+    size?: number;
+    fgColor?: string;
+    bgColor?: string;
+    className?: string;
+  }
+  export interface FontProps {
+    family: string;
+  }
+
+  export const Media: (props: MediaProps) => import("react").ReactElement;
+  export const QrCode: (props: QrCodeProps) => import("react").ReactElement;
+  export const Font: (props: FontProps) => import("react").ReactElement | null;
 }

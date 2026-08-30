@@ -18,3 +18,8 @@ export const useCountdown = platform.useCountdown;
 export const useCalendar = platform.useCalendar;
 export const useEntryPass = platform.useEntryPass;
 export const useAudio = platform.useAudio;
+
+// Components.
+export const Media = platform.Media;
+export const QrCode = platform.QrCode;
+export const Font = platform.Font;

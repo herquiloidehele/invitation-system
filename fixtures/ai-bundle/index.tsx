@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import {
+  Font,
+  Media,
+  QrCode,
   invitation,
   useAudio,
   useCalendar,
@@ -54,6 +57,25 @@ function FixtureInvitation({ coverOpened }: BundleProps) {
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         style={{ maxWidth: "34rem", margin: "0 auto", textAlign: "center" }}
       >
+        <Font family="Playfair Display" />
+
+        {(() => {
+          const heroSrc = (invitation as { heroImage?: string }).heroImage;
+          return heroSrc ? (
+            <div
+              data-testid="ai-fixture-media"
+              style={{
+                position: "relative",
+                width: "100%",
+                height: 200,
+                marginBottom: "1.5rem",
+              }}
+            >
+              <Media src={heroSrc} alt="" fill objectFit="cover" rounded={12} />
+            </div>
+          ) : null;
+        })()}
+
         <h1 style={{ fontSize: "2.5rem", fontWeight: 400 }}>
           {couple?.bride ?? "—"} &amp; {couple?.groom ?? "—"}
         </h1>
@@ -89,6 +111,20 @@ function FixtureInvitation({ coverOpened }: BundleProps) {
         >
           pass: {entryPass.ready ? (entryPass.value ?? "none") : "…"}
         </p>
+
+        {entryPass.ready && entryPass.value ? (
+          <div
+            data-testid="ai-fixture-qr"
+            style={{ display: "flex", justifyContent: "center", margin: "0.75rem 0" }}
+          >
+            <QrCode
+              value={entryPass.value}
+              size={140}
+              fgColor="#f3ece1"
+              bgColor="#12100e"
+            />
+          </div>
+        ) : null}
 
         <div
           style={{

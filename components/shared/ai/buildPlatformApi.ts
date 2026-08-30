@@ -10,6 +10,9 @@ import {
   useLocale,
   useRsvp,
 } from "./platform-hooks";
+import Media from "./Media";
+import QrCode from "./QrCode";
+import Font from "./Font";
 
 /**
  * Per-request holder for the invitation + guest. The provider writes it on
@@ -42,5 +45,8 @@ export function buildPlatformApi(): PlatformApi {
     useCalendar,
     useEntryPass,
     useAudio,
+    Media,
+    QrCode,
+    Font,
   };
 }
