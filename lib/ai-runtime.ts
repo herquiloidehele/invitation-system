@@ -1,4 +1,5 @@
 import type { BundleRegistry } from "./ai-bundle-registry";
+import type { PlatformApi } from "./ai-platform-types";
 
 /** Global key holding the host-provided runtime. */
 export const AI_RUNTIME_KEY = "__INVITATION_AI_RUNTIME__";
@@ -15,7 +16,8 @@ export interface AiRuntime {
   react: unknown;
   jsxRuntime: unknown;
   framerMotion: unknown;
-  platform: Record<string, unknown>;
+  /** The `@platform` SDK surface. Empty object before the provider builds it. */
+  platform: PlatformApi | Record<string, never>;
   bundles: BundleRegistry;
 }
 

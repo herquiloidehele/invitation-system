@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import AiBundleMount from "@/components/shared/AiBundleMount";
 import AiCoverGate from "@/components/shared/AiCoverGate";
 import AiRuntimeProvider from "@/components/shared/AiRuntimeProvider";
+import PlatformProvider from "@/components/shared/ai/PlatformProvider";
 import { buildAiBundleProps } from "@/lib/ai-invitation-props";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 
@@ -32,15 +33,17 @@ export default function AiInvitationView({
     <AiRuntimeProvider>
       <AiCoverGate invitation={invitation} theme={theme}>
         {(opened) => (
-          <AiBundleMount
-            url={bundleUrl}
-            bundleId={invitation.slug}
-            props={buildAiBundleProps({
-              invitation,
-              locale,
-              coverOpened: opened,
-            })}
-          />
+          <PlatformProvider invitation={invitation} guest={invitation.guest ?? null}>
+            <AiBundleMount
+              url={bundleUrl}
+              bundleId={invitation.slug}
+              props={buildAiBundleProps({
+                invitation,
+                locale,
+                coverOpened: opened,
+              })}
+            />
+          </PlatformProvider>
         )}
       </AiCoverGate>
     </AiRuntimeProvider>

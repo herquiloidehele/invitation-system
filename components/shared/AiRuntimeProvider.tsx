@@ -6,6 +6,7 @@ import * as FramerMotion from "framer-motion";
 
 import { createBundleRegistry } from "@/lib/ai-bundle-registry";
 import { AI_RUNTIME_KEY, type AiRuntime } from "@/lib/ai-runtime";
+import { buildPlatformApi } from "./ai/buildPlatformApi";
 
 /**
  * Installs the host runtime before any bundle script is injected. Idempotent:
@@ -21,7 +22,7 @@ function ensureRuntime(): AiRuntime {
     react: React,
     jsxRuntime: JsxRuntime,
     framerMotion: FramerMotion,
-    platform: {},
+    platform: buildPlatformApi(),
     bundles: createBundleRegistry(),
   };
   globals[AI_RUNTIME_KEY] = runtime;

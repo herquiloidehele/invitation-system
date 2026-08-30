@@ -31,6 +31,7 @@ build({
       "fixtures/ai-bundle/shims/jsx-runtime.ts",
     ),
     "framer-motion": path.join(root, "fixtures/ai-bundle/shims/framer-motion.ts"),
+    "@platform": path.join(root, "fixtures/ai-bundle/shims/platform.ts"),
   },
   define: {
     __FIXTURE_BUNDLE_ID__: JSON.stringify(bundleId),
