@@ -37,6 +37,7 @@ console.log("built dist/bundle.js");
 export async function provisionWorkspace(
   workspaceDir: string,
   dtsContent: string,
+  priorSource?: Record<string, string> | null,
 ): Promise<string> {
   await mkdir(workspaceDir, { recursive: true });
   await cp(TEMPLATE_DIR, workspaceDir, { recursive: true });
@@ -47,6 +48,14 @@ export async function provisionWorkspace(
   const skillDir = path.join(workspaceDir, ".claude", "skills", "platform");
   await mkdir(skillDir, { recursive: true });
   await writeFile(path.join(skillDir, "SKILL.md"), buildPlatformSkill(dtsContent));
+
+  // Resuming: rehydrate the last revision's source so the agent edits it.
+  if (priorSource?.["index.tsx"]) {
+    await writeFile(
+      path.join(workspaceDir, "index.tsx"),
+      priorSource["index.tsx"],
+    );
+  }
 
   return workspaceDir;
 }

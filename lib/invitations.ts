@@ -185,15 +185,9 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
       undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
     renderMode: normalizeRenderMode(row.renderMode),
-    // PHASE 1 SCAFFOLD: no AiRevision/bundleKey exists yet, so point every ai
-    // invitation at the hand-built fixture bundle. Phase 3 replaces this with
-    // the publicUrlForKey(row.activeRevision.bundleKey) resolution below.
-    aiBundleUrl:
-      normalizeRenderMode(row.renderMode) === "ai"
-        ? "/ai-bundles/fixture.js"
-        : row.activeRevision?.bundleKey
-          ? publicUrlForKey(row.activeRevision.bundleKey)
-          : null,
+    aiBundleUrl: row.activeRevision?.bundleKey
+      ? publicUrlForKey(row.activeRevision.bundleKey)
+      : null,
     externalLink: row.externalLink ?? undefined,
     isDemo: row.isDemo,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,

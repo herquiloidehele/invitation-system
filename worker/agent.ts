@@ -5,6 +5,7 @@ import { query } from "@anthropic-ai/claude-agent-sdk";
 export interface BuildAgentResult {
   messages: unknown[];
   costUsd: number | null;
+  sessionId: string | null;
 }
 
 const SYSTEM_PROMPT = `You are an expert frontend designer building a single, self-contained wedding-invitation component.
@@ -29,6 +30,7 @@ export async function runBuildAgent(args: {
   bundleId: string;
   model?: string;
   maxBudgetUsd?: number;
+  resume?: string;
   onMessage?: (message: unknown) => void;
 }): Promise<BuildAgentResult> {
   const repoRoot = process.cwd();
@@ -37,6 +39,7 @@ export async function runBuildAgent(args: {
 
   const messages: unknown[] = [];
   let costUsd: number | null = null;
+  let sessionId: string | null = null;
 
   const q = query({
     prompt: args.prompt,
@@ -55,6 +58,7 @@ export async function runBuildAgent(args: {
       ],
       model: args.model ?? "claude-opus-5",
       maxBudgetUsd: args.maxBudgetUsd ?? 5,
+      ...(args.resume ? { resume: args.resume } : {}),
       env: {
         ...process.env,
         BUNDLE_ID: args.bundleId,
@@ -67,11 +71,16 @@ export async function runBuildAgent(args: {
   for await (const message of q) {
     messages.push(message);
     args.onMessage?.(message);
-    const m = message as { type?: string; total_cost_usd?: number };
+    const m = message as {
+      type?: string;
+      session_id?: string;
+      total_cost_usd?: number;
+    };
+    if (typeof m.session_id === "string") sessionId = m.session_id;
     if (m.type === "result" && typeof m.total_cost_usd === "number") {
       costUsd = m.total_cost_usd;
     }
   }
 
-  return { messages, costUsd };
+  return { messages, costUsd, sessionId };
 }
