@@ -171,6 +171,11 @@ model Invitation {
   socialPreview           Json? // SocialPreview { image?, title?, description? } — used only for OG/Twitter meta tags
   ownerSocialPreview      Json? // SocialPreview { image?, title?, description? } — OG/Twitter meta for the private /confirmacoes owner page
 
+  // AI-generated invitations -------------------------------------------------
+  renderMode       String      @default("standard") // "standard" | "ai" — selects the renderer in InvitationView
+  activeRevisionId String?     @unique // published AiRevision currently served; rollback is a write to this field
+  activeRevision   AiRevision? @relation("InvitationActiveRevision", fields: [activeRevisionId], references: [id])
+
   priceFromCents            Int?
   discountPriceFromCents    Int? // sale price in cents; valid only when 0 < discount < priceFromCents
   currency                  String  @default("EUR") // base currency; stays "EUR"
@@ -191,6 +196,7 @@ model Invitation {
   guests           Guest[]
   giftReservations GiftReservation[]
   landingFeatures  LandingFeature[]
+  aiBuilds         AiBuild[]
 }
 
 // ---------------------------------------------------------------------------
@@ -431,4 +437,58 @@ model ContactSubmission {
 
   @@index([createdAt])
   @@index([status, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// AI invitation builds
+// ---------------------------------------------------------------------------
+
+model AiBuild {
+  id           String     @id @default(cuid())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  // "draft" | "building" | "ready" | "failed"
+  status String @default("draft")
+
+  // Agent SDK session id, so a build can be resumed. Null until Phase 3.
+  agentSessionId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  revisions AiRevision[]
+
+  @@index([invitationId])
+}
+
+model AiRevision {
+  id      String  @id @default(cuid())
+  buildId String
+  build   AiBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+
+  // Denormalised so revisions can be listed for an invitation without a join.
+  invitationId String
+
+  // The prompt that produced this revision. Null for hand-authored fixtures.
+  prompt String?
+
+  // The generated source tree: { "index.tsx": "...", "styles.ts": "..." }.
+  // Kilobytes of text, and the durable record — a bundle can always be rebuilt
+  // from it, which is why draft bundles never need to reach S3.
+  sourceFiles Json
+
+  // S3 object key. Null until published.
+  bundleKey   String?
+  publishedAt DateTime?
+
+  // Optional human label for a revision worth keeping ("final", "client pick").
+  label String?
+
+  createdAt DateTime @default(now())
+
+  activeFor Invitation? @relation("InvitationActiveRevision")
+
+  @@index([buildId])
+  @@index([invitationId])
 }

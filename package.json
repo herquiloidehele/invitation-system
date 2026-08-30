@@ -19,6 +19,7 @@
     "db:studio": "prisma studio",
     "db:migrate:neon-to-railway": "tsx --env-file=.env.migrate scripts/migrate-neon-to-railway.ts",
     "hash-password": "tsx scripts/hash-password.ts",
+    "build:ai-fixture": "tsx scripts/build-ai-fixture.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -79,6 +80,7 @@
     "cross-env": "^10.1.0",
     "dotenv": "^17.3.1",
     "env-cmd": "^11.0.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "prettier": "3.8.1",

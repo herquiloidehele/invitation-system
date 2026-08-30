@@ -1311,6 +1311,13 @@ export interface InvitationData {
   eventType: InvitationEventType;
   /** Invitation type — determines what content is shown after the envelope opens. Defaults to "standard". */
   invitationType: InvitationType;
+  /** Which renderer serves this invitation. Absent on rows predating the column. */
+  renderMode?: "standard" | "ai";
+  /**
+   * Absolute URL of the published bundle for `renderMode: "ai"`. Resolved
+   * server-side from the active revision; null when nothing is published yet.
+   */
+  aiBundleUrl?: string | null;
   /** External URL for the iframe page (external_link type). */
   externalLink?: string;
   /** Admin-only marker for demonstration invitations. Public pages ignore it. */

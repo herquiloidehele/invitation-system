@@ -55,7 +55,10 @@ describe("getInvitation request-scoped caching", () => {
     await getInvitation("slug-a");
     expect(findUniqueInvitation).toHaveBeenCalledWith({
       where: { slug: "slug-a" },
-      include: { theme: { select: { name: true } } },
+      include: {
+        theme: { select: { name: true } },
+        activeRevision: { select: { id: true, bundleKey: true } },
+      },
     });
   });
 });
