@@ -20,6 +20,12 @@ describe("buildSystemPrompt", () => {
   it("keeps the content-from-props rule", () => {
     expect(buildSystemPrompt(dts)).toContain("props.invitation");
   });
+
+  it("inlines the art direction so design rules need no extra turn", () => {
+    const prompt = buildSystemPrompt(dts).toLowerCase();
+    expect(prompt).toContain("art direction");
+    expect(prompt).toContain("inter");
+  });
 });
 
 describe("workspaceTsconfig", () => {

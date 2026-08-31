@@ -9,10 +9,16 @@ import { bundleRegistersComponent } from "./lib/verify-bundle";
 import { buildInvitationBrief } from "./lib/invitation-brief";
 import { toBuildEvent, type BuildEvent } from "./lib/build-events";
 import {
+  proposeDirections,
+  directionToPrompt,
+  type Direction,
+} from "./lib/directions";
+import {
   getOrCreateBuild,
   latestRevisionSource,
   createDraftRevision,
   appendMessage,
+  revisionCount,
   saveSessionId,
 } from "./persistence";
 
@@ -23,9 +29,13 @@ import {
 export async function runInvitationBuild(args: {
   slug: string;
   prompt: string;
+  /** Chosen direction — when set, the gate is skipped and this is built. */
+  direction?: Direction | null;
+  /** Ask for a fresh set of directions, optionally with a note. */
+  refineDirections?: string | null;
   onEvent: (event: BuildEvent) => void;
 }): Promise<{ ok: boolean }> {
-  const { slug, prompt, onEvent } = args;
+  const { slug, prompt, direction, refineDirections, onEvent } = args;
 
   const invitation = await getInvitation(slug);
   if (!invitation) {
@@ -40,8 +50,44 @@ export async function runInvitationBuild(args: {
 
   const build = await getOrCreateBuild(invitationId);
   await appendMessage({ buildId: build.id, role: "user", content: prompt });
+  const brief = buildInvitationBrief(invitation);
+
+  // The directions gate: before any code exists, propose distinct visual
+  // directions and stop. Fires when the invitation has no revisions at all, or
+  // whenever another round is explicitly requested.
+  const existing = await revisionCount(invitationId);
+  if (!direction && (existing === 0 || refineDirections)) {
+    const { directions } = await proposeDirections({
+      brief,
+      prompt,
+      note: refineDirections,
+    });
+    if (directions.length === 0) {
+      const message = "Could not propose directions. Try again.";
+      await appendMessage({
+        buildId: build.id,
+        role: "assistant",
+        content: message,
+      });
+      onEvent({ kind: "error", message });
+      return { ok: false };
+    }
+    await appendMessage({
+      buildId: build.id,
+      role: "assistant",
+      content: "Pick a direction to build.",
+      directions,
+    });
+    onEvent({ kind: "directions", directions });
+    return { ok: true };
+  }
+
   const priorSource = await latestRevisionSource(build.id);
-  const fullPrompt = `${buildInvitationBrief(invitation)}\n\n${prompt}`;
+  const fullPrompt = [
+    brief,
+    direction ? `\n${directionToPrompt(direction)}` : "",
+    `\n${prompt}`,
+  ].join("\n");
 
   const repoRoot = process.cwd();
   const dts = await readFile(

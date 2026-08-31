@@ -476,6 +476,9 @@ model AiMessage {
   revisionId String?
   costUsd    Float?
 
+  // Proposed visual directions, when this assistant turn is a directions gate.
+  directions Json?
+
   createdAt DateTime @default(now())
 
   @@index([buildId])

@@ -3,6 +3,7 @@ import path from "node:path";
 import { query } from "@anthropic-ai/claude-agent-sdk";
 
 import { platformContract } from "./lib/skill";
+import { artDirection } from "./lib/art-direction";
 
 export interface BuildAgentResult {
   messages: unknown[];
@@ -23,6 +24,8 @@ export function buildSystemPrompt(dtsContent: string): string {
 You are working inside a workspace. Write your component to index.tsx. Import only from react, framer-motion, and @platform. Then run \`npm run build\` and fix any errors until it succeeds and writes dist/bundle.js.
 
 The design must be distinctive and production-grade — never generic. When you are done and the build passes, stop.
+
+${artDirection()}
 
 The full @platform contract you must build against follows. It is authoritative; you do not need to look it up anywhere else.
 

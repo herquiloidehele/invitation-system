@@ -13,6 +13,8 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 interface AiInvitationViewProps {
   invitation: InvitationData;
   theme: TemplateTheme;
+  /** Admin builder preview: render the invitation itself, not the envelope. */
+  skipCover?: boolean;
 }
 
 /**
@@ -24,6 +26,7 @@ interface AiInvitationViewProps {
 export default function AiInvitationView({
   invitation,
   theme,
+  skipCover = false,
 }: AiInvitationViewProps) {
   const locale = useLocale();
   const bundleUrl = invitation.aiBundleUrl;
@@ -33,7 +36,7 @@ export default function AiInvitationView({
   return (
     <AiRuntimeProvider>
       <AiAudioProvider invitation={invitation}>
-        <AiCoverGate invitation={invitation} theme={theme}>
+        <AiCoverGate invitation={invitation} theme={theme} skipCover={skipCover}>
           {(opened) => (
             <PlatformProvider invitation={invitation} guest={invitation.guest ?? null}>
               <AiBundleMount

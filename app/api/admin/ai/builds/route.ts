@@ -33,6 +33,11 @@ export async function POST(req: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) {
     return jsonError("ANTHROPIC_API_KEY is not configured.", 500);
   }
+  // Directions gate options. `direction` is the card the admin picked;
+  // `refineDirections` asks for another round of proposals.
+  const direction = (body as { direction?: unknown }).direction ?? null;
+  const rawRefine = (body as { refineDirections?: unknown }).refineDirections;
+  const refineDirections = typeof rawRefine === "string" ? rawRefine : null;
 
   const encoder = new TextEncoder();
   const repoRoot = process.cwd();
@@ -43,7 +48,12 @@ export async function POST(req: NextRequest) {
       // 0.12–0.47s of pure overhead per build.
       const child = spawn(
         path.join(repoRoot, "node_modules", ".bin", "tsx"),
-        [path.join("worker", "build-invitation-ndjson.ts"), slug, prompt],
+        [
+          path.join("worker", "build-invitation-ndjson.ts"),
+          slug,
+          prompt,
+          JSON.stringify({ direction, refineDirections }),
+        ],
         { cwd: repoRoot, env: process.env },
       );
 

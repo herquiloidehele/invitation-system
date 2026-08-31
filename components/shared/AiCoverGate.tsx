@@ -15,6 +15,12 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 interface AiCoverGateProps {
   invitation: InvitationData;
   theme: TemplateTheme;
+  /**
+   * Start already opened, with no cover drawn. Used by the admin builder
+   * preview, where the designer wants the invitation itself, not the envelope.
+   * Audio is not primed in this mode — there is no tap to grant the gesture.
+   */
+  skipCover?: boolean;
   /** Rendered behind the cover; receives the opened flag. */
   children: (opened: boolean) => ReactNode;
 }
@@ -30,10 +36,11 @@ interface AiCoverGateProps {
 export default function AiCoverGate({
   invitation,
   theme,
+  skipCover = false,
   children,
 }: AiCoverGateProps) {
-  const [opened, setOpened] = useState(false);
-  const [coverVisible, setCoverVisible] = useState(true);
+  const [opened, setOpened] = useState(skipCover);
+  const [coverVisible, setCoverVisible] = useState(!skipCover);
   const [videoCoverFailed, setVideoCoverFailed] = useState(false);
 
   const usesVideoCover =

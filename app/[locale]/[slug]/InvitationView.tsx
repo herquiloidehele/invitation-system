@@ -79,6 +79,8 @@ interface InvitationViewProps {
   /** Section id to reveal + scroll to on load (e.g. "gifts" when returning from
    *  the gifts sub-page). When set, the envelope cover is skipped. */
   initialSection?: string;
+  /** Admin AI-builder preview: skip the cover and show the invitation itself. */
+  skipCover?: boolean;
 }
 
 export default function InvitationView({
@@ -87,11 +89,18 @@ export default function InvitationView({
   isLandingPreview = false,
   lazyExternalIframe = false,
   initialSection,
+  skipCover = false,
 }: InvitationViewProps) {
   // AI invitations render a generated bundle behind the platform-owned cover.
   // Branch first so none of the standard renderer's hooks are instantiated.
   if (isAiRenderMode(invitation)) {
-    return <AiInvitationView invitation={invitation} theme={theme} />;
+    return (
+      <AiInvitationView
+        invitation={invitation}
+        theme={theme}
+        skipCover={skipCover}
+      />
+    );
   }
 
   // Curtain-Canva templates skip the entire envelope flow and render

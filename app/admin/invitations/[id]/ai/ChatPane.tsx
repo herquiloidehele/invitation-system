@@ -3,15 +3,18 @@
 import { useEffect, useRef } from "react";
 import { Loader2, Send, Wrench } from "lucide-react";
 
+import type { Direction } from "@/worker/lib/directions";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import DirectionsCards from "./DirectionsCards";
 
 export type ChatItem =
   | { kind: "user"; id: string; text: string }
   | { kind: "assistant"; id: string; text: string; costUsd?: number | null }
   | { kind: "activity"; id: string; text: string }
+  | { kind: "directions"; id: string; directions: Direction[] }
   | { kind: "error"; id: string; text: string };
 
 export default function ChatPane({
@@ -20,12 +23,16 @@ export default function ChatPane({
   onPromptChange,
   onSubmit,
   building,
+  onPickDirection,
+  onAnotherRound,
 }: {
   items: ChatItem[];
   prompt: string;
   onPromptChange: (v: string) => void;
   onSubmit: () => void;
   building: boolean;
+  onPickDirection: (d: Direction) => void;
+  onAnotherRound: (note: string) => void;
 }) {
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -52,6 +59,17 @@ export default function ChatPane({
                     <Wrench className="size-3 shrink-0" />
                     <span className="truncate">{m.text}</span>
                   </div>
+                );
+              }
+              if (m.kind === "directions") {
+                return (
+                  <DirectionsCards
+                    key={m.id}
+                    directions={m.directions}
+                    disabled={building}
+                    onPick={onPickDirection}
+                    onAnotherRound={onAnotherRound}
+                  />
                 );
               }
               if (m.kind === "error") {

@@ -158,6 +158,8 @@ export async function appendMessage(args: {
   content: string;
   revisionId?: string | null;
   costUsd?: number | null;
+  /** Proposed directions, when this turn is a directions gate. */
+  directions?: unknown;
 }): Promise<void> {
   await prisma.aiMessage.create({
     data: {
@@ -166,8 +168,14 @@ export async function appendMessage(args: {
       content: args.content,
       revisionId: args.revisionId ?? null,
       costUsd: args.costUsd ?? null,
+      directions: (args.directions ?? undefined) as never,
     },
   });
+}
+
+/** How many revisions exist for an invitation — 0 means no design exists yet. */
+export async function revisionCount(invitationId: string): Promise<number> {
+  return prisma.aiRevision.count({ where: { invitationId } });
 }
 
 /** The full conversation for an invitation's build, oldest first. */
@@ -178,6 +186,7 @@ export async function listMessagesForInvitation(invitationId: string): Promise<
     content: string;
     revisionId: string | null;
     costUsd: number | null;
+    directions: unknown;
     createdAt: Date;
   }>
 > {
@@ -196,6 +205,7 @@ export async function listMessagesForInvitation(invitationId: string): Promise<
       content: true,
       revisionId: true,
       costUsd: true,
+      directions: true,
       createdAt: true,
     },
   });

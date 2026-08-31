@@ -39,4 +39,22 @@ describe("BuildEvent union", () => {
     const e: BuildEvent = { kind: "draft", revisionId: "r1", slug: "sofia-pedro" };
     expect(e.kind).toBe("draft");
   });
+
+  it("includes a directions variant", () => {
+    const e: BuildEvent = {
+      kind: "directions",
+      directions: [
+        {
+          id: "a",
+          name: "X",
+          palette: ["#000"],
+          typography: "A + B",
+          motion: "m",
+          composition: "c",
+          rationale: "r",
+        },
+      ],
+    };
+    expect(e.kind).toBe("directions");
+  });
 });

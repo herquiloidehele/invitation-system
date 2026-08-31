@@ -211,6 +211,9 @@ export default async function InvitationSlugPage({
   // Admin-only draft/revision preview. For an authenticated admin, `?revision=`
   // renders a specific (possibly unpublished) revision via the same public
   // renderer. Unauthenticated visitors are ignored — no preview leak.
+  // Deliberately derived from the preview override, not from a query param: a
+  // public `?cover=0` would let anyone skip the envelope on a live invitation.
+  let skipCover = false;
   if (previewRevisionId && (await isAdminRequest())) {
     const invRow = await prisma.invitation.findUnique({
       where: { slug },
@@ -228,6 +231,7 @@ export default async function InvitationSlugPage({
       invitation.aiBundleUrl = preview.aiBundleUrl;
       sourceInvitation.renderMode = preview.renderMode;
       sourceInvitation.aiBundleUrl = preview.aiBundleUrl;
+      skipCover = true;
     }
   }
 
@@ -327,6 +331,7 @@ export default async function InvitationSlugPage({
         isLandingPreview={landingPreview === "1"}
         lazyExternalIframe={lazyExternalIframe === "1"}
         initialSection={section}
+        skipCover={skipCover}
       />
     </>
   );
