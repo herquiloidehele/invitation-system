@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { motion, type Variants } from "framer-motion";
+import dynamic from "next/dynamic";
 import { CalendarPlus, Heart, Shirt } from "lucide-react";
 
 import type {
@@ -64,6 +65,11 @@ import {
   quickStagger,
   WordReveal,
 } from "./animations";
+
+// Inline RSVP mode renders the form on the page, so it can't hide behind the
+// modal's lazy boundary. `ssr: false` is safe — InvitationView already loads
+// this whole page client-side only.
+const InlineRSVPForm = dynamic(() => import("./RSVPForm"), { ssr: false });
 
 // Re-export so existing imports from this module keep working.
 export { getHeroSectionHeight };
@@ -250,7 +256,9 @@ export default function InvitationPage({
 }: InvitationPageProps) {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
-  const isCalendarCta = getRsvpCtaAction(invitation.rsvp) === "calendar";
+  const rsvpCtaAction = getRsvpCtaAction(invitation.rsvp);
+  const isCalendarCta = rsvpCtaAction === "calendar";
+  const isInlineRsvp = rsvpCtaAction === "inline";
   const t = useCustomText(invitation.customTexts);
   const locale = useLocale();
   const footerMonthDisplay = formatLocalizedMonthLong(
@@ -963,6 +971,17 @@ export default function InvitationPage({
               <CalendarPlus size={17} strokeWidth={1.5} />
               <span>{t("cta_addToCalendar")}</span>
             </CalendarButton>
+          ) : isInlineRsvp ? (
+            <div className="w-full max-w-[440px]">
+              <InlineRSVPForm
+                inline
+                hideTitle
+                invitation={invitation}
+                theme={theme}
+                customTexts={invitation.customTexts}
+                guest={invitation.guest}
+              />
+            </div>
           ) : rsvpSubmitted && inlinePassValue ? (
             <div className="flex w-full flex-col items-center">
               <EntryPassQr
@@ -1148,7 +1167,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* RSVP Modal                                                        */}
       {/* ================================================================= */}
-      {!isCalendarCta && (
+      {!isCalendarCta && !isInlineRsvp && (
         <RSVPModal
           open={rsvpOpen}
           onClose={() => {

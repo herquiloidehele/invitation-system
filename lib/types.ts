@@ -970,7 +970,11 @@ export interface RsvpCustomAnswerInput {
   value: unknown;
 }
 
-export type RsvpCtaAction = "rsvp" | "calendar";
+/** What the invitation's primary CTA does.
+ *  - "rsvp": a button that opens the RSVP modal (default)
+ *  - "calendar": a button that adds the event to the guest's calendar
+ *  - "inline": no button — the RSVP form renders directly on the page */
+export type RsvpCtaAction = "rsvp" | "calendar" | "inline";
 
 /** Every guest-visible UI string that can be overridden per invitation.
  *  All fields are optional — missing keys fall back to the built-in defaults

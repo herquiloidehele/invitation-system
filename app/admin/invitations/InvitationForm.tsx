@@ -44,6 +44,7 @@ import {
   validateInvitationLanguageSettings,
 } from "@/lib/invitation-translations";
 import { buildInvitationFormPayload } from "@/lib/invitation-form-payload";
+import { getRsvpCtaAction } from "@/lib/rsvp-config";
 import { useInvitationTranslationDraft } from "@/hooks/use-invitation-translation-draft";
 
 import {
@@ -3226,15 +3227,12 @@ export default function InvitationForm({
                     <div className="space-y-1.5">
                       <Label>Ação do botão principal</Label>
                       <p className="text-xs text-muted-foreground">
-                        Escolha se o botão principal abre o formulário de RSVP
-                        ou adiciona o evento ao calendário.
+                        Escolha se o botão principal abre o formulário de RSVP,
+                        adiciona o evento ao calendário, ou se o formulário
+                        aparece embutido na própria página, sem botão.
                       </p>
                       <Select
-                        value={
-                          form.rsvp.ctaAction === "calendar"
-                            ? "calendar"
-                            : "rsvp"
-                        }
+                        value={getRsvpCtaAction(form.rsvp)}
                         onValueChange={(value) => {
                           if (value) updateRsvp("ctaAction", value);
                         }}
@@ -3248,6 +3246,9 @@ export default function InvitationForm({
                           </SelectItem>
                           <SelectItem value="calendar">
                             Adicionar ao calendário
+                          </SelectItem>
+                          <SelectItem value="inline">
+                            Formulário embutido na página
                           </SelectItem>
                         </SelectContent>
                       </Select>

@@ -144,6 +144,9 @@ export interface RSVPFormDirectProps {
   slugKey?: string;
   /** When true: render without the modal-style header X close button. */
   inline?: boolean;
+  /** Inline mode only: omit the form's own title header. Use when the host
+   *  page already renders a heading for the RSVP section. */
+  hideTitle?: boolean;
   /** Called when the modal wrapper wants the form to close. Ignored in inline mode. */
   onClose?: () => void;
   /** Optional palette overrides to theme the form (field bg, border, text colors, fonts). */
@@ -158,6 +161,9 @@ export interface RSVPFormIntegrationProps {
   slugKey?: string;
   guest?: PublicGuestData;
   inline?: boolean;
+  /** Inline mode only: omit the form's own title header. Use when the host
+   *  page already renders a heading for the RSVP section. */
+  hideTitle?: boolean;
   onClose?: () => void;
   /** Optional palette overrides to theme the form (field bg, border, text colors, fonts). */
   paletteOverride?: Partial<ModalPalette>;
@@ -208,6 +214,9 @@ function hasSubmittedRsvp(slug: string): boolean {
 
 export default function RSVPForm(props: RSVPFormProps) {
   const inline = props.inline === true;
+  // Modal mode always keeps its header — that's where the X close button
+  // lives — so hiding the title is an inline-only affordance.
+  const hideHeader = inline && props.hideTitle === true;
   const slug = isIntegration(props)
     ? props.invitation.slug
     : props.invitationSlug;
@@ -443,38 +452,41 @@ export default function RSVPForm(props: RSVPFormProps) {
   return (
     <>
       {/* Header — modal mode renders X close on the right; inline mode
-          centers the title since there's no close affordance. */}
-      <div
-        className={
-          inline
-            ? "px-1 pb-4 text-center"
-            : "flex items-center justify-between border-b px-5 py-4"
-        }
-        style={inline ? undefined : { borderColor: p.border }}
-      >
-        <h2
-          className={inline ? "" : "text-base font-semibold"}
-          style={{
-            fontFamily: p.displayFont,
-            fontSize: inline ? 28 : 18,
-            color: props.theme.accent,
-            ...titleOverride,
-          }}
+          centers the title since there's no close affordance. Callers that
+          render their own section heading pass `hideTitle`. */}
+      {!hideHeader && (
+        <div
+          className={
+            inline
+              ? "px-1 pb-4 text-center"
+              : "flex items-center justify-between border-b px-5 py-4"
+          }
+          style={inline ? undefined : { borderColor: p.border }}
         >
-          <EditableText elementKey="sectionTitles">
-            {resolveText("rsvp_modalTitle")}
-          </EditableText>
-        </h2>
-        {!inline && (
-          <button
-            onClick={handleCloseInModal}
-            aria-label={resolveText("rsvp_closeButton")}
-            className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-black/5"
+          <h2
+            className={inline ? "" : "text-base font-semibold"}
+            style={{
+              fontFamily: p.displayFont,
+              fontSize: inline ? 28 : 18,
+              color: props.theme.accent,
+              ...titleOverride,
+            }}
           >
-            <X size={18} color={p.iconColor} />
-          </button>
-        )}
-      </div>
+            <EditableText elementKey="sectionTitles">
+              {resolveText("rsvp_modalTitle")}
+            </EditableText>
+          </h2>
+          {!inline && (
+            <button
+              onClick={handleCloseInModal}
+              aria-label={resolveText("rsvp_closeButton")}
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-black/5"
+            >
+              <X size={18} color={p.iconColor} />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Body */}
       <div
