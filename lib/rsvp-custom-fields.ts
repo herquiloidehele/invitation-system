@@ -84,6 +84,11 @@ export function normalizeRsvpCustomFields(
         visibility: visibility as RsvpCustomFieldVisibility,
       };
 
+      const placeholder = trimString(fieldRecord.placeholder);
+      if (placeholder) {
+        normalized.placeholder = placeholder;
+      }
+
       if (normalized.type === "radio" || normalized.type === "select") {
         const options = normalizeOptions(fieldRecord.options);
         if (options.length === 0) return null;

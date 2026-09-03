@@ -57,6 +57,7 @@ export function RSVPCustomFields({
               rows={3}
               value={stringValue(values[field.id])}
               onChange={(event) => onChange(field.id, event.target.value)}
+              placeholder={field.placeholder || undefined}
               className={`${inputClassName} resize-none`}
               style={inputStyle}
             />
@@ -103,7 +104,9 @@ export function RSVPCustomFields({
               className={inputClassName}
               style={inputStyle}
             >
-              <option value="">Selecione uma opção</option>
+              <option value="">
+                {field.placeholder || "Selecione uma opção"}
+              </option>
               {(field.options ?? []).map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.label}
@@ -114,6 +117,7 @@ export function RSVPCustomFields({
             <input
               value={stringValue(values[field.id])}
               onChange={(event) => onChange(field.id, event.target.value)}
+              placeholder={field.placeholder || undefined}
               className={inputClassName}
               style={inputStyle}
             />

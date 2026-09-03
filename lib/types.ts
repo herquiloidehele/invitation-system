@@ -699,7 +699,8 @@ export type CardSectionKey =
   | "guestGuide"
   | "faqs"
   | "countdown"
-  | "places";
+  | "places"
+  | "rsvp";
 
 /** Per-section card styling overrides stored on each invitation.
  *  Missing keys or undefined fields fall back to theme defaults.
@@ -954,6 +955,11 @@ export interface RsvpCustomField {
   type: RsvpCustomFieldType;
   required: boolean;
   visibility: RsvpCustomFieldVisibility;
+  /**
+   * Hint shown inside the empty input. Only used by the text, textarea and
+   * select types (select renders it as the empty option).
+   */
+  placeholder?: string;
   options?: RsvpCustomFieldOption[];
 }
 
@@ -970,7 +976,11 @@ export interface RsvpCustomAnswerInput {
   value: unknown;
 }
 
-export type RsvpCtaAction = "rsvp" | "calendar";
+/** What the invitation's primary CTA does.
+ *  - "rsvp": a button that opens the RSVP modal (default)
+ *  - "calendar": a button that adds the event to the guest's calendar
+ *  - "inline": no button — the RSVP form renders directly on the page */
+export type RsvpCtaAction = "rsvp" | "calendar" | "inline";
 
 /** Every guest-visible UI string that can be overridden per invitation.
  *  All fields are optional — missing keys fall back to the built-in defaults
@@ -1178,6 +1188,7 @@ export interface InvitationTranslationOverlay {
     string,
     {
       label?: string;
+      placeholder?: string;
       options?: Record<string, { label?: string }>;
     }
   >;

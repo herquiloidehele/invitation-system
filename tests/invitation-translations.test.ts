@@ -342,6 +342,7 @@ describe("invitation localization", () => {
             type: "select",
             required: false,
             visibility: "always",
+            placeholder: "Escolha a refeição",
             options: [{ id: "fish", label: "Peixe" }],
           },
         ],
@@ -380,7 +381,11 @@ describe("invitation localization", () => {
           },
           ourStory: { title: "Our story", description: "It began..." },
           rsvpCustomFields: {
-            meal: { label: "Meal", options: { fish: { label: "Fish" } } },
+            meal: {
+              label: "Meal",
+              placeholder: "Pick a meal",
+              options: { fish: { label: "Fish" } },
+            },
           },
         },
       },
@@ -418,6 +423,7 @@ describe("invitation localization", () => {
     });
     expect(localized.rsvp.customFields?.[0]).toMatchObject({
       label: "Meal",
+      placeholder: "Pick a meal",
       options: [{ id: "fish", label: "Fish" }],
     });
   });

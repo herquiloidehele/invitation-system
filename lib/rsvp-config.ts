@@ -19,7 +19,9 @@ export interface RsvpConfigWithEmail {
 export function getRsvpCtaAction(
   config: { ctaAction?: unknown } | null | undefined,
 ): RsvpCtaAction {
-  return config?.ctaAction === "calendar" ? "calendar" : "rsvp";
+  if (config?.ctaAction === "calendar") return "calendar";
+  if (config?.ctaAction === "inline") return "inline";
+  return "rsvp";
 }
 
 /**
