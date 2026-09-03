@@ -77,7 +77,7 @@ export default function PreviewPane({
           />
         ) : (
           <p className="text-sm text-muted-foreground">
-            Build a draft to preview it here.
+            Construa um rascunho para o pré-visualizar aqui.
           </p>
         )}
       </div>

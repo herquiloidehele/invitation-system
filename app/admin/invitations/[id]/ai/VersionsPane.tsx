@@ -30,25 +30,25 @@ export default function VersionsPane({
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <h2 className="text-sm font-medium">Versions</h2>
+      <h2 className="text-sm font-medium">Versões</h2>
       <ScrollArea className="min-h-0 flex-1 rounded-lg border p-3">
         {revisions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No versions yet.</p>
+          <p className="text-sm text-muted-foreground">Ainda não há versões.</p>
         ) : (
           <ul className="space-y-2">
             {revisions.map((r) => (
               <li key={r.id} className="rounded-lg border p-3">
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <p className="line-clamp-2 text-xs text-foreground">
-                    {r.label || r.prompt || "(no prompt)"}
+                    {r.label || r.prompt || "(sem pedido)"}
                   </p>
                   {r.active ? (
                     <Badge className="shrink-0 gap-1">
-                      <CheckCircle2 className="size-3" /> Live
+                      <CheckCircle2 className="size-3" /> Ativa
                     </Badge>
                   ) : (
                     <Badge variant="secondary" className="shrink-0">
-                      {r.published ? "Published" : "Draft"}
+                      {r.published ? "Publicada" : "Rascunho"}
                     </Badge>
                   )}
                 </div>
@@ -61,7 +61,7 @@ export default function VersionsPane({
                     variant="ghost"
                     onClick={() => onPreview(r.id)}
                   >
-                    <Eye className="size-3" /> Preview
+                    <Eye className="size-3" /> Pré-ver
                   </Button>
                   {!r.published && (
                     <Button
@@ -70,7 +70,7 @@ export default function VersionsPane({
                       disabled={busy}
                       onClick={() => onPublish(r.id)}
                     >
-                      <Upload className="size-3" /> Publish
+                      <Upload className="size-3" /> Publicar
                     </Button>
                   )}
                   {r.published && !r.active && (
@@ -80,7 +80,7 @@ export default function VersionsPane({
                       disabled={busy}
                       onClick={() => onActivate(r.id)}
                     >
-                      <RotateCcw className="size-3" /> Restore
+                      <RotateCcw className="size-3" /> Repor
                     </Button>
                   )}
                 </div>

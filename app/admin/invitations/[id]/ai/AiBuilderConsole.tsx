@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import type { BuildEvent } from "@/worker/lib/build-events";
 import type { Direction } from "@/worker/lib/directions";
 import { parseSseFrames } from "@/lib/ai-build-stream";
+import { classifyBuildError, isFatalAgentText } from "@/lib/build-errors";
 import ChatPane, { type ChatItem } from "./ChatPane";
 import PreviewPane from "./PreviewPane";
 import VersionsPane, { type Revision } from "./VersionsPane";
@@ -33,6 +34,19 @@ export default function AiBuilderConsole({
   // The prompt that opened the directions gate, so picking a card (or asking
   // for another round) can rebuild with the original brief.
   const [gatePrompt, setGatePrompt] = useState("");
+  // Id of the assistant bubble currently being streamed into, if any. A ref,
+  // not state: it is read and written inside the async stream loop.
+  const streamingId = useRef<string | null>(null);
+
+  /** Replace the text of one assistant bubble. */
+  const setBubbleText = (id: string, next: (prev: string) => string) =>
+    setItems((prev) =>
+      prev.map((it) =>
+        it.kind === "assistant" && it.id === id
+          ? { ...it, text: next(it.text) }
+          : it,
+      ),
+    );
 
   const append = (item: ChatItem) => setItems((prev) => [...prev, item]);
 
@@ -103,14 +117,53 @@ export default function AiBuilderConsole({
   const handleEvent = (e: BuildEvent) => {
     switch (e.kind) {
       case "tool":
-        append({ kind: "activity", id: nextId(), text: e.name });
+        // A tool call ends the current prose block.
+        streamingId.current = null;
+        append({ kind: "activity", id: nextId(), text: e.label });
         break;
-      case "progress":
-        append({ kind: "assistant", id: nextId(), text: e.text });
+      case "delta": {
+        const id = streamingId.current;
+        if (id) {
+          setBubbleText(id, (prev) => prev + e.text);
+        } else {
+          const fresh = nextId();
+          streamingId.current = fresh;
+          append({ kind: "assistant", id: fresh, text: e.text });
+        }
         break;
+      }
+      case "progress": {
+        const id = streamingId.current;
+        // The SDK reports some fatal problems as ordinary assistant prose
+        // ("Credit balance is too low"). Render those as errors, not replies.
+        if (isFatalAgentText(e.text)) {
+          if (id) {
+            setItems((prev) => prev.filter((it) => it.id !== id));
+            streamingId.current = null;
+          }
+          const info = classifyBuildError(e.text);
+          append({
+            kind: "error",
+            id: nextId(),
+            text: info.title,
+            hint: info.hint,
+            detail: info.detail,
+          });
+          break;
+        }
+        // The complete message — authoritative. Seal the streamed bubble with
+        // it rather than appending a duplicate.
+        if (id) {
+          setBubbleText(id, () => e.text);
+          streamingId.current = null;
+        } else {
+          append({ kind: "assistant", id: nextId(), text: e.text });
+        }
+        break;
+      }
       case "result":
         if (!e.ok) {
-          append({ kind: "error", id: nextId(), text: "Build failed." });
+          append({ kind: "error", id: nextId(), text: "A construção falhou." });
         }
         break;
       case "directions":
@@ -118,10 +171,16 @@ export default function AiBuilderConsole({
         break;
       case "draft":
         showPreview(e.revisionId);
-        toast.success("Draft ready — preview it, then publish.");
+        toast.success("Rascunho pronto — pré-visualize e depois publique.");
         break;
       case "error":
-        append({ kind: "error", id: nextId(), text: e.message });
+        append({
+          kind: "error",
+          id: nextId(),
+          text: e.message,
+          hint: e.hint,
+          detail: e.detail,
+        });
         break;
     }
   };
@@ -133,6 +192,7 @@ export default function AiBuilderConsole({
     const trimmed = text.trim();
     if (!trimmed || building) return;
     setBuilding(true);
+    streamingId.current = null;
     // A pick / another-round reuses the original prompt, so don't echo it again.
     if (!opts?.direction && !opts?.refineDirections) {
       append({ kind: "user", id: nextId(), text: trimmed });
@@ -154,7 +214,7 @@ export default function AiBuilderConsole({
         append({
           kind: "error",
           id: nextId(),
-          text: `Build request failed (${res.status}).`,
+          text: `O pedido de construção falhou (${res.status}).`,
         });
         return;
       }
@@ -173,7 +233,7 @@ export default function AiBuilderConsole({
       append({
         kind: "error",
         id: nextId(),
-        text: err instanceof Error ? err.message : "Stream error.",
+        text: err instanceof Error ? err.message : "Erro na ligação.",
       });
     } finally {
       setBuilding(false);
@@ -189,8 +249,8 @@ export default function AiBuilderConsole({
         method: "POST",
       });
       const body = await res.json();
-      if (res.ok) toast.success("Published — now live.");
-      else toast.error(body.error ?? "Publish failed.");
+      if (res.ok) toast.success("Publicado — já está ativo.");
+      else toast.error(body.error ?? "Falha ao publicar.");
       await refreshRail();
     } finally {
       setBusy(false);
@@ -205,8 +265,8 @@ export default function AiBuilderConsole({
         method: "POST",
       });
       const body = await res.json();
-      if (res.ok) toast.success("Restored — now live.");
-      else toast.error(body.error ?? "Restore failed.");
+      if (res.ok) toast.success("Reposto — já está ativo.");
+      else toast.error(body.error ?? "Falha ao repor.");
       await refreshRail();
     } finally {
       setBusy(false);

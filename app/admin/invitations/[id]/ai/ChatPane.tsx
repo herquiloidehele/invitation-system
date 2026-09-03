@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Loader2, Send, Wrench } from "lucide-react";
+import { AlertTriangle, Loader2, Send, Wrench } from "lucide-react";
 
 import type { Direction } from "@/worker/lib/directions";
 import { Button } from "@/components/ui/button";
@@ -9,13 +9,20 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import DirectionsCards from "./DirectionsCards";
+import ChatMarkdown from "./ChatMarkdown";
 
 export type ChatItem =
   | { kind: "user"; id: string; text: string }
   | { kind: "assistant"; id: string; text: string; costUsd?: number | null }
   | { kind: "activity"; id: string; text: string }
   | { kind: "directions"; id: string; directions: Direction[] }
-  | { kind: "error"; id: string; text: string };
+  | {
+      kind: "error";
+      id: string;
+      text: string;
+      hint?: string;
+      detail?: string;
+    };
 
 export default function ChatPane({
   items,
@@ -35,17 +42,22 @@ export default function ChatPane({
   onAnotherRound: (note: string) => void;
 }) {
   const endRef = useRef<HTMLDivElement>(null);
+  // Streaming grows the last bubble's text without changing the item count, so
+  // the length alone is not enough to keep the view pinned to the bottom.
+  const lastItem = items[items.length - 1];
+  const streamKey =
+    lastItem && "text" in lastItem ? lastItem.text.length : 0;
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [items.length]);
+  }, [items.length, streamKey]);
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <ScrollArea className="min-h-0 flex-1 rounded-lg border p-4">
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Describe the invitation you want. The agent writes real code, then
-            you preview it before publishing.
+            Descreva o convite que pretende. O agente escreve código real e
+            pode pré-visualizar antes de publicar.
           </p>
         ) : (
           <div className="space-y-3">
@@ -74,12 +86,34 @@ export default function ChatPane({
               }
               if (m.kind === "error") {
                 return (
-                  <p
+                  <div
                     key={m.id}
-                    className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                    className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2"
                   >
-                    {m.text}
-                  </p>
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-destructive">
+                          {m.text}
+                        </p>
+                        {m.hint && (
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            {m.hint}
+                          </p>
+                        )}
+                        {m.detail && m.detail !== m.text && (
+                          <details className="mt-1.5">
+                            <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+                              Detalhes técnicos
+                            </summary>
+                            <pre className="mt-1 max-h-40 overflow-auto rounded bg-foreground/5 p-2 font-mono text-[11px] whitespace-pre-wrap break-all">
+                              {m.detail}
+                            </pre>
+                          </details>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 );
               }
               const isUser = m.kind === "user";
@@ -93,13 +127,13 @@ export default function ChatPane({
                 >
                   <div
                     className={cn(
-                      "max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2 text-sm",
+                      "max-w-[85%] rounded-lg px-3 py-2 text-sm",
                       isUser
-                        ? "bg-primary text-primary-foreground"
+                        ? "whitespace-pre-wrap bg-primary text-primary-foreground"
                         : "bg-muted text-foreground",
                     )}
                   >
-                    {m.text}
+                    {isUser ? m.text : <ChatMarkdown>{m.text}</ChatMarkdown>}
                     {m.kind === "assistant" && m.costUsd != null && (
                       <span className="mt-1 block text-xs opacity-60">
                         ${m.costUsd.toFixed(4)}
@@ -120,21 +154,21 @@ export default function ChatPane({
           onChange={(e) => onPromptChange(e.target.value)}
           rows={3}
           disabled={building}
-          placeholder="e.g. An editorial art-deco invitation in deep emerald and gold…"
+          placeholder="ex.: um convite editorial art déco em esmeralda e ouro…"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) onSubmit();
           }}
         />
         <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">⌘↵ to send</span>
+          <span className="text-xs text-muted-foreground">⌘↵ para enviar</span>
           <Button onClick={onSubmit} disabled={building || !prompt.trim()}>
             {building ? (
               <>
-                <Loader2 className="size-4 animate-spin" /> Building…
+                <Loader2 className="size-4 animate-spin" /> A construir…
               </>
             ) : (
               <>
-                <Send className="size-4" /> Send
+                <Send className="size-4" /> Enviar
               </>
             )}
           </Button>

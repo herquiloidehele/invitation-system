@@ -66,6 +66,10 @@ export async function runBuildAgent(args: {
       cwd: args.workspaceDir,
       systemPrompt: buildSystemPrompt(args.dts),
       settingSources: ["project"],
+      // Stream the assistant's prose token-by-token into the admin chat. The
+      // complete assistant message still arrives afterwards and seals the
+      // bubble, so the final text is always authoritative.
+      includePartialMessages: true,
       permissionMode: "bypassPermissions",
       allowDangerouslySkipPermissions: true,
       allowedTools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],

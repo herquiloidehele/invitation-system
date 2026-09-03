@@ -3,6 +3,7 @@ import path from "node:path";
 import { NextRequest } from "next/server";
 
 import { formatSseEvent, parseNdjsonLines } from "@/lib/sse";
+import { classifyBuildError, extractStderrMessage } from "@/lib/build-errors";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -73,9 +74,24 @@ export async function POST(req: NextRequest) {
         for (const e of events) send(e);
       });
 
+      // Once a specific cause has been reported, the generic non-zero exit is
+      // just noise on top of it.
+      let reportedError = false;
+
       child.stderr.on("data", (chunk: Buffer) => {
-        // Surface worker diagnostics as progress rather than failing the stream.
-        send({ kind: "progress", text: chunk.toString("utf8").trimEnd() });
+        // Worker stderr is a developer diagnostic — a raw Node stack trace in
+        // the admin chat is noise. Extract the one meaningful line and explain
+        // it, so "Credit balance is too low" becomes actionable guidance.
+        const summary = extractStderrMessage(chunk.toString("utf8"));
+        if (!summary) return;
+        const info = classifyBuildError(summary);
+        reportedError = true;
+        send({
+          kind: "error",
+          message: info.title,
+          hint: info.hint,
+          detail: info.detail,
+        });
       });
 
       const finish = () => {
@@ -87,7 +103,14 @@ export async function POST(req: NextRequest) {
       };
 
       child.on("error", (err) => {
-        send({ kind: "error", message: `Worker failed to start: ${err.message}` });
+        const info = classifyBuildError(err.message);
+        reportedError = true;
+        send({
+          kind: "error",
+          message: info.title,
+          hint: info.hint,
+          detail: info.detail,
+        });
         finish();
       });
 
@@ -95,8 +118,15 @@ export async function POST(req: NextRequest) {
         // Flush any final buffered line.
         const { events } = parseNdjsonLines(buffer + "\n");
         for (const e of events) send(e);
-        if (code !== 0) {
-          send({ kind: "error", message: `Worker exited with code ${code}.` });
+        // Only report the bare exit code when nothing more specific was said —
+        // otherwise it stacks a meaningless second error under the real one.
+        if (code !== 0 && !reportedError) {
+          send({
+            kind: "error",
+            message: "A construção falhou",
+            hint: "Tente novamente; se persistir, verifique os registos do servidor.",
+            detail: `Worker exited with code ${code}.`,
+          });
         }
         finish();
       });

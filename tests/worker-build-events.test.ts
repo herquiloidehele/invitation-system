@@ -12,12 +12,16 @@ describe("toBuildEvent", () => {
     expect(e).toEqual({ kind: "progress", text: "Writing index.tsx" });
   });
 
-  it("maps an assistant tool_use to a tool event", () => {
+  it("maps an assistant tool_use to a tool event with a human label", () => {
     const e = toBuildEvent({
       type: "assistant",
       message: { content: [{ type: "tool_use", name: "Bash" }] },
     });
-    expect(e).toEqual({ kind: "tool", name: "Bash" });
+    expect(e).toEqual({
+      kind: "tool",
+      name: "Bash",
+      label: "A executar comando",
+    });
   });
 
   it("maps a result message to a done event with cost", () => {

@@ -32,7 +32,7 @@ export default function DirectionsCards({
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        Pick a direction to build it — or ask for another round.
+        Escolha uma direção para a construir — ou peça outra ronda.
       </p>
       <div className="grid gap-2">
         {directions.map((d) => (
@@ -76,7 +76,7 @@ export default function DirectionsCards({
         <Input
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Optional: warmer, less formal…"
+          placeholder="Opcional: mais quente, menos formal…"
           disabled={disabled}
         />
         <Button
@@ -84,7 +84,7 @@ export default function DirectionsCards({
           disabled={disabled}
           onClick={() => onAnotherRound(note.trim())}
         >
-          <RefreshCw className="size-4" /> None of these
+          <RefreshCw className="size-4" /> Nenhuma destas
         </Button>
       </div>
     </div>
