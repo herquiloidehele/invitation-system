@@ -258,7 +258,7 @@ export default function InvitationPage({
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const rsvpCtaAction = getRsvpCtaAction(invitation.rsvp);
   const isCalendarCta = rsvpCtaAction === "calendar";
-  const isInlineRsvp = true || rsvpCtaAction === "inline"; // TEMP-VERIFY
+  const isInlineRsvp = rsvpCtaAction === "inline";
   const t = useCustomText(invitation.customTexts);
   const locale = useLocale();
   const footerMonthDisplay = formatLocalizedMonthLong(
