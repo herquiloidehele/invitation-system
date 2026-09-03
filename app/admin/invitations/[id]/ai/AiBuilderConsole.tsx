@@ -48,7 +48,20 @@ export default function AiBuilderConsole({
       ),
     );
 
-  const append = (item: ChatItem) => setItems((prev) => [...prev, item]);
+  const append = (item: ChatItem) =>
+    setItems((prev) => {
+      // One failure often reaches us twice — as fatal assistant prose and again
+      // on stderr. Don't stack identical cards.
+      const last = prev[prev.length - 1];
+      if (
+        item.kind === "error" &&
+        last?.kind === "error" &&
+        last.text === item.text
+      ) {
+        return prev;
+      }
+      return [...prev, item];
+    });
 
   const refreshRail = useCallback(async () => {
     const res = await fetch(
