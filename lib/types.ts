@@ -955,6 +955,11 @@ export interface RsvpCustomField {
   type: RsvpCustomFieldType;
   required: boolean;
   visibility: RsvpCustomFieldVisibility;
+  /**
+   * Hint shown inside the empty input. Only used by the text, textarea and
+   * select types (select renders it as the empty option).
+   */
+  placeholder?: string;
   options?: RsvpCustomFieldOption[];
 }
 
@@ -1183,6 +1188,7 @@ export interface InvitationTranslationOverlay {
     string,
     {
       label?: string;
+      placeholder?: string;
       options?: Record<string, { label?: string }>;
     }
   >;

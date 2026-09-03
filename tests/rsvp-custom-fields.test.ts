@@ -61,6 +61,20 @@ describe("normalizeRsvpCustomFields", () => {
     ]);
   });
 
+  it("keeps trimmed placeholders and omits blank ones", () => {
+    expect(
+      normalizeRsvpCustomFields({
+        customFields: [
+          { ...textField, placeholder: "  Ex: João e Maria  " },
+          { ...switchField, placeholder: "   " },
+        ],
+      }),
+    ).toEqual([
+      { ...textField, placeholder: "Ex: João e Maria" },
+      switchField,
+    ]);
+  });
+
   it("drops radio and select fields without options", () => {
     expect(
       normalizeRsvpCustomFields({

@@ -34,6 +34,11 @@ function needsOptions(type: RsvpCustomFieldType) {
   return type === "radio" || type === "select";
 }
 
+/** Sim/Não and button choices have no empty state to hint at. */
+function supportsPlaceholder(type: RsvpCustomFieldType) {
+  return type === "text" || type === "textarea" || type === "select";
+}
+
 function createField(): RsvpCustomField {
   return {
     id: newId("rsvp-field"),
@@ -75,6 +80,9 @@ export function RsvpCustomFieldsBuilder({
           delete next.options;
         } else if (!next.options || next.options.length === 0) {
           next.options = [createOption()];
+        }
+        if (!supportsPlaceholder(next.type)) {
+          delete next.placeholder;
         }
         return next;
       }),
@@ -196,6 +204,29 @@ export function RsvpCustomFieldsBuilder({
                 }
               />
             </div>
+
+            {supportsPlaceholder(field.type) && (
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Texto de exemplo</Label>
+                <Input
+                  value={field.placeholder ?? ""}
+                  onChange={(event) =>
+                    updateField(field.id, { placeholder: event.target.value })
+                  }
+                  placeholder={
+                    sourceById.get(field.id)?.placeholder ||
+                    (field.type === "select"
+                      ? "Ex: Selecione uma opção"
+                      : "Ex: João e Maria")
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  {field.type === "select"
+                    ? "Aparece como primeira opção da lista, antes de escolher."
+                    : "Aparece dentro do campo enquanto está vazio."}
+                </p>
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <Label>Tipo</Label>

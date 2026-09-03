@@ -217,6 +217,7 @@ function sanitizeRsvpCustomFields(value: unknown) {
     if (!field) return undefined;
     return compact({
       label: readString(field.label),
+      placeholder: readString(field.placeholder),
       options: readRecord(field.options, (optionValue) => {
         const option = readObject(optionValue);
         if (!option) return undefined;
@@ -556,6 +557,9 @@ function transformRsvp(
       return {
         ...field,
         label: translated?.label ?? (behavior === "blank" ? "" : field.label),
+        placeholder:
+          translated?.placeholder ??
+          (behavior === "blank" ? "" : field.placeholder),
         options: field.options?.map((option) => ({
           ...option,
           label:
@@ -838,6 +842,7 @@ function restoreRsvpText(
         ...draftField,
         id: field.id,
         label: field.label,
+        placeholder: field.placeholder,
         options: field.options?.map((option) => ({
           ...option,
           ...draftOptions.get(option.id),
@@ -1033,6 +1038,7 @@ function extractOverlay(draft: InvitationData): InvitationTranslationOverlay {
       : undefined,
     rsvpCustomFields: recordById(draft.rsvp.customFields, (field) => ({
       label: field.label,
+      placeholder: field.placeholder,
       options: recordById(field.options, (option) => ({
         label: option.label,
       })),
