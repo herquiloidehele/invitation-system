@@ -258,7 +258,7 @@ export default function InvitationPage({
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const rsvpCtaAction = getRsvpCtaAction(invitation.rsvp);
   const isCalendarCta = rsvpCtaAction === "calendar";
-  const isInlineRsvp = rsvpCtaAction === "inline";
+  const isInlineRsvp = true || rsvpCtaAction === "inline"; // TEMP-VERIFY
   const t = useCustomText(invitation.customTexts);
   const locale = useLocale();
   const footerMonthDisplay = formatLocalizedMonthLong(
@@ -314,6 +314,10 @@ export default function InvitationPage({
     accentColor: invitation.cardStyles?.[section]?.accentColor,
     plain: invitation.cardStyles?.[section]?.plain === true,
   });
+
+  // Card surface behind the inline RSVP form. Hosts turn it off with the
+  // "Sem cartão" switch in the card toolbar, same as any other section.
+  const rsvpCard = cs("rsvp", 20);
 
   return (
     <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
@@ -972,16 +976,33 @@ export default function InvitationPage({
               <span>{t("cta_addToCalendar")}</span>
             </CalendarButton>
           ) : isInlineRsvp ? (
-            <div className="w-full max-w-[440px]">
-              <InlineRSVPForm
-                inline
-                hideTitle
-                invitation={invitation}
-                theme={theme}
-                customTexts={invitation.customTexts}
-                guest={invitation.guest}
-              />
-            </div>
+            <EditableCard sectionKey="rsvp" className="w-full max-w-[440px]">
+              <div
+                style={{
+                  ...resolveCardSurfaceStyle(rsvpCard, {
+                    background: rsvpCard.cardBg,
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    borderRadius: rsvpCard.borderRadius,
+                    boxShadow:
+                      "0 1px 2px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.04)",
+                    border: `1px solid ${rsvpCard.cardBorder}`,
+                  }),
+                  // Plain mode drops the surface, so drop its inset too and
+                  // the form sits flush on the page background as before.
+                  padding: rsvpCard.plain ? 0 : 20,
+                }}
+              >
+                <InlineRSVPForm
+                  inline
+                  hideTitle
+                  invitation={invitation}
+                  theme={theme}
+                  customTexts={invitation.customTexts}
+                  guest={invitation.guest}
+                />
+              </div>
+            </EditableCard>
           ) : rsvpSubmitted && inlinePassValue ? (
             <div className="flex w-full flex-col items-center">
               <EntryPassQr

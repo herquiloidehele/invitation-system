@@ -699,7 +699,8 @@ export type CardSectionKey =
   | "guestGuide"
   | "faqs"
   | "countdown"
-  | "places";
+  | "places"
+  | "rsvp";
 
 /** Per-section card styling overrides stored on each invitation.
  *  Missing keys or undefined fields fall back to theme defaults.
