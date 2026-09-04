@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { AlertTriangle, HelpCircle, Loader2, Send, Wrench } from "lucide-react";
+import {
+  AlertTriangle,
+  FileText,
+  HelpCircle,
+  Loader2,
+  Send,
+  Wrench,
+} from "lucide-react";
 
 import type { Direction } from "@/worker/lib/directions";
 import type { AttachmentRecord } from "@/worker/persistence";
@@ -14,7 +21,7 @@ import ChatMarkdown from "./ChatMarkdown";
 import AttachmentPicker from "./AttachmentPicker";
 
 export type ChatItem =
-  | { kind: "user"; id: string; text: string }
+  | { kind: "user"; id: string; text: string; attachments?: AttachmentRecord[] }
   | { kind: "assistant"; id: string; text: string; costUsd?: number | null }
   | { kind: "activity"; id: string; text: string }
   | { kind: "directions"; id: string; directions: Direction[] }
@@ -163,6 +170,32 @@ export default function ChatPane({
                     )}
                   >
                     {isUser ? m.text : <ChatMarkdown>{m.text}</ChatMarkdown>}
+                    {m.kind === "user" && m.attachments?.length ? (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {m.attachments.map((a) =>
+                          a.kind === "image" ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              key={a.id}
+                              src={a.url}
+                              alt={a.name}
+                              title={a.name}
+                              className="size-16 rounded-md border border-primary-foreground/25 object-cover"
+                            />
+                          ) : (
+                            <span
+                              key={a.id}
+                              className="flex items-center gap-1 rounded-md border border-primary-foreground/25 px-2 py-1 text-xs"
+                            >
+                              <FileText className="size-3 shrink-0" />
+                              <span className="max-w-[9rem] truncate">
+                                {a.name}
+                              </span>
+                            </span>
+                          ),
+                        )}
+                      </div>
+                    ) : null}
                     {m.kind === "assistant" && m.costUsd != null && (
                       <span className="mt-1 block text-xs opacity-60">
                         ${m.costUsd.toFixed(4)}

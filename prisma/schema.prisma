@@ -471,8 +471,10 @@ model AiAttachment {
 
   /// Denormalised so the render path can list a whole invitation's assets.
   invitationId String
-  /// The chat turn this arrived with, for rendering history.
+  /// The chat turn this was sent with. Null while it is still pending in the
+  /// composer — that nullness IS the "not yet sent" state.
   messageId String?
+  message   AiMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
 
   /// Original file name, shown in the UI and given to the agent.
   name     String
@@ -511,6 +513,8 @@ model AiMessage {
   directions Json?
 
   createdAt DateTime @default(now())
+
+  attachments AiAttachment[]
 
   @@index([buildId])
 }

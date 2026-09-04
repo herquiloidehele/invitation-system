@@ -22,6 +22,7 @@ import {
   createDraftRevision,
   appendMessage,
   listAttachmentsForInvitation,
+  linkPendingAttachments,
   revisionCount,
   saveSessionId,
 } from "./persistence";
@@ -57,7 +58,13 @@ export async function runInvitationBuild(args: {
   const invitationId = invRow!.id;
 
   const build = await getOrCreateBuild(invitationId);
-  await appendMessage({ buildId: build.id, role: "user", content: prompt });
+  const userMessageId = await appendMessage({
+    buildId: build.id,
+    role: "user",
+    content: prompt,
+  });
+  // Sending is what turns pending uploads into part of the conversation.
+  await linkPendingAttachments(build.id, userMessageId);
   const brief = buildInvitationBrief(invitation);
   const attachments = await listAttachmentsForInvitation(invitationId);
 

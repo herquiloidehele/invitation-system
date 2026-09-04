@@ -160,8 +160,8 @@ export async function appendMessage(args: {
   costUsd?: number | null;
   /** Proposed directions, when this turn is a directions gate. */
   directions?: unknown;
-}): Promise<void> {
-  await prisma.aiMessage.create({
+}): Promise<string> {
+  const created = await prisma.aiMessage.create({
     data: {
       buildId: args.buildId,
       role: args.role,
@@ -169,6 +169,43 @@ export async function appendMessage(args: {
       revisionId: args.revisionId ?? null,
       costUsd: args.costUsd ?? null,
       directions: (args.directions ?? undefined) as never,
+    },
+    select: { id: true },
+  });
+  return created.id;
+}
+
+/**
+ * Attach every not-yet-sent upload to the message being sent. "Pending" is
+ * simply `messageId === null`, which is exactly the composer's tray — so
+ * sending is what turns a tray item into part of the conversation.
+ */
+export async function linkPendingAttachments(
+  buildId: string,
+  messageId: string,
+): Promise<void> {
+  await prisma.aiAttachment.updateMany({
+    where: { buildId, messageId: null },
+    data: { messageId },
+  });
+}
+
+/** Uploads not yet sent with a message — what the composer tray shows. */
+export async function listPendingAttachments(
+  invitationId: string,
+): Promise<AttachmentRecord[]> {
+  return prisma.aiAttachment.findMany({
+    where: { invitationId, messageId: null },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      name: true,
+      kind: true,
+      mimeType: true,
+      objectKey: true,
+      url: true,
+      width: true,
+      height: true,
     },
   });
 }
@@ -187,6 +224,7 @@ export async function listMessagesForInvitation(invitationId: string): Promise<
     revisionId: string | null;
     costUsd: number | null;
     directions: unknown;
+    attachments: AttachmentRecord[];
     createdAt: Date;
   }>
 > {
@@ -207,6 +245,19 @@ export async function listMessagesForInvitation(invitationId: string): Promise<
       costUsd: true,
       directions: true,
       createdAt: true,
+      attachments: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          name: true,
+          kind: true,
+          mimeType: true,
+          objectKey: true,
+          url: true,
+          width: true,
+          height: true,
+        },
+      },
     },
   });
 }

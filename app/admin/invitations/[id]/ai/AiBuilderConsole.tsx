@@ -92,12 +92,18 @@ export default function AiBuilderConsole({
         content: string;
         costUsd: number | null;
         directions: unknown;
+        attachments?: AttachmentRecord[];
       }>;
     };
     setItems(
       messages.map((m): ChatItem => {
         if (m.role === "user") {
-          return { kind: "user", id: m.id, text: m.content };
+          return {
+            kind: "user",
+            id: m.id,
+            text: m.content,
+            attachments: m.attachments ?? [],
+          };
         }
         if (Array.isArray(m.directions) && m.directions.length > 0) {
           return {
@@ -121,7 +127,7 @@ export default function AiBuilderConsole({
 
   const loadAttachments = useCallback(async () => {
     const res = await fetch(
-      `/api/admin/ai/attachments?slug=${encodeURIComponent(slug)}`,
+      `/api/admin/ai/attachments?slug=${encodeURIComponent(slug)}&pending=1`,
     );
     if (res.ok) setAttachments((await res.json()).attachments ?? []);
   }, [slug]);
@@ -232,7 +238,15 @@ export default function AiBuilderConsole({
     streamingId.current = null;
     // A pick / another-round reuses the original prompt, so don't echo it again.
     if (!opts?.direction && !opts?.refineDirections) {
-      append({ kind: "user", id: nextId(), text: trimmed });
+      // The tray belongs to this message now — show it in the bubble and clear
+      // the composer, the same way any chat client behaves.
+      append({
+        kind: "user",
+        id: nextId(),
+        text: trimmed,
+        attachments,
+      });
+      setAttachments([]);
       setGatePrompt(trimmed);
       setPrompt("");
     }
@@ -275,6 +289,7 @@ export default function AiBuilderConsole({
     } finally {
       setBuilding(false);
       void refreshRail();
+      void loadAttachments();
     }
   };
 

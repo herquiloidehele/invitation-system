@@ -5,6 +5,7 @@ import {
   deleteAttachment,
   getOrCreateBuild,
   listAttachmentsForInvitation,
+  listPendingAttachments,
   recordAttachment,
 } from "@/worker/persistence";
 
@@ -35,8 +36,14 @@ export async function GET(req: NextRequest) {
   if (!invitationId) {
     return NextResponse.json({ error: "Invitation not found" }, { status: 404 });
   }
+  // `?pending=1` is the composer tray (not yet sent); the unfiltered list is
+  // everything the invitation has ever received, which is what assets.library
+  // exposes to the bundle.
+  const pendingOnly = req.nextUrl.searchParams.get("pending") === "1";
   return NextResponse.json({
-    attachments: await listAttachmentsForInvitation(invitationId),
+    attachments: pendingOnly
+      ? await listPendingAttachments(invitationId)
+      : await listAttachmentsForInvitation(invitationId),
   });
 }
 
