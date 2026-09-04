@@ -44,6 +44,16 @@ describe("classifyBuildError", () => {
     );
   });
 
+  it("explains the SDK's real turn-cap wording", () => {
+    // The SDK says "Reached maximum number of turns (15)" — the words are not
+    // adjacent, which an earlier /max ?turns/ pattern missed entirely.
+    const e = classifyBuildError(
+      "Error: Claude Code returned an error result: Reached maximum number of turns (15)",
+    );
+    expect(e.title).toMatch(/limite da constru/i);
+    expect(e.hint).toBeTruthy();
+  });
+
   it("explains a rate limit", () => {
     expect(classifyBuildError("429 rate_limit_error").title).toMatch(/limite/i);
   });

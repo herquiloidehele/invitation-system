@@ -193,9 +193,8 @@ export default function AiBuilderConsole({
         break;
       }
       case "result":
-        if (!e.ok) {
-          append({ kind: "error", id: nextId(), text: "A construção falhou." });
-        }
+        // Deliberately silent: the worker emits a specific `error` (or salvages
+        // a draft). Adding a generic failure here stacked a second card.
         break;
       case "directions":
         append({ kind: "directions", id: nextId(), directions: e.directions });

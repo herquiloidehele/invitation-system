@@ -81,10 +81,10 @@ export async function runBuildAgent(args: {
       ],
       model: args.model ?? "claude-sonnet-5",
       maxBudgetUsd: args.maxBudgetUsd ?? 5,
-      // Without a turn cap the $5 budget permits dozens of turns, which is the
-      // dominant source of wall-clock time. Raise it if a complex first build
-      // stops early — the terminal result surfaces in the admin chat.
-      maxTurns: args.maxTurns ?? 15,
+      // A turn cap stops runaway loops, but the real spend guard is
+      // maxBudgetUsd. 15 proved too low: a first build that must also read
+      // attachments spends several turns before it writes any code.
+      maxTurns: args.maxTurns ?? 40,
       ...(args.resume ? { resume: args.resume } : {}),
       // Deliberately NOT `...process.env`. This env reaches the agent's Bash
       // tool, so it must not carry DATABASE_URL or the AWS credentials —

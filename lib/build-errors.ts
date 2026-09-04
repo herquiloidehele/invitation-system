@@ -59,7 +59,7 @@ const PATTERNS: Array<{
     hint: "Aguarde um momento e tente novamente.",
   },
   {
-    match: /max ?turns|budget|maxBudgetUsd/i,
+    match: /max(imum)?[ _]?(number of )?turns|budget|maxBudgetUsd/i,
     title: "O agente atingiu o limite da construção",
     hint: "Peça uma alteração mais pequena, ou aumente o limite.",
   },

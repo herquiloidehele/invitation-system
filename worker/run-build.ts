@@ -9,6 +9,7 @@ import { runBuildAgent } from "./agent";
 import { bundleRegistersComponent } from "./lib/verify-bundle";
 import { buildInvitationBrief } from "./lib/invitation-brief";
 import { toBuildEvent, type BuildEvent } from "./lib/build-events";
+import { classifyBuildError } from "@/lib/build-errors";
 import {
   proposeDirections,
   directionToPrompt,
@@ -130,21 +131,36 @@ export async function runInvitationBuild(args: {
   let lastAssistantText = "";
   let costUsd: number | null = null;
 
-  const { sessionId } = await runBuildAgent({
-    workspaceDir: workspace,
-    prompt: fullPrompt,
-    bundleId: slug,
-    dts,
-    resume: build.agentSessionId ?? undefined,
-    onMessage: (m) => {
-      const e = toBuildEvent(m);
-      if (!e) return;
-      if (e.kind === "progress") lastAssistantText = e.text;
-      if (e.kind === "result") costUsd = e.costUsd;
-      onEvent(e);
-    },
-  });
-  if (sessionId) await saveSessionId(build.id, sessionId);
+  // Captured from the raw message stream, not only from the return value: the
+  // SDK throws on a turn/budget cap, and losing the session id would silently
+  // break `resume` on the next turn.
+  let sessionIdSeen: string | null = null;
+  let agentError: string | null = null;
+
+  try {
+    const { sessionId } = await runBuildAgent({
+      workspaceDir: workspace,
+      prompt: fullPrompt,
+      bundleId: slug,
+      dts,
+      resume: build.agentSessionId ?? undefined,
+      onMessage: (m) => {
+        const raw = m as { session_id?: string };
+        if (typeof raw.session_id === "string") sessionIdSeen = raw.session_id;
+        const e = toBuildEvent(m);
+        if (!e) return;
+        if (e.kind === "progress") lastAssistantText = e.text;
+        if (e.kind === "result") costUsd = e.costUsd;
+        onEvent(e);
+      },
+    });
+    if (sessionId) sessionIdSeen = sessionId;
+  } catch (err) {
+    // Do NOT return here. The agent may already have written a valid bundle
+    // before it ran out of turns; throwing that away wastes the whole spend.
+    agentError = err instanceof Error ? err.message : String(err);
+  }
+  if (sessionIdSeen) await saveSessionId(build.id, sessionIdSeen);
 
   // The agent asks rather than guessing what an attachment is for. Checked
   // before bundle verification: on a tweak the previous dist/bundle.js is still
@@ -171,20 +187,44 @@ export async function runInvitationBuild(args: {
     path.join(workspace, "dist", "bundle.js"),
     "utf8",
   ).catch(() => "");
-  if (!bundleCode || !bundleRegistersComponent(bundleCode, slug)) {
-    const message = "Build did not produce a valid bundle.";
+  // A capped run leaves the PREVIOUS turn's bundle on disk. Publishing that as
+  // a new revision would silently claim success while changing nothing, so a
+  // salvage only counts when the source actually moved.
+  const sourceUnchanged = (priorSource?.["index.tsx"] ?? null) === indexTsx;
+  const salvageImpossible =
+    !bundleCode ||
+    !bundleRegistersComponent(bundleCode, slug) ||
+    (agentError !== null && sourceUnchanged);
+
+  if (salvageImpossible) {
+    const info = agentError
+      ? classifyBuildError(agentError)
+      : { title: "Build did not produce a valid bundle.", hint: undefined, detail: undefined };
     // Record the failure too — otherwise the thread shows a user turn with no
     // reply on reload, which reads as "still running".
     await appendMessage({
       buildId: build.id,
       role: "assistant",
       content: lastAssistantText
-        ? `${message}\n\n${lastAssistantText}`
-        : message,
+        ? `${info.title}\n\n${lastAssistantText}`
+        : info.title,
       costUsd,
     });
-    onEvent({ kind: "error", message });
+    onEvent({
+      kind: "error",
+      message: info.title,
+      hint: info.hint,
+      detail: info.detail,
+    });
     return { ok: false };
+  }
+
+  if (agentError) {
+    // Work survived the cap — say so rather than pretending it went cleanly.
+    onEvent({
+      kind: "progress",
+      text: "O agente parou antes de terminar, mas o que já tinha construído foi guardado como rascunho.",
+    });
   }
 
   const { revisionId } = await createDraftRevision({
