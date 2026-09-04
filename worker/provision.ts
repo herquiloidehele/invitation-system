@@ -52,12 +52,14 @@ export async function provisionWorkspace(
   await mkdir(skillDir, { recursive: true });
   await writeFile(path.join(skillDir, "SKILL.md"), buildPlatformSkill(dtsContent));
 
-  // Resuming: rehydrate the last revision's source so the agent edits it.
-  if (priorSource?.["index.tsx"]) {
-    await writeFile(
-      path.join(workspaceDir, "index.tsx"),
-      priorSource["index.tsx"],
-    );
+  // Resuming: rehydrate the last revision's whole source tree so the agent
+  // edits it. Older revisions carry only index.tsx; newer ones carry sections.
+  if (priorSource) {
+    for (const [rel, body] of Object.entries(priorSource)) {
+      const target = path.join(workspaceDir, rel);
+      await mkdir(path.dirname(target), { recursive: true });
+      await writeFile(target, body);
+    }
   }
 
   // A question from a previous turn must not be re-detected as a new one.

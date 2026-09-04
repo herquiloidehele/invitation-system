@@ -20,6 +20,23 @@ Node.js v22.22.3
     expect(extractStderrMessage(raw)).toBe("Credit balance is too low");
   });
 
+  it("finds the sentence inside a Prisma known-request stack", () => {
+    const raw = `
+/Users/x/node_modules/@prisma/client/runtime/library.js:120
+    throw new PrismaClientKnownRequestError(message, {
+    ^
+
+PrismaClientKnownRequestError:
+Invalid \`prisma.aiBuild.findFirst()\` invocation:
+
+The column \`AiBuild.lastContextTokens\` does not exist in the current database.
+    at Xn.handleRequestError (/Users/x/node_modules/@prisma/client/runtime/library.js:121:7)
+`;
+    expect(extractStderrMessage(raw)).toBe(
+      "The column `AiBuild.lastContextTokens` does not exist in the current database.",
+    );
+  });
+
   it("drops minified source lines", () => {
     const raw =
       "`;k2(n).then(()=>{if(t!==void 0){let s=dNe(n);if(s!==null)t.append(s,[{data:o}]).catch(()=>{});return}";

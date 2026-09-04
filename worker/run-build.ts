@@ -8,28 +8,40 @@ import { provisionWorkspace } from "./provision";
 import { runBuildAgent } from "./agent";
 import { bundleRegistersComponent } from "./lib/verify-bundle";
 import { buildInvitationBrief } from "./lib/invitation-brief";
-import { toBuildEvent, type BuildEvent } from "./lib/build-events";
+import { type BuildEvent, type BuildUsage, toBuildEvent } from "./lib/build-events";
 import { classifyBuildError } from "@/lib/build-errors";
-import {
-  proposeDirections,
-  directionToPrompt,
-  type Direction,
-} from "./lib/directions";
+import { type Direction, directionToPrompt, proposeDirections } from "./lib/directions";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
+import { collectSourceFiles, sourceFilesEqual } from "./lib/source-files";
+import { buildSourceManifest } from "./lib/source-manifest";
+import { type Critique, critiqueToPrompt } from "./lib/critique";
+import { buildRecap, shouldRotateSession } from "./lib/session-rotation";
 import {
-  getOrCreateBuild,
-  latestRevisionSource,
-  createDraftRevision,
   appendMessage,
-  listAttachmentsForInvitation,
+  createDraftRevision,
+  getOrCreateBuild,
+  latestDraftRevisionId,
+  latestRevisionSource,
   linkPendingAttachments,
+  listAttachmentsForInvitation,
+  listMessagesForInvitation,
   revisionCount,
   saveSessionId,
+  updateDraftRevisionSource
 } from "./persistence";
 
 /** The directions gate is deliberately cheap — bound what it looks at. */
 const MAX_GATE_IMAGES = 4;
 const MAX_GATE_IMAGE_BYTES = 4 * 1024 * 1024;
+
+/** Design is decided on the first build; tweaks are mechanical edits. */
+function effortFor(isFirstBuild: boolean): "low" | "medium" | "high" {
+  const env = isFirstBuild
+    ? process.env.AI_BUILD_EFFORT_FIRST
+    : process.env.AI_BUILD_EFFORT_TWEAK;
+  if (env === "low" || env === "medium" || env === "high") return env;
+  return isFirstBuild ? "high" : "low";
+}
 
 /**
  * The full build-and-publish flow, emitting typed events. Reused by the human
@@ -42,9 +54,12 @@ export async function runInvitationBuild(args: {
   direction?: Direction | null;
   /** Ask for a fresh set of directions, optionally with a note. */
   refineDirections?: string | null;
+  /** A visual review to apply: resumes the first build's session, fixes, updates the draft in place. */
+  critique?: Critique | null;
   onEvent: (event: BuildEvent) => void;
 }): Promise<{ ok: boolean }> {
-  const { slug, prompt, direction, refineDirections, onEvent } = args;
+  const { slug, prompt, direction, refineDirections, critique, onEvent } = args;
+  const isCritiqueTurn = Boolean(critique);
 
   const invitation = await getInvitation(slug);
   if (!invitation) {
@@ -61,8 +76,18 @@ export async function runInvitationBuild(args: {
   const userMessageId = await appendMessage({
     buildId: build.id,
     role: "user",
-    content: prompt,
+    // The critique prompt is long and machine-shaped; the thread shows a label.
+    content: isCritiqueTurn
+      ? `Aplicar correções da revisão visual (${critique!.issues.length} pontos)`
+      : prompt,
   });
+  if (isCritiqueTurn && !build.agentSessionId) {
+    onEvent({
+      kind: "error",
+      message: "Sem sessão para retomar — construa primeiro.",
+    });
+    return { ok: false };
+  }
   // Sending is what turns pending uploads into part of the conversation.
   await linkPendingAttachments(build.id, userMessageId);
   const brief = buildInvitationBrief(invitation);
@@ -72,7 +97,8 @@ export async function runInvitationBuild(args: {
   // directions and stop. Fires when the invitation has no revisions at all, or
   // whenever another round is explicitly requested.
   const existing = await revisionCount(invitationId);
-  if (!direction && (existing === 0 || refineDirections)) {
+  const isFirstBuild = existing === 0;
+  if (!direction && !critique && (existing === 0 || refineDirections)) {
     // Moodboards matter most here. PDFs are skipped — they would need document
     // blocks and would blow up the cost of a deliberately cheap gate.
     const candidates = attachments.filter((a) => a.kind === "image");
@@ -118,25 +144,75 @@ export async function runInvitationBuild(args: {
 
   const priorSource = await latestRevisionSource(build.id);
   const attachmentBrief = buildAttachmentBrief(attachments);
+  const manifest = buildSourceManifest(priorSource ?? {});
+
+  const rotateLimit = Number(process.env.AI_SESSION_ROTATE_TOKENS ?? "200000");
+  const hardCeiling = Number(process.env.AI_SESSION_HARD_CEILING ?? "600000");
+  const hasSections = Object.keys(priorSource ?? {}).some((k) =>
+    k.startsWith("sections/"),
+  );
+  const rotate =
+    !isCritiqueTurn &&
+    !isFirstBuild &&
+    shouldRotateSession({
+      contextTokens: build.lastContextTokens ?? null,
+      limit: rotateLimit,
+      hardLimit: hardCeiling,
+      hasSections,
+    });
+  const recap = rotate
+    ? buildRecap(
+        (await listMessagesForInvitation(invitationId)).slice(0, -1),
+        6,
+      )
+    : "";
+  if (rotate) {
+    onEvent({
+      kind: "progress",
+      text: "Sessão reiniciada a partir do código (contexto grande).",
+    });
+  }
+
   const fullPrompt = [
     brief,
     direction ? `\n${directionToPrompt(direction)}` : "",
+    manifest ? `\n${manifest}` : "",
+    recap ? `\n${recap}` : "",
     attachmentBrief ? `\n${attachmentBrief}` : "",
-    `\n${prompt}`,
+    `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
   ].join("\n");
+
+  // Opus writes the design (taste is decided on the first build); Sonnet does
+  // the edits. A critique turn resumes the first build's session, so it must
+  // use the first build's model — a resume under another model drops the cache.
+  const model =
+    isCritiqueTurn || isFirstBuild
+      ? (process.env.AI_BUILD_MODEL_FIRST ?? "claude-opus-5")
+      : (process.env.AI_BUILD_MODEL_TWEAK ?? "claude-sonnet-5");
+  const effort = isCritiqueTurn ? "medium" : effortFor(isFirstBuild);
 
   const repoRoot = process.cwd();
   const dts = await readFile(
     path.join(repoRoot, "worker", "templates", "platform.d.ts"),
     "utf8",
   );
-  const workspace = path.join(repoRoot, ".ai-workspaces", `inv-${invitationId}`);
+  const workspace = path.join(
+    repoRoot,
+    ".ai-workspaces",
+    `inv-${invitationId}`,
+  );
   await mkdir(workspace, { recursive: true });
   await provisionWorkspace(workspace, dts, priorSource, attachments);
 
   // Keep the agent's last prose turn + final cost so the thread survives reload.
   let lastAssistantText = "";
   let costUsd: number | null = null;
+  let usage: BuildUsage | null = null;
+  // The LAST request's context size. `modelUsage` on the result is cumulative
+  // across every request in the query (10 tool iterations ≈ 10× the context),
+  // so it cannot drive the rotation decision; each assistant message's own
+  // `usage` can.
+  let lastRequestContext: number | null = null;
 
   // Captured from the raw message stream, not only from the return value: the
   // SDK throws on a turn/budget cap, and losing the session id would silently
@@ -150,14 +226,41 @@ export async function runInvitationBuild(args: {
       prompt: fullPrompt,
       bundleId: slug,
       dts,
-      resume: build.agentSessionId ?? undefined,
+      model,
+      effort,
+      resume: rotate ? undefined : (build.agentSessionId ?? undefined),
       onMessage: (m) => {
-        const raw = m as { session_id?: string };
+        const raw = m as {
+          session_id?: string;
+          type?: string;
+          parent_tool_use_id?: string | null;
+          message?: {
+            usage?: {
+              input_tokens?: number;
+              cache_read_input_tokens?: number;
+              cache_creation_input_tokens?: number;
+            };
+          };
+        };
         if (typeof raw.session_id === "string") sessionIdSeen = raw.session_id;
+        if (
+          raw.type === "assistant" &&
+          !raw.parent_tool_use_id &&
+          raw.message?.usage
+        ) {
+          const u = raw.message.usage;
+          lastRequestContext =
+            (u.input_tokens ?? 0) +
+            (u.cache_read_input_tokens ?? 0) +
+            (u.cache_creation_input_tokens ?? 0);
+        }
         const e = toBuildEvent(m);
         if (!e) return;
         if (e.kind === "progress") lastAssistantText = e.text;
-        if (e.kind === "result") costUsd = e.costUsd;
+        if (e.kind === "result") {
+          costUsd = e.costUsd;
+          usage = e.usage;
+        }
         onEvent(e);
       },
     });
@@ -168,6 +271,15 @@ export async function runInvitationBuild(args: {
     agentError = err instanceof Error ? err.message : String(err);
   }
   if (sessionIdSeen) await saveSessionId(build.id, sessionIdSeen);
+  // Assigned inside the onMessage callback, which control-flow analysis cannot
+  // see — without the cast TS narrows it to `never` here.
+  const ctx = lastRequestContext as number | null;
+  if (ctx !== null) {
+    await prisma.aiBuild.update({
+      where: { id: build.id },
+      data: { lastContextTokens: ctx },
+    });
+  }
 
   // The agent asks rather than guessing what an attachment is for. Checked
   // before bundle verification: on a tweak the previous dist/bundle.js is still
@@ -181,15 +293,13 @@ export async function runInvitationBuild(args: {
       role: "assistant",
       content: question.trim(),
       costUsd,
+      usage,
     });
     onEvent({ kind: "question", text: question.trim() });
     return { ok: true };
   }
 
-  const indexTsx = await readFile(
-    path.join(workspace, "index.tsx"),
-    "utf8",
-  ).catch(() => "");
+  const sourceFiles = await collectSourceFiles(workspace);
   const bundleCode = await readFile(
     path.join(workspace, "dist", "bundle.js"),
     "utf8",
@@ -197,16 +307,21 @@ export async function runInvitationBuild(args: {
   // A capped run leaves the PREVIOUS turn's bundle on disk. Publishing that as
   // a new revision would silently claim success while changing nothing, so a
   // salvage only counts when the source actually moved.
-  const sourceUnchanged = (priorSource?.["index.tsx"] ?? null) === indexTsx;
+  const sourceUnchanged = sourceFilesEqual(priorSource, sourceFiles);
   const salvageImpossible =
     !bundleCode ||
     !bundleRegistersComponent(bundleCode, slug) ||
+    !sourceFiles["index.tsx"] || // the mount contract requires the entry file
     (agentError !== null && sourceUnchanged);
 
   if (salvageImpossible) {
     const info = agentError
       ? classifyBuildError(agentError)
-      : { title: "Build did not produce a valid bundle.", hint: undefined, detail: undefined };
+      : {
+          title: "Build did not produce a valid bundle.",
+          hint: undefined,
+          detail: undefined,
+        };
     // Record the failure too — otherwise the thread shows a user turn with no
     // reply on reload, which reads as "still running".
     await appendMessage({
@@ -216,6 +331,7 @@ export async function runInvitationBuild(args: {
         ? `${info.title}\n\n${lastAssistantText}`
         : info.title,
       costUsd,
+      usage,
     });
     onEvent({
       kind: "error",
@@ -234,19 +350,38 @@ export async function runInvitationBuild(args: {
     });
   }
 
-  const { revisionId } = await createDraftRevision({
-    buildId: build.id,
-    invitationId,
-    prompt,
-    sourceFiles: { "index.tsx": indexTsx },
-  });
+  let revisionId: string;
+  if (isCritiqueTurn) {
+    // The review fixes the draft the admin is already looking at — no new
+    // revision, or the rail would show two entries for one design.
+    const latest = await latestDraftRevisionId(invitationId);
+    if (!latest) {
+      onEvent({ kind: "error", message: "Não há rascunho para atualizar." });
+      return { ok: false };
+    }
+    await updateDraftRevisionSource(latest, sourceFiles);
+    revisionId = latest;
+  } else {
+    ({ revisionId } = await createDraftRevision({
+      buildId: build.id,
+      invitationId,
+      prompt,
+      sourceFiles,
+    }));
+  }
   await appendMessage({
     buildId: build.id,
     role: "assistant",
     content: lastAssistantText || "Draft ready.",
     revisionId,
     costUsd,
+    usage,
   });
-  onEvent({ kind: "draft", revisionId, slug });
+  onEvent({
+    kind: "draft",
+    revisionId,
+    slug,
+    firstBuild: isFirstBuild && !isCritiqueTurn,
+  });
   return { ok: true };
 }

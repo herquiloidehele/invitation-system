@@ -3,10 +3,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type { BuildEvent } from "@/worker/lib/build-events";
+import type { BuildEvent, BuildUsage } from "@/worker/lib/build-events";
+import type { Critique } from "@/worker/lib/critique";
 import type { Direction } from "@/worker/lib/directions";
 import type { AttachmentRecord } from "@/worker/persistence";
 import { parseSseFrames } from "@/lib/ai-build-stream";
+import {
+  AI_PREVIEW_CAPTURE,
+  AI_PREVIEW_CAPTURED,
+  AI_PREVIEW_READY,
+  MAX_TILES,
+  type CaptureResult,
+} from "@/lib/ai-preview-capture";
 import { classifyBuildError, isFatalAgentText } from "@/lib/build-errors";
 import ChatPane, { type ChatItem } from "./ChatPane";
 import PreviewPane from "./PreviewPane";
@@ -14,6 +22,14 @@ import VersionsPane, { type Revision } from "./VersionsPane";
 
 let seq = 0;
 const nextId = () => `c${++seq}`;
+
+/** Cards persisted before the review went phone-only stored `{ phone, desktop }`. */
+function legacyScreenshots(
+  value: string[] | { phone?: string[]; desktop?: string[] } | null | undefined,
+): string[] {
+  if (Array.isArray(value)) return value;
+  return [...(value?.phone ?? []), ...(value?.desktop ?? [])];
+}
 
 export default function AiBuilderConsole({
   slug,
@@ -39,6 +55,26 @@ export default function AiBuilderConsole({
   // Id of the assistant bubble currently being streamed into, if any. A ref,
   // not state: it is read and written inside the async stream loop.
   const streamingId = useRef<string | null>(null);
+  // The SDK sends `result` (with the token numbers) AFTER the final assistant
+  // message, so remember which bubble was sealed last to stamp them onto.
+  const lastSealedId = useRef<string | null>(null);
+  // Visual critique: the console captures the preview iframe after a first
+  // build and sends the tiles for review. Bounded to one round per prompt.
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const chosenDirection = useRef<Direction | null>(null);
+  const critiqueRounds = useRef(0);
+  const MAX_CRITIQUE_ROUNDS = 1;
+  // True while tiles are being captured or judged; drives the manual button.
+  const [reviewing, setReviewing] = useState(false);
+  // Set while a build is applying a critique, so its draft can be labelled.
+  const applyingCritique = useRef(false);
+
+  const setBubbleUsage = (id: string, usage: BuildUsage | null) =>
+    setItems((prev) =>
+      prev.map((it) =>
+        it.kind === "assistant" && it.id === id ? { ...it, usage } : it,
+      ),
+    );
 
   /** Replace the text of one assistant bubble. */
   const setBubbleText = (id: string, next: (prev: string) => string) =>
@@ -76,7 +112,8 @@ export default function AiBuilderConsole({
     // revision — otherwise an invitation with only drafts opens to an empty
     // pane even though there is something to look at.
     setPreviewRevisionId(
-      (current) => current ?? list.find((r) => r.active)?.id ?? list[0]?.id ?? null,
+      (current) =>
+        current ?? list.find((r) => r.active)?.id ?? list[0]?.id ?? null,
     );
   }, [slug]);
 
@@ -92,6 +129,8 @@ export default function AiBuilderConsole({
         content: string;
         costUsd: number | null;
         directions: unknown;
+        usage: unknown;
+        critique: unknown;
         attachments?: AttachmentRecord[];
       }>;
     };
@@ -103,6 +142,25 @@ export default function AiBuilderConsole({
             id: m.id,
             text: m.content,
             attachments: m.attachments ?? [],
+          };
+        }
+        const c = m.critique as
+          | {
+              score: number;
+              verdict: "ship" | "revise";
+              issues: Critique["issues"];
+              screenshots: string[];
+            }
+          | null
+          | undefined;
+        if (c && typeof c.score === "number") {
+          return {
+            kind: "critique",
+            id: m.id,
+            score: c.score,
+            verdict: c.verdict,
+            issues: c.issues ?? [],
+            screenshots: legacyScreenshots(c.screenshots),
           };
         }
         if (Array.isArray(m.directions) && m.directions.length > 0) {
@@ -117,6 +175,7 @@ export default function AiBuilderConsole({
           id: m.id,
           text: m.content,
           costUsd: m.costUsd,
+          usage: (m.usage as BuildUsage | null) ?? null,
         };
       }),
     );
@@ -193,14 +252,18 @@ export default function AiBuilderConsole({
         if (id) {
           setBubbleText(id, () => e.text);
           streamingId.current = null;
+          lastSealedId.current = id;
         } else {
-          append({ kind: "assistant", id: nextId(), text: e.text });
+          const fresh = nextId();
+          lastSealedId.current = fresh;
+          append({ kind: "assistant", id: fresh, text: e.text });
         }
         break;
       }
       case "result":
-        // Deliberately silent: the worker emits a specific `error` (or salvages
-        // a draft). Adding a generic failure here stacked a second card.
+        // No error card here — the worker emits a specific `error` (or salvages
+        // a draft). This event's job is the token numbers.
+        if (lastSealedId.current) setBubbleUsage(lastSealedId.current, e.usage);
         break;
       case "directions":
         append({ kind: "directions", id: nextId(), directions: e.directions });
@@ -214,7 +277,16 @@ export default function AiBuilderConsole({
         break;
       case "draft":
         showPreview(e.revisionId);
+        if (applyingCritique.current) {
+          applyingCritique.current = false;
+          append({
+            kind: "activity",
+            id: nextId(),
+            text: "Correções aplicadas ao rascunho.",
+          });
+        }
         toast.success("Rascunho pronto — pré-visualize e depois publique.");
+        if (e.firstBuild) void runCritique(e.revisionId);
         break;
       case "error":
         append({
@@ -228,16 +300,165 @@ export default function AiBuilderConsole({
     }
   };
 
+  /** Resolve when the preview iframe reports the bundle has mounted. */
+  const waitForPreviewReady = (timeoutMs = 45_000) =>
+    new Promise<boolean>((resolve) => {
+      const origin = window.location.origin;
+      const cleanup = () => {
+        clearTimeout(timer);
+        window.removeEventListener("message", onMsg);
+      };
+      const timer = setTimeout(() => {
+        cleanup();
+        resolve(false);
+      }, timeoutMs);
+      const onMsg = (e: MessageEvent) => {
+        if (e.origin !== origin || e.data?.type !== AI_PREVIEW_READY) return;
+        cleanup();
+        resolve(true);
+      };
+      window.addEventListener("message", onMsg);
+    });
+
+  /** Ask the bridge inside the iframe for tiles at the current width. */
+  const captureTiles = (maxTiles: number, timeoutMs = 60_000) =>
+    new Promise<{ tiles: string[]; error?: string }>((resolve) => {
+      const win = iframeRef.current?.contentWindow;
+      if (!win)
+        return resolve({ tiles: [], error: "preview frame not mounted" });
+      const origin = window.location.origin;
+      const requestId = `cap-${Date.now()}`;
+      const cleanup = () => {
+        clearTimeout(timer);
+        window.removeEventListener("message", onMsg);
+      };
+      const timer = setTimeout(() => {
+        cleanup();
+        resolve({ tiles: [], error: "the preview did not answer in time" });
+      }, timeoutMs);
+      const onMsg = (e: MessageEvent<CaptureResult>) => {
+        if (
+          e.origin !== origin ||
+          e.data?.type !== AI_PREVIEW_CAPTURED ||
+          e.data.requestId !== requestId
+        ) {
+          return;
+        }
+        cleanup();
+        resolve({ tiles: e.data.tiles ?? [], error: e.data.error });
+      };
+      window.addEventListener("message", onMsg);
+      win.postMessage(
+        { type: AI_PREVIEW_CAPTURE, requestId, maxTiles },
+        origin,
+      );
+    });
+
+  const runCritique = async (
+    revisionId: string,
+    opts?: { manual?: boolean },
+  ) => {
+    if (process.env.NEXT_PUBLIC_AI_CRITIQUE === "off") return;
+    // The automatic round is bounded; an explicit request from the admin is not.
+    if (!opts?.manual && critiqueRounds.current >= MAX_CRITIQUE_ROUNDS) return;
+    if (reviewing || building) return;
+    critiqueRounds.current += 1;
+    setReviewing(true);
+    try {
+      await critiqueOnce(revisionId, opts?.manual === true);
+    } finally {
+      setReviewing(false);
+    }
+  };
+
+  const critiqueOnce = async (revisionId: string, manual: boolean) => {
+    append({
+      kind: "activity",
+      id: nextId(),
+      text: "A capturar o resultado renderizado…",
+    });
+
+    // After a draft event the nonce was bumped, so the iframe is reloading and
+    // READY tells us when it has mounted. A manual run captures the frame as it
+    // stands; the bridge re-checks the mount on each request anyway.
+    if (!manual) await waitForPreviewReady();
+    // Phone only: that is how guests open an invitation, and the console's
+    // "desktop" is a narrow column that would only mislead the reviewer.
+    const before = device;
+    setDevice("phone");
+    const phone = await captureTiles(MAX_TILES);
+    const width = iframeRef.current?.clientWidth ?? 0;
+    setDevice(before);
+
+    const shots = phone.tiles.map((dataUrl) => ({ width, dataUrl }));
+    if (shots.length === 0) {
+      const reason = phone.error;
+      append({
+        kind: "activity",
+        id: nextId(),
+        text: reason
+          ? `A captura falhou (${reason}) — revisão visual ignorada.`
+          : "Captura vazia — revisão visual ignorada.",
+      });
+      return;
+    }
+
+    append({ kind: "activity", id: nextId(), text: "A analisar o resultado…" });
+    const res = await fetch("/api/admin/ai/critique", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slug,
+        revisionId,
+        direction: chosenDirection.current,
+        shots,
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      append({
+        kind: "error",
+        id: nextId(),
+        text: "A revisão visual falhou.",
+        detail: body.error,
+      });
+      return;
+    }
+    const { critique, screenshots } = (await res.json()) as {
+      critique: Critique;
+      screenshots: string[];
+    };
+    append({
+      kind: "critique",
+      id: nextId(),
+      score: critique.score,
+      verdict: critique.verdict,
+      issues: critique.issues,
+      screenshots,
+    });
+
+    if (critique.verdict === "revise" && critique.issues.length > 0) {
+      await startBuild("Aplicar correções da revisão visual", { critique });
+    }
+  };
+
   const startBuild = async (
     text: string,
-    opts?: { direction?: Direction; refineDirections?: string },
+    opts?: {
+      direction?: Direction;
+      refineDirections?: string;
+      critique?: Critique;
+    },
   ) => {
     const trimmed = text.trim();
     if (!trimmed || building) return;
     setBuilding(true);
     streamingId.current = null;
-    // A pick / another-round reuses the original prompt, so don't echo it again.
-    if (!opts?.direction && !opts?.refineDirections) {
+    applyingCritique.current = Boolean(opts?.critique);
+    // A pick / another-round / critique reuses or labels its own turn — only a
+    // fresh prompt echoes a user bubble, clears the tray, and re-arms the loop.
+    if (!opts?.direction && !opts?.refineDirections && !opts?.critique) {
+      critiqueRounds.current = 0;
       // The tray belongs to this message now — show it in the bubble and clear
       // the composer, the same way any chat client behaves.
       append({
@@ -259,6 +480,7 @@ export default function AiBuilderConsole({
           prompt: trimmed,
           direction: opts?.direction,
           refineDirections: opts?.refineDirections,
+          critique: opts?.critique,
         }),
       });
       if (!res.ok || !res.body) {
@@ -313,9 +535,12 @@ export default function AiBuilderConsole({
     if (busy) return;
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/ai/revisions/${revisionId}/activate`, {
-        method: "POST",
-      });
+      const res = await fetch(
+        `/api/admin/ai/revisions/${revisionId}/activate`,
+        {
+          method: "POST",
+        },
+      );
       const body = await res.json();
       if (res.ok) toast.success("Reposto — já está ativo.");
       else toast.error(body.error ?? "Falha ao repor.");
@@ -338,10 +563,19 @@ export default function AiBuilderConsole({
         onPromptChange={setPrompt}
         onSubmit={() => startBuild(prompt)}
         building={building}
-        onPickDirection={(d) => startBuild(gatePrompt, { direction: d })}
+        onPickDirection={(d) => {
+          chosenDirection.current = d;
+          void startBuild(gatePrompt, { direction: d });
+        }}
         onAnotherRound={(note) =>
           startBuild(gatePrompt, { refineDirections: note || "different" })
         }
+        onCritique={() => {
+          if (previewRevisionId)
+            void runCritique(previewRevisionId, { manual: true });
+        }}
+        canCritique={previewRevisionId != null}
+        reviewing={reviewing}
         slug={slug}
         attachments={attachments}
         onAttach={(a) => setAttachments((prev) => [...prev, a])}
@@ -352,6 +586,7 @@ export default function AiBuilderConsole({
         device={device}
         onDeviceChange={setDevice}
         onReload={() => setPreviewNonce((n) => n + 1)}
+        iframeRef={iframeRef}
       />
       <VersionsPane
         revisions={revisions}

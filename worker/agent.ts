@@ -21,7 +21,7 @@ export interface BuildAgentResult {
 export function buildSystemPrompt(dtsContent: string): string {
   return `You are an expert frontend designer building a single, self-contained wedding-invitation component.
 
-You are working inside a workspace. Write your component to index.tsx. Import only from react, framer-motion, and @platform. Then run \`npm run build\` and fix any errors until it succeeds and writes dist/bundle.js.
+You are working inside a workspace. Write the component following the File layout in the contract below (index.tsx + theme.ts + sections/*.tsx). Import only from react, framer-motion, and @platform. Run \`npm run build\` ONCE, when you believe you are done. If it fails, fix the reported errors and run it again. Do not run it after every edit, and do not run tsc separately — the build already does.
 
 The design must be distinctive and production-grade — never generic. When you are done and the build passes, stop.
 
@@ -49,6 +49,8 @@ export async function runBuildAgent(args: {
   model?: string;
   maxBudgetUsd?: number;
   maxTurns?: number;
+  /** Thinking depth. Design turns deserve `high`; mechanical edits do not. */
+  effort?: "low" | "medium" | "high" | "xhigh" | "max";
   resume?: string;
   onMessage?: (message: unknown) => void;
 }): Promise<BuildAgentResult> {
@@ -85,6 +87,9 @@ export async function runBuildAgent(args: {
       // maxBudgetUsd. 15 proved too low: a first build that must also read
       // attachments spends several turns before it writes any code.
       maxTurns: args.maxTurns ?? 40,
+      // No `thinking` override: Opus 5 runs adaptive thinking by default, and
+      // `disabled` is rejected above effort `high`.
+      ...(args.effort ? { effort: args.effort } : {}),
       ...(args.resume ? { resume: args.resume } : {}),
       // Deliberately NOT `...process.env`. This env reaches the agent's Bash
       // tool, so it must not carry DATABASE_URL or the AWS credentials —

@@ -20,6 +20,12 @@ export const DirectionSchema = z.object({
   motion: z.string().describe("One short sentence."),
   composition: z.string().describe("One short sentence."),
   rationale: z.string().describe("One short sentence — why it suits this couple."),
+  signatureDetails: z
+    .array(z.string())
+    .length(3)
+    .describe(
+      "Exactly 3 concrete, checkable details that make this direction THIS direction — e.g. 'names set in 22vw Fraunces with the ampersand hung into the margin'. Not adjectives.",
+    ),
 });
 
 export const DirectionsSchema = z.object({
@@ -93,6 +99,8 @@ export function directionToPrompt(d: Direction): string {
     `- Motion: ${d.motion}`,
     `- Composition: ${d.composition}`,
     `- Why: ${d.rationale}`,
+    `- Signature details (all three must be visible in the result):`,
+    ...(d.signatureDetails ?? []).map((sd) => `  • ${sd}`),
     `Execute this direction faithfully. Do not substitute a different one.`,
   ].join("\n");
 }

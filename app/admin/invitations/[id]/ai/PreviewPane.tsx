@@ -11,11 +11,13 @@ export default function PreviewPane({
   device,
   onDeviceChange,
   onReload,
+  iframeRef,
 }: {
   src: string | null;
   device: "phone" | "desktop";
   onDeviceChange: (d: "phone" | "desktop") => void;
   onReload: () => void;
+  iframeRef?: React.RefObject<HTMLIFrameElement | null>;
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
@@ -66,6 +68,7 @@ export default function PreviewPane({
         {src ? (
           <iframe
             key={src}
+            ref={iframeRef}
             src={src}
             title="Invitation preview"
             className={cn(

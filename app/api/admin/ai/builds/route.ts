@@ -39,6 +39,8 @@ export async function POST(req: NextRequest) {
   const direction = (body as { direction?: unknown }).direction ?? null;
   const rawRefine = (body as { refineDirections?: unknown }).refineDirections;
   const refineDirections = typeof rawRefine === "string" ? rawRefine : null;
+  // A visual review to apply (from /api/admin/ai/critique); resumes the session.
+  const critique = (body as { critique?: unknown }).critique ?? null;
 
   const encoder = new TextEncoder();
   const repoRoot = process.cwd();
@@ -53,7 +55,7 @@ export async function POST(req: NextRequest) {
           path.join("worker", "build-invitation-ndjson.ts"),
           slug,
           prompt,
-          JSON.stringify({ direction, refineDirections }),
+          JSON.stringify({ direction, refineDirections, critique }),
         ],
         { cwd: repoRoot, env: process.env },
       );

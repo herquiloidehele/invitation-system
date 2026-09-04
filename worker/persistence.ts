@@ -4,6 +4,7 @@ import path from "node:path";
 import { prisma } from "@/lib/db";
 import { buildBundleObjectKey } from "@/lib/ai-bundle";
 import { publicUrlForKey, putObjectBuffer } from "@/lib/s3";
+import type { BuildUsage } from "./lib/build-events";
 
 /** On-disk workspace for an invitation's builds (shared fs with the app). */
 export function workspaceBundlePath(invitationId: string): string {
@@ -132,6 +133,29 @@ export async function publishExistingRevision(
   return { bundleUrl: publicUrlForKey(key), activeRevisionId: revision.id };
 }
 
+/** The newest unpublished revision — the one whose bundle is in the workspace. */
+export async function latestDraftRevisionId(
+  invitationId: string,
+): Promise<string | null> {
+  const rev = await prisma.aiRevision.findFirst({
+    where: { invitationId, bundleKey: null },
+    orderBy: { createdAt: "desc" },
+    select: { id: true },
+  });
+  return rev?.id ?? null;
+}
+
+/** Replace a draft's stored source without creating a new revision. */
+export async function updateDraftRevisionSource(
+  revisionId: string,
+  sourceFiles: Record<string, string>,
+): Promise<void> {
+  await prisma.aiRevision.update({
+    where: { id: revisionId },
+    data: { sourceFiles },
+  });
+}
+
 /** Roll back / forward: point the invitation at an already-published revision. */
 export async function activatePublishedRevision(
   revisionId: string,
@@ -160,6 +184,10 @@ export async function appendMessage(args: {
   costUsd?: number | null;
   /** Proposed directions, when this turn is a directions gate. */
   directions?: unknown;
+  /** Token accounting for the agent turn that produced this message. */
+  usage?: BuildUsage | null;
+  /** Visual critique payload, when this turn is a review. */
+  critique?: unknown;
 }): Promise<string> {
   const created = await prisma.aiMessage.create({
     data: {
@@ -169,6 +197,8 @@ export async function appendMessage(args: {
       revisionId: args.revisionId ?? null,
       costUsd: args.costUsd ?? null,
       directions: (args.directions ?? undefined) as never,
+      usage: (args.usage ?? undefined) as never,
+      critique: (args.critique ?? undefined) as never,
     },
     select: { id: true },
   });
@@ -224,6 +254,8 @@ export async function listMessagesForInvitation(invitationId: string): Promise<
     revisionId: string | null;
     costUsd: number | null;
     directions: unknown;
+    usage: unknown;
+    critique: unknown;
     attachments: AttachmentRecord[];
     createdAt: Date;
   }>
@@ -244,6 +276,8 @@ export async function listMessagesForInvitation(invitationId: string): Promise<
       revisionId: true,
       costUsd: true,
       directions: true,
+      usage: true,
+      critique: true,
       createdAt: true,
       attachments: {
         orderBy: { createdAt: "asc" },

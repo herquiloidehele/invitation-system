@@ -21,6 +21,11 @@ function isNoiseLine(line: string): boolean {
   if (/^at\s/.test(line)) return true;
   if (/node_modules|\.mjs:\d+|\.js:\d+:\d+/.test(line)) return true;
   if (/^(Node\.js v|\^+$)/.test(line)) return true;
+  // The `throw new X(message, {` line of a Node stack is code, not the message.
+  if (/^throw\s/.test(line)) return true;
+  // A line that only opens something or only names a category ("Error:",
+  // "Invalid `prisma.x()` invocation:") — the real sentence follows it.
+  if (/[{(:]$/.test(line)) return true;
   // Minified/source-ish: starts with punctuation, or is dense with code symbols.
   if (/^[`;{}()[\]^]/.test(line)) return true;
   const symbols = (line.match(/[{}();=>[\]]/g) ?? []).length;

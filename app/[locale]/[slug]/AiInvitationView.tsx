@@ -6,6 +6,7 @@ import AiBundleMount from "@/components/shared/AiBundleMount";
 import AiCoverGate from "@/components/shared/AiCoverGate";
 import AiRuntimeProvider from "@/components/shared/AiRuntimeProvider";
 import AiAudioProvider from "@/components/shared/ai/AiAudioProvider";
+import AiPreviewCaptureBridge from "@/components/shared/ai/AiPreviewCaptureBridge";
 import PlatformProvider from "@/components/shared/ai/PlatformProvider";
 import { buildAiBundleProps } from "@/lib/ai-invitation-props";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
@@ -48,6 +49,9 @@ export default function AiInvitationView({
                   coverOpened: opened,
                 })}
               />
+              {/* Only the authenticated admin preview is ever framed by the
+                  builder, so the public page never ships this listener. */}
+              {skipCover && <AiPreviewCaptureBridge />}
             </PlatformProvider>
           )}
         </AiCoverGate>

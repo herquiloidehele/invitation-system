@@ -10,6 +10,11 @@ const sample = {
   motion: "Slow horizon reveal timed off coverOpened",
   composition: "Full-bleed hero, asymmetric lower third",
   rationale: "Evening seaside venue in summer",
+  signatureDetails: [
+    "Names in 22vw Fraunces with a hung ampersand",
+    "Schedule as a two-column ledger with hairline rules",
+    "Audio toggle is a wax-seal that fills when playing",
+  ],
 };
 
 describe("DirectionsSchema", () => {
@@ -25,6 +30,20 @@ describe("DirectionsSchema", () => {
       directions: [withoutRationale],
     });
     expect(parsed.success).toBe(false);
+  });
+});
+
+describe("signatureDetails", () => {
+  it("requires exactly three", () => {
+    expect(
+      DirectionsSchema.safeParse({
+        directions: [{ ...sample, signatureDetails: ["only one"] }],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("puts them in the build prompt", () => {
+    expect(directionToPrompt(sample)).toContain("hung ampersand");
   });
 });
 

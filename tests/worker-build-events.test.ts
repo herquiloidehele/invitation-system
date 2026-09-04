@@ -30,7 +30,7 @@ describe("toBuildEvent", () => {
       subtype: "success",
       total_cost_usd: 1.23,
     });
-    expect(e).toEqual({ kind: "result", ok: true, costUsd: 1.23 });
+    expect(e).toEqual({ kind: "result", ok: true, costUsd: 1.23, usage: null });
   });
 
   it("returns null for messages with no user-facing content", () => {
@@ -40,7 +40,12 @@ describe("toBuildEvent", () => {
 
 describe("BuildEvent union", () => {
   it("includes a draft variant carrying revisionId + slug", () => {
-    const e: BuildEvent = { kind: "draft", revisionId: "r1", slug: "sofia-pedro" };
+    const e: BuildEvent = {
+      kind: "draft",
+      revisionId: "r1",
+      slug: "sofia-pedro",
+      firstBuild: true,
+    };
     expect(e.kind).toBe("draft");
   });
 
@@ -56,6 +61,7 @@ describe("BuildEvent union", () => {
           motion: "m",
           composition: "c",
           rationale: "r",
+          signatureDetails: ["a", "b", "c"],
         },
       ],
     };

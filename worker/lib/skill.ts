@@ -29,6 +29,20 @@ You are writing a single self-contained invitation component in \`index.tsx\`.
 ${dtsContent}
 \`\`\`
 
+## File layout (required)
+
+- \`index.tsx\` — small (aim for under 120 lines): the default export, the
+  \`register\` call, the \`<Font>\` loads, and the section order. No section
+  markup lives here.
+- \`theme.ts\` — the palette, type scale, spacing and motion tokens as
+  exported constants. Every section imports from it; nothing hardcodes a hex.
+- \`sections/<Name>.tsx\` — one file per section (Hero, Schedule, Location,
+  Rsvp, Gifts, Faqs, Story, Gallery…). A section owns its own markup, styles
+  and motion.
+- \`ui/\` — only for genuinely shared pieces (a rule, an eyebrow label).
+Import with relative paths. esbuild bundles the whole tree from index.tsx.
+When asked for a change, edit only the file that owns it.
+
 ## Rules
 
 - Behaviour is platform-owned: use \`useRsvp()\`, \`useGifts()\`, etc. — never re-implement RSVP/gift/audio logic or fetch APIs yourself.

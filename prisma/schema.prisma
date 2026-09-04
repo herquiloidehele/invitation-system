@@ -453,6 +453,9 @@ model AiBuild {
 
   // Agent SDK session id, so a build can be resumed. Null until Phase 3.
   agentSessionId String?
+  // Input tokens the last resumed turn replayed (cache reads + writes +
+  // uncached). Past a threshold the next turn starts a fresh session.
+  lastContextTokens Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -511,6 +514,11 @@ model AiMessage {
 
   // Proposed visual directions, when this assistant turn is a directions gate.
   directions Json?
+
+  // Token accounting for this turn: { model, inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens }.
+  usage    Json?
+  // Visual critique attached to this turn: { score, verdict, issues[], screenshots{phone[],desktop[]} }.
+  critique Json?
 
   createdAt DateTime @default(now())
 

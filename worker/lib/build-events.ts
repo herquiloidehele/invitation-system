@@ -5,11 +5,81 @@ export type BuildEvent =
   | { kind: "progress"; text: string }
   | { kind: "delta"; text: string }
   | { kind: "tool"; name: string; label: string }
-  | { kind: "result"; ok: boolean; costUsd: number | null }
+  | { kind: "result"; ok: boolean; costUsd: number | null; usage: BuildUsage | null }
   | { kind: "directions"; directions: Direction[] }
   | { kind: "question"; text: string }
-  | { kind: "draft"; revisionId: string; slug: string }
+  | { kind: "draft"; revisionId: string; slug: string; firstBuild: boolean }
   | { kind: "error"; message: string; hint?: string; detail?: string };
+
+/** Token accounting for one build turn, summed across every model the SDK used. */
+export type BuildUsage = {
+  /** The model that produced the most output — the one that did the writing. */
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
+};
+
+/**
+ * The SDK's per-model entry (`ModelUsage`): camelCase, cumulative for the
+ * query() call. Some transports also nest a raw snake_case `apiUsage`; both are
+ * read so a shape change degrades to zeros rather than crashing.
+ */
+type ModelUsageEntry = {
+  inputTokens?: number;
+  outputTokens?: number;
+  cacheReadInputTokens?: number;
+  cacheCreationInputTokens?: number;
+  apiUsage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+    cache_creation_input_tokens?: number;
+    cache_read_input_tokens?: number;
+  } | null;
+};
+
+function fields(u: ModelUsageEntry) {
+  const a = u.apiUsage ?? {};
+  return {
+    input: u.inputTokens ?? a.input_tokens ?? 0,
+    output: u.outputTokens ?? a.output_tokens ?? 0,
+    cacheRead: u.cacheReadInputTokens ?? a.cache_read_input_tokens ?? 0,
+    cacheWrite: u.cacheCreationInputTokens ?? a.cache_creation_input_tokens ?? 0,
+  };
+}
+
+/**
+ * Pull usage out of an SDK `result` message. `modelUsage` is keyed by model
+ * id; the numbers are cumulative for the query() call, so read the final
+ * result rather than summing across results.
+ */
+export function usageFromResult(message: unknown): BuildUsage | null {
+  const m = message as { modelUsage?: Record<string, ModelUsageEntry> };
+  const entries = Object.entries(m.modelUsage ?? {});
+  if (entries.length === 0) return null;
+
+  const usage: BuildUsage = {
+    model: "",
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheReadTokens: 0,
+    cacheWriteTokens: 0,
+  };
+  let topOutput = -1;
+  for (const [model, u] of entries) {
+    const f = fields(u);
+    usage.inputTokens += f.input;
+    usage.outputTokens += f.output;
+    usage.cacheReadTokens += f.cacheRead;
+    usage.cacheWriteTokens += f.cacheWrite;
+    if (f.output > topOutput) {
+      topOutput = f.output;
+      usage.model = model;
+    }
+  }
+  return usage;
+}
 
 /** Just the file name — the workspace path is noise in the admin UI. */
 function baseName(filePath: unknown): string | null {
@@ -104,6 +174,7 @@ export function toBuildEvent(message: unknown): BuildEvent | null {
       kind: "result",
       ok: m.subtype === "success",
       costUsd: typeof m.total_cost_usd === "number" ? m.total_cost_usd : null,
+      usage: usageFromResult(m),
     };
   }
   return null;

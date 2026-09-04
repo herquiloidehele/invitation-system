@@ -77,5 +77,12 @@ export default function AiBundleMount({
   if (!Component) return null;
 
   const Rendered = Component as unknown as (p: AiBundleProps) => ReactElement;
-  return <Rendered {...props} />;
+  return (
+    // `data-ai-mounted` exists only once the bundle has registered and rendered:
+    // the signal the admin preview's capture bridge waits for. display:contents
+    // keeps the wrapper out of layout.
+    <div data-ai-mounted="1" style={{ display: "contents" }}>
+      <Rendered {...props} />
+    </div>
+  );
 }

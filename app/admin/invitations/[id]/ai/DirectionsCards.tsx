@@ -69,6 +69,16 @@ export default function DirectionsCards({
               {d.composition}
             </p>
             <p className="mt-1 line-clamp-2 text-xs">{d.rationale}</p>
+            {/* Older persisted directions predate this field — hence the guard. */}
+            {(d.signatureDetails ?? []).length > 0 && (
+              <ul className="mt-1 list-disc pl-4 text-xs text-muted-foreground">
+                {(d.signatureDetails ?? []).map((sd, i) => (
+                  <li key={`${d.id}-s${i}`} className="line-clamp-1">
+                    {sd}
+                  </li>
+                ))}
+              </ul>
+            )}
           </button>
         ))}
       </div>
