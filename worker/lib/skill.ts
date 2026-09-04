@@ -19,6 +19,9 @@ You are writing a single self-contained invitation component in \`index.tsx\`.
 - It must register itself: \`hostRuntime().bundles.register(__BUNDLE_ID__, Invitation)\` (the harness injects \`__BUNDLE_ID__\`; import \`hostRuntime\` from \`./runtime\`).
 - Import **only** from \`react\`, \`framer-motion\`, and \`@platform\`. Never import anything else — no network, no other packages. React and framer-motion are provided by the host; do not add your own.
 - Props: \`{ invitation, guest, locale, assets, coverOpened }\`. Time entrance animations off \`coverOpened\`.
+- \`assets\` is \`{ hero: string | null; gallery: string[]; sections: Record<string,string>; library: AssetRef[] }\`
+  where \`AssetRef = { id: string; name: string; kind: "image" | "pdf"; url: string; width?: number | null; height?: number | null }\`.
+  \`library\` holds files the admin uploaded in the chat.
 
 ## The @platform contract (authoritative types)
 
@@ -31,6 +34,7 @@ ${dtsContent}
 - Behaviour is platform-owned: use \`useRsvp()\`, \`useGifts()\`, etc. — never re-implement RSVP/gift/audio logic or fetch APIs yourself.
 - Locale-reactive text: author \`{ pt, en, ... }\` maps and read them via \`useLocale().t(...)\`. Do not read localized strings off \`invitation\`.
 - Images: use \`<Media>\`. QR: \`<QrCode>\`. Fonts: \`<Font family=... />\`. Video: a plain \`<video>\` element is fine.
+- Uploaded files live in \`props.assets.library\`. To display one, look it up by \`id\` or \`name\` and pass its \`url\` to \`<Media>\`. **Never hardcode an attachment URL** into the source. Entries with \`kind: "pdf"\` are reference material only — never render them.
 - The design must be distinctive and never generic. Avoid Inter/Roboto/system fonts, purple-on-white gradients, and cookie-cutter card layouts.
 
 ## Content comes from props, never from the prompt

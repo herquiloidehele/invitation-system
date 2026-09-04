@@ -457,9 +457,40 @@ model AiBuild {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  revisions AiRevision[]
-  messages  AiMessage[]
+  revisions   AiRevision[]
+  messages    AiMessage[]
+  attachments AiAttachment[]
 
+  @@index([invitationId])
+}
+
+model AiAttachment {
+  id      String  @id @default(cuid())
+  buildId String
+  build   AiBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+
+  /// Denormalised so the render path can list a whole invitation's assets.
+  invitationId String
+  /// The chat turn this arrived with, for rendering history.
+  messageId String?
+
+  /// Original file name, shown in the UI and given to the agent.
+  name     String
+  /// "image" | "pdf"
+  kind     String
+  mimeType String
+
+  /// S3 object key and its public URL.
+  objectKey String
+  url       String
+
+  sizeBytes Int
+  width     Int?
+  height    Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([buildId])
   @@index([invitationId])
 }
 

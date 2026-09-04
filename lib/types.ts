@@ -1207,8 +1207,25 @@ export interface QrCodeStyle {
   bgColor?: string;
 }
 
+/**
+ * A file uploaded in the AI builder chat. Declared here rather than imported
+ * from `lib/ai-invitation-props.ts` — that module imports this one, and the
+ * dependency must stay one-way.
+ */
+export interface AiAssetLibraryItem {
+  id: string;
+  name: string;
+  /** "image" | "pdf" */
+  kind: string;
+  url: string;
+  width?: number | null;
+  height?: number | null;
+}
+
 export interface InvitationData {
   slug: string;
+  /** Builder attachments. Only populated when renderMode is "ai". */
+  aiAssetLibrary?: AiAssetLibraryItem[];
   /** The theme's database id — used when saving/updating invitations. */
   themeId: string;
   /** The theme's slug name (e.g. "pink-floral") — derived from the Theme relation. */

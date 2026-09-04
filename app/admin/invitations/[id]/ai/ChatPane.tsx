@@ -1,21 +1,24 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { AlertTriangle, Loader2, Send, Wrench } from "lucide-react";
+import { AlertTriangle, HelpCircle, Loader2, Send, Wrench } from "lucide-react";
 
 import type { Direction } from "@/worker/lib/directions";
+import type { AttachmentRecord } from "@/worker/persistence";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import DirectionsCards from "./DirectionsCards";
 import ChatMarkdown from "./ChatMarkdown";
+import AttachmentPicker from "./AttachmentPicker";
 
 export type ChatItem =
   | { kind: "user"; id: string; text: string }
   | { kind: "assistant"; id: string; text: string; costUsd?: number | null }
   | { kind: "activity"; id: string; text: string }
   | { kind: "directions"; id: string; directions: Direction[] }
+  | { kind: "question"; id: string; text: string }
   | {
       kind: "error";
       id: string;
@@ -32,6 +35,10 @@ export default function ChatPane({
   building,
   onPickDirection,
   onAnotherRound,
+  slug,
+  attachments,
+  onAttach,
+  onRemoveAttachment,
 }: {
   items: ChatItem[];
   prompt: string;
@@ -40,6 +47,10 @@ export default function ChatPane({
   building: boolean;
   onPickDirection: (d: Direction) => void;
   onAnotherRound: (note: string) => void;
+  slug: string;
+  attachments: AttachmentRecord[];
+  onAttach: (a: AttachmentRecord) => void;
+  onRemoveAttachment: (id: string) => void;
 }) {
   const endRef = useRef<HTMLDivElement>(null);
   // Streaming grows the last bubble's text without changing the item count, so
@@ -82,6 +93,24 @@ export default function ChatPane({
                     onPick={onPickDirection}
                     onAnotherRound={onAnotherRound}
                   />
+                );
+              }
+              if (m.kind === "question") {
+                return (
+                  <div
+                    key={m.id}
+                    className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-2"
+                  >
+                    <div className="flex items-start gap-2">
+                      <HelpCircle className="mt-0.5 size-4 shrink-0 text-primary" />
+                      <div className="min-w-0 flex-1 text-sm">
+                        <ChatMarkdown>{m.text}</ChatMarkdown>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Responda abaixo para continuar.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 );
               }
               if (m.kind === "error") {
@@ -149,6 +178,13 @@ export default function ChatPane({
       </ScrollArea>
 
       <div className="space-y-2">
+        <AttachmentPicker
+          slug={slug}
+          attachments={attachments}
+          onAttach={onAttach}
+          onRemove={onRemoveAttachment}
+          disabled={building}
+        />
         <Textarea
           value={prompt}
           onChange={(e) => onPromptChange(e.target.value)}

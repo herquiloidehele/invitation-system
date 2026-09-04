@@ -38,6 +38,8 @@ export async function proposeDirections(args: {
   brief: string;
   prompt: string;
   note?: string | null;
+  /** Reference images as base64. Capped by the caller. */
+  images?: Array<{ mediaType: string; base64: string }>;
 }): Promise<{ directions: Direction[] }> {
   const client = new Anthropic();
 
@@ -52,14 +54,30 @@ export async function proposeDirections(args: {
     "",
     `What the client asked for: ${args.prompt}`,
     args.note ? `\nRefine the previous proposals: ${args.note}` : "",
+    args.images?.length
+      ? "\nReference images are attached. Let them inform palette and mood, but still propose four genuinely different directions — do not describe the same idea four times."
+      : "",
     "",
     artDirection(),
   ].join("\n");
 
+  // Images first, then the instruction: the model should look before it reads.
+  const content = [
+    ...(args.images ?? []).map((img) => ({
+      type: "image" as const,
+      source: {
+        type: "base64" as const,
+        media_type: img.mediaType,
+        data: img.base64,
+      },
+    })),
+    { type: "text" as const, text: instruction },
+  ];
+
   const response = await client.messages.parse({
     model: "claude-opus-5",
     max_tokens: 4000,
-    messages: [{ role: "user", content: instruction }],
+    messages: [{ role: "user", content: content as never }],
     output_config: { format: zodOutputFormat(DirectionsSchema) },
   });
 

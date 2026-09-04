@@ -245,7 +245,27 @@ export const getInvitation = cache(
       include: includeTheme,
     });
     if (!row) return null;
-    return toInvitationData(row as unknown as InvitationWithTheme);
+    const data = toInvitationData(row as unknown as InvitationWithTheme);
+
+    // Builder attachments are only meaningful to a generated bundle, so the
+    // extra query is scoped to AI invitations — standard ones are unaffected.
+    if (data.renderMode === "ai") {
+      const attachments = await prisma.aiAttachment.findMany({
+        where: { invitationId: row.id },
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          name: true,
+          kind: true,
+          url: true,
+          width: true,
+          height: true,
+        },
+      });
+      data.aiAssetLibrary = attachments;
+    }
+
+    return data;
   },
 );
 

@@ -211,6 +211,88 @@ export async function listMessagesForInvitation(invitationId: string): Promise<
   });
 }
 
+/**
+ * A file the admin uploaded in the builder chat. Client components may import
+ * this type, but must do so with `import type` so Prisma never reaches the
+ * browser bundle.
+ */
+export type AttachmentRecord = {
+  id: string;
+  name: string;
+  kind: string;
+  mimeType: string;
+  objectKey: string;
+  url: string;
+  width: number | null;
+  height: number | null;
+};
+
+/** Register a file that has already been uploaded to S3. */
+export async function recordAttachment(args: {
+  buildId: string;
+  invitationId: string;
+  messageId?: string | null;
+  name: string;
+  kind: "image" | "pdf";
+  mimeType: string;
+  objectKey: string;
+  url: string;
+  sizeBytes: number;
+  width?: number | null;
+  height?: number | null;
+}): Promise<AttachmentRecord> {
+  return prisma.aiAttachment.create({
+    data: {
+      buildId: args.buildId,
+      invitationId: args.invitationId,
+      messageId: args.messageId ?? null,
+      name: args.name,
+      kind: args.kind,
+      mimeType: args.mimeType,
+      objectKey: args.objectKey,
+      url: args.url,
+      sizeBytes: args.sizeBytes,
+      width: args.width ?? null,
+      height: args.height ?? null,
+    },
+    select: {
+      id: true,
+      name: true,
+      kind: true,
+      mimeType: true,
+      objectKey: true,
+      url: true,
+      width: true,
+      height: true,
+    },
+  });
+}
+
+/** Every attachment for an invitation, oldest first. */
+export async function listAttachmentsForInvitation(
+  invitationId: string,
+): Promise<AttachmentRecord[]> {
+  return prisma.aiAttachment.findMany({
+    where: { invitationId },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      name: true,
+      kind: true,
+      mimeType: true,
+      objectKey: true,
+      url: true,
+      width: true,
+      height: true,
+    },
+  });
+}
+
+/** Remove an attachment (does not delete the S3 object). */
+export async function deleteAttachment(id: string): Promise<void> {
+  await prisma.aiAttachment.delete({ where: { id } });
+}
+
 /** A revision resolved for preview: its invitation + whether it is published. */
 export async function getRevisionForPreview(revisionId: string): Promise<{
   id: string;

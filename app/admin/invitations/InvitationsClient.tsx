@@ -59,6 +59,7 @@ import {
   ChevronDown,
   Scroll,
   Link2,
+  Sparkles,
   CopyPlus,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -280,6 +281,17 @@ export function InvitationsClient({
                     <p className="font-medium text-sm">Externo</p>
                     <p className="text-xs text-muted-foreground">
                       Capa + vídeo ou link externo
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => router.push("/admin/invitations/new-ai")}
+                >
+                  <Sparkles className="size-4 mr-2 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium text-sm">IA</p>
+                    <p className="text-xs text-muted-foreground">
+                      Design gerado por IA a partir de um pedido
                     </p>
                   </div>
                 </DropdownMenuItem>

@@ -1,7 +1,9 @@
-import { cp, mkdir, writeFile } from "node:fs/promises";
+import { cp, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+import { getObjectBuffer } from "@/lib/s3";
 import { buildPlatformSkill } from "./lib/skill";
+import type { AttachmentRecord } from "./persistence";
 import {
   workspacePackageJson,
   workspaceTsconfig,
@@ -38,6 +40,7 @@ export async function provisionWorkspace(
   workspaceDir: string,
   dtsContent: string,
   priorSource?: Record<string, string> | null,
+  attachments?: AttachmentRecord[] | null,
 ): Promise<string> {
   await mkdir(workspaceDir, { recursive: true });
   await cp(TEMPLATE_DIR, workspaceDir, { recursive: true });
@@ -55,6 +58,19 @@ export async function provisionWorkspace(
       path.join(workspaceDir, "index.tsx"),
       priorSource["index.tsx"],
     );
+  }
+
+  // A question from a previous turn must not be re-detected as a new one.
+  await rm(path.join(workspaceDir, "NEEDS_INPUT.md"), { force: true });
+
+  // Uploaded files, so the agent can actually look at them.
+  if (attachments?.length) {
+    const refsDir = path.join(workspaceDir, "refs");
+    await mkdir(refsDir, { recursive: true });
+    for (const attachment of attachments) {
+      const buffer = await getObjectBuffer(attachment.objectKey);
+      await writeFile(path.join(refsDir, attachment.name), buffer);
+    }
   }
 
   return workspaceDir;

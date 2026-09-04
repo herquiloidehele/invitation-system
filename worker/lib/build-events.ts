@@ -7,6 +7,7 @@ export type BuildEvent =
   | { kind: "tool"; name: string; label: string }
   | { kind: "result"; ok: boolean; costUsd: number | null }
   | { kind: "directions"; directions: Direction[] }
+  | { kind: "question"; text: string }
   | { kind: "draft"; revisionId: string; slug: string }
   | { kind: "error"; message: string; hint?: string; detail?: string };
 

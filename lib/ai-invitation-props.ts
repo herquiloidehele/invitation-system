@@ -4,10 +4,23 @@ import type { InvitationData } from "./types";
  * Uploaded media, flattened for generated code. The agent composes with these
  * URLs; it never fetches or generates imagery itself.
  */
+/** A file the admin uploaded in the AI builder chat. */
+export interface AiAssetRef {
+  id: string;
+  name: string;
+  /** "image" | "pdf" — a pdf is reference material and must never be rendered. */
+  kind: string;
+  url: string;
+  width?: number | null;
+  height?: number | null;
+}
+
 export interface AiAssetManifest {
   hero: string | null;
   gallery: string[];
   sections: Record<string, string>;
+  /** Files uploaded in the builder chat, addressable by id or name. */
+  library: AiAssetRef[];
 }
 
 /** Everything a generated bundle receives. This is the mount contract. */
@@ -72,6 +85,7 @@ export function buildAiBundleProps(args: {
       hero: isNonEmptyString(invitation.heroImage) ? invitation.heroImage : null,
       gallery: collectGallery(invitation.coupleGallery),
       sections: collectSectionImages(invitation.sectionImages),
+      library: invitation.aiAssetLibrary ?? [],
     },
   };
 }

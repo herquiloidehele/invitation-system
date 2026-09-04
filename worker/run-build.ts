@@ -1,7 +1,8 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 
 import { prisma } from "@/lib/db";
+import { getObjectBuffer } from "@/lib/s3";
 import { getInvitation } from "@/lib/invitations";
 import { provisionWorkspace } from "./provision";
 import { runBuildAgent } from "./agent";
@@ -13,14 +14,20 @@ import {
   directionToPrompt,
   type Direction,
 } from "./lib/directions";
+import { buildAttachmentBrief } from "./lib/attachment-brief";
 import {
   getOrCreateBuild,
   latestRevisionSource,
   createDraftRevision,
   appendMessage,
+  listAttachmentsForInvitation,
   revisionCount,
   saveSessionId,
 } from "./persistence";
+
+/** The directions gate is deliberately cheap — bound what it looks at. */
+const MAX_GATE_IMAGES = 4;
+const MAX_GATE_IMAGE_BYTES = 4 * 1024 * 1024;
 
 /**
  * The full build-and-publish flow, emitting typed events. Reused by the human
@@ -51,16 +58,35 @@ export async function runInvitationBuild(args: {
   const build = await getOrCreateBuild(invitationId);
   await appendMessage({ buildId: build.id, role: "user", content: prompt });
   const brief = buildInvitationBrief(invitation);
+  const attachments = await listAttachmentsForInvitation(invitationId);
 
   // The directions gate: before any code exists, propose distinct visual
   // directions and stop. Fires when the invitation has no revisions at all, or
   // whenever another round is explicitly requested.
   const existing = await revisionCount(invitationId);
   if (!direction && (existing === 0 || refineDirections)) {
+    // Moodboards matter most here. PDFs are skipped — they would need document
+    // blocks and would blow up the cost of a deliberately cheap gate.
+    const candidates = attachments.filter((a) => a.kind === "image");
+    const chosen = candidates.slice(-MAX_GATE_IMAGES);
+    if (candidates.length > chosen.length) {
+      onEvent({
+        kind: "progress",
+        text: `A usar as ${chosen.length} imagens mais recentes de ${candidates.length}.`,
+      });
+    }
+    const images: Array<{ mediaType: string; base64: string }> = [];
+    for (const a of chosen) {
+      const buf = await getObjectBuffer(a.objectKey).catch(() => null);
+      if (!buf || buf.byteLength > MAX_GATE_IMAGE_BYTES) continue;
+      images.push({ mediaType: a.mimeType, base64: buf.toString("base64") });
+    }
+
     const { directions } = await proposeDirections({
       brief,
       prompt,
       note: refineDirections,
+      images,
     });
     if (directions.length === 0) {
       const message = "Could not propose directions. Try again.";
@@ -83,9 +109,11 @@ export async function runInvitationBuild(args: {
   }
 
   const priorSource = await latestRevisionSource(build.id);
+  const attachmentBrief = buildAttachmentBrief(attachments);
   const fullPrompt = [
     brief,
     direction ? `\n${directionToPrompt(direction)}` : "",
+    attachmentBrief ? `\n${attachmentBrief}` : "",
     `\n${prompt}`,
   ].join("\n");
 
@@ -96,7 +124,7 @@ export async function runInvitationBuild(args: {
   );
   const workspace = path.join(repoRoot, ".ai-workspaces", `inv-${invitationId}`);
   await mkdir(workspace, { recursive: true });
-  await provisionWorkspace(workspace, dts, priorSource);
+  await provisionWorkspace(workspace, dts, priorSource, attachments);
 
   // Keep the agent's last prose turn + final cost so the thread survives reload.
   let lastAssistantText = "";
@@ -117,6 +145,23 @@ export async function runInvitationBuild(args: {
     },
   });
   if (sessionId) await saveSessionId(build.id, sessionId);
+
+  // The agent asks rather than guessing what an attachment is for. Checked
+  // before bundle verification: on a tweak the previous dist/bundle.js is still
+  // on disk, so "no new bundle" cannot signal a question by itself.
+  const sentinelPath = path.join(workspace, "NEEDS_INPUT.md");
+  const question = await readFile(sentinelPath, "utf8").catch(() => "");
+  if (question.trim()) {
+    await rm(sentinelPath, { force: true });
+    await appendMessage({
+      buildId: build.id,
+      role: "assistant",
+      content: question.trim(),
+      costUsd,
+    });
+    onEvent({ kind: "question", text: question.trim() });
+    return { ok: true };
+  }
 
   const indexTsx = await readFile(
     path.join(workspace, "index.tsx"),

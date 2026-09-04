@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import type { BuildEvent } from "@/worker/lib/build-events";
 import type { Direction } from "@/worker/lib/directions";
+import type { AttachmentRecord } from "@/worker/persistence";
 import { parseSseFrames } from "@/lib/ai-build-stream";
 import { classifyBuildError, isFatalAgentText } from "@/lib/build-errors";
 import ChatPane, { type ChatItem } from "./ChatPane";
@@ -34,6 +35,7 @@ export default function AiBuilderConsole({
   // The prompt that opened the directions gate, so picking a card (or asking
   // for another round) can rebuild with the original brief.
   const [gatePrompt, setGatePrompt] = useState("");
+  const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
   // Id of the assistant bubble currently being streamed into, if any. A ref,
   // not state: it is read and written inside the async stream loop.
   const streamingId = useRef<string | null>(null);
@@ -117,10 +119,26 @@ export default function AiBuilderConsole({
     if (lastUser) setGatePrompt(lastUser.content);
   }, [slug]);
 
+  const loadAttachments = useCallback(async () => {
+    const res = await fetch(
+      `/api/admin/ai/attachments?slug=${encodeURIComponent(slug)}`,
+    );
+    if (res.ok) setAttachments((await res.json()).attachments ?? []);
+  }, [slug]);
+
   useEffect(() => {
     void loadHistory();
     void refreshRail();
-  }, [loadHistory, refreshRail]);
+    void loadAttachments();
+  }, [loadHistory, refreshRail, loadAttachments]);
+
+  const removeAttachment = async (id: string) => {
+    const res = await fetch(`/api/admin/ai/attachments?id=${id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) setAttachments((prev) => prev.filter((a) => a.id !== id));
+    else toast.error("Falha ao remover o ficheiro.");
+  };
 
   const showPreview = (revisionId: string) => {
     setPreviewRevisionId(revisionId);
@@ -181,6 +199,13 @@ export default function AiBuilderConsole({
         break;
       case "directions":
         append({ kind: "directions", id: nextId(), directions: e.directions });
+        break;
+      case "question":
+        // The agent could not tell what an attachment was for and asked instead
+        // of guessing. Replying in the composer resumes the same session.
+        streamingId.current = null;
+        append({ kind: "question", id: nextId(), text: e.text });
+        toast.info("O agente precisa de uma resposta.");
         break;
       case "draft":
         showPreview(e.revisionId);
@@ -303,6 +328,10 @@ export default function AiBuilderConsole({
         onAnotherRound={(note) =>
           startBuild(gatePrompt, { refineDirections: note || "different" })
         }
+        slug={slug}
+        attachments={attachments}
+        onAttach={(a) => setAttachments((prev) => [...prev, a])}
+        onRemoveAttachment={removeAttachment}
       />
       <PreviewPane
         src={previewSrc}

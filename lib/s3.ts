@@ -43,7 +43,7 @@ export interface PresignedUploadResult {
 export async function generatePresignedUploadUrl(
   fileName: string,
   contentType: string,
-  folder: "images" | "videos" | "audio" | "fonts/pending",
+  folder: "images" | "videos" | "audio" | "documents" | "fonts/pending",
   expiresIn = 600, // 10 minutes
 ): Promise<PresignedUploadResult> {
   const client = getS3Client();

@@ -161,7 +161,10 @@ import {
   type InvitationFormError,
   type InvitationFormMode,
 } from "@/lib/invitation-form-mode";
-import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
+import {
+  getInvitationDuplicatePath,
+  getInvitationEditPath,
+} from "@/lib/admin-row-navigation";
 import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
 
 // ---------------------------------------------------------------------------
@@ -1555,7 +1558,8 @@ export default function InvitationForm({
 
       toast.success(formCopy.successMessage);
       if (mode !== "edit") {
-        router.push(`/admin/invitations/${data.id}/edit`);
+        // AI invitations land in the builder, not the classic form.
+        router.push(getInvitationEditPath(data.id, sourceForm.renderMode));
       }
       router.refresh();
     } catch (err) {
@@ -2138,8 +2142,10 @@ export default function InvitationForm({
                   {isAi ? "Mídia" : "Modelo & Mídia"}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
-                  {/* Theme picker: design-only, meaningless for AI bundles. */}
-                  {!isAi && (
+                  {/* Theme picker: design-only once the bundle exists, but on
+                      create it is still required (the API needs a themeId) and
+                      it seeds the platform-owned envelope/cover. */}
+                  {(!isAi || createLike) && (
                     <div className="space-y-1.5">
                       <Label>Modelo</Label>
                       <Select

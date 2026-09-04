@@ -30,6 +30,8 @@ const ALLOWED_TYPES: Record<string, UploadFolder> = {
   "audio/webm": "audio",
   "audio/aac": "audio",
   "audio/flac": "audio",
+  // Documents — AI builder reference material only, never rendered.
+  "application/pdf": "documents",
 };
 
 export async function POST(req: NextRequest) {
