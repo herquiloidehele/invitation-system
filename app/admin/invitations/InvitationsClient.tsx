@@ -59,6 +59,7 @@ import {
   ChevronDown,
   Scroll,
   Link2,
+  Sparkles,
   CopyPlus,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -166,17 +167,18 @@ export function InvitationsClient({
       year: "numeric",
     });
 
-  const openInvitation = (id: string) => {
-    router.push(getInvitationEditPath(id));
+  const openInvitation = (id: string, renderMode?: string | null) => {
+    router.push(getInvitationEditPath(id, renderMode));
   };
 
   const handleRowKeyDown = (
     event: KeyboardEvent<HTMLTableRowElement>,
     id: string,
+    renderMode?: string | null,
   ) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      openInvitation(id);
+      openInvitation(id, renderMode);
     }
   };
 
@@ -279,6 +281,17 @@ export function InvitationsClient({
                     <p className="font-medium text-sm">Externo</p>
                     <p className="text-xs text-muted-foreground">
                       Capa + vídeo ou link externo
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => router.push("/admin/invitations/new-ai")}
+                >
+                  <Sparkles className="size-4 mr-2 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium text-sm">IA</p>
+                    <p className="text-xs text-muted-foreground">
+                      Design gerado por IA a partir de um pedido
                     </p>
                   </div>
                 </DropdownMenuItem>
@@ -385,11 +398,18 @@ export function InvitationsClient({
                         role="link"
                         tabIndex={0}
                         className="cursor-pointer"
-                        onClick={() => openInvitation(inv.id)}
-                        onKeyDown={(event) => handleRowKeyDown(event, inv.id)}
+                        onClick={() => openInvitation(inv.id, inv.renderMode)}
+                        onKeyDown={(event) =>
+                          handleRowKeyDown(event, inv.id, inv.renderMode)
+                        }
                       >
                         <TableCell className="font-medium whitespace-nowrap">
                           {coupleName}
+                          {inv.renderMode === "ai" && (
+                            <Badge variant="secondary" className="ml-2">
+                              AI
+                            </Badge>
+                          )}
                         </TableCell>
 
                         <TableCell>
@@ -489,7 +509,7 @@ export function InvitationsClient({
                             </Link>
 
                             <Link
-                              href={getInvitationEditPath(inv.id)}
+                              href={getInvitationEditPath(inv.id, inv.renderMode)}
                               className={cn(
                                 buttonVariants({
                                   variant: "ghost",

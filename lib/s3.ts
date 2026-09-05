@@ -43,7 +43,7 @@ export interface PresignedUploadResult {
 export async function generatePresignedUploadUrl(
   fileName: string,
   contentType: string,
-  folder: "images" | "videos" | "audio" | "fonts/pending",
+  folder: "images" | "videos" | "audio" | "documents" | "fonts/pending",
   expiresIn = 600, // 10 minutes
 ): Promise<PresignedUploadResult> {
   const client = getS3Client();
@@ -75,7 +75,7 @@ export async function generatePresignedUploadUrl(
  * upload server-side and want to expose the same `https://…amazonaws.com/key`
  * shape that `generatePresignedUploadUrl` produces.
  */
-function publicUrlForKey(key: string): string {
+export function publicUrlForKey(key: string): string {
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
 

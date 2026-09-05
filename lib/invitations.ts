@@ -8,6 +8,8 @@ import { sanitizeLandingTranslations } from "./landing-translations";
 import { sanitizeLandingDetailImages } from "./landing-product-details";
 import { normalizeOwnerGuestFormMode } from "./owner-guest-form-mode";
 import { normalizeCurrency } from "./currency/config";
+import { normalizeRenderMode } from "./ai-invitation";
+import { publicUrlForKey } from "./s3";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -41,6 +43,10 @@ type InvitationWithTheme = {
   slug: string;
   themeId: string;
   theme: { name: string };
+  // Optional so shared fixtures (e.g. the admin-mapper row) can omit them; the
+  // Prisma query always supplies both, and the mapper handles their absence.
+  renderMode?: string;
+  activeRevision?: { id: string; bundleKey: string | null } | null;
   couple: unknown;
   date: unknown;
   quote: string;
@@ -178,6 +184,10 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
       (row.personalGuestCard as InvitationData["personalGuestCard"] | null) ??
       undefined,
     invitationType: (row.invitationType as InvitationType) ?? "standard",
+    renderMode: normalizeRenderMode(row.renderMode),
+    aiBundleUrl: row.activeRevision?.bundleKey
+      ? publicUrlForKey(row.activeRevision.bundleKey)
+      : null,
     externalLink: row.externalLink ?? undefined,
     isDemo: row.isDemo,
     textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
@@ -219,7 +229,10 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
   };
 }
 
-const includeTheme = { theme: { select: { name: true } } } as const;
+const includeTheme = {
+  theme: { select: { name: true } },
+  activeRevision: { select: { id: true, bundleKey: true } },
+} as const;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -232,7 +245,27 @@ export const getInvitation = cache(
       include: includeTheme,
     });
     if (!row) return null;
-    return toInvitationData(row as unknown as InvitationWithTheme);
+    const data = toInvitationData(row as unknown as InvitationWithTheme);
+
+    // Builder attachments are only meaningful to a generated bundle, so the
+    // extra query is scoped to AI invitations — standard ones are unaffected.
+    if (data.renderMode === "ai") {
+      const attachments = await prisma.aiAttachment.findMany({
+        where: { invitationId: row.id },
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          name: true,
+          kind: true,
+          url: true,
+          width: true,
+          height: true,
+        },
+      });
+      data.aiAssetLibrary = attachments;
+    }
+
+    return data;
   },
 );
 

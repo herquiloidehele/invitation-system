@@ -24,6 +24,8 @@ interface InvitationLocaleControllerProps {
   isLandingPreview?: boolean;
   lazyExternalIframe?: boolean;
   initialSection?: string;
+  /** Admin AI-builder preview: skip the cover and show the invitation itself. */
+  skipCover?: boolean;
 }
 
 /**
@@ -45,6 +47,7 @@ export default function InvitationLocaleController({
   isLandingPreview = false,
   lazyExternalIframe = false,
   initialSection,
+  skipCover = false,
 }: InvitationLocaleControllerProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -91,6 +94,7 @@ export default function InvitationLocaleController({
           isLandingPreview={isLandingPreview}
           lazyExternalIframe={lazyExternalIframe}
           initialSection={initialSection}
+          skipCover={skipCover}
         />
       </InvitationLocaleChangeProvider>
     </NextIntlClientProvider>

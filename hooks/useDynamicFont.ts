@@ -80,6 +80,11 @@ function acquireGoogleFont(family: string, weights?: number[]) {
   const link = document.createElement("link");
   link.id = linkId;
   link.rel = "stylesheet";
+  // CORS-mode so the sheet's rules are readable through CSSOM (Google serves
+  // `Access-Control-Allow-Origin: *`). Without it, anything that walks
+  // `document.styleSheets` — the AI preview capture, for one — trips a
+  // SecurityError on this sheet, which the dev overlay reports as an issue.
+  link.crossOrigin = "anonymous";
   link.href = buildGoogleFontUrl(family, weights);
   document.head.appendChild(link);
   googleLinks.set(family, link);

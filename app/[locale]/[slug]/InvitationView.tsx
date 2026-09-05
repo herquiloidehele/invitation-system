@@ -13,6 +13,7 @@ import {
 import type { ExternalVideoPageHandle } from "@/components/shared/ExternalVideoPage";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import VideoSequenceCover from "@/components/shared/VideoSequenceCover";
+import { isAiRenderMode } from "@/lib/ai-invitation";
 import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { isVideoEntranceLayout } from "@/lib/video-entrance";
 import { shouldRenderVideoSequenceCover } from "@/lib/cover-videos";
@@ -63,6 +64,9 @@ const ElegantFloralPage = dynamic(
   () => import("@/components/elegant-floral/ElegantFloralPage"),
   { ssr: false },
 );
+const AiInvitationView = dynamic(() => import("./AiInvitationView"), {
+  ssr: false,
+});
 
 interface InvitationViewProps {
   invitation: InvitationData;
@@ -75,6 +79,8 @@ interface InvitationViewProps {
   /** Section id to reveal + scroll to on load (e.g. "gifts" when returning from
    *  the gifts sub-page). When set, the envelope cover is skipped. */
   initialSection?: string;
+  /** Admin AI-builder preview: skip the cover and show the invitation itself. */
+  skipCover?: boolean;
 }
 
 export default function InvitationView({
@@ -83,7 +89,20 @@ export default function InvitationView({
   isLandingPreview = false,
   lazyExternalIframe = false,
   initialSection,
+  skipCover = false,
 }: InvitationViewProps) {
+  // AI invitations render a generated bundle behind the platform-owned cover.
+  // Branch first so none of the standard renderer's hooks are instantiated.
+  if (isAiRenderMode(invitation)) {
+    return (
+      <AiInvitationView
+        invitation={invitation}
+        theme={theme}
+        skipCover={skipCover}
+      />
+    );
+  }
+
   // Curtain-Canva templates skip the entire envelope flow and render
   // their own self-contained page. Branch at the top so the
   // envelope-specific hook tree is never instantiated for these themes.

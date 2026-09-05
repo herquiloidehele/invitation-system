@@ -126,6 +126,7 @@ import {
   isImageLayerEditorActive,
 } from "@/lib/image-layer-editor-mode";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
+import { defaultInvitationDate } from "@/lib/invitation-default-date";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
 import { EditingLocaleNotice } from "@/components/admin/EditingLocaleNotice";
@@ -161,7 +162,10 @@ import {
   type InvitationFormError,
   type InvitationFormMode,
 } from "@/lib/invitation-form-mode";
-import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
+import {
+  getInvitationDuplicatePath,
+  getInvitationEditPath,
+} from "@/lib/admin-row-navigation";
 import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
 
 // ---------------------------------------------------------------------------
@@ -461,15 +465,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     themeId: firstTheme?.id ?? "theme_pink_floral",
     template: firstTheme?.name ?? "pink-floral",
     couple: { bride: "", groom: "", monogram: "" },
-    date: {
-      iso: "",
-      display: "",
-      dayOfWeek: "",
-      time: "",
-      day: "",
-      month: "",
-      year: "",
-    },
+    date: defaultInvitationDate(),
     quote: "",
     eventType: "wedding",
     location: {
@@ -566,6 +562,18 @@ interface InvitationFormProps {
   ownerUrl?: string;
   /** All available themes (fetched by the server parent and passed down). */
   themes: TemplateTheme[];
+  /**
+   * "ai" hides design-only controls (theme picker, hero sizing, background
+   * image layers) that a generated bundle ignores — it authors its own design.
+   * Content, media and cover sections stay: the bundle reads them from props.
+   */
+  variant?: "standard" | "ai";
+  /**
+   * For AI invitations: which revision to render in the "Convite" preview, and
+   * the locale to render it in. The preview is the real generated bundle shown
+   * through the cover-skipped admin preview route, not the standard renderer.
+   */
+  aiPreview?: { revisionId: string | null; locale: string };
 }
 
 export default function InvitationForm({
@@ -576,7 +584,10 @@ export default function InvitationForm({
   sourceCustomerName,
   ownerUrl,
   themes,
+  variant = "standard",
+  aiPreview,
 }: InvitationFormProps) {
+  const isAi = variant === "ai";
   const router = useRouter();
   const formCopy = invitationFormCopy(mode, false);
   const createLike = isCreateLikeInvitationMode(mode);
@@ -1547,7 +1558,8 @@ export default function InvitationForm({
 
       toast.success(formCopy.successMessage);
       if (mode !== "edit") {
-        router.push(`/admin/invitations/${data.id}/edit`);
+        // AI invitations land in the builder, not the classic form.
+        router.push(getInvitationEditPath(data.id, sourceForm.renderMode));
       }
       router.refresh();
     } catch (err) {
@@ -2127,35 +2139,40 @@ export default function InvitationForm({
                 className="border rounded-lg px-4"
               >
                 <AccordionTrigger className="text-sm font-medium">
-                  Modelo & Mídia
+                  {isAi ? "Mídia" : "Modelo & Mídia"}
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3 pb-4">
-                  <div className="space-y-1.5">
-                    <Label>Modelo</Label>
-                    <Select
-                      value={form.template}
-                      onValueChange={(v) => {
-                        if (!v) return;
-                        const selected = themes.find((t) => t.name === v);
-                        setForm((prev) => ({
-                          ...prev,
-                          template: v,
-                          themeId: selected?.id ?? v,
-                        }));
-                      }}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {themes.map((t) => (
-                          <SelectItem key={t.name} value={t.name}>
-                            {t.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {/* Theme picker: design-only once the bundle exists, but on
+                      create it is still required (the API needs a themeId) and
+                      it seeds the platform-owned envelope/cover. */}
+                  {(!isAi || createLike) && (
+                    <div className="space-y-1.5">
+                      <Label>Modelo</Label>
+                      <Select
+                        value={form.template}
+                        onValueChange={(v) => {
+                          if (!v) return;
+                          const selected = themes.find((t) => t.name === v);
+                          setForm((prev) => ({
+                            ...prev,
+                            template: v,
+                            themeId: selected?.id ?? v,
+                          }));
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {themes.map((t) => (
+                            <SelectItem key={t.name} value={t.name}>
+                              {t.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div className="space-y-1.5">
                     <Label>Imagem Principal</Label>
                     <MediaUpload
@@ -2172,31 +2189,37 @@ export default function InvitationForm({
                         onChange={(s) => updateImageSettings("heroImage", s)}
                       />
                     )}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="heroHeight">Altura do hero</Label>
-                        <span className="text-xs text-muted-foreground tabular-nums">
-                          {form.heroHeight ?? DEFAULT_HERO_HEIGHT}px
-                        </span>
-                      </div>
-                      <input
-                        id="heroHeight"
-                        type="range"
-                        min={MIN_HERO_HEIGHT}
-                        max={MAX_HERO_HEIGHT}
-                        step={HERO_HEIGHT_STEP}
-                        value={form.heroHeight ?? DEFAULT_HERO_HEIGHT}
-                        onChange={(e) =>
-                          update("heroHeight", parseInt(e.target.value, 10))
-                        }
-                        className="w-full accent-foreground cursor-pointer"
-                      />
-                    </div>
-                    <HeroMediaFitSelect
-                      id="heroMediaFit"
-                      value={form.heroMediaFit}
-                      onChange={(v) => update("heroMediaFit", v)}
-                    />
+                    {/* Hero sizing/fit: the generated bundle lays out its own
+                        hero, so these do nothing for an AI invitation. */}
+                    {!isAi && (
+                      <>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="heroHeight">Altura do hero</Label>
+                            <span className="text-xs text-muted-foreground tabular-nums">
+                              {form.heroHeight ?? DEFAULT_HERO_HEIGHT}px
+                            </span>
+                          </div>
+                          <input
+                            id="heroHeight"
+                            type="range"
+                            min={MIN_HERO_HEIGHT}
+                            max={MAX_HERO_HEIGHT}
+                            step={HERO_HEIGHT_STEP}
+                            value={form.heroHeight ?? DEFAULT_HERO_HEIGHT}
+                            onChange={(e) =>
+                              update("heroHeight", parseInt(e.target.value, 10))
+                            }
+                            className="w-full accent-foreground cursor-pointer"
+                          />
+                        </div>
+                        <HeroMediaFitSelect
+                          id="heroMediaFit"
+                          value={form.heroMediaFit}
+                          onChange={(v) => update("heroMediaFit", v)}
+                        />
+                      </>
+                    )}
                     {/* Hero overlay controls */}
                     <div className="space-y-3 pt-2">
                       {form.videoUrl ? (
@@ -2450,7 +2473,8 @@ export default function InvitationForm({
                 </AccordionContent>
               </AccordionItem>
 
-              {/* ── Imagens de fundo ── */}
+              {/* ── Imagens de fundo (design-only: hidden for AI) ── */}
+              {!isAi && (
               <AccordionItem
                 value="imageLayer"
                 className="border rounded-lg px-4"
@@ -2492,6 +2516,7 @@ export default function InvitationForm({
                   )}
                 </AccordionContent>
               </AccordionItem>
+              )}
 
               {/* ── Date & Time ── */}
               <AccordionItem value="date" className="border rounded-lg px-4">
@@ -4433,6 +4458,23 @@ export default function InvitationForm({
             value="invite"
             className="flex-1 overflow-auto m-0 bg-neutral-100"
           >
+            {isAi ? (
+              aiPreview?.revisionId ? (
+                // The real generated bundle, via the cover-skipped admin preview
+                // route — the standard renderer below would misrepresent it.
+                <iframe
+                  key={aiPreview.revisionId}
+                  src={`/${aiPreview.locale}/${form.slug}?revision=${aiPreview.revisionId}`}
+                  title="Pré-visualização do convite"
+                  className="h-full max-h-165 w-full border-0 bg-white"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                  Ainda não há nenhuma versão gerada. Crie uma no separador
+                  Builder para a pré-visualizar aqui.
+                </div>
+              )
+            ) : (
             <SpacingStyleProvider spacingStyles={form.spacingStyles}>
               <InlineTextEditProvider
                 updateTextStyleElement={updateTextStyleElement}
@@ -4487,6 +4529,7 @@ export default function InvitationForm({
                 </InlineCardEditProvider>
               </InlineTextEditProvider>
             </SpacingStyleProvider>
+            )}
           </TabsContent>
         </Tabs>
       </div>

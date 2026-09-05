@@ -86,6 +86,9 @@ export function buildInvitationCreateData(
     countdown: sanitizeJsonField(body.countdown, null),
     personalGuestCard: sanitizeJsonField(body.personalGuestCard, null),
     invitationType: body.invitationType ?? "standard",
+    // "ai" invitations are created from the builder entry point; everything
+    // else renders with the standard renderer.
+    renderMode: body.renderMode === "ai" ? "ai" : "standard",
     externalLink: body.externalLink ?? "",
     isDemo: body.isDemo === true,
     textStyles: sanitizeJsonField(body.textStyles, null),

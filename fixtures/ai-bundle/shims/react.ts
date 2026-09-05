@@ -1,0 +1,13 @@
+import { hostRuntime } from "../runtime";
+
+const React = hostRuntime().react as Record<string, never>;
+
+export const useState = React.useState;
+export const useEffect = React.useEffect;
+export const useMemo = React.useMemo;
+export const useRef = React.useRef;
+export const useCallback = React.useCallback;
+export const createElement = React.createElement;
+export const Fragment = React.Fragment;
+
+export default React;

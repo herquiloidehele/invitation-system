@@ -36,6 +36,12 @@ interface InvitationLocaleChange {
 const InvitationLocaleChangeContext =
   createContext<InvitationLocaleChange | null>(null);
 
+/** Read the locale-change context (null outside a provider). Exposes the
+ *  existing internal context so the AI SDK's useLocale().switchTo can drive it. */
+export function useInvitationLocaleChange(): InvitationLocaleChange | null {
+  return useContext(InvitationLocaleChangeContext);
+}
+
 export function InvitationLocaleChangeProvider({
   mode,
   onLocaleChange,

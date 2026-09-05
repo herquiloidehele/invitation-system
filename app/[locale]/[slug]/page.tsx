@@ -22,6 +22,9 @@ import {
 } from "@/lib/invitation-translations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
+import { getRevisionForPreview } from "@/worker/persistence";
+import { isAdminRequest, resolvePreviewRenderState } from "@/lib/ai-preview";
+import { prisma } from "@/lib/db";
 import InvitationLocaleController from "./InvitationLocaleController";
 import {
   OG_IMAGE_HEIGHT,
@@ -176,6 +179,10 @@ export default async function InvitationSlugPage({
     "lazyExternalIframe",
   );
   const section = getInvitationSearchParam(resolvedSearchParams, "section");
+  const previewRevisionId = getInvitationSearchParam(
+    resolvedSearchParams,
+    "revision",
+  );
 
   const sourceInvitation = await getInvitation(slug);
 
@@ -199,6 +206,33 @@ export default async function InvitationSlugPage({
 
   if (!theme) {
     notFound();
+  }
+
+  // Admin-only draft/revision preview. For an authenticated admin, `?revision=`
+  // renders a specific (possibly unpublished) revision via the same public
+  // renderer. Unauthenticated visitors are ignored — no preview leak.
+  // Deliberately derived from the preview override, not from a query param: a
+  // public `?cover=0` would let anyone skip the envelope on a live invitation.
+  let skipCover = false;
+  if (previewRevisionId && (await isAdminRequest())) {
+    const invRow = await prisma.invitation.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    const revision = invRow
+      ? await getRevisionForPreview(previewRevisionId)
+      : null;
+    const preview = resolvePreviewRenderState({
+      revision,
+      invitationId: invRow?.id ?? "",
+    });
+    if (preview) {
+      invitation.renderMode = preview.renderMode;
+      invitation.aiBundleUrl = preview.aiBundleUrl;
+      sourceInvitation.renderMode = preview.renderMode;
+      sourceInvitation.aiBundleUrl = preview.aiBundleUrl;
+      skipCover = true;
+    }
   }
 
   const browserUiColor = resolveBrowserUiColor({
@@ -297,6 +331,7 @@ export default async function InvitationSlugPage({
         isLandingPreview={landingPreview === "1"}
         lazyExternalIframe={lazyExternalIframe === "1"}
         initialSection={section}
+        skipCover={skipCover}
       />
     </>
   );

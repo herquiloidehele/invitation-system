@@ -57,3 +57,8 @@ neon_data.sql
 
 # fallow cache
 .fallow/
+.ai-workspaces/
+
+
+#Ai design
+design/
