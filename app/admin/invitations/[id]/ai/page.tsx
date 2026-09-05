@@ -48,7 +48,10 @@ export default async function AiInvitationPage({
   const previewRevisionId = row.activeRevisionId ?? newest?.id ?? null;
 
   return (
-    <Tabs defaultValue="builder" className="flex min-h-0 flex-1 flex-col gap-4">
+    <Tabs
+      defaultValue="builder"
+      className="flex h-[calc(100svh-5rem)] min-h-0 flex-col gap-4"
+    >
       <div className="flex items-center justify-between gap-4">
         <h1 className="truncate text-2xl font-semibold tracking-tight">
           {title}
@@ -59,7 +62,10 @@ export default async function AiInvitationPage({
         </TabsList>
       </div>
 
-      <TabsContent value="builder" className="mt-0">
+      <TabsContent
+        value="builder"
+        className="mt-0 flex min-h-0 flex-1 flex-col"
+      >
         <AiBuilderConsole slug={row.slug} locale={locale} />
       </TabsContent>
 

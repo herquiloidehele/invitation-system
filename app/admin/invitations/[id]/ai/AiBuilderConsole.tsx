@@ -552,6 +552,7 @@ export default function AiBuilderConsole({
           id: nextId(),
           text: "Já existe uma construção em curso para este convite.",
         });
+        finishBuild();
         return;
       }
       if (!res.ok || !res.body) {
@@ -560,6 +561,7 @@ export default function AiBuilderConsole({
           id: nextId(),
           text: `O pedido de construção falhou (${res.status}).`,
         });
+        finishBuild();
         return;
       }
       const reader = res.body.getReader();
@@ -663,7 +665,7 @@ export default function AiBuilderConsole({
       : null;
 
   return (
-    <div className="grid h-[calc(100vh-11rem)] min-h-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,9fr)_minmax(0,5fr)]">
+    <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,9fr)_minmax(0,5fr)]">
       <ChatPane
         items={items}
         prompt={prompt}

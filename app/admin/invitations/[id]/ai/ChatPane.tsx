@@ -1,16 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  AlertTriangle,
-  Eye,
-  FileText,
-  HelpCircle,
-  Loader2,
-  Send,
-  Wrench,
-  X,
-} from "lucide-react";
+import { AlertTriangle, Eye, FileText, HelpCircle, Loader2, Send, Wrench, X } from "lucide-react";
 
 import type { BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
@@ -311,6 +302,18 @@ export default function ChatPane({
                 </div>
               );
             })}
+            {building && (
+              <div
+                className="flex items-center gap-1.5 pl-1 text-muted-foreground relative"
+                aria-live="polite"
+                aria-label="A trabalhar"
+              >
+                <span className="sr-only">A trabalhar…</span>
+                <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+                <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+                <span className="size-1.5 animate-bounce rounded-full bg-current" />
+              </div>
+            )}
             <div ref={endRef} />
           </div>
         )}
