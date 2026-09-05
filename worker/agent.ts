@@ -105,6 +105,7 @@ export async function runBuildAgent(args: {
         NODE_PATH: repoModules,
         HOME: process.env.HOME ?? "",
         ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? "",
+        IS_SANDBOX: "1",
       },
     },
   });
