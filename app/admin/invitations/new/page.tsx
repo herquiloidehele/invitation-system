@@ -1,6 +1,7 @@
 import { getThemes } from "@/lib/themes";
 import InvitationForm from "../InvitationForm";
 import type { InvitationData } from "@/lib/types";
+import { defaultInvitationDate } from "@/lib/invitation-default-date";
 
 interface PageProps {
   searchParams: Promise<{ template?: string }>;
@@ -23,15 +24,7 @@ export default async function NewInvitationPage({ searchParams }: PageProps) {
         themeId: matchedTheme.id,
         template: matchedTheme.name,
         couple: { bride: "", groom: "", monogram: "" },
-        date: {
-          iso: "",
-          display: "",
-          dayOfWeek: "",
-          time: "",
-          day: "",
-          month: "",
-          year: "",
-        },
+        date: defaultInvitationDate(),
         quote: "",
         eventType: "wedding",
         location: {
