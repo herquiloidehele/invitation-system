@@ -126,6 +126,7 @@ import {
   isImageLayerEditorActive,
 } from "@/lib/image-layer-editor-mode";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
+import { defaultInvitationDate } from "@/lib/invitation-default-date";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
 import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicateNotice";
 import { EditingLocaleNotice } from "@/components/admin/EditingLocaleNotice";
@@ -464,15 +465,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     themeId: firstTheme?.id ?? "theme_pink_floral",
     template: firstTheme?.name ?? "pink-floral",
     couple: { bride: "", groom: "", monogram: "" },
-    date: {
-      iso: "",
-      display: "",
-      dayOfWeek: "",
-      time: "",
-      day: "",
-      month: "",
-      year: "",
-    },
+    date: defaultInvitationDate(),
     quote: "",
     eventType: "wedding",
     location: {

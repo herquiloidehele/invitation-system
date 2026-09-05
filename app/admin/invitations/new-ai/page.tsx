@@ -1,6 +1,7 @@
 import { getThemes } from "@/lib/themes";
 import InvitationForm from "../InvitationForm";
 import type { InvitationData } from "@/lib/types";
+import { defaultInvitationDate } from "@/lib/invitation-default-date";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +23,7 @@ export default async function NewAiInvitationPage() {
     template: themes[0]?.name ?? "",
     renderMode: "ai",
     couple: { bride: "", groom: "", monogram: "" },
-    date: {
-      iso: "",
-      display: "",
-      dayOfWeek: "",
-      time: "",
-      day: "",
-      month: "",
-      year: "",
-    },
+    date: defaultInvitationDate(),
     quote: "",
     eventType: "wedding",
     location: {
