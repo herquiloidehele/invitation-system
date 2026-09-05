@@ -13,13 +13,11 @@ import {
 
 import type { BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
-import type { Direction } from "@/worker/lib/directions";
 import type { AttachmentRecord } from "@/worker/persistence";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import DirectionsCards from "./DirectionsCards";
 import ChatMarkdown from "./ChatMarkdown";
 import AttachmentPicker from "./AttachmentPicker";
 
@@ -33,7 +31,6 @@ export type ChatItem =
       usage?: BuildUsage | null;
     }
   | { kind: "activity"; id: string; text: string }
-  | { kind: "directions"; id: string; directions: Direction[] }
   | { kind: "question"; id: string; text: string }
   | {
       kind: "critique";
@@ -91,8 +88,6 @@ export default function ChatPane({
   onPromptChange,
   onSubmit,
   building,
-  onPickDirection,
-  onAnotherRound,
   onCritique,
   canCritique,
   reviewing,
@@ -106,8 +101,6 @@ export default function ChatPane({
   onPromptChange: (v: string) => void;
   onSubmit: () => void;
   building: boolean;
-  onPickDirection: (d: Direction) => void;
-  onAnotherRound: (note: string) => void;
   /** Capture the current draft and ask for a visual review, on demand. */
   onCritique: () => void;
   canCritique: boolean;
@@ -146,17 +139,6 @@ export default function ChatPane({
                     <Wrench className="size-3 shrink-0" />
                     <span className="truncate">{m.text}</span>
                   </div>
-                );
-              }
-              if (m.kind === "directions") {
-                return (
-                  <DirectionsCards
-                    key={m.id}
-                    directions={m.directions}
-                    disabled={building}
-                    onPick={onPickDirection}
-                    onAnotherRound={onAnotherRound}
-                  />
                 );
               }
               if (m.kind === "critique") {

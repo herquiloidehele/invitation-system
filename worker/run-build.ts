@@ -93,54 +93,10 @@ export async function runInvitationBuild(args: {
   const brief = buildInvitationBrief(invitation);
   const attachments = await listAttachmentsForInvitation(invitationId);
 
-  // The directions gate: before any code exists, propose distinct visual
-  // directions and stop. Fires when the invitation has no revisions at all, or
-  // whenever another round is explicitly requested.
+  // Every build goes straight to building — the directions gate (which used to
+  // propose 4 visual directions and stop) has been removed.
   const existing = await revisionCount(invitationId);
   const isFirstBuild = existing === 0;
-  if (!direction && !critique && (existing === 0 || refineDirections)) {
-    // Moodboards matter most here. PDFs are skipped — they would need document
-    // blocks and would blow up the cost of a deliberately cheap gate.
-    const candidates = attachments.filter((a) => a.kind === "image");
-    const chosen = candidates.slice(-MAX_GATE_IMAGES);
-    if (candidates.length > chosen.length) {
-      onEvent({
-        kind: "progress",
-        text: `A usar as ${chosen.length} imagens mais recentes de ${candidates.length}.`,
-      });
-    }
-    const images: Array<{ mediaType: string; base64: string }> = [];
-    for (const a of chosen) {
-      const buf = await getObjectBuffer(a.objectKey).catch(() => null);
-      if (!buf || buf.byteLength > MAX_GATE_IMAGE_BYTES) continue;
-      images.push({ mediaType: a.mimeType, base64: buf.toString("base64") });
-    }
-
-    const { directions } = await proposeDirections({
-      brief,
-      prompt,
-      note: refineDirections,
-      images,
-    });
-    if (directions.length === 0) {
-      const message = "Could not propose directions. Try again.";
-      await appendMessage({
-        buildId: build.id,
-        role: "assistant",
-        content: message,
-      });
-      onEvent({ kind: "error", message });
-      return { ok: false };
-    }
-    await appendMessage({
-      buildId: build.id,
-      role: "assistant",
-      content: "Pick a direction to build.",
-      directions,
-    });
-    onEvent({ kind: "directions", directions });
-    return { ok: true };
-  }
 
   const priorSource = await latestRevisionSource(build.id);
   const attachmentBrief = buildAttachmentBrief(attachments);

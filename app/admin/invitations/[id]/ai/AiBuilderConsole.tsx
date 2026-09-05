@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 import type { BuildEvent, BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
-import type { Direction } from "@/worker/lib/directions";
 import type { AttachmentRecord } from "@/worker/persistence";
 import { parseSseFrames } from "@/lib/ai-build-stream";
 import {
@@ -48,9 +47,6 @@ export default function AiBuilderConsole({
   );
   const [previewNonce, setPreviewNonce] = useState(0);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
-  // The prompt that opened the directions gate, so picking a card (or asking
-  // for another round) can rebuild with the original brief.
-  const [gatePrompt, setGatePrompt] = useState("");
   const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
   // Id of the assistant bubble currently being streamed into, if any. A ref,
   // not state: it is read and written inside the async stream loop.
@@ -61,7 +57,6 @@ export default function AiBuilderConsole({
   // Visual critique: the console captures the preview iframe after a first
   // build and sends the tiles for review. Bounded to one round per prompt.
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const chosenDirection = useRef<Direction | null>(null);
   const critiqueRounds = useRef(0);
   const MAX_CRITIQUE_ROUNDS = 1;
   // True while tiles are being captured or judged; drives the manual button.
@@ -128,7 +123,6 @@ export default function AiBuilderConsole({
         role: string;
         content: string;
         costUsd: number | null;
-        directions: unknown;
         usage: unknown;
         critique: unknown;
         attachments?: AttachmentRecord[];
@@ -163,13 +157,6 @@ export default function AiBuilderConsole({
             screenshots: legacyScreenshots(c.screenshots),
           };
         }
-        if (Array.isArray(m.directions) && m.directions.length > 0) {
-          return {
-            kind: "directions",
-            id: m.id,
-            directions: m.directions as Direction[],
-          };
-        }
         return {
           kind: "assistant",
           id: m.id,
@@ -179,9 +166,6 @@ export default function AiBuilderConsole({
         };
       }),
     );
-    // Re-arm the gate prompt so a pick after a reload still has its brief.
-    const lastUser = [...messages].reverse().find((m) => m.role === "user");
-    if (lastUser) setGatePrompt(lastUser.content);
   }, [slug]);
 
   const loadAttachments = useCallback(async () => {
@@ -264,9 +248,6 @@ export default function AiBuilderConsole({
         // No error card here — the worker emits a specific `error` (or salvages
         // a draft). This event's job is the token numbers.
         if (lastSealedId.current) setBubbleUsage(lastSealedId.current, e.usage);
-        break;
-      case "directions":
-        append({ kind: "directions", id: nextId(), directions: e.directions });
         break;
       case "question":
         // The agent could not tell what an attachment was for and asked instead
@@ -410,7 +391,6 @@ export default function AiBuilderConsole({
       body: JSON.stringify({
         slug,
         revisionId,
-        direction: chosenDirection.current,
         shots,
       }),
     });
@@ -445,8 +425,6 @@ export default function AiBuilderConsole({
   const startBuild = async (
     text: string,
     opts?: {
-      direction?: Direction;
-      refineDirections?: string;
       critique?: Critique;
     },
   ) => {
@@ -457,7 +435,7 @@ export default function AiBuilderConsole({
     applyingCritique.current = Boolean(opts?.critique);
     // A pick / another-round / critique reuses or labels its own turn — only a
     // fresh prompt echoes a user bubble, clears the tray, and re-arms the loop.
-    if (!opts?.direction && !opts?.refineDirections && !opts?.critique) {
+    if (!opts?.critique) {
       critiqueRounds.current = 0;
       // The tray belongs to this message now — show it in the bubble and clear
       // the composer, the same way any chat client behaves.
@@ -468,7 +446,6 @@ export default function AiBuilderConsole({
         attachments,
       });
       setAttachments([]);
-      setGatePrompt(trimmed);
       setPrompt("");
     }
     try {
@@ -478,8 +455,6 @@ export default function AiBuilderConsole({
         body: JSON.stringify({
           slug,
           prompt: trimmed,
-          direction: opts?.direction,
-          refineDirections: opts?.refineDirections,
           critique: opts?.critique,
         }),
       });
@@ -589,13 +564,6 @@ export default function AiBuilderConsole({
         onPromptChange={setPrompt}
         onSubmit={() => startBuild(prompt)}
         building={building}
-        onPickDirection={(d) => {
-          chosenDirection.current = d;
-          void startBuild(gatePrompt, { direction: d });
-        }}
-        onAnotherRound={(note) =>
-          startBuild(gatePrompt, { refineDirections: note || "different" })
-        }
         onCritique={() => {
           if (previewRevisionId)
             void runCritique(previewRevisionId, { manual: true });
