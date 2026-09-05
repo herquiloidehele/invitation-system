@@ -43,6 +43,7 @@ export default function AiBuilderConsole({
   const [items, setItems] = useState<ChatItem[]>([]);
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [busy, setBusy] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [previewRevisionId, setPreviewRevisionId] = useState<string | null>(
     null,
   );
@@ -659,6 +660,34 @@ export default function AiBuilderConsole({
     }
   };
 
+  const resetAll = async () => {
+    if (building || resetting) return;
+    setResetting(true);
+    try {
+      const res = await fetch("/api/admin/ai/builds/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(body.error ?? "Falha ao recomeçar.");
+        return;
+      }
+      // Everything is gone server-side: clear the whole console to the empty,
+      // freshly-created state.
+      setItems([]);
+      setRevisions([]);
+      setPreviewRevisionId(null);
+      setAttachments([]);
+      setPrompt("");
+      toast.success("Convite reposto. Pode começar do zero.");
+      await refreshRail();
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const previewSrc =
     previewRevisionId != null
       ? `/${locale}/${slug}?revision=${previewRevisionId}&_=${previewNonce}`
@@ -699,6 +728,8 @@ export default function AiBuilderConsole({
         onPublish={publish}
         onActivate={activate}
         onRemove={remove}
+        onReset={resetAll}
+        resetting={resetting}
       />
     </div>
   );

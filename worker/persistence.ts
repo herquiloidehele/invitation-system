@@ -205,6 +205,61 @@ export async function deleteRevision(
   return { deletedId: revision.id, sessionReset };
 }
 
+/**
+ * Wipe every AI artifact for an invitation so the builder starts from scratch:
+ * all builds — which cascade to their revisions, messages and attachments at
+ * the DB level — plus their S3 objects (published bundles and uploaded
+ * attachments). The invitation's settings and `renderMode: "ai"` are left
+ * untouched, so it lands in the exact empty state of a freshly-created AI
+ * invitation. Idempotent: safe to call when nothing has been generated yet.
+ */
+export async function resetInvitationAi(invitationId: string): Promise<{
+  builds: number;
+  revisions: number;
+  deletedObjects: number;
+}> {
+  const builds = await prisma.aiBuild.findMany({
+    where: { invitationId },
+    select: {
+      id: true,
+      revisions: { select: { bundleKey: true } },
+      attachments: { select: { objectKey: true } },
+    },
+  });
+
+  const keys: string[] = [];
+  let revisions = 0;
+  for (const b of builds) {
+    revisions += b.revisions.length;
+    for (const r of b.revisions) if (r.bundleKey) keys.push(r.bundleKey);
+    for (const a of b.attachments) keys.push(a.objectKey);
+  }
+
+  // Best effort, one at a time: a dangling object costs cents, and a failed
+  // delete must never leave the database half-wiped.
+  let deletedObjects = 0;
+  for (const key of keys) {
+    await deleteObject(key)
+      .then(() => {
+        deletedObjects += 1;
+      })
+      .catch(() => undefined);
+  }
+
+  // Clear the active-revision FK first — otherwise deleting the revision it
+  // points at would violate the constraint — then delete the builds; the DB
+  // cascades to revisions, messages and attachments.
+  await prisma.$transaction([
+    prisma.invitation.update({
+      where: { id: invitationId },
+      data: { activeRevisionId: null },
+    }),
+    prisma.aiBuild.deleteMany({ where: { invitationId } }),
+  ]);
+
+  return { builds: builds.length, revisions, deletedObjects };
+}
+
 /** Roll back / forward: point the invitation at an already-published revision. */
 export async function activatePublishedRevision(
   revisionId: string,

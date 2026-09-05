@@ -1,6 +1,13 @@
 "use client";
 
-import { CheckCircle2, Eye, RotateCcw, Trash2, Upload } from "lucide-react";
+import {
+  CheckCircle2,
+  Eye,
+  Eraser,
+  RotateCcw,
+  Trash2,
+  Upload,
+} from "lucide-react";
 
 import {
   AlertDialog,
@@ -33,6 +40,8 @@ export default function VersionsPane({
   onPublish,
   onActivate,
   onRemove,
+  onReset,
+  resetting,
 }: {
   revisions: Revision[];
   busy: boolean;
@@ -41,10 +50,53 @@ export default function VersionsPane({
   onActivate: (id: string) => void;
   /** Never offered for the active version. */
   onRemove: (id: string) => void;
+  /** Wipe every message, version and generated file — start from scratch. */
+  onReset: () => void;
+  resetting: boolean;
 }) {
+  // An active revision means a published page is being served live: resetting
+  // blanks it, so the dialog warns about that specifically.
+  const hasLivePage = revisions.some((r) => r.active);
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <h2 className="text-sm font-medium">Versões</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-medium">Versões</h2>
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={busy || resetting}
+                className="text-destructive hover:text-destructive"
+              />
+            }
+          >
+            <Eraser className="size-3" /> Recomeçar
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Recomeçar do zero?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Todas as mensagens, versões e ficheiros gerados serão apagados
+                de forma permanente. Esta ação não pode ser anulada.
+                {hasLivePage
+                  ? " A versão publicada está no ar — a página pública ficará em branco até publicar uma nova versão."
+                  : ""}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={onReset}
+                className="bg-destructive text-white hover:bg-destructive/90"
+              >
+                Apagar tudo
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
       <ScrollArea className="min-h-0 flex-1 rounded-lg border p-3">
         {revisions.length === 0 ? (
           <p className="text-sm text-muted-foreground">Ainda não há versões.</p>
