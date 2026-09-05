@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { prisma } from "@/lib/db";
 import { buildBundleObjectKey } from "@/lib/ai-bundle";
-import { publicUrlForKey, putObjectBuffer } from "@/lib/s3";
+import { deleteObject, publicUrlForKey, putObjectBuffer } from "@/lib/s3";
 import type { BuildUsage } from "./lib/build-events";
 
 /** On-disk workspace for an invitation's builds (shared fs with the app). */
@@ -154,6 +154,59 @@ export async function updateDraftRevisionSource(
     where: { id: revisionId },
     data: { sourceFiles },
   });
+}
+
+/**
+ * Remove one revision. The active (live) one is protected; a published but
+ * inactive one also loses its S3 bundle. If it was the newest revision of its
+ * build, the agent session is dropped: the resumed agent would otherwise
+ * remember edits that the rehydrated (older) source no longer has.
+ */
+export async function deleteRevision(
+  revisionId: string,
+): Promise<{ deletedId: string; sessionReset: boolean }> {
+  const revision = await prisma.aiRevision.findUnique({
+    where: { id: revisionId },
+    select: {
+      id: true,
+      invitationId: true,
+      buildId: true,
+      bundleKey: true,
+      createdAt: true,
+    },
+  });
+  if (!revision) throw new Error("Revision not found.");
+  const inv = await prisma.invitation.findUnique({
+    where: { id: revision.invitationId },
+    select: { activeRevisionId: true },
+  });
+  if (inv?.activeRevisionId === revision.id) {
+    throw new Error(
+      "The active version cannot be removed; activate another one first.",
+    );
+  }
+  const newer = await prisma.aiRevision.count({
+    where: { buildId: revision.buildId, createdAt: { gt: revision.createdAt } },
+  });
+  const sessionReset = newer === 0;
+
+  if (revision.bundleKey) {
+    // Best effort: a dangling object costs cents; a failed delete must not
+    // leave the row behind.
+    await deleteObject(revision.bundleKey).catch(() => undefined);
+  }
+  await prisma.$transaction([
+    prisma.aiRevision.delete({ where: { id: revision.id } }),
+    ...(sessionReset
+      ? [
+          prisma.aiBuild.update({
+            where: { id: revision.buildId },
+            data: { agentSessionId: null, lastContextTokens: null },
+          }),
+        ]
+      : []),
+  ]);
+  return { deletedId: revision.id, sessionReset };
 }
 
 /** Roll back / forward: point the invitation at an already-published revision. */

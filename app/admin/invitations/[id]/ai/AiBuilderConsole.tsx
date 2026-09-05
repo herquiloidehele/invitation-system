@@ -550,6 +550,32 @@ export default function AiBuilderConsole({
     }
   };
 
+  const remove = async (revisionId: string) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/ai/revisions/${revisionId}`, {
+        method: "DELETE",
+      });
+      const body = await res.json();
+      if (res.ok) {
+        toast.success(
+          body.sessionReset
+            ? "Versão removida. A próxima alteração parte da versão anterior."
+            : "Versão removida.",
+        );
+        // The pane was showing the deleted version: let the rail refresh
+        // re-seed it with what is live, or the newest that remains.
+        if (previewRevisionId === revisionId) setPreviewRevisionId(null);
+      } else {
+        toast.error(body.error ?? "Falha ao remover.");
+      }
+      await refreshRail();
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const previewSrc =
     previewRevisionId != null
       ? `/${locale}/${slug}?revision=${previewRevisionId}&_=${previewNonce}`
@@ -594,6 +620,7 @@ export default function AiBuilderConsole({
         onPreview={showPreview}
         onPublish={publish}
         onActivate={activate}
+        onRemove={remove}
       />
     </div>
   );

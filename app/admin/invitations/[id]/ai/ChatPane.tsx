@@ -66,6 +66,25 @@ function formatUsage(u: BuildUsage): string {
   return `${k(totalIn)} in (${cachePct}% cache) · ${k(u.outputTokens)} out · ${model}`;
 }
 
+/**
+ * ⌘↵ / Ctrl↵ do not insert a newline on their own, so put one at the caret.
+ * `execCommand` keeps the undo stack and fires `input` (so React's onChange
+ * runs); the fallback writes the value directly and restores the caret.
+ */
+function insertLineBreak(
+  el: HTMLTextAreaElement,
+  onChange: (value: string) => void,
+) {
+  if (document.execCommand?.("insertText", false, "\n")) return;
+  const { selectionStart, selectionEnd, value } = el;
+  const next =
+    value.slice(0, selectionStart) + "\n" + value.slice(selectionEnd);
+  onChange(next);
+  requestAnimationFrame(() => {
+    el.selectionStart = el.selectionEnd = selectionStart + 1;
+  });
+}
+
 export default function ChatPane({
   items,
   prompt,
@@ -322,11 +341,20 @@ export default function ChatPane({
           disabled={building}
           placeholder="ex.: um convite editorial art déco em esmeralda e ouro…"
           onKeyDown={(e) => {
-            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) onSubmit();
+            if (e.key !== "Enter" || e.nativeEvent.isComposing) return;
+            if (e.shiftKey) return; // the browser inserts the line break
+            e.preventDefault();
+            if (e.metaKey || e.ctrlKey) {
+              insertLineBreak(e.currentTarget, onPromptChange);
+              return;
+            }
+            onSubmit();
           }}
         />
         <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">⌘↵ para enviar</span>
+          <span className="text-xs text-muted-foreground">
+            ↵ para enviar · ⌘↵ nova linha
+          </span>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

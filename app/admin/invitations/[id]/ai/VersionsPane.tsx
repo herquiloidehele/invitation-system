@@ -1,7 +1,18 @@
 "use client";
 
-import { CheckCircle2, Eye, RotateCcw, Upload } from "lucide-react";
+import { CheckCircle2, Eye, RotateCcw, Trash2, Upload } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,12 +32,15 @@ export default function VersionsPane({
   onPreview,
   onPublish,
   onActivate,
+  onRemove,
 }: {
   revisions: Revision[];
   busy: boolean;
   onPreview: (id: string) => void;
   onPublish: (id: string) => void;
   onActivate: (id: string) => void;
+  /** Never offered for the active version. */
+  onRemove: (id: string) => void;
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
@@ -82,6 +96,41 @@ export default function VersionsPane({
                     >
                       <RotateCcw className="size-3" /> Repor
                     </Button>
+                  )}
+                  {!r.active && (
+                    <AlertDialog>
+                      <AlertDialogTrigger
+                        render={
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            disabled={busy}
+                            className="text-destructive hover:text-destructive"
+                            aria-label="Remover versão"
+                          />
+                        }
+                      >
+                        <Trash2 className="size-3" /> Remover
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Remover esta versão?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {r.published
+                              ? "A versão e o seu bundle publicado serão apagados. Esta ação não pode ser anulada."
+                              : "O rascunho será apagado. Esta ação não pode ser anulada."}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => onRemove(r.id)}>
+                            Remover
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
                 </div>
               </li>
