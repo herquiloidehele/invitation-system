@@ -7,6 +7,7 @@ import type { BuildEvent, BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
 import type { AttachmentRecord } from "@/worker/persistence";
 import { parseSseFrames } from "@/lib/ai-build-stream";
+import { formatElapsed } from "@/lib/ai-build-elapsed";
 import {
   AI_PREVIEW_CAPTURE,
   AI_PREVIEW_CAPTURED,
@@ -63,6 +64,13 @@ export default function AiBuilderConsole({
   const [reviewing, setReviewing] = useState(false);
   // Set while a build is applying a critique, so its draft can be labelled.
   const applyingCritique = useRef(false);
+  // Build progress + reconnect. `buildStartedAt` drives the elapsed timer;
+  // `sawTerminal` distinguishes a clean end from a dropped stream; the poller
+  // re-attaches to a build still running server-side after a reload/blip.
+  const [buildStartedAt, setBuildStartedAt] = useState<number | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const sawTerminal = useRef(false);
+  const reconnectTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const setBubbleUsage = (id: string, usage: BuildUsage | null) =>
     setItems((prev) =>
@@ -175,11 +183,84 @@ export default function AiBuilderConsole({
     if (res.ok) setAttachments((await res.json()).attachments ?? []);
   }, [slug]);
 
+  // Tick the elapsed timer once a second while a build runs.
+  useEffect(() => {
+    if (!building || buildStartedAt == null) {
+      setElapsedMs(0);
+      return;
+    }
+    const tick = () => setElapsedMs(Date.now() - buildStartedAt);
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [building, buildStartedAt]);
+
+  const finishBuild = useCallback(() => {
+    setBuilding(false);
+    setBuildStartedAt(null);
+    void refreshRail();
+    void loadAttachments();
+  }, [refreshRail, loadAttachments]);
+
+  /** Is a build for this invitation still running on the server? */
+  const isBuildRunning = useCallback(async (): Promise<number | null> => {
+    try {
+      const res = await fetch(
+        `/api/admin/ai/builds/status?slug=${encodeURIComponent(slug)}`,
+      );
+      if (!res.ok) return null;
+      const st = (await res.json()) as { running?: boolean; startedAt?: number };
+      return st.running ? (st.startedAt ?? Date.now()) : null;
+    } catch {
+      return null;
+    }
+  }, [slug]);
+
+  /** Re-attach to a build running server-side: show progress, refresh on end. */
+  const enterReconnect = useCallback(
+    (startedAt: number) => {
+      setBuilding(true);
+      setBuildStartedAt(startedAt);
+      if (reconnectTimer.current) return;
+      reconnectTimer.current = setInterval(async () => {
+        const running = await isBuildRunning();
+        if (running != null) {
+          setBuildStartedAt(running);
+          return;
+        }
+        if (reconnectTimer.current) clearInterval(reconnectTimer.current);
+        reconnectTimer.current = null;
+        await loadHistory();
+        finishBuild();
+      }, 3000);
+    },
+    [isBuildRunning, loadHistory, finishBuild],
+  );
+
+  const cancelBuild = useCallback(async () => {
+    try {
+      await fetch("/api/admin/ai/builds/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+    } catch {
+      // best effort — the stream/poller will settle the UI either way
+    }
+  }, [slug]);
+
   useEffect(() => {
     void loadHistory();
     void refreshRail();
     void loadAttachments();
-  }, [loadHistory, refreshRail, loadAttachments]);
+    // If a build is already running (reload mid-build), re-attach to it.
+    void isBuildRunning().then((startedAt) => {
+      if (startedAt != null) enterReconnect(startedAt);
+    });
+    return () => {
+      if (reconnectTimer.current) clearInterval(reconnectTimer.current);
+    };
+  }, [loadHistory, refreshRail, loadAttachments, isBuildRunning, enterReconnect]);
 
   const removeAttachment = async (id: string) => {
     const res = await fetch(`/api/admin/ai/attachments?id=${id}`, {
@@ -195,6 +276,11 @@ export default function AiBuilderConsole({
   };
 
   const handleEvent = (e: BuildEvent) => {
+    // A terminal event means the build ended in-band; a stream that ends
+    // WITHOUT one of these is a dropped connection, not a finished build.
+    if (e.kind === "draft" || e.kind === "error" || e.kind === "question") {
+      sawTerminal.current = true;
+    }
     switch (e.kind) {
       case "tool":
         // A tool call ends the current prose block.
@@ -431,6 +517,8 @@ export default function AiBuilderConsole({
     const trimmed = text.trim();
     if (!trimmed || building) return;
     setBuilding(true);
+    setBuildStartedAt(Date.now());
+    sawTerminal.current = false;
     streamingId.current = null;
     applyingCritique.current = Boolean(opts?.critique);
     // A pick / another-round / critique reuses or labels its own turn — only a
@@ -477,17 +565,27 @@ export default function AiBuilderConsole({
         buffer = rest;
         for (const e of events) handleEvent(e);
       }
-    } catch (err) {
-      append({
-        kind: "error",
-        id: nextId(),
-        text: err instanceof Error ? err.message : "Erro na ligação.",
-      });
-    } finally {
-      setBuilding(false);
-      void refreshRail();
-      void loadAttachments();
+      // Stream closed. If it ended without a terminal event and the worker is
+      // still running server-side, we were disconnected — reconnect instead of
+      // declaring the build over.
+      if (!sawTerminal.current) {
+        const startedAt = await isBuildRunning();
+        if (startedAt != null) {
+          enterReconnect(startedAt);
+          return;
+        }
+      }
+    } catch {
+      // Network drop mid-stream. The worker child survives, so re-attach if it
+      // is still running rather than showing a connection error.
+      const startedAt = await isBuildRunning();
+      if (startedAt != null) {
+        enterReconnect(startedAt);
+        return;
+      }
+      append({ kind: "error", id: nextId(), text: "Erro na ligação." });
     }
+    finishBuild();
   };
 
   const publish = async (revisionId: string) => {
@@ -564,6 +662,8 @@ export default function AiBuilderConsole({
         onPromptChange={setPrompt}
         onSubmit={() => startBuild(prompt)}
         building={building}
+        elapsedMs={elapsedMs}
+        onCancel={cancelBuild}
         onCritique={() => {
           if (previewRevisionId)
             void runCritique(previewRevisionId, { manual: true });

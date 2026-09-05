@@ -9,11 +9,13 @@ import {
   Loader2,
   Send,
   Wrench,
+  X,
 } from "lucide-react";
 
 import type { BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
 import type { AttachmentRecord } from "@/worker/persistence";
+import { formatElapsed } from "@/lib/ai-build-elapsed";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,6 +90,8 @@ export default function ChatPane({
   onPromptChange,
   onSubmit,
   building,
+  elapsedMs,
+  onCancel,
   onCritique,
   canCritique,
   reviewing,
@@ -101,6 +105,10 @@ export default function ChatPane({
   onPromptChange: (v: string) => void;
   onSubmit: () => void;
   building: boolean;
+  /** Milliseconds elapsed on the running build, for the progress label. */
+  elapsedMs: number;
+  /** Stop the running build (kills the worker; the paid spend stops). */
+  onCancel: () => void;
   /** Capture the current draft and ask for a visual review, on demand. */
   onCritique: () => void;
   canCritique: boolean;
@@ -335,7 +343,9 @@ export default function ChatPane({
         />
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
-            ↵ para enviar · ⌘↵ nova linha
+            {building
+              ? `A construir… ${formatElapsed(elapsedMs)}`
+              : "↵ para enviar · ⌘↵ nova linha"}
           </span>
           <div className="flex items-center gap-2">
             <Button
@@ -351,17 +361,15 @@ export default function ChatPane({
               )}
               Revisão visual
             </Button>
-            <Button onClick={onSubmit} disabled={building || !prompt.trim()}>
-              {building ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" /> A construir…
-                </>
-              ) : (
-                <>
-                  <Send className="size-4" /> Enviar
-                </>
-              )}
-            </Button>
+            {building ? (
+              <Button variant="destructive" onClick={onCancel}>
+                <X className="size-4" /> Cancelar
+              </Button>
+            ) : (
+              <Button onClick={onSubmit} disabled={!prompt.trim()}>
+                <Send className="size-4" /> Enviar
+              </Button>
+            )}
           </div>
         </div>
       </div>

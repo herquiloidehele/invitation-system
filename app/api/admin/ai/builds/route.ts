@@ -4,6 +4,11 @@ import { NextRequest } from "next/server";
 
 import { formatSseEvent, parseNdjsonLines } from "@/lib/sse";
 import { classifyBuildError, extractStderrMessage } from "@/lib/build-errors";
+import {
+  registerBuild,
+  unregisterBuild,
+  wasCancelled,
+} from "@/lib/ai-build-registry";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -57,8 +62,15 @@ export async function POST(req: NextRequest) {
           prompt,
           JSON.stringify({ direction, refineDirections, critique }),
         ],
-        { cwd: repoRoot, env: process.env },
+        {
+          cwd: repoRoot,
+          env: process.env,
+          // Its own process group, so a cancel can SIGTERM the group (worker +
+          // the Agent SDK subprocess) and actually stop the spend.
+          detached: true,
+        },
       );
+      registerBuild(slug, child);
 
       const send = (event: unknown) => {
         try {
@@ -105,6 +117,7 @@ export async function POST(req: NextRequest) {
       };
 
       child.on("error", (err) => {
+        unregisterBuild(slug, child);
         const info = classifyBuildError(err.message);
         reportedError = true;
         send({
@@ -116,13 +129,19 @@ export async function POST(req: NextRequest) {
         finish();
       });
 
-      child.on("close", (code) => {
+      child.on("close", (code, signal) => {
+        // Read the cancel flag BEFORE unregistering clears the entry.
+        const cancelled = wasCancelled(slug) || signal === "SIGTERM";
+        unregisterBuild(slug, child);
         // Flush any final buffered line.
         const { events } = parseNdjsonLines(buffer + "\n");
         for (const e of events) send(e);
-        // Only report the bare exit code when nothing more specific was said —
-        // otherwise it stacks a meaningless second error under the real one.
-        if (code !== 0 && !reportedError) {
+        // Cancellation is not a failure — say so rather than an error card.
+        if (cancelled) {
+          send({ kind: "progress", text: "Construção cancelada." });
+        } else if (code !== 0 && !reportedError) {
+          // Only report the bare exit code when nothing more specific was said —
+          // otherwise it stacks a meaningless second error under the real one.
           send({
             kind: "error",
             message: "A construção falhou",
