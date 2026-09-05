@@ -546,6 +546,14 @@ export default function AiBuilderConsole({
           critique: opts?.critique,
         }),
       });
+      if (res.status === 409) {
+        append({
+          kind: "error",
+          id: nextId(),
+          text: "Já existe uma construção em curso para este convite.",
+        });
+        return;
+      }
       if (!res.ok || !res.body) {
         append({
           kind: "error",

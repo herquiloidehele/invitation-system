@@ -56,6 +56,7 @@ export async function createDraftRevision(args: {
   invitationId: string;
   prompt: string;
   sourceFiles: Record<string, string>;
+  bundleCode: string;
 }): Promise<{ revisionId: string }> {
   const revision = await prisma.aiRevision.create({
     data: {
@@ -63,6 +64,7 @@ export async function createDraftRevision(args: {
       invitationId: args.invitationId,
       prompt: args.prompt,
       sourceFiles: args.sourceFiles,
+      bundleCode: args.bundleCode,
     },
   });
   await prisma.aiBuild.update({
@@ -73,10 +75,10 @@ export async function createDraftRevision(args: {
 }
 
 /**
- * Publish a draft revision: upload its workspace bundle to S3, stamp
- * bundleKey/publishedAt, and repoint the invitation (renderMode='ai'). Only the
- * latest draft is publishable — its bundle is the one currently in the
- * workspace. Older drafts must be rebuilt first.
+ * Publish a draft revision: upload its stored bundle to S3, stamp
+ * bundleKey/publishedAt, and repoint the invitation (renderMode='ai'). The
+ * bundle comes from the revision row, so any draft is publishable and the
+ * workspace disk is not consulted.
  */
 export async function publishExistingRevision(
   revisionId: string,
@@ -97,23 +99,13 @@ export async function publishExistingRevision(
     };
   }
 
-  const newest = await prisma.aiRevision.findFirst({
-    where: { invitationId: revision.invitationId, bundleKey: null },
-    orderBy: { createdAt: "desc" },
-    select: { id: true },
-  });
-  if (newest?.id !== revision.id) {
-    throw new Error(
-      "Only the latest draft can be published; rebuild this revision first.",
-    );
-  }
-
-  const bundleCode = await readFile(
-    workspaceBundlePath(revision.invitationId),
-    "utf8",
-  ).catch(() => "");
+  // The bundle is stored on the row (survives the ephemeral filesystem), so any
+  // draft publishes deterministically — no "newest only" workspace dependency.
+  const bundleCode = revision.bundleCode ?? "";
   if (!bundleCode) {
-    throw new Error("Draft bundle missing from workspace; rebuild to publish.");
+    throw new Error(
+      "Este rascunho não tem bundle guardado; reconstrua antes de publicar.",
+    );
   }
 
   const key = buildBundleObjectKey(revision.invitationId, revision.id);
@@ -124,7 +116,10 @@ export async function publishExistingRevision(
   );
   await prisma.aiRevision.update({
     where: { id: revision.id },
-    data: { bundleKey: key, publishedAt: new Date() },
+    // Clear the DB copy: the bundle now lives in S3 (bundleKey), so the row's
+    // bytes are redundant. Drafts keep bundleCode; published revisions don't —
+    // that bounds Postgres growth to the drafts currently being worked on.
+    data: { bundleKey: key, publishedAt: new Date(), bundleCode: null },
   });
   await prisma.invitation.update({
     where: { id: revision.invitationId },
@@ -149,10 +144,11 @@ export async function latestDraftRevisionId(
 export async function updateDraftRevisionSource(
   revisionId: string,
   sourceFiles: Record<string, string>,
+  bundleCode: string,
 ): Promise<void> {
   await prisma.aiRevision.update({
     where: { id: revisionId },
-    data: { sourceFiles },
+    data: { sourceFiles, bundleCode },
   });
 }
 
@@ -432,14 +428,31 @@ export async function deleteAttachment(id: string): Promise<void> {
 }
 
 /** A revision resolved for preview: its invitation + whether it is published. */
+/** Total USD spent across an invitation's build turns (from AiMessage.costUsd). */
+export async function sumCostForInvitation(
+  invitationId: string,
+): Promise<number> {
+  const rows = await prisma.aiMessage.findMany({
+    where: { build: { invitationId }, costUsd: { not: null } },
+    select: { costUsd: true },
+  });
+  return rows.reduce((sum, r) => sum + (r.costUsd ?? 0), 0);
+}
+
 export async function getRevisionForPreview(revisionId: string): Promise<{
   id: string;
   invitationId: string;
   bundleKey: string | null;
+  bundleCode: string | null;
 } | null> {
   return prisma.aiRevision.findUnique({
     where: { id: revisionId },
-    select: { id: true, invitationId: true, bundleKey: true },
+    select: {
+      id: true,
+      invitationId: true,
+      bundleKey: true,
+      bundleCode: true,
+    },
   });
 }
 

@@ -1,16 +1,16 @@
-import { readFile } from "node:fs/promises";
 import { NextRequest } from "next/server";
 
-import { prisma } from "@/lib/db";
-import { getRevisionForPreview, workspaceBundlePath } from "@/worker/persistence";
+import { getRevisionForPreview } from "@/worker/persistence";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
- * Stream a DRAFT revision's compiled bundle from the worker workspace for
- * preview. Published revisions are previewed directly from their immutable S3
- * URL (see lib/ai-preview.ts), so this path is draft-only.
+ * Stream a DRAFT revision's compiled bundle for preview. The bundle is stored
+ * on the revision row (`bundleCode`), so this survives the ephemeral filesystem
+ * and any draft is previewable — not just the newest one in the workspace.
+ * Published revisions are previewed from their immutable S3 URL (see
+ * lib/ai-preview.ts), so this path is draft-only.
  */
 export async function GET(
   _req: NextRequest,
@@ -23,19 +23,7 @@ export async function GET(
     // Published — should be loaded from S3, not here.
     return notFound();
   }
-
-  // Only the newest draft's bundle is the one currently in the workspace.
-  const newest = await prisma.aiRevision.findFirst({
-    where: { invitationId: revision.invitationId, bundleKey: null },
-    orderBy: { createdAt: "desc" },
-    select: { id: true },
-  });
-  if (newest?.id !== revision.id) return notFound();
-
-  const code = await readFile(
-    workspaceBundlePath(revision.invitationId),
-    "utf8",
-  ).catch(() => null);
+  const code = revision.bundleCode;
   if (!code) return notFound();
 
   return new Response(code, {

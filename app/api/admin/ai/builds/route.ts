@@ -5,6 +5,7 @@ import { NextRequest } from "next/server";
 import { formatSseEvent, parseNdjsonLines } from "@/lib/sse";
 import { classifyBuildError, extractStderrMessage } from "@/lib/build-errors";
 import {
+  getBuildStatus,
   registerBuild,
   unregisterBuild,
   wasCancelled,
@@ -38,6 +39,14 @@ export async function POST(req: NextRequest) {
   }
   if (!process.env.ANTHROPIC_API_KEY) {
     return jsonError("ANTHROPIC_API_KEY is not configured.", 500);
+  }
+  // One build at a time per invitation: two builds would share the workspace
+  // dir and clobber each other's source tree + race their draft writes.
+  if (getBuildStatus(slug).running) {
+    return jsonError(
+      "Já existe uma construção em curso para este convite.",
+      409,
+    );
   }
   // Directions gate options. `direction` is the card the admin picked;
   // `refineDirections` asks for another round of proposals.
@@ -80,17 +89,22 @@ export async function POST(req: NextRequest) {
         }
       };
 
+      // Once a specific cause has been reported, the generic non-zero exit is
+      // just noise on top of it.
+      let reportedError = false;
+
       let buffer = "";
       child.stdout.on("data", (chunk: Buffer) => {
         buffer += chunk.toString("utf8");
         const { events, rest } = parseNdjsonLines(buffer);
         buffer = rest;
-        for (const e of events) send(e);
+        for (const e of events) {
+          // A worker-emitted error is specific; suppress the generic exit-code
+          // error the close handler would otherwise stack on top of it.
+          if ((e as { kind?: string }).kind === "error") reportedError = true;
+          send(e);
+        }
       });
-
-      // Once a specific cause has been reported, the generic non-zero exit is
-      // just noise on top of it.
-      let reportedError = false;
 
       child.stderr.on("data", (chunk: Buffer) => {
         // Worker stderr is a developer diagnostic — a raw Node stack trace in

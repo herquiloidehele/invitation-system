@@ -543,6 +543,11 @@ model AiRevision {
   // from it, which is why draft bundles never need to reach S3.
   sourceFiles Json
 
+  // The compiled bundle (esbuild IIFE) for this revision. Stored so a draft
+  // survives the ephemeral filesystem and publishing reads a durable record
+  // rather than the workspace disk. It can always be rebuilt from sourceFiles.
+  bundleCode String?
+
   // S3 object key. Null until published.
   bundleKey   String?
   publishedAt DateTime?

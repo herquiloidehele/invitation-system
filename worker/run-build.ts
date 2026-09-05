@@ -16,6 +16,7 @@ import { collectSourceFiles, sourceFilesEqual } from "./lib/source-files";
 import { buildSourceManifest } from "./lib/source-manifest";
 import { type Critique, critiqueToPrompt } from "./lib/critique";
 import { buildRecap, shouldRotateSession } from "./lib/session-rotation";
+import { spendCapExceeded } from "./lib/spend-cap";
 import {
   appendMessage,
   createDraftRevision,
@@ -27,6 +28,7 @@ import {
   listMessagesForInvitation,
   revisionCount,
   saveSessionId,
+  sumCostForInvitation,
   updateDraftRevisionSource
 } from "./persistence";
 
@@ -90,6 +92,23 @@ export async function runInvitationBuild(args: {
   }
   // Sending is what turns pending uploads into part of the conversation.
   await linkPendingAttachments(build.id, userMessageId);
+
+  // Per-invitation spend ceiling — cost is persisted per turn (AiMessage.costUsd)
+  // but otherwise unbounded. Refuse before spending more.
+  const capUsd = Number(process.env.AI_BUILD_INVITATION_CAP_USD ?? "25");
+  const spentUsd = await sumCostForInvitation(invitationId);
+  if (spendCapExceeded(spentUsd, capUsd)) {
+    const message = `Limite de custo atingido para este convite ($${spentUsd.toFixed(
+      2,
+    )} de $${capUsd.toFixed(2)}).`;
+    await appendMessage({ buildId: build.id, role: "assistant", content: message });
+    onEvent({
+      kind: "error",
+      message,
+      hint: "Aumente AI_BUILD_INVITATION_CAP_USD ou apague versões antigas.",
+    });
+    return { ok: false };
+  }
   const brief = buildInvitationBrief(invitation);
   const attachments = await listAttachmentsForInvitation(invitationId);
 
@@ -315,7 +334,7 @@ export async function runInvitationBuild(args: {
       onEvent({ kind: "error", message: "Não há rascunho para atualizar." });
       return { ok: false };
     }
-    await updateDraftRevisionSource(latest, sourceFiles);
+    await updateDraftRevisionSource(latest, sourceFiles, bundleCode);
     revisionId = latest;
   } else {
     ({ revisionId } = await createDraftRevision({
@@ -323,6 +342,7 @@ export async function runInvitationBuild(args: {
       invitationId,
       prompt,
       sourceFiles,
+      bundleCode,
     }));
   }
   await appendMessage({
