@@ -36,6 +36,17 @@ export default async function AiInvitationPage({
 
   const initialData = toAdminInvitationInitialData(row);
 
+  // Preview the live version, falling back to the newest revision — matches the
+  // Builder pane, so the Settings "Convite" tab shows the real generated design.
+  const newest = row.activeRevisionId
+    ? null
+    : await prisma.aiRevision.findFirst({
+        where: { invitationId: row.id },
+        orderBy: { createdAt: "desc" },
+        select: { id: true },
+      });
+  const previewRevisionId = row.activeRevisionId ?? newest?.id ?? null;
+
   return (
     <Tabs defaultValue="builder" className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="flex items-center justify-between gap-4">
@@ -60,6 +71,7 @@ export default async function AiInvitationPage({
           invitationId={row.id}
           ownerUrl={ownerUrl}
           themes={themes}
+          aiPreview={{ revisionId: previewRevisionId, locale }}
         />
       </TabsContent>
     </Tabs>

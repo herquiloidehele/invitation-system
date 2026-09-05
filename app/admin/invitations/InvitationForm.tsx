@@ -575,6 +575,12 @@ interface InvitationFormProps {
    * Content, media and cover sections stay: the bundle reads them from props.
    */
   variant?: "standard" | "ai";
+  /**
+   * For AI invitations: which revision to render in the "Convite" preview, and
+   * the locale to render it in. The preview is the real generated bundle shown
+   * through the cover-skipped admin preview route, not the standard renderer.
+   */
+  aiPreview?: { revisionId: string | null; locale: string };
 }
 
 export default function InvitationForm({
@@ -586,6 +592,7 @@ export default function InvitationForm({
   ownerUrl,
   themes,
   variant = "standard",
+  aiPreview,
 }: InvitationFormProps) {
   const isAi = variant === "ai";
   const router = useRouter();
@@ -4458,6 +4465,23 @@ export default function InvitationForm({
             value="invite"
             className="flex-1 overflow-auto m-0 bg-neutral-100"
           >
+            {isAi ? (
+              aiPreview?.revisionId ? (
+                // The real generated bundle, via the cover-skipped admin preview
+                // route — the standard renderer below would misrepresent it.
+                <iframe
+                  key={aiPreview.revisionId}
+                  src={`/${aiPreview.locale}/${form.slug}?revision=${aiPreview.revisionId}`}
+                  title="Pré-visualização do convite"
+                  className="h-full max-h-165 w-full border-0 bg-white"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                  Ainda não há nenhuma versão gerada. Crie uma no separador
+                  Builder para a pré-visualizar aqui.
+                </div>
+              )
+            ) : (
             <SpacingStyleProvider spacingStyles={form.spacingStyles}>
               <InlineTextEditProvider
                 updateTextStyleElement={updateTextStyleElement}
@@ -4512,6 +4536,7 @@ export default function InvitationForm({
                 </InlineCardEditProvider>
               </InlineTextEditProvider>
             </SpacingStyleProvider>
+            )}
           </TabsContent>
         </Tabs>
       </div>
