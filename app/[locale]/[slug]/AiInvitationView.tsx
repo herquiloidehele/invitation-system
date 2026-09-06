@@ -35,27 +35,42 @@ export default function AiInvitationView({
   if (!bundleUrl) return null;
 
   return (
-    <AiRuntimeProvider>
-      <AiAudioProvider invitation={invitation}>
-        <AiCoverGate invitation={invitation} theme={theme} skipCover={skipCover}>
-          {(opened) => (
-            <PlatformProvider invitation={invitation} guest={invitation.guest ?? null}>
-              <AiBundleMount
-                url={bundleUrl}
-                bundleId={invitation.slug}
-                props={buildAiBundleProps({
-                  invitation,
-                  locale,
-                  coverOpened: opened,
-                })}
-              />
-              {/* Only the authenticated admin preview is ever framed by the
-                  builder, so the public page never ships this listener. */}
-              {skipCover && <AiPreviewCaptureBridge />}
-            </PlatformProvider>
-          )}
-        </AiCoverGate>
-      </AiAudioProvider>
-    </AiRuntimeProvider>
+    /* Outer full-screen layer — visible on wide screens as the side gutters.
+       Mirrors EnvelopeInvitationView so the AI cover and bundle are capped at
+       the same 500 px column as the standard path. */
+    <div
+      className="min-h-dvh flex justify-center"
+      style={{ backgroundColor: theme.bg }}
+    >
+      {/* Inner column — capped at 500 px, acts as the positioning context for
+          the envelope cover (absolute inset-0 inside it). */}
+      <div
+        className="relative min-h-dvh w-full overflow-hidden"
+        style={{ maxWidth: "500px", backgroundColor: theme.bg }}
+      >
+        <AiRuntimeProvider>
+          <AiAudioProvider invitation={invitation}>
+            <AiCoverGate invitation={invitation} theme={theme} skipCover={skipCover}>
+              {(opened) => (
+                <PlatformProvider invitation={invitation} guest={invitation.guest ?? null}>
+                  <AiBundleMount
+                    url={bundleUrl}
+                    bundleId={invitation.slug}
+                    props={buildAiBundleProps({
+                      invitation,
+                      locale,
+                      coverOpened: opened,
+                    })}
+                  />
+                  {/* Only the authenticated admin preview is ever framed by the
+                      builder, so the public page never ships this listener. */}
+                  {skipCover && <AiPreviewCaptureBridge />}
+                </PlatformProvider>
+              )}
+            </AiCoverGate>
+          </AiAudioProvider>
+        </AiRuntimeProvider>
+      </div>
+    </div>
   );
 }
