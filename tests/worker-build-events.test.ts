@@ -48,23 +48,4 @@ describe("BuildEvent union", () => {
     };
     expect(e.kind).toBe("draft");
   });
-
-  it("includes a directions variant", () => {
-    const e: BuildEvent = {
-      kind: "directions",
-      directions: [
-        {
-          id: "a",
-          name: "X",
-          palette: ["#000"],
-          typography: "A + B",
-          motion: "m",
-          composition: "c",
-          rationale: "r",
-          signatureDetails: ["a", "b", "c"],
-        },
-      ],
-    };
-    expect(e.kind).toBe("directions");
-  });
 });

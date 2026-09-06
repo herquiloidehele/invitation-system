@@ -10,7 +10,6 @@ import { bundleRegistersComponent } from "./lib/verify-bundle";
 import { buildInvitationBrief } from "./lib/invitation-brief";
 import { type BuildEvent, type BuildUsage, toBuildEvent } from "./lib/build-events";
 import { classifyBuildError } from "@/lib/build-errors";
-import { type Direction, directionToPrompt, proposeDirections } from "./lib/directions";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
 import { SELECTION_IMAGE_NAME, buildElementBrief } from "./lib/element-brief";
 import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
@@ -34,10 +33,6 @@ import {
   updateDraftRevisionSource
 } from "./persistence";
 
-/** The directions gate is deliberately cheap — bound what it looks at. */
-const MAX_GATE_IMAGES = 4;
-const MAX_GATE_IMAGE_BYTES = 4 * 1024 * 1024;
-
 /** Design is decided on the first build; tweaks are mechanical edits. */
 function effortFor(isFirstBuild: boolean): "low" | "medium" | "high" {
   const env = isFirstBuild
@@ -54,10 +49,6 @@ function effortFor(isFirstBuild: boolean): "low" | "medium" | "high" {
 export async function runInvitationBuild(args: {
   slug: string;
   prompt: string;
-  /** Chosen direction — when set, the gate is skipped and this is built. */
-  direction?: Direction | null;
-  /** Ask for a fresh set of directions, optionally with a note. */
-  refineDirections?: string | null;
   /** A visual review to apply: resumes the first build's session, fixes, updates the draft in place. */
   critique?: Critique | null;
   /** A block the user pointed at in the preview: a crop file + its descriptor. */
@@ -67,8 +58,7 @@ export async function runInvitationBuild(args: {
   } | null;
   onEvent: (event: BuildEvent) => void;
 }): Promise<{ ok: boolean }> {
-  const { slug, prompt, direction, refineDirections, critique, selection, onEvent } =
-    args;
+  const { slug, prompt, critique, selection, onEvent } = args;
   const isCritiqueTurn = Boolean(critique);
 
   const invitation = await getInvitation(slug);
@@ -208,7 +198,6 @@ export async function runInvitationBuild(args: {
 
   const fullPrompt = [
     brief,
-    direction ? `\n${directionToPrompt(direction)}` : "",
     manifest ? `\n${manifest}` : "",
     recap ? `\n${recap}` : "",
     attachmentBrief ? `\n${attachmentBrief}` : "",

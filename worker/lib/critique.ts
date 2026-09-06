@@ -3,7 +3,6 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 
 import { artDirection } from "./art-direction";
-import { type Direction, directionToPrompt } from "./directions";
 
 export const CritiqueSchema = z.object({
   score: z
@@ -47,7 +46,6 @@ export async function critiqueDesign(args: {
     /** CSS px the page was laid out at, when the capture knows it. */
     width?: number | null;
   }>;
-  direction: Direction | null;
   brief: string;
 }): Promise<Critique> {
   const client = new Anthropic();
@@ -59,13 +57,10 @@ export async function critiqueDesign(args: {
     "",
     args.brief,
     "",
-    args.direction ? directionToPrompt(args.direction) : "",
-    "",
-    "Check, in this order: (1) every signature detail of the chosen direction is",
-    "actually visible; (2) nothing violates the art direction below; (3) hierarchy",
-    "— does one element per screen dominate; (4) the phone layout is not a",
+    "Check, in this order: (1) nothing violates the art direction below; (2) hierarchy",
+    "— does one element per screen dominate; (3) the phone layout is not a",
     "shrunken desktop. Report at most 6 issues, most severe first, each with a",
-    "concrete fix. Do not praise. Do not suggest a different direction.",
+    "concrete fix. Do not praise.",
     "",
     artDirection(),
   ].join("\n");

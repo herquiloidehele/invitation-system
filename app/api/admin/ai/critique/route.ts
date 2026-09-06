@@ -5,7 +5,6 @@ import { getInvitation } from "@/lib/invitations";
 import { publicUrlForKey, putObjectBuffer } from "@/lib/s3";
 import { buildInvitationBrief } from "@/worker/lib/invitation-brief";
 import { critiqueDesign } from "@/worker/lib/critique";
-import type { Direction } from "@/worker/lib/directions";
 import { appendMessage, getOrCreateBuild } from "@/worker/persistence";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +30,6 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as {
     slug?: string;
     revisionId?: string;
-    direction?: Direction | null;
     /** Phone tiles, top-to-bottom. */
     shots?: Array<{
       /** CSS px the frame was rendered at. */
@@ -88,7 +86,6 @@ export async function POST(req: NextRequest) {
   try {
     critique = await critiqueDesign({
       images,
-      direction: body?.direction ?? null,
       brief: buildInvitationBrief(invitation),
     });
   } catch (err) {

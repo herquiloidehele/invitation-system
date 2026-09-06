@@ -1,12 +1,9 @@
-import type { Direction } from "./directions";
-
 /** A compact event surfaced to the admin UI (a subset of the SDK's message stream). */
 export type BuildEvent =
   | { kind: "progress"; text: string }
   | { kind: "delta"; text: string }
   | { kind: "tool"; name: string; label: string }
   | { kind: "result"; ok: boolean; costUsd: number | null; usage: BuildUsage | null }
-  | { kind: "directions"; directions: Direction[] }
   | { kind: "question"; text: string }
   | { kind: "draft"; revisionId: string; slug: string; firstBuild: boolean }
   | { kind: "error"; message: string; hint?: string; detail?: string };

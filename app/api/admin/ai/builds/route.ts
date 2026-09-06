@@ -53,11 +53,6 @@ export async function POST(req: NextRequest) {
       409,
     );
   }
-  // Directions gate options. `direction` is the card the admin picked;
-  // `refineDirections` asks for another round of proposals.
-  const direction = (body as { direction?: unknown }).direction ?? null;
-  const rawRefine = (body as { refineDirections?: unknown }).refineDirections;
-  const refineDirections = typeof rawRefine === "string" ? rawRefine : null;
   // A visual review to apply (from /api/admin/ai/critique); resumes the session.
   const critique = (body as { critique?: unknown }).critique ?? null;
 
@@ -97,7 +92,7 @@ export async function POST(req: NextRequest) {
           path.join("worker", "build-invitation-ndjson.ts"),
           slug,
           prompt,
-          JSON.stringify({ direction, refineDirections, critique, selection }),
+          JSON.stringify({ critique, selection }),
         ],
         {
           cwd: repoRoot,
