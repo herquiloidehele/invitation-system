@@ -121,7 +121,13 @@ export async function runInvitationBuild(args: {
   const attachmentBrief = buildAttachmentBrief(attachments);
   const manifest = buildSourceManifest(priorSource ?? {});
 
-  const rotateLimit = Number(process.env.AI_SESSION_ROTATE_TOKENS ?? "200000");
+  // 200k never fired: a nine-turn session measured at 130,899 tokens at its
+  // peak, so rotation was dead code. Meanwhile each resumed tweak replayed
+  // ~80k tokens per request to edit one file, where a fresh session costs ~20k
+  // to prime. 50k is the point past which starting over is cheaper than
+  // carrying the history — `hasSections` still guards the monolith case, where
+  // rotation measured as a net loss (235s vs 15s re-orienting).
+  const rotateLimit = Number(process.env.AI_SESSION_ROTATE_TOKENS ?? "50000");
   const hardCeiling = Number(process.env.AI_SESSION_HARD_CEILING ?? "600000");
   const hasSections = Object.keys(priorSource ?? {}).some((k) =>
     k.startsWith("sections/"),

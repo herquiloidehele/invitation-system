@@ -106,6 +106,17 @@ export async function runBuildAgent(args: {
         HOME: process.env.HOME ?? "",
         ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? "",
         IS_SANDBOX: "1",
+        // The prompt cache defaults to a 5-minute TTL on an API key, and the
+        // admin always thinks for longer than that between turns (measured
+        // gaps: 2–51 min). Every turn therefore started cold and re-uploaded
+        // the whole session at 1.25x full input price — 458k tokens / $1.15 on
+        // one measured invitation, 42% of everything spent after the first
+        // build. A 1h TTL turns those rewrites into 0.1x cache reads. The
+        // tradeoff is that 1h writes cost 2x base instead of 1.25x, so the
+        // within-turn incremental writes get dearer; every multi-turn
+        // invitation still comes out well ahead.
+        CLAUDE_CODE_PROMPT_CACHE_TTL:
+          process.env.AI_BUILD_CACHE_TTL ?? "1h",
       },
     },
   });
