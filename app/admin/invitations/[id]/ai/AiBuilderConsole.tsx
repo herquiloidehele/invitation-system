@@ -7,14 +7,19 @@ import type { BuildEvent, BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
 import type { AttachmentRecord } from "@/worker/persistence";
 import { parseSseFrames } from "@/lib/ai-build-stream";
-import { formatElapsed } from "@/lib/ai-build-elapsed";
 import {
   AI_PREVIEW_CAPTURE,
   AI_PREVIEW_CAPTURED,
   AI_PREVIEW_READY,
-  MAX_TILES,
   type CaptureResult,
+  MAX_TILES
 } from "@/lib/ai-preview-capture";
+import {
+  AI_PREVIEW_SELECT_MODE,
+  AI_PREVIEW_SELECTED,
+  type SelectedElementDescriptor,
+  type SelectedMessage
+} from "@/lib/ai-preview-select";
 import { classifyBuildError, isFatalAgentText } from "@/lib/build-errors";
 import ChatPane, { type ChatItem } from "./ChatPane";
 import PreviewPane from "./PreviewPane";
@@ -50,6 +55,11 @@ export default function AiBuilderConsole({
   const [previewNonce, setPreviewNonce] = useState(0);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
   const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedElement, setSelectedElement] = useState<{
+    descriptor: SelectedElementDescriptor;
+    png: string | null;
+  } | null>(null);
   // Id of the assistant bubble currently being streamed into, if any. A ref,
   // not state: it is read and written inside the async stream loop.
   const streamingId = useRef<string | null>(null);
@@ -210,7 +220,10 @@ export default function AiBuilderConsole({
         `/api/admin/ai/builds/status?slug=${encodeURIComponent(slug)}`,
       );
       if (!res.ok) return null;
-      const st = (await res.json()) as { running?: boolean; startedAt?: number };
+      const st = (await res.json()) as {
+        running?: boolean;
+        startedAt?: number;
+      };
       return st.running ? (st.startedAt ?? Date.now()) : null;
     } catch {
       return null;
@@ -261,7 +274,13 @@ export default function AiBuilderConsole({
     return () => {
       if (reconnectTimer.current) clearInterval(reconnectTimer.current);
     };
-  }, [loadHistory, refreshRail, loadAttachments, isBuildRunning, enterReconnect]);
+  }, [
+    loadHistory,
+    refreshRail,
+    loadAttachments,
+    isBuildRunning,
+    enterReconnect,
+  ]);
 
   const removeAttachment = async (id: string) => {
     const res = await fetch(`/api/admin/ai/attachments?id=${id}`, {
@@ -271,9 +290,33 @@ export default function AiBuilderConsole({
     else toast.error("Falha ao remover o ficheiro.");
   };
 
+  // The preview iframe posts a selected block back; hold it as a pending chip.
+  useEffect(() => {
+    const origin = window.location.origin;
+    const onMsg = (e: MessageEvent<SelectedMessage>) => {
+      if (e.origin !== origin || e.data?.type !== AI_PREVIEW_SELECTED) return;
+      setSelectedElement({ descriptor: e.data.descriptor, png: e.data.png });
+      setSelectMode(false);
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
+
+  const toggleSelectMode = () => {
+    const next = !selectMode;
+    setSelectMode(next);
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: AI_PREVIEW_SELECT_MODE, enabled: next },
+      window.location.origin,
+    );
+  };
+
   const showPreview = (revisionId: string) => {
     setPreviewRevisionId(revisionId);
     setPreviewNonce((n) => n + 1);
+    // The iframe reloads on a nonce bump, so the bridge loses select mode anyway.
+    setSelectedElement(null);
+    setSelectMode(false);
   };
 
   const handleEvent = (e: BuildEvent) => {
@@ -533,10 +576,21 @@ export default function AiBuilderConsole({
         id: nextId(),
         text: trimmed,
         attachments,
+        selection: selectedElement
+          ? {
+              descriptor: selectedElement.descriptor,
+              thumb: selectedElement.png,
+            }
+          : undefined,
       });
       setAttachments([]);
       setPrompt("");
     }
+    // Capture the selection before clearing it, so it rides with this request.
+    const selectionPayload = selectedElement
+      ? { descriptor: selectedElement.descriptor, png: selectedElement.png }
+      : undefined;
+    if (!opts?.critique) setSelectedElement(null);
     try {
       const res = await fetch("/api/admin/ai/builds", {
         method: "POST",
@@ -545,6 +599,7 @@ export default function AiBuilderConsole({
           slug,
           prompt: trimmed,
           critique: opts?.critique,
+          selection: selectionPayload,
         }),
       });
       if (res.status === 409) {
@@ -713,6 +768,8 @@ export default function AiBuilderConsole({
         attachments={attachments}
         onAttach={(a) => setAttachments((prev) => [...prev, a])}
         onRemoveAttachment={removeAttachment}
+        selection={selectedElement}
+        onClearSelection={() => setSelectedElement(null)}
       />
       <PreviewPane
         src={previewSrc}
@@ -720,6 +777,8 @@ export default function AiBuilderConsole({
         onDeviceChange={setDevice}
         onReload={() => setPreviewNonce((n) => n + 1)}
         iframeRef={iframeRef}
+        selectMode={selectMode}
+        onToggleSelect={toggleSelectMode}
       />
       <VersionsPane
         revisions={revisions}

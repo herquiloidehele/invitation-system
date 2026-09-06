@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { AlertTriangle, Eye, FileText, HelpCircle, Loader2, Send, Wrench, X } from "lucide-react";
+import { AlertTriangle, Eye, FileText, HelpCircle, Loader2, MousePointerClick, Send, Wrench, X } from "lucide-react";
 
 import type { BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
 import type { AttachmentRecord } from "@/worker/persistence";
+import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
 import { formatElapsed } from "@/lib/ai-build-elapsed";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,7 +16,13 @@ import ChatMarkdown from "./ChatMarkdown";
 import AttachmentPicker from "./AttachmentPicker";
 
 export type ChatItem =
-  | { kind: "user"; id: string; text: string; attachments?: AttachmentRecord[] }
+  | {
+      kind: "user";
+      id: string;
+      text: string;
+      attachments?: AttachmentRecord[];
+      selection?: { descriptor: SelectedElementDescriptor; thumb: string | null };
+    }
   | {
       kind: "assistant";
       id: string;
@@ -90,6 +97,8 @@ export default function ChatPane({
   attachments,
   onAttach,
   onRemoveAttachment,
+  selection,
+  onClearSelection,
 }: {
   items: ChatItem[];
   prompt: string;
@@ -108,6 +117,8 @@ export default function ChatPane({
   attachments: AttachmentRecord[];
   onAttach: (a: AttachmentRecord) => void;
   onRemoveAttachment: (id: string) => void;
+  selection: { descriptor: SelectedElementDescriptor; png: string | null } | null;
+  onClearSelection: () => void;
 }) {
   const endRef = useRef<HTMLDivElement>(null);
   // Streaming grows the last bubble's text without changing the item count, so
@@ -289,6 +300,24 @@ export default function ChatPane({
                         )}
                       </div>
                     ) : null}
+                    {m.kind === "user" && m.selection ? (
+                      <div className="mt-2 flex items-center gap-2 rounded-md border border-primary-foreground/25 px-2 py-1 text-xs">
+                        {m.selection.thumb ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={m.selection.thumb}
+                            alt=""
+                            className="size-10 rounded border border-primary-foreground/25 object-cover object-top"
+                          />
+                        ) : (
+                          <MousePointerClick className="size-3 shrink-0" />
+                        )}
+                        <span className="max-w-[10rem] truncate">
+                          {m.selection.descriptor.text ||
+                            `<${m.selection.descriptor.tag}>`}
+                        </span>
+                      </div>
+                    ) : null}
                     {m.kind === "assistant" &&
                       (m.costUsd != null || m.usage) && (
                         <span className="mt-1 block text-xs opacity-60">
@@ -320,6 +349,35 @@ export default function ChatPane({
       </ScrollArea>
 
       <div className="space-y-2">
+        {selection ? (
+          <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-2 py-1 text-xs">
+            {selection.png ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={selection.png}
+                alt=""
+                className="size-10 rounded border object-cover object-top"
+              />
+            ) : (
+              <MousePointerClick className="size-4 shrink-0 text-muted-foreground" />
+            )}
+            <span className="min-w-0 flex-1 truncate">
+              Elemento selecionado:{" "}
+              <span className="font-medium">
+                {selection.descriptor.text || `<${selection.descriptor.tag}>`}
+              </span>
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="size-6 p-0"
+              onClick={onClearSelection}
+              aria-label="Remover elemento selecionado"
+            >
+              <X className="size-3" />
+            </Button>
+          </div>
+        ) : null}
         <AttachmentPicker
           slug={slug}
           attachments={attachments}

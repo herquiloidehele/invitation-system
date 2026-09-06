@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 
 import { prisma } from "@/lib/db";
@@ -12,6 +12,8 @@ import { type BuildEvent, type BuildUsage, toBuildEvent } from "./lib/build-even
 import { classifyBuildError } from "@/lib/build-errors";
 import { type Direction, directionToPrompt, proposeDirections } from "./lib/directions";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
+import { SELECTION_IMAGE_NAME, buildElementBrief } from "./lib/element-brief";
+import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
 import { collectSourceFiles, sourceFilesEqual } from "./lib/source-files";
 import { buildSourceManifest } from "./lib/source-manifest";
 import { type Critique, critiqueToPrompt } from "./lib/critique";
@@ -58,9 +60,15 @@ export async function runInvitationBuild(args: {
   refineDirections?: string | null;
   /** A visual review to apply: resumes the first build's session, fixes, updates the draft in place. */
   critique?: Critique | null;
+  /** A block the user pointed at in the preview: a crop file + its descriptor. */
+  selection?: {
+    descriptor: SelectedElementDescriptor;
+    imagePath: string | null;
+  } | null;
   onEvent: (event: BuildEvent) => void;
 }): Promise<{ ok: boolean }> {
-  const { slug, prompt, direction, refineDirections, critique, onEvent } = args;
+  const { slug, prompt, direction, refineDirections, critique, selection, onEvent } =
+    args;
   const isCritiqueTurn = Boolean(critique);
 
   const invitation = await getInvitation(slug);
@@ -154,15 +162,6 @@ export async function runInvitationBuild(args: {
     });
   }
 
-  const fullPrompt = [
-    brief,
-    direction ? `\n${directionToPrompt(direction)}` : "",
-    manifest ? `\n${manifest}` : "",
-    recap ? `\n${recap}` : "",
-    attachmentBrief ? `\n${attachmentBrief}` : "",
-    `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
-  ].join("\n");
-
   // Opus writes the design (taste is decided on the first build); Sonnet does
   // the edits. A critique turn resumes the first build's session, so it must
   // use the first build's model — a resume under another model drops the cache.
@@ -184,6 +183,38 @@ export async function runInvitationBuild(args: {
   );
   await mkdir(workspace, { recursive: true });
   await provisionWorkspace(workspace, dts, priorSource, attachments);
+
+  // A block the user selected in the preview. Copy its crop into refs/ so the
+  // agent can Read it, and describe it in the prompt. Best-effort: a failed
+  // copy degrades to a text-only reference rather than aborting the build.
+  let elementBrief = "";
+  if (selection) {
+    let hasImage = false;
+    if (selection.imagePath) {
+      try {
+        await mkdir(path.join(workspace, "refs"), { recursive: true });
+        await copyFile(
+          selection.imagePath,
+          path.join(workspace, "refs", SELECTION_IMAGE_NAME),
+        );
+        hasImage = true;
+      } catch {
+        hasImage = false;
+      }
+      await rm(selection.imagePath, { force: true });
+    }
+    elementBrief = buildElementBrief(selection.descriptor, hasImage);
+  }
+
+  const fullPrompt = [
+    brief,
+    direction ? `\n${directionToPrompt(direction)}` : "",
+    manifest ? `\n${manifest}` : "",
+    recap ? `\n${recap}` : "",
+    attachmentBrief ? `\n${attachmentBrief}` : "",
+    elementBrief ? `\n${elementBrief}` : "",
+    `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
+  ].join("\n");
 
   // Keep the agent's last prose turn + final cost so the thread survives reload.
   let lastAssistantText = "";

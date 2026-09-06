@@ -13,6 +13,13 @@ import {
   type CaptureRequest,
   type CaptureResult,
 } from "@/lib/ai-preview-capture";
+import {
+  AI_PREVIEW_SELECT_MODE,
+  AI_PREVIEW_SELECTED,
+  describeSelectedElement,
+  snapToBlock,
+  type SelectModeMessage,
+} from "@/lib/ai-preview-select";
 
 /** A 1×1 transparent PNG: what a cross-origin image becomes instead of aborting the capture. */
 const TRANSPARENT_PX =
@@ -203,6 +210,123 @@ export default function AiPreviewCaptureBridge() {
       if (ok) window.parent.postMessage({ type: AI_PREVIEW_READY }, origin);
     });
     return () => window.removeEventListener("message", onMessage);
+  }, []);
+
+  // Select mode: the console arms it, the user hovers (snap highlight) and
+  // clicks a block; we rasterize just that block and post it back. Clicks are
+  // swallowed in the capture phase so the invitation's own controls don't fire.
+  useEffect(() => {
+    if (window.parent === window) return;
+    const origin = window.location.origin;
+    let active = false;
+    let overlay: HTMLDivElement | null = null;
+    let hovered: Element | null = null;
+
+    const root = (): Element =>
+      document.querySelector('[data-ai-mounted="1"]') ?? document.body;
+
+    const ensureOverlay = (): HTMLDivElement => {
+      if (overlay) return overlay;
+      overlay = document.createElement("div");
+      overlay.setAttribute("data-ai-select-overlay", "1");
+      Object.assign(overlay.style, {
+        position: "fixed",
+        pointerEvents: "none",
+        zIndex: "2147483646",
+        border: "2px solid #6366f1",
+        background: "rgba(99,102,241,0.12)",
+        borderRadius: "4px",
+        transition: "top 60ms, left 60ms, width 60ms, height 60ms",
+      });
+      document.body.appendChild(overlay);
+      return overlay;
+    };
+
+    const positionOverlay = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      const o = ensureOverlay();
+      o.style.top = `${r.top}px`;
+      o.style.left = `${r.left}px`;
+      o.style.width = `${r.width}px`;
+      o.style.height = `${r.height}px`;
+      o.style.display = "block";
+    };
+
+    const onMove = (e: MouseEvent) => {
+      if (!active) return;
+      const target = e.target as Element | null;
+      if (!target) return;
+      hovered = snapToBlock(target, root());
+      positionOverlay(hovered);
+    };
+
+    const onClick = async (e: MouseEvent) => {
+      if (!active) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const base = hovered ?? (e.target as Element | null);
+      if (!base) return;
+      const target = snapToBlock(base, root());
+      const rect = target.getBoundingClientRect();
+      const descriptor = describeSelectedElement(
+        target,
+        root(),
+        rect.top + window.scrollY,
+        document.documentElement.scrollHeight,
+      );
+      exit(); // hide the overlay before rasterizing so it isn't in the crop
+      let png: string | null = null;
+      try {
+        const { toPng } = await import("html-to-image");
+        png = await toPng(target as HTMLElement, {
+          pixelRatio: PIXEL_RATIO,
+          cacheBust: true,
+          imagePlaceholder: TRANSPARENT_PX,
+          filter: (node) =>
+            (node as HTMLElement).tagName !== "NEXTJS-PORTAL" &&
+            (node as HTMLElement).getAttribute?.("data-ai-select-overlay") !==
+              "1",
+        });
+      } catch {
+        png = null;
+      }
+      window.parent.postMessage(
+        { type: AI_PREVIEW_SELECTED, descriptor, png },
+        origin,
+      );
+    };
+
+    const enter = () => {
+      if (active) return;
+      active = true;
+      document.addEventListener("mousemove", onMove, true);
+      document.addEventListener("click", onClick, true);
+      document.body.style.cursor = "crosshair";
+    };
+
+    function exit() {
+      active = false;
+      document.removeEventListener("mousemove", onMove, true);
+      document.removeEventListener("click", onClick, true);
+      document.body.style.cursor = "";
+      if (overlay) overlay.style.display = "none";
+      hovered = null;
+    }
+
+    const onMessage = (event: MessageEvent<SelectModeMessage>) => {
+      if (event.origin !== origin || event.source !== window.parent) return;
+      if (event.data?.type !== AI_PREVIEW_SELECT_MODE) return;
+      if (event.data.enabled) enter();
+      else exit();
+    };
+
+    window.addEventListener("message", onMessage);
+    return () => {
+      window.removeEventListener("message", onMessage);
+      exit();
+      overlay?.remove();
+      overlay = null;
+    };
   }, []);
 
   return null;

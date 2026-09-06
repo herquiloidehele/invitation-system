@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Monitor, RotateCw, Smartphone } from "lucide-react";
+import { ExternalLink, Monitor, MousePointerClick, RotateCw, Smartphone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -12,12 +12,16 @@ export default function PreviewPane({
   onDeviceChange,
   onReload,
   iframeRef,
+  selectMode,
+  onToggleSelect,
 }: {
   src: string | null;
   device: "phone" | "desktop";
   onDeviceChange: (d: "phone" | "desktop") => void;
   onReload: () => void;
   iframeRef?: React.RefObject<HTMLIFrameElement | null>;
+  selectMode: boolean;
+  onToggleSelect: () => void;
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
@@ -41,6 +45,17 @@ export default function PreviewPane({
           </Button>
         </div>
         <div className="flex gap-1">
+          <Button
+            variant={selectMode ? "secondary" : "ghost"}
+            size="sm"
+            onClick={onToggleSelect}
+            disabled={!src}
+            aria-pressed={selectMode}
+            aria-label="Selecionar um elemento"
+            title="Selecionar um elemento da pré-visualização para referir no chat"
+          >
+            <MousePointerClick className="size-4" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"

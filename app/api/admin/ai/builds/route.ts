@@ -1,7 +1,12 @@
 import { spawn } from "node:child_process";
+import { writeFile } from "node:fs/promises";
+import os from "node:os";
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { NextRequest } from "next/server";
 
+import { decodePngDataUrl } from "@/lib/ai-selection-image";
+import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
 import { formatSseEvent, parseNdjsonLines } from "@/lib/sse";
 import { classifyBuildError, extractStderrMessage } from "@/lib/build-errors";
 import {
@@ -56,6 +61,29 @@ export async function POST(req: NextRequest) {
   // A visual review to apply (from /api/admin/ai/critique); resumes the session.
   const critique = (body as { critique?: unknown }).critique ?? null;
 
+  // A block the user pointed at in the preview. The PNG can be tens/hundreds of
+  // KB — too big for the worker's argv — so decode it to a temp file here and
+  // pass the path. The worker copies it into its workspace and deletes it.
+  const rawSelection = (body as { selection?: unknown }).selection;
+  let selection:
+    | { descriptor: SelectedElementDescriptor; imagePath: string | null }
+    | null = null;
+  if (rawSelection && typeof rawSelection === "object") {
+    const s = rawSelection as {
+      descriptor?: SelectedElementDescriptor;
+      png?: unknown;
+    };
+    if (s.descriptor && typeof s.descriptor.tag === "string") {
+      let imagePath: string | null = null;
+      const buf = typeof s.png === "string" ? decodePngDataUrl(s.png) : null;
+      if (buf) {
+        imagePath = path.join(os.tmpdir(), `ai-selection-${randomUUID()}.png`);
+        await writeFile(imagePath, buf);
+      }
+      selection = { descriptor: s.descriptor, imagePath };
+    }
+  }
+
   const encoder = new TextEncoder();
   const repoRoot = process.cwd();
 
@@ -69,7 +97,7 @@ export async function POST(req: NextRequest) {
           path.join("worker", "build-invitation-ndjson.ts"),
           slug,
           prompt,
-          JSON.stringify({ direction, refineDirections, critique }),
+          JSON.stringify({ direction, refineDirections, critique, selection }),
         ],
         {
           cwd: repoRoot,
