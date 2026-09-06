@@ -9,7 +9,7 @@ import { runBuildAgent } from "./agent";
 import { bundleRegistersComponent } from "./lib/verify-bundle";
 import { buildInvitationBrief } from "./lib/invitation-brief";
 import { type BuildEvent, type BuildUsage, toBuildEvent } from "./lib/build-events";
-import { classifyBuildError } from "@/lib/build-errors";
+import { classifyBuildError, isMissingSessionError } from "@/lib/build-errors";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
 import { SELECTION_IMAGE_NAME, buildElementBrief } from "./lib/element-brief";
 import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
@@ -196,14 +196,19 @@ export async function runInvitationBuild(args: {
     elementBrief = buildElementBrief(selection.descriptor, hasImage);
   }
 
-  const fullPrompt = [
-    brief,
-    manifest ? `\n${manifest}` : "",
-    recap ? `\n${recap}` : "",
-    attachmentBrief ? `\n${attachmentBrief}` : "",
-    elementBrief ? `\n${elementBrief}` : "",
-    `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
-  ].join("\n");
+  // Recap is empty on a normal turn; the no-resume fallback below rebuilds the
+  // prompt WITH a recap so a fresh session can re-orient from the saved source.
+  const composePrompt = (recapText: string) =>
+    [
+      brief,
+      manifest ? `\n${manifest}` : "",
+      recapText ? `\n${recapText}` : "",
+      attachmentBrief ? `\n${attachmentBrief}` : "",
+      elementBrief ? `\n${elementBrief}` : "",
+      `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
+    ].join("\n");
+
+  const fullPrompt = composePrompt(recap);
 
   // Keep the agent's last prose turn + final cost so the thread survives reload.
   let lastAssistantText = "";
@@ -221,15 +226,17 @@ export async function runInvitationBuild(args: {
   let sessionIdSeen: string | null = null;
   let agentError: string | null = null;
 
-  try {
-    const { sessionId } = await runBuildAgent({
+  // Run the agent, streaming its messages into the console. Shared by the normal
+  // attempt and the no-resume fallback below.
+  const runAgent = (agentPrompt: string, resume: string | undefined) =>
+    runBuildAgent({
       workspaceDir: workspace,
-      prompt: fullPrompt,
+      prompt: agentPrompt,
       bundleId: slug,
       dts,
       model,
       effort,
-      resume: rotate ? undefined : (build.agentSessionId ?? undefined),
+      resume,
       onMessage: (m) => {
         const raw = m as {
           session_id?: string;
@@ -265,11 +272,48 @@ export async function runInvitationBuild(args: {
         onEvent(e);
       },
     });
+
+  const resumeId = rotate ? undefined : (build.agentSessionId ?? undefined);
+  try {
+    const { sessionId } = await runAgent(fullPrompt, resumeId);
     if (sessionId) sessionIdSeen = sessionId;
   } catch (err) {
-    // Do NOT return here. The agent may already have written a valid bundle
-    // before it ran out of turns; throwing that away wastes the whole spend.
-    agentError = err instanceof Error ? err.message : String(err);
+    const message = err instanceof Error ? err.message : String(err);
+    // The resumed session's transcript is gone — the container's ephemeral
+    // filesystem was wiped (e.g. a redeploy) while the session id lived on in
+    // the DB. Recover the way rotation does: start a FRESH session primed with
+    // the saved source manifest + a recap, instead of failing every turn until
+    // someone resets the invitation.
+    if (resumeId && isMissingSessionError(message)) {
+      onEvent({
+        kind: "progress",
+        text: "A sessão anterior já não está disponível — a recomeçar a partir do código guardado.",
+      });
+      // Drop the dead id up front: even if the fresh run also fails, the next
+      // turn must not try to resume it again.
+      await saveSessionId(build.id, "");
+      const recapForRestart =
+        recap ||
+        buildRecap(
+          (await listMessagesForInvitation(invitationId)).slice(0, -1),
+          6,
+        );
+      sessionIdSeen = null;
+      try {
+        const { sessionId } = await runAgent(
+          composePrompt(recapForRestart),
+          undefined,
+        );
+        if (sessionId) sessionIdSeen = sessionId;
+      } catch (retryErr) {
+        agentError =
+          retryErr instanceof Error ? retryErr.message : String(retryErr);
+      }
+    } else {
+      // Do NOT return here. The agent may already have written a valid bundle
+      // before it ran out of turns; throwing that away wastes the whole spend.
+      agentError = message;
+    }
   }
   if (sessionIdSeen) await saveSessionId(build.id, sessionIdSeen);
   // Assigned inside the onMessage callback, which control-flow analysis cannot

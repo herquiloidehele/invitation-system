@@ -4,6 +4,7 @@ import {
   classifyBuildError,
   extractStderrMessage,
   isFatalAgentText,
+  isMissingSessionError,
 } from "@/lib/build-errors";
 
 describe("extractStderrMessage", () => {
@@ -79,6 +80,40 @@ describe("classifyBuildError", () => {
     const e = classifyBuildError("Something odd happened");
     expect(e.title).toMatch(/falhou/i);
     expect(e.detail).toBe("Something odd happened");
+  });
+});
+
+describe("isMissingSessionError", () => {
+  it("recognises the SDK's lost-session error (ephemeral fs after a redeploy)", () => {
+    expect(
+      isMissingSessionError(
+        "Claude Code returned an error result: No conversation found with session ID: 80a20936-1c04-48c9-b264-91a178ca4467",
+      ),
+    ).toBe(true);
+  });
+
+  it("matches regardless of surrounding wrapper text or case", () => {
+    expect(
+      isMissingSessionError("Error: no conversation found with session id: abc"),
+    ).toBe(true);
+  });
+
+  it("leaves unrelated failures alone", () => {
+    expect(isMissingSessionError("Credit balance is too low")).toBe(false);
+    expect(isMissingSessionError("Reached maximum number of turns (15)")).toBe(
+      false,
+    );
+    expect(isMissingSessionError("")).toBe(false);
+  });
+});
+
+describe("classifyBuildError — lost session", () => {
+  it("explains a lost session in operator-readable terms", () => {
+    const e = classifyBuildError(
+      "No conversation found with session ID: 80a20936-1c04-48c9-b264-91a178ca4467",
+    );
+    expect(e.title).toMatch(/sess/i);
+    expect(e.hint).toBeTruthy();
   });
 });
 

@@ -69,6 +69,11 @@ const PATTERNS: Array<{
     hint: "Peça uma alteração mais pequena, ou aumente o limite.",
   },
   {
+    match: /no conversation found with session id/i,
+    title: "A sessão anterior já não está disponível",
+    hint: "Tente novamente — a construção recomeça a partir do código guardado.",
+  },
+  {
     match: /ENOENT|ECONNREFUSED|ETIMEDOUT|network|fetch failed/i,
     title: "Falha de ligação ao executar a construção",
     hint: "Verifique a ligação e tente novamente.",
@@ -84,6 +89,16 @@ export function classifyBuildError(raw: string): BuildErrorInfo {
     }
   }
   return { title: "A construção falhou", detail: text || undefined };
+}
+
+/**
+ * True when the failure is the Agent SDK failing to `resume` a session whose
+ * transcript is gone — the local conversation file was wiped (e.g. the
+ * container's ephemeral filesystem after a redeploy) while the session id lived
+ * on durably in the DB. The caller recovers by rerunning without `resume`.
+ */
+export function isMissingSessionError(message: string): boolean {
+  return /no conversation found with session id/i.test(message ?? "");
 }
 
 /**
