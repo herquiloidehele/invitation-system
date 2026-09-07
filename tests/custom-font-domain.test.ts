@@ -112,4 +112,29 @@ describe("custom font domain", () => {
     expect(css).toContain("format('opentype')");
     expect(css.match(/@font-face/g)).toHaveLength(2);
   });
+
+  it("registers each variant under the human name too, when present", () => {
+    const css = buildCustomFontFaceCss({
+      id: "f1",
+      name: "Cormorant Display",
+      cssFamily: "custom-font-f1",
+      fallbackCategory: "display",
+      revision: 1,
+      variants: [
+        {
+          id: "v1",
+          weight: 400,
+          style: "normal",
+          format: "woff2",
+          revision: 1,
+          url: "/api/fonts/files/v1?v=1",
+        },
+      ],
+    });
+
+    // Both the id identity (back-compat) and the readable alias resolve.
+    expect(css).toContain("font-family: 'custom-font-f1'");
+    expect(css).toContain("font-family: 'Cormorant Display'");
+    expect(css.match(/@font-face/g)).toHaveLength(2);
+  });
 });

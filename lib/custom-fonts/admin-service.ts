@@ -308,6 +308,36 @@ export async function createCustomFontFamily(
   return toAdminCustomFontFamily(family!);
 }
 
+/**
+ * Create a custom font family from a freshly-analysed pending upload, OR reuse
+ * the family that already carries this (normalised) name. The AI builder
+ * auto-creates fonts without the admin form, so a re-upload of a font already
+ * in the library must resolve to that family instead of failing on the
+ * unique-name constraint.
+ */
+export async function getOrCreateCustomFontFamilyFromPending(
+  input: CreateCustomFontFamilyInput,
+): Promise<AdminCustomFontFamily> {
+  try {
+    return await createCustomFontFamily(input);
+  } catch (error) {
+    if (
+      error instanceof CustomFontServiceError &&
+      error.code === "duplicate_family"
+    ) {
+      // The name is taken — the font is already in the library. Drop the
+      // pending upload we won't use and point at the existing family.
+      await deletePendingFont(input.pendingKey).catch(() => undefined);
+      const existing = await prisma.customFontFamily.findUnique({
+        where: { normalizedName: normalizeCustomFontName(input.name) },
+        include: { variants: true },
+      });
+      if (existing) return toAdminCustomFontFamily(existing);
+    }
+    throw error;
+  }
+}
+
 export async function addCustomFontVariant(
   familyId: string,
   input: CommitVariantInput,

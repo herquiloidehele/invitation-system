@@ -482,6 +482,91 @@ export async function deleteAttachment(id: string): Promise<void> {
   await prisma.aiAttachment.delete({ where: { id } });
 }
 
+/**
+ * A font the admin uploaded in the builder chat. It points at a global
+ * `CustomFontFamily` (fonts are reusable, not owned by an invitation); the
+ * denormalised `cssFamily`/`category` are what the agent brief and the runtime
+ * `<Font>` need, so a deleted family just fails to load like any custom font.
+ * Client components may import this type, but must do so with `import type`.
+ */
+export type FontAssetRecord = {
+  id: string;
+  customFontFamilyId: string;
+  family: string;
+  cssFamily: string;
+  category: string;
+};
+
+const FONT_ASSET_SELECT = {
+  id: true,
+  customFontFamilyId: true,
+  family: true,
+  cssFamily: true,
+  category: true,
+} as const;
+
+/** Link an already-created custom font to an invitation's build. */
+export async function recordFontAsset(args: {
+  buildId: string;
+  invitationId: string;
+  messageId?: string | null;
+  customFontFamilyId: string;
+  family: string;
+  cssFamily: string;
+  category: string;
+}): Promise<FontAssetRecord> {
+  return prisma.aiFontAsset.create({
+    data: {
+      buildId: args.buildId,
+      invitationId: args.invitationId,
+      messageId: args.messageId ?? null,
+      customFontFamilyId: args.customFontFamilyId,
+      family: args.family,
+      cssFamily: args.cssFamily,
+      category: args.category,
+    },
+    select: FONT_ASSET_SELECT,
+  });
+}
+
+/** Every uploaded font for an invitation, oldest first. */
+export async function listFontAssetsForInvitation(
+  invitationId: string,
+): Promise<FontAssetRecord[]> {
+  return prisma.aiFontAsset.findMany({
+    where: { invitationId },
+    orderBy: { createdAt: "asc" },
+    select: FONT_ASSET_SELECT,
+  });
+}
+
+/** Uploaded fonts not yet sent with a message — what the composer tray shows. */
+export async function listPendingFontAssets(
+  invitationId: string,
+): Promise<FontAssetRecord[]> {
+  return prisma.aiFontAsset.findMany({
+    where: { invitationId, messageId: null },
+    orderBy: { createdAt: "asc" },
+    select: FONT_ASSET_SELECT,
+  });
+}
+
+/** Attach every not-yet-sent uploaded font to the message being sent. */
+export async function linkPendingFontAssets(
+  buildId: string,
+  messageId: string,
+): Promise<void> {
+  await prisma.aiFontAsset.updateMany({
+    where: { buildId, messageId: null },
+    data: { messageId },
+  });
+}
+
+/** Remove a font link from the composer tray (keeps the global font). */
+export async function deleteFontAsset(id: string): Promise<void> {
+  await prisma.aiFontAsset.delete({ where: { id } });
+}
+
 /** A revision resolved for preview: its invitation + whether it is published. */
 /** Total USD spent across an invitation's build turns (from AiMessage.costUsd). */
 export async function sumCostForInvitation(

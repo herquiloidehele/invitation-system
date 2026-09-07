@@ -463,6 +463,7 @@ model AiBuild {
   revisions   AiRevision[]
   messages    AiMessage[]
   attachments AiAttachment[]
+  fontAssets  AiFontAsset[]
 
   @@index([invitationId])
 }
@@ -499,6 +500,34 @@ model AiAttachment {
   @@index([invitationId])
 }
 
+model AiFontAsset {
+  id      String  @id @default(cuid())
+  buildId String
+  build   AiBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+
+  /// Denormalised so a whole invitation's uploaded fonts can be listed.
+  invitationId String
+  /// The chat turn this was sent with. Null while it is still pending in the
+  /// composer — that nullness IS the "not yet sent" state.
+  messageId String?
+  message   AiMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  /// The global CustomFontFamily this points at. Fonts are reusable across
+  /// invitations, so this is a loose id, not a cascading relation.
+  customFontFamilyId String
+  /// Human family name, shown in the UI and used as a label for the agent.
+  family String
+  /// The CSS family the agent must reference: "custom-font-<id>".
+  cssFamily String
+  /// Fallback category: serif | sans-serif | display | handwriting | monospace.
+  category String
+
+  createdAt DateTime @default(now())
+
+  @@index([buildId])
+  @@index([invitationId])
+}
+
 model AiMessage {
   id      String  @id @default(cuid())
   buildId String
@@ -523,6 +552,7 @@ model AiMessage {
   createdAt DateTime @default(now())
 
   attachments AiAttachment[]
+  fontAssets  AiFontAsset[]
 
   @@index([buildId])
 }

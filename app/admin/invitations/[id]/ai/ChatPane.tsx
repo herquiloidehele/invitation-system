@@ -5,7 +5,7 @@ import { AlertTriangle, Eye, FileText, HelpCircle, Loader2, MousePointerClick, S
 
 import type { BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
-import type { AttachmentRecord } from "@/worker/persistence";
+import type { AttachmentRecord, FontAssetRecord } from "@/worker/persistence";
 import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
 import { formatElapsed } from "@/lib/ai-build-elapsed";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import ChatMarkdown from "./ChatMarkdown";
 import AttachmentPicker from "./AttachmentPicker";
+import FontUploadControl from "./FontUploadControl";
 
 export type ChatItem =
   | {
@@ -97,6 +98,9 @@ export default function ChatPane({
   attachments,
   onAttach,
   onRemoveAttachment,
+  fonts,
+  onAddFont,
+  onRemoveFont,
   selection,
   onClearSelection,
 }: {
@@ -117,6 +121,9 @@ export default function ChatPane({
   attachments: AttachmentRecord[];
   onAttach: (a: AttachmentRecord) => void;
   onRemoveAttachment: (id: string) => void;
+  fonts: FontAssetRecord[];
+  onAddFont: (f: FontAssetRecord) => void;
+  onRemoveFont: (id: string) => void;
   selection: { descriptor: SelectedElementDescriptor; png: string | null } | null;
   onClearSelection: () => void;
 }) {
@@ -383,6 +390,13 @@ export default function ChatPane({
           attachments={attachments}
           onAttach={onAttach}
           onRemove={onRemoveAttachment}
+          disabled={building}
+        />
+        <FontUploadControl
+          slug={slug}
+          fonts={fonts}
+          onAdd={onAddFont}
+          onRemove={onRemoveFont}
           disabled={building}
         />
         <Textarea

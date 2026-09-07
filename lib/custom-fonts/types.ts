@@ -20,6 +20,8 @@ export interface CustomFontManifestVariant {
 export interface CustomFontManifest {
   id: string;
   cssFamily: string;
+  /** Human family name, registered as a readable @font-face alias. */
+  name?: string;
   fallbackCategory: FontCategory;
   revision: number;
   variants: CustomFontManifestVariant[];

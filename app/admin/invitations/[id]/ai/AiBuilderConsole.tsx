@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import type { BuildEvent, BuildUsage } from "@/worker/lib/build-events";
 import type { Critique } from "@/worker/lib/critique";
-import type { AttachmentRecord } from "@/worker/persistence";
+import type { AttachmentRecord, FontAssetRecord } from "@/worker/persistence";
 import { parseSseFrames } from "@/lib/ai-build-stream";
 import {
   AI_PREVIEW_CAPTURE,
@@ -55,6 +55,7 @@ export default function AiBuilderConsole({
   const [previewNonce, setPreviewNonce] = useState(0);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
   const [attachments, setAttachments] = useState<AttachmentRecord[]>([]);
+  const [fonts, setFonts] = useState<FontAssetRecord[]>([]);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedElement, setSelectedElement] = useState<{
     descriptor: SelectedElementDescriptor;
@@ -194,6 +195,13 @@ export default function AiBuilderConsole({
     if (res.ok) setAttachments((await res.json()).attachments ?? []);
   }, [slug]);
 
+  const loadFonts = useCallback(async () => {
+    const res = await fetch(
+      `/api/admin/ai/fonts?slug=${encodeURIComponent(slug)}&pending=1`,
+    );
+    if (res.ok) setFonts((await res.json()).fonts ?? []);
+  }, [slug]);
+
   // Tick the elapsed timer once a second while a build runs.
   useEffect(() => {
     if (!building || buildStartedAt == null) {
@@ -211,7 +219,8 @@ export default function AiBuilderConsole({
     setBuildStartedAt(null);
     void refreshRail();
     void loadAttachments();
-  }, [refreshRail, loadAttachments]);
+    void loadFonts();
+  }, [refreshRail, loadAttachments, loadFonts]);
 
   /** Is a build for this invitation still running on the server? */
   const isBuildRunning = useCallback(async (): Promise<number | null> => {
@@ -267,6 +276,7 @@ export default function AiBuilderConsole({
     void loadHistory();
     void refreshRail();
     void loadAttachments();
+    void loadFonts();
     // If a build is already running (reload mid-build), re-attach to it.
     void isBuildRunning().then((startedAt) => {
       if (startedAt != null) enterReconnect(startedAt);
@@ -278,6 +288,7 @@ export default function AiBuilderConsole({
     loadHistory,
     refreshRail,
     loadAttachments,
+    loadFonts,
     isBuildRunning,
     enterReconnect,
   ]);
@@ -288,6 +299,14 @@ export default function AiBuilderConsole({
     });
     if (res.ok) setAttachments((prev) => prev.filter((a) => a.id !== id));
     else toast.error("Falha ao remover o ficheiro.");
+  };
+
+  const removeFont = async (id: string) => {
+    const res = await fetch(`/api/admin/ai/fonts?id=${id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) setFonts((prev) => prev.filter((f) => f.id !== id));
+    else toast.error("Falha ao remover a fonte.");
   };
 
   // The preview iframe posts a selected block back; hold it as a pending chip.
@@ -584,6 +603,7 @@ export default function AiBuilderConsole({
           : undefined,
       });
       setAttachments([]);
+      setFonts([]);
       setPrompt("");
     }
     // Capture the selection before clearing it, so it rides with this request.
@@ -735,6 +755,7 @@ export default function AiBuilderConsole({
       setRevisions([]);
       setPreviewRevisionId(null);
       setAttachments([]);
+      setFonts([]);
       setPrompt("");
       toast.success("Convite reposto. Pode começar do zero.");
       await refreshRail();
@@ -768,6 +789,9 @@ export default function AiBuilderConsole({
         attachments={attachments}
         onAttach={(a) => setAttachments((prev) => [...prev, a])}
         onRemoveAttachment={removeAttachment}
+        fonts={fonts}
+        onAddFont={(f) => setFonts((prev) => [...prev, f])}
+        onRemoveFont={removeFont}
         selection={selectedElement}
         onClearSelection={() => setSelectedElement(null)}
       />

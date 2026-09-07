@@ -11,6 +11,7 @@ import { buildInvitationBrief } from "./lib/invitation-brief";
 import { type BuildEvent, type BuildUsage, toBuildEvent } from "./lib/build-events";
 import { classifyBuildError, isMissingSessionError } from "@/lib/build-errors";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
+import { buildFontBrief } from "./lib/font-brief";
 import { SELECTION_IMAGE_NAME, buildElementBrief } from "./lib/element-brief";
 import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
 import { collectSourceFiles, sourceFilesEqual } from "./lib/source-files";
@@ -25,7 +26,9 @@ import {
   latestDraftRevisionId,
   latestRevisionSource,
   linkPendingAttachments,
+  linkPendingFontAssets,
   listAttachmentsForInvitation,
+  listFontAssetsForInvitation,
   listMessagesForInvitation,
   revisionCount,
   saveSessionId,
@@ -90,6 +93,7 @@ export async function runInvitationBuild(args: {
   }
   // Sending is what turns pending uploads into part of the conversation.
   await linkPendingAttachments(build.id, userMessageId);
+  await linkPendingFontAssets(build.id, userMessageId);
 
   // Per-invitation spend ceiling — cost is persisted per turn (AiMessage.costUsd)
   // but otherwise unbounded. Refuse before spending more.
@@ -109,6 +113,7 @@ export async function runInvitationBuild(args: {
   }
   const brief = buildInvitationBrief(invitation);
   const attachments = await listAttachmentsForInvitation(invitationId);
+  const fonts = await listFontAssetsForInvitation(invitationId);
 
   // Every build goes straight to building — the directions gate (which used to
   // propose 4 visual directions and stop) has been removed.
@@ -117,6 +122,7 @@ export async function runInvitationBuild(args: {
 
   const priorSource = await latestRevisionSource(build.id);
   const attachmentBrief = buildAttachmentBrief(attachments);
+  const fontBrief = buildFontBrief(fonts);
   const manifest = buildSourceManifest(priorSource ?? {});
 
   // 200k never fired: a nine-turn session measured at 130,899 tokens at its
@@ -204,6 +210,7 @@ export async function runInvitationBuild(args: {
       manifest ? `\n${manifest}` : "",
       recapText ? `\n${recapText}` : "",
       attachmentBrief ? `\n${attachmentBrief}` : "",
+      fontBrief ? `\n${fontBrief}` : "",
       elementBrief ? `\n${elementBrief}` : "",
       `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
     ].join("\n");

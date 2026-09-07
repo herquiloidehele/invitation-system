@@ -57,6 +57,20 @@ export function buildCustomFontStack(
   return `'${buildCustomFontCssFamily(id)}', ${GENERIC_FALLBACK[category]}`;
 }
 
+/**
+ * A readable font stack built from the font's human name, e.g.
+ * `'Cormorant Display', serif`. Preferred in generated CSS so computed styles
+ * show the actual name instead of the opaque `custom-font-<id>` identity.
+ * Names are globally unique (normalizedName @unique), so this never clashes
+ * with another uploaded font.
+ */
+export function buildFontDisplayStack(
+  familyName: string,
+  category: FontCategory,
+): string {
+  return `'${familyName.replaceAll("'", "\\'")}', ${GENERIC_FALLBACK[category]}`;
+}
+
 export function extractCustomFontFamilyId(stack: string): string | null {
   const family = unquoteFamily(stack);
   if (!family.startsWith(CUSTOM_FONT_PREFIX)) return null;
@@ -188,20 +202,32 @@ export function filterCustomFontFamilies(
 export function buildCustomFontFaceCss(
   manifest: CustomFontManifest,
 ): string {
-  const family = manifest.cssFamily.replaceAll("'", "\\'");
+  const escape = (value: string) => value.replaceAll("'", "\\'");
+  // Register each variant under the id-based family (stable machine identity,
+  // and back-compat with any bundle that already references it) AND, when the
+  // font has a human name, under that name — so generated CSS can read
+  // `font-family: 'Cormorant Display'` instead of the opaque id. Names are
+  // globally unique (normalizedName @unique), so aliases never clash.
+  const families = [manifest.cssFamily];
+  const humanName = manifest.name?.trim();
+  if (humanName && humanName.toLowerCase() !== manifest.cssFamily.toLowerCase()) {
+    families.push(humanName);
+  }
   return [...manifest.variants]
     .sort(
       (left, right) =>
         left.weight - right.weight || left.style.localeCompare(right.style),
     )
-    .map(
-      (variant) => `@font-face {
-  font-family: '${family}';
+    .flatMap((variant) =>
+      families.map(
+        (family) => `@font-face {
+  font-family: '${escape(family)}';
   src: url('${variant.url}') format('${CSS_FORMAT[variant.format]}');
   font-weight: ${variant.weight};
   font-style: ${variant.style};
   font-display: swap;
 }`,
+      ),
     )
     .join("\n");
 }

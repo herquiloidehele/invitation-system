@@ -14,6 +14,7 @@ export async function getCustomFontManifest(
     where: { id },
     select: {
       id: true,
+      name: true,
       cssFamily: true,
       fallbackCategory: true,
       revision: true,
@@ -32,6 +33,7 @@ export async function getCustomFontManifest(
   if (!family) return null;
   return {
     id: family.id,
+    name: family.name,
     cssFamily: family.cssFamily,
     fallbackCategory: family.fallbackCategory as FontCategory,
     revision: family.revision,

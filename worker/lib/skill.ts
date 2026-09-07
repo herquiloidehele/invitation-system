@@ -48,6 +48,7 @@ When asked for a change, edit only the file that owns it.
 - Behaviour is platform-owned: use \`useRsvp()\`, \`useGifts()\`, etc. — never re-implement RSVP/gift/audio logic or fetch APIs yourself.
 - Locale-reactive text: author \`{ pt, en, ... }\` maps and read them via \`useLocale().t(...)\`. Do not read localized strings off \`invitation\`.
 - Images: use \`<Media>\`. QR: \`<QrCode>\`. Fonts: \`<Font family=... />\`. Video: a plain \`<video>\` element is fine.
+- Admin-uploaded fonts: \`<Font family="custom-font-<id>" />\` loads one (the host injects its \`@font-face\`). The host registers that face under the font's readable name too, so in your CSS/theme use the human name (e.g. \`'Cormorant Display', serif\`), NOT the \`custom-font-<id>\` string. The task prompt lists any uploaded for this invitation with the exact load tag and CSS stack; never invent a \`custom-font-\` id.
 - Uploaded files live in \`props.assets.library\`. To display one, look it up by \`id\` or \`name\` and pass its \`url\` to \`<Media>\`. **Never hardcode an attachment URL** into the source. Entries with \`kind: "pdf"\` are reference material only — never render them.
 - The design must be distinctive and never generic. Avoid Inter/Roboto/system fonts, purple-on-white gradients, and cookie-cutter card layouts.
 
