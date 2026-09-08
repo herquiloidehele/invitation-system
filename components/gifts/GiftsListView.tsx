@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  type CSSProperties,
-  type MouseEvent as ReactMouseEvent,
-  useMemo,
-  useState,
-} from "react";
+import { type CSSProperties, type MouseEvent as ReactMouseEvent, useMemo, useState } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, Check, ChevronLeft, ExternalLink, Gift, LockKeyhole } from "lucide-react";
@@ -289,6 +284,7 @@ export default function GiftsListView({
         <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
           <Link
             href={backHref}
+            onClick={handleBack}
             style={{
               display: "inline-flex",
               alignItems: "center",
