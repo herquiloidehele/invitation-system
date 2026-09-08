@@ -1,7 +1,11 @@
 /**
- * The art-direction contract. Inlined into the agent's system prompt (see
- * worker/agent.ts) rather than shipped as a skill the agent must read —
- * Phase 4b removed that round-trip and this must not reintroduce it.
+ * The art-direction contract.
+ *
+ * Consumed two ways: `critiqueDesign()` imports it as the rubric for grading
+ * rendered screenshots, and `buildDesignProcessSkill()` embeds it into the
+ * design-process SKILL.md. It is deliberately NOT system-prompt text — a ban
+ * list as ambient framing produces bland-but-compliant work, and duplicating it
+ * in two places is how the two copies drift.
  *
  * These are prohibitions plus positive direction. Prohibitions alone produce
  * bland-but-compliant work, so each ban names what to do instead.
@@ -37,6 +41,24 @@ The output must look like a designer made it for these specific people. Generic
 - Use asymmetry, deliberate whitespace, and a real editorial hierarchy. Let one
   element per screen dominate.
 - Full-bleed imagery beats a boxed thumbnail. Overlap and offset are allowed.
+
+### Genre defaults (the wedding-invitation tells)
+
+These are what a template produces. Each is legitimate if the couple actually
+asked for it — the brief's own words always win — but where the brief leaves the
+choice open, do not spend it on one of these:
+
+- Eucalyptus or sage green with cream and a script display face.
+- Everything centred, every section, top to bottom.
+- A hairline gold rule with a leaf or laurel motif as a section divider.
+- Tracked-out ALL-CAPS labels: "SAVE THE DATE", "OUR STORY", "GETTING THERE".
+- A full-bleed photo under a dark scrim with the names centred over it in white
+  serif — the single commonest cover in the genre.
+- A dot-and-line vertical timeline for the schedule.
+- Identical rounded cards with the same soft shadow for FAQs or details.
+- Warm cream near #F4F1EA with a terracotta accent near #D97757. This one is
+  especially dangerous here: in this genre it reads as tasteful rather than as
+  the generated-page default it is.
 
 ### Motion
 - Motion must be purposeful. Do not apply the same fade-up-on-scroll to every

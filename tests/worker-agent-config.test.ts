@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSystemPrompt } from "@/worker/agent";
+import { ENABLED_SKILLS, buildSystemPrompt } from "@/worker/agent";
 import { workspaceTsconfig } from "@/worker/lib/workspace-files";
 
 describe("buildSystemPrompt", () => {
@@ -21,10 +21,35 @@ describe("buildSystemPrompt", () => {
     expect(buildSystemPrompt(dts)).toContain("props.invitation");
   });
 
-  it("inlines the art direction so design rules need no extra turn", () => {
+  it("keeps the rubric out of the prefix — it belongs to the skill and the critique", () => {
     const prompt = buildSystemPrompt(dts).toLowerCase();
-    expect(prompt).toContain("art direction");
-    expect(prompt).toContain("inter");
+    expect(prompt).not.toContain("eucalyptus");
+    expect(prompt).not.toContain("art direction (non-negotiable)");
+  });
+
+  it("tells an edit turn to stay inside the design already on disk", () => {
+    const prompt = buildSystemPrompt(dts);
+    expect(prompt).toContain("PLAN.md");
+    expect(prompt).toContain("theme.ts");
+  });
+
+  it("is byte-identical across calls, so resumed turns keep their cache", () => {
+    expect(buildSystemPrompt(dts)).toBe(buildSystemPrompt(dts));
+  });
+});
+
+describe("ENABLED_SKILLS", () => {
+  it("is an explicit allow-list, never a wildcard", () => {
+    expect(Array.isArray(ENABLED_SKILLS)).toBe(true);
+    expect(ENABLED_SKILLS).not.toContain("all");
+  });
+
+  it("names exactly the three skills provisionWorkspace writes", () => {
+    expect([...ENABLED_SKILLS].sort()).toEqual([
+      "design-process",
+      "phone-craft",
+      "platform",
+    ]);
   });
 });
 

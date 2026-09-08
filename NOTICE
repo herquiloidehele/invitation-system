@@ -1,0 +1,28 @@
+This product includes software and documentation adapted from third-party
+open-source projects.
+
+--------------------------------------------------------------------------------
+Anthropic — "frontend-design" agent skill
+Licensed under the Apache License, Version 2.0.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Adapted in: worker/lib/design-process-skill.ts
+
+Modifications: the two-pass plan-then-review method was rewritten for digital
+wedding invitations. The landing-page hero guidance was replaced with cover /
+coverOpened guidance; the calibration list of generated-design traits was
+replaced with wedding-genre defaults; the grounding guidance was bound to this
+platform's invitation brief; and the plan is persisted as PLAN.md.
+
+--------------------------------------------------------------------------------
+Vercel Labs — "Web Interface Guidelines"
+Copyright (c) 2025 Vercel Labs
+Licensed under the MIT License.
+
+Adapted in: worker/lib/phone-craft-skill.ts
+
+Modifications: reduced to the rules that apply to a single-page invitation opened
+on a phone; dashboard-oriented rules (list virtualization, hydration, dark-mode
+theming) were removed. Form guidance was rewritten because validation and
+submission are owned by this platform's useRsvp() hook rather than by the
+generated code. Instagram-webview memory rules were added.

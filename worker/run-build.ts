@@ -12,6 +12,7 @@ import { type BuildEvent, type BuildUsage, toBuildEvent } from "./lib/build-even
 import { classifyBuildError, isMissingSessionError } from "@/lib/build-errors";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
 import { buildFontBrief } from "./lib/font-brief";
+import { buildPlanBrief } from "./lib/plan-brief";
 import { SELECTION_IMAGE_NAME, buildElementBrief } from "./lib/element-brief";
 import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
 import { collectSourceFiles, sourceFilesEqual } from "./lib/source-files";
@@ -124,6 +125,7 @@ export async function runInvitationBuild(args: {
   const attachmentBrief = buildAttachmentBrief(attachments);
   const fontBrief = buildFontBrief(fonts);
   const manifest = buildSourceManifest(priorSource ?? {});
+  const planBrief = buildPlanBrief(isFirstBuild && !isCritiqueTurn);
 
   // 200k never fired: a nine-turn session measured at 130,899 tokens at its
   // peak, so rotation was dead code. Meanwhile each resumed tweak replayed
@@ -166,6 +168,14 @@ export async function runInvitationBuild(args: {
       ? (process.env.AI_BUILD_MODEL_FIRST ?? "claude-opus-5")
       : (process.env.AI_BUILD_MODEL_TWEAK ?? "claude-sonnet-5");
   const effort = isCritiqueTurn ? "medium" : effortFor(isFirstBuild);
+
+  // The plan pass costs a turn the old flow did not spend. Tweaks keep the
+  // runBuildAgent default; only the first build gets headroom.
+  const maxBudgetUsd = Number(
+    isFirstBuild && !isCritiqueTurn
+      ? (process.env.AI_BUILD_BUDGET_FIRST ?? "7")
+      : (process.env.AI_BUILD_BUDGET_TWEAK ?? "5"),
+  );
 
   const repoRoot = process.cwd();
   const dts = await readFile(
@@ -212,6 +222,7 @@ export async function runInvitationBuild(args: {
       attachmentBrief ? `\n${attachmentBrief}` : "",
       fontBrief ? `\n${fontBrief}` : "",
       elementBrief ? `\n${elementBrief}` : "",
+      planBrief ? `\n${planBrief}` : "",
       `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
     ].join("\n");
 
@@ -243,6 +254,7 @@ export async function runInvitationBuild(args: {
       dts,
       model,
       effort,
+      maxBudgetUsd,
       resume,
       onMessage: (m) => {
         const raw = m as {

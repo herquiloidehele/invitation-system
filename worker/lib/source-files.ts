@@ -13,7 +13,11 @@ const SKIP_FILES = new Set([
   "NEEDS_INPUT.md",
   ".tsbuildinfo",
 ]);
-const SOURCE_EXT = new Set([".ts", ".tsx", ".css"]);
+// `.md` is here for PLAN.md — the design decision record the agent writes on a
+// first build. Persisting it means a rotated or redeployed session re-orients
+// from the real design rationale instead of reconstructing intent from chat.
+// NEEDS_INPUT.md is excluded by name in SKIP_FILES above.
+const SOURCE_EXT = new Set([".ts", ".tsx", ".css", ".md"]);
 
 /**
  * Every file the agent authored, keyed by workspace-relative POSIX path.

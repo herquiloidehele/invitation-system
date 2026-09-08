@@ -15,6 +15,7 @@ async function scaffold() {
   await put("theme.ts", "export const t = 1");
   await put("sections/Hero.tsx", "export const Hero = 1");
   await put("ui/Rule.tsx", "export const Rule = 1");
+  await put("PLAN.md", "# Plan");
   // Everything below is harness-owned or generated and must NOT be captured.
   await put("shims/react.ts", "shim");
   await put("runtime.ts", "runtime");
@@ -32,12 +33,19 @@ describe("collectSourceFiles", () => {
   it("captures the agent's source tree and nothing the harness owns", async () => {
     const files = await collectSourceFiles(await scaffold());
     expect(Object.keys(files).sort()).toEqual([
+      "PLAN.md",
       "index.tsx",
       "sections/Hero.tsx",
       "theme.ts",
       "ui/Rule.tsx",
     ]);
     expect(files["sections/Hero.tsx"]).toBe("export const Hero = 1");
+  });
+
+  it("keeps PLAN.md but never the NEEDS_INPUT sentinel", async () => {
+    const files = await collectSourceFiles(await scaffold());
+    expect(files["PLAN.md"]).toBe("# Plan");
+    expect(files["NEEDS_INPUT.md"]).toBeUndefined();
   });
 });
 

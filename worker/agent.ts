@@ -3,7 +3,6 @@ import path from "node:path";
 import { query } from "@anthropic-ai/claude-agent-sdk";
 
 import { platformContract } from "./lib/skill";
-import { artDirection } from "./lib/art-direction";
 
 export interface BuildAgentResult {
   messages: unknown[];
@@ -12,11 +11,31 @@ export interface BuildAgentResult {
 }
 
 /**
+ * The only skills the agent may invoke.
+ *
+ * An explicit list, never `'all'`. `settingSources: ["project"]` scopes settings
+ * to the workspace, but skill discovery can separately reach the host's own
+ * `~/.claude/skills` — and `HOME` is passed through in the agent env below.
+ * Host skills have no business inside a customer's invitation build.
+ *
+ * Every name here must match a directory `provisionWorkspace` writes.
+ */
+export const ENABLED_SKILLS = ["platform", "design-process", "phone-craft"];
+
+/**
  * The agent's system prompt, with the `@platform` contract inlined.
  *
  * The contract used to live only in `.claude/skills/platform/SKILL.md`, which
  * cost a full round-trip on every run just to re-orient. Inlining it here is
  * ~6KB in the stable, cacheable prefix and removes that turn entirely.
+ *
+ * The art direction deliberately does NOT live here. It is the shared rubric
+ * (`lib/art-direction.ts`), consumed by `critiqueDesign()` and embedded into the
+ * design-process skill, so it is read while planning rather than sitting in
+ * every turn's prefix.
+ *
+ * This string must stay byte-identical across every turn: a critique turn
+ * resumes the first build's session, and a varying prefix would split the cache.
  */
 export function buildSystemPrompt(dtsContent: string): string {
   return `You are an expert frontend designer building a single, self-contained wedding-invitation component.
@@ -25,7 +44,7 @@ You are working inside a workspace. Write the component following the File layou
 
 The design must be distinctive and production-grade — never generic. When you are done and the build passes, stop.
 
-${artDirection()}
+If \`PLAN.md\` and \`theme.ts\` already exist, this invitation has a design: read them before editing and stay inside it. Do not introduce a font, colour, or card pattern that is not already in the theme. If they do not exist, your task prompt will tell you how to start.
 
 The full @platform contract you must build against follows. It is authoritative; you do not need to look it up anywhere else.
 
@@ -81,6 +100,9 @@ export async function runBuildAgent(args: {
         "Bash(curl*)",
         "Bash(wget*)",
       ],
+      // Turning skills on. The SDK documents this as the single place to do it —
+      // adding "Skill" to allowedTools is deprecated and not required here.
+      skills: ENABLED_SKILLS,
       model: args.model ?? "claude-sonnet-5",
       maxBudgetUsd: args.maxBudgetUsd ?? 5,
       // A turn cap stops runaway loops, but the real spend guard is

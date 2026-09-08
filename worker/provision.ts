@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { getObjectBuffer } from "@/lib/s3";
 import { buildPlatformSkill } from "./lib/skill";
+import { buildDesignProcessSkill } from "./lib/design-process-skill";
+import { buildPhoneCraftSkill } from "./lib/phone-craft-skill";
 import type { AttachmentRecord } from "./persistence";
 import {
   workspacePackageJson,
@@ -48,9 +50,18 @@ export async function provisionWorkspace(
   await writeFile(path.join(workspaceDir, "package.json"), workspacePackageJson());
   await writeFile(path.join(workspaceDir, "build.mjs"), buildScript());
 
-  const skillDir = path.join(workspaceDir, ".claude", "skills", "platform");
-  await mkdir(skillDir, { recursive: true });
-  await writeFile(path.join(skillDir, "SKILL.md"), buildPlatformSkill(dtsContent));
+  // Every skill named in ENABLED_SKILLS (worker/agent.ts) must exist here — the
+  // SDK's allow-list rejects a name it cannot discover.
+  const skills: Array<[string, string]> = [
+    ["platform", buildPlatformSkill(dtsContent)],
+    ["design-process", buildDesignProcessSkill()],
+    ["phone-craft", buildPhoneCraftSkill()],
+  ];
+  for (const [name, body] of skills) {
+    const skillDir = path.join(workspaceDir, ".claude", "skills", name);
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(path.join(skillDir, "SKILL.md"), body);
+  }
 
   // Resuming: rehydrate the last revision's whole source tree so the agent
   // edits it. Older revisions carry only index.tsx; newer ones carry sections.
