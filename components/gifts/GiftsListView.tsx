@@ -1,13 +1,18 @@
 "use client";
 
-import { type CSSProperties, useMemo, useState } from "react";
+import {
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  useMemo,
+  useState,
+} from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, Check, ChevronLeft, ExternalLink, Gift, LockKeyhole } from "lucide-react";
 
 import GiftReservationDialog, { type GiftReservationDialogMode } from "@/components/gifts/GiftReservationDialog";
 import { useGiftReservations } from "@/components/gifts/useGiftReservations";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { useCustomText } from "@/lib/custom-texts";
 import {
   type GiftAvailability,
@@ -43,6 +48,7 @@ export default function GiftsListView({
   initialAvailability,
 }: GiftsListViewProps) {
   const reduceMotion = useReducedMotion();
+  const router = useRouter();
   const t = useTranslations("Invitation");
   const ct = useCustomText(invitation.customTexts);
   const exclusive = invitation.giftRegistry.exclusiveSelectionEnabled === true;
@@ -71,6 +77,31 @@ export default function GiftsListView({
   const backHref = `/${slug}?section=gifts${
     guestToken ? `&g=${encodeURIComponent(guestToken)}` : ""
   }`;
+
+  // Mimic the browser Back button. When the guest reached this page from the
+  // invitation (in-app navigation from the gift-list link), popping history
+  // restores the invitation exactly as it was — already opened and scrolled to
+  // the gifts section. A fresh navigation to `backHref` instead re-mounts the
+  // invitation from scratch, which re-shows the closed envelope cover (and,
+  // for rich external-link invitations, cannot scroll to the section because
+  // that page locks scroll to the top on mount). Fall back to the <Link>
+  // navigation on direct entry (page opened/refreshed here or via a shared
+  // link) when there is no in-app history to pop, and let modified clicks
+  // (open-in-new-tab, etc.) use the real href.
+  const handleBack = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.button === 0 &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey &&
+      typeof window !== "undefined" &&
+      window.history.length > 1
+    ) {
+      event.preventDefault();
+      router.back();
+    }
+  };
 
   const reveal = reduceMotion
     ? {}
@@ -109,6 +140,7 @@ export default function GiftsListView({
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
         <Link
           href={backHref}
+          onClick={handleBack}
           style={{
             display: "inline-flex",
             alignItems: "center",
