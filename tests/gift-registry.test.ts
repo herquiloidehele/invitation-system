@@ -5,6 +5,7 @@ import {
   hasBankTransfer,
   hasGiftItems,
   isExclusiveGiftSelectionEnabled,
+  shouldRenderGiftRegistryOnExternal,
 } from "@/lib/gift-registry";
 import type { GiftItem } from "@/lib/types";
 
@@ -93,5 +94,32 @@ describe("isExclusiveGiftSelectionEnabled", () => {
     expect(
       isExclusiveGiftSelectionEnabled({ exclusiveSelectionEnabled: true }),
     ).toBe(true);
+  });
+});
+
+describe("shouldRenderGiftRegistryOnExternal", () => {
+  it("is false when the registry is null/undefined or disabled", () => {
+    expect(shouldRenderGiftRegistryOnExternal(null)).toBe(false);
+    expect(shouldRenderGiftRegistryOnExternal(undefined)).toBe(false);
+    expect(shouldRenderGiftRegistryOnExternal({ enabled: false })).toBe(false);
+  });
+
+  it("is true when enabled and not hidden from the invitation", () => {
+    expect(shouldRenderGiftRegistryOnExternal({ enabled: true })).toBe(true);
+    expect(
+      shouldRenderGiftRegistryOnExternal({
+        enabled: true,
+        hideFromInvitation: false,
+      }),
+    ).toBe(true);
+  });
+
+  it("is false when enabled but hidden from the invitation", () => {
+    expect(
+      shouldRenderGiftRegistryOnExternal({
+        enabled: true,
+        hideFromInvitation: true,
+      }),
+    ).toBe(false);
   });
 });

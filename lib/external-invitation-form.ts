@@ -2,6 +2,7 @@ import type { InvitationData, InvitationType, PublicGuestData } from "./types";
 import { slugifyName } from "./guest-links";
 import { encodeCanvaPersonalization } from "./canva-personalization";
 import { shouldRenderCoupleGallery } from "./couple-gallery";
+import { shouldRenderGiftRegistryOnExternal } from "./gift-registry";
 import { shouldRenderPlaces } from "./places";
 
 export function shouldShowExternalInvitationAudioControls(
@@ -254,7 +255,7 @@ export function hasRichExternalSections(invitation: InvitationData): boolean {
     invitation.rsvp?.enabled && invitation.rsvp?.showOnExternalPage,
   );
   const galleryOn = shouldRenderCoupleGallery(invitation);
-  const giftsOn = invitation.giftRegistry.enabled === true;
+  const giftsOn = shouldRenderGiftRegistryOnExternal(invitation.giftRegistry);
   const faqsOn = (invitation.faqs?.length ?? 0) > 0;
   const placesOn = shouldRenderPlaces(invitation);
 

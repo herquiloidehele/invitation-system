@@ -1,4 +1,5 @@
 import { shouldRenderCoupleGallery } from "./couple-gallery";
+import { shouldRenderGiftRegistryOnExternal } from "./gift-registry";
 import { getEffectiveExternalLink } from "./invitation-external-link";
 import { isPersonalGuestCardHidden } from "./personal-guest-card";
 import { shouldRenderPlaces } from "./places";
@@ -34,7 +35,8 @@ export function getRichExternalInvitationImageSectionKeys(
   if (externalLink) keys.push("canvaDetails");
 
   if (shouldRenderCoupleGallery(invitation)) keys.push("coupleGallery");
-  if (invitation.giftRegistry.enabled) keys.push("giftRegistry");
+  if (shouldRenderGiftRegistryOnExternal(invitation.giftRegistry))
+    keys.push("giftRegistry");
   if ((invitation.faqs?.length ?? 0) > 0) keys.push("faqs");
   if (shouldRenderPlaces(invitation)) keys.push("places");
   if (showRsvp) keys.push("rsvp");

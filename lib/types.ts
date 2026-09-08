@@ -165,6 +165,12 @@ export interface GiftRegistry {
   exclusiveSelectionEnabled?: boolean;
   /** When true, hides the Gift icon chip at the top of the gifts card. */
   hideIcon?: boolean;
+  /**
+   * When true, the gifts section is omitted from the main external invitation
+   * page while the registry stays active — the standalone /{slug}/gifts page
+   * and reservations keep working.
+   */
+  hideFromInvitation?: boolean;
   /** Legacy external registry link (kept for backwards-compat; non-breaking). */
   link?: string;
   /** Product grid shown on /{slug}/gifts. */

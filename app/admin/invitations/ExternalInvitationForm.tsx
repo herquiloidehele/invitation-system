@@ -2861,6 +2861,24 @@ export default function ExternalInvitationForm({
                             />
                           </div>
 
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="space-y-0.5">
+                              <Label>Ocultar da página de convite</Label>
+                              <p className="text-xs text-muted-foreground">
+                                A secção não aparece no convite, mas a lista
+                                continua acessível pelo link direto.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={
+                                form.giftRegistry.hideFromInvitation === true
+                              }
+                              onCheckedChange={(enabled) =>
+                                updateGiftRegistry("hideFromInvitation", enabled)
+                              }
+                            />
+                          </div>
+
                           <div className="space-y-1.5">
                             <Label htmlFor="externalGiftText">
                               Texto da Lista de Presentes

@@ -16,6 +16,17 @@ export function hasBankTransfer(
   );
 }
 
+/**
+ * True when the gifts section should render on the main external invitation
+ * page: the registry is enabled and not explicitly hidden from the invitation.
+ * A hidden-but-enabled registry stays reachable at /{slug}/gifts.
+ */
+export function shouldRenderGiftRegistryOnExternal(
+  registry: Pick<GiftRegistry, "enabled" | "hideFromInvitation"> | null | undefined,
+): boolean {
+  return registry?.enabled === true && registry?.hideFromInvitation !== true;
+}
+
 /** Missing configuration is deliberately unrestricted for backward compatibility. */
 export function isExclusiveGiftSelectionEnabled(
   registry:

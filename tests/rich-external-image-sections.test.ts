@@ -78,6 +78,32 @@ describe("getRichExternalInvitationImageSectionKeys", () => {
     ).not.toContain("personalGuestCard");
   });
 
+  it("omits giftRegistry when enabled but hidden from the invitation", () => {
+    const invitation: InvitationData = {
+      ...MOCK_INVITATION,
+      invitationType: "external_link",
+      externalLink: "https://example.com/invitation",
+      scratchReveal: { enabled: false },
+      countdown: { enabled: false },
+      guestManagementEnabled: false,
+      coupleGallery: { enabled: false, style: "grid", images: [] },
+      giftRegistry: {
+        ...MOCK_INVITATION.giftRegistry,
+        enabled: true,
+        hideFromInvitation: true,
+      },
+      faqs: [],
+      places: { enabled: false, layout: "stacked", sections: [] },
+      rsvp: { ...MOCK_INVITATION.rsvp, enabled: false },
+    };
+
+    expect(
+      getRichExternalInvitationImageSectionKeys(invitation, {
+        showRsvp: false,
+      }),
+    ).not.toContain("giftRegistry");
+  });
+
   it("omits section hosts whose content is absent", () => {
     const invitation: InvitationData = {
       ...MOCK_INVITATION,

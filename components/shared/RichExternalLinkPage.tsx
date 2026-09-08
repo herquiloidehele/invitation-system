@@ -18,6 +18,7 @@ import { isPersonalGuestCardHidden } from "@/lib/personal-guest-card";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
+import { shouldRenderGiftRegistryOnExternal } from "@/lib/gift-registry";
 import { shouldRenderPlaces } from "@/lib/places";
 import {
   getRichExternalInvitationImageSectionKeys,
@@ -380,7 +381,7 @@ export default function RichExternalLinkPage({
             </SectionImageHost>
           )}
 
-          {invitation.giftRegistry.enabled && (
+          {shouldRenderGiftRegistryOnExternal(invitation.giftRegistry) && (
             <SectionImageHost
               sectionKey="giftRegistry"
               layer={invitation.imageLayer}
