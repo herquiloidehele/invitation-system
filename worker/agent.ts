@@ -3,6 +3,7 @@ import path from "node:path";
 import { query } from "@anthropic-ai/claude-agent-sdk";
 
 import { platformContract } from "./lib/skill";
+import { STOCK_TOOL_NAMES, createStockServer } from "./lib/stock-tools";
 
 export interface BuildAgentResult {
   messages: unknown[];
@@ -52,6 +53,22 @@ ${platformContract(dtsContent)}`;
 }
 
 /**
+ * Everything the agent may call. The stock-image tools are always here: a
+ * provider key that turns out to be missing is reported by the tool itself
+ * ("not configured"), which is cheaper to reason about than a tool set that
+ * changes shape with the environment.
+ */
+export const AGENT_TOOLS = [
+  "Read",
+  "Write",
+  "Edit",
+  "Bash",
+  "Glob",
+  "Grep",
+  ...STOCK_TOOL_NAMES,
+];
+
+/**
  * Run the builder agent in `workspaceDir` for one prompt. Returns the collected
  * messages and cost. `bundleId` is exported into the build via BUNDLE_ID.
  *
@@ -65,6 +82,8 @@ export async function runBuildAgent(args: {
   bundleId: string;
   /** The `@platform` .d.ts, inlined into the system prompt. */
   dts: string;
+  /** Namespaces mirrored stock images in the bucket. */
+  invitationId: string;
   model?: string;
   maxBudgetUsd?: number;
   maxTurns?: number;
@@ -93,7 +112,15 @@ export async function runBuildAgent(args: {
       includePartialMessages: true,
       permissionMode: "bypassPermissions",
       allowDangerouslySkipPermissions: true,
-      allowedTools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      allowedTools: AGENT_TOOLS,
+      // Stock search runs in THIS process, so the provider keys and the AWS
+      // credentials never reach the agent's shell env below.
+      mcpServers: {
+        stock: createStockServer({
+          workspaceDir: args.workspaceDir,
+          invitationId: args.invitationId,
+        }),
+      },
       disallowedTools: [
         "Bash(rm -rf /*)",
         "Bash(npm install*)",

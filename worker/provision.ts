@@ -6,6 +6,7 @@ import { buildPlatformSkill } from "./lib/skill";
 import { buildDesignProcessSkill } from "./lib/design-process-skill";
 import { buildPhoneCraftSkill } from "./lib/phone-craft-skill";
 import type { AttachmentRecord } from "./persistence";
+import { STOCK_THUMB_DIR } from "./lib/stock-tools";
 import {
   workspacePackageJson,
   workspaceTsconfig,
@@ -75,6 +76,15 @@ export async function provisionWorkspace(
 
   // A question from a previous turn must not be re-detected as a new one.
   await rm(path.join(workspaceDir, "NEEDS_INPUT.md"), { force: true });
+
+  // Stock previews are per-turn scratch: the search tool re-downloads whatever
+  // this turn actually looks at, so clearing them keeps a long-lived workspace
+  // from accumulating every photo the agent has ever considered. The rest of
+  // refs/ (attachments, the selection crop) is rewritten below and left alone.
+  await rm(path.join(workspaceDir, STOCK_THUMB_DIR), {
+    recursive: true,
+    force: true,
+  });
 
   // Uploaded files, so the agent can actually look at them.
   if (attachments?.length) {

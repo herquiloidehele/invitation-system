@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ENABLED_SKILLS, buildSystemPrompt } from "@/worker/agent";
+import { AGENT_TOOLS, ENABLED_SKILLS, buildSystemPrompt } from "@/worker/agent";
 import { workspaceTsconfig } from "@/worker/lib/workspace-files";
 
 describe("buildSystemPrompt", () => {
@@ -60,5 +60,20 @@ describe("workspaceTsconfig", () => {
     };
     expect(cfg.compilerOptions.incremental).toBe(true);
     expect(cfg.compilerOptions.skipLibCheck).toBe(true);
+  });
+});
+
+describe("AGENT_TOOLS", () => {
+  it("carries the file and shell tools the agent builds with", () => {
+    expect(AGENT_TOOLS).toEqual([
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Glob",
+      "Grep",
+      "mcp__stock__search_images",
+      "mcp__stock__use_image",
+    ]);
   });
 });

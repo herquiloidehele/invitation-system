@@ -13,6 +13,7 @@ import { classifyBuildError, isMissingSessionError } from "@/lib/build-errors";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
 import { buildFontBrief } from "./lib/font-brief";
 import { buildPlanBrief } from "./lib/plan-brief";
+import { buildStockBrief } from "./lib/stock-brief";
 import { SELECTION_IMAGE_NAME, buildElementBrief } from "./lib/element-brief";
 import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
 import { collectSourceFiles, sourceFilesEqual } from "./lib/source-files";
@@ -126,6 +127,9 @@ export async function runInvitationBuild(args: {
   const fontBrief = buildFontBrief(fonts);
   const manifest = buildSourceManifest(priorSource ?? {});
   const planBrief = buildPlanBrief(isFirstBuild && !isCritiqueTurn);
+  // Every turn, not just the first: a tweak like "make the cover more
+  // atmospheric" is exactly when the agent should go looking for a photograph.
+  const stockBrief = buildStockBrief();
 
   // 200k never fired: a nine-turn session measured at 130,899 tokens at its
   // peak, so rotation was dead code. Meanwhile each resumed tweak replayed
@@ -221,6 +225,7 @@ export async function runInvitationBuild(args: {
       recapText ? `\n${recapText}` : "",
       attachmentBrief ? `\n${attachmentBrief}` : "",
       fontBrief ? `\n${fontBrief}` : "",
+      `\n${stockBrief}`,
       elementBrief ? `\n${elementBrief}` : "",
       planBrief ? `\n${planBrief}` : "",
       `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
@@ -252,6 +257,7 @@ export async function runInvitationBuild(args: {
       prompt: agentPrompt,
       bundleId: slug,
       dts,
+      invitationId,
       model,
       effort,
       maxBudgetUsd,

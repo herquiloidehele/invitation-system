@@ -64,6 +64,7 @@ async function main() {
     prompt,
     bundleId,
     dts,
+    invitationId: bundleId,
     onMessage: (m) => {
       const line = compactMessage(m);
       if (line) console.log(line);
