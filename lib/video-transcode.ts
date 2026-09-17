@@ -9,7 +9,11 @@
  * to H.264 fixes playback everywhere.
  *
  * Strategy (cheapest that works):
- *  - Already H.264 in an `.mp4` container → skip (nothing to do).
+ *  - Already H.264 in a faststart `.mp4` → skip (nothing to do).
+ *  - H.264 `.mp4` with `moov` after `mdat` → remux in place (`-c copy`,
+ *    lossless) purely to move `moov` to the front. Without this the browser
+ *    downloads the clip in three requests instead of one (see
+ *    `lib/mp4-faststart.ts`).
  *  - H.264 in another container (e.g. `.mov`) → remux to `.mp4` (`-c copy`,
  *    lossless, no re-encode).
  *  - Anything else (HEVC, VP9-in-mov, ...) → re-encode to H.264 / yuv420p.
@@ -18,7 +22,10 @@
  */
 
 import { spawn } from "node:child_process";
+import { open } from "node:fs/promises";
 import ffmpegStatic from "ffmpeg-static";
+
+import { MP4_FASTSTART_PROBE_BYTES, isFaststartMp4 } from "./mp4-faststart";
 
 const ffmpegPath = ffmpegStatic;
 
@@ -100,6 +107,18 @@ async function probeVideo(
   };
 }
 
+/** Read the file head and report whether its `moov` atom precedes `mdat`. */
+async function isFaststartMp4File(inputPath: string): Promise<boolean> {
+  const handle = await open(inputPath, "r");
+  try {
+    const head = Buffer.alloc(MP4_FASTSTART_PROBE_BYTES);
+    const { bytesRead } = await handle.read(head, 0, head.length, 0);
+    return isFaststartMp4(head.subarray(0, bytesRead));
+  } finally {
+    await handle.close();
+  }
+}
+
 /**
  * Ensures the video at `inputPath` is a web-safe H.264 MP4, writing the result
  * to `outputPath` when a conversion is needed.
@@ -119,8 +138,26 @@ export async function ensureWebSafeMp4(
   const isH264 = videoCodec === "h264";
   const isMp4Container = sourceExtension.toLowerCase() === "mp4";
 
-  // Already broadly playable → nothing to do.
-  if (isH264 && isMp4Container) return false;
+  if (isH264 && isMp4Container) {
+    // Right codec and container. The only thing that can still be wrong is the
+    // atom layout: a trailing `moov` costs two extra round trips and makes the
+    // browser fetch the clip three times over. A container-level remux moves it
+    // to the front — no re-encode, so it is lossless and near-instant.
+    if (await isFaststartMp4File(inputPath)) return false;
+    await runFfmpeg(binary, [
+      "-y",
+      "-loglevel",
+      "error",
+      "-i",
+      inputPath,
+      "-c",
+      "copy",
+      "-movflags",
+      "+faststart",
+      outputPath,
+    ]);
+    return true;
+  }
 
   const args = ["-y", "-loglevel", "error", "-i", inputPath];
   if (isH264) {

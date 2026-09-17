@@ -3,6 +3,7 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -269,6 +270,52 @@ export async function putObjectFile(
     }),
   );
   return publicUrlForKey(key);
+}
+
+/**
+ * Reads the first `byteCount` bytes of an object with a ranged GET, so callers
+ * that only need a file header (e.g. an MP4 atom layout) don't pay to transfer
+ * the whole object.
+ */
+export async function getObjectHead(
+  key: string,
+  byteCount: number,
+): Promise<Buffer> {
+  const res = await getS3Client().send(
+    new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Range: `bytes=0-${byteCount - 1}`,
+    }),
+  );
+  if (!res.Body) {
+    throw new Error(`S3 object ${key} returned no body`);
+  }
+  return Buffer.from(await res.Body.transformToByteArray());
+}
+
+/**
+ * Lists every object key under `prefix`, following S3's pagination. Used by
+ * maintenance scripts that sweep a whole media folder.
+ */
+export async function listObjectKeys(prefix: string): Promise<string[]> {
+  const client = getS3Client();
+  const keys: string[] = [];
+  let continuationToken: string | undefined;
+  do {
+    const page = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      }),
+    );
+    for (const item of page.Contents ?? []) {
+      if (item.Key) keys.push(item.Key);
+    }
+    continuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
+  } while (continuationToken);
+  return keys;
 }
 
 /** Deletes one object created by a failed processing attempt. */
