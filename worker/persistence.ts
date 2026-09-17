@@ -596,6 +596,21 @@ export async function getRevisionForPreview(revisionId: string): Promise<{
   });
 }
 
+/**
+ * The saved source tree of one revision. The critique reads it to find the
+ * replication manifest the build wrote — see `lib/replication-manifest.ts`.
+ */
+export async function revisionSourceFiles(
+  revisionId: string,
+): Promise<Record<string, string> | null> {
+  const row = await prisma.aiRevision.findUnique({
+    where: { id: revisionId },
+    select: { sourceFiles: true },
+  });
+  if (!row) return null;
+  return (row.sourceFiles as Record<string, string>) ?? null;
+}
+
 /** All revisions for an invitation, newest first, shaped for the admin rail. */
 export async function listRevisionsForInvitation(invitationId: string): Promise<
   Array<{

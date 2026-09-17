@@ -2,10 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getInvitation } from "@/lib/invitations";
-import { publicUrlForKey, putObjectBuffer } from "@/lib/s3";
+import { getObjectBuffer, publicUrlForKey, putObjectBuffer } from "@/lib/s3";
 import { buildInvitationBrief } from "@/worker/lib/invitation-brief";
+import type {
+  CritiqueReference,
+  ReferenceMediaType,
+} from "@/worker/lib/critique";
 import { critiqueDesign } from "@/worker/lib/critique";
-import { appendMessage, getOrCreateBuild } from "@/worker/persistence";
+import { selectReplicatedReferences } from "@/worker/lib/replication-manifest";
+import {
+  appendMessage,
+  getOrCreateBuild,
+  listAttachmentsForInvitation,
+  revisionSourceFiles,
+} from "@/worker/persistence";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -13,12 +23,49 @@ export const maxDuration = 120;
 
 const MAX_SHOTS = 6;
 const MAX_BYTES_PER_SHOT = 2 * 1024 * 1024;
+/** The Messages API's own per-image ceiling. */
+const MAX_REFERENCE_BYTES = 5 * 1024 * 1024;
 
 function decodeJpeg(dataUrl: string): Buffer | null {
   const m = /^data:image\/jpeg;base64,(.+)$/.exec(dataUrl);
   if (!m) return null;
   const buf = Buffer.from(m[1], "base64");
   return buf.byteLength <= MAX_BYTES_PER_SHOT ? buf : null;
+}
+
+/**
+ * The design files this revision said it replicated, fetched so the reviewer can
+ * compare against them.
+ *
+ * Best-effort throughout: a missing manifest, a deleted attachment or an S3 hiccup
+ * returns nothing, and the review falls back to grading taste. A worse review
+ * beats a failed one.
+ */
+async function loadReplicatedReferences(
+  invitationId: string,
+  revisionId: string,
+): Promise<CritiqueReference[]> {
+  try {
+    const [source, attachments] = await Promise.all([
+      revisionSourceFiles(revisionId),
+      listAttachmentsForInvitation(invitationId),
+    ]);
+    const picked = selectReplicatedReferences(source, attachments);
+
+    const references: CritiqueReference[] = [];
+    for (const attachment of picked) {
+      const data = await getObjectBuffer(attachment.objectKey);
+      if (data.byteLength > MAX_REFERENCE_BYTES) continue;
+      references.push({
+        data,
+        mediaType: attachment.mimeType as ReferenceMediaType,
+      });
+    }
+    return references;
+  } catch (err) {
+    console.warn("[ai-critique] could not load the replicated references:", err);
+    return [];
+  }
 }
 
 /**
@@ -82,11 +129,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "no valid JPEG shots" }, { status: 400 });
   }
 
+  const references = await loadReplicatedReferences(row.id, revisionId);
+
   let critique;
   try {
     critique = await critiqueDesign({
       images,
       brief: buildInvitationBrief(invitation),
+      references,
     });
   } catch (err) {
     // The model call is the step that fails in practice (overload, a rejected
@@ -104,7 +154,9 @@ export async function POST(req: NextRequest) {
   await appendMessage({
     buildId: build.id,
     role: "assistant",
-    content: `Revisão visual: ${critique.score}/10 — ${
+    content: `${
+      references.length > 0 ? "Fidelidade à referência" : "Revisão visual"
+    }: ${critique.score}/10 — ${
       critique.verdict === "ship" ? "aprovado" : "a corrigir"
     }.`,
     critique: payload,

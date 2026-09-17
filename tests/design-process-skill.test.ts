@@ -39,3 +39,38 @@ describe("buildDesignProcessSkill", () => {
     expect(md).toContain("useLocale()");
   });
 });
+
+describe("buildDesignProcessSkill, replicating a reference", () => {
+  const md = buildDesignProcessSkill(true);
+
+  it("is still a valid, discoverable skill file", () => {
+    expect(md.startsWith("---\n")).toBe(true);
+    expect(md).toContain("name: design-process");
+  });
+
+  it("turns pass one into values measured off the reference", () => {
+    expect(md).toContain("PLAN.md");
+    expect(md).toMatch(/measur/i);
+    expect(md).toMatch(/hex/i);
+    expect(md).toMatch(/type scale/i);
+  });
+
+  it("records how the reference's system covers what it omits", () => {
+    expect(md).toMatch(/does not show|omits/i);
+  });
+
+  it("turns pass two into a fidelity check", () => {
+    expect(md).toMatch(/back to the image|compare/i);
+    expect(md).toMatch(/fidelity|value by value|differs/i);
+  });
+
+  it("stops asking whether the design is too default", () => {
+    expect(md).not.toMatch(/is this what I would have produced for/i);
+    expect(md.toLowerCase()).not.toContain("eucalyptus");
+  });
+
+  it("keeps the craft floor and localised copy", () => {
+    expect(md).toContain("useLocale()");
+    expect(md.toLowerCase()).toContain("lorem");
+  });
+});

@@ -9,8 +9,16 @@
  *
  * These are prohibitions plus positive direction. Prohibitions alone produce
  * bland-but-compliant work, so each ban names what to do instead.
+ *
+ * `replicating` returns a much shorter rubric rather than the full one plus an
+ * exemption. When the admin uploaded a design to reproduce, the ban lists and
+ * genre defaults are not merely outranked — they are the wrong question, and
+ * emitting them only to override them puts a rule and its negation in the same
+ * context window. What survives is what a chosen design cannot excuse.
  */
-export function artDirection(): string {
+export function artDirection(opts?: { replicating?: boolean }): string {
+  if (opts?.replicating) return replicationFloor();
+
   return `## Art direction (non-negotiable)
 
 The output must look like a designer made it for these specific people. Generic
@@ -70,4 +78,25 @@ choice open, do not spend it on one of these:
 - No emoji used as icons. No placeholder greys. No lorem text of any kind.
 - Every section must be justified by real data — if gifts are off, there is no
   gifts section.`;
+}
+
+/**
+ * What holds when the design was chosen rather than invented. Everything here is
+ * a craft or truthfulness rule — none of it is taste, so none of it yields to a
+ * reference.
+ */
+function replicationFloor(): string {
+  return `## What still holds (non-negotiable)
+
+The design itself is settled — it is the reference, matched as closely as the
+phone allows. These are not design choices and do not yield to it:
+
+- No emoji used as icons. No placeholder greys. No lorem text of any kind. Where
+  the reference shows dummy copy, the real content goes in its place.
+- Every section must be justified by real data — if gifts are off, there is no
+  gifts section, whatever the reference shows.
+- Guest-facing words are localised through \`useLocale().t(...)\`, never English
+  strings a guest sees.
+- Respect \`prefers-reduced-motion\`, and keep the DOM small enough to survive
+  Instagram's webview.`;
 }

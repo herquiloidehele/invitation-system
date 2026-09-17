@@ -19,6 +19,33 @@ describe("provisionWorkspace — skills", () => {
     expect(await read("design-process")).toContain("name: design-process");
     expect(await read("phone-craft")).toContain("name: phone-craft");
   });
+
+  it("writes the invention design process when nothing was uploaded", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "prov-"));
+    await provisionWorkspace(dir, DTS);
+
+    const skill = await readFile(
+      path.join(dir, ".claude", "skills", "design-process", "SKILL.md"),
+      "utf8",
+    );
+
+    expect(skill).toMatch(/is this what I would have produced for/i);
+    expect(skill).toContain("Montserrat");
+  });
+
+  it("writes the replication design process when a reference is in play", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "prov-"));
+    await provisionWorkspace(dir, DTS, null, null, { replicating: true });
+
+    const skill = await readFile(
+      path.join(dir, ".claude", "skills", "design-process", "SKILL.md"),
+      "utf8",
+    );
+
+    expect(skill).toMatch(/measure the reference/i);
+    expect(skill).not.toMatch(/is this what I would have produced for/i);
+    expect(skill).not.toContain("Montserrat");
+  });
 });
 
 describe("provisionWorkspace — stock previews", () => {

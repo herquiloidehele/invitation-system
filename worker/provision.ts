@@ -44,6 +44,11 @@ export async function provisionWorkspace(
   dtsContent: string,
   priorSource?: Record<string, string> | null,
   attachments?: AttachmentRecord[] | null,
+  /** `replicating`: the design came from an uploaded reference, so the
+   *  design-process skill is written in its transcription form. Decided by the
+   *  caller rather than from `attachments`, which also carry files meant for
+   *  the page rather than for the design. */
+  opts?: { replicating?: boolean },
 ): Promise<string> {
   await mkdir(workspaceDir, { recursive: true });
   await cp(TEMPLATE_DIR, workspaceDir, { recursive: true });
@@ -55,7 +60,7 @@ export async function provisionWorkspace(
   // SDK's allow-list rejects a name it cannot discover.
   const skills: Array<[string, string]> = [
     ["platform", buildPlatformSkill(dtsContent)],
-    ["design-process", buildDesignProcessSkill()],
+    ["design-process", buildDesignProcessSkill(opts?.replicating ?? false)],
     ["phone-craft", buildPhoneCraftSkill()],
   ];
   for (const [name, body] of skills) {

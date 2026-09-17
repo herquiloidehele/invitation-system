@@ -36,4 +36,31 @@ describe("artDirection", () => {
     const text = artDirection().toLowerCase();
     expect(text).toContain("the brief's own words always win");
   });
+
+  it("drops the taste rules entirely when a reference is being replicated", () => {
+    const text = artDirection({ replicating: true });
+
+    expect(text).not.toContain("Montserrat");
+    expect(text).not.toContain("#667eea");
+    expect(text.toLowerCase()).not.toContain("eucalyptus");
+  });
+
+  it("keeps the non-negotiables that a reference cannot excuse", () => {
+    const text = artDirection({ replicating: true });
+
+    expect(text.toLowerCase()).toContain("lorem");
+    expect(text).toMatch(/real data/i);
+    expect(text).toContain("prefers-reduced-motion");
+  });
+
+  it("never argues with itself about which rule wins", () => {
+    const text = artDirection({ replicating: true });
+
+    expect(text).not.toMatch(/outranks|do not apply|does not apply/i);
+  });
+
+  it("is the full rubric by default", () => {
+    expect(artDirection()).toContain("Montserrat");
+    expect(artDirection({ replicating: false })).toContain("Montserrat");
+  });
 });

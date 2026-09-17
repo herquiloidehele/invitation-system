@@ -4,8 +4,13 @@
  *
  * Per-turn, never in the system prompt: the system prompt must stay
  * byte-identical across turns or a resumed session re-uploads its whole prefix.
+ *
+ * `replicating` swaps the closing advice rather than contradicting it. "Using no
+ * photograph at all is a fine answer" is true when the agent is choosing the
+ * design and false when a reference already shows photographs, so the wrong one
+ * is simply not emitted.
  */
-export function buildStockBrief(): string {
+export function buildStockBrief(replicating: boolean = false): string {
   return [
     "Stock photography:",
     "You can search Pexels, Unsplash and Pixabay from inside this build with",
@@ -28,7 +33,18 @@ export function buildStockBrief(): string {
     "  for this couple or a named guest — no stock face next to their names, no",
     "  caption that reads as if it were them.",
     "- Their own photographs always win where they exist (props.assets).",
-    "- Using no photograph at all is a fine answer. A confident typographic",
-    "  design beats a decorated one.",
+    ...(replicating
+      ? [
+          "- Fill every image slot the reference has. Search for its subject, crop",
+          "  and tone rather than for a picture you like better — matching it is",
+          "  the job.",
+          "- Those photographs are placeholders: the admin replaces them with the",
+          "  couple's own. Choose for composition first, and say at the end of the",
+          "  turn which ones are stand-ins.",
+        ]
+      : [
+          "- Using no photograph at all is a fine answer. A confident typographic",
+          "  design beats a decorated one.",
+        ]),
   ].join("\n");
 }

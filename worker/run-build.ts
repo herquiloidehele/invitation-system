@@ -11,8 +11,10 @@ import { buildInvitationBrief } from "./lib/invitation-brief";
 import { type BuildEvent, type BuildUsage, toBuildEvent } from "./lib/build-events";
 import { classifyBuildError, isMissingSessionError } from "@/lib/build-errors";
 import { buildAttachmentBrief } from "./lib/attachment-brief";
+import { composeBuildPrompt } from "./lib/compose-prompt";
 import { buildFontBrief } from "./lib/font-brief";
 import { buildPlanBrief } from "./lib/plan-brief";
+import { buildReplicationBrief } from "./lib/replication-brief";
 import { buildStockBrief } from "./lib/stock-brief";
 import { SELECTION_IMAGE_NAME, buildElementBrief } from "./lib/element-brief";
 import type { SelectedElementDescriptor } from "@/lib/ai-preview-select";
@@ -124,12 +126,16 @@ export async function runInvitationBuild(args: {
 
   const priorSource = await latestRevisionSource(build.id);
   const attachmentBrief = buildAttachmentBrief(attachments);
+  // A design the admin uploaded is reproduced, not interpreted — every turn,
+  // because a tweak must not drift off a reference the first build matched.
+  const replicating = attachments.length > 0;
+  const replicationBrief = buildReplicationBrief(replicating);
   const fontBrief = buildFontBrief(fonts);
   const manifest = buildSourceManifest(priorSource ?? {});
   const planBrief = buildPlanBrief(isFirstBuild && !isCritiqueTurn);
   // Every turn, not just the first: a tweak like "make the cover more
   // atmospheric" is exactly when the agent should go looking for a photograph.
-  const stockBrief = buildStockBrief();
+  const stockBrief = buildStockBrief(replicating);
 
   // 200k never fired: a nine-turn session measured at 130,899 tokens at its
   // peak, so rotation was dead code. Meanwhile each resumed tweak replayed
@@ -192,7 +198,9 @@ export async function runInvitationBuild(args: {
     `inv-${invitationId}`,
   );
   await mkdir(workspace, { recursive: true });
-  await provisionWorkspace(workspace, dts, priorSource, attachments);
+  await provisionWorkspace(workspace, dts, priorSource, attachments, {
+    replicating,
+  });
 
   // A block the user selected in the preview. Copy its crop into refs/ so the
   // agent can Read it, and describe it in the prompt. Best-effort: a failed
@@ -219,17 +227,18 @@ export async function runInvitationBuild(args: {
   // Recap is empty on a normal turn; the no-resume fallback below rebuilds the
   // prompt WITH a recap so a fresh session can re-orient from the saved source.
   const composePrompt = (recapText: string) =>
-    [
+    composeBuildPrompt({
       brief,
-      manifest ? `\n${manifest}` : "",
-      recapText ? `\n${recapText}` : "",
-      attachmentBrief ? `\n${attachmentBrief}` : "",
-      fontBrief ? `\n${fontBrief}` : "",
-      `\n${stockBrief}`,
-      elementBrief ? `\n${elementBrief}` : "",
-      planBrief ? `\n${planBrief}` : "",
-      `\n${isCritiqueTurn ? critiqueToPrompt(critique!) : prompt}`,
-    ].join("\n");
+      manifest,
+      recap: recapText,
+      attachmentBrief,
+      replicationBrief,
+      fontBrief,
+      stockBrief,
+      elementBrief,
+      planBrief,
+      prompt: isCritiqueTurn ? critiqueToPrompt(critique!) : prompt,
+    });
 
   const fullPrompt = composePrompt(recap);
 

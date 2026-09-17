@@ -57,9 +57,16 @@ describe("buildAttachmentBrief", () => {
     expect(brief).toContain("NEEDS_INPUT.md");
   });
 
-  it("marks pdfs as always reference and never a question", () => {
+  it("treats a design reference as something to reproduce, not cues to take", () => {
+    const brief = buildAttachmentBrief([image]);
+    expect(brief).toMatch(/reproduce/i);
+    expect(brief).not.toMatch(/take cues/i);
+  });
+
+  it("keeps a pdf out of the page while still replicating its design", () => {
     const brief = buildAttachmentBrief([pdf]);
-    expect(brief).toContain('kind "pdf" are ALWAYS reference only');
-    expect(brief).toContain("never ask about them");
+    expect(brief).toMatch(/never render/i);
+    expect(brief).toMatch(/replicat/i);
+    expect(brief).toMatch(/never ask about a\s+PDF/i);
   });
 });
