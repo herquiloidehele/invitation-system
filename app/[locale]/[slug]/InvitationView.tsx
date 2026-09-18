@@ -518,6 +518,7 @@ function EnvelopeInvitationView({
               }
               isLandingPreview={isLandingPreview}
               animateHeroText={richExternalLinkVisible}
+              heroAutoPlay={richExternalLinkVisible}
               canvaPreloading={shouldPreloadRichExternalCanva({
                 isPreview: false,
                 isVisible: richExternalLinkVisible,

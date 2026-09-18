@@ -66,6 +66,9 @@ interface RichExternalLinkPageProps {
   isLandingPreview?: boolean;
   /** Play the hero text blocks' entrance when the rich page is revealed. */
   animateHeroText?: boolean;
+  /** False while the cover is still up — keeps the hero video from playing
+   *  (and downloading at full speed) behind it. */
+  heroAutoPlay?: boolean;
   canvaPreloading?: boolean;
 }
 
@@ -91,6 +94,7 @@ export default function RichExternalLinkPage({
   isPreview = false,
   isLandingPreview = false,
   animateHeroText = false,
+  heroAutoPlay = true,
   canvaPreloading = false,
 }: RichExternalLinkPageProps) {
   const heroOn = Boolean(invitation.heroImage || invitation.videoUrl);
@@ -275,6 +279,7 @@ export default function RichExternalLinkPage({
                 audioRef={audioRef}
                 prefetchedVideoRef={prefetchedVideoRef}
                 animateHeroText={animateHeroText}
+                autoPlay={heroAutoPlay}
               />
               {invitation.heroTextLayer?.hideDefaultText !== true && (
                 <InvitationHeroNames

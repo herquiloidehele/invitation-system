@@ -169,6 +169,7 @@ export default function InvitationHero({
             posterUrl={invitation.videoPoster}
             mediaFit={mediaFit}
             muted={heroVideoMuted}
+            autoPlay={autoPlay}
           />
         ) : (
           <div className="absolute inset-0 z-0 h-full w-full">
