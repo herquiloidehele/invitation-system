@@ -536,7 +536,7 @@ function EnvelopeInvitationView({
             ref={heroVideoRef}
             src={invitation.videoUrl!}
             poster={invitation.videoPoster}
-            preload="auto"
+            preload="metadata"
             muted={resolveHeroVideoMuted(invitation.heroVideoMuted)}
             loop
             playsInline
