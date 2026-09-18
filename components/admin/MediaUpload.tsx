@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { parseProcessedVideoUpload } from "@/lib/video-upload";
+import { mediaUploadHeaders } from "@/lib/media-cache-control";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -170,7 +171,7 @@ export default function MediaUpload({
 
         // Upload directly to S3 with progress tracking
         await axios.put(presignedUrl, fileToUpload, {
-          headers: { "Content-Type": fileToUpload.type || file.type },
+          headers: mediaUploadHeaders(fileToUpload.type || file.type),
           onUploadProgress: (e) => {
             if (e.total) {
               const progress = Math.round((e.loaded / e.total) * 100);

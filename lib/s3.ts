@@ -8,6 +8,8 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+import { MEDIA_CACHE_CONTROL } from "./media-cache-control";
 import { createReadStream, createWriteStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { Readable } from "node:stream";
@@ -40,6 +42,11 @@ export interface PresignedUploadResult {
 /**
  * Generates a presigned PUT URL so the browser can upload directly to S3.
  * The key is structured as: uploads/{folder}/{timestamp}-{sanitized-filename}
+ *
+ * NOTE: `CacheControl` deliberately isn't set on the command below — the
+ * presigner drops it (the signature is byte-identical with and without it), so
+ * it would be misleading. Uploading clients send `Cache-Control` as a request
+ * header instead; use `mediaUploadHeaders()` from `lib/media-cache-control.ts`.
  */
 export async function generatePresignedUploadUrl(
   fileName: string,
@@ -162,6 +169,8 @@ export async function copyObject(
       CopySource: `${bucket}/${encodedSource}`,
       Key: destinationKey,
       ContentType: contentType,
+      // REPLACE drops the source object's headers, so restate the policy.
+      CacheControl: MEDIA_CACHE_CONTROL,
       MetadataDirective: "REPLACE",
     }),
   );
@@ -247,6 +256,7 @@ export async function putObjectBuffer(
       Key: key,
       Body: body,
       ContentType: contentType,
+      CacheControl: MEDIA_CACHE_CONTROL,
     }),
   );
   return publicUrlForKey(key);
@@ -267,6 +277,7 @@ export async function putObjectFile(
       Body: createReadStream(filePath),
       ContentLength: metadata.size,
       ContentType: contentType,
+      CacheControl: MEDIA_CACHE_CONTROL,
     }),
   );
   return publicUrlForKey(key);

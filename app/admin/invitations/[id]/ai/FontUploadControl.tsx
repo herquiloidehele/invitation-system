@@ -7,6 +7,7 @@ import { Loader2, Type, X } from "lucide-react";
 import type { FontAssetRecord } from "@/worker/persistence";
 import type { CustomFontAnalysis } from "@/lib/custom-fonts/types";
 import { Button } from "@/components/ui/button";
+import { mediaUploadHeaders } from "@/lib/media-cache-control";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = ".woff2,.woff,.ttf,.otf";
@@ -71,7 +72,7 @@ export default function FontUploadControl({
 
       const put = await fetch(presignedUrl, {
         method: "PUT",
-        headers: { "Content-Type": fileType },
+        headers: mediaUploadHeaders(fileType),
         body: file,
       });
       if (!put.ok) {

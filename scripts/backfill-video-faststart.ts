@@ -12,6 +12,13 @@
  * change, near-instant. Each fixed file is written back to the SAME S3 key, so
  * every stored URL keeps working and no database rows need touching.
  *
+ * Rewriting a key in place is the one exception to the `immutable` policy in
+ * `lib/media-cache-control.ts`: a browser that already cached the old bytes
+ * under that policy will keep them until they expire. Nothing breaks — those
+ * guests simply keep the slower three-request version — but it does mean this
+ * sweep pays off fastest when run BEFORE the objects have been served with a
+ * long-lived cache header.
+ *
  * Usage (read-only unless `--apply` is passed):
  *   npx tsx --env-file=.env.development scripts/backfill-video-faststart.ts
  *   npx tsx --env-file=.env.production  scripts/backfill-video-faststart.ts --apply

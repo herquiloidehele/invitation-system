@@ -6,6 +6,7 @@ import { FileText, Loader2, Paperclip, X } from "lucide-react";
 // Type-only: keeps Prisma (and the whole worker module) out of the browser bundle.
 import type { AttachmentRecord } from "@/worker/persistence";
 import { Button } from "@/components/ui/button";
+import { mediaUploadHeaders } from "@/lib/media-cache-control";
 
 /** Natural dimensions of an image file, so the bundle can size it correctly. */
 async function imageSize(
@@ -70,7 +71,7 @@ export default function AttachmentPicker({
 
       const put = await fetch(presigned.presignedUrl, {
         method: "PUT",
-        headers: { "Content-Type": file.type },
+        headers: mediaUploadHeaders(file.type),
         body: file,
       });
       if (!put.ok) {

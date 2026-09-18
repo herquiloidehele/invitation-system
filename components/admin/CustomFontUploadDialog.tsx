@@ -23,6 +23,7 @@ import type {
   CustomFontStyle,
   FontCategory,
 } from "@/lib/custom-fonts/types";
+import { mediaUploadHeaders } from "@/lib/media-cache-control";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = ".woff2,.woff,.ttf,.otf";
@@ -135,7 +136,7 @@ export default function CustomFontUploadDialog({
       const pendingKey = String(presign.pendingKey);
       pendingKeyRef.current = pendingKey;
       await axios.put(String(presign.presignedUrl), file, {
-        headers: { "Content-Type": file.type || "application/octet-stream" },
+        headers: mediaUploadHeaders(file.type || "application/octet-stream"),
         onUploadProgress(event) {
           if (!event.total) return;
           setState({
