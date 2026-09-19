@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type {
+  CardStyle,
   TemplateTheme,
   LocationInfo,
   LocationPhoto,
@@ -30,8 +31,12 @@ export const EF_BACKGROUND_PATTERN =
  * Tile width in px. The damask is drawn at phone-screen scale, so pinning the
  * width keeps one motif roughly one handset wide and stops the pattern
  * stretching on desktop — it repeats instead.
+ *
+ * This is twice the source artwork's width because `damask.webp` is a
+ * horizontally mirrored pair (see that folder's README): displaying the pair at
+ * 840px renders each motif at the 420px the original was drawn for.
  */
-export const EF_BACKGROUND_TILE_WIDTH = 420;
+export const EF_BACKGROUND_TILE_WIDTH = 840;
 
 /** Background style for the elegant-floral page root: damask over `theme.bg`. */
 export function efPageBackgroundStyle(
@@ -43,6 +48,29 @@ export function efPageBackgroundStyle(
     backgroundRepeat: "repeat",
     backgroundSize: `${EF_BACKGROUND_TILE_WIDTH}px auto`,
     backgroundPosition: "top center",
+  };
+}
+
+/**
+ * Card surface for the guest-guide item grid on this layout.
+ *
+ * Defaults to the translucent wash the gifts grid uses (see GiftsSection) so
+ * the damask page background reads through each tile instead of twelve opaque
+ * rectangles punching holes in it. A per-invitation `cardStyles.guestGuide`
+ * override still wins, so the admin's card controls keep working here.
+ */
+export function efGuestGuideCardStyle(
+  theme: Pick<TemplateTheme, "secondary">,
+  override?: CardStyle | null,
+): { cardBg: string; cardBorder: string; plain: boolean } {
+  return {
+    cardBg:
+      override?.cardBg ||
+      `color-mix(in srgb, ${theme.secondary} 8%, transparent)`,
+    cardBorder:
+      override?.cardBorder ||
+      `color-mix(in srgb, ${theme.secondary} 28%, transparent)`,
+    plain: override?.plain === true,
   };
 }
 

@@ -9,15 +9,21 @@ import ImageCanvas from "@/components/shared/ImageCanvas";
 import Announcement from "./Announcement";
 import Countdown from "./Countdown";
 import LocationCard from "./LocationCard";
-import FloralDivider from "./FloralDivider";
 import ScheduleBlock from "./ScheduleBlock";
 import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
 import DressCodeSection from "./DressCodeSection";
 import GiftsSection from "./GiftsSection";
 import FaqSection from "./FaqSection";
+import GuestGuideSection from "@/components/shared/GuestGuideSection";
 import ScriptTitle from "./ScriptTitle";
 import { EfRevealProvider, Reveal } from "./motion";
-import { efPageBackgroundStyle, efStyle } from "@/lib/elegant-floral";
+import {
+  efGuestGuideCardStyle,
+  efPageBackgroundStyle,
+  efStyle,
+} from "@/lib/elegant-floral";
+import { resolveTextStyles } from "@/lib/text-styles";
+import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 
@@ -53,6 +59,8 @@ export default function ElegantFloralPage({
   animateHeroText,
 }: ElegantFloralPageProps) {
   const ts = invitation.textStyles;
+  const resolvedTs = resolveTextStyles(theme, ts);
+  const ct = useCustomText(invitation.customTexts);
   return (
     <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
       <EfRevealProvider instant={isPreview ?? false}>
@@ -137,14 +145,6 @@ export default function ElegantFloralPage({
               )}
             </div>
 
-            <Reveal>
-              <FloralDivider
-                primary={theme.primary}
-                secondary={theme.secondary}
-                style={{ marginTop: "1.5rem" }}
-              />
-            </Reveal>
-
             <ScheduleBlock invitation={invitation} theme={theme} />
 
             <div style={{ margin: "2rem 0" }}>
@@ -164,6 +164,42 @@ export default function ElegantFloralPage({
                 guestToken={invitation.guest?.token}
               />
             </div>
+
+            {invitation.guestGuide?.enabled &&
+              invitation.guestGuide.items.length > 0 && (
+                <section
+                  style={{
+                    margin: "2rem 0",
+                    padding: "0 clamp(1rem, 4.5vw, 1.75rem)",
+                    maxWidth: 560,
+                    marginInline: "auto",
+                  }}
+                >
+                  <Reveal>
+                    <ScriptTitle theme={theme} textStyles={ts}>
+                      {/* The shared copy embeds a newline for the stacked
+                    heading on the standard layout; this one is a single
+                    calligraphy line, so collapse it. */}
+                      {ct("sectionTitle_guestGuide")
+                        .replace(/\s+/g, " ")
+                        .trim()}
+                    </ScriptTitle>
+                  </Reveal>
+
+                  <div style={{ marginTop: "1.75rem" }}>
+                    <GuestGuideSection
+                      guestGuide={invitation.guestGuide}
+                      theme={theme}
+                      ts={resolvedTs}
+                      isPreview={isPreview}
+                      {...efGuestGuideCardStyle(
+                        theme,
+                        invitation.cardStyles?.guestGuide,
+                      )}
+                    />
+                  </div>
+                </section>
+              )}
 
             {invitation.faqs && (
               <div style={{ margin: "4rem 0" }}>
@@ -188,15 +224,6 @@ export default function ElegantFloralPage({
                 <ScriptTitle theme={theme} textStyles={ts}>
                   Confirmar Presença
                 </ScriptTitle>
-              </Reveal>
-
-              <Reveal delay={0.04}>
-                <FloralDivider
-                  primary={theme.primary}
-                  secondary={theme.secondary}
-                  width={170}
-                  style={{ marginTop: "0.6rem" }}
-                />
               </Reveal>
 
               {invitation.rsvp?.enabled && (

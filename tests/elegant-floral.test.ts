@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -9,6 +9,7 @@ import {
   efPageBackgroundStyle,
   EF_BACKGROUND_PATTERN,
   EF_BACKGROUND_TILE_WIDTH,
+  efGuestGuideCardStyle,
 } from "../lib/elegant-floral";
 
 describe("isElegantFloralLayout", () => {
@@ -94,5 +95,68 @@ describe("efPageBackgroundStyle", () => {
     expect(
       existsSync(join(process.cwd(), "public", EF_BACKGROUND_PATTERN)),
     ).toBe(true);
+  });
+
+  it("keeps the original artwork so the tile can be re-derived", () => {
+    expect(
+      existsSync(
+        join(
+          process.cwd(),
+          "public/images/themes/elegant-floral/damask-source.webp",
+        ),
+      ),
+    ).toBe(true);
+  });
+});
+
+describe("efGuestGuideCardStyle", () => {
+  const theme = { secondary: "#C9A962" };
+
+  it("defaults to the translucent wash so the damask reads through", () => {
+    const s = efGuestGuideCardStyle(theme);
+    expect(s.cardBg).toBe("color-mix(in srgb, #C9A962 8%, transparent)");
+    expect(s.cardBorder).toBe("color-mix(in srgb, #C9A962 28%, transparent)");
+    expect(s.plain).toBe(false);
+  });
+
+  it("lets a per-invitation override win over the layout default", () => {
+    const s = efGuestGuideCardStyle(theme, {
+      cardBg: "#FFF",
+      cardBorder: "#000",
+    });
+    expect(s.cardBg).toBe("#FFF");
+    expect(s.cardBorder).toBe("#000");
+  });
+
+  it("only turns plain on for an explicit true", () => {
+    expect(efGuestGuideCardStyle(theme, { plain: true }).plain).toBe(true);
+    expect(efGuestGuideCardStyle(theme, { plain: false }).plain).toBe(false);
+    expect(efGuestGuideCardStyle(theme, {}).plain).toBe(false);
+    expect(efGuestGuideCardStyle(theme, null).plain).toBe(false);
+  });
+});
+
+describe("elegant-floral guest guide wiring", () => {
+  const page = readFileSync(
+    "components/elegant-floral/ElegantFloralPage.tsx",
+    "utf8",
+  );
+
+  it("renders the shared guest-guide section behind the enabled flag", () => {
+    expect(page).toContain("invitation.guestGuide?.enabled");
+    expect(page).toContain("<GuestGuideSection");
+  });
+
+  it("titles it from the host-renameable custom text", () => {
+    expect(page).toContain('ct("sectionTitle_guestGuide")');
+  });
+
+  it("places it between the gifts and FAQ sections", () => {
+    const gifts = page.indexOf("<GiftsSection");
+    const guide = page.indexOf("<GuestGuideSection");
+    const faq = page.indexOf("<FaqSection");
+    expect(gifts).toBeGreaterThan(-1);
+    expect(guide).toBeGreaterThan(gifts);
+    expect(faq).toBeGreaterThan(guide);
   });
 });
