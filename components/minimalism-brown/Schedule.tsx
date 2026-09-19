@@ -3,8 +3,12 @@
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
+import { resolveTextStyles } from "@/lib/text-styles";
+import { mbCardStyle } from "@/lib/minimalism-brown";
 import { EditableText } from "@/components/shared/EditableText";
-import { ScheduleIconGraphic } from "@/components/shared/ScheduleSection";
+import SharedSchedule, {
+  ScheduleIconGraphic,
+} from "@/components/shared/ScheduleSection";
 import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
 import { Sprig } from "./Decor";
@@ -30,6 +34,36 @@ export default function Schedule({
   const ct = useCustomText(invitation.customTexts);
   const events = invitation.schedule ?? [];
   if (events.length === 0) return null;
+
+  // "Illustrated" is a platform style with its own layout; the connected
+  // timeline below is this template's own and stands in for "default".
+  if (invitation.scheduleStyle === "illustrated") {
+    return (
+      <Reveal as="section" style={{ marginTop: t.gap.section }}>
+        <SectionCard theme={theme}>
+          <SectionTitle theme={theme} textStyles={ts}>
+            {ct("sectionTitle_schedule")}
+          </SectionTitle>
+          <div style={{ marginTop: t.gap.block }}>
+            <SharedSchedule
+              schedule={events}
+              scheduleStyle="illustrated"
+              theme={theme}
+              ts={resolveTextStyles(theme, ts)}
+              cardStyle={mbCardStyle(
+                invitation.cardStyles,
+                theme,
+                "schedule",
+                t.card.radius,
+              )}
+              customTexts={invitation.customTexts}
+              isPreview
+            />
+          </div>
+        </SectionCard>
+      </Reveal>
+    );
+  }
 
   return (
     <Reveal

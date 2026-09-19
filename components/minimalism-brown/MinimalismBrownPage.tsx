@@ -7,6 +7,9 @@ import type { Wish } from "@/lib/minimalism-brown";
 import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import ImageCanvas from "@/components/shared/ImageCanvas";
+import SectionImageHost from "@/components/shared/SectionImageHost";
+import SectionImage from "@/components/shared/SectionImage";
+import InvitationHero from "@/components/shared/InvitationHero";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 import { EditableText } from "@/components/shared/EditableText";
 import { PaperGround, LeafWatermark, Sprig } from "./Decor";
@@ -17,6 +20,7 @@ import {
   useAutoScroll,
 } from "./motion";
 import Hero from "./Hero";
+import SaveTheDate from "./SaveTheDate";
 import CeremonyInfo from "./CeremonyInfo";
 import PhotoGallery from "./PhotoGallery";
 import ReceptionInfo from "./ReceptionInfo";
@@ -63,9 +67,43 @@ export default function MinimalismBrownPage(props: MinimalismBrownPageProps) {
   );
 }
 
+/** One of the four uploadable section images, hosted so free-floating layer
+ *  items anchored to that slot still land on it. */
+function MbSectionImage({
+  invitation,
+  theme,
+  slot,
+}: {
+  invitation: InvitationData;
+  theme: TemplateTheme;
+  slot: "image1" | "image2" | "image3" | "image4";
+}) {
+  const src = invitation.sectionImages?.[slot];
+  if (!src) return null;
+  const key = ("sectionImage" + slot.slice(-1)) as
+    | "sectionImage1"
+    | "sectionImage2"
+    | "sectionImage3"
+    | "sectionImage4";
+  return (
+    <div style={{ marginTop: mbTokens(theme).gap.section }}>
+      <SectionImageHost sectionKey={key} layer={invitation.imageLayer}>
+        <SectionImage
+          src={src}
+          theme={theme}
+          imageSettings={invitation.imageSettings}
+          imageKey={key}
+        />
+      </SectionImageHost>
+    </div>
+  );
+}
+
 function MinimalismBrownBody({
   invitation,
   theme,
+  audioRef,
+  prefetchedVideoRef,
   isPreview,
   wishes,
 }: MinimalismBrownPageProps) {
@@ -121,8 +159,21 @@ function MinimalismBrownBody({
               padding: `0 0 ${t.gap.section}px`,
             }}
           >
-            <Hero invitation={invitation} theme={theme} />
+            {invitation.videoUrl?.trim() ? (
+              <InvitationHero
+                invitation={invitation}
+                theme={theme}
+                audioRef={audioRef}
+                prefetchedVideoRef={prefetchedVideoRef}
+                animateHeroText
+              />
+            ) : (
+              <Hero invitation={invitation} theme={theme} audioRef={audioRef} />
+            )}
+            <SaveTheDate invitation={invitation} theme={theme} />
+            <MbSectionImage invitation={invitation} theme={theme} slot="image1" />
             <CeremonyInfo invitation={invitation} theme={theme} />
+            <MbSectionImage invitation={invitation} theme={theme} slot="image2" />
             <PhotoGallery invitation={invitation} theme={theme} />
             <ReceptionInfo
               invitation={invitation}
@@ -136,6 +187,7 @@ function MinimalismBrownBody({
               <DressCode invitation={invitation} theme={theme} />
             </div>
             <Schedule invitation={invitation} theme={theme} />
+            <MbSectionImage invitation={invitation} theme={theme} slot="image3" />
             <div style={{ paddingInline: t.gutter }}>
               <Guestbook
                 invitation={invitation}
@@ -147,6 +199,7 @@ function MinimalismBrownBody({
             <div style={{ paddingInline: t.gutter }}>
               <GiftBox invitation={invitation} theme={theme} />
             </div>
+            <MbSectionImage invitation={invitation} theme={theme} slot="image4" />
             <div style={{ paddingInline: t.gutter }}>
               <OptionalSections
                 invitation={invitation}

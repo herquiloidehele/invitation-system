@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, MutableRefObject } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
@@ -8,6 +8,7 @@ import { useCustomText } from "@/lib/custom-texts";
 import { EASE } from "@/components/shared/animations";
 import { EditableText } from "@/components/shared/EditableText";
 import Polaroid from "./Polaroid";
+import AudioPlayer from "@/components/shared/AudioPlayer";
 import { HouseBackdrop, ScrollCue, Sprig } from "./Decor";
 import { useIdle, useMbMotion } from "./motion";
 
@@ -24,9 +25,11 @@ import { useIdle, useMbMotion } from "./motion";
 export default function Hero({
   invitation,
   theme,
+  audioRef,
 }: {
   invitation: InvitationData;
   theme: TemplateTheme;
+  audioRef?: MutableRefObject<HTMLAudioElement | null>;
 }) {
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
@@ -163,6 +166,26 @@ export default function Hero({
           }}
         />
       </motion.div>
+
+      {/* Only InvitationHero rendered this, which this template doesn't use —
+          so background music played here with no way to pause it. */}
+      {invitation.audio?.enabled && (invitation.audio.visibility ?? true) && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: t.gap.block,
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          <AudioPlayer
+            audio={invitation.audio}
+            theme={theme}
+            externalAudioRef={audioRef}
+          />
+        </div>
+      )}
 
       <ScrollCue theme={theme} />
     </header>
