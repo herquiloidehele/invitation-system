@@ -55,33 +55,32 @@
     {
       "time": "16:30",
       "label": "Chegada dos convidados",
-      "venue": ""
+      "venue": "",
+      "icon": "sparkles"
     },
     {
       "time": "17:00",
       "label": "Cerimónia religiosa",
       "venue": "",
-      "icon": "church",
-      "iconUrl": "/images/themes/minimalism-brown/gate.webp"
+      "icon": "church"
     },
     {
       "time": "18:30",
       "label": "Cocktail no jardim",
       "venue": "",
-      "icon": "toast",
-      "iconUrl": "/images/themes/minimalism-brown/water.webp"
+      "icon": "toast"
     },
     {
       "time": "20:00",
       "label": "Jantar e brinde",
       "venue": "",
-      "icon": "dinner",
-      "iconUrl": "/images/themes/minimalism-brown/cake.webp"
+      "icon": "dinner"
     },
     {
       "time": "23:30",
       "label": "Dança e festa",
-      "venue": ""
+      "venue": "",
+      "icon": "dance"
     }
   ],
   "coupleGallery": {

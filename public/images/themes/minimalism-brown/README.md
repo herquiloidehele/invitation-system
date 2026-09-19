@@ -16,12 +16,9 @@ box) so the decorative layers cannot shift layout as they load.
 
 | File | px | size |
 |---|---|---|
-| cake.webp | 144 × 208 | 12 KB |
 | flower2-decoration.webp | 320 × 743 | 79 KB |
 | frame-avatar.webp | 1094 × 1554 | 68 KB |
-| gate.webp | 144 × 159 | 16 KB |
 | giftbox.webp | 480 × 504 | 33 KB |
 | house-background.webp | 900 × 887 | 190 KB |
 | leaf-background.webp | 441 × 1254 | 62 KB |
 | paper.webp | 1333 × 2000 | 137 KB |
-| water.webp | 144 × 206 | 16 KB |

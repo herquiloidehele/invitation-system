@@ -104,18 +104,16 @@ export default function Schedule({
                 placeItems: "center",
               }}
             >
-              {event.iconUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  aria-hidden
-                  alt=""
-                  src={event.iconUrl}
-                  loading="lazy"
-                  style={{ width: 36, height: 36, objectFit: "contain" }}
-                />
-              ) : event.icon ? (
+              {/* The platform's own icon set, tinted by the theme.
+                  ScheduleIconGraphic also covers `icon: "custom"`, where it
+                  masks the host's uploaded SVG in the theme colour — which is
+                  what the admin promises ("cor herdada do tema"). Rendering
+                  iconUrl as a full-colour image instead, as this did, broke
+                  that contract and dropped stock artwork into the timeline. */}
+              {event.icon ? (
                 <ScheduleIconGraphic
                   icon={event.icon}
+                  iconUrl={event.iconUrl}
                   color={theme.primary}
                   size={22}
                 />
