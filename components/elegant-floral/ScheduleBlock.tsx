@@ -10,6 +10,14 @@ import ScrollTimeline from "@/components/shared/ScrollTimeline";
 import { ScheduleIconGraphic } from "@/components/shared/ScheduleSection";
 import { efGroup, efItem, useRevealProps } from "./motion";
 
+/** Gutter the rail runs down, and how far left of centre that gutter sits. */
+const RAIL_WIDTH = 28;
+const RAIL_SHIFT = 28;
+/** Space either side of the gutter; the grid arithmetic below depends on it. */
+const COLUMN_GAP = 10;
+/** Half the gutter plus one gap — what each outer column gives up at the row's centre. */
+const EDGE = RAIL_WIDTH / 2 + COLUMN_GAP;
+
 interface ScheduleBlockProps {
   invitation: InvitationData;
   theme: TemplateTheme;
@@ -82,18 +90,19 @@ export default function ScheduleBlock({
         </ScriptTitle>
       </motion.div>
 
-      {/* The rows are centred, so the rail runs down the left of the list
-          rather than through the middle of the text. The list keeps its own
-          centring; only the rail lives in the gutter. */}
+      {/* Rail down the middle of the list, a touch left of the section's
+          centre line: the left column only ever holds an icon and "HH:MM"
+          while labels wrap, so the slack is worth more on the right. */}
       <div ref={trackRef} style={{ position: "relative" }}>
         <div
           aria-hidden
           style={{
             position: "absolute",
-            // Full width: ScrollTimeline centres its own rail, so this puts
-            // the stepper down the middle between the time and label columns.
+            // ScrollTimeline centres its rail in this box, so pulling the
+            // right edge in by twice the shift moves the rail left by the
+            // shift — keeping it on the grid gutter below.
             left: 0,
-            right: 0,
+            right: RAIL_SHIFT * 2,
             top: 14,
             bottom: 14,
           }}
@@ -116,16 +125,17 @@ export default function ScheduleBlock({
               variants={efItem}
               style={{
                 display: "grid",
-                // minmax(0, …) rather than a bare 1fr: a bare fr floors at
-                // min-content, so one long label widens its column and drags
-                // the rail off the section's centre line.
-                gridTemplateColumns: "minmax(0, 1fr) 28px minmax(0, 1fr)",
+                // Percentages, not fr: a bare fr floors at min-content, so one
+                // long label would widen its column and drag the gutter off
+                // the rail. Each side is half the row less its own gap and
+                // half the gutter, then RAIL_SHIFT off the centre line.
+                gridTemplateColumns: `minmax(0, calc(50% - ${EDGE + RAIL_SHIFT}px)) ${RAIL_WIDTH}px minmax(0, calc(50% - ${EDGE - RAIL_SHIFT}px))`,
                 alignItems: "center",
-                columnGap: 10,
+                columnGap: COLUMN_GAP,
               }}
             >
               {/* Icon and time travel together, right-aligned as a group, so
-                the rail stays on the section's centre line. */}
+                they hug the rail however short the time is. */}
               <div
                 style={{
                   display: "flex",
@@ -162,7 +172,7 @@ export default function ScheduleBlock({
                 </span>
               </div>
 
-              {/* Gutter for the centred rail, drawn once for the whole list. */}
+              {/* Gutter the rail runs through, drawn once for the whole list. */}
               <span aria-hidden style={{ display: "block", minHeight: 34 }} />
 
               <div style={{ textAlign: "left" }}>
