@@ -7,7 +7,6 @@ import { useCustomText } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { EditableText } from "@/components/shared/EditableText";
 import SectionTitle from "./SectionTitle";
-import DateRow from "./DateRow";
 import SectionCard from "./SectionCard";
 import { Reveal, RevealGroup, RevealItem } from "./motion";
 
@@ -214,61 +213,6 @@ export default function CeremonyInfo({
         )}
       </div>
 
-      <div style={{ textAlign: "center", marginTop: t.gap.section / 2 }}>
-        <p
-          style={mbStyle(
-            {
-              margin: 0,
-              fontFamily: theme.bodyFont,
-              fontSize: 16,
-              fontWeight: 400,
-              color: theme.textSecondary,
-            },
-            ts,
-            "mbVenueLine",
-          )}
-        >
-          <EditableText elementKey="mbVenueLine">
-            {invitation.location.name}
-          </EditableText>
-        </p>
-
-        {invitation.date.time && (
-          <p
-            style={mbStyle(
-              {
-                margin: `${t.gap.row}px 0 0`,
-                fontFamily: theme.bodyFont,
-                fontSize: 16,
-                color: theme.textSecondary,
-              },
-              ts,
-              "mbCeremonyAt",
-            )}
-          >
-            <EditableText elementKey="mbCeremonyAt">
-              {ct("mb_ceremonyAt")}
-            </EditableText>{" "}
-            <span
-              style={mbStyle(
-                {
-                  fontSize: 20,
-                  fontWeight: 300,
-                  color: theme.textPrimary,
-                },
-                ts,
-                "mbTimeValue",
-              )}
-            >
-              <EditableText elementKey="mbTimeValue">
-                {invitation.date.time}
-              </EditableText>
-            </span>
-          </p>
-        )}
-
-        <DateRow invitation={invitation} theme={theme} />
-      </div>
       </SectionCard>
     </Reveal>
   );

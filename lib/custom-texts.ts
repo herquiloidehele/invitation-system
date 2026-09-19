@@ -160,11 +160,6 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "A receção terá lugar em:",
       },
       {
-        key: "mb_ceremonyAt",
-        label: "Preposição antes da hora",
-        placeholder: "às",
-      },
-      {
         key: "mb_sendWishes",
         label: "Botão do livro de honra",
         placeholder: "Deixar mensagem",

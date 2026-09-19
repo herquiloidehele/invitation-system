@@ -19,6 +19,34 @@ export function isElegantFloralLayout(
 }
 
 /**
+ * The damask pattern behind the whole elegant-floral page. Sits on the page
+ * root so every section scrolls over it; `theme.bg` still paints the base
+ * colour underneath, which shows through the asset's cream ground.
+ */
+export const EF_BACKGROUND_PATTERN =
+  "/images/themes/elegant-floral/damask.webp";
+
+/**
+ * Tile width in px. The damask is drawn at phone-screen scale, so pinning the
+ * width keeps one motif roughly one handset wide and stops the pattern
+ * stretching on desktop — it repeats instead.
+ */
+export const EF_BACKGROUND_TILE_WIDTH = 420;
+
+/** Background style for the elegant-floral page root: damask over `theme.bg`. */
+export function efPageBackgroundStyle(
+  theme: Pick<TemplateTheme, "bg">,
+): CSSProperties {
+  return {
+    backgroundColor: theme.bg,
+    backgroundImage: `url(${EF_BACKGROUND_PATTERN})`,
+    backgroundRepeat: "repeat",
+    backgroundSize: `${EF_BACKGROUND_TILE_WIDTH}px auto`,
+    backgroundPosition: "top center",
+  };
+}
+
+/**
  * Venue photos for the LocationCard carousel: the explicit `photos` array when
  * present (blank-src entries dropped), else a single-item list from the legacy
  * `imageUrl` so older invitations still show their image. Empty otherwise.

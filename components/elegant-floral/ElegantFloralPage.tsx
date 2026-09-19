@@ -17,7 +17,7 @@ import GiftsSection from "./GiftsSection";
 import FaqSection from "./FaqSection";
 import ScriptTitle from "./ScriptTitle";
 import { EfRevealProvider, Reveal } from "./motion";
-import { efStyle } from "@/lib/elegant-floral";
+import { efPageBackgroundStyle, efStyle } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 
@@ -56,7 +56,9 @@ export default function ElegantFloralPage({
   return (
     <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
       <EfRevealProvider instant={isPreview ?? false}>
-        <div style={{ backgroundColor: theme.bg, color: theme.textPrimary }}>
+        <div
+          style={{ ...efPageBackgroundStyle(theme), color: theme.textPrimary }}
+        >
           <ImageCanvas layer={invitation.imageLayer}>
             <DynamicFontLoader
               theme={theme}

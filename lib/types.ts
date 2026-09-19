@@ -821,9 +821,6 @@ export interface TextStyleOverrides {
     mbRoleCaption?: TextStyle;
     mbVenueLine?: TextStyle;
     mbTimeValue?: TextStyle;
-    mbDateDay?: TextStyle;
-    mbDateMonth?: TextStyle;
-    mbDateYear?: TextStyle;
     mbScheduleTime?: TextStyle;
     mbScheduleLabel?: TextStyle;
     mbWishName?: TextStyle;
@@ -838,8 +835,6 @@ export interface TextStyleOverrides {
     mbLinkLabel?: TextStyle;
     /** The "&" between the announcement names (larger than the hero's). */
     mbAnnounceAmp?: TextStyle;
-    /** The preposition before the ceremony time ("às"). */
-    mbCeremonyAt?: TextStyle;
     mbCalendarMonth?: TextStyle;
     mbCalendarWeekday?: TextStyle;
     mbCalendarDay?: TextStyle;
@@ -1048,7 +1043,6 @@ export interface CustomTexts {
   mb_groomCaption?: string;
   mb_brideCaption?: string;
   mb_receptionIntro?: string;
-  mb_ceremonyAt?: string;
   mb_sendWishes?: string;
   mb_giftTapToOpen?: string;
   /** Shown under the RSVP message field when the guestbook publishes it. */
