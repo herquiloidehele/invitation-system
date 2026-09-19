@@ -6,7 +6,7 @@ import {
   resolveLocationPhotos,
   wrapCarouselIndex,
   countdownPartsFrom,
-  efPageBackgroundStyle,
+  EF_PAGE_BACKGROUND,
   EF_BACKGROUND_PATTERN,
   EF_BACKGROUND_TILE_WIDTH,
   efGuestGuideCardStyle,
@@ -78,69 +78,17 @@ describe("countdownPartsFrom", () => {
   });
 });
 
-describe("efPageBackgroundStyle", () => {
-  it("layers the damask tile over the theme's background colour", () => {
-    const style = efPageBackgroundStyle({ bg: "#FFFDF7" });
-    expect(style.backgroundColor).toBe("#FFFDF7");
-    expect(style.backgroundImage).toBe(`url(${EF_BACKGROUND_PATTERN})`);
-  });
-
-  it("tiles at a fixed width so the damask keeps one scale on every viewport", () => {
-    const style = efPageBackgroundStyle({ bg: "#FFFDF7" });
-    expect(style.backgroundRepeat).toBe("repeat");
-    expect(style.backgroundSize).toBe(`${EF_BACKGROUND_TILE_WIDTH}px auto`);
-  });
-
-  it("uses an uploaded background image in place of the damask", () => {
-    const style = efPageBackgroundStyle(
-      { bg: "#FFFDF7" },
-      "https://cdn.example.com/custom-pattern.webp",
-    );
-    expect(style.backgroundImage).toBe(
-      "url(https://cdn.example.com/custom-pattern.webp)",
-    );
-  });
-
-  it("tiles an uploaded image exactly like the damask it replaces", () => {
-    const style = efPageBackgroundStyle(
-      { bg: "#FFFDF7" },
-      "/uploads/mine.webp",
-    );
-    expect(style.backgroundRepeat).toBe("repeat");
-    expect(style.backgroundSize).toBe(`${EF_BACKGROUND_TILE_WIDTH}px auto`);
-    expect(style.backgroundColor).toBe("#FFFDF7");
-  });
-
-  it("falls back to the damask when the upload is absent or blank", () => {
-    const damask = `url(${EF_BACKGROUND_PATTERN})`;
-    expect(efPageBackgroundStyle({ bg: "#FFFDF7" }).backgroundImage).toBe(
-      damask,
-    );
-    expect(
-      efPageBackgroundStyle({ bg: "#FFFDF7" }, undefined).backgroundImage,
-    ).toBe(damask);
-    expect(efPageBackgroundStyle({ bg: "#FFFDF7" }, "").backgroundImage).toBe(
-      damask,
-    );
-    expect(
-      efPageBackgroundStyle({ bg: "#FFFDF7" }, "   ").backgroundImage,
-    ).toBe(damask);
+describe("elegant-floral bundled background", () => {
+  it("describes the damask at the tile width tuned for that artwork", () => {
+    expect(EF_PAGE_BACKGROUND).toEqual({
+      url: EF_BACKGROUND_PATTERN,
+      tileWidth: EF_BACKGROUND_TILE_WIDTH,
+    });
   });
 
   it("points at an asset that actually ships in public/", () => {
     expect(
       existsSync(join(process.cwd(), "public", EF_BACKGROUND_PATTERN)),
-    ).toBe(true);
-  });
-
-  it("keeps the original artwork so the tile can be re-derived", () => {
-    expect(
-      existsSync(
-        join(
-          process.cwd(),
-          "public/images/themes/elegant-floral/damask-source.webp",
-        ),
-      ),
     ).toBe(true);
   });
 });

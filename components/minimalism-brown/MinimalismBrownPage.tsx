@@ -3,6 +3,7 @@
 import { useState, type MutableRefObject, type RefObject } from "react";
 import dynamic from "next/dynamic";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
+import { pageBackgroundStyle } from "@/lib/page-background";
 import type { Wish } from "@/lib/minimalism-brown";
 import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
@@ -121,7 +122,7 @@ function MinimalismBrownBody({
       <div
         style={{
           position: "relative",
-          backgroundColor: theme.bg,
+          ...pageBackgroundStyle(theme, invitation.pageBackgroundImageUrl),
           color: theme.textPrimary,
           overflow: "hidden",
         }}

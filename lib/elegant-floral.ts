@@ -7,6 +7,7 @@ import type {
   TextStyleOverrides,
 } from "./types";
 import { applyOverride } from "./text-styles";
+import type { PageBackgroundFallback } from "./page-background";
 
 /**
  * Returns true when the theme should render via the ElegantFloralPage pipeline.
@@ -39,28 +40,14 @@ export const EF_BACKGROUND_PATTERN =
 export const EF_BACKGROUND_TILE_WIDTH = 840;
 
 /**
- * Background style for the elegant-floral page root: a tiled pattern over
- * `theme.bg`.
- *
- * `customUrl` is the per-invitation `pageBackgroundImageUrl` upload. It is
- * tiled on exactly the same terms as the bundled damask it replaces, so an
- * uploaded pattern keeps the motif scale the layout is built around. Blank or
- * missing falls back to the damask — the admin's "Repor" button clears the
- * field to `""`, and that has to mean "use the default", not "no background".
+ * The damask as a page-background fallback, handed to `pageBackgroundStyle` by
+ * ElegantFloralPage. This layout is the only one with a bundled pattern; every
+ * other layout passes no fallback and stays bare until the host uploads one.
  */
-export function efPageBackgroundStyle(
-  theme: Pick<TemplateTheme, "bg">,
-  customUrl?: string | null,
-): CSSProperties {
-  const custom = customUrl?.trim();
-  return {
-    backgroundColor: theme.bg,
-    backgroundImage: `url(${custom || EF_BACKGROUND_PATTERN})`,
-    backgroundRepeat: "repeat",
-    backgroundSize: `${EF_BACKGROUND_TILE_WIDTH}px auto`,
-    backgroundPosition: "top center",
-  };
-}
+export const EF_PAGE_BACKGROUND: PageBackgroundFallback = {
+  url: EF_BACKGROUND_PATTERN,
+  tileWidth: EF_BACKGROUND_TILE_WIDTH,
+};
 
 /**
  * Card surface for the guest-guide item grid on this layout.

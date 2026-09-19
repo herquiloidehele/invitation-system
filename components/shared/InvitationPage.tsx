@@ -9,6 +9,7 @@ import {
 } from "react";
 import { motion, type Variants } from "framer-motion";
 import dynamic from "next/dynamic";
+import { pageBackgroundStyle } from "@/lib/page-background";
 import { CalendarPlus, Heart, Shirt } from "lucide-react";
 
 import type {
@@ -323,7 +324,7 @@ export default function InvitationPage({
     <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
       <div
       style={{
-        background: theme.bg,
+        ...pageBackgroundStyle(theme, invitation.pageBackgroundImageUrl),
         color: theme.textPrimary,
         minHeight: "100dvh",
         position: "relative",

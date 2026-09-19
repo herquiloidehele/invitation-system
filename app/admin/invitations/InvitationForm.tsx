@@ -2494,29 +2494,28 @@ export default function InvitationForm({
                     Imagens de fundo
                   </AccordionTrigger>
                   <AccordionContent className="space-y-3 pb-4">
-                    {isElegantFloral && (
-                      <>
-                        <div className="space-y-1.5">
-                          <Label>Fundo do convite</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Padrão repetido atrás de todo o convite. Sem imagem,
-                            o modelo usa o damasco incluído.
-                          </p>
-                          <MediaUpload
-                            kind="image"
-                            maxSizeMB={2}
-                            value={form.pageBackgroundImageUrl}
-                            onUpload={(url) =>
-                              update("pageBackgroundImageUrl", url)
-                            }
-                            onClear={() =>
-                              update("pageBackgroundImageUrl", undefined)
-                            }
-                          />
-                        </div>
-                        <Separator />
-                      </>
-                    )}
+                    <div className="space-y-1.5">
+                      <Label>Fundo do convite</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Padrão repetido atrás de todo o convite, à largura da
+                        coluna.{" "}
+                        {isElegantFloral
+                          ? "Sem imagem, o modelo usa o damasco incluído."
+                          : "Sem imagem, o convite mantém apenas a cor de fundo do tema."}
+                      </p>
+                      <MediaUpload
+                        kind="image"
+                        maxSizeMB={2}
+                        value={form.pageBackgroundImageUrl}
+                        onUpload={(url) =>
+                          update("pageBackgroundImageUrl", url)
+                        }
+                        onClear={() =>
+                          update("pageBackgroundImageUrl", undefined)
+                        }
+                      />
+                    </div>
+                    <Separator />
                     <p className="text-xs text-muted-foreground">
                       Carregue imagens e clique numa imagem na pré-visualização
                       para a posicionar e personalizar — atrás ou à frente do
