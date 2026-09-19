@@ -7,6 +7,39 @@ import { mbTokens } from "@/lib/minimalism-brown";
 const PAPER = "/images/themes/minimalism-brown/paper.webp";
 
 /**
+ * The paper grain, as its own layer.
+ *
+ * Absolutely positioned, so the surface using it needs `position: relative`
+ * and `overflow: hidden` to keep the grain inside its rounded corners.
+ */
+export function PaperTexture({
+  opacity = 0.5,
+  /** `cover` suits a full-width card. On a small tile it stretches the grain
+   *  until it reads as a flat wash, so pass the width a section card would
+   *  have and the texture keeps the same frequency everywhere. */
+  size = "cover",
+}: {
+  opacity?: number;
+  size?: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        backgroundImage: `url(${PAPER})`,
+        backgroundSize: size,
+        backgroundPosition: "center",
+        opacity,
+        mixBlendMode: "multiply",
+        pointerEvents: "none",
+      }}
+    />
+  );
+}
+
+/**
  * The warm card the reference puts behind its major sections.
  *
  * Built the way the original is: the card is an `absolute inset-0` layer
@@ -52,19 +85,7 @@ export default function SectionCard({
           zIndex: 0,
         }}
       >
-        {textured && (
-          <span
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundImage: `url(${PAPER})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              opacity: 0.5,
-              mixBlendMode: "multiply",
-            }}
-          />
-        )}
+        {textured && <PaperTexture />}
       </div>
 
       <div style={{ position: "relative", zIndex: 1, padding: t.card.pad }}>

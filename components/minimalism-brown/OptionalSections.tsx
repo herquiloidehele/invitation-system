@@ -11,6 +11,7 @@ import PlacesSection from "@/components/shared/PlacesSection";
 import GuestGuideSection from "@/components/shared/GuestGuideSection";
 import FaqSection from "@/components/shared/FaqSection";
 import SectionTitle from "./SectionTitle";
+import SectionCard from "./SectionCard";
 import Countdown from "./Countdown";
 import { Reveal } from "./motion";
 
@@ -140,25 +141,33 @@ export default function OptionalSections({
               stray from another template next to our section titles. Hide it
               and its underline, and supply the heading ourselves. */}
           <style>{`
-            .mb-faq > section > div > span:first-child,
-            .mb-faq > section > div > span:first-child + div { display: none; }
+            .mb-faq section > div:first-child > span:first-child,
+            .mb-faq section > div:first-child > span:first-child + div {
+              display: none;
+            }
+            /* SectionCard already pads; the shared section's own px-4 would
+               double it. */
+            .mb-faq section { padding-left: 0; padding-right: 0; padding-bottom: 0; }
           `}</style>
           <SectionTitle theme={theme} textStyles={ts}>
             {ct("sectionTitle_faqs")}
           </SectionTitle>
-          <FaqSection
-            faqs={invitation.faqs}
-            theme={theme}
-            textStyles={ts}
-            customTexts={invitation.customTexts}
-            cardStyle={mbCardStyle(
-              invitation.cardStyles,
-              theme,
-              "faqs",
-              t.card.radius,
-            )}
-            isPreview
-          />
+          {/* The card and its paper grain come from SectionCard, so the shared
+              accordion is told to render `plain` — otherwise its own flat fill
+              sits on top of the texture. */}
+          <SectionCard theme={theme} style={{ marginTop: t.gap.block }}>
+            <FaqSection
+              faqs={invitation.faqs}
+              theme={theme}
+              textStyles={ts}
+              customTexts={invitation.customTexts}
+              cardStyle={{
+                ...mbCardStyle(invitation.cardStyles, theme, "faqs", t.card.radius),
+                plain: true,
+              }}
+              isPreview
+            />
+          </SectionCard>
         </Reveal>
       )}
     </>

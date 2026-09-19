@@ -6,6 +6,7 @@ import { countdownPartsFrom } from "@/lib/elegant-floral";
 import { mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
 import SectionTitle from "./SectionTitle";
+import { PaperTexture } from "./SectionCard";
 import { Reveal, RevealGroup, RevealItem, mbPop } from "./motion";
 
 /**
@@ -81,6 +82,8 @@ export default function Countdown({
           <RevealItem key={cell.label} variant={mbPop}>
             <div
               style={{
+                position: "relative",
+                overflow: "hidden",
                 backgroundColor: t.card.bg,
                 border: `1px solid ${mixWithTransparent(theme.primary, 14)}`,
                 borderRadius: t.card.radius,
@@ -88,8 +91,11 @@ export default function Countdown({
                 textAlign: "center",
               }}
             >
+              {/* Same grain scale as a full-width section card. */}
+              <PaperTexture size="343px auto" />
               <div
                 style={{
+                  position: "relative",
                   fontFamily: theme.displayFont,
                   fontSize: 26,
                   fontWeight: 400,
@@ -102,6 +108,7 @@ export default function Countdown({
               </div>
               <div
                 style={{
+                  position: "relative",
                   marginTop: 4,
                   fontFamily: t.eyebrow.font,
                   fontSize: t.eyebrow.size,
