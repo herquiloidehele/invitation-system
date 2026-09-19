@@ -8,7 +8,6 @@ import { EditableText } from "@/components/shared/EditableText";
 import CalendarButton from "@/components/shared/CalendarButton";
 import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
-import DateRow from "./DateRow";
 import MonthCalendar from "./MonthCalendar";
 import { Reveal } from "./motion";
 import { LeafWatermark } from "./Decor";
@@ -34,7 +33,6 @@ export default function ReceptionInfo({
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
   const venue = invitation.location2 ?? invitation.location;
-  const miniRows = (invitation.schedule ?? []).slice(0, 2);
 
   const intro: CSSProperties = {
     margin: 0,
@@ -81,55 +79,8 @@ export default function ReceptionInfo({
             "mbTimeValue",
           )}
         >
-          <EditableText elementKey="mbTimeValue">
-            {invitation.date.time}
-          </EditableText>
+          <EditableText elementKey="mbTimeValue">{venue.name}</EditableText>
         </p>
-
-        <DateRow invitation={invitation} theme={theme} />
-
-        {miniRows.length > 0 && (
-          <div
-            style={{
-              marginTop: t.gap.block,
-              display: "flex",
-              justifyContent: "center",
-              gap: 32,
-            }}
-          >
-            {miniRows.map((row, i) => (
-              <div
-                key={row.id ?? `${row.time}-${i}`}
-                style={{ textAlign: "center" }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    fontFamily: theme.bodyFont,
-                    fontSize: 12,
-                    fontWeight: 300,
-                    letterSpacing: "0.6px",
-                    textTransform: "uppercase",
-                    color: theme.textSecondary,
-                  }}
-                >
-                  {row.label}
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    fontFamily: theme.bodyFont,
-                    fontSize: 18,
-                    fontWeight: 500,
-                    color: theme.textPrimary,
-                  }}
-                >
-                  {row.time}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* The brown fill belongs to the calendar alone. */}
         <div
