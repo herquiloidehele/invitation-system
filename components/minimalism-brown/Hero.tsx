@@ -9,7 +9,7 @@ import { EASE } from "@/components/shared/animations";
 import { EditableText } from "@/components/shared/EditableText";
 import Polaroid from "./Polaroid";
 import AudioPlayer from "@/components/shared/AudioPlayer";
-import { HouseBackdrop, ScrollCue, Sprig } from "./Decor";
+import { HouseBackdrop, Sprig } from "./Decor";
 import { useIdle, useMbMotion } from "./motion";
 
 /**
@@ -186,8 +186,6 @@ export default function Hero({
           />
         </div>
       )}
-
-      <ScrollCue theme={theme} />
     </header>
   );
 }
