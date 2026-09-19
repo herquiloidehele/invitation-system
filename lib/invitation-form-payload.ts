@@ -19,6 +19,7 @@ export function buildInvitationFormPayload(sourceForm: InvitationData) {
     customTexts: normalized.customTexts ?? null,
     qrCodeStyle: normalized.qrCodeStyle ?? null,
     scheduleMarkerUrl: normalized.scheduleMarkerUrl ?? null,
+    pageBackgroundImageUrl: normalized.pageBackgroundImageUrl ?? null,
     ownerSocialPreview: normalized.ownerSocialPreview ?? null,
   };
 }

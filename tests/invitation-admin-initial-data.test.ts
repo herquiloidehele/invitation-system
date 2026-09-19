@@ -18,6 +18,7 @@ const baseRow = {
   schedule: [],
   scheduleStyle: null,
   scheduleMarkerUrl: null,
+  pageBackgroundImageUrl: null,
   dressCode: { enabled: false, text: "" },
   giftRegistry: { enabled: false, text: "" },
   audio: { enabled: false, src: "", artist: "", title: "" },

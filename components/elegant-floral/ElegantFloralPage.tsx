@@ -65,7 +65,10 @@ export default function ElegantFloralPage({
     <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
       <EfRevealProvider instant={isPreview ?? false}>
         <div
-          style={{ ...efPageBackgroundStyle(theme), color: theme.textPrimary }}
+          style={{
+            ...efPageBackgroundStyle(theme, invitation.pageBackgroundImageUrl),
+            color: theme.textPrimary,
+          }}
         >
           <ImageCanvas layer={invitation.imageLayer}>
             <DynamicFontLoader

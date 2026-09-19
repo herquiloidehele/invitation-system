@@ -82,6 +82,7 @@ export const sourceInvitationRow = {
   schedule: [{ time: "15:00", label: "Cerimónia", venue: "Quinta" }],
   scheduleStyle: "illustrated",
   scheduleMarkerUrl: null,
+  pageBackgroundImageUrl: null,
   dressCode: { enabled: true, text: "Formal" },
   giftRegistry: {
     enabled: true,

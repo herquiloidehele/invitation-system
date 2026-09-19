@@ -1330,6 +1330,9 @@ export interface InvitationData {
   /** Image riding the schedule timeline as it scrolls (minimalism-brown).
    *  Absent => the template draws its own bloom. */
   scheduleMarkerUrl?: string;
+  /** Tiled background image for the elegant-floral page, uploaded per
+   *  invitation. Absent => the bundled damask (EF_BACKGROUND_PATTERN). */
+  pageBackgroundImageUrl?: string;
   dressCode: DressCode;
   giftRegistry: GiftRegistry;
   audio: AudioConfig;

@@ -2486,47 +2486,70 @@ export default function InvitationForm({
 
               {/* ── Imagens de fundo (design-only: hidden for AI) ── */}
               {!isAi && (
-              <AccordionItem
-                value="imageLayer"
-                className="border rounded-lg px-4"
-              >
-                <AccordionTrigger className="text-sm font-medium">
-                  Imagens de fundo
-                </AccordionTrigger>
-                <AccordionContent className="space-y-3 pb-4">
-                  <p className="text-xs text-muted-foreground">
-                    Carregue imagens e clique numa imagem na pré-visualização
-                    para a posicionar e personalizar — atrás ou à frente do
-                    conteúdo.
-                  </p>
-                  <ImageLayerUploader
-                    value={form.imageLayer}
-                    onChange={updateImageLayer}
-                    getPreviewRoot={() => previewRootRef.current}
-                    onAdded={(id) => {
-                      setSelectedImageId(id);
-                      dispatchImageEditing({ type: "image-added" });
-                    }}
-                  />
-                  <ImageLayerEditModeControl
-                    active={imageLayerEditorActive}
-                    hasImages={hasImageItems}
-                    onActiveChange={(editing) =>
-                      dispatchImageEditing({ type: "set-editing", editing })
-                    }
-                  />
-                  {(form.imageLayer?.items?.length ?? 0) > 0 && (
-                    <div className="space-y-2 rounded-md border p-2">
-                      <ImageLayerInspector
-                        layer={form.imageLayer}
-                        selectedId={selectedImageId}
-                        onChange={updateImageLayer}
-                        onSelect={setSelectedImageId}
-                      />
-                    </div>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
+                <AccordionItem
+                  value="imageLayer"
+                  className="border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="text-sm font-medium">
+                    Imagens de fundo
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-3 pb-4">
+                    {isElegantFloral && (
+                      <>
+                        <div className="space-y-1.5">
+                          <Label>Fundo do convite</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Padrão repetido atrás de todo o convite. Sem imagem,
+                            o modelo usa o damasco incluído.
+                          </p>
+                          <MediaUpload
+                            kind="image"
+                            maxSizeMB={2}
+                            value={form.pageBackgroundImageUrl}
+                            onUpload={(url) =>
+                              update("pageBackgroundImageUrl", url)
+                            }
+                            onClear={() =>
+                              update("pageBackgroundImageUrl", undefined)
+                            }
+                          />
+                        </div>
+                        <Separator />
+                      </>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Carregue imagens e clique numa imagem na pré-visualização
+                      para a posicionar e personalizar — atrás ou à frente do
+                      conteúdo.
+                    </p>
+                    <ImageLayerUploader
+                      value={form.imageLayer}
+                      onChange={updateImageLayer}
+                      getPreviewRoot={() => previewRootRef.current}
+                      onAdded={(id) => {
+                        setSelectedImageId(id);
+                        dispatchImageEditing({ type: "image-added" });
+                      }}
+                    />
+                    <ImageLayerEditModeControl
+                      active={imageLayerEditorActive}
+                      hasImages={hasImageItems}
+                      onActiveChange={(editing) =>
+                        dispatchImageEditing({ type: "set-editing", editing })
+                      }
+                    />
+                    {(form.imageLayer?.items?.length ?? 0) > 0 && (
+                      <div className="space-y-2 rounded-md border p-2">
+                        <ImageLayerInspector
+                          layer={form.imageLayer}
+                          selectedId={selectedImageId}
+                          onChange={updateImageLayer}
+                          onSelect={setSelectedImageId}
+                        />
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
               )}
 
               {/* ── Date & Time ── */}
@@ -3743,9 +3766,7 @@ export default function InvitationForm({
                         maxSizeMB={2}
                         value={form.scheduleMarkerUrl}
                         onUpload={(url) => update("scheduleMarkerUrl", url)}
-                        onClear={() =>
-                          update("scheduleMarkerUrl", undefined)
-                        }
+                        onClear={() => update("scheduleMarkerUrl", undefined)}
                       />
                     </div>
                   )}
@@ -4526,67 +4547,67 @@ export default function InvitationForm({
                 </div>
               )
             ) : (
-            <SpacingStyleProvider spacingStyles={form.spacingStyles}>
-              <InlineTextEditProvider
-                updateTextStyleElement={updateTextStyleElement}
-                updateElementSpacing={updateElementSpacing}
-                textStyles={form.textStyles}
-                spacingStyles={form.spacingStyles}
-              >
-                <InlineCardEditProvider
-                  updateCardStyle={updateCardStyle}
-                  updateSectionSpacing={updateSectionSpacing}
-                  cardStyles={form.cardStyles}
+              <SpacingStyleProvider spacingStyles={form.spacingStyles}>
+                <InlineTextEditProvider
+                  updateTextStyleElement={updateTextStyleElement}
+                  updateElementSpacing={updateElementSpacing}
+                  textStyles={form.textStyles}
                   spacingStyles={form.spacingStyles}
                 >
-                  <TextStyleToolbar />
-                  <CardStyleToolbar />
-                  <div
-                    ref={previewRootRef}
-                    className="mx-auto origin-top w-full max-h-165 relative"
+                  <InlineCardEditProvider
+                    updateCardStyle={updateCardStyle}
+                    updateSectionSpacing={updateSectionSpacing}
+                    cardStyles={form.cardStyles}
+                    spacingStyles={form.spacingStyles}
                   >
-                    <NextIntlClientProvider
-                      locale={activeLocale}
-                      messages={getClientMessages(activeLocale)}
+                    <TextStyleToolbar />
+                    <CardStyleToolbar />
+                    <div
+                      ref={previewRootRef}
+                      className="mx-auto origin-top w-full max-h-165 relative"
                     >
-                      <InvitationLanguagePreviewProvider
-                        onLocaleChange={setActiveLocale}
+                      <NextIntlClientProvider
+                        locale={activeLocale}
+                        messages={getClientMessages(activeLocale)}
                       >
-                        {hasRequiredNames ? (
-                          isMinimalismBrown ? (
-                            <MinimalismBrownPage
-                              invitation={previewInvitation}
-                              theme={currentTheme}
-                              isPreview
-                              animateHeroText
-                            />
-                          ) : isElegantFloral ? (
-                            <ElegantFloralPage
-                              invitation={previewInvitation}
-                              theme={currentTheme}
-                              isPreview
-                              animateHeroText
-                            />
+                        <InvitationLanguagePreviewProvider
+                          onLocaleChange={setActiveLocale}
+                        >
+                          {hasRequiredNames ? (
+                            isMinimalismBrown ? (
+                              <MinimalismBrownPage
+                                invitation={previewInvitation}
+                                theme={currentTheme}
+                                isPreview
+                                animateHeroText
+                              />
+                            ) : isElegantFloral ? (
+                              <ElegantFloralPage
+                                invitation={previewInvitation}
+                                theme={currentTheme}
+                                isPreview
+                                animateHeroText
+                              />
+                            ) : (
+                              <InvitationPage
+                                invitation={previewInvitation}
+                                theme={currentTheme}
+                                isPreview
+                              />
+                            )
                           ) : (
-                            <InvitationPage
-                              invitation={previewInvitation}
-                              theme={currentTheme}
-                              isPreview
-                            />
-                          )
-                        ) : (
-                          <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
-                            {isWedding
-                              ? "Insira os nomes do casal para ver a pré-visualização"
-                              : "Insira o nome para ver a pré-visualização"}
-                          </div>
-                        )}
-                      </InvitationLanguagePreviewProvider>
-                    </NextIntlClientProvider>
-                  </div>
-                </InlineCardEditProvider>
-              </InlineTextEditProvider>
-            </SpacingStyleProvider>
+                            <div className="flex items-center justify-center h-96 text-muted-foreground text-sm">
+                              {isWedding
+                                ? "Insira os nomes do casal para ver a pré-visualização"
+                                : "Insira o nome para ver a pré-visualização"}
+                            </div>
+                          )}
+                        </InvitationLanguagePreviewProvider>
+                      </NextIntlClientProvider>
+                    </div>
+                  </InlineCardEditProvider>
+                </InlineTextEditProvider>
+              </SpacingStyleProvider>
             )}
           </TabsContent>
         </Tabs>

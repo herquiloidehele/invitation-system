@@ -38,13 +38,24 @@ export const EF_BACKGROUND_PATTERN =
  */
 export const EF_BACKGROUND_TILE_WIDTH = 840;
 
-/** Background style for the elegant-floral page root: damask over `theme.bg`. */
+/**
+ * Background style for the elegant-floral page root: a tiled pattern over
+ * `theme.bg`.
+ *
+ * `customUrl` is the per-invitation `pageBackgroundImageUrl` upload. It is
+ * tiled on exactly the same terms as the bundled damask it replaces, so an
+ * uploaded pattern keeps the motif scale the layout is built around. Blank or
+ * missing falls back to the damask — the admin's "Repor" button clears the
+ * field to `""`, and that has to mean "use the default", not "no background".
+ */
 export function efPageBackgroundStyle(
   theme: Pick<TemplateTheme, "bg">,
+  customUrl?: string | null,
 ): CSSProperties {
+  const custom = customUrl?.trim();
   return {
     backgroundColor: theme.bg,
-    backgroundImage: `url(${EF_BACKGROUND_PATTERN})`,
+    backgroundImage: `url(${custom || EF_BACKGROUND_PATTERN})`,
     backgroundRepeat: "repeat",
     backgroundSize: `${EF_BACKGROUND_TILE_WIDTH}px auto`,
     backgroundPosition: "top center",

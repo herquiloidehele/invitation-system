@@ -91,6 +91,42 @@ describe("efPageBackgroundStyle", () => {
     expect(style.backgroundSize).toBe(`${EF_BACKGROUND_TILE_WIDTH}px auto`);
   });
 
+  it("uses an uploaded background image in place of the damask", () => {
+    const style = efPageBackgroundStyle(
+      { bg: "#FFFDF7" },
+      "https://cdn.example.com/custom-pattern.webp",
+    );
+    expect(style.backgroundImage).toBe(
+      "url(https://cdn.example.com/custom-pattern.webp)",
+    );
+  });
+
+  it("tiles an uploaded image exactly like the damask it replaces", () => {
+    const style = efPageBackgroundStyle(
+      { bg: "#FFFDF7" },
+      "/uploads/mine.webp",
+    );
+    expect(style.backgroundRepeat).toBe("repeat");
+    expect(style.backgroundSize).toBe(`${EF_BACKGROUND_TILE_WIDTH}px auto`);
+    expect(style.backgroundColor).toBe("#FFFDF7");
+  });
+
+  it("falls back to the damask when the upload is absent or blank", () => {
+    const damask = `url(${EF_BACKGROUND_PATTERN})`;
+    expect(efPageBackgroundStyle({ bg: "#FFFDF7" }).backgroundImage).toBe(
+      damask,
+    );
+    expect(
+      efPageBackgroundStyle({ bg: "#FFFDF7" }, undefined).backgroundImage,
+    ).toBe(damask);
+    expect(efPageBackgroundStyle({ bg: "#FFFDF7" }, "").backgroundImage).toBe(
+      damask,
+    );
+    expect(
+      efPageBackgroundStyle({ bg: "#FFFDF7" }, "   ").backgroundImage,
+    ).toBe(damask);
+  });
+
   it("points at an asset that actually ships in public/", () => {
     expect(
       existsSync(join(process.cwd(), "public", EF_BACKGROUND_PATTERN)),

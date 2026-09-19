@@ -49,6 +49,7 @@ type AdminInvitationInitialDataRow = {
   schedule: unknown;
   scheduleStyle: string | null;
   scheduleMarkerUrl: string | null;
+  pageBackgroundImageUrl: string | null;
   dressCode: unknown;
   giftRegistry: unknown;
   audio: unknown;
@@ -136,6 +137,7 @@ export function toAdminInvitationInitialData(
     schedule: row.schedule as InvitationData["schedule"],
     scheduleStyle: (row.scheduleStyle as ScheduleStyle | null) ?? "default",
     scheduleMarkerUrl: row.scheduleMarkerUrl ?? undefined,
+    pageBackgroundImageUrl: row.pageBackgroundImageUrl ?? undefined,
     dressCode: row.dressCode as InvitationData["dressCode"],
     giftRegistry: row.giftRegistry as InvitationData["giftRegistry"],
     audio: row.audio as InvitationData["audio"],
