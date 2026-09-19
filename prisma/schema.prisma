@@ -115,6 +115,7 @@ model Invitation {
   rsvp                    Json // { enabled, deadline? }
   schedule                Json // ScheduleEvent[]
   scheduleStyle           String? // "default" | "illustrated"
+  scheduleMarkerUrl       String? // Image riding the minimalism-brown schedule timeline as it scrolls. Null => the drawn theme bloom.
   dressCode               Json // { enabled, text }
   giftRegistry            Json // { enabled, text, link?, items? }
   audio                   Json // { enabled, src, artist, title }

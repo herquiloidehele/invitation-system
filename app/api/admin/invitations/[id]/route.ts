@@ -158,6 +158,9 @@ export async function PUT(
             existing.schedule,
           ),
         }),
+        ...(body.scheduleMarkerUrl !== undefined && {
+          scheduleMarkerUrl: body.scheduleMarkerUrl || null,
+        }),
         ...(body.scheduleStyle !== undefined && {
           scheduleStyle: body.scheduleStyle,
         }),

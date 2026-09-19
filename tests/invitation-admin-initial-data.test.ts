@@ -17,6 +17,7 @@ const baseRow = {
   rsvp: { enabled: true },
   schedule: [],
   scheduleStyle: null,
+  scheduleMarkerUrl: null,
   dressCode: { enabled: false, text: "" },
   giftRegistry: { enabled: false, text: "" },
   audio: { enabled: false, src: "", artist: "", title: "" },

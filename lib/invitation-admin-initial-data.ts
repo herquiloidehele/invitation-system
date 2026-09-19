@@ -48,6 +48,7 @@ type AdminInvitationInitialDataRow = {
   rsvp: unknown;
   schedule: unknown;
   scheduleStyle: string | null;
+  scheduleMarkerUrl: string | null;
   dressCode: unknown;
   giftRegistry: unknown;
   audio: unknown;
@@ -134,6 +135,7 @@ export function toAdminInvitationInitialData(
     rsvp: row.rsvp as InvitationData["rsvp"],
     schedule: row.schedule as InvitationData["schedule"],
     scheduleStyle: (row.scheduleStyle as ScheduleStyle | null) ?? "default",
+    scheduleMarkerUrl: row.scheduleMarkerUrl ?? undefined,
     dressCode: row.dressCode as InvitationData["dressCode"],
     giftRegistry: row.giftRegistry as InvitationData["giftRegistry"],
     audio: row.audio as InvitationData["audio"],

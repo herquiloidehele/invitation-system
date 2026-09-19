@@ -1333,6 +1333,9 @@ export interface InvitationData {
   schedule: ScheduleEvent[];
   /** Visual layout for the schedule section. Defaults to "default". */
   scheduleStyle?: ScheduleStyle;
+  /** Image riding the schedule timeline as it scrolls (minimalism-brown).
+   *  Absent => the template draws its own bloom. */
+  scheduleMarkerUrl?: string;
   dressCode: DressCode;
   giftRegistry: GiftRegistry;
   audio: AudioConfig;

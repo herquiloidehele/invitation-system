@@ -3729,6 +3729,26 @@ export default function InvitationForm({
                       </SelectContent>
                     </Select>
                   </div>
+                  {isMinimalismBrown && (
+                    <div className="space-y-1">
+                      <Label className="text-xs">
+                        Imagem que percorre a linha do tempo
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Acompanha o scroll ao longo da programação. Sem imagem,
+                        o modelo desenha uma flor nas cores do tema.
+                      </p>
+                      <MediaUpload
+                        kind="image"
+                        maxSizeMB={2}
+                        value={form.scheduleMarkerUrl}
+                        onUpload={(url) => update("scheduleMarkerUrl", url)}
+                        onClear={() =>
+                          update("scheduleMarkerUrl", undefined)
+                        }
+                      />
+                    </div>
+                  )}
                   {form.scheduleStyle === "illustrated" && (
                     <div className="space-y-1">
                       <Label className="text-xs">

@@ -1,16 +1,18 @@
 "use client";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
+import { useRef } from "react";
 import { useCustomText } from "@/lib/custom-texts";
 import { resolveTextStyles } from "@/lib/text-styles";
-import { mbCardStyle } from "@/lib/minimalism-brown";
+import { mbCardStyle, mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import { EditableText } from "@/components/shared/EditableText";
 import SharedSchedule, {
   ScheduleIconGraphic,
 } from "@/components/shared/ScheduleSection";
 import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
+import TimelineTrack from "./TimelineTrack";
+import TimelineBloom from "./TimelineBloom";
 import { Sprig } from "./Decor";
 import { Reveal, RevealGroup, RevealItem } from "./motion";
 
@@ -32,6 +34,7 @@ export default function Schedule({
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
+  const trackRef = useRef<HTMLDivElement | null>(null);
   const events = invitation.schedule ?? [];
   if (events.length === 0) return null;
 
@@ -84,6 +87,28 @@ export default function Schedule({
       <SectionTitle theme={theme} textStyles={ts}>
         {ct("sectionTitle_schedule")}
       </SectionTitle>
+
+      <div ref={trackRef} style={{ position: "relative" }}>
+        {/* One rail and one bloom for the whole list, positioned over the
+            stop column (40px icon + 56px time + 8px gaps puts its centre at
+            113px). Keep in step with gridTemplateColumns below. */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: 113,
+            top: 23,
+            bottom: 23,
+            width: 0,
+          }}
+        >
+          <TimelineTrack theme={theme} containerRef={trackRef} />
+          <TimelineBloom
+            theme={theme}
+            containerRef={trackRef}
+            imageUrl={invitation.scheduleMarkerUrl}
+          />
+        </div>
 
       <RevealGroup style={{ marginTop: t.gap.block }}>
         {events.map((event, i) => (
@@ -139,41 +164,13 @@ export default function Schedule({
               </EditableText>
             </span>
 
-            {/* Connector: a continuous rule through the column with a dot per
-                stop, which is how the reference threads its timeline. */}
+            {/* Spacer for the rail, which is drawn once for the whole list
+                (see TimelineTrack). The bloom is the only marker on it — the
+                per-stop dots competed with the row icons for the same job. */}
             <span
               aria-hidden
-              style={{
-                position: "relative",
-                alignSelf: "stretch",
-                display: "block",
-                minHeight: 46,
-              }}
-            >
-              <span
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: i === 0 ? "50%" : 0,
-                  bottom: i === events.length - 1 ? "50%" : 0,
-                  width: 1,
-                  transform: "translateX(-50%)",
-                  backgroundColor: mixWithTransparent(theme.primary, 30),
-                }}
-              />
-              <span
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  transform: "translate(-50%, -50%)",
-                  backgroundColor: theme.primary,
-                }}
-              />
-            </span>
+              style={{ alignSelf: "stretch", display: "block", minHeight: 46 }}
+            />
 
             <span
               style={mbStyle(
@@ -194,6 +191,7 @@ export default function Schedule({
           </RevealItem>
         ))}
       </RevealGroup>
+      </div>
       </SectionCard>
     </Reveal>
   );
