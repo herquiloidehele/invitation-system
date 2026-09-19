@@ -36,7 +36,10 @@
     "name": "Quinta da Alegria",
     "address": "Estrada da Lagoa Azul, 2710-405 Sintra",
     "googleMapsUrl": "https://maps.google.com/?q=Quinta+da+Alegria+Sintra",
-    "wazeUrl": "https://waze.com/ul?q=Quinta%20da%20Alegria%20Sintra"
+    "wazeUrl": "https://waze.com/ul?q=Quinta%20da%20Alegria%20Sintra",
+    "latitude": 38.7876,
+    "longitude": -9.3904,
+    "mapZoom": 15
   },
   "rsvp": {
     "enabled": true,

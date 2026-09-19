@@ -5,7 +5,6 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
-import CalendarButton from "@/components/shared/CalendarButton";
 import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
 import MonthCalendar from "./MonthCalendar";
@@ -110,33 +109,6 @@ export default function ReceptionInfo({
             gap: 12,
           }}
         >
-          {invitation.showCalendarCta !== false && (
-            <CalendarButton
-              date={invitation.date}
-              location={venue}
-              couple={invitation.couple}
-              eventType={invitation.eventType}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: theme.bodyFont,
-                fontSize: 14,
-                fontWeight: 300,
-                color: theme.textPrimary,
-                background: "transparent",
-                border: "none",
-                textDecoration: "underline",
-                textUnderlineOffset: 4,
-                padding: "0 12px",
-                minHeight: 44,
-                cursor: "pointer",
-              }}
-            >
-              {ct("cta_addToCalendar")}
-            </CalendarButton>
-          )}
-
           {invitation.rsvp?.enabled && onRsvpClick && (
             <button
               type="button"
