@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import InvitationPage from "@/components/shared/InvitationPage";
+import ThemeLayoutPreview from "@/components/admin/ThemeLayoutPreview";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 
@@ -81,7 +81,7 @@ function PhoneFrame({
         }}
       >
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-        <InvitationPage invitation={invitation} theme={theme} />
+        <ThemeLayoutPreview invitation={invitation} theme={theme} />
       </div>
 
       {/* Bottom home-indicator bar */}

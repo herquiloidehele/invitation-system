@@ -15,7 +15,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Smartphone } from "lucide-react";
-import InvitationPage from "@/components/shared/InvitationPage";
+import ThemeLayoutPreview from "@/components/admin/ThemeLayoutPreview";
 import FontPicker from "@/components/admin/FontPicker";
 import { MOCK_INVITATION } from "@/lib/mock-invitation";
 import type { ThemeFormData } from "@/lib/theme-form-data";
@@ -69,7 +69,7 @@ function PhonePreview({ form }: { form: ThemeFormData }) {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-          <InvitationPage invitation={invitation} theme={theme} isPreview />
+          <ThemeLayoutPreview invitation={invitation} theme={theme} />
         </div>
 
         {/* Home indicator */}
@@ -414,6 +414,12 @@ export default function ThemeForm({
                   </option>
                   <option value="video-entrance">
                     Vídeo de entrada (video-entrance)
+                  </option>
+                  <option value="elegant-floral">
+                    Floral elegante (elegant-floral)
+                  </option>
+                  <option value="minimalism-brown">
+                    Minimalismo castanho (minimalism-brown)
                   </option>
                 </select>
               </div>
