@@ -24,6 +24,7 @@ import { isSectionIconHidden } from "@/lib/section-icons";
 import { useLocale } from "next-intl";
 
 import { useCustomText } from "@/lib/custom-texts";
+import { useAutoScroll } from "@/components/shared/useAutoScroll";
 import { formatLocalizedMonthLong } from "@/lib/date-format";
 import ScheduleSection from "./ScheduleSection";
 import RSVPModal from "./RSVPModal";
@@ -260,6 +261,11 @@ export default function InvitationPage({
   const rsvpCtaAction = getRsvpCtaAction(invitation.rsvp);
   const isCalendarCta = rsvpCtaAction === "calendar";
   const isInlineRsvp = rsvpCtaAction === "inline";
+
+  // Carry the reader down the page when the invitation opens, until they take
+  // over. Never in the admin preview, where an editor is trying to work.
+  useAutoScroll({ enabled: !isPreview });
+
   const t = useCustomText(invitation.customTexts);
   const locale = useLocale();
   const footerMonthDisplay = formatLocalizedMonthLong(

@@ -14,12 +14,8 @@ import InvitationHero from "@/components/shared/InvitationHero";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 import { EditableText } from "@/components/shared/EditableText";
 import { PaperGround, LeafWatermark, Sprig } from "./Decor";
-import {
-  MbKeyframes,
-  MbMotionProvider,
-  Reveal,
-  useAutoScroll,
-} from "./motion";
+import { MbKeyframes, MbMotionProvider, Reveal } from "./motion";
+import { useAutoScroll } from "@/components/shared/useAutoScroll";
 import Hero from "./Hero";
 import SaveTheDate from "./SaveTheDate";
 import CeremonyInfo from "./CeremonyInfo";

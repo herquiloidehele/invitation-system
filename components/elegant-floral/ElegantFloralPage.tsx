@@ -27,6 +27,7 @@ import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import { pageBackgroundStyle } from "@/lib/page-background";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
+import { useAutoScroll } from "@/components/shared/useAutoScroll";
 
 // The inline RSVP form pulls in react-hook-form + zod; lazy-load it (below the
 // fold) so it doesn't bloat the initial page bundle.
@@ -60,6 +61,11 @@ export default function ElegantFloralPage({
   animateHeroText,
 }: ElegantFloralPageProps) {
   const ts = invitation.textStyles;
+
+  // Carry the reader down the page when the invitation opens, until they take
+  // over. Never in the admin preview, where an editor is trying to work.
+  useAutoScroll({ enabled: !isPreview });
+
   const resolvedTs = resolveTextStyles(theme, ts);
   const ct = useCustomText(invitation.customTexts);
   return (
