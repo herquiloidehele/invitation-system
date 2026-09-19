@@ -9,6 +9,7 @@ import {
 import { useCustomText } from "@/lib/custom-texts";
 import { mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import GalleryLightbox from "@/components/shared/gallery/GalleryLightbox";
+import CoupleGallery from "@/components/shared/gallery/CoupleGallery";
 import SectionTitle from "./SectionTitle";
 import { Reveal, RevealGroup, RevealItem, mbPop } from "./motion";
 
@@ -16,10 +17,13 @@ import { Reveal, RevealGroup, RevealItem, mbPop } from "./motion";
 const VISIBLE_TILES = 4;
 
 /**
- * Photo grid with a "+N" overflow tile, opening the shared lightbox.
+ * Photo gallery, honouring the style the host picked in the admin.
  *
- * The grid is bespoke to this template; the viewer is the platform's existing
- * GalleryLightbox so keyboard handling and navigation stay in one place.
+ * "Mosaico" (grid) is rendered bespoke here, because the reference's 2x2 with
+ * a "+N" overflow tile is part of this template's look. Every other style —
+ * cinematic, coverflow, polaroid, filmstrip — is the platform's own component,
+ * so picking one in the admin actually changes the invitation instead of
+ * silently falling back to the grid.
  */
 export default function PhotoGallery({
   invitation,
@@ -40,6 +44,34 @@ export default function PhotoGallery({
   const overflow = images.length - tiles.length;
   const title =
     invitation.coupleGallery?.title?.trim() || ct("sectionTitle_gallery");
+
+  if (invitation.coupleGallery?.style !== "grid") {
+    return (
+      <section
+        className="mb-gallery"
+        style={{ marginTop: t.gap.section, paddingInline: 24 }}
+      >
+        {/* CoupleGallery ships its own heading and rule in a different type
+            treatment; hide them so our section title is the only one. */}
+        <style>{`
+          .mb-gallery section > div:first-child > span:first-child,
+          .mb-gallery section > div:first-child > span:first-child + div {
+            display: none;
+          }
+          .mb-gallery section { padding-left: 0; padding-right: 0; }
+        `}</style>
+        <Reveal>
+          <SectionTitle theme={theme} textStyles={invitation.textStyles}>
+            {title}
+          </SectionTitle>
+          {/* `isPreview` renders it outright: the shared gallery reveals with
+              `once: false`, so left to itself it fades back out once the
+              reader scrolls past. Our Reveal above handles the entrance. */}
+          <CoupleGallery invitation={invitation} theme={theme} isPreview />
+        </Reveal>
+      </section>
+    );
+  }
 
   return (
     /* The lightbox must sit outside the Reveal: framer-motion leaves a
