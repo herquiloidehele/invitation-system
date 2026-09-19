@@ -138,6 +138,8 @@ interface GuideItemCardProps {
   cardBorderRadius?: number;
   plain?: boolean;
   isPreview?: boolean;
+  /** Stretches the card across both grid columns (odd item count → last row). */
+  fullWidth?: boolean;
 }
 
 function GuideItemCard({
@@ -149,13 +151,16 @@ function GuideItemCard({
   cardBorderRadius,
   plain,
   isPreview,
+  fullWidth,
 }: GuideItemCardProps) {
   return (
     <motion.div
       {...(isPreview
         ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 } }
         : { variants: fadeInUp })}
-      className="flex flex-col items-center gap-2 text-center"
+      className={`flex flex-col items-center gap-2 text-center${
+        fullWidth ? " col-span-2" : ""
+      }`}
       style={{
         ...resolveCardSurfaceStyle({ plain }, {
           background: cardBg || theme.cardBg,
@@ -243,7 +248,7 @@ export default function GuestGuideSection({
               viewport: { once: false, margin: "-40px" },
             })}
       >
-        {guestGuide.items.map((item) => (
+        {guestGuide.items.map((item, index) => (
           <GuideItemCard
             key={item.id}
             item={item}
@@ -254,6 +259,10 @@ export default function GuestGuideSection({
             cardBorderRadius={cardBorderRadius}
             plain={plain}
             isPreview={isPreview}
+            fullWidth={
+              guestGuide.items.length % 2 === 1 &&
+              index === guestGuide.items.length - 1
+            }
           />
         ))}
       </motion.div>
