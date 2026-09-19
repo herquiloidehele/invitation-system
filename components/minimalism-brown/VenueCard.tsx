@@ -1,15 +1,27 @@
 "use client";
 
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { MapPin } from "lucide-react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { resolveLocationPhotos } from "@/lib/elegant-floral";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Reveal } from "./motion";
 import { HouseBackdrop } from "./Decor";
 
+// Leaflet touches `window`, so this can't be evaluated on the server. The null
+// loading state matters too: without it the ~500KB Leaflet chunk is eagerly
+// prefetched on every invitation, including the ones with no coordinates.
+const MinimalistMap = dynamic(
+  () => import("@/components/shared/MinimalistMap"),
+  { ssr: false, loading: () => null },
+);
+
 /**
- * Reception venue with its address and a directions link.
+ * Reception venue with its address, map and a directions link.
  *
  * Photos come through the shared resolveLocationPhotos so an invitation saved
  * with the legacy single `imageUrl` still shows its picture.
@@ -29,6 +41,8 @@ export default function VenueCard({
 
   const photo = resolveLocationPhotos(venue)[0];
   const mapUrl = venue.googleMapsUrl || venue.wazeUrl;
+  const hasCoordinates =
+    venue.latitude != null && venue.longitude != null;
 
   return (
     <Reveal as="section" style={{ marginTop: t.gap.section, position: "relative" }}>
@@ -90,6 +104,62 @@ export default function VenueCard({
             >
               {venue.address}
             </p>
+          )}
+
+          {hasCoordinates && (
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: 220,
+                marginTop: t.gap.block,
+                borderRadius: t.card.radius,
+                overflow: "hidden",
+                border: `1px solid ${mixWithTransparent(theme.primary, 16)}`,
+              }}
+            >
+              <ErrorBoundary
+                fallback={
+                  <div
+                    style={{
+                      display: "grid",
+                      placeItems: "center",
+                      height: "100%",
+                      backgroundColor: mixWithTransparent(theme.primary, 6),
+                    }}
+                  >
+                    <MapPin size={22} color={theme.textMuted} strokeWidth={1.5} />
+                  </div>
+                }
+              >
+                <Suspense
+                  fallback={
+                    <div
+                      style={{
+                        display: "grid",
+                        placeItems: "center",
+                        height: "100%",
+                        backgroundColor: mixWithTransparent(theme.primary, 6),
+                      }}
+                    >
+                      <MapPin
+                        size={22}
+                        color={theme.textMuted}
+                        strokeWidth={1.5}
+                      />
+                    </div>
+                  }
+                >
+                  <MinimalistMap
+                    latitude={venue.latitude!}
+                    longitude={venue.longitude!}
+                    theme={theme}
+                    venueName={venue.name}
+                    zoom={venue.mapZoom}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
           )}
 
           {mapUrl && (
