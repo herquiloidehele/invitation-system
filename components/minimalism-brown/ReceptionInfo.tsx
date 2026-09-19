@@ -97,6 +97,7 @@ export default function ReceptionInfo({
             iso={invitation.date.iso}
             theme={theme}
             color={t.panel.fg}
+            textStyles={ts}
           />
         </div>
 

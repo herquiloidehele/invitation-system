@@ -144,7 +144,7 @@ export default function Hero({
                   ...ampIdle,
                 }}
               >
-                &amp;
+                <EditableText elementKey="mbAmpersand">&amp;</EditableText>
               </span>
               <span style={mbStyle(name, ts, "mbNames")}>
                 <EditableText elementKey="mbNames">

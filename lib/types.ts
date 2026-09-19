@@ -817,7 +817,6 @@ export interface TextStyleOverrides {
     mbSectionTitle?: TextStyle;
     mbParentLabel?: TextStyle;
     mbParentName?: TextStyle;
-    mbParentCity?: TextStyle;
     mbAnnounce?: TextStyle;
     mbRoleCaption?: TextStyle;
     mbVenueLine?: TextStyle;
@@ -837,6 +836,13 @@ export interface TextStyleOverrides {
     mbWishDate?: TextStyle;
     mbVenueAddress?: TextStyle;
     mbLinkLabel?: TextStyle;
+    /** The "&" between the announcement names (larger than the hero's). */
+    mbAnnounceAmp?: TextStyle;
+    /** The preposition before the ceremony time ("às"). */
+    mbCeremonyAt?: TextStyle;
+    mbCalendarMonth?: TextStyle;
+    mbCalendarWeekday?: TextStyle;
+    mbCalendarDay?: TextStyle;
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
     dressCodeText?: TextStyle;

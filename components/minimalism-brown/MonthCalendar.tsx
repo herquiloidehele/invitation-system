@@ -1,8 +1,14 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import type { TemplateTheme } from "@/lib/types";
-import { buildMonthGrid, mbTokens, readableOn } from "@/lib/minimalism-brown";
+import type { TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import {
+  buildMonthGrid,
+  mbStyle,
+  mbTokens,
+  readableOn,
+} from "@/lib/minimalism-brown";
+import { EditableText } from "@/components/shared/EditableText";
 import { useIdle } from "./motion";
 
 /**
@@ -16,9 +22,11 @@ export default function MonthCalendar({
   iso,
   theme,
   color,
+  textStyles,
 }: {
   iso: string;
   theme: TemplateTheme;
+  textStyles?: TextStyleOverrides | null;
   /** Foreground on the inverted panel. */
   color: string;
 }) {
@@ -61,16 +69,20 @@ export default function MonthCalendar({
   return (
     <div style={{ marginTop: t.gap.block }}>
       <p
-        style={{
-          margin: 0,
-          textAlign: "center",
-          fontFamily: theme.scriptFont ?? theme.displayFont,
-          fontSize: 24,
-          letterSpacing: "0.6px",
-          color,
-        }}
+        style={mbStyle(
+          {
+            margin: 0,
+            textAlign: "center",
+            fontFamily: theme.scriptFont ?? theme.displayFont,
+            fontSize: 24,
+            letterSpacing: "0.6px",
+            color,
+          },
+          textStyles,
+          "mbCalendarMonth",
+        )}
       >
-        {monthLabel}
+        <EditableText elementKey="mbCalendarMonth">{monthLabel}</EditableText>
       </p>
 
       <div
@@ -81,8 +93,15 @@ export default function MonthCalendar({
         }}
       >
         {weekdays.map((w, i) => (
-          <span key={i} style={{ ...cell, fontSize: 10, fontWeight: 500 }}>
-            {w}
+          <span
+            key={i}
+            style={mbStyle(
+              { ...cell, fontSize: 10, fontWeight: 500 },
+              textStyles,
+              "mbCalendarWeekday",
+            )}
+          >
+            <EditableText elementKey="mbCalendarWeekday">{w}</EditableText>
           </span>
         ))}
 
@@ -90,7 +109,10 @@ export default function MonthCalendar({
           day === null ? (
             <span key={`b-${i}`} style={cell} />
           ) : day.isTarget ? (
-            <span key={`d-${day.day}`} style={cell}>
+            <span
+              key={`d-${day.day}`}
+              style={mbStyle(cell, textStyles, "mbCalendarDay")}
+            >
               <span
                 style={{
                   display: "inline-grid",
@@ -110,12 +132,17 @@ export default function MonthCalendar({
                   ...markIdle,
                 }}
               >
-                {day.day}
+                <EditableText elementKey="mbCalendarDay">
+                  {day.day}
+                </EditableText>
               </span>
             </span>
           ) : (
-            <span key={`d-${day.day}`} style={cell}>
-              {day.day}
+            <span
+              key={`d-${day.day}`}
+              style={mbStyle(cell, textStyles, "mbCalendarDay")}
+            >
+              <EditableText elementKey="mbCalendarDay">{day.day}</EditableText>
             </span>
           ),
         )}

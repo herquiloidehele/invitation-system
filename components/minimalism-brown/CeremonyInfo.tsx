@@ -29,8 +29,16 @@ function ParentColumn({
       <p style={labelStyle}>
         <EditableText elementKey="mbParentLabel">Sr. &amp; Sra.</EditableText>
       </p>
-      {father && <p style={nameStyle}>{father}</p>}
-      {mother && <p style={nameStyle}>{mother}</p>}
+      {father && (
+        <p style={nameStyle}>
+          <EditableText elementKey="mbParentName">{father}</EditableText>
+        </p>
+      )}
+      {mother && (
+        <p style={nameStyle}>
+          <EditableText elementKey="mbParentName">{mother}</EditableText>
+        </p>
+      )}
     </RevealItem>
   );
 }
@@ -177,15 +185,19 @@ export default function CeremonyInfo({
           <>
             <p
               aria-hidden
-              style={{
-                margin: `${t.gap.row}px 0`,
-                fontFamily: theme.scriptFont ?? theme.displayFont,
-                fontSize: 35,
-                lineHeight: 1,
-                color: theme.textPrimary,
-              }}
+              style={mbStyle(
+                {
+                  margin: `${t.gap.row}px 0`,
+                  fontFamily: theme.scriptFont ?? theme.displayFont,
+                  fontSize: 35,
+                  lineHeight: 1,
+                  color: theme.textPrimary,
+                },
+                ts,
+                "mbAnnounceAmp",
+              )}
             >
-              &amp;
+              <EditableText elementKey="mbAnnounceAmp">&amp;</EditableText>
             </p>
 
             <p style={mbStyle(bigName, ts, "mbNames")}>
@@ -223,14 +235,20 @@ export default function CeremonyInfo({
 
         {invitation.date.time && (
           <p
-            style={{
-              margin: `${t.gap.row}px 0 0`,
-              fontFamily: theme.bodyFont,
-              fontSize: 16,
-              color: theme.textSecondary,
-            }}
+            style={mbStyle(
+              {
+                margin: `${t.gap.row}px 0 0`,
+                fontFamily: theme.bodyFont,
+                fontSize: 16,
+                color: theme.textSecondary,
+              },
+              ts,
+              "mbCeremonyAt",
+            )}
           >
-            {ct("mb_ceremonyAt")}{" "}
+            <EditableText elementKey="mbCeremonyAt">
+              {ct("mb_ceremonyAt")}
+            </EditableText>{" "}
             <span
               style={mbStyle(
                 {
