@@ -38,6 +38,7 @@ const baseRow = {
   faqs: null,
   envelope: null,
   guestGuide: null,
+  guestbook: null,
   saveDateStyle: null,
   cinematicImageUrl: null,
   saveTheDateBackgroundImageUrl: null,

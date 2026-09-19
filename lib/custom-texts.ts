@@ -126,6 +126,60 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "Nossos Momentos",
       },
       { key: "sectionTitle_rsvp", label: "RSVP", placeholder: "RSVP" },
+      {
+        key: "sectionTitle_ceremonyInfo",
+        label: "Informações da Cerimónia",
+        placeholder: "Informações da Cerimónia",
+      },
+      {
+        key: "sectionTitle_receptionInfo",
+        label: "Informações do Copo de Água",
+        placeholder: "Informações do Copo de Água",
+      },
+      {
+        key: "sectionTitle_guestbook",
+        label: "Livro de Honra",
+        placeholder: "Livro de Honra",
+      },
+    ],
+  },
+  {
+    id: "minimalismBrown",
+    label: "Modelo Minimalism Brown",
+    fields: [
+      {
+        key: "mb_heroEyebrow",
+        label: "Linha acima dos nomes",
+        placeholder: "O Casamento De",
+      },
+      { key: "mb_groomCaption", label: "Legenda do noivo", placeholder: "O Noivo" },
+      { key: "mb_brideCaption", label: "Legenda da noiva", placeholder: "A Noiva" },
+      {
+        key: "mb_receptionIntro",
+        label: "Introdução do copo de água",
+        placeholder: "A receção terá lugar em:",
+      },
+      {
+        key: "mb_ceremonyAt",
+        label: "Preposição antes da hora",
+        placeholder: "às",
+      },
+      {
+        key: "mb_sendWishes",
+        label: "Botão do livro de honra",
+        placeholder: "Deixar mensagem",
+      },
+      {
+        key: "mb_giftTapToOpen",
+        label: "Abrir caixa de presentes",
+        placeholder: "Toque para abrir",
+      },
+      {
+        key: "rsvp_messagePublicNote",
+        label: "Aviso de mensagem pública",
+        placeholder:
+          "A tua mensagem poderá ser mostrada no livro de honra do convite.",
+      },
     ],
   },
   {

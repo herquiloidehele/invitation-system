@@ -38,7 +38,16 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trash2, Users, CheckCircle2, XCircle, Heart, CalendarHeart } from "lucide-react";
+import {
+  Trash2,
+  Users,
+  CheckCircle2,
+  XCircle,
+  Heart,
+  CalendarHeart,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   getInvitationRsvpPath,
@@ -159,6 +168,80 @@ function AttendingBadge({ attending }: { attending: boolean }) {
 // ---------------------------------------------------------------------------
 // Empty state
 // ---------------------------------------------------------------------------
+
+/**
+ * Per-message publish control for the guestbook.
+ *
+ * Only rendered when the host has turned the guestbook on for that invitation
+ * — otherwise no RSVP message is public and there is nothing to hide. Writes
+ * the response id into the invitation's `guestbook.hiddenResponseIds`.
+ */
+function GuestbookVisibilityToggle({
+  response,
+}: {
+  response: RsvpResponseWithInvitation;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const guestbook = response.invitation.guestbook;
+
+  if (guestbook?.enabled !== true) return null;
+
+  const hidden = (guestbook.hiddenResponseIds ?? []).includes(response.id);
+
+  async function toggle() {
+    const current = guestbook?.hiddenResponseIds ?? [];
+    const next = hidden
+      ? current.filter((id) => id !== response.id)
+      : [...current, response.id];
+    try {
+      const res = await fetch(
+        `/api/admin/invitations/${response.invitation.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            guestbook: { ...guestbook, hiddenResponseIds: next },
+          }),
+        },
+      );
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(
+        hidden ? "Mensagem visível no convite" : "Mensagem escondida do convite",
+      );
+      startTransition(() => router.refresh());
+    } catch {
+      toast.error("Não foi possível atualizar a mensagem");
+    }
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-6 px-1 mt-1 text-muted-foreground"
+      disabled={isPending}
+      onClick={(event) => {
+        event.stopPropagation();
+        void toggle();
+      }}
+      title={
+        hidden
+          ? "Mostrar esta mensagem no livro de honra"
+          : "Esconder esta mensagem do livro de honra"
+      }
+    >
+      {hidden ? (
+        <EyeOff className="h-3.5 w-3.5" />
+      ) : (
+        <Eye className="h-3.5 w-3.5" />
+      )}
+      <span className="text-xs ml-1">
+        {hidden ? "Escondida" : "No livro de honra"}
+      </span>
+    </Button>
+  );
+}
 
 function EmptyState({ message }: { message: string }) {
   return (
@@ -354,6 +437,7 @@ function InvitationsTab({
                         ) : (
                           <span className="text-muted-foreground text-sm">—</span>
                         )}
+                        {r.message && <GuestbookVisibilityToggle response={r} />}
                         <CustomAnswersBlock answers={r.customAnswers} />
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">

@@ -75,6 +75,7 @@ type InvitationWithTheme = {
   heroTapPrompt: boolean;
   faqs: unknown;
   guestGuide: unknown;
+  guestbook: unknown;
   envelope: unknown;
   saveDateStyle: string | null;
   cinematicImageUrl: string | null;
@@ -161,6 +162,7 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     heroTapPrompt: row.heroTapPrompt,
     faqs: (row.faqs as InvitationData["faqs"]) ?? undefined,
     guestGuide: (row.guestGuide as InvitationData["guestGuide"]) ?? undefined,
+    guestbook: (row.guestbook as InvitationData["guestbook"]) ?? undefined,
     envelope: row.envelope as InvitationData["envelope"],
     saveDateStyle: (row.saveDateStyle as SaveDateStyle | null) ?? "classic",
     cinematicImageUrl: row.cinematicImageUrl ?? undefined,

@@ -135,6 +135,7 @@ model Invitation {
   imageLayer              Json? // ImageLayer { items[] } — free-floating images anchored to sections.
   faqs                    Json? // FAQItem[]
   guestGuide              Json? // GuestGuide { enabled, items[] }
+  guestbook               Json? // GuestbookConfig { enabled, title?, hiddenResponseIds? } — public wishes wall fed from RSVP messages. Absent => disabled.
   envelope                Json? // EnvelopeConfig { base?, coverBackground?, topFlap?, bottomFlap?, shimmer? }
   coverVideos             Json? // CoverVideos { enabled, items: { url, poster? }[] } — tap-to-play video-sequence cover; replaces the envelope when enabled.
   saveDateStyle           String? // "classic" | "countdown" | "quad-cards" | "cinematic" | "minimal-line" | "inline-countdown"

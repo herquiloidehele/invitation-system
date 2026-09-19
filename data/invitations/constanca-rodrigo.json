@@ -1,0 +1,173 @@
+{
+  "slug": "minimalism-brown-demo",
+  "template": "minimalism-brown",
+  "eventType": "wedding",
+  "couple": {
+    "bride": "Constança",
+    "groom": "Rodrigo",
+    "monogram": "CR"
+  },
+  "date": {
+    "iso": "2027-05-16T17:00:00",
+    "display": "16 de Maio de 2027",
+    "dayOfWeek": "domingo",
+    "time": "17:00",
+    "day": "16",
+    "month": "Maio",
+    "year": "2027"
+  },
+  "quote": "A vossa presença seria o maior presente que poderíamos receber.",
+  "parents": {
+    "enabled": true,
+    "blessingMessage": "Com a bênção das nossas famílias",
+    "inviteMessage": "É com enorme alegria que anunciamos o casamento dos nossos filhos",
+    "bridesFather": "Henrique Albuquerque",
+    "bridesMother": "Teresa Albuquerque",
+    "groomsFather": "Manuel Seabra",
+    "groomsMother": "Leonor Seabra"
+  },
+  "location": {
+    "name": "Igreja de Santa Maria",
+    "address": "Largo da Sé, 2700-186 Sintra",
+    "googleMapsUrl": "https://maps.google.com/?q=Igreja+de+Santa+Maria+Sintra",
+    "wazeUrl": "https://waze.com/ul?q=Igreja%20de%20Santa%20Maria%20Sintra"
+  },
+  "location2": {
+    "name": "Quinta da Alegria",
+    "address": "Estrada da Lagoa Azul, 2710-405 Sintra",
+    "googleMapsUrl": "https://maps.google.com/?q=Quinta+da+Alegria+Sintra",
+    "wazeUrl": "https://waze.com/ul?q=Quinta%20da%20Alegria%20Sintra"
+  },
+  "rsvp": {
+    "enabled": true,
+    "showDietaryRestrictions": true
+  },
+  "guestbook": {
+    "enabled": true
+  },
+  "countdown": {
+    "enabled": true
+  },
+  "schedule": [
+    {
+      "time": "16:30",
+      "label": "Chegada dos convidados",
+      "venue": ""
+    },
+    {
+      "time": "17:00",
+      "label": "Cerimónia religiosa",
+      "venue": "",
+      "icon": "church",
+      "iconUrl": "/images/themes/minimalism-brown/gate.webp"
+    },
+    {
+      "time": "18:30",
+      "label": "Cocktail no jardim",
+      "venue": "",
+      "icon": "toast",
+      "iconUrl": "/images/themes/minimalism-brown/water.webp"
+    },
+    {
+      "time": "20:00",
+      "label": "Jantar e brinde",
+      "venue": "",
+      "icon": "dinner",
+      "iconUrl": "/images/themes/minimalism-brown/cake.webp"
+    },
+    {
+      "time": "23:30",
+      "label": "Dança e festa",
+      "venue": ""
+    }
+  ],
+  "coupleGallery": {
+    "enabled": true,
+    "style": "grid",
+    "images": [
+      {
+        "src": "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=80"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=80"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800&q=80"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1507290439931-a861b5a38200?w=800&q=80"
+      }
+    ]
+  },
+  "dressCode": {
+    "enabled": true,
+    "text": "Traje formal em tons terrosos",
+    "colors": [
+      "#3B3027",
+      "#7C6A60",
+      "#C8A97E",
+      "#EFE4DA"
+    ]
+  },
+  "giftRegistry": {
+    "enabled": true,
+    "text": "A vossa presença é o nosso maior presente. Para quem quiser assinalar o dia com um gesto de carinho, deixamos aqui os nossos dados.",
+    "items": []
+  },
+  "faqs": [
+    {
+      "question": "Posso levar acompanhante?",
+      "answer": "O convite indica o número de lugares reservados. Em caso de dúvida, fala connosco."
+    },
+    {
+      "question": "Há estacionamento na quinta?",
+      "answer": "Sim, com lugares gratuitos junto à entrada principal."
+    },
+    {
+      "question": "A cerimónia é ao ar livre?",
+      "answer": "A cerimónia é na igreja; o copo de água e o jantar são no jardim da quinta."
+    }
+  ],
+  "audio": {
+    "enabled": false,
+    "src": "",
+    "artist": "",
+    "title": ""
+  },
+  "heroImage": "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=80",
+  "heroHeight": 420,
+  "demoWishes": [
+    {
+      "guestName": "Mariana Castro",
+      "message": "Que alegria enorme! Desejo-vos uma vida inteira de amor e cumplicidade.",
+      "submittedAt": "2026-09-02T14:12:00.000Z"
+    },
+    {
+      "guestName": "Tiago Nunes",
+      "message": "Parabéns aos dois! Mal posso esperar para celebrar convosco.",
+      "submittedAt": "2026-09-06T09:40:00.000Z"
+    },
+    {
+      "guestName": "Beatriz Lopes",
+      "message": "Um convite lindíssimo. Felicidades sem fim para vocês!",
+      "submittedAt": "2026-09-11T18:25:00.000Z"
+    },
+    {
+      "guestName": "André Pinto",
+      "message": "Que este seja o primeiro de muitos dias felizes. Um abraço grande!",
+      "submittedAt": "2026-09-15T11:05:00.000Z"
+    }
+  ]
+}

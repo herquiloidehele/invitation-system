@@ -508,7 +508,8 @@
     "guestCard_tableLabel": "Mesa",
     "guestCard_noteLabel": "Nota",
     "guestCard_inviteButton": "Convidar mais pessoas",
-    "guestCard_entryPassTitle": "O teu passe de entrada",    "entryPass_downloadButton": "Descarregar",
+    "guestCard_entryPassTitle": "O teu passe de entrada",
+    "entryPass_downloadButton": "Descarregar",
     "rsvp_entryPassTitle": "Apresenta este código à entrada",
     "calendar_weddingTitle": "Casamento {names}",
     "calendar_genericTitle": "Evento {name}",
@@ -544,6 +545,17 @@
     "scratch_revealMonthAria": "Raspe para revelar o mês",
     "scratch_revealYearAria": "Raspe para revelar o ano",
     "nav_scrollToNextAria": "Ir para a próxima secção",
-    "embed_iframeTitle": "Convite"
+    "embed_iframeTitle": "Convite",
+    "sectionTitle_ceremonyInfo": "Informações da Cerimónia",
+    "sectionTitle_receptionInfo": "Informações do Copo de Água",
+    "sectionTitle_guestbook": "Livro de Honra",
+    "mb_heroEyebrow": "O Casamento De",
+    "mb_groomCaption": "O Noivo",
+    "mb_brideCaption": "A Noiva",
+    "mb_receptionIntro": "A receção terá lugar em:",
+    "mb_ceremonyAt": "às",
+    "mb_sendWishes": "Deixar mensagem",
+    "mb_giftTapToOpen": "Toque para abrir",
+    "rsvp_messagePublicNote": "A tua mensagem poderá ser mostrada no livro de honra do convite."
   }
 }

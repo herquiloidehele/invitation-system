@@ -22,6 +22,11 @@ import {
 } from "@/lib/invitation-translations";
 import { getPublicGuestByToken } from "@/lib/guests";
 import { getTheme } from "@/lib/themes";
+import {
+  isGuestbookEnabled,
+  isMinimalismBrownLayout,
+  resolveWishes,
+} from "@/lib/minimalism-brown";
 import { getRevisionForPreview } from "@/worker/persistence";
 import { isAdminRequest, resolvePreviewRenderState } from "@/lib/ai-preview";
 import { prisma } from "@/lib/db";
@@ -300,6 +305,31 @@ export default async function InvitationSlugPage({
     }
   }
 
+  // Guestbook wishes are the messages guests left on their RSVP — private
+  // until the host opts in. Guard on both the layout and the toggle so the
+  // query never runs, and no private message is ever read, otherwise.
+  const wishes =
+    isMinimalismBrownLayout(theme) &&
+    isGuestbookEnabled(sourceInvitation.guestbook)
+      ? resolveWishes(
+          await prisma.rsvpResponse.findMany({
+            where: {
+              invitationSlug: sourceInvitation.slug,
+              message: { not: null },
+            },
+            select: {
+              id: true,
+              guestName: true,
+              message: true,
+              submittedAt: true,
+            },
+            orderBy: { submittedAt: "desc" },
+            take: 60,
+          }),
+          sourceInvitation.guestbook,
+        )
+      : undefined;
+
   return (
     <>
       {invitation.isDemo === true && (
@@ -332,6 +362,7 @@ export default async function InvitationSlugPage({
         lazyExternalIframe={lazyExternalIframe === "1"}
         initialSection={section}
         skipCover={skipCover}
+        wishes={wishes}
       />
     </>
   );

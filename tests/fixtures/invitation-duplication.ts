@@ -111,6 +111,7 @@ export const sourceInvitationRow = {
   faqs: [{ question: "Quando?", answer: "Às 15h" }],
   envelope: { base: "#330000" },
   guestGuide: { enabled: true, items: [] },
+  guestbook: null,
   saveDateStyle: "cinematic",
   cinematicImageUrl: "https://cdn.example.com/cinematic.jpg",
   saveTheDateBackgroundImageUrl:

@@ -508,7 +508,8 @@
     "guestCard_tableLabel": "Table",
     "guestCard_noteLabel": "Note",
     "guestCard_inviteButton": "Invite more people",
-    "guestCard_entryPassTitle": "Your entry pass",    "entryPass_downloadButton": "Download",
+    "guestCard_entryPassTitle": "Your entry pass",
+    "entryPass_downloadButton": "Download",
     "rsvp_entryPassTitle": "Show this code at the door",
     "calendar_weddingTitle": "{names} Wedding",
     "calendar_genericTitle": "{name} Event",
@@ -544,6 +545,17 @@
     "scratch_revealMonthAria": "Scratch to reveal the month",
     "scratch_revealYearAria": "Scratch to reveal the year",
     "nav_scrollToNextAria": "Scroll to next section",
-    "embed_iframeTitle": "Invitation"
+    "embed_iframeTitle": "Invitation",
+    "sectionTitle_ceremonyInfo": "Ceremony Info",
+    "sectionTitle_receptionInfo": "Reception Info",
+    "sectionTitle_guestbook": "Guestbook",
+    "mb_heroEyebrow": "The Wedding Of",
+    "mb_groomCaption": "The Groom",
+    "mb_brideCaption": "The Bride",
+    "mb_receptionIntro": "The reception will take place at:",
+    "mb_ceremonyAt": "at",
+    "mb_sendWishes": "Send wishes",
+    "mb_giftTapToOpen": "Tap to open",
+    "rsvp_messagePublicNote": "Your message may appear in the invitation's guestbook."
   }
 }
