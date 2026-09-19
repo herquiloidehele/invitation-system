@@ -10,6 +10,7 @@ import type {
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import {
+  resolveGalleryAutoplay,
   resolveGalleryImages,
   shouldRenderCoupleGallery,
 } from "@/lib/couple-gallery";
@@ -45,6 +46,7 @@ export default function CoupleGallery({
     theme,
     accent: ts.accent,
     isPreview,
+    autoplay: resolveGalleryAutoplay(gallery),
     onOpenLightbox: setLightboxIndex,
   };
 

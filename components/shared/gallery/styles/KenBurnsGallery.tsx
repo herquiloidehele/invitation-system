@@ -11,18 +11,19 @@ export default function KenBurnsGallery({
   images,
   theme,
   accent,
+  autoplay,
 }: GalleryStyleProps) {
   const [index, setIndex] = useState(0);
   const reduce = useReducedMotion();
 
   useEffect(() => {
-    if (reduce || images.length <= 1) return;
+    if (!autoplay || reduce || images.length <= 1) return;
     const id = setInterval(
       () => setIndex((i) => (i + 1) % images.length),
       SLIDE_MS,
     );
     return () => clearInterval(id);
-  }, [reduce, images.length]);
+  }, [autoplay, reduce, images.length]);
 
   const current = images[index];
   const advance = () =>

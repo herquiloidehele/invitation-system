@@ -8,6 +8,9 @@ export interface GalleryStyleProps {
   accent: string;
   /** True in the admin live preview. */
   isPreview: boolean;
+  /** Host's autoplay choice, already resolved against the per-style default.
+   *  Only the styles that advance on their own (kenburns, coverflow) use it. */
+  autoplay: boolean;
   /** Open the shared full-screen lightbox at the given index. */
   onOpenLightbox?: (index: number) => void;
 }
