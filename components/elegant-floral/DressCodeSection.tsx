@@ -5,7 +5,6 @@ import type { DressCode, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
-import HeartDivider from "./HeartDivider";
 import { efGroup, efItem, efPop, useRevealProps } from "./motion";
 
 interface DressCodeSectionProps {
@@ -74,7 +73,12 @@ export default function DressCodeSection({
 
   return (
     <motion.section
-      style={{ textAlign: "center", padding: `2rem ${SIDE_PAD}`, maxWidth: 560, marginInline: "auto" }}
+      style={{
+        textAlign: "center",
+        padding: `2rem ${SIDE_PAD}`,
+        maxWidth: 560,
+        marginInline: "auto",
+      }}
       variants={efGroup}
       {...reveal}
     >
@@ -100,7 +104,9 @@ export default function DressCodeSection({
             "efDressTitle",
           )}
         >
-          <EditableText elementKey="efDressTitle">{dressCode.title}</EditableText>
+          <EditableText elementKey="efDressTitle">
+            {dressCode.title}
+          </EditableText>
         </motion.p>
       )}
       {dressCode.intro && (
@@ -113,7 +119,9 @@ export default function DressCodeSection({
         <motion.div variants={efItem}>
           {ladies.label && (
             <p style={labelStyle}>
-              <EditableText elementKey="efSubLabel">{ladies.label}</EditableText>
+              <EditableText elementKey="efSubLabel">
+                {ladies.label}
+              </EditableText>
             </p>
           )}
           {ladies.note && (
@@ -134,7 +142,11 @@ export default function DressCodeSection({
               }}
             >
               {ladies.palette.map((c, i) => (
-                <motion.span key={`${c.name}-${i}`} variants={efPop} style={chipStyle}>
+                <motion.span
+                  key={`${c.name}-${i}`}
+                  variants={efPop}
+                  style={chipStyle}
+                >
                   <span
                     style={{
                       width: 6,
@@ -151,7 +163,11 @@ export default function DressCodeSection({
           )}
           {ladies.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={ladies.imageUrl} alt="Vestidos" style={{ ...figureStyle, maxWidth: 300 }} />
+            <img
+              src={ladies.imageUrl}
+              alt="Vestidos"
+              style={{ ...figureStyle, maxWidth: 300 }}
+            />
           )}
         </motion.div>
       )}
@@ -160,7 +176,9 @@ export default function DressCodeSection({
         <motion.div variants={efItem}>
           {gentlemen.label && (
             <p style={labelStyle}>
-              <EditableText elementKey="efSubLabel">{gentlemen.label}</EditableText>
+              <EditableText elementKey="efSubLabel">
+                {gentlemen.label}
+              </EditableText>
             </p>
           )}
           {gentlemen.note && (
@@ -170,25 +188,32 @@ export default function DressCodeSection({
           )}
           {gentlemen.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={gentlemen.imageUrl} alt="Fatos" style={{ ...figureStyle, maxWidth: 230 }} />
+            <img
+              src={gentlemen.imageUrl}
+              alt="Fatos"
+              style={{ ...figureStyle, maxWidth: 230 }}
+            />
           )}
         </motion.div>
       )}
 
       {dressCode.reservedNote && (
         <motion.div variants={efItem} style={{ marginTop: "2.1rem" }}>
-          <ScriptTitle theme={theme} textStyles={ts} as="h3" size="clamp(1.4rem, 6vw, 1.85rem)">
+          <ScriptTitle
+            theme={theme}
+            textStyles={ts}
+            as="h3"
+            size="clamp(1.4rem, 6vw, 1.85rem)"
+          >
             {noteTitle}
           </ScriptTitle>
           <p style={{ ...noteStyle, maxWidth: 440, margin: "0.6rem auto 0" }}>
-            <EditableText elementKey="efBody">{dressCode.reservedNote}</EditableText>
+            <EditableText elementKey="efBody">
+              {dressCode.reservedNote}
+            </EditableText>
           </p>
         </motion.div>
       )}
-
-      <motion.div variants={efItem}>
-        <HeartDivider color={theme.secondary} style={{ marginTop: "2.1rem" }} />
-      </motion.div>
     </motion.section>
   );
 }
