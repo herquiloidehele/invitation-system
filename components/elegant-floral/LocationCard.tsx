@@ -68,7 +68,6 @@ export default function LocationCard({
           gap: 8,
         }}
       >
-        <MapPin color={theme.secondary} />
         <span
           style={efStyle(
             {
