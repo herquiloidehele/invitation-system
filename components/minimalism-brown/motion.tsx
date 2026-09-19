@@ -2,17 +2,17 @@
 
 import {
   createContext,
+  type CSSProperties,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
+  useState
 } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { EASE } from "@/components/shared/animations";
-import { autoScrollFrame, idleDelay, isUserScroll } from "@/lib/minimalism-brown";
+import { autoScrollFrame, idleDelay, isUserScroll } from "@/lib/minimalism-brown"; // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // Motion mode
@@ -122,19 +122,19 @@ const viewport = { once: true, margin: "-70px" } as const;
 /** Stagger container — children arrive in sequence. */
 export const mbGroup: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+  visible: { transition: { staggerChildren: 0.11, delayChildren: 0.06 } },
 };
 
 /** Standard child: fade + rise. */
 export const mbItem: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
 };
 
 /** Small elements (swatches, calendar cells, gallery tiles). */
 export const mbPop: Variants = {
-  hidden: { opacity: 0, scale: 0.86 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.45, ease: EASE } },
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.52, ease: EASE } },
 };
 
 /**
@@ -148,13 +148,13 @@ export const mbPop: Variants = {
  */
 function useRevealProps(revealAll: boolean, onReveal: () => void) {
   return revealAll
-    ? ({ initial: "visible" as const, animate: "visible" as const })
-    : ({
+    ? { initial: "visible" as const, animate: "visible" as const }
+    : {
         initial: "hidden" as const,
         whileInView: "visible" as const,
         viewport,
         onViewportEnter: onReveal,
-      });
+      };
 }
 
 /**
@@ -289,27 +289,27 @@ export function MbKeyframes() {
     <style>{`
 @keyframes mb-sway {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%      { transform: translate3d(0, -9px, 0) rotate(1.1deg); }
+  50%      { transform: translate3d(0, -14px, 0) rotate(1.8deg); }
 }
 @keyframes mb-float {
   0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(0, -7px, 0); }
+  50%      { transform: translate3d(0, -12px, 0); }
 }
 @keyframes mb-breathe {
   0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.06); }
+  50%      { transform: scale(1.09); }
 }
 @keyframes mb-bob {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-1.5deg); }
-  50%      { transform: translate3d(0, -10px, 0) rotate(1.5deg); }
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-2.4deg); }
+  50%      { transform: translate3d(0, -16px, 0) rotate(2.4deg); }
 }
 @keyframes mb-shimmer {
-  0%, 100% { opacity: 0.72; transform: scale(1); }
-  50%      { opacity: 1;    transform: scale(1.04); }
+  0%, 100% { opacity: 0.62; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.08); }
 }
 @keyframes mb-cue {
-  0%, 100% { opacity: 0.35; transform: translate3d(0, 0, 0); }
-  50%      { opacity: 0.9;  transform: translate3d(0, 6px, 0); }
+  0%, 100% { opacity: 0.3; transform: translate3d(0, 0, 0); }
+  50%      { opacity: 1;   transform: translate3d(0, 10px, 0); }
 }
 @media (prefers-reduced-motion: reduce) {
   [style*="mb-sway"], [style*="mb-float"], [style*="mb-breathe"],
@@ -326,6 +326,16 @@ export function MbKeyframes() {
 // ---------------------------------------------------------------------------
 
 /**
+ * How long the page sits still before the crawl begins.
+ *
+ * The hero's own reveal takes about a second, so anything much shorter than
+ * this starts moving the page while the reader is still taking in the names
+ * and the photo — it reads as the page running away from them rather than
+ * offering to turn the page.
+ */
+const AUTO_SCROLL_DELAY_MS = 3000;
+
+/**
  * Carry the reader gently down the page when the invitation opens, and get out
  * of the way the moment they take over.
  *
@@ -338,7 +348,7 @@ export function MbKeyframes() {
 export function useAutoScroll({
   enabled,
   speedPxPerSec = 46,
-  startDelayMs = 1400,
+  startDelayMs = AUTO_SCROLL_DELAY_MS,
 }: {
   enabled: boolean;
   speedPxPerSec?: number;
@@ -364,7 +374,8 @@ export function useAutoScroll({
     };
 
     const onScroll = () => {
-      if (!cancelled.current && isUserScroll(window.scrollY, state.lastY)) stop();
+      if (!cancelled.current && isUserScroll(window.scrollY, state.lastY))
+        stop();
     };
 
     const frame = (now: number) => {
