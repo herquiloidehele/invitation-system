@@ -27,6 +27,18 @@ export default function SaveTheDate({
   // defaults saveDateStyle to "classic" and the form offers no "none", so
   // every invitation has one. The style only chooses how it is presented.
 
+  // The shared section colours its "Save the Date" eyebrow and calendar link
+  // with the theme accent. That gold is a decorative tone — at 10px it lands
+  // near 2:1 on this card, far below AA — so those two labels take the body
+  // text colour here. The accent itself is untouched and still used where it
+  // is decoration rather than text.
+  const resolved = resolveTextStyles(theme, invitation.textStyles);
+  const stdTextStyles = {
+    ...resolved,
+    saveLabel: { ...resolved.saveLabel, color: theme.textSecondary },
+    calendarCta: { ...resolved.calendarCta, color: theme.textSecondary },
+  };
+
   const card = mbCardStyle(
     invitation.cardStyles,
     theme,
@@ -43,7 +55,7 @@ export default function SaveTheDate({
         <SharedSaveTheDate
           invitation={invitation}
           theme={theme}
-          ts={resolveTextStyles(theme, invitation.textStyles)}
+          ts={stdTextStyles}
           cardBg={card.cardBg}
           cardBorder={card.cardBorder}
           cardBorderRadius={card.borderRadius}

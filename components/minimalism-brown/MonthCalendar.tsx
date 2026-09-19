@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl";
 import type { TemplateTheme } from "@/lib/types";
-import { buildMonthGrid, mbTokens } from "@/lib/minimalism-brown";
+import { buildMonthGrid, mbTokens, readableOn } from "@/lib/minimalism-brown";
 import { useIdle } from "./motion";
 
 /**
@@ -99,7 +99,13 @@ export default function MonthCalendar({
                   height: 24,
                   borderRadius: "50%",
                   backgroundColor: theme.accent,
-                  color: theme.ctaPrimaryText,
+                  // The accent is a pale gold; pale text on it lands near 2:1.
+                  // Pick whichever of the theme's own dark/light reads on it.
+                  color: readableOn(theme.accent, [
+                    theme.textPrimary,
+                    theme.ctaPrimaryText,
+                    "#3B322C",
+                  ]),
                   fontWeight: 600,
                   ...markIdle,
                 }}

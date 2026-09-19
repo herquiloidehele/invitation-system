@@ -6,10 +6,12 @@ import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import {
   mbCardStyle,
+  mbStyle,
   mbTokens,
   mixWithTransparent,
 } from "@/lib/minimalism-brown";
 import GiftsSection from "@/components/shared/GiftsSection";
+import { EditableText } from "@/components/shared/EditableText";
 import SectionTitle from "./SectionTitle";
 import { Reveal, useIdle } from "./motion";
 import { HouseBackdrop } from "./Decor";
@@ -87,16 +89,22 @@ export default function GiftBox({
             }}
           />
           <span
-            style={{
-              // The reference uses the OS sans for this one affordance.
-              fontFamily:
-                "ui-sans-serif, system-ui, -apple-system, sans-serif",
-              fontSize: 12,
-              fontWeight: 500,
-              color: theme.textPrimary,
-            }}
+            style={mbStyle(
+              {
+                // The reference uses the OS sans for this one affordance.
+                fontFamily:
+                  "ui-sans-serif, system-ui, -apple-system, sans-serif",
+                fontSize: 12,
+                fontWeight: 500,
+                color: theme.textPrimary,
+              },
+              invitation.textStyles,
+              "mbGiftPrompt",
+            )}
           >
-            {ct("mb_giftTapToOpen")}
+            <EditableText elementKey="mbGiftPrompt">
+              {ct("mb_giftTapToOpen")}
+            </EditableText>
           </span>
         </button>
       ) : (

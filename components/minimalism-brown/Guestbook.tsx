@@ -5,6 +5,7 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import type { Wish } from "@/lib/minimalism-brown";
 import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
+import { EditableText } from "@/components/shared/EditableText";
 import SectionTitle from "./SectionTitle";
 import { Reveal, RevealGroup, RevealItem } from "./motion";
 
@@ -51,20 +52,26 @@ export default function Guestbook({
           <button
             type="button"
             onClick={onRsvpClick}
-            style={{
-              fontFamily: t.title.font,
-              fontSize: 14,
-              fontWeight: 600,
-              color: t.panel.fg,
-              backgroundColor: t.panel.bg,
-              border: "none",
-              borderRadius: theme.ctaRadius,
-              padding: "12px 24px",
-              minHeight: 44,
-              cursor: "pointer",
-            }}
+            style={mbStyle(
+              {
+                fontFamily: t.title.font,
+                fontSize: 14,
+                fontWeight: 600,
+                color: t.panel.fg,
+                backgroundColor: t.panel.bg,
+                border: "none",
+                borderRadius: theme.ctaRadius,
+                padding: "12px 24px",
+                minHeight: 44,
+                cursor: "pointer",
+              },
+              ts,
+              "mbButtonLabel",
+            )}
           >
-            {ct("mb_sendWishes")}
+            <EditableText elementKey="mbButtonLabel">
+              {ct("mb_sendWishes")}
+            </EditableText>
           </button>
         </div>
       )}
@@ -81,7 +88,7 @@ export default function Guestbook({
           <RevealItem
             key={wish.id}
             style={{
-              backgroundColor: mixWithTransparent("#FFFFFF", 55),
+              backgroundColor: mixWithTransparent("#FFFFFF", 78),
               border: `1px solid ${mixWithTransparent(theme.primary, 12)}`,
               borderRadius: 8,
               padding: 14,
@@ -107,18 +114,26 @@ export default function Guestbook({
                   "mbWishName",
                 )}
               >
-                {wish.guestName}
+                <EditableText elementKey="mbWishName">
+                  {wish.guestName}
+                </EditableText>
               </span>
               <span
-                style={{
-                  fontFamily: t.title.font,
-                  fontSize: 12,
-                  fontWeight: 300,
-                  color: theme.textPrimary,
-                  whiteSpace: "nowrap",
-                }}
+                style={mbStyle(
+                  {
+                    fontFamily: t.title.font,
+                    fontSize: 12,
+                    fontWeight: 300,
+                    color: theme.textPrimary,
+                    whiteSpace: "nowrap",
+                  },
+                  ts,
+                  "mbWishDate",
+                )}
               >
-                {fmt.format(wish.submittedAt)}
+                <EditableText elementKey="mbWishDate">
+                  {fmt.format(wish.submittedAt)}
+                </EditableText>
               </span>
             </div>
 
@@ -136,7 +151,9 @@ export default function Guestbook({
                 "mbWishBody",
               )}
             >
-              {wish.message}
+              <EditableText elementKey="mbWishBody">
+                {wish.message}
+              </EditableText>
             </p>
           </RevealItem>
         ))}

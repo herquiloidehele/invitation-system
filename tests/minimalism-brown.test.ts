@@ -8,6 +8,7 @@ import {
   resolveWishes,
   contrastRatio,
   resolvePanelForeground,
+  readableOn,
   idleDelay,
   parallaxOffset,
   autoScrollFrame,
@@ -261,5 +262,26 @@ describe("isUserScroll", () => {
   it("detects a real move in either direction", () => {
     expect(isUserScroll(260, 200)).toBe(true);
     expect(isUserScroll(120, 200)).toBe(true);
+  });
+});
+
+describe("readableOn", () => {
+  it("returns the first candidate that clears AA", () => {
+    expect(readableOn("#C8A97E", ["#F5F1EF", "#7C6A60", "#3B322C"])).toBe(
+      "#3B322C",
+    );
+  });
+
+  it("keeps an early candidate when it already reads", () => {
+    expect(readableOn("#7C6A60", ["#F5F1EF", "#000000"])).toBe("#F5F1EF");
+  });
+
+  it("falls back to the highest contrast when none clears AA", () => {
+    // Both are near-white on white; neither passes, so the darker wins.
+    expect(readableOn("#FFFFFF", ["#FAFAFA", "#E0E0E0"])).toBe("#E0E0E0");
+  });
+
+  it("ignores candidates it cannot parse", () => {
+    expect(readableOn("#FFFFFF", ["var(--x)", "#000000"])).toBe("#000000");
   });
 });

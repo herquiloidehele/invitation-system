@@ -830,6 +830,13 @@ export interface TextStyleOverrides {
     mbWishName?: TextStyle;
     mbWishBody?: TextStyle;
     mbFooter?: TextStyle;
+    mbCountdownValue?: TextStyle;
+    mbCountdownLabel?: TextStyle;
+    mbGiftPrompt?: TextStyle;
+    mbButtonLabel?: TextStyle;
+    mbWishDate?: TextStyle;
+    mbVenueAddress?: TextStyle;
+    mbLinkLabel?: TextStyle;
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
     dressCodeText?: TextStyle;

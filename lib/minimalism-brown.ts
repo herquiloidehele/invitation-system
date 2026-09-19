@@ -91,6 +91,26 @@ export function contrastRatio(a: string, b: string): number | null {
 export const PANEL_CONTRAST_FLOOR = 3;
 
 /**
+ * Pick the first candidate that clears AA against `background`, falling back
+ * to the highest-contrast one. Used where a themed fill (the accent pip) can
+ * be any lightness and a fixed foreground would sometimes vanish.
+ */
+export function readableOn(background: string, candidates: string[]): string {
+  let best = candidates[0];
+  let bestRatio = -1;
+  for (const c of candidates) {
+    const r = contrastRatio(c, background);
+    if (r === null) continue;
+    if (r >= 4.5) return c;
+    if (r > bestRatio) {
+      bestRatio = r;
+      best = c;
+    }
+  }
+  return best;
+}
+
+/**
  * Foreground for the brown calendar block and CTAs.
  *
  * Most palettes are fine, but an admin is free to pick a pale primary, which

@@ -39,6 +39,8 @@ interface PolaroidProps {
   /** 0–100 focal point, matching the platform's imageSettings convention. */
   positionX?: number;
   positionY?: number;
+  /** Honours the invitation's heroMediaFit; "cover" fills the frame window. */
+  fit?: CSSProperties["objectFit"];
   style?: CSSProperties;
 }
 
@@ -57,6 +59,7 @@ export default function Polaroid({
   width = "min(88%, 400px)",
   positionX = 50,
   positionY = 50,
+  fit = "cover",
   style,
 }: PolaroidProps) {
   const t = mbTokens(theme);
@@ -97,7 +100,7 @@ export default function Polaroid({
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              objectFit: fit,
               objectPosition: `${positionX}% ${positionY}%`,
               display: "block",
             }}

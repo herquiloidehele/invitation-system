@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
+import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { EditableText } from "@/components/shared/EditableText";
 import SectionTitle from "./SectionTitle";
 import DateRow from "./DateRow";
@@ -53,6 +54,9 @@ export default function CeremonyInfo({
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
   const parents = invitation.parents;
+  // Non-wedding events have a single honouree; the role captions ("O Noivo" /
+  // "A Noiva") and the second name don't apply.
+  const isWedding = isWeddingEventType(invitation.eventType);
   const showParents =
     parents?.enabled &&
     (parents.bridesFather ||
@@ -161,35 +165,41 @@ export default function CeremonyInfo({
             {invitation.couple.groom}
           </EditableText>
         </p>
-        <p style={mbStyle(roleCaption, ts, "mbRoleCaption")}>
-          <EditableText elementKey="mbRoleCaption">
-            {ct("mb_groomCaption")}
-          </EditableText>
-        </p>
+        {isWedding && (
+          <p style={mbStyle(roleCaption, ts, "mbRoleCaption")}>
+            <EditableText elementKey="mbRoleCaption">
+              {ct("mb_groomCaption")}
+            </EditableText>
+          </p>
+        )}
 
-        <p
-          aria-hidden
-          style={{
-            margin: `${t.gap.row}px 0`,
-            fontFamily: theme.scriptFont ?? theme.displayFont,
-            fontSize: 35,
-            lineHeight: 1,
-            color: theme.textPrimary,
-          }}
-        >
-          &amp;
-        </p>
+        {isWedding && (
+          <>
+            <p
+              aria-hidden
+              style={{
+                margin: `${t.gap.row}px 0`,
+                fontFamily: theme.scriptFont ?? theme.displayFont,
+                fontSize: 35,
+                lineHeight: 1,
+                color: theme.textPrimary,
+              }}
+            >
+              &amp;
+            </p>
 
-        <p style={mbStyle(bigName, ts, "mbNames")}>
-          <EditableText elementKey="mbNames">
-            {invitation.couple.bride}
-          </EditableText>
-        </p>
-        <p style={mbStyle(roleCaption, ts, "mbRoleCaption")}>
-          <EditableText elementKey="mbRoleCaption">
-            {ct("mb_brideCaption")}
-          </EditableText>
-        </p>
+            <p style={mbStyle(bigName, ts, "mbNames")}>
+              <EditableText elementKey="mbNames">
+                {invitation.couple.bride}
+              </EditableText>
+            </p>
+            <p style={mbStyle(roleCaption, ts, "mbRoleCaption")}>
+              <EditableText elementKey="mbRoleCaption">
+                {ct("mb_brideCaption")}
+              </EditableText>
+            </p>
+          </>
+        )}
       </div>
 
       <div style={{ textAlign: "center", marginTop: t.gap.section / 2 }}>

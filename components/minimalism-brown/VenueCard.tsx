@@ -93,16 +93,22 @@ export default function VenueCard({
 
           {venue.address && (
             <p
-              style={{
-                margin: `${t.gap.row}px 0 0`,
-                fontFamily: theme.bodyFont,
-                fontSize: 12,
-                fontWeight: 300,
-                lineHeight: 1.7,
-                color: theme.textSecondary,
-              }}
+              style={mbStyle(
+                {
+                  margin: `${t.gap.row}px 0 0`,
+                  fontFamily: theme.bodyFont,
+                  fontSize: 12,
+                  fontWeight: 300,
+                  lineHeight: 1.7,
+                  color: theme.textSecondary,
+                },
+                ts,
+                "mbVenueAddress",
+              )}
             >
-              {venue.address}
+              <EditableText elementKey="mbVenueAddress">
+                {venue.address}
+              </EditableText>
             </p>
           )}
 
@@ -167,22 +173,28 @@ export default function VenueCard({
               href={mapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: 44,
-                padding: "0 16px",
-                marginTop: t.gap.block - 10,
-                fontFamily: theme.bodyFont,
-                fontSize: 14,
-                fontWeight: 600,
-                color: theme.textSecondary,
-                textDecoration: "underline",
-                textUnderlineOffset: 4,
-              }}
+              style={mbStyle(
+                {
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: 44,
+                  padding: "0 16px",
+                  marginTop: t.gap.block - 10,
+                  fontFamily: theme.bodyFont,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: theme.textSecondary,
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                },
+                ts,
+                "mbLinkLabel",
+              )}
             >
-              {ct("cta_openMap")}
+              <EditableText elementKey="mbLinkLabel">
+                {ct("cta_openMap")}
+              </EditableText>
             </a>
           )}
         </div>

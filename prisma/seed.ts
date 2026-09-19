@@ -235,14 +235,16 @@ const THEMES = [
     // Measured from the reference: the page ground is the pale cream and the
     // section cards are the warmer beige — not the other way round.
     bg: "#FFF7F3",
-    cardBg: "#F6EADD",
+    // Nudged from the reference's #F6EADD so body copy clears WCAG AA on it;
+    // the reference's own pairing sits at 4.34 / 3.19.
+    cardBg: "#F9F0E6",
     cardBorder: "rgba(124,106,96,0.10)",
     primary: "#7C6A60",
-    secondary: "#918077",
+    secondary: "#7A6B62",
     accent: "#C8A97E",
     textPrimary: "#7C6A60",
-    textSecondary: "#918077",
-    textMuted: "rgba(145,128,119,0.55)",
+    textSecondary: "#7A6B62",
+    textMuted: "#7A6B62",
     // Baskerville is a system face on Apple platforms, which is what the
     // reference renders with; Times New Roman is its fallback elsewhere, same
     // as the reference behaves.
@@ -254,7 +256,7 @@ const THEMES = [
     sectionTitleFontSize: 20,
     sectionTitleFontWeight: "700",
     ctaPrimaryBg: "#7C6A60",
-    ctaPrimaryText: "#DED9D7",
+    ctaPrimaryText: "#F5F1EF", // 4.58:1 on #7C6A60 — AA at body size; the reference ships #DED9D7 at 3.67:1
     ctaSecondaryBorder: "#7C6A60",
     ctaSecondaryText: "#7C6A60",
     ctaRadius: "9999px",

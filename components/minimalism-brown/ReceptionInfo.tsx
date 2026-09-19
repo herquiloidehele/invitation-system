@@ -113,22 +113,28 @@ export default function ReceptionInfo({
             <button
               type="button"
               onClick={onRsvpClick}
-              style={{
-                fontFamily: theme.bodyFont,
-                fontSize: 14,
-                fontWeight: 300,
-                letterSpacing: "0.35px",
-                textTransform: "uppercase",
-                color: t.panel.fg,
-                backgroundColor: t.panel.bg,
-                border: "none",
-                borderRadius: theme.ctaRadius,
-                padding: "12px 24px",
-                minHeight: 44,
-                cursor: "pointer",
-              }}
+              style={mbStyle(
+                {
+                  fontFamily: theme.bodyFont,
+                  fontSize: 14,
+                  fontWeight: 300,
+                  letterSpacing: "0.35px",
+                  textTransform: "uppercase",
+                  color: t.panel.fg,
+                  backgroundColor: t.panel.bg,
+                  border: "none",
+                  borderRadius: theme.ctaRadius,
+                  padding: "12px 24px",
+                  minHeight: 44,
+                  cursor: "pointer",
+                },
+                ts,
+                "mbButtonLabel",
+              )}
             >
-              {ct("cta_confirmButton")}
+              <EditableText elementKey="mbButtonLabel">
+                {ct("cta_confirmButton")}
+              </EditableText>
             </button>
           )}
         </div>

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { countdownPartsFrom } from "@/lib/elegant-floral";
-import { mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
+import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
+import { EditableText } from "@/components/shared/EditableText";
 import SectionTitle from "./SectionTitle";
 import { PaperTexture } from "./SectionCard";
 import { Reveal, RevealGroup, RevealItem, mbPop } from "./motion";
@@ -94,30 +95,42 @@ export default function Countdown({
               {/* Same grain scale as a full-width section card. */}
               <PaperTexture size="343px auto" />
               <div
-                style={{
-                  position: "relative",
-                  fontFamily: theme.displayFont,
-                  fontSize: 26,
-                  fontWeight: 400,
-                  lineHeight: 1.1,
-                  color: theme.textPrimary,
-                  fontVariantNumeric: "tabular-nums",
-                }}
+                style={mbStyle(
+                  {
+                    position: "relative",
+                    fontFamily: theme.displayFont,
+                    fontSize: 26,
+                    fontWeight: 400,
+                    lineHeight: 1.1,
+                    color: theme.textPrimary,
+                    fontVariantNumeric: "tabular-nums",
+                  },
+                  invitation.textStyles,
+                  "mbCountdownValue",
+                )}
               >
-                {String(cell.value).padStart(2, "0")}
+                <EditableText elementKey="mbCountdownValue">
+                  {String(cell.value).padStart(2, "0")}
+                </EditableText>
               </div>
               <div
-                style={{
-                  position: "relative",
-                  marginTop: 4,
-                  fontFamily: t.eyebrow.font,
-                  fontSize: t.eyebrow.size,
-                  letterSpacing: `${t.eyebrow.tracking}px`,
-                  textTransform: "uppercase",
-                  color: theme.textSecondary,
-                }}
+                style={mbStyle(
+                  {
+                    position: "relative",
+                    marginTop: 4,
+                    fontFamily: t.eyebrow.font,
+                    fontSize: t.eyebrow.size,
+                    letterSpacing: `${t.eyebrow.tracking}px`,
+                    textTransform: "uppercase",
+                    color: theme.textSecondary,
+                  },
+                  invitation.textStyles,
+                  "mbCountdownLabel",
+                )}
               >
-                {cell.label}
+                <EditableText elementKey="mbCountdownLabel">
+                  {cell.label}
+                </EditableText>
               </div>
             </div>
           </RevealItem>

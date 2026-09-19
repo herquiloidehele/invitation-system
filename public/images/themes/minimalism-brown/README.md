@@ -14,15 +14,14 @@ See `docs/superpowers/specs/2026-09-18-minimalism-brown-template-design.md`.
 Every `<img>` using these must set explicit width/height (or an aspect-ratio
 box) so the decorative layers cannot shift layout as they load.
 
-| File | px |
-|---|---|
-| cake.webp | 781 × 1129 |
-| flower2-decoration.webp | 499 × 1159 |
-| frame-avatar.webp | 1094 × 1554 |
-| gate.webp | 979 × 1084 |
-| giftbox.webp | 480 × 504 |
-| house-background.webp | 1188 × 1171 |
-| leaf-background.webp | 441 × 1254 |
-| paper-note.webp | 1405 × 1033 |
-| paper.webp | 1333 × 2000 |
-| water.webp | 736 × 1054 |
+| File | px | size |
+|---|---|---|
+| cake.webp | 144 × 208 | 12 KB |
+| flower2-decoration.webp | 320 × 743 | 79 KB |
+| frame-avatar.webp | 1094 × 1554 | 68 KB |
+| gate.webp | 144 × 159 | 16 KB |
+| giftbox.webp | 480 × 504 | 33 KB |
+| house-background.webp | 900 × 887 | 190 KB |
+| leaf-background.webp | 441 × 1254 | 62 KB |
+| paper.webp | 1333 × 2000 | 137 KB |
+| water.webp | 144 × 206 | 16 KB |

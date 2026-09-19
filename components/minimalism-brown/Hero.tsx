@@ -5,6 +5,9 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
+import { isWeddingEventType } from "@/lib/invitation-event-types";
+import { resolveTextStyles } from "@/lib/text-styles";
+import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
 import { EASE } from "@/components/shared/animations";
 import { EditableText } from "@/components/shared/EditableText";
 import Polaroid from "./Polaroid";
@@ -34,6 +37,13 @@ export default function Hero({
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
+  // Only a wedding pairs two names. A baptism or anniversary has one
+  // honouree, and showing "&" plus a second name invents a person.
+  const isWedding = isWeddingEventType(invitation.eventType);
+  // The free-text layer is hero media furniture, so it belongs on the
+  // still-image hero too — not only the video path.
+  const hideDefaultText = invitation.heroTextLayer?.hideDefaultText === true;
+  const resolved = resolveTextStyles(theme, ts);
   const { instant, reduced } = useMbMotion();
   const still = instant || reduced;
 
@@ -90,49 +100,62 @@ export default function Hero({
     <header
       style={{
         position: "relative",
+        // HeroTextOverlay sizes its blocks in `cqw`, which resolve against the
+        // nearest inline-size container — without this they collapse.
+        containerType: "inline-size",
         // Reference: 48px 16px 80px.
         padding: "48px 16px 80px",
       }}
     >
       <HouseBackdrop top="42%" />
-      <motion.p style={mbStyle(eyebrow, ts, "mbEyebrow")} {...enter(0.05)}>
-        <EditableText elementKey="mbEyebrow">
-          {ct("mb_heroEyebrow")}
-        </EditableText>
-      </motion.p>
+      {/* The free-text layer can replace the built-in hero text, same as on
+          the video hero. */}
+      {!hideDefaultText && (
+        <>
+        <motion.p style={mbStyle(eyebrow, ts, "mbEyebrow")} {...enter(0.05)}>
+          <EditableText elementKey="mbEyebrow">
+            {ct("mb_heroEyebrow")}
+          </EditableText>
+        </motion.p>
 
-      <motion.h1
-        style={{
-          margin: `${t.gap.row}px 0 0`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
-          flexWrap: "wrap",
-        }}
-        {...enter(0.18)}
-      >
-        <span style={mbStyle(name, ts, "mbNames")}>
-          <EditableText elementKey="mbNames">
-            {invitation.couple.groom}
-          </EditableText>
-        </span>
-        <span
-          aria-hidden
+        <motion.h1
           style={{
-            ...mbStyle(amp, ts, "mbAmpersand"),
-            display: "inline-block",
-            ...ampIdle,
+            margin: `${t.gap.row}px 0 0`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            flexWrap: "wrap",
           }}
+          {...enter(0.18)}
         >
-          &amp;
-        </span>
-        <span style={mbStyle(name, ts, "mbNames")}>
-          <EditableText elementKey="mbNames">
-            {invitation.couple.bride}
-          </EditableText>
-        </span>
-      </motion.h1>
+          <span style={mbStyle(name, ts, "mbNames")}>
+            <EditableText elementKey="mbNames">
+              {invitation.couple.groom}
+            </EditableText>
+          </span>
+          {isWedding && (
+            <>
+              <span
+                aria-hidden
+                style={{
+                  ...mbStyle(amp, ts, "mbAmpersand"),
+                  display: "inline-block",
+                  ...ampIdle,
+                }}
+              >
+                &amp;
+              </span>
+              <span style={mbStyle(name, ts, "mbNames")}>
+                <EditableText elementKey="mbNames">
+                  {invitation.couple.bride}
+                </EditableText>
+              </span>
+            </>
+          )}
+        </motion.h1>
+        </>
+      )}
 
       <motion.div
         style={{
@@ -149,8 +172,13 @@ export default function Hero({
             })}
       >
         <Polaroid
+          fit={invitation.heroMediaFit ?? undefined}
           src={invitation.heroImage}
-          alt={`${invitation.couple.groom} & ${invitation.couple.bride}`}
+          alt={
+            isWedding
+              ? `${invitation.couple.groom} & ${invitation.couple.bride}`
+              : invitation.couple.groom
+          }
           theme={theme}
         />
         <Sprig
@@ -186,6 +214,20 @@ export default function Hero({
           />
         </div>
       )}
+      {/* Free-positioned custom text, the same layer the video hero renders.
+          No videoRef here: its timing options key off a video's playback, and
+          a still-image hero has none, so blocks show immediately. */}
+      <HeroTextOverlay
+        layer={invitation.heroTextLayer}
+        fonts={{
+          display: resolved.displayFont,
+          body: resolved.bodyFont,
+          script: resolved.scriptFont,
+          ui: resolved.uiFont,
+        }}
+        play={!reduced}
+      />
+
     </header>
   );
 }
