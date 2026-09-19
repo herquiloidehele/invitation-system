@@ -4561,9 +4561,16 @@ export default function InvitationForm({
                   >
                     <TextStyleToolbar />
                     <CardStyleToolbar />
+                    {/* `overflow-x-clip` mirrors the live column
+                        (InvitationView's `overflow-hidden` shell): decorative
+                        images and carousels that bleed past the page edge are
+                        clipped there, so without it the preview pane scrolls
+                        sideways and every section looks shifted off-centre.
+                        Clip, not hidden — the Y axis must stay visible so the
+                        page can overflow `max-h-165` into the pane's scroll. */}
                     <div
                       ref={previewRootRef}
-                      className="mx-auto origin-top w-full max-h-165 relative"
+                      className="mx-auto origin-top w-full max-h-165 relative overflow-x-clip"
                     >
                       <NextIntlClientProvider
                         locale={activeLocale}

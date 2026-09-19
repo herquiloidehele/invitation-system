@@ -11,8 +11,7 @@ import SharedSchedule, {
 } from "@/components/shared/ScheduleSection";
 import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
-import TimelineTrack from "./TimelineTrack";
-import TimelineBloom from "./TimelineBloom";
+import ScrollTimeline from "@/components/shared/ScrollTimeline";
 import { Sprig } from "./Decor";
 import { Reveal, RevealGroup, RevealItem } from "./motion";
 
@@ -102,11 +101,10 @@ export default function Schedule({
             width: 0,
           }}
         >
-          <TimelineTrack theme={theme} containerRef={trackRef} />
-          <TimelineBloom
+          <ScrollTimeline
             theme={theme}
             containerRef={trackRef}
-            imageUrl={invitation.scheduleMarkerUrl}
+            markerImageUrl={invitation.scheduleMarkerUrl}
           />
         </div>
 
@@ -165,7 +163,7 @@ export default function Schedule({
             </span>
 
             {/* Spacer for the rail, which is drawn once for the whole list
-                (see TimelineTrack). The bloom is the only marker on it — the
+                (see ScrollTimeline). The bloom is the only marker on it — the
                 per-stop dots competed with the row icons for the same job. */}
             <span
               aria-hidden
