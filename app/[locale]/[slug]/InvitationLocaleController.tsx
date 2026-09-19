@@ -14,6 +14,7 @@ import {
 } from "@/lib/invitation-translations";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import InvitationView from "./InvitationView";
+import type { Wish } from "@/lib/minimalism-brown";
 
 interface InvitationLocaleControllerProps {
   /** Untranslated record, including its `translations` overlay. */
@@ -26,6 +27,8 @@ interface InvitationLocaleControllerProps {
   initialSection?: string;
   /** Admin AI-builder preview: skip the cover and show the invitation itself. */
   skipCover?: boolean;
+  /** Public guestbook wishes, resolved server-side. Minimalism-brown only. */
+  wishes?: Wish[];
 }
 
 /**
@@ -48,6 +51,7 @@ export default function InvitationLocaleController({
   lazyExternalIframe = false,
   initialSection,
   skipCover = false,
+  wishes,
 }: InvitationLocaleControllerProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -95,6 +99,7 @@ export default function InvitationLocaleController({
           lazyExternalIframe={lazyExternalIframe}
           initialSection={initialSection}
           skipCover={skipCover}
+          wishes={wishes}
         />
       </InvitationLocaleChangeProvider>
     </NextIntlClientProvider>

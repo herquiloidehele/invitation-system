@@ -89,6 +89,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InvitationPage from "@/components/shared/InvitationPage";
 import EntryPassQr from "@/components/shared/EntryPassQr";
 import ElegantFloralPage from "@/components/elegant-floral/ElegantFloralPage";
+import MinimalismBrownPage from "@/components/minimalism-brown/MinimalismBrownPage";
 import { InvitationLanguagePreviewProvider } from "@/components/shared/InvitationLanguageSwitcher";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import { InvitationLanguageSettings } from "@/components/admin/InvitationLanguageSettings";
@@ -981,6 +982,15 @@ export default function InvitationForm({
     }));
   }, []);
 
+  // Guestbook — publishes the messages guests leave on their RSVP. Off by
+  // default: those messages were written privately to the host.
+  const updateGuestbookEnabled = useCallback((enabled: boolean) => {
+    setForm((prev) => ({
+      ...prev,
+      guestbook: { ...(prev.guestbook ?? {}), enabled },
+    }));
+  }, []);
+
   // Guest Guide management
   const updateGuestGuideEnabled = useCallback((enabled: boolean) => {
     setForm((prev) => ({
@@ -1450,6 +1460,7 @@ export default function InvitationForm({
   }, [themes, form.template, form.envelope]);
 
   const isElegantFloral = currentTheme.layout === "elegant-floral";
+  const isMinimalismBrown = currentTheme.layout === "minimalism-brown";
   const hasSpacingStyles = Boolean(
     (form.spacingStyles?.sections &&
       Object.keys(form.spacingStyles.sections).length > 0) ||
@@ -3944,6 +3955,26 @@ export default function InvitationForm({
                 </AccordionContent>
               </AccordionItem>
 
+              {/* ── Livro de Honra (minimalism-brown) ── */}
+              {isMinimalismBrown && (
+                <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="guestbookEnabled">
+                      Mostrar livro de honra no convite
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      As mensagens deixadas na confirmação de presença passam a
+                      ser públicas. Os convidados são avisados no formulário.
+                    </p>
+                  </div>
+                  <Switch
+                    id="guestbookEnabled"
+                    checked={form.guestbook?.enabled === true}
+                    onCheckedChange={updateGuestbookEnabled}
+                  />
+                </div>
+              )}
+
               {/* ── Manual do Bom Convidado ── */}
               <GuestGuideFormSection
                 guestGuide={form.guestGuide ?? { enabled: false, items: [] }}
@@ -4502,7 +4533,14 @@ export default function InvitationForm({
                         onLocaleChange={setActiveLocale}
                       >
                         {hasRequiredNames ? (
-                          isElegantFloral ? (
+                          isMinimalismBrown ? (
+                            <MinimalismBrownPage
+                              invitation={previewInvitation}
+                              theme={currentTheme}
+                              isPreview
+                              animateHeroText
+                            />
+                          ) : isElegantFloral ? (
                             <ElegantFloralPage
                               invitation={previewInvitation}
                               theme={currentTheme}

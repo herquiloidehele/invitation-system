@@ -227,6 +227,11 @@ export default function RSVPForm(props: RSVPFormProps) {
   const resolveText = useCustomText(ct);
   const rsvpSchema = createRsvpSchema(resolveText);
   const guest = isIntegration(props) ? props.guest : undefined;
+  // When the host has turned the guestbook on, messages left here are shown
+  // publicly on the invitation. Guests wrote them privately, so say so at the
+  // point of writing rather than publishing them unannounced.
+  const messageIsPublic =
+    isIntegration(props) && props.invitation.guestbook?.enabled === true;
   const closed = isIntegration(props) && isRsvpClosed(props.invitation.rsvp);
   const showEmail = isIntegration(props)
     ? shouldShowRsvpEmail(props.invitation.rsvp)
@@ -945,6 +950,14 @@ export default function RSVPForm(props: RSVPFormProps) {
                 style={inputStyle}
                 suppressHydrationWarning
               />
+              {messageIsPublic && (
+                <p
+                  className="text-xs"
+                  style={{ color: p.textMuted, fontFamily: uiFont }}
+                >
+                  {resolveText("rsvp_messagePublicNote")}
+                </p>
+              )}
             </div>
 
             <RsvpActionButton

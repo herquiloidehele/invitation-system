@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { resolveSelectedRsvpSlug } from "@/lib/admin-rsvp-defaults";
-import type { RsvpCustomAnswer } from "@/lib/types";
+import type { GuestbookConfig, RsvpCustomAnswer } from "@/lib/types";
 import { RsvpsClient } from "./RsvpsClient";
 
 export const dynamic = "force-dynamic";
@@ -65,6 +65,7 @@ export default async function AdminRsvpsPage({
               id: true,
               slug: true,
               couple: true,
+              guestbook: true,
               theme: { select: { name: true } },
             },
           },
@@ -156,6 +157,8 @@ export type RsvpResponseWithInvitation = {
     slug: string;
     couple: { bride: string; groom: string };
     template: string;
+    /** Guestbook settings — drives the per-message publish control. */
+    guestbook?: GuestbookConfig | null;
   };
 };
 

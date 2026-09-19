@@ -706,7 +706,11 @@ export type CardSectionKey =
   | "faqs"
   | "countdown"
   | "places"
-  | "rsvp";
+  | "rsvp"
+  | "ceremonyInfo"
+  | "receptionInfo"
+  | "guestbook"
+  | "gallery";
 
 /** Per-section card styling overrides stored on each invitation.
  *  Missing keys or undefined fields fall back to theme defaults.
@@ -806,6 +810,26 @@ export interface TextStyleOverrides {
     efPill?: TextStyle;
     efFaqQuestion?: TextStyle;
     efFaqAnswer?: TextStyle;
+    // -- Minimalism Brown template (role-based keys) --
+    mbEyebrow?: TextStyle;
+    mbNames?: TextStyle;
+    mbAmpersand?: TextStyle;
+    mbSectionTitle?: TextStyle;
+    mbParentLabel?: TextStyle;
+    mbParentName?: TextStyle;
+    mbParentCity?: TextStyle;
+    mbAnnounce?: TextStyle;
+    mbRoleCaption?: TextStyle;
+    mbVenueLine?: TextStyle;
+    mbTimeValue?: TextStyle;
+    mbDateDay?: TextStyle;
+    mbDateMonth?: TextStyle;
+    mbDateYear?: TextStyle;
+    mbScheduleTime?: TextStyle;
+    mbScheduleLabel?: TextStyle;
+    mbWishName?: TextStyle;
+    mbWishBody?: TextStyle;
+    mbFooter?: TextStyle;
     sectionTitles?: TextStyle;
     bodyText?: TextStyle;
     dressCodeText?: TextStyle;
@@ -1002,6 +1026,20 @@ export interface CustomTexts {
   sectionTitle_guestGuide?: string;
   sectionTitle_faqs?: string;
   sectionTitle_gallery?: string;
+  sectionTitle_ceremonyInfo?: string;
+  sectionTitle_receptionInfo?: string;
+  sectionTitle_guestbook?: string;
+
+  // -- Minimalism Brown template --
+  mb_heroEyebrow?: string;
+  mb_groomCaption?: string;
+  mb_brideCaption?: string;
+  mb_receptionIntro?: string;
+  mb_ceremonyAt?: string;
+  mb_sendWishes?: string;
+  mb_giftTapToOpen?: string;
+  /** Shown under the RSVP message field when the guestbook publishes it. */
+  rsvp_messagePublicNote?: string;
 
   // -- CTA / Buttons --
   cta_confirmLabel?: string;
@@ -1228,6 +1266,18 @@ export interface AiAssetLibraryItem {
   height?: number | null;
 }
 
+/**
+ * Per-invitation guestbook settings (minimalism-brown layout). Absent, or
+ * `enabled: false`, means the section is hidden — RSVP messages were written
+ * privately to the host and stay that way until the host opts in.
+ */
+export interface GuestbookConfig {
+  enabled: boolean;
+  title?: string;
+  /** RsvpResponse ids the host has chosen not to publish. */
+  hiddenResponseIds?: string[];
+}
+
 export interface InvitationData {
   slug: string;
   /** Builder attachments. Only populated when renderMode is "ai". */
@@ -1305,6 +1355,8 @@ export interface InvitationData {
   faqs?: FAQItem[];
   /** "Manual do bom convidado" section — optional list of icon + label tips for guests. */
   guestGuide?: GuestGuide;
+  /** Public wishes wall fed from RSVP messages. Absent => disabled. */
+  guestbook?: GuestbookConfig;
   /** Per-invitation envelope appearance overrides. Missing fields fall back to theme defaults. */
   envelope?: EnvelopeConfig;
   /** Visual style for the Save the Date section. Defaults to "classic". */
@@ -1459,7 +1511,12 @@ export interface TemplateTheme {
    * - "video-entrance": VideoEntrancePage flow (single tap-to-play video as
    *   cover + hero, timed text reveal, then the same external sections)
    */
-  layout?: "default" | "curtain-canva" | "video-entrance" | "elegant-floral";
+  layout?:
+    | "default"
+    | "curtain-canva"
+    | "video-entrance"
+    | "elegant-floral"
+    | "minimalism-brown";
 }
 
 // ---------------------------------------------------------------------------

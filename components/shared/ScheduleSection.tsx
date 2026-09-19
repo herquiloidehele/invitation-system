@@ -112,7 +112,9 @@ const PRESET_ICONS: Record<Exclude<ScheduleIcon, "custom">, LucideIcon> = {
   map: MapIcon,
 };
 
-function ScheduleIconGraphic({
+/** Exported so bespoke layouts can reuse the preset icon set instead of
+ *  declaring a second registry. */
+export function ScheduleIconGraphic({
   icon,
   iconUrl,
   color,

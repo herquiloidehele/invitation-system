@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { Wish } from "@/lib/minimalism-brown";
 import {
   playHeroVideo,
   primeHeroVideoPlayback,
@@ -18,6 +19,7 @@ import { isCurtainCanvaLayout } from "@/lib/curtain-canva";
 import { isVideoEntranceLayout } from "@/lib/video-entrance";
 import { shouldRenderVideoSequenceCover } from "@/lib/cover-videos";
 import { isElegantFloralLayout } from "@/lib/elegant-floral";
+import { isMinimalismBrownLayout } from "@/lib/minimalism-brown";
 import {
   hasRichExternalSections,
   shouldPreloadRichExternalCanva,
@@ -64,6 +66,10 @@ const ElegantFloralPage = dynamic(
   () => import("@/components/elegant-floral/ElegantFloralPage"),
   { ssr: false },
 );
+const MinimalismBrownPage = dynamic(
+  () => import("@/components/minimalism-brown/MinimalismBrownPage"),
+  { ssr: false },
+);
 const AiInvitationView = dynamic(() => import("./AiInvitationView"), {
   ssr: false,
 });
@@ -81,6 +87,8 @@ interface InvitationViewProps {
   initialSection?: string;
   /** Admin AI-builder preview: skip the cover and show the invitation itself. */
   skipCover?: boolean;
+  /** Public guestbook wishes, resolved server-side. Minimalism-brown only. */
+  wishes?: Wish[];
 }
 
 export default function InvitationView({
@@ -90,6 +98,7 @@ export default function InvitationView({
   lazyExternalIframe = false,
   initialSection,
   skipCover = false,
+  wishes,
 }: InvitationViewProps) {
   // AI invitations render a generated bundle behind the platform-owned cover.
   // Branch first so none of the standard renderer's hooks are instantiated.
@@ -125,6 +134,7 @@ export default function InvitationView({
       isLandingPreview={isLandingPreview}
       lazyExternalIframe={lazyExternalIframe}
       initialSection={initialSection}
+      wishes={wishes}
     />
   );
 }
@@ -135,6 +145,7 @@ function EnvelopeInvitationView({
   isLandingPreview = false,
   lazyExternalIframe = false,
   initialSection,
+  wishes,
 }: InvitationViewProps) {
   // When arriving back from a sub-page (e.g. the gifts list) via `?section=`,
   // skip the envelope cover and reveal the content directly so we can scroll to
@@ -429,6 +440,21 @@ function EnvelopeInvitationView({
 
   /** Render the appropriate content based on invitation type. */
   function renderContent() {
+    // Minimalism-brown, like elegant-floral, keeps the envelope shell and
+    // swaps only the post-envelope page.
+    if (isMinimalismBrownLayout(theme)) {
+      return (
+        <MinimalismBrownPage
+          invitation={invitation}
+          theme={theme}
+          audioRef={audioRef}
+          prefetchedVideoRef={isHeroVideoInvitation ? heroVideoRef : undefined}
+          isLandingPreview={isLandingPreview}
+          wishes={wishes}
+          animateHeroText
+        />
+      );
+    }
     // Elegant-floral keeps the envelope shell but swaps the post-envelope page.
     if (isElegantFloralLayout(theme)) {
       return (

@@ -50,6 +50,9 @@ const THEMES = [
     bodyFont: "'Cormorant Garamond', serif",
     scriptFont: "'Great Vibes', cursive",
     uiFont: "'Outfit', sans-serif",
+    sectionTitleFont: null,
+    sectionTitleFontSize: null,
+    sectionTitleFontWeight: null,
     ctaPrimaryBg: "#C4A050",
     ctaPrimaryText: "#FFFFFF",
     ctaSecondaryBorder: "#8B1A4A",
@@ -86,6 +89,9 @@ const THEMES = [
     bodyFont: "'Cormorant Garamond', serif",
     scriptFont: null,
     uiFont: "'Outfit', sans-serif",
+    sectionTitleFont: null,
+    sectionTitleFontSize: null,
+    sectionTitleFontWeight: null,
     ctaPrimaryBg: "#2C2C2C",
     ctaPrimaryText: "#FAFAF7",
     ctaSecondaryBorder: "#D4AF37",
@@ -122,6 +128,9 @@ const THEMES = [
     bodyFont: "'Libre Baskerville', serif",
     scriptFont: "'Homemade Apple', cursive",
     uiFont: "'Outfit', sans-serif",
+    sectionTitleFont: null,
+    sectionTitleFontSize: null,
+    sectionTitleFontWeight: null,
     ctaPrimaryBg: "#A0715A",
     ctaPrimaryText: "#FFFFFF",
     ctaSecondaryBorder: "#A0715A",
@@ -158,6 +167,9 @@ const THEMES = [
     bodyFont: "'Lora', serif",
     scriptFont: null,
     uiFont: "'Outfit', sans-serif",
+    sectionTitleFont: null,
+    sectionTitleFontSize: null,
+    sectionTitleFontWeight: null,
     ctaPrimaryBg: "#FFD700",
     ctaPrimaryText: "#080C16",
     ctaSecondaryBorder: "#FFD700",
@@ -194,6 +206,9 @@ const THEMES = [
     bodyFont: "'Cormorant Garamond', serif",
     scriptFont: "'Pinyon Script', cursive",
     uiFont: "'Outfit', sans-serif",
+    sectionTitleFont: null,
+    sectionTitleFontSize: null,
+    sectionTitleFontWeight: null,
     ctaPrimaryBg: "#8C6A1C",
     ctaPrimaryText: "#FFFFFF",
     ctaSecondaryBorder: "#925F4A",
@@ -207,6 +222,49 @@ const THEMES = [
     ctaGlow: "rgba(184,144,47,0.25)",
     layout: "elegant-floral",
   },
+  {
+    id: "theme_minimalism_brown",
+    name: "minimalism-brown",
+    label: "Minimalism Brown",
+    description: "Terroso & Minimalista",
+    envelope: {
+      base: "#FFF7F3",
+      topFlap: "/images/top.png",
+      bottomFlap: "/images/bottom.png",
+    },
+    // Measured from the reference: the page ground is the pale cream and the
+    // section cards are the warmer beige — not the other way round.
+    bg: "#FFF7F3",
+    cardBg: "#F6EADD",
+    cardBorder: "rgba(124,106,96,0.10)",
+    primary: "#7C6A60",
+    secondary: "#918077",
+    accent: "#C8A97E",
+    textPrimary: "#7C6A60",
+    textSecondary: "#918077",
+    textMuted: "rgba(145,128,119,0.55)",
+    // Baskerville is a system face on Apple platforms, which is what the
+    // reference renders with; Times New Roman is its fallback elsewhere, same
+    // as the reference behaves.
+    displayFont: "'EB Garamond', serif",
+    bodyFont: "Baskerville, 'Times New Roman', serif",
+    scriptFont: "'The Nautigal', cursive",
+    uiFont: "'Cormorant Garamond', serif",
+    sectionTitleFont: "Baskerville, 'Times New Roman', serif",
+    sectionTitleFontSize: 20,
+    sectionTitleFontWeight: "700",
+    ctaPrimaryBg: "#7C6A60",
+    ctaPrimaryText: "#DED9D7",
+    ctaSecondaryBorder: "#7C6A60",
+    ctaSecondaryText: "#7C6A60",
+    ctaRadius: "9999px",
+    monogramColor: "rgba(255,255,255,0.85)",
+    tapTextColor: "rgba(255,255,255,0.75)",
+    bgGradient: null,
+    decorativeColor: "rgba(124,106,96,0.18)",
+    ctaGlow: "rgba(200,169,126,0.25)",
+    layout: "minimalism-brown",
+  },
 ];
 
 // Map from template slug → theme id
@@ -216,6 +274,7 @@ const TEMPLATE_TO_THEME_ID: Record<string, string> = {
   "boho-chic": "theme_boho_chic",
   "midnight-elegance": "theme_midnight_elegance",
   "elegant-floral": "theme_elegant_floral",
+  "minimalism-brown": "theme_minimalism_brown",
 };
 
 // Read all invitation JSON files
@@ -227,6 +286,7 @@ const jsonFiles = [
   "sofia-pedro.json",
   "leonor-diogo.json",
   "elma-osvaldo.json",
+  "constanca-rodrigo.json",
 ];
 
 async function main() {
@@ -264,6 +324,9 @@ async function main() {
         bgGradient: theme.bgGradient,
         decorativeColor: theme.decorativeColor,
         ctaGlow: theme.ctaGlow,
+        sectionTitleFont: theme.sectionTitleFont ?? null,
+        sectionTitleFontSize: theme.sectionTitleFontSize ?? null,
+        sectionTitleFontWeight: theme.sectionTitleFontWeight ?? null,
         layout: theme.layout,
       },
       create: {
@@ -295,6 +358,9 @@ async function main() {
         bgGradient: theme.bgGradient,
         decorativeColor: theme.decorativeColor,
         ctaGlow: theme.ctaGlow,
+        sectionTitleFont: theme.sectionTitleFont ?? null,
+        sectionTitleFontSize: theme.sectionTitleFontSize ?? null,
+        sectionTitleFontWeight: theme.sectionTitleFontWeight ?? null,
         layout: theme.layout,
       },
     });
@@ -357,6 +423,8 @@ async function main() {
         ),
         textStyles: data.textStyles ?? null,
         cardStyles: data.cardStyles ?? null,
+        spacingStyles: data.spacingStyles ?? null,
+        guestbook: data.guestbook ?? null,
       },
       create: {
         slug: data.slug,
@@ -397,8 +465,32 @@ async function main() {
         ),
         textStyles: data.textStyles ?? null,
         cardStyles: data.cardStyles ?? null,
+        spacingStyles: data.spacingStyles ?? null,
+        guestbook: data.guestbook ?? null,
       },
     });
+
+    // Demo guestbook entries. The guestbook renders the messages guests leave
+    // on their RSVP, so a demo invitation needs a few real RsvpResponse rows
+    // for that section to have anything to show.
+    if (Array.isArray(data.demoWishes) && data.demoWishes.length > 0) {
+      for (const [i, wish] of data.demoWishes.entries()) {
+        const id = `demo_wish_${data.slug}_${i}`;
+        const row = {
+          invitationSlug: data.slug,
+          guestName: wish.guestName as string,
+          attending: true,
+          message: wish.message as string,
+          submittedAt: new Date(wish.submittedAt as string),
+        };
+        await prisma.rsvpResponse.upsert({
+          where: { id },
+          update: row,
+          create: { id, ...row },
+        });
+      }
+      console.log(`    ↳ ${data.demoWishes.length} demo wishes`);
+    }
 
     console.log(
       `  ✓ ${data.slug} (${data.couple.bride} & ${data.couple.groom})`,

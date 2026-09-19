@@ -232,6 +232,9 @@ export async function PUT(
         ...(body.guestGuide !== undefined && {
           guestGuide: sanitizeJsonField(body.guestGuide, null),
         }),
+        ...(body.guestbook !== undefined && {
+          guestbook: sanitizeJsonField(body.guestbook, null),
+        }),
         ...(body.envelope !== undefined && {
           envelope: sanitizeJsonField(body.envelope, null),
         }),
