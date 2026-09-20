@@ -61,6 +61,8 @@ import {
   Link2,
   Sparkles,
   CopyPlus,
+  Ban,
+  LockOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -70,6 +72,7 @@ import {
   getInvitationDuplicatePath,
   getInvitationEditPath,
 } from "@/lib/admin-row-navigation";
+import { BlockInvitationDialog } from "./BlockInvitationDialog";
 
 const TEMPLATE_LABELS: Record<string, string> = {
   "pink-floral": "Pink Floral",
@@ -91,6 +94,11 @@ export function InvitationsClient({
   const [templateFilter, setTemplateFilter] = useState("all");
   const [demoTab, setDemoTab] = useState<"real" | "demo">("real");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [blockingId, setBlockingId] = useState<string | null>(null);
+  const [blockDialogFor, setBlockDialogFor] = useState<{
+    id: string;
+    coupleName: string;
+  } | null>(null);
 
   // Derived stats
   const totalRsvps = useMemo(
@@ -155,6 +163,54 @@ export function InvitationsClient({
         );
       } finally {
         setDeletingId(null);
+      }
+    },
+    [router],
+  );
+
+  const handleSetBlocked = useCallback(
+    async (id: string, coupleName: string, blocked: boolean, reason = "") => {
+      setBlockingId(id);
+      try {
+        const res = await fetch(`/api/admin/invitations/${id}/block`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ blocked, reason }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error ?? "Falha ao atualizar o bloqueio");
+        }
+        const updated = (await res.json()) as {
+          blockedAt: string | null;
+          blockedReason: string | null;
+        };
+        setInvitations((prev) =>
+          prev.map((inv) =>
+            inv.id === id
+              ? {
+                  ...inv,
+                  blockedAt: updated.blockedAt,
+                  blockedReason: updated.blockedReason,
+                }
+              : inv,
+          ),
+        );
+        setBlockDialogFor(null);
+        toast.success(
+          blocked
+            ? `Convite de ${coupleName} bloqueado.`
+            : `Convite de ${coupleName} desbloqueado.`,
+        );
+        router.refresh();
+      } catch (err) {
+        toast.error(
+          err instanceof Error
+            ? err.message
+            : "Erro ao atualizar o bloqueio. Tente novamente.",
+        );
+      } finally {
+        setBlockingId(null);
       }
     },
     [router],
@@ -410,6 +466,18 @@ export function InvitationsClient({
                               AI
                             </Badge>
                           )}
+                          {inv.blockedAt && (
+                            <Badge
+                              variant="destructive"
+                              className="ml-2"
+                              title={
+                                inv.blockedReason ??
+                                `Bloqueado em ${formatDate(inv.blockedAt)}`
+                              }
+                            >
+                              Bloqueado
+                            </Badge>
+                          )}
                         </TableCell>
 
                         <TableCell>
@@ -523,6 +591,81 @@ export function InvitationsClient({
                               <span className="sr-only">Editar</span>
                             </Link>
 
+                            {inv.blockedAt ? (
+                              <AlertDialog>
+                                <AlertDialogTrigger
+                                  render={
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="size-8 text-destructive"
+                                      disabled={blockingId === inv.id}
+                                      title="Desbloquear convite"
+                                    />
+                                  }
+                                >
+                                  <LockOpen className="size-4" />
+                                  <span className="sr-only">
+                                    Desbloquear convite
+                                  </span>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Desbloquear convite
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      O convite de <strong>{coupleName}</strong>{" "}
+                                      voltará a estar acessível para convidados
+                                      e anfitriões.
+                                      {inv.blockedReason && (
+                                        <>
+                                          {" "}
+                                          Motivo atual:{" "}
+                                          <em>{inv.blockedReason}</em>.
+                                        </>
+                                      )}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancelar
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() =>
+                                        handleSetBlocked(
+                                          inv.id,
+                                          coupleName,
+                                          false,
+                                        )
+                                      }
+                                      disabled={blockingId === inv.id}
+                                    >
+                                      {blockingId === inv.id
+                                        ? "A desbloquear..."
+                                        : "Desbloquear"}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-8 text-muted-foreground hover:text-destructive"
+                                disabled={blockingId === inv.id}
+                                title="Bloquear convite"
+                                onClick={() =>
+                                  setBlockDialogFor({ id: inv.id, coupleName })
+                                }
+                              >
+                                <Ban className="size-4" />
+                                <span className="sr-only">
+                                  Bloquear convite
+                                </span>
+                              </Button>
+                            )}
+
                             <AlertDialog>
                               <AlertDialogTrigger
                                 render={
@@ -586,6 +729,27 @@ export function InvitationsClient({
           )}
         </CardContent>
       </Card>
+
+      <BlockInvitationDialog
+        open={blockDialogFor !== null}
+        onOpenChange={(open) => {
+          if (!open) setBlockDialogFor(null);
+        }}
+        coupleName={blockDialogFor?.coupleName ?? ""}
+        pending={
+          blockDialogFor !== null && blockingId === blockDialogFor.id
+        }
+        onConfirm={(reason) => {
+          if (blockDialogFor) {
+            void handleSetBlocked(
+              blockDialogFor.id,
+              blockDialogFor.coupleName,
+              true,
+              reason,
+            );
+          }
+        }}
+      />
     </div>
   );
 }

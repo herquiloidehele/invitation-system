@@ -10,6 +10,8 @@ import {
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
 import { getInvitation } from "@/lib/invitations";
+import { getInvitationBlock } from "@/lib/invitation-block";
+import InvitationBlockedPage from "@/components/InvitationBlockedPage";
 import {
   getInvitationLocaleRedirectPath,
   getInvitationSearchParam,
@@ -43,6 +45,7 @@ import {
   buildAbsoluteUrl,
   buildLanguageAlternates,
   buildLocalePath,
+  createNoIndexMetadata,
   createPublicPageRobotsMetadata,
 } from "@/lib/seo";
 
@@ -67,6 +70,12 @@ export async function generateMetadata({
 
   if (!sourceInvitation) {
     const t = await getTranslations("Metadata");
+    // Blocked invitations get a neutral title and no Open Graph card, so a
+    // shared link never previews the original content.
+    const block = await getInvitationBlock(slug);
+    if (block) {
+      return { ...createNoIndexMetadata(), title: t("invitationBlocked") };
+    }
     return { title: t("invitationNotFound") };
   }
 
@@ -192,6 +201,12 @@ export default async function InvitationSlugPage({
   const sourceInvitation = await getInvitation(slug);
 
   if (!sourceInvitation) {
+    // The loader fails closed for blocked rows; distinguish blocked from
+    // missing so guests see the notice instead of a 404.
+    const block = await getInvitationBlock(slug);
+    if (block) {
+      return <InvitationBlockedPage reason={block.reason} locale={locale} />;
+    }
     notFound();
   }
 

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import {
+  invitationBlockSelect,
+  invitationBlockedResponse,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
+import {
   GuestValidationError,
   createGuest,
   getGuestsForInvitation,
@@ -25,6 +30,7 @@ async function resolveOwner(token: string) {
       slug: true,
       guestManagementEnabled: true,
       ownerCanAddGuests: true,
+      ...invitationBlockSelect,
     },
   });
   return invitation;
@@ -41,6 +47,9 @@ export async function GET(
       { error: "Invitation not found" },
       { status: 404 },
     );
+  }
+  if (isInvitationBlocked(inv)) {
+    return invitationBlockedResponse();
   }
   const guests = await getGuestsForInvitation(inv.slug);
   return NextResponse.json({
@@ -62,6 +71,9 @@ export async function POST(
       { error: "Invitation not found" },
       { status: 404 },
     );
+  }
+  if (isInvitationBlocked(inv)) {
+    return invitationBlockedResponse();
   }
   if (!inv.guestManagementEnabled) {
     return NextResponse.json(

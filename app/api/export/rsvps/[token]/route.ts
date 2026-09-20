@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import type { DocumentProps } from "@react-pdf/renderer";
 import type { ReactElement } from "react";
 import { prisma } from "@/lib/db";
+import {
+  invitationBlockedResponse,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
 import type { RsvpConfigWithEmail } from "@/lib/rsvp-config";
 
 export const dynamic = "force-dynamic";
@@ -70,6 +74,9 @@ export async function GET(
   });
 
   if (invitation) {
+    if (isInvitationBlocked(invitation)) {
+      return invitationBlockedResponse();
+    }
     const couple = asObj(invitation.couple);
     const coupleNames = `${str(couple.bride, "Noiva")} & ${str(couple.groom, "Noivo")}`;
     const dateDisplay = str(asObj(invitation.date).display);

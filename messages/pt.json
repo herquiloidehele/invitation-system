@@ -19,7 +19,8 @@
     "homeTitle": "Convites Digitais para Casamentos | Brindeal Studio",
     "homeDescription": "Convites digitais personalizados para casamentos e celebrações em Portugal, com RSVP online, mapa, música, modelos e partilha simples por WhatsApp.",
     "invitationNotFound": "Convite não encontrado",
-    "saveTheDateNotFound": "Save the Date não encontrado"
+    "saveTheDateNotFound": "Save the Date não encontrado",
+    "invitationBlocked": "Convite bloqueado"
   },
   "Landing": {
     "navAriaLabel": "Página inicial Brindeal",
@@ -556,5 +557,11 @@
     "mb_sendWishes": "Deixar mensagem",
     "mb_giftTapToOpen": "Toque para abrir",
     "rsvp_messagePublicNote": "A tua mensagem poderá ser mostrada no livro de honra do convite."
+  },
+  "InvitationBlocked": {
+    "title": "Convite bloqueado",
+    "description": "Este convite foi bloqueado e de momento não está disponível.",
+    "reasonLabel": "Motivo",
+    "footer": "Brindeal Studio — Convites Digitais"
   }
 }

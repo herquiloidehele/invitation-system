@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { prisma } from "@/lib/db";
+import {
+  invitationBlockSelect,
+  invitationBlockedResponse,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
 import { parseScannedValue } from "@/lib/checkin";
 import { applyCheckIn, undoCheckIn } from "@/lib/checkin-service";
 
@@ -13,7 +18,7 @@ const schema = z.object({
 async function resolveOwner(token: string) {
   return prisma.invitation.findUnique({
     where: { ownerToken: token },
-    select: { slug: true, checkInEnabled: true },
+    select: { slug: true, checkInEnabled: true, ...invitationBlockSelect },
   });
 }
 
@@ -25,6 +30,9 @@ export async function POST(
   const inv = await resolveOwner(token);
   if (!inv) {
     return NextResponse.json({ error: "Invitation not found" }, { status: 404 });
+  }
+  if (isInvitationBlocked(inv)) {
+    return invitationBlockedResponse();
   }
   if (!inv.checkInEnabled) {
     return NextResponse.json(

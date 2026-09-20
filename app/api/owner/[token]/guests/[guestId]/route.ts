@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import {
+  invitationBlockSelect,
+  invitationBlockedResponse,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
+import {
   GuestValidationError,
   deleteGuest,
   updateGuest,
@@ -21,7 +26,7 @@ const updateSchema = z
   .strict();
 
 type ResolveResult =
-  | { error: "not-found" | "forbidden" }
+  | { error: "not-found" | "forbidden" | "blocked" }
   | {
       invitation: { slug: string; guestManagementEnabled: boolean };
       guest: { id: string; invitationSlug: string };
@@ -33,9 +38,14 @@ async function resolveOwnerAndGuest(
 ): Promise<ResolveResult> {
   const invitation = await prisma.invitation.findUnique({
     where: { ownerToken: token },
-    select: { slug: true, guestManagementEnabled: true },
+    select: {
+      slug: true,
+      guestManagementEnabled: true,
+      ...invitationBlockSelect,
+    },
   });
   if (!invitation) return { error: "not-found" };
+  if (isInvitationBlocked(invitation)) return { error: "blocked" };
 
   const guest = await prisma.guest.findUnique({
     where: { id: guestId },
@@ -48,9 +58,12 @@ async function resolveOwnerAndGuest(
   return { invitation, guest };
 }
 
-function errorResponse(kind: "not-found" | "forbidden") {
+function errorResponse(kind: "not-found" | "forbidden" | "blocked") {
   if (kind === "not-found") {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  if (kind === "blocked") {
+    return invitationBlockedResponse();
   }
   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }

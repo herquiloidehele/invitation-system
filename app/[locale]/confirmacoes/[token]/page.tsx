@@ -4,6 +4,11 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/db";
 import {
+  getInvitationBlockState,
+  invitationBlockSelect,
+} from "@/lib/invitation-block";
+import InvitationBlockedPage from "@/components/InvitationBlockedPage";
+import {
   CheckCircle2,
   XCircle,
   Users,
@@ -49,7 +54,7 @@ export async function generateMetadata({
   // Invitation first (most common), then save-the-date.
   const invitation = await prisma.invitation.findUnique({
     where: { ownerToken: token },
-    select: { couple: true, ownerSocialPreview: true },
+    select: { couple: true, ownerSocialPreview: true, ...invitationBlockSelect },
   });
   const std = invitation
     ? null
@@ -60,6 +65,12 @@ export async function generateMetadata({
 
   const row = invitation ?? std;
   if (!row) return base;
+
+  // A blocked invitation's owner page must not preview the original content.
+  if (invitation && getInvitationBlockState(invitation)) {
+    const tm = await getTranslations({ locale, namespace: "Metadata" });
+    return { ...base, title: tm("invitationBlocked") };
+  }
 
   const couple = row.couple as { bride?: string; groom?: string };
   const coupleLabel = [couple.bride, couple.groom].filter(Boolean).join(" & ");
@@ -691,6 +702,10 @@ export default async function OwnerRsvpPage({ params, searchParams }: Props) {
   });
 
   if (invitation) {
+    const block = getInvitationBlockState(invitation);
+    if (block) {
+      return <InvitationBlockedPage reason={block.reason} locale={locale} />;
+    }
     return (
       <InvitationRsvpView
         token={token}

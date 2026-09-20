@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import {
+  invitationBlockSelect,
+  invitationBlockedResponse,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
 import { getPublicGuestByToken } from "@/lib/guests";
 
 export async function GET(
@@ -16,8 +21,11 @@ export async function GET(
   // do not surface the personalization at all.
   const invitation = await prisma.invitation.findUnique({
     where: { slug: guest.invitationSlug },
-    select: { guestManagementEnabled: true },
+    select: { guestManagementEnabled: true, ...invitationBlockSelect },
   });
+  if (invitation && isInvitationBlocked(invitation)) {
+    return invitationBlockedResponse();
+  }
   if (!invitation || !invitation.guestManagementEnabled) {
     return NextResponse.json({ error: "Guest not found" }, { status: 404 });
   }

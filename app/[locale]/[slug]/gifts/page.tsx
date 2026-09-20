@@ -7,6 +7,8 @@ import {
 } from "@/lib/gift-registry";
 import { getGiftAvailability } from "@/lib/gift-reservations";
 import { getInvitation } from "@/lib/invitations";
+import { getInvitationBlock } from "@/lib/invitation-block";
+import InvitationBlockedPage from "@/components/InvitationBlockedPage";
 import {
   getInvitationLocaleRedirectPath,
   getInvitationSearchParam,
@@ -37,7 +39,13 @@ export default async function GiftsPage({
   const guestToken = getInvitationSearchParam(resolvedSearchParams, "g");
 
   const sourceInvitation = await getInvitation(slug);
-  if (!sourceInvitation) notFound();
+  if (!sourceInvitation) {
+    const block = await getInvitationBlock(slug);
+    if (block) {
+      return <InvitationBlockedPage reason={block.reason} locale={locale} />;
+    }
+    notFound();
+  }
 
   const pathname = buildLocalePath(`/${slug}/gifts`, locale);
   const redirectPath = getInvitationLocaleRedirectPath(
