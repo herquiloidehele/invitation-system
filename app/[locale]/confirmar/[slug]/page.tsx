@@ -11,6 +11,8 @@ import {
   supportsInvitationTranslations,
 } from "@/lib/invitation-translations";
 import { getInvitation } from "@/lib/invitations";
+import { getInvitationBlock } from "@/lib/invitation-block";
+import InvitationBlockedPage from "@/components/InvitationBlockedPage";
 import {
   getRsvpCustomFields,
   isRsvpClosed,
@@ -56,7 +58,13 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
   const guestToken = getInvitationSearchParam(resolvedSearchParams, "g");
 
   const sourceInvitation = await getInvitation(slug);
-  if (!sourceInvitation) notFound();
+  if (!sourceInvitation) {
+    const block = await getInvitationBlock(slug);
+    if (block) {
+      return <InvitationBlockedPage reason={block.reason} locale={locale} />;
+    }
+    notFound();
+  }
 
   const pathname = buildLocalePath(`/confirmar/${slug}`, locale);
   const redirectPath = getInvitationLocaleRedirectPath(

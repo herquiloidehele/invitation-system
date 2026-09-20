@@ -251,6 +251,10 @@ export const getInvitation = cache(
       include: includeTheme,
     });
     if (!row) return null;
+    // Fail closed: a blocked invitation is invisible to every consumer of this
+    // loader. Pages that must tell "blocked" from "missing" call
+    // `getInvitationBlock(slug)` from lib/invitation-block.ts.
+    if (row.blockedAt) return null;
     const data = toInvitationData(row as unknown as InvitationWithTheme);
 
     // Builder attachments are only meaningful to a generated bundle, so the

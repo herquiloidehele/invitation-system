@@ -1,6 +1,12 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { createNoIndexMetadata } from "@/lib/seo";
+import { resolveLocale } from "@/i18n/locales";
+import {
+  getInvitationBlockState,
+  invitationBlockSelect,
+} from "@/lib/invitation-block";
+import InvitationBlockedPage from "@/components/InvitationBlockedPage";
 import PassView from "./PassView";
 
 export const dynamic = "force-dynamic";
@@ -12,15 +18,31 @@ type Props = {
 };
 
 export default async function PassPage({ params, searchParams }: Props) {
-  const { slug } = await params;
+  const { locale: rawLocale, slug } = await params;
   const { c } = await searchParams;
   if (!c) notFound();
 
   const invitation = await prisma.invitation.findUnique({
     where: { slug },
-    select: { slug: true, checkInEnabled: true, qrCodeStyle: true },
+    select: {
+      slug: true,
+      checkInEnabled: true,
+      qrCodeStyle: true,
+      ...invitationBlockSelect,
+    },
   });
-  if (!invitation || !invitation.checkInEnabled) notFound();
+  if (!invitation) notFound();
+
+  const block = getInvitationBlockState(invitation);
+  if (block) {
+    return (
+      <InvitationBlockedPage
+        reason={block.reason}
+        locale={resolveLocale(rawLocale)}
+      />
+    );
+  }
+  if (!invitation.checkInEnabled) notFound();
 
   const rsvp = await prisma.rsvpResponse.findUnique({
     where: { checkInToken: c },

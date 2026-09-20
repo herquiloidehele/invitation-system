@@ -1,5 +1,10 @@
 import { prisma } from "./db";
 import {
+  INVITATION_BLOCKED_MESSAGE,
+  invitationBlockSelect,
+  isInvitationBlocked,
+} from "./invitation-block";
+import {
   slugifyName,
   DEFAULT_COUNTRY_CODE,
   DEFAULT_GUEST_MESSAGE_TEMPLATE,
@@ -263,6 +268,7 @@ export async function deleteGuest(guestId: string): Promise<void> {
  *  - inviter must exist
  *  - inviter must have canInviteOthers === true
  *  - the invitation must have guestManagementEnabled === true
+ *  - the invitation must not be blocked by an admin
  *  - new guest is forced canInviteOthers = false (no chains)
  *  - phone fields are stored empty (host can fill later)
  */
@@ -273,10 +279,17 @@ export async function selfRegisterGuest(input: {
 }): Promise<GuestData> {
   const inviter = await prisma.guest.findUnique({
     where: { token: input.inviterToken },
-    include: { invitation: { select: { guestManagementEnabled: true } } },
+    include: {
+      invitation: {
+        select: { guestManagementEnabled: true, ...invitationBlockSelect },
+      },
+    },
   });
   if (!inviter) {
     throw new GuestValidationError("Convite não encontrado", "inviterToken");
+  }
+  if (isInvitationBlocked(inviter.invitation)) {
+    throw new GuestValidationError(INVITATION_BLOCKED_MESSAGE, "inviterToken");
   }
   if (!inviter.canInviteOthers) {
     throw new GuestValidationError(

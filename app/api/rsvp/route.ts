@@ -3,6 +3,11 @@ import { z } from "zod/v4";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import {
+  invitationBlockSelect,
+  invitationBlockedResponse,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
+import {
   normalizeRsvpCustomFields,
   validateRsvpCustomAnswers,
 } from "@/lib/rsvp-custom-fields";
@@ -58,7 +63,7 @@ export async function POST(request: NextRequest) {
     // Verify that the invitation exists
     const invitation = await prisma.invitation.findUnique({
       where: { slug: data.invitationSlug },
-      select: { slug: true, rsvp: true },
+      select: { slug: true, rsvp: true, ...invitationBlockSelect },
     });
 
     if (!invitation) {
@@ -69,6 +74,12 @@ export async function POST(request: NextRequest) {
         },
         { status: 404 },
       );
+    }
+
+    // Admin block wins over every feature flag — blocked invitations accept
+    // nothing, even when confirmations are open.
+    if (isInvitationBlocked(invitation)) {
+      return invitationBlockedResponse();
     }
 
     // Host has closed confirmations for this invitation — reject new responses.

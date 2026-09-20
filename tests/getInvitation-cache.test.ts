@@ -61,6 +61,18 @@ describe("getInvitation request-scoped caching", () => {
       },
     });
   });
+
+  it("resolves null for a blocked invitation (fail closed)", async () => {
+    findUniqueInvitation.mockResolvedValue({
+      id: "inv_1",
+      slug: "slug-a",
+      themeId: "theme_1",
+      blockedAt: new Date("2026-09-20T10:00:00Z"),
+      blockedReason: null,
+    });
+    const { getInvitation } = await import("../lib/invitations");
+    await expect(getInvitation("slug-a")).resolves.toBeNull();
+  });
 });
 
 describe("getTheme request-scoped caching", () => {

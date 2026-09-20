@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import {
+  invitationBlockSelect,
+  invitationBlockedResponse,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
 import { parseScannedValue } from "@/lib/checkin";
 import { resolveSubject } from "@/lib/checkin-service";
 
 async function resolveOwner(token: string) {
   return prisma.invitation.findUnique({
     where: { ownerToken: token },
-    select: { slug: true, checkInEnabled: true },
+    select: { slug: true, checkInEnabled: true, ...invitationBlockSelect },
   });
 }
 
@@ -18,6 +23,9 @@ export async function GET(
   const inv = await resolveOwner(token);
   if (!inv) {
     return NextResponse.json({ error: "Invitation not found" }, { status: 404 });
+  }
+  if (isInvitationBlocked(inv)) {
+    return invitationBlockedResponse();
   }
   if (!inv.checkInEnabled) {
     return NextResponse.json(

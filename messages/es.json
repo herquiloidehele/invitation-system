@@ -19,7 +19,8 @@
     "homeTitle": "Invitaciones Digitales para Bodas | Brindeal Studio",
     "homeDescription": "Invitaciones digitales personalizadas para bodas y celebraciones en Portugal, con RSVP online, mapa, música, modelos y envío fácil por WhatsApp.",
     "invitationNotFound": "Invitación no encontrada",
-    "saveTheDateNotFound": "Save the Date no encontrado"
+    "saveTheDateNotFound": "Save the Date no encontrado",
+    "invitationBlocked": "Invitación bloqueada"
   },
   "Landing": {
     "navAriaLabel": "Página inicial de Brindeal",
@@ -556,5 +557,11 @@
     "mb_sendWishes": "Enviar deseos",
     "mb_giftTapToOpen": "Toca para abrir",
     "rsvp_messagePublicNote": "Tu mensaje podría aparecer en el libro de firmas de la invitación."
+  },
+  "InvitationBlocked": {
+    "title": "Invitación bloqueada",
+    "description": "Esta invitación ha sido bloqueada y no está disponible por el momento.",
+    "reasonLabel": "Motivo",
+    "footer": "Brindeal Studio — Invitaciones Digitales"
   }
 }

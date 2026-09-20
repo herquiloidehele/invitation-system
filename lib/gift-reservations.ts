@@ -9,6 +9,10 @@ import {
 import { isExclusiveGiftSelectionEnabled } from "@/lib/gift-registry";
 import type { GiftItem, GiftRegistry } from "@/lib/types";
 import { prisma } from "@/lib/db";
+import {
+  invitationBlockSelect,
+  isInvitationBlocked,
+} from "@/lib/invitation-block";
 
 export type GiftReservationErrorCode =
   | "bad_request"
@@ -16,7 +20,8 @@ export type GiftReservationErrorCode =
   | "forbidden"
   | "not_found"
   | "disabled"
-  | "conflict";
+  | "conflict"
+  | "blocked";
 
 export class GiftReservationError extends Error {
   constructor(
@@ -38,6 +43,7 @@ export function giftReservationErrorStatus(
     not_found: 404,
     conflict: 409,
     disabled: 422,
+    blocked: 403,
   }[code];
 }
 
@@ -81,10 +87,13 @@ async function loadExclusiveInvitation(
 ): Promise<ExclusiveInvitation> {
   const invitation = await prisma.invitation.findUnique({
     where: { slug },
-    select: { slug: true, giftRegistry: true },
+    select: { slug: true, giftRegistry: true, ...invitationBlockSelect },
   });
   if (!invitation) {
     throw new GiftReservationError("not_found", "Invitation not found");
+  }
+  if (isInvitationBlocked(invitation)) {
+    throw new GiftReservationError("blocked", "Invitation blocked");
   }
 
   const registry = asGiftRegistry(invitation.giftRegistry);
@@ -319,10 +328,13 @@ export async function releaseGuestGift(
 async function resolveOwnerInvitation(ownerToken: string) {
   const invitation = await prisma.invitation.findUnique({
     where: { ownerToken },
-    select: { slug: true, giftRegistry: true },
+    select: { slug: true, giftRegistry: true, ...invitationBlockSelect },
   });
   if (!invitation) {
     throw new GiftReservationError("not_found", "Invitation not found");
+  }
+  if (isInvitationBlocked(invitation)) {
+    throw new GiftReservationError("blocked", "Invitation blocked");
   }
   return {
     slug: invitation.slug,

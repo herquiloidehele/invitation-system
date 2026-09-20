@@ -10,6 +10,9 @@ export type InvitationRow = {
   couple: { bride: string; groom: string; monogram?: string };
   eventType: "wedding" | "anniversary" | "baptism" | "engagement" | "other";
   isDemo: boolean;
+  /** Set when an admin blocked the invitation (null = live). */
+  blockedAt: Date | string | null;
+  blockedReason: string | null;
   date: { display: string; iso?: string };
   rsvp: { enabled: boolean };
   /** "standard" | "ai" — AI invitations route to their own builder page. */
@@ -28,6 +31,8 @@ export default async function AdminInvitationsPage() {
       couple: true,
       eventType: true,
       isDemo: true,
+      blockedAt: true,
+      blockedReason: true,
       date: true,
       rsvp: true,
       renderMode: true,
