@@ -2498,10 +2498,8 @@ export default function InvitationForm({
                       <Label>Fundo do convite</Label>
                       <p className="text-xs text-muted-foreground">
                         Padrão repetido atrás de todo o convite, à largura da
-                        coluna.{" "}
-                        {isElegantFloral
-                          ? "Sem imagem, o modelo usa o damasco incluído."
-                          : "Sem imagem, o convite mantém apenas a cor de fundo do tema."}
+                        coluna. Sem imagem, o convite mantém apenas a cor de
+                        fundo do tema.
                       </p>
                       <MediaUpload
                         kind="image"

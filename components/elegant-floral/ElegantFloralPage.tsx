@@ -17,11 +17,7 @@ import FaqSection from "./FaqSection";
 import GuestGuideSection from "@/components/shared/GuestGuideSection";
 import ScriptTitle from "./ScriptTitle";
 import { EfRevealProvider, Reveal } from "./motion";
-import {
-  efGuestGuideCardStyle,
-  EF_PAGE_BACKGROUND,
-  efStyle,
-} from "@/lib/elegant-floral";
+import { efGuestGuideCardStyle, efStyle } from "@/lib/elegant-floral";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
@@ -73,11 +69,7 @@ export default function ElegantFloralPage({
       <EfRevealProvider instant={isPreview ?? false}>
         <div
           style={{
-            ...pageBackgroundStyle(
-              theme,
-              invitation.pageBackgroundImageUrl,
-              EF_PAGE_BACKGROUND,
-            ),
+            ...pageBackgroundStyle(theme, invitation.pageBackgroundImageUrl),
             color: theme.textPrimary,
           }}
         >

@@ -1,14 +1,10 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   isElegantFloralLayout,
   resolveLocationPhotos,
   wrapCarouselIndex,
   countdownPartsFrom,
-  EF_PAGE_BACKGROUND,
-  EF_BACKGROUND_PATTERN,
-  EF_BACKGROUND_TILE_WIDTH,
   efGuestGuideCardStyle,
 } from "../lib/elegant-floral";
 
@@ -78,25 +74,10 @@ describe("countdownPartsFrom", () => {
   });
 });
 
-describe("elegant-floral bundled background", () => {
-  it("describes the damask at the tile width tuned for that artwork", () => {
-    expect(EF_PAGE_BACKGROUND).toEqual({
-      url: EF_BACKGROUND_PATTERN,
-      tileWidth: EF_BACKGROUND_TILE_WIDTH,
-    });
-  });
-
-  it("points at an asset that actually ships in public/", () => {
-    expect(
-      existsSync(join(process.cwd(), "public", EF_BACKGROUND_PATTERN)),
-    ).toBe(true);
-  });
-});
-
 describe("efGuestGuideCardStyle", () => {
   const theme = { secondary: "#C9A962" };
 
-  it("defaults to the translucent wash so the damask reads through", () => {
+  it("defaults to the translucent wash so a page background reads through", () => {
     const s = efGuestGuideCardStyle(theme);
     expect(s.cardBg).toBe("color-mix(in srgb, #C9A962 8%, transparent)");
     expect(s.cardBorder).toBe("color-mix(in srgb, #C9A962 28%, transparent)");

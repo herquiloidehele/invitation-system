@@ -7,7 +7,6 @@ import type {
   TextStyleOverrides,
 } from "./types";
 import { applyOverride } from "./text-styles";
-import type { PageBackgroundFallback } from "./page-background";
 
 /**
  * Returns true when the theme should render via the ElegantFloralPage pipeline.
@@ -21,41 +20,13 @@ export function isElegantFloralLayout(
 }
 
 /**
- * The damask pattern behind the whole elegant-floral page. Sits on the page
- * root so every section scrolls over it; `theme.bg` still paints the base
- * colour underneath, which shows through the asset's cream ground.
- */
-export const EF_BACKGROUND_PATTERN =
-  "/images/themes/elegant-floral/damask.webp";
-
-/**
- * Tile width in px. The damask is drawn at phone-screen scale, so pinning the
- * width keeps one motif roughly one handset wide and stops the pattern
- * stretching on desktop — it repeats instead.
- *
- * This is twice the source artwork's width because `damask.webp` is a
- * horizontally mirrored pair (see that folder's README): displaying the pair at
- * 840px renders each motif at the 420px the original was drawn for.
- */
-export const EF_BACKGROUND_TILE_WIDTH = 840;
-
-/**
- * The damask as a page-background fallback, handed to `pageBackgroundStyle` by
- * ElegantFloralPage. This layout is the only one with a bundled pattern; every
- * other layout passes no fallback and stays bare until the host uploads one.
- */
-export const EF_PAGE_BACKGROUND: PageBackgroundFallback = {
-  url: EF_BACKGROUND_PATTERN,
-  tileWidth: EF_BACKGROUND_TILE_WIDTH,
-};
-
-/**
  * Card surface for the guest-guide item grid on this layout.
  *
  * Defaults to the translucent wash the gifts grid uses (see GiftsSection) so
- * the damask page background reads through each tile instead of twelve opaque
- * rectangles punching holes in it. A per-invitation `cardStyles.guestGuide`
- * override still wins, so the admin's card controls keep working here.
+ * a host-uploaded page background reads through each tile instead of twelve
+ * opaque rectangles punching holes in it. A per-invitation
+ * `cardStyles.guestGuide` override still wins, so the admin's card controls
+ * keep working here.
  */
 export function efGuestGuideCardStyle(
   theme: Pick<TemplateTheme, "secondary">,
