@@ -16,7 +16,7 @@ import { autoScrollFrame, isUserScroll } from "@/lib/auto-scroll";
  * and the photo — it reads as the page running away from them rather than
  * offering to turn the page.
  */
-const AUTO_SCROLL_DELAY_MS = 2000;
+const AUTO_SCROLL_DELAY_MS = 1500;
 
 /**
  * Carry the reader gently down the page when the invitation opens, and get out
@@ -30,7 +30,7 @@ const AUTO_SCROLL_DELAY_MS = 2000;
  */
 export function useAutoScroll({
   enabled,
-  speedPxPerSec = 46,
+  speedPxPerSec = 150,
   startDelayMs = AUTO_SCROLL_DELAY_MS,
 }: {
   enabled: boolean;
