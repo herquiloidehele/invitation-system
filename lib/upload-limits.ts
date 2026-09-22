@@ -10,6 +10,7 @@ const DEFAULT_MAX_SIZES: Record<UploadFolder, number> = {
 };
 
 const RSVP_BACKGROUND_MAX_BYTES = 500 * 1024;
+const PAGE_BACKGROUND_MAX_BYTES = 1024 * 1024;
 const HERO_VIDEO_MAX_BYTES = 500 * 1024 * 1024;
 
 export function getUploadMaxSizeBytes(
@@ -18,6 +19,12 @@ export function getUploadMaxSizeBytes(
 ): number {
   if (profile === "rsvp-background" && folder === "images") {
     return RSVP_BACKGROUND_MAX_BYTES;
+  }
+
+  // Backgrounds are transcoded to a tiny WebP client-side; this is only a
+  // server-side guard against an upload that skips that path.
+  if (profile === "page-background" && folder === "images") {
+    return PAGE_BACKGROUND_MAX_BYTES;
   }
 
   if (profile === "hero-video" && folder === "videos") {

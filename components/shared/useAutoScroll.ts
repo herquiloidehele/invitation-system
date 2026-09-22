@@ -30,7 +30,7 @@ const AUTO_SCROLL_DELAY_MS = 1500;
  */
 export function useAutoScroll({
   enabled,
-  speedPxPerSec = 150,
+  speedPxPerSec = 120,
   startDelayMs = AUTO_SCROLL_DELAY_MS,
 }: {
   enabled: boolean;

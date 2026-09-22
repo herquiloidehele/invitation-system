@@ -4,6 +4,7 @@ import axios from "axios";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import imageCompression from "browser-image-compression";
+import { resolveImageCompression } from "@/lib/upload-compression";
 import {
   ImageIcon,
   VideoIcon,
@@ -131,21 +132,21 @@ export default function MediaUpload({
       try {
         let fileToUpload = file;
 
-        // Compress images client-side before uploading.
-        // SVGs are vector and GIFs are (often) animated: compressing either
-        // via canvas would rasterise/flatten them, so upload those as-is.
-        if (
-          kind === "image" &&
-          file.type !== "image/svg+xml" &&
-          file.type !== "image/gif"
-        ) {
-          setUploadState({ status: "compressing" });
-          fileToUpload = await imageCompression(file, {
-            maxSizeMB: Math.min(maxSizeMB, 2),
-            maxWidthOrHeight: 2560,
-            useWebWorker: true,
-            fileType: file.type as "image/jpeg" | "image/png" | "image/webp",
+        // Compress images client-side before uploading. The helper decides
+        // the format and budget: page backgrounds become a compact WebP so
+        // they don't paint in bands as they stream; SVG/GIF are skipped so
+        // canvas never rasterises or flattens them; every other image keeps
+        // its source format under a 2MB ceiling.
+        if (kind === "image") {
+          const options = resolveImageCompression({
+            fileType: file.type,
+            maxSizeMB,
+            uploadProfile,
           });
+          if (options) {
+            setUploadState({ status: "compressing" });
+            fileToUpload = await imageCompression(file, options);
+          }
         }
 
         // Request presigned URL

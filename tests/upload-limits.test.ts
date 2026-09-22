@@ -14,4 +14,12 @@ describe("getUploadMaxSizeBytes", () => {
   it("still honours the rsvp-background profile", () => {
     expect(getUploadMaxSizeBytes("images", "rsvp-background")).toBe(500 * 1024);
   });
+
+  it("caps a page-background upload tightly as a server-side safety net", () => {
+    // The client transcodes backgrounds to a ~19 KB WebP; this cap only guards
+    // against a client that bypasses that path.
+    expect(getUploadMaxSizeBytes("images", "page-background")).toBe(
+      1024 * 1024,
+    );
+  });
 });

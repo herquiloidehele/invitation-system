@@ -2504,6 +2504,7 @@ export default function InvitationForm({
                       <MediaUpload
                         kind="image"
                         maxSizeMB={2}
+                        uploadProfile="page-background"
                         value={form.pageBackgroundImageUrl}
                         onUpload={(url) =>
                           update("pageBackgroundImageUrl", url)
