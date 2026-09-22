@@ -399,6 +399,8 @@ model LandingFeature {
   galleryCategory String? // "wedding" | "save_the_date" | "baptism" | "anniversary" | "engagement"
   position        Int     @default(0)
   enabled         Boolean @default(true)
+  // Shows the "Novo" badge on the landing card while in the future.
+  newUntil        DateTime?
 
   invitationId String?
   invitation   Invitation? @relation(fields: [invitationId], references: [id], onDelete: Cascade)

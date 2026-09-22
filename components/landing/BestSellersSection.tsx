@@ -37,6 +37,7 @@ export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
                   key={item.id}
                   item={item}
                   variant="bestSeller"
+                  badgeLabel={item.isNew ? t("newBadge") : undefined}
                   className={MODEL_CAROUSEL_SLIDE_CLASS_NAME}
                   motionProps={{
                     layout: isMobile ? undefined : true,

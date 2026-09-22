@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { landingFeatureInclude } from "@/lib/landing-features";
+import { parseNewUntilInput } from "@/lib/landing-new-badge";
 
 const CATEGORIES = new Set([
   "wedding",
@@ -20,6 +21,7 @@ export async function PATCH(
     enabled?: boolean;
     position?: number;
     galleryCategory?: string | null;
+    newUntil?: Date | null;
   } = {};
 
   if (typeof body.enabled === "boolean") data.enabled = body.enabled;
@@ -33,6 +35,12 @@ export async function PATCH(
     }
     data.galleryCategory = body.galleryCategory;
   }
+
+  const newUntil = parseNewUntilInput(body.newUntil);
+  if (!newUntil.ok) {
+    return NextResponse.json({ error: "Invalid newUntil" }, { status: 400 });
+  }
+  if (newUntil.value !== undefined) data.newUntil = newUntil.value;
 
   const row = await prisma.landingFeature.update({
     where: { id },

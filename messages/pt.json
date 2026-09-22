@@ -91,7 +91,8 @@
     "showLess": "Ver menos",
     "clickToPreview": "Clica para visualizar",
     "viewDetails": "Ver detalhes",
-    "buyCta": "Enviar Mensagem"
+    "buyCta": "Enviar Mensagem",
+    "newBadge": "Novo"
   },
   "LandingGallery": {
     "eyebrow": "Modelos",
@@ -123,7 +124,8 @@
       "baptism": "Baptizados",
       "anniversary": "Aniversários",
       "engagement": "Noivado"
-    }
+    },
+    "newBadge": "Novo"
   },
   "LandingCustomInvitation": {
     "eyebrow": "Uma alternativa só sua",
@@ -423,7 +425,8 @@
     "saveTheDateIncludedBody": "Anúncio digital da data, experiência interativa e partilha por link.",
     "fullyCustomizableBody": "Estrutura, cores, textos, imagens e detalhes podem ser adaptados ao vosso evento.",
     "preDesignedBody": "Personalizamos o conteúdo e a identidade visual mantendo a estrutura deste design.",
-    "orderingBody": "Envie-nos uma mensagem no WhatsApp. Confirmamos os detalhes, recebemos o conteúdo e preparamos a primeira versão para revisão."
+    "orderingBody": "Envie-nos uma mensagem no WhatsApp. Confirmamos os detalhes, recebemos o conteúdo e preparamos a primeira versão para revisão.",
+    "newBadge": "Novo"
   },
   "Invitation": {
     "sectionTitle_ourStory": "Nossa História",

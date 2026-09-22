@@ -11,6 +11,7 @@ import {
   type LandingCustomizationLevel,
 } from "@/lib/landing-customization";
 import { localizeLandingMetadata } from "@/lib/landing-translations";
+import { isLandingFeatureNew } from "@/lib/landing-new-badge";
 import { DEFAULT_LOCALE, type AppLocale } from "@/i18n/locales";
 import { buildLandingProductDetailsPath } from "@/lib/landing-product-details";
 
@@ -130,6 +131,7 @@ export type GalleryFeature = {
   price: LandingPrice | null;
   category: GalleryCategory;
   customizationLevel: LandingCustomizationLevel;
+  isNew: boolean;
 };
 
 export type LiveDemoFeature = {
@@ -253,6 +255,7 @@ export async function getGalleryFeaturesByCategory(
       customizationLevel: normalizeLandingCustomizationLevel(
         target.landingCustomizationLevel,
       ),
+      isNew: isLandingFeatureNew(row.newUntil),
     });
   }
 
@@ -268,10 +271,12 @@ export type BestSellerFeature = {
   description: string | null;
   price: LandingPrice | null;
   customizationLevel: LandingCustomizationLevel;
+  isNew: boolean;
 };
 
 type BestSellerSourceRow = {
   id: string;
+  newUntil: Date | null;
   invitation: {
     slug: string;
     couple: unknown;
@@ -338,6 +343,7 @@ function mapBestSellerRowToFeature(
     customizationLevel: normalizeLandingCustomizationLevel(
       target.landingCustomizationLevel,
     ),
+    isNew: isLandingFeatureNew(row.newUntil),
   };
 }
 

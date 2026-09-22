@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { landingFeatureInclude } from "@/lib/landing-features";
+import { parseNewUntilInput } from "@/lib/landing-new-badge";
 
 const SECTIONS = new Set(["hero", "gallery", "live_demo", "best_seller"]);
 const CATEGORIES = new Set([
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
     enabled,
     invitationId,
     saveTheDateId,
+    newUntil,
   } = body as {
     section?: string;
     galleryCategory?: string | null;
@@ -35,6 +37,7 @@ export async function POST(req: NextRequest) {
     enabled?: boolean;
     invitationId?: string | null;
     saveTheDateId?: string | null;
+    newUntil?: string | null;
   };
 
   if (!section || !SECTIONS.has(section)) {
@@ -55,6 +58,11 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  const parsedNewUntil = parseNewUntilInput(newUntil);
+  if (!parsedNewUntil.ok) {
+    return NextResponse.json({ error: "Invalid newUntil" }, { status: 400 });
+  }
+
   if (section === "hero") {
     await prisma.landingFeature.deleteMany({ where: { section: "hero" } });
   }
@@ -67,6 +75,7 @@ export async function POST(req: NextRequest) {
       enabled: enabled !== false,
       invitationId: invitationId ?? null,
       saveTheDateId: saveTheDateId ?? null,
+      newUntil: parsedNewUntil.value ?? null,
     },
     include: landingFeatureInclude,
   });

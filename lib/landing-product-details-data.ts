@@ -9,6 +9,7 @@ import {
   type LandingProductKind,
   resolveLandingDetailImages
 } from "@/lib/landing-product-details";
+import { isLandingFeatureNew } from "@/lib/landing-new-badge";
 import { localizeLandingMetadata } from "@/lib/landing-translations";
 import { buildPurchaseMessage, buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import type { AppLocale } from "@/i18n/locales";
@@ -20,6 +21,8 @@ export type LandingProductDetails = {
   subtitle: string | null;
   description: string | null;
   customizationLevel: LandingCustomizationLevel;
+  /** True while any enabled landing placement of this model is flagged new. */
+  isNew: boolean;
   price: LandingPrice | null;
   /**
    * Raw effective price for structured data. `price` above holds only
@@ -90,6 +93,7 @@ type SaveTheDateProductRow = ProductRow & {
 };
 
 type PublicFeatureRow = {
+  newUntil: Date | null;
   invitation: InvitationProductRow | null;
   saveTheDate: SaveTheDateProductRow | null;
 };
@@ -135,6 +139,8 @@ export async function getLandingProductDetails(
       kind === "convite"
         ? { enabled: true, invitation: { is: { slug } } }
         : { enabled: true, saveTheDate: { is: { slug } } },
+    // A model can sit in several sections; the latest "Novo" date wins.
+    orderBy: { newUntil: { sort: "desc", nulls: "last" } },
     include: publicProductInclude,
   })) as unknown as PublicFeatureRow | null;
 
@@ -161,6 +167,7 @@ export async function getLandingProductDetails(
     customizationLevel: normalizeLandingCustomizationLevel(
       target.landingCustomizationLevel,
     ),
+    isNew: isLandingFeatureNew(row.newUntil),
     price: pricing.price,
     offer: pricing.offer,
     images: resolveLandingDetailImages({
