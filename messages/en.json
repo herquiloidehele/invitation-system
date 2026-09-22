@@ -91,7 +91,8 @@
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
     "viewDetails": "View details",
-    "buyCta": "Send Message"
+    "buyCta": "Send Message",
+    "newBadge": "New"
   },
   "LandingGallery": {
     "eyebrow": "Models",
@@ -123,7 +124,8 @@
       "baptism": "Baptisms",
       "anniversary": "Birthdays",
       "engagement": "Engagement"
-    }
+    },
+    "newBadge": "New"
   },
   "LandingCustomInvitation": {
     "eyebrow": "Made just for you",
@@ -423,7 +425,8 @@
     "saveTheDateIncludedBody": "A digital date announcement, an interactive experience and a shareable link.",
     "fullyCustomizableBody": "The structure, colours, wording, images and details can be adapted to your event.",
     "preDesignedBody": "We personalize the content and visual identity while keeping this design’s structure.",
-    "orderingBody": "Message us on WhatsApp. We confirm the details, collect your content and prepare the first version for review."
+    "orderingBody": "Message us on WhatsApp. We confirm the details, collect your content and prepare the first version for review.",
+    "newBadge": "New"
   },
   "Invitation": {
     "sectionTitle_ourStory": "Our Story",

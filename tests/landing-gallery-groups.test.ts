@@ -22,6 +22,7 @@ function feature(
     subtitle: null,
     description: null,
     price: null,
+    isNew: false,
   };
 }
 

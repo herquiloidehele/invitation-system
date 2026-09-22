@@ -132,6 +132,7 @@ export function GallerySection({
                 key={item.id}
                 item={item}
                 variant="gallery"
+                badgeLabel={item.isNew ? t("newBadge") : undefined}
                 className={MODEL_CAROUSEL_SLIDE_CLASS_NAME}
                 motionProps={{
                   layout: isMobile ? undefined : true,

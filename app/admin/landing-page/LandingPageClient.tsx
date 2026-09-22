@@ -35,6 +35,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LandingFeatureListEditor } from "@/components/admin/LandingFeatureListEditor";
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";
 import {
+  defaultNewUntil,
+  fromNewUntilDateInput,
+  isLandingFeatureNew,
+  toNewUntilDateInput,
+} from "@/lib/landing-new-badge";
+import {
   filterPickablesForCustomizationLevel,
   groupGalleryFeaturesByCustomizationLevel,
 } from "@/lib/landing-admin-groups";
@@ -65,6 +71,7 @@ type FeatureRow = {
   galleryCategory: string | null;
   position: number;
   enabled: boolean;
+  newUntil: string | null;
   invitationId: string | null;
   saveTheDateId: string | null;
   invitation?: {
@@ -233,6 +240,25 @@ export function LandingPageClient() {
       await refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro a reordenar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function setNewUntil(id: string, newUntil: string | null) {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admin/landing-features/${id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ newUntil }),
+      });
+      if (!res.ok) throw new Error("Erro ao actualizar “Novo”");
+      await refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao actualizar “Novo”",
+      );
     } finally {
       setBusy(false);
     }
@@ -448,6 +474,7 @@ export function LandingPageClient() {
                 canMoveDown={index < bestSellers.length - 1}
                 onMoveUp={() => move(row.id, -1)}
                 onMoveDown={() => move(row.id, 1)}
+                onNewUntilChange={(value) => setNewUntil(row.id, value)}
                 onRemove={() => deleteFeature(row.id)}
               />
             ))
@@ -541,6 +568,7 @@ export function LandingPageClient() {
               })
             }
             onMove={move}
+            onNewUntilChange={setNewUntil}
             onRemove={deleteFeature}
           />
           <Separator />
@@ -565,6 +593,7 @@ export function LandingPageClient() {
               })
             }
             onMove={move}
+            onNewUntilChange={setNewUntil}
             onRemove={deleteFeature}
           />
         </CardContent>
@@ -583,6 +612,7 @@ function GalleryAdminGroup({
   onFeaturesChange,
   onAdd,
   onMove,
+  onNewUntilChange,
   onRemove,
 }: {
   title: string;
@@ -594,6 +624,7 @@ function GalleryAdminGroup({
   onFeaturesChange: (next: string[]) => Promise<void>;
   onAdd: (category: GalleryCategoryKey, pickableId: string) => void;
   onMove: (id: string, delta: number) => void;
+  onNewUntilChange: (id: string, newUntil: string | null) => void;
   onRemove: (id: string) => void;
 }) {
   const categories = CATEGORIES.map((category) => ({
@@ -637,6 +668,7 @@ function GalleryAdminGroup({
                   canMoveDown={index < category.rows.length - 1}
                   onMoveUp={() => onMove(row.id, -1)}
                   onMoveDown={() => onMove(row.id, 1)}
+                  onNewUntilChange={(value) => onNewUntilChange(row.id, value)}
                   onRemove={() => onRemove(row.id)}
                 />
               ))
@@ -691,6 +723,7 @@ function FeatureItem({
   canMoveDown,
   onMoveUp,
   onMoveDown,
+  onNewUntilChange,
   onRemove,
 }: {
   row: FeatureRow;
@@ -699,6 +732,7 @@ function FeatureItem({
   canMoveDown?: boolean;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  onNewUntilChange?: (newUntil: string | null) => void;
   onRemove: () => void;
 }) {
   const image = readImage(row);
@@ -730,6 +764,13 @@ function FeatureItem({
           </Badge>
         </div>
         <p className="truncate text-xs text-muted-foreground">/{slug}</p>
+        {onNewUntilChange ? (
+          <NewBadgeControl
+            newUntil={row.newUntil}
+            busy={busy}
+            onChange={onNewUntilChange}
+          />
+        ) : null}
       </div>
 
       <div className="flex items-center gap-1">
@@ -777,6 +818,66 @@ function FeatureItem({
           <Trash2 className="size-4" />
         </Button>
       </div>
+    </div>
+  );
+}
+
+function NewBadgeControl({
+  newUntil,
+  busy,
+  onChange,
+}: {
+  newUntil: string | null;
+  busy: boolean;
+  onChange: (newUntil: string | null) => void;
+}) {
+  if (!newUntil) {
+    return (
+      <div>
+        <Button
+          type="button"
+          variant="outline"
+          size="xs"
+          disabled={busy}
+          onClick={() => onChange(defaultNewUntil().toISOString())}
+        >
+          <Sparkles className="size-3" />
+          Marcar como Novo
+        </Button>
+      </div>
+    );
+  }
+
+  const active = isLandingFeatureNew(newUntil);
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      <Badge variant={active ? "default" : "outline"}>
+        {active ? "Novo" : "Novo expirado"}
+      </Badge>
+      <label className="flex items-center gap-1.5 text-muted-foreground">
+        até
+        <input
+          type="date"
+          value={toNewUntilDateInput(newUntil)}
+          disabled={busy}
+          onChange={(event) => {
+            const next = fromNewUntilDateInput(event.target.value);
+            if (next) onChange(next);
+          }}
+          className="h-7 rounded-md border bg-background px-2 text-xs text-foreground"
+        />
+      </label>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-xs"
+        disabled={busy}
+        onClick={() => onChange(null)}
+        aria-label="Remover “Novo”"
+      >
+        <X className="size-3" />
+      </Button>
     </div>
   );
 }

@@ -107,6 +107,7 @@ export function LandingProductDetailsPage({
           <ProductDetailsPanel
             details={details}
             eyebrow={t(contentKeys.eyebrowKey)}
+            newBadge={details.isNew ? t("newBadge") : undefined}
             tags={tags}
             accordionItems={accordionItems}
             requestLabel={t("requestViaWhatsapp")}

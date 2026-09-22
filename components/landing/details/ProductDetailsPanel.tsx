@@ -8,6 +8,7 @@ import type { LandingProductDetails } from "@/lib/landing-product-details-data";
 export function ProductDetailsPanel({
   details,
   eyebrow,
+  newBadge,
   tags,
   accordionItems,
   requestLabel,
@@ -16,6 +17,7 @@ export function ProductDetailsPanel({
 }: {
   details: LandingProductDetails;
   eyebrow: string;
+  newBadge?: string;
   tags: string[];
   accordionItems: Array<{ title: string; body: string }>;
   requestLabel: string;
@@ -24,9 +26,16 @@ export function ProductDetailsPanel({
 }) {
   return (
     <aside className="lg:sticky lg:top-20 lg:self-start lg:px-5 xl:px-10">
-      <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--brindel-brown)]">
-        {eyebrow}
-      </p>
+      <div className="flex flex-wrap items-center gap-2.5">
+        <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--brindel-brown)]">
+          {eyebrow}
+        </p>
+        {newBadge ? (
+          <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary-foreground">
+            {newBadge}
+          </span>
+        ) : null}
+      </div>
 
       <h1 className="mt-3 max-w-xl text-[1.75rem] font-medium leading-[1.15] tracking-[-0.025em] text-foreground [text-wrap:balance] sm:text-[2.125rem] lg:text-[2.75rem]">
         {details.title}

@@ -132,6 +132,33 @@ describe("getLandingProductDetails", () => {
       customizationLevel: "pre_designed",
     });
   });
+
+  it("flags the model as new from the placement with the latest newUntil", async () => {
+    findFirst.mockResolvedValue({
+      ...invitationFeature,
+      newUntil: new Date(Date.now() + 60_000),
+    });
+
+    const result = await getLandingProductDetails("convite", "amalfi", "EUR", "pt");
+
+    expect(result?.isNew).toBe(true);
+    expect(findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: { newUntil: { sort: "desc", nulls: "last" } },
+      }),
+    );
+  });
+
+  it("does not flag the model once newUntil has passed", async () => {
+    findFirst.mockResolvedValue({
+      ...invitationFeature,
+      newUntil: new Date(Date.now() - 60_000),
+    });
+
+    const result = await getLandingProductDetails("convite", "amalfi", "EUR", "pt");
+
+    expect(result?.isNew).toBe(false);
+  });
 });
 
 describe("getPublicLandingProductPaths", () => {
