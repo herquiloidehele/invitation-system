@@ -1354,6 +1354,8 @@ export interface InvitationData {
   videoPoster?: string;
   /** Whether the hero video starts muted. Missing values default to true. */
   heroVideoMuted?: boolean;
+  /** Minimalism-brown only: play the hero video inside the polaroid frame instead of the full-screen video hero. Missing values default to false. */
+  heroVideoInFrame?: boolean;
   /** How the hero video/image is fitted to the hero box. Unset => "cover". */
   heroMediaFit?: ObjectFit;
   /** Curtain-canva only: the curtain animation video played on tap. Falls back to the bundled default when empty. */
