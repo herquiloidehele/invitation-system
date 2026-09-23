@@ -5,7 +5,15 @@ import { useInlineTextEdit } from "@/components/shared/EditableText";
 import FontPicker from "@/components/admin/FontPicker";
 import { extractFamilyName } from "@/lib/google-fonts";
 import { useDynamicFont } from "@/hooks/useDynamicFont";
-import { AlignCenter, AlignLeft, AlignRight, RotateCcw, X } from "lucide-react";
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  Eye,
+  EyeOff,
+  RotateCcw,
+  X,
+} from "lucide-react";
 import type { SpacingField } from "@/lib/spacing-styles";
 import type {
   TextAlign,
@@ -224,7 +232,10 @@ export default function TextStyleToolbar() {
       : "left");
 
   // ---- Handlers ---------------------------------------------------------
-  const set = (field: keyof TextStyle, value: string | number | undefined) => {
+  const set = (
+    field: keyof TextStyle,
+    value: string | number | boolean | undefined,
+  ) => {
     ctx.updateStyle(elementKey, field, value);
   };
   const setSpacing = (field: SpacingField, value: number | undefined) => {
@@ -402,6 +413,26 @@ export default function TextStyleToolbar() {
       {/* Divider */}
       <div className="h-5 w-px bg-border" />
 
+      {/* Hide on the public page */}
+      <button
+        type="button"
+        title={overrides.hidden ? "Mostrar no convite" : "Ocultar no convite"}
+        aria-label={
+          overrides.hidden ? "Mostrar no convite" : "Ocultar no convite"
+        }
+        aria-pressed={overrides.hidden === true}
+        onClick={() => set("hidden", overrides.hidden ? undefined : true)}
+        className={`flex h-7 w-7 items-center justify-center rounded border bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-[0.96] ${
+          overrides.hidden ? "bg-accent text-accent-foreground" : ""
+        }`}
+      >
+        {overrides.hidden ? (
+          <EyeOff className="size-3.5" />
+        ) : (
+          <Eye className="size-3.5" />
+        )}
+      </button>
+
       {/* Reset this element */}
       <button
         type="button"
@@ -416,6 +447,7 @@ export default function TextStyleToolbar() {
           set("textAlign", undefined);
           set("color", undefined);
           set("letterSpacing", undefined);
+          set("hidden", undefined);
           setSpacing("spaceBefore", undefined);
           setSpacing("spaceAfter", undefined);
         }}

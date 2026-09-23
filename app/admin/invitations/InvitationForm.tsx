@@ -1324,7 +1324,7 @@ export default function InvitationForm({
     (
       element: keyof NonNullable<TextStyleOverrides["elements"]>,
       field: keyof TextStyle,
-      value: string | number | undefined,
+      value: string | number | boolean | undefined,
     ) => {
       setForm((prev) => {
         const ts = prev.textStyles ?? {};

@@ -65,7 +65,10 @@ export default function ElegantFloralPage({
   const resolvedTs = resolveTextStyles(theme, ts);
   const ct = useCustomText(invitation.customTexts);
   return (
-    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+    <SpacingStyleProvider
+      spacingStyles={invitation.spacingStyles}
+      textStyles={invitation.textStyles}
+    >
       <EfRevealProvider instant={isPreview ?? false}>
         <div
           style={{

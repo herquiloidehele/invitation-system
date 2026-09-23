@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
-import type { SpacingStyleOverrides } from "@/lib/types";
+import { createContext, type ReactNode, useContext } from "react";
+import type { SpacingStyleOverrides, TextStyleOverrides } from "@/lib/types";
+import { TextStyleProvider } from "./TextStyleProvider";
 
 const SpacingStyleContext = createContext<SpacingStyleOverrides | undefined>(
   undefined,
@@ -10,13 +11,15 @@ const SpacingStyleContext = createContext<SpacingStyleOverrides | undefined>(
 export function SpacingStyleProvider({
   children,
   spacingStyles,
+  textStyles,
 }: {
   children: ReactNode;
   spacingStyles?: SpacingStyleOverrides;
+  textStyles?: TextStyleOverrides;
 }) {
   return (
     <SpacingStyleContext.Provider value={spacingStyles}>
-      {children}
+      <TextStyleProvider textStyles={textStyles}>{children}</TextStyleProvider>
     </SpacingStyleContext.Provider>
   );
 }

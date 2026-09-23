@@ -223,6 +223,21 @@ export function applyOverride(
   return result;
 }
 
+/**
+ * Whether an element was hidden via the inline toolbar. Looks up the exact
+ * key only — unlike styles, visibility must not cascade through fallback
+ * keys (hiding `bodyText` would otherwise hide FAQ answers, gift text, …).
+ */
+export function isTextElementHidden(
+  overrides: TextStyleOverrides | null | undefined,
+  elementKey: string,
+): boolean {
+  const elements = overrides?.elements as
+    | Record<string, TextStyle | undefined>
+    | undefined;
+  return elements?.[elementKey]?.hidden === true;
+}
+
 // ---------------------------------------------------------------------------
 // Main resolver
 // ---------------------------------------------------------------------------

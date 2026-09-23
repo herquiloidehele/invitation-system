@@ -28,6 +28,7 @@ import {
   getSaveTheDateLocationTheme,
 } from "@/lib/save-the-date-location-theme";
 import { getSaveTheDateRsvpButtonBackground } from "@/lib/save-the-date-rsvp-button";
+import { TextStyleProvider } from "@/components/shared/TextStyleProvider";
 import {
   getRsvpCustomFields,
   shouldShowRsvpCompanion,
@@ -149,7 +150,15 @@ const revealSparkle: Variants = {
   },
 };
 
-export default function SaveTheDateView({
+export default function SaveTheDateView(props: SaveTheDateViewProps) {
+  return (
+    <TextStyleProvider textStyles={props.saveTheDate.textStyles ?? undefined}>
+      <SaveTheDateViewContent {...props} />
+    </TextStyleProvider>
+  );
+}
+
+function SaveTheDateViewContent({
   saveTheDate,
   hideEnvelope = false,
 }: SaveTheDateViewProps) {

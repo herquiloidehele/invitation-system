@@ -750,6 +750,7 @@ export interface TextStyle {
   textAlign?: TextAlign;
   textTransform?: TextTransform;
   letterSpacing?: number;
+  hidden?: boolean;
 }
 
 /** Two-tier text styling overrides stored on each invitation.

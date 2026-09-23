@@ -327,7 +327,10 @@ export default function InvitationPage({
   const rsvpCard = cs("rsvp", 20);
 
   return (
-    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+    <SpacingStyleProvider
+      spacingStyles={invitation.spacingStyles}
+      textStyles={invitation.textStyles}
+    >
       <div
       style={{
         ...pageBackgroundStyle(theme, invitation.pageBackgroundImageUrl),

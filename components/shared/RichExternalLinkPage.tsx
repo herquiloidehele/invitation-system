@@ -251,7 +251,10 @@ export default function RichExternalLinkPage({
   }, [isPreview]);
 
   return (
-    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+    <SpacingStyleProvider
+      spacingStyles={invitation.spacingStyles}
+      textStyles={invitation.textStyles}
+    >
       <main
         style={{
           background: theme.bg,

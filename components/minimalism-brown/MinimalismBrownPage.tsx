@@ -114,7 +114,10 @@ function MinimalismBrownBody({
   useAutoScroll({ enabled: !isPreview && !rsvpOpen });
 
   return (
-    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+    <SpacingStyleProvider
+      spacingStyles={invitation.spacingStyles}
+      textStyles={invitation.textStyles}
+    >
       <div
         style={{
           position: "relative",

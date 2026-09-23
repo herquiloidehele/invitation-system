@@ -481,7 +481,7 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
     (
       element: keyof NonNullable<TextStyleOverrides["elements"]>,
       field: keyof TextStyle,
-      value: string | number | undefined,
+      value: string | number | boolean | undefined,
     ) => {
       setData((prev) => {
         const ts = prev.textStyles ?? {};

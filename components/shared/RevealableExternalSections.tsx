@@ -123,7 +123,10 @@ export default function RevealableExternalSections({
   const placesOn = shouldRenderPlaces(invitation);
 
   return (
-    <SpacingStyleProvider spacingStyles={invitation.spacingStyles}>
+    <SpacingStyleProvider
+      spacingStyles={invitation.spacingStyles}
+      textStyles={invitation.textStyles}
+    >
       {/* Persistent prefetched audio — no UI controls (per spec) */}
       {audioEnabled && (
         <audio
