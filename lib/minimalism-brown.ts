@@ -3,6 +3,8 @@ import type {
   CardSectionKey,
   CardStyleOverrides,
   GuestbookConfig,
+  InvitationData,
+  LocationInfo,
   TemplateTheme,
   TextStyleOverrides,
 } from "./types";
@@ -360,4 +362,16 @@ export function resolveWishes(
       submittedAt: r.submittedAt,
     }))
     .sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+}
+
+/**
+ * Every venue the invitation names, in admin order (ceremony, then reception).
+ * A location without a name is treated as unset.
+ */
+export function mbVenues(
+  invitation: Pick<InvitationData, "location" | "location2">,
+): LocationInfo[] {
+  return [invitation.location, invitation.location2].filter(
+    (venue): venue is LocationInfo => !!venue?.name?.trim(),
+  );
 }

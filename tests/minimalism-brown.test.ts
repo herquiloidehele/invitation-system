@@ -11,6 +11,7 @@ import {
   readableOn,
   idleDelay,
   parallaxOffset,
+  mbVenues,
 } from "../lib/minimalism-brown";
 
 const theme = {
@@ -246,5 +247,27 @@ describe("readableOn", () => {
 
   it("ignores candidates it cannot parse", () => {
     expect(readableOn("#FFFFFF", ["var(--x)", "#000000"])).toBe("#000000");
+  });
+});
+
+describe("mbVenues", () => {
+  const church = { name: "Igreja", address: "Largo", googleMapsUrl: "" };
+  const quinta = { name: "Quinta", address: "Estrada", googleMapsUrl: "" };
+
+  it("returns both locations in order when a second one is set", () => {
+    expect(mbVenues({ location: church, location2: quinta })).toEqual([
+      church,
+      quinta,
+    ]);
+  });
+
+  it("returns only the first location when there is no second", () => {
+    expect(mbVenues({ location: church })).toEqual([church]);
+  });
+
+  it("skips a location with no name", () => {
+    expect(
+      mbVenues({ location: { ...church, name: "  " }, location2: quinta }),
+    ).toEqual([quinta]);
   });
 });

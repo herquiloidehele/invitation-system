@@ -4,7 +4,7 @@ import type { MutableRefObject, RefObject } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { pageBackgroundStyle } from "@/lib/page-background";
 import type { Wish } from "@/lib/minimalism-brown";
-import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
+import { mbStyle, mbTokens, mbVenues } from "@/lib/minimalism-brown";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import ImageCanvas from "@/components/shared/ImageCanvas";
 import SectionImageHost from "@/components/shared/SectionImageHost";
@@ -176,7 +176,15 @@ function MinimalismBrownBody({
             <PhotoGallery invitation={invitation} theme={theme} />
             <ReceptionInfo invitation={invitation} theme={theme} />
             <div style={{ paddingInline: t.gutter }}>
-              <VenueCard invitation={invitation} theme={theme} />
+              {mbVenues(invitation).map((venue, i) => (
+                <VenueCard
+                  key={i}
+                  invitation={invitation}
+                  theme={theme}
+                  venue={venue}
+                  index={i}
+                />
+              ))}
             </div>
             <div style={{ paddingInline: t.gutter }}>
               <DressCode invitation={invitation} theme={theme} />

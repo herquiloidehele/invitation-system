@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { MapPin } from "lucide-react";
-import type { InvitationData, TemplateTheme } from "@/lib/types";
+import type { InvitationData, LocationInfo, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { resolveLocationPhotos } from "@/lib/elegant-floral";
 import { useCustomText } from "@/lib/custom-texts";
@@ -21,7 +21,8 @@ const MinimalistMap = dynamic(
 );
 
 /**
- * Reception venue with its address, map and a directions link.
+ * One venue with its address, map and a directions link. The page renders one
+ * per location (see mbVenues), so a ceremony and a reception venue both show.
  *
  * Photos come through the shared resolveLocationPhotos so an invitation saved
  * with the legacy single `imageUrl` still shows its picture.
@@ -29,15 +30,19 @@ const MinimalistMap = dynamic(
 export default function VenueCard({
   invitation,
   theme,
+  venue,
+  index = 0,
 }: {
   invitation: InvitationData;
   theme: TemplateTheme;
+  venue: LocationInfo;
+  /** Position in the venue list. Later cards sit closer, as one group, and
+   *  leave the house watermark to the first. */
+  index?: number;
 }) {
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
-  const venue = invitation.location2 ?? invitation.location;
-  if (!venue?.name) return null;
 
   const photo = resolveLocationPhotos(venue)[0];
   const mapUrl = venue.googleMapsUrl || venue.wazeUrl;
@@ -45,8 +50,14 @@ export default function VenueCard({
     venue.latitude != null && venue.longitude != null;
 
   return (
-    <Reveal as="section" style={{ marginTop: t.gap.section, position: "relative" }}>
-      <HouseBackdrop top="52%" width={560} opacity={0.14} />
+    <Reveal
+      as="section"
+      style={{
+        marginTop: index === 0 ? t.gap.section : t.gap.block,
+        position: "relative",
+      }}
+    >
+      {index === 0 && <HouseBackdrop top="52%" width={560} opacity={0.14} />}
       <div
         style={{
           backgroundColor: photo ? t.card.bg : "transparent",
