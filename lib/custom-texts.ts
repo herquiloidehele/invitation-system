@@ -129,7 +129,7 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
       {
         key: "sectionTitle_ceremonyInfo",
         label: "Informações da Cerimónia",
-        placeholder: "Informações da Cerimónia",
+        placeholder: "Com a bênção de Deus",
       },
       {
         key: "sectionTitle_receptionInfo",
