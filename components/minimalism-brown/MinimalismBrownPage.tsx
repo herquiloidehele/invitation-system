@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, type MutableRefObject, type RefObject } from "react";
-import dynamic from "next/dynamic";
+import type { MutableRefObject, RefObject } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { pageBackgroundStyle } from "@/lib/page-background";
 import type { Wish } from "@/lib/minimalism-brown";
@@ -27,11 +26,7 @@ import Schedule from "./Schedule";
 import Guestbook from "./Guestbook";
 import GiftBox from "./GiftBox";
 import OptionalSections from "./OptionalSections";
-
-// The RSVP modal drags in react-hook-form + zod; keep it off the first load.
-const RSVPModal = dynamic(() => import("@/components/shared/RSVPModal"), {
-  ssr: false,
-});
+import RsvpSection, { MB_RSVP_ID } from "./RsvpSection";
 
 export interface MinimalismBrownPageProps {
   invitation: InvitationData;
@@ -104,14 +99,18 @@ function MinimalismBrownBody({
   isPreview,
   wishes,
 }: MinimalismBrownPageProps) {
-  const [rsvpOpen, setRsvpOpen] = useState(false);
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
-  const openRsvp = () => setRsvpOpen(true);
+  // The RSVP form sits inline at the foot of the page; buttons further up
+  // take the guest down to it.
+  const goToRsvp = () =>
+    document
+      .getElementById(MB_RSVP_ID)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   // Carry the reader down the page when the invitation opens, until they take
   // over. Never in the admin preview, where an editor is trying to work.
-  useAutoScroll({ enabled: !isPreview && !rsvpOpen });
+  useAutoScroll({ enabled: !isPreview });
 
   return (
     <SpacingStyleProvider
@@ -175,11 +174,7 @@ function MinimalismBrownBody({
             <CeremonyInfo invitation={invitation} theme={theme} />
             <MbSectionImage invitation={invitation} theme={theme} slot="image2" />
             <PhotoGallery invitation={invitation} theme={theme} />
-            <ReceptionInfo
-              invitation={invitation}
-              theme={theme}
-              onRsvpClick={openRsvp}
-            />
+            <ReceptionInfo invitation={invitation} theme={theme} />
             <div style={{ paddingInline: t.gutter }}>
               <VenueCard invitation={invitation} theme={theme} />
             </div>
@@ -193,7 +188,7 @@ function MinimalismBrownBody({
                 invitation={invitation}
                 theme={theme}
                 wishes={wishes}
-                onRsvpClick={openRsvp}
+                onRsvpClick={goToRsvp}
               />
             </div>
             <div style={{ paddingInline: t.gutter }}>
@@ -201,12 +196,9 @@ function MinimalismBrownBody({
             </div>
             <MbSectionImage invitation={invitation} theme={theme} slot="image4" />
             <div style={{ paddingInline: t.gutter }}>
-              <OptionalSections
-                invitation={invitation}
-                theme={theme}
-                onRsvpClick={openRsvp}
-              />
+              <OptionalSections invitation={invitation} theme={theme} />
             </div>
+            <RsvpSection invitation={invitation} theme={theme} />
 
             {invitation.quote && (
               <Reveal
@@ -245,17 +237,6 @@ function MinimalismBrownBody({
             )}
           </div>
         </ImageCanvas>
-
-        {invitation.rsvp?.enabled && (
-          <RSVPModal
-            open={rsvpOpen}
-            onClose={() => setRsvpOpen(false)}
-            invitation={invitation}
-            theme={theme}
-            customTexts={invitation.customTexts}
-            guest={invitation.guest}
-          />
-        )}
       </div>
     </SpacingStyleProvider>
   );

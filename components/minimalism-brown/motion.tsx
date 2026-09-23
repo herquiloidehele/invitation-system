@@ -165,6 +165,7 @@ function useRevealProps(revealAll: boolean, onReveal: () => void) {
  */
 export function Reveal({
   children,
+  id,
   className,
   style,
   delay = 0,
@@ -172,6 +173,7 @@ export function Reveal({
   as: Tag = "div",
 }: {
   children: ReactNode;
+  id?: string;
   className?: string;
   style?: CSSProperties;
   delay?: number;
@@ -184,6 +186,7 @@ export function Reveal({
 
   return (
     <Comp
+      id={id}
       className={className}
       style={style}
       variants={{

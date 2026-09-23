@@ -5,6 +5,7 @@ import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
+import CalendarButton from "@/components/shared/CalendarButton";
 import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
 import MonthCalendar from "./MonthCalendar";
@@ -15,18 +16,19 @@ import { LeafWatermark } from "./Decor";
  * Reception block.
  *
  * Structured as the reference is: a warm card carrying the whole section, with
- * the brown fill scoped to the month calendar and the confirm pill rather than
+ * the brown fill scoped to the month calendar and the pill rather than
  * flooding the section. Inverting that — as this template first did — changes
  * the weight of the entire page.
+ *
+ * The pill adds the event to the guest's calendar. Confirming attendance
+ * happens in the inline RSVP form at the foot of the page.
  */
 export default function ReceptionInfo({
   invitation,
   theme,
-  onRsvpClick,
 }: {
   invitation: InvitationData;
   theme: TemplateTheme;
-  onRsvpClick?: () => void;
 }) {
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
@@ -101,19 +103,19 @@ export default function ReceptionInfo({
           />
         </div>
 
-        <div
-          style={{
-            marginTop: t.gap.block,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
-          {invitation.rsvp?.enabled && onRsvpClick && (
-            <button
-              type="button"
-              onClick={onRsvpClick}
+        {invitation.showCalendarCta !== false && (
+          <div
+            style={{
+              marginTop: t.gap.block,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CalendarButton
+              date={invitation.date}
+              location={invitation.location}
+              couple={invitation.couple}
+              eventType={invitation.eventType}
               style={mbStyle(
                 {
                   fontFamily: theme.bodyFont,
@@ -134,11 +136,11 @@ export default function ReceptionInfo({
               )}
             >
               <EditableText elementKey="mbButtonLabel">
-                {ct("cta_confirmButton")}
+                {ct("cta_addToCalendar")}
               </EditableText>
-            </button>
-          )}
-        </div>
+            </CalendarButton>
+          </div>
+        )}
       </SectionCard>
     </Reveal>
   );
