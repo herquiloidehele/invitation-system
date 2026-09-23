@@ -1,0 +1,2 @@
+ALTER TABLE "Invitation"
+ADD COLUMN "heroVideoInFrame" BOOLEAN NOT NULL DEFAULT false;

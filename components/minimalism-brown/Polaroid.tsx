@@ -1,8 +1,11 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import type { TemplateTheme } from "@/lib/types";
+import type { CSSProperties, RefObject } from "react";
+import type { ObjectFit, TemplateTheme } from "@/lib/types";
 import { mbTokens } from "@/lib/minimalism-brown";
+import { PrefetchedVideoSlot } from "@/components/shared/PrefetchedVideoSlot";
+import VideoPosterLayer from "@/components/shared/VideoPosterLayer";
+import { useVideoFrameReady } from "@/components/shared/useVideoFrameReady";
 
 const FRAME = {
   src: "/images/themes/minimalism-brown/frame-avatar.webp",
@@ -30,6 +33,19 @@ const APERTURE = {
   tiltDeg: -4.78,
 };
 
+export interface PolaroidVideo {
+  src: string;
+  poster?: string;
+  muted: boolean;
+  /**
+   * When true, `videoRef` already holds the invitation's buffered <video>,
+   * which is adopted into the window so the file is not downloaded twice.
+   * Otherwise the polaroid renders its own element into `videoRef` (admin
+   * preview, demos).
+   */
+  prefetched: boolean;
+}
+
 interface PolaroidProps {
   src?: string | null;
   alt?: string;
@@ -42,6 +58,10 @@ interface PolaroidProps {
   /** Honours the invitation's heroMediaFit; "cover" fills the frame window. */
   fit?: CSSProperties["objectFit"];
   style?: CSSProperties;
+  /** Plays in the frame window in place of the photo. */
+  video?: PolaroidVideo | null;
+  /** The hero video element; required with `video`. */
+  videoRef?: RefObject<HTMLVideoElement | null>;
 }
 
 /**
@@ -61,6 +81,8 @@ export default function Polaroid({
   positionY = 50,
   fit = "cover",
   style,
+  video,
+  videoRef,
 }: PolaroidProps) {
   const t = mbTokens(theme);
   const hasPhoto = Boolean(src && src.trim());
@@ -91,20 +113,28 @@ export default function Polaroid({
           backgroundColor: "#FFFFFF",
         }}
       >
-        {hasPhoto && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={src as string}
-            alt={alt}
-            loading="lazy"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: fit,
-              objectPosition: `${positionX}% ${positionY}%`,
-              display: "block",
-            }}
+        {video && videoRef ? (
+          <FrameVideo
+            video={video}
+            videoRef={videoRef}
+            fit={fit as ObjectFit}
           />
+        ) : (
+          hasPhoto && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={src as string}
+              alt={alt}
+              loading="lazy"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: fit,
+                objectPosition: `${positionX}% ${positionY}%`,
+                display: "block",
+              }}
+            />
+          )
         )}
       </div>
 
@@ -129,5 +159,58 @@ export default function Polaroid({
         }}
       />
     </div>
+  );
+}
+
+interface FrameVideoProps {
+  video: PolaroidVideo;
+  videoRef: RefObject<HTMLVideoElement | null>;
+  fit: ObjectFit;
+}
+
+function FrameVideo({ video, videoRef, fit }: FrameVideoProps) {
+  if (video.prefetched) {
+    return (
+      <PrefetchedVideoSlot
+        videoRef={videoRef}
+        posterUrl={video.poster}
+        mediaFit={fit}
+        muted={video.muted}
+      />
+    );
+  }
+  return <DirectFrameVideo video={video} videoRef={videoRef} fit={fit} />;
+}
+
+function DirectFrameVideo({ video, videoRef, fit }: FrameVideoProps) {
+  const ready = useVideoFrameReady(videoRef, video.src);
+  return (
+    <>
+      <video
+        ref={videoRef}
+        src={video.src}
+        poster={video.poster}
+        muted={video.muted}
+        loop
+        playsInline
+        autoPlay
+        preload="auto"
+        data-invitation-video
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: fit,
+          display: "block",
+        }}
+      />
+      <VideoPosterLayer
+        posterUrl={video.poster}
+        visible={!ready}
+        mediaFit={fit}
+        zIndex={1}
+      />
+    </>
   );
 }

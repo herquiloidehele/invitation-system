@@ -1,9 +1,15 @@
 "use client";
 
-import type { CSSProperties, MutableRefObject } from "react";
+import {
+  useRef,
+  type CSSProperties,
+  type MutableRefObject,
+  type RefObject,
+} from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
+import { mbStyle, mbTokens, resolveMbHeroMode } from "@/lib/minimalism-brown";
+import { resolveHeroVideoMuted } from "@/lib/hero-video-audio";
 import { useCustomText } from "@/lib/custom-texts";
 import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { resolveTextStyles } from "@/lib/text-styles";
@@ -29,10 +35,13 @@ export default function Hero({
   invitation,
   theme,
   audioRef,
+  prefetchedVideoRef,
 }: {
   invitation: InvitationData;
   theme: TemplateTheme;
   audioRef?: MutableRefObject<HTMLAudioElement | null>;
+  /** The invitation's pre-buffered hero <video>, adopted by the polaroid. */
+  prefetchedVideoRef?: RefObject<HTMLVideoElement | null>;
 }) {
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
@@ -46,6 +55,19 @@ export default function Hero({
   const resolved = resolveTextStyles(theme, ts);
   const { instant, reduced } = useMbMotion();
   const still = instant || reduced;
+
+  // With the frame toggle on, the hero video plays in the polaroid window.
+  const directVideoRef = useRef<HTMLVideoElement | null>(null);
+  const frameVideoRef = prefetchedVideoRef ?? directVideoRef;
+  const inFrameVideo =
+    resolveMbHeroMode(invitation) === "polaroid-video"
+      ? {
+          src: invitation.videoUrl as string,
+          poster: invitation.videoPoster,
+          muted: resolveHeroVideoMuted(invitation.heroVideoMuted),
+          prefetched: Boolean(prefetchedVideoRef),
+        }
+      : null;
 
   // Only a vertical drift. An added rotation here inflates the polaroid's
   // bounding box and stacks on top of the tilt already painted into the frame
@@ -180,6 +202,8 @@ export default function Hero({
               : invitation.couple.groom
           }
           theme={theme}
+          video={inFrameVideo}
+          videoRef={frameVideoRef}
         />
         <Sprig
           theme={theme}
@@ -215,8 +239,9 @@ export default function Hero({
         </div>
       )}
       {/* Free-positioned custom text, the same layer the video hero renders.
-          No videoRef here: its timing options key off a video's playback, and
-          a still-image hero has none, so blocks show immediately. */}
+          Its timing options key off the video's playback, so they only apply
+          when the polaroid is playing one; on a still photo blocks show
+          immediately. */}
       <HeroTextOverlay
         layer={invitation.heroTextLayer}
         fonts={{
@@ -226,6 +251,8 @@ export default function Hero({
           ui: resolved.uiFont,
         }}
         play={!reduced}
+        videoRef={inFrameVideo ? frameVideoRef : undefined}
+        timingEnabled={Boolean(inFrameVideo)}
       />
 
     </header>

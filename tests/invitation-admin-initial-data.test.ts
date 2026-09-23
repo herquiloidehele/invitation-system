@@ -31,6 +31,7 @@ const baseRow = {
   videoUrl: null,
   videoPoster: null,
   heroVideoMuted: true,
+  heroVideoInFrame: false,
   heroMediaFit: null,
   curtainVideoUrl: null,
   curtainVideoPoster: null,

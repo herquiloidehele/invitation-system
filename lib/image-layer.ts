@@ -1,16 +1,11 @@
 import type { CSSProperties } from "react";
 
-import {
-  IMAGE_LAYER_SECTION_KEYS,
-  type ImageItem,
-  type ImageLayer,
-  type ImageLayerSectionKey,
-} from "./types";
+import { IMAGE_LAYER_SECTION_KEYS, type ImageItem, type ImageLayer, type ImageLayerSectionKey } from "./types";
 
 export const EMPTY_IMAGE_LAYER: ImageLayer = { items: [] };
 
 /** Soft cap to keep the DOM / mobile-webview memory in check. */
-export const MAX_ITEMS_TOTAL = 24;
+export const MAX_ITEMS_TOTAL = 200;
 
 /** Defaults for a freshly-added item (id/src/naturalAspect/aspect supplied separately). */
 export const DEFAULT_IMAGE_ITEM: Omit<

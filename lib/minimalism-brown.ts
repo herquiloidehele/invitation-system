@@ -334,6 +334,25 @@ interface WishSource {
   submittedAt: Date;
 }
 
+export type MbHeroMode =
+  | "polaroid-photo"
+  | "polaroid-video"
+  | "fullscreen-video";
+
+/**
+ * Which hero this layout renders. A hero video keeps the platform's
+ * full-screen video hero by default — that is what live invitations were
+ * published with — and moves into the polaroid only when the host opts in.
+ */
+export function resolveMbHeroMode(
+  invitation: Pick<InvitationData, "videoUrl" | "heroVideoInFrame">,
+): MbHeroMode {
+  if (!invitation.videoUrl?.trim()) return "polaroid-photo";
+  return invitation.heroVideoInFrame === true
+    ? "polaroid-video"
+    : "fullscreen-video";
+}
+
 export function isGuestbookEnabled(
   config: GuestbookConfig | null | undefined,
 ): boolean {

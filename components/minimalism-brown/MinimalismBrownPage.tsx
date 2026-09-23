@@ -4,7 +4,12 @@ import type { MutableRefObject, RefObject } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { pageBackgroundStyle } from "@/lib/page-background";
 import type { Wish } from "@/lib/minimalism-brown";
-import { mbStyle, mbTokens, mbVenues } from "@/lib/minimalism-brown";
+import {
+  mbStyle,
+  mbTokens,
+  mbVenues,
+  resolveMbHeroMode,
+} from "@/lib/minimalism-brown";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import ImageCanvas from "@/components/shared/ImageCanvas";
 import SectionImageHost from "@/components/shared/SectionImageHost";
@@ -158,7 +163,7 @@ function MinimalismBrownBody({
               padding: `0 0 ${t.gap.section}px`,
             }}
           >
-            {invitation.videoUrl?.trim() ? (
+            {resolveMbHeroMode(invitation) === "fullscreen-video" ? (
               <InvitationHero
                 invitation={invitation}
                 theme={theme}
@@ -167,7 +172,12 @@ function MinimalismBrownBody({
                 animateHeroText
               />
             ) : (
-              <Hero invitation={invitation} theme={theme} audioRef={audioRef} />
+              <Hero
+                invitation={invitation}
+                theme={theme}
+                audioRef={audioRef}
+                prefetchedVideoRef={prefetchedVideoRef}
+              />
             )}
             <SaveTheDate invitation={invitation} theme={theme} />
             <MbSectionImage invitation={invitation} theme={theme} slot="image1" />

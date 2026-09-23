@@ -58,6 +58,7 @@ export function buildInvitationCreateData(
     videoUrl: body.videoUrl ?? null,
     videoPoster: body.videoPoster ?? null,
     heroVideoMuted: body.heroVideoMuted !== false,
+    heroVideoInFrame: body.heroVideoInFrame === true,
     heroMediaFit: isObjectFit(body.heroMediaFit) ? body.heroMediaFit : null,
     curtainVideoUrl: body.curtainVideoUrl ?? null,
     curtainVideoPoster: body.curtainVideoPoster ?? null,

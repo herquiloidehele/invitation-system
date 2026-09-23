@@ -12,6 +12,7 @@ import {
   idleDelay,
   parallaxOffset,
   mbVenues,
+  resolveMbHeroMode,
 } from "../lib/minimalism-brown";
 
 const theme = {
@@ -269,5 +270,36 @@ describe("mbVenues", () => {
     expect(
       mbVenues({ location: { ...church, name: "  " }, location2: quinta }),
     ).toEqual([quinta]);
+  });
+});
+
+describe("resolveMbHeroMode", () => {
+  it("uses the polaroid photo hero when there is no video", () => {
+    expect(resolveMbHeroMode({})).toBe("polaroid-photo");
+    expect(resolveMbHeroMode({ videoUrl: "  " })).toBe("polaroid-photo");
+    expect(resolveMbHeroMode({ videoUrl: "", heroVideoInFrame: true })).toBe(
+      "polaroid-photo",
+    );
+  });
+
+  it("keeps the full-screen video hero unless the frame toggle is on", () => {
+    expect(resolveMbHeroMode({ videoUrl: "https://x/v.mp4" })).toBe(
+      "fullscreen-video",
+    );
+    expect(
+      resolveMbHeroMode({
+        videoUrl: "https://x/v.mp4",
+        heroVideoInFrame: false,
+      }),
+    ).toBe("fullscreen-video");
+  });
+
+  it("plays the video inside the polaroid when the toggle is on", () => {
+    expect(
+      resolveMbHeroMode({
+        videoUrl: "https://x/v.mp4",
+        heroVideoInFrame: true,
+      }),
+    ).toBe("polaroid-video");
   });
 });

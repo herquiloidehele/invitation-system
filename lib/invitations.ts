@@ -67,6 +67,7 @@ type InvitationWithTheme = {
   videoUrl: string | null;
   videoPoster: string | null;
   heroVideoMuted: boolean;
+  heroVideoInFrame: boolean;
   heroMediaFit: string | null;
   curtainVideoUrl: string | null;
   curtainVideoPoster: string | null;
@@ -156,6 +157,7 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     videoUrl: row.videoUrl ?? undefined,
     videoPoster: row.videoPoster ?? undefined,
     heroVideoMuted: row.heroVideoMuted,
+    heroVideoInFrame: row.heroVideoInFrame,
     heroMediaFit: (row.heroMediaFit as ObjectFit | null) ?? undefined,
     curtainVideoUrl: row.curtainVideoUrl ?? undefined,
     curtainVideoPoster: row.curtainVideoPoster ?? undefined,

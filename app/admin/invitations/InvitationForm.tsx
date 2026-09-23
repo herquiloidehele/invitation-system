@@ -2368,6 +2368,26 @@ export default function InvitationForm({
                       value={form.heroVideoMuted}
                       onChange={(value) => update("heroVideoMuted", value)}
                     />
+                    {isMinimalismBrown && form.videoUrl && (
+                      <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
+                        <div className="space-y-0.5">
+                          <Label htmlFor="heroVideoInFrame">
+                            Mostrar vídeo dentro da polaroid
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Desligado, o vídeo ocupa o ecrã inteiro e substitui
+                            a polaroid.
+                          </p>
+                        </div>
+                        <Switch
+                          id="heroVideoInFrame"
+                          checked={form.heroVideoInFrame === true}
+                          onCheckedChange={(checked) =>
+                            update("heroVideoInFrame", checked)
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* ── Section Images ── */}
