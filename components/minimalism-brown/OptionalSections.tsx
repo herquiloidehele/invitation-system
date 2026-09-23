@@ -154,8 +154,14 @@ export default function OptionalSections({
           </SectionTitle>
           {/* The card and its paper grain come from SectionCard, so the shared
               accordion is told to render `plain` — otherwise its own flat fill
-              sits on top of the texture. */}
-          <SectionCard theme={theme} style={{ marginTop: t.gap.block }}>
+              sits on top of the texture. This wrapper already applies the
+              gutter, so the card drops its own margin to match the other
+              cards' width, and each row's padding is the only inset. */}
+          <SectionCard
+            theme={theme}
+            padding="6px 0"
+            style={{ marginTop: t.gap.block, marginInline: 0 }}
+          >
             <FaqSection
               faqs={invitation.faqs}
               theme={theme}

@@ -54,6 +54,7 @@ export default function SectionCard({
   children,
   radius,
   textured = true,
+  padding,
   style,
 }: {
   theme: TemplateTheme;
@@ -61,6 +62,9 @@ export default function SectionCard({
   radius?: number;
   /** The reference textures the schedule card; others take the flat fill. */
   textured?: boolean;
+  /** Inner padding; defaults to the card token. Pass a tighter one when the
+   *  content brings its own inset. */
+  padding?: CSSProperties["padding"];
   style?: CSSProperties;
 }) {
   const t = mbTokens(theme);
@@ -88,7 +92,7 @@ export default function SectionCard({
         {textured && <PaperTexture />}
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, padding: t.card.pad }}>
+      <div style={{ position: "relative", zIndex: 1, padding: padding ?? t.card.pad }}>
         {children}
       </div>
     </div>
