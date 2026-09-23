@@ -871,6 +871,16 @@ export interface TextStyleOverrides {
     ctaLabel?: TextStyle;
     giftLink?: TextStyle;
     giftText?: TextStyle;
+    /** Gift accordion headers ("Lista de presentes", "Transferência bancária"). */
+    giftAccordionHeader?: TextStyle;
+    /** Intro paragraph inside the bank-transfer accordion. */
+    giftBankText?: TextStyle;
+    /** Bank-transfer row label (e.g. account holder). Shared by every row. */
+    giftBankLabel?: TextStyle;
+    /** Bank-transfer row value (e.g. IBAN). Shared by every row. */
+    giftBankValue?: TextStyle;
+    /** "Copiar" button on copyable bank-transfer rows. */
+    giftCopyButton?: TextStyle;
     locationName?: TextStyle;
     locationAddress?: TextStyle;
     guideItemLabel?: TextStyle;

@@ -66,6 +66,16 @@ export interface ResolvedTextStyles {
   giftText: CSSProperties;
   /** Gift link text */
   giftLink: CSSProperties;
+  /** Gift accordion header text */
+  giftAccordionHeader: CSSProperties;
+  /** Bank-transfer intro paragraph */
+  giftBankText: CSSProperties;
+  /** Bank-transfer row label */
+  giftBankLabel: CSSProperties;
+  /** Bank-transfer row value */
+  giftBankValue: CSSProperties;
+  /** Bank-transfer "Copiar" button text (no default colour: follows the card accent) */
+  giftCopyButton: CSSProperties;
   /** Location venue name */
   locationName: CSSProperties;
   /** Location address */
@@ -596,6 +606,52 @@ export function resolveTextStyles(
       textDecoration: "none",
     },
     el?.giftLink,
+  );
+
+  const giftAccordionHeader = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: "0.82rem",
+      fontWeight: 500,
+      color: textPrimary,
+    },
+    el?.giftAccordionHeader,
+  );
+
+  const giftBankText = applyOverride(
+    {
+      fontFamily: bodyFont,
+      fontSize: "0.82rem",
+      color: textSecondary,
+    },
+    el?.giftBankText,
+  );
+
+  const giftBankLabel = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: "0.78rem",
+      fontWeight: 600,
+      color: textPrimary,
+    },
+    el?.giftBankLabel,
+  );
+
+  const giftBankValue = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: "0.78rem",
+      color: textSecondary,
+    },
+    el?.giftBankValue,
+  );
+
+  const giftCopyButton = applyOverride(
+    {
+      fontFamily: uiFont,
+      fontSize: "0.72rem",
+    },
+    el?.giftCopyButton,
   );
 
   const locationName = applyOverride(
@@ -1154,6 +1210,11 @@ export function resolveTextStyles(
     ctaLabel,
     giftText,
     giftLink,
+    giftAccordionHeader,
+    giftBankText,
+    giftBankLabel,
+    giftBankValue,
+    giftCopyButton,
     locationName,
     locationAddress,
     guideItemLabel,

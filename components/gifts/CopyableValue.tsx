@@ -1,6 +1,11 @@
 "use client";
 
-import { useCallback, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { Check, Copy } from "lucide-react";
 
 interface CopyableValueProps {
@@ -10,6 +15,8 @@ interface CopyableValueProps {
   copiedLabel?: string;
   copyLabel?: string;
   iconSize?: number;
+  /** Wraps the visible label, e.g. in an EditableText for the admin toolbar. */
+  renderLabel?: (label: string) => ReactNode;
 }
 
 export function CopyableValue({
@@ -19,6 +26,7 @@ export function CopyableValue({
   copiedLabel = "Copiado",
   copyLabel = "Copiar",
   iconSize = 14,
+  renderLabel = (label) => label,
 }: CopyableValueProps) {
   const [copied, setCopied] = useState(false);
 
@@ -61,7 +69,7 @@ export function CopyableValue({
       style={style}
     >
       {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
-      {copied ? copiedLabel : copyLabel}
+      {renderLabel(copied ? copiedLabel : copyLabel)}
     </button>
   );
 }

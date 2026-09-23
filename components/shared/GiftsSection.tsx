@@ -1,6 +1,12 @@
 "use client";
 
-import { type ReactNode, useCallback, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Gift, ExternalLink, ArrowRight } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -106,6 +112,7 @@ export default function GiftsSection({
               theme={theme}
               cardStyle={cardStyle}
               accent={ts.accent}
+              headerStyle={ts.giftAccordionHeader}
             >
               <div className="flex justify-center mt-2">
                 {hasGiftItems(giftRegistry) ? (
@@ -173,19 +180,20 @@ export default function GiftsSection({
               theme={theme}
               cardStyle={cardStyle}
               accent={ts.accent}
+              headerStyle={ts.giftAccordionHeader}
             >
               {giftRegistry.bankTransferText && (
                 <p
                   style={{
                     margin: "0 0 0.75rem",
-                    fontFamily: theme.bodyFont,
-                    color: theme.textSecondary,
-                    fontSize: "0.82rem",
                     lineHeight: 1.55,
                     whiteSpace: "pre-line",
+                    ...ts.giftBankText,
                   }}
                 >
-                  {giftRegistry.bankTransferText}
+                  <EditableText elementKey="giftBankText">
+                    {giftRegistry.bankTransferText}
+                  </EditableText>
                 </p>
               )}
               <div
@@ -209,31 +217,31 @@ export default function GiftsSection({
                     >
                       <div style={{ minWidth: 0, flex: 1 }}>
                         {row.label?.trim() && (
-                          <div
-                            style={{
-                              fontFamily: theme.uiFont,
-                              fontWeight: 600,
-                              fontSize: "0.78rem",
-                              color: theme.textPrimary,
-                            }}
-                          >
-                            {row.label}
+                          <div style={ts.giftBankLabel}>
+                            <EditableText elementKey="giftBankLabel">
+                              {row.label}
+                            </EditableText>
                           </div>
                         )}
                         <div
                           style={{
-                            fontFamily: theme.uiFont,
-                            fontSize: "0.78rem",
-                            color: theme.textSecondary,
+                            ...ts.giftBankValue,
                             wordBreak: "break-word",
                           }}
                         >
-                          {row.value}
+                          <EditableText elementKey="giftBankValue">
+                            {row.value}
+                          </EditableText>
                         </div>
                       </div>
                       {row.copyable && (
                         <CopyableValue
                           value={row.value}
+                          renderLabel={(label) => (
+                            <EditableText elementKey="giftCopyButton">
+                              {label}
+                            </EditableText>
+                          )}
                           style={{
                             display: "inline-flex",
                             alignItems: "center",
@@ -244,10 +252,11 @@ export default function GiftsSection({
                             border: "none",
                             cursor: "pointer",
                             background: `${cardStyle.accentColor || ts.accent}14`,
-                            color: cardStyle.accentColor || ts.accent,
-                            fontFamily: theme.uiFont,
-                            fontSize: "0.72rem",
                             lineHeight: 1,
+                            ...ts.giftCopyButton,
+                            color:
+                              ts.giftCopyButton.color ??
+                              (cardStyle.accentColor || ts.accent),
                           }}
                         />
                       )}
@@ -268,6 +277,7 @@ interface GiftAccordionProps {
   theme: TemplateTheme;
   cardStyle: CardStyle;
   accent: string;
+  headerStyle: CSSProperties;
 }
 
 function GiftAccordion({
@@ -276,6 +286,7 @@ function GiftAccordion({
   theme,
   cardStyle,
   accent,
+  headerStyle,
 }: GiftAccordionProps) {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLButtonElement>(null);
@@ -327,13 +338,12 @@ function GiftAccordion({
           border: "none",
           cursor: "pointer",
           textAlign: "left",
-          fontFamily: theme.uiFont,
-          fontSize: "0.82rem",
-          color: theme.textPrimary,
           lineHeight: 1.3,
         }}
       >
-        <span style={{ fontWeight: 500 }}>{header}</span>
+        <span style={{ flex: 1, minWidth: 0, ...headerStyle }}>
+          <EditableText elementKey="giftAccordionHeader">{header}</EditableText>
+        </span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.3, ease: EASE }}
