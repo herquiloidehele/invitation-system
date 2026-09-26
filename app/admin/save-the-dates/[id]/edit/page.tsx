@@ -10,6 +10,7 @@ import type { PriceOverrides } from "@/lib/currency/template-price";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import SaveTheDateForm from "../../SaveTheDateForm";
+import { IntakeHeaderActions } from "@/components/admin/IntakeHeaderActions";
 import type { SaveTheDateFormData } from "../../SaveTheDateForm";
 
 export const dynamic = "force-dynamic";
@@ -102,7 +103,32 @@ export default async function EditSaveTheDatePage({
         : "fully_customizable",
   };
 
+  const sourceIntake = await prisma.intake.findUnique({
+    where: { createdSaveTheDateId: item.id },
+    select: { id: true },
+  });
+
   return (
-    <SaveTheDateForm mode="edit" initialData={initialData} themes={themes} />
+    <SaveTheDateForm
+      mode="edit"
+      initialData={initialData}
+      themes={themes}
+      headerActions={
+        <IntakeHeaderActions
+          sourceIntakeId={sourceIntake?.id}
+          demo={
+            item.isDemo
+              ? {
+                  kind: "save-the-date",
+                  id: item.id,
+                  name:
+                    item.landingModelName ||
+                    [couple.bride, couple.groom].filter(Boolean).join(" & "),
+                }
+              : null
+          }
+        />
+      }
+    />
   );
 }

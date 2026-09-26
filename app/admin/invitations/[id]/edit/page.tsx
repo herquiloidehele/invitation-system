@@ -5,6 +5,8 @@ import { getThemes } from "@/lib/themes";
 import { toAdminInvitationInitialData } from "@/lib/invitation-admin-initial-data";
 import InvitationForm from "../../InvitationForm";
 import ExternalInvitationForm from "../../ExternalInvitationForm";
+import { IntakeHeaderActions } from "@/components/admin/IntakeHeaderActions";
+import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +41,33 @@ export default async function EditInvitationPage({
 
   const initialData = toAdminInvitationInitialData(row);
 
+  // Customer intake shortcuts: create a link for a demo, or open the answers
+  // this customer invitation was built from.
+  const sourceIntake = await prisma.intake.findUnique({
+    where: { createdInvitationId: row.id },
+    select: { id: true },
+  });
+  const headerActions = (
+    <IntakeHeaderActions
+      sourceIntakeId={sourceIntake?.id}
+      demo={
+        row.isDemo && !row.blockedAt
+          ? {
+              kind: "convite",
+              id: row.id,
+              name:
+                row.landingModelName ||
+                buildInvitationDisplayName({
+                  eventType: initialData.eventType,
+                  primaryName: initialData.couple.bride,
+                  secondaryName: initialData.couple.groom,
+                }),
+            }
+          : null
+      }
+    />
+  );
+
   const isExternal =
     initialData.invitationType === "external_video" ||
     initialData.invitationType === "external_link";
@@ -51,6 +80,7 @@ export default async function EditInvitationPage({
         invitationId={row.id}
         ownerUrl={ownerUrl}
         themes={themes}
+        headerActions={headerActions}
       />
     );
   }
@@ -62,6 +92,7 @@ export default async function EditInvitationPage({
       invitationId={row.id}
       ownerUrl={ownerUrl}
       themes={themes}
+      headerActions={headerActions}
     />
   );
 }

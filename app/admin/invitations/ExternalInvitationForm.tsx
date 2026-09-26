@@ -1,54 +1,39 @@
 "use client";
 
-import { useState, useCallback, useMemo, useReducer, useRef } from "react";
+import { useCallback, useMemo, useReducer, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { NextIntlClientProvider } from "next-intl";
 import { getClientMessages } from "@/i18n/client-messages";
 import { InvitationLanguagePreviewProvider } from "@/components/shared/InvitationLanguageSwitcher";
-import {
-  Video,
-  Link2,
-  CheckCircle2,
-  Copy,
-  CopyPlus,
-  Check,
-  ExternalLink,
-} from "lucide-react";
+import { Check, CheckCircle2, Copy, CopyPlus, ExternalLink, Link2, Video } from "lucide-react";
 
 import type {
+  BankTransferDetail,
+  CardSectionKey,
+  CardStyle,
+  CoupleGallery,
+  CoverVideos,
+  CustomTexts,
+  EnvelopeConfig,
+  GiftItem,
+  ImageLayer,
+  ImageSettings,
+  ImageSettingsKey,
   InvitationData,
   InvitationEventType,
   InvitationType,
+  PersonalGuestCardVisibility,
   ScratchRevealShape,
   TemplateTheme,
-  EnvelopeConfig,
-  CoverVideos,
-  BankTransferDetail,
-  CoupleGallery,
-  GiftItem,
-  ImageLayer,
   TextStyle,
-  TextStyleOverrides,
-  ImageSettings,
-  ImageSettingsKey,
-  CardSectionKey,
-  CardStyle,
-  CustomTexts,
-  PersonalGuestCardVisibility,
+  TextStyleOverrides
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
-import {
-  buildInvitationMonogram,
-  buildInvitationSlug,
-  isWeddingEventType,
-} from "@/lib/invitation-event-types";
+import { buildInvitationMonogram, buildInvitationSlug, isWeddingEventType } from "@/lib/invitation-event-types";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
-import {
-  normalizeInvitationLocales,
-  validateInvitationLanguageSettings,
-} from "@/lib/invitation-translations";
+import { normalizeInvitationLocales, validateInvitationLanguageSettings } from "@/lib/invitation-translations";
 import { buildInvitationFormPayload } from "@/lib/invitation-form-payload";
 import { useInvitationTranslationDraft } from "@/hooks/use-invitation-translation-draft";
 import { InvitationLanguageSettings } from "@/components/admin/InvitationLanguageSettings";
@@ -61,28 +46,12 @@ import { Switch } from "@/components/ui/switch";
 import { ColorArrayField } from "@/components/admin/ColorArrayField";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import MediaUpload from "@/components/admin/MediaUpload";
 import CoverVideosEditor from "@/components/admin/CoverVideosEditor";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
@@ -95,10 +64,7 @@ import ImageLayerEditor from "@/components/admin/ImageLayerEditor";
 import ImageLayerEditModeControl from "@/components/admin/ImageLayerEditModeControl";
 import ImageLayerUploader from "@/components/admin/ImageLayerUploader";
 import ImageLayerInspector from "@/components/admin/ImageLayerInspector";
-import {
-  imageLayerEditorModeReducer,
-  isImageLayerEditorActive,
-} from "@/lib/image-layer-editor-mode";
+import { imageLayerEditorModeReducer, isImageLayerEditorActive } from "@/lib/image-layer-editor-mode";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
 import GiftsListEditor from "@/components/admin/GiftsListEditor";
 import BankTransferEditor from "@/components/admin/BankTransferEditor";
@@ -107,11 +73,8 @@ import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
-import {
-  resolveInvitationSocialPreview,
-  resolveOwnerSocialPreview,
-} from "@/lib/social-preview";
-import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
+import { resolveInvitationSocialPreview, resolveOwnerSocialPreview } from "@/lib/social-preview";
+import { type CardStyleValue, setCardStyleField } from "@/lib/card-styles";
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import EntryPassQr from "@/components/shared/EntryPassQr";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
@@ -124,29 +87,17 @@ import VideoEntrancePage from "@/components/video-entrance/VideoEntrancePage";
 import { PREVIEW_SAMPLE_GUEST } from "@/components/shared/PersonalGuestCard";
 import InvitationHero from "@/components/shared/InvitationHero";
 import RichExternalLinkPage from "@/components/shared/RichExternalLinkPage";
-import {
-  isCurtainCanvaLayout,
-  resolveScratchRevealShape,
-} from "@/lib/curtain-canva";
-import {
-  DEFAULT_HERO_REVEAL_SECONDS,
-  isVideoEntranceLayout,
-} from "@/lib/video-entrance";
+import { isCurtainCanvaLayout, resolveScratchRevealShape } from "@/lib/curtain-canva";
+import { DEFAULT_HERO_REVEAL_SECONDS, isVideoEntranceLayout } from "@/lib/video-entrance";
 import {
   getExternalInvitationEmbedSrc,
   getExternalInvitationPublicHref,
   hasRichExternalSections,
-  shouldShowExternalInvitationAudioControls,
+  shouldShowExternalInvitationAudioControls
 } from "@/lib/external-invitation-form";
 import { DEFAULT_GUEST_MESSAGE_TEMPLATE } from "@/lib/guest-links";
-import {
-  normalizeOwnerGuestFormMode,
-  OWNER_GUEST_FORM_MODE_OPTIONS,
-} from "@/lib/owner-guest-form-mode";
-import {
-  PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS,
-  resolvePersonalGuestCardVisibility,
-} from "@/lib/personal-guest-card";
+import { normalizeOwnerGuestFormMode, OWNER_GUEST_FORM_MODE_OPTIONS } from "@/lib/owner-guest-form-mode";
+import { PERSONAL_GUEST_CARD_VISIBILITY_OPTIONS, resolvePersonalGuestCardVisibility } from "@/lib/personal-guest-card";
 import { HERO_VIDEO_UPLOAD_PROFILE } from "@/lib/video-upload";
 import { OwnerLinkPanel } from "./OwnerLinkPanel";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
@@ -154,11 +105,11 @@ import { InvitationDuplicateNotice } from "@/components/admin/InvitationDuplicat
 import { EditingLocaleNotice } from "@/components/admin/EditingLocaleNotice";
 import {
   invitationFormCopy,
-  invitationFormRequest,
-  isCreateLikeInvitationMode,
-  readInvitationFormError,
   type InvitationFormError,
   type InvitationFormMode,
+  invitationFormRequest,
+  isCreateLikeInvitationMode,
+  readInvitationFormError
 } from "@/lib/invitation-form-mode";
 import { getInvitationDuplicatePath } from "@/lib/admin-row-navigation";
 import { setSpacingOverride, type SpacingField } from "@/lib/spacing-styles";
@@ -293,6 +244,7 @@ interface ExternalInvitationFormProps {
   sourceCustomerName?: string;
   ownerUrl?: string;
   themes: TemplateTheme[];
+  headerActions?: React.ReactNode;
 }
 
 // ---------------------------------------------------------------------------
@@ -379,6 +331,7 @@ export default function ExternalInvitationForm({
   sourceCustomerName,
   ownerUrl,
   themes,
+  headerActions,
 }: ExternalInvitationFormProps) {
   const router = useRouter();
   const formCopy = invitationFormCopy(mode, true);
@@ -1001,6 +954,7 @@ export default function ExternalInvitationForm({
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                {headerActions}
                 {mode === "edit" && invitationId && (
                   <Link
                     href={getInvitationDuplicatePath(invitationId)}
@@ -2874,7 +2828,10 @@ export default function ExternalInvitationForm({
                                 form.giftRegistry.hideFromInvitation === true
                               }
                               onCheckedChange={(enabled) =>
-                                updateGiftRegistry("hideFromInvitation", enabled)
+                                updateGiftRegistry(
+                                  "hideFromInvitation",
+                                  enabled,
+                                )
                               }
                             />
                           </div>

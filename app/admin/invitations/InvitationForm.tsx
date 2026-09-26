@@ -583,6 +583,8 @@ interface InvitationFormProps {
    * through the cover-skipped admin preview route, not the standard renderer.
    */
   aiPreview?: { revisionId: string | null; locale: string };
+  /** Extra header buttons supplied by the page (e.g. intake form shortcuts). */
+  headerActions?: React.ReactNode;
 }
 
 export default function InvitationForm({
@@ -595,6 +597,7 @@ export default function InvitationForm({
   themes,
   variant = "standard",
   aiPreview,
+  headerActions,
 }: InvitationFormProps) {
   const isAi = variant === "ai";
   const router = useRouter();
@@ -1618,6 +1621,7 @@ export default function InvitationForm({
                 {formCopy.title}
               </h1>
               <div className="flex items-center gap-2">
+                {headerActions}
                 {mode === "edit" && invitationId && (
                   <Link
                     href={getInvitationDuplicatePath(invitationId)}

@@ -203,6 +203,8 @@ model Invitation {
   giftReservations GiftReservation[]
   landingFeatures  LandingFeature[]
   aiBuilds         AiBuild[]
+  intakeDemos      Intake[] @relation("IntakeDemoInvitation")
+  intakeResult     Intake?  @relation("IntakeResultInvitation")
 }
 
 // ---------------------------------------------------------------------------
@@ -280,6 +282,8 @@ model SaveTheDate {
 
   rsvpResponses   SaveTheDateRsvpResponse[]
   landingFeatures LandingFeature[]
+  intakeDemos     Intake[] @relation("IntakeDemoSaveTheDate")
+  intakeResult    Intake?  @relation("IntakeResultSaveTheDate")
 }
 
 // ---------------------------------------------------------------------------
@@ -599,4 +603,56 @@ model AiRevision {
 
   @@index([buildId])
   @@index([invitationId])
+}
+
+// ---------------------------------------------------------------------------
+// Customer intake forms — replaces the legacy Google Form. One Intake per
+// customer request, tied to the demo model they picked; answers are
+// key-value rows so adding a question never needs a migration. The question
+// catalogue and per-key zod schemas live in lib/intake/catalog.ts.
+// ---------------------------------------------------------------------------
+
+model Intake {
+  id                   String       @id @default(cuid())
+  token                String       @unique // personal link token (32 random bytes, base64url)
+  productKind          String // "convite" | "save-the-date"
+  invitationId         String? // demo invitation (productKind = convite)
+  invitation           Invitation?  @relation("IntakeDemoInvitation", fields: [invitationId], references: [id], onDelete: SetNull)
+  saveTheDateId        String? // demo save-the-date (productKind = save-the-date)
+  saveTheDate          SaveTheDate? @relation("IntakeDemoSaveTheDate", fields: [saveTheDateId], references: [id], onDelete: SetNull)
+  demoSlug             String // snapshot so the intake still reads well if the demo is deleted
+  demoName             String
+  source               String // "admin" | "self"
+  locale               String       @default("pt")
+  status               String       @default("draft") // draft | submitted | in_production | archived
+  contactName          String?
+  contactWhatsapp      String? // digits only, country code included, no "+"
+  lastStep             String? // resume pointer (step id)
+  submittedAt          DateTime?
+  answersUpdatedAt     DateTime? // bumped on every answer write
+  adminViewedAt        DateTime? // drives the "changed since you looked" markers
+  createdInvitationId  String?      @unique
+  createdInvitation    Invitation?  @relation("IntakeResultInvitation", fields: [createdInvitationId], references: [id], onDelete: SetNull)
+  createdSaveTheDateId String?      @unique
+  createdSaveTheDate   SaveTheDate? @relation("IntakeResultSaveTheDate", fields: [createdSaveTheDateId], references: [id], onDelete: SetNull)
+  ipHash               String?
+  userAgent            String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  answers              IntakeAnswer[]
+
+  @@index([status, createdAt])
+  @@index([invitationId])
+  @@index([saveTheDateId])
+}
+
+model IntakeAnswer {
+  id        String   @id @default(cuid())
+  intakeId  String
+  intake    Intake   @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+  key       String // catalogue key, e.g. "event", "schedule"
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@unique([intakeId, key])
 }

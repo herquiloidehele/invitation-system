@@ -32,6 +32,28 @@ export function buildDuplicateInvitationInitialData(
   };
 }
 
+/**
+ * Prisma fields that turn a demo copy into a customer invitation: it stops
+ * being a demo and loses its catalogue pricing and landing copy. Shared by the
+ * duplicate route and the intake "apply" route.
+ */
+export function customerInvitationResetData() {
+  return {
+    isDemo: false,
+    priceFromCents: null,
+    discountPriceFromCents: null,
+    currency: "EUR",
+    priceOverrides: Prisma.JsonNull,
+    landingModelName: null,
+    landingImageUrl: null,
+    landingDetailImages: Prisma.JsonNull,
+    landingDescription: null,
+    landingSubtitle: null,
+    landingTranslations: Prisma.JsonNull,
+    landingCustomizationLevel: "fully_customizable",
+  } satisfies Partial<Prisma.InvitationCreateInput>;
+}
+
 function normalizeCustomerName(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
 }
@@ -103,4 +125,33 @@ export function buildDuplicateThemeData(
     ctaGlow: theme.ctaGlow,
     layout: theme.layout,
   };
+}
+
+/**
+ * Create the customer's own copy of a theme inside a transaction, picking the
+ * first free name (`<theme>-<slug>`, then `-2`, `-3`…). Customer invitations
+ * never share a theme with the demo, so later style edits stay private.
+ */
+export async function createCustomerThemeCopy(
+  tx: Prisma.TransactionClient,
+  theme: Theme,
+  invitationSlug: string,
+  customerDisplayName: string,
+) {
+  let suffix = 1;
+  let themeName = buildDuplicateThemeName(theme.name, invitationSlug, suffix);
+
+  while (
+    await tx.theme.findUnique({
+      where: { name: themeName },
+      select: { id: true },
+    })
+  ) {
+    suffix += 1;
+    themeName = buildDuplicateThemeName(theme.name, invitationSlug, suffix);
+  }
+
+  return tx.theme.create({
+    data: buildDuplicateThemeData(theme, themeName, customerDisplayName),
+  });
 }

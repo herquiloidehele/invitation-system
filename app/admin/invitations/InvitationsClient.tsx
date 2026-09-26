@@ -63,6 +63,7 @@ import {
   CopyPlus,
   Ban,
   LockOpen,
+  ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -73,6 +74,10 @@ import {
   getInvitationEditPath,
 } from "@/lib/admin-row-navigation";
 import { BlockInvitationDialog } from "./BlockInvitationDialog";
+import {
+  CreateIntakeDialog,
+  type IntakeDemoOption,
+} from "@/components/admin/CreateIntakeDialog";
 
 const TEMPLATE_LABELS: Record<string, string> = {
   "pink-floral": "Pink Floral",
@@ -99,6 +104,8 @@ export function InvitationsClient({
     id: string;
     coupleName: string;
   } | null>(null);
+  const [intakeDialogFor, setIntakeDialogFor] =
+    useState<IntakeDemoOption | null>(null);
 
   // Derived stats
   const totalRsvps = useMemo(
@@ -561,6 +568,27 @@ export function InvitationsClient({
                               <span className="sr-only">Confirmações</span>
                             </Link>
 
+                            {inv.isDemo && !inv.blockedAt ? (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-8 text-muted-foreground"
+                                title="Criar formulário de cliente"
+                                onClick={() =>
+                                  setIntakeDialogFor({
+                                    kind: "convite",
+                                    id: inv.id,
+                                    name: inv.landingModelName || coupleName,
+                                  })
+                                }
+                              >
+                                <ClipboardList className="size-4" />
+                                <span className="sr-only">
+                                  Criar formulário de cliente
+                                </span>
+                              </Button>
+                            ) : null}
+
                             <Link
                               href={getInvitationDuplicatePath(inv.id)}
                               className={cn(
@@ -729,6 +757,17 @@ export function InvitationsClient({
           )}
         </CardContent>
       </Card>
+
+      {intakeDialogFor ? (
+        <CreateIntakeDialog
+          key={intakeDialogFor.id}
+          open
+          onOpenChange={(open) => {
+            if (!open) setIntakeDialogFor(null);
+          }}
+          preset={intakeDialogFor}
+        />
+      ) : null}
 
       <BlockInvitationDialog
         open={blockDialogFor !== null}

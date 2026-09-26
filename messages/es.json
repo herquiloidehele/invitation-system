@@ -426,7 +426,8 @@
     "fullyCustomizableBody": "La estructura, los colores, los textos, las imágenes y los detalles se pueden adaptar a vuestro evento.",
     "preDesignedBody": "Personalizamos el contenido y la identidad visual manteniendo la estructura de este diseño.",
     "orderingBody": "Escríbenos por WhatsApp. Confirmamos los detalles, recibimos el contenido y preparamos la primera versión para revisión.",
-    "newBadge": "Nuevo"
+    "newBadge": "Nuevo",
+    "customizeShort": "Personalizar"
   },
   "Invitation": {
     "sectionTitle_ourStory": "Nuestra Historia",
@@ -566,5 +567,213 @@
     "description": "Esta invitación ha sido bloqueada y no está disponible por el momento.",
     "reasonLabel": "Motivo",
     "footer": "Brindeal Studio — Invitaciones Digitales"
+  },
+  "Intake": {
+    "metaTitle": "Personaliza tu invitación",
+    "eyebrowInvitation": "Personalizar invitación",
+    "eyebrowSaveTheDate": "Personalizar Save the Date",
+    "viewModel": "Ver diseño",
+    "stepCounter": "Paso {current} de {total}",
+    "saving": "Guardando…",
+    "saved": "Guardado",
+    "saveError": "No se pudo guardar",
+    "back": "Atrás",
+    "continue": "Continuar",
+    "toReview": "Revisar respuestas",
+    "submit": "Enviar respuestas",
+    "saveChanges": "Guardar cambios",
+    "sending": "Enviando…",
+    "edit": "Editar",
+    "optional": "Opcional",
+    "yes": "Sí",
+    "no": "No",
+    "remove": "Quitar",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "welcomeBack": "¡Bienvenido de nuevo, {name}! Continúa donde lo dejaste.",
+    "steps": {
+      "contact": {
+        "title": "Tus datos de contacto",
+        "description": "Usamos WhatsApp para enviarte la primera versión y acordar los detalles."
+      },
+      "event": {
+        "title": "El evento",
+        "description": "Lo esencial: qué se celebra, quién y cuándo."
+      },
+      "locations": {
+        "title": "Lugares",
+        "description": "¿Dónde será? Puedes indicar hasta tres lugares."
+      },
+      "schedule": {
+        "title": "Programa",
+        "description": "Los momentos del día, en orden. Puedes dejarlo en blanco si aún no lo sabes."
+      },
+      "details": {
+        "title": "Detalles",
+        "description": "Código de vestimenta, regalos y música."
+      },
+      "detailsSaveTheDate": {
+        "title": "Detalles",
+        "description": "Confirmación, música y otras peticiones."
+      },
+      "guestGuide": {
+        "title": "Manual del invitado",
+        "description": "Elige las normas que quieres mostrar a los invitados."
+      },
+      "rsvp": {
+        "title": "Confirmación de asistencia",
+        "description": "Cómo confirman los invitados su asistencia."
+      },
+      "extras": {
+        "title": "Últimos detalles",
+        "description": "Todo lo que aún quieras contarnos."
+      }
+    },
+    "fields": {
+      "contactName": "Nombre",
+      "contactNamePlaceholder": "Tu nombre",
+      "whatsapp": "WhatsApp",
+      "whatsappHint": "Elige el prefijo y escribe el número.",
+      "whatsappPrefix": "Prefijo",
+      "whatsappNumberPlaceholder": "84 123 4567",
+      "eventType": "Tipo de evento",
+      "typeLabel": "¿Qué evento es?",
+      "typeLabelPlaceholder": "Ej.: Despedida de soltera",
+      "coupleFirst": "Primer nombre",
+      "coupleSecond": "Segundo nombre",
+      "coupleSecondHint": "Déjalo en blanco si la invitación es de una sola persona.",
+      "singleName": "Nombre que aparece en la invitación",
+      "singleNameHint": "Ej.: el/la cumpleañero/a, el/la graduado/a o la empresa.",
+      "namePlaceholder": "Ej.: Ana",
+      "date": "Fecha del evento",
+      "time": "Hora",
+      "quote": "Frase o versículo",
+      "quotePlaceholder": "Una frase especial para abrir la invitación",
+      "place": "Lugar",
+      "placeHint": "Basta con la ciudad o el país.",
+      "placePlaceholder": "Ej.: Madrid",
+      "parentsToggle": "Incluir los nombres de los padres",
+      "parentsHint": "Aparecen al inicio de la invitación.",
+      "father": "Padre",
+      "mother": "Madre",
+      "bridesFather": "Padre de la novia",
+      "bridesMother": "Madre de la novia",
+      "groomsFather": "Padre del novio",
+      "groomsMother": "Madre del novio",
+      "locationN": "Lugar {n}",
+      "locationKind": "Tipo de lugar",
+      "locationName": "Nombre del lugar",
+      "locationNamePlaceholder": "Ej.: Iglesia de San Antonio",
+      "locationAddress": "Dirección",
+      "locationAddressPlaceholder": "Calle, número, ciudad",
+      "locationMaps": "Enlace de Google Maps",
+      "locationMapsHint": "En Google Maps, toca Compartir y copia el enlace.",
+      "addLocation": "Añadir lugar",
+      "scheduleTime": "Hora",
+      "scheduleLabel": "Momento",
+      "scheduleLabelPlaceholder": "Ej.: Ceremonia",
+      "scheduleVenue": "Lugar",
+      "scheduleVenueNone": "Sin lugar",
+      "addScheduleRow": "Añadir momento",
+      "suggestions": "Sugerencias",
+      "scheduleEmpty": "Aún no hay momentos. Usa las sugerencias o añade uno.",
+      "dressCodeToggle": "¿Hay código de vestimenta?",
+      "dressCodeText": "Código de vestimenta",
+      "dressCodePlaceholder": "Ej.: Traje formal, tonos pastel",
+      "dressCodeColors": "Colores sugeridos",
+      "addColor": "Añadir color",
+      "giftsToggle": "¿Mostrar información de regalos?",
+      "giftsText": "Datos bancarios o lista de regalos",
+      "giftsPlaceholder": "Ej.: IBAN o enlace a tu lista",
+      "musicToggle": "¿Quieres música en la invitación?",
+      "musicText": "Música",
+      "musicPlaceholder": "Ej.: Perfect — Ed Sheeran, o un enlace",
+      "guestGuideToggle": "Mostrar el manual del invitado",
+      "customRules": "Otras normas",
+      "addRule": "Añadir norma",
+      "rulePlaceholder": "Ej.: Traed paraguas",
+      "rsvpDeadline": "Fecha límite para confirmar",
+      "rsvpDeadlineHint": "Después de esta fecha el formulario de confirmación se cierra.",
+      "askDietary": "Preguntar por restricciones alimentarias",
+      "askDietaryHint": "Los invitados indican alergias o dietas al confirmar.",
+      "colors": "Colores de la invitación",
+      "colorsPlaceholder": "Ej.: verde oliva y dorado",
+      "colorsSwatches": "Elegir colores",
+      "faqs": "Preguntas frecuentes",
+      "faqQuestion": "Pregunta",
+      "faqAnswer": "Respuesta",
+      "addFaq": "Añadir pregunta",
+      "notes": "Observaciones y peticiones especiales",
+      "notesPlaceholder": "¿Algo más que debamos saber?",
+      "notesCustomizableHint": "Este diseño es totalmente personalizable: puedes sugerir nuevas secciones o cambios de diseño."
+    },
+    "eventChoices": {
+      "wedding": "Boda",
+      "engagement": "Compromiso",
+      "anniversary": "Cumpleaños",
+      "baptism": "Bautizo",
+      "xiguiane": "Xiguiane",
+      "graduation": "Graduación",
+      "other": "Otro"
+    },
+    "locationKinds": {
+      "religious": "Ceremonia religiosa",
+      "civil": "Ceremonia civil",
+      "reception": "Celebración",
+      "other": "Otro"
+    },
+    "schedulePresets": {
+      "ceremony": "Ceremonia",
+      "cocktail": "Cóctel",
+      "dinner": "Cena",
+      "party": "Fiesta"
+    },
+    "faqPresets": {
+      "howToGetThere": "¿Cómo llegar?",
+      "kids": "¿Puedo llevar niños?",
+      "parking": "¿Hay aparcamiento?"
+    },
+    "guidePresets": {
+      "confirm-presence": "¡Confirma tu asistencia!",
+      "no-photographer": "¡No estorbes al fotógrafo!",
+      "white-bride": "¡El blanco es para la novia!",
+      "no-decor": "¡No te lleves la decoración!",
+      "no-plus-one": "¡Invitado no invita!",
+      "wait-sweets": "¡Espera a que abran la mesa de dulces!",
+      "be-punctual": "¡Sé puntual!",
+      "no-gossip": "¡Evita los comentarios maliciosos!",
+      "attend-ceremony": "¡Ven también a la ceremonia!",
+      "have-fun": "¡Diviértete mucho!",
+      "silent-phone": "¡Pon el móvil en silencio!",
+      "say-goodbye": "¡No te vayas sin despedirte de los novios!",
+      "no-children": "¡No lleves niños!",
+      "take-photos": "¡Haz muchas fotos!"
+    },
+    "errors": {
+      "required": "Campo obligatorio.",
+      "invalid": "Valor no válido.",
+      "tooLong": "Texto demasiado largo.",
+      "tooMany": "Demasiados elementos.",
+      "fixStep": "Revisa los campos marcados.",
+      "network": "Sin conexión. Comprueba internet e inténtalo de nuevo.",
+      "generic": "Algo salió mal. Inténtalo de nuevo.",
+      "rateLimited": "Demasiados intentos. Espera unos minutos.",
+      "readOnly": "Este formulario ya no se puede modificar."
+    },
+    "review": {
+      "title": "Revisa tus respuestas",
+      "description": "Confirma que todo está bien antes de enviar.",
+      "empty": "Sin respuesta",
+      "submittedBanner": "Enviado el {date}. Puedes cambiar las respuestas hasta que empecemos la producción.",
+      "readOnlyBanner": "Tu pedido ya está en producción. Para cambios, escríbenos por WhatsApp.",
+      "talkOnWhatsapp": "Escribir por WhatsApp"
+    },
+    "success": {
+      "title": "¡Hemos recibido tus respuestas!",
+      "body": "Prepararemos la primera versión con el diseño {model} y te la enviaremos por WhatsApp.",
+      "whatsappCta": "Avisar por WhatsApp",
+      "whatsappMessage": "¡Hola! Acabo de rellenar el formulario del diseño {model}. Ref. {ref}",
+      "editAnswers": "Revisar o cambiar respuestas"
+    }
   }
 }

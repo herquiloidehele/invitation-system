@@ -17,6 +17,8 @@ export type InvitationRow = {
   rsvp: { enabled: boolean };
   /** "standard" | "ai" — AI invitations route to their own builder page. */
   renderMode: string;
+  /** Catalogue name shown for demos (null for customer invitations). */
+  landingModelName: string | null;
   createdAt: Date | string;
   _count: { rsvpResponses: number };
 };
@@ -36,6 +38,7 @@ export default async function AdminInvitationsPage() {
       date: true,
       rsvp: true,
       renderMode: true,
+      landingModelName: true,
       createdAt: true,
       _count: { select: { rsvpResponses: true } },
     },

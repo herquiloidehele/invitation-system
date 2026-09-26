@@ -18,3 +18,7 @@ export const getInvitationRsvpPath = (slug: string) =>
 
 export const getSaveTheDateRsvpPath = (slug: string) =>
   `/admin/rsvps?tab=std&std=${slug}`;
+
+export const getIntakesPath = () => "/admin/formularios";
+
+export const getIntakePath = (id: string) => `/admin/formularios/${id}`;
