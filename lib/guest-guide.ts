@@ -1,7 +1,7 @@
 import type { GuestGuideItem } from "./types";
 
 /**
- * The 12 predefined "Manual do bom convidado" items shown as a
+ * The predefined "Manual do bom convidado" items shown as a
  * checkbox grid in the admin editor and rendered on the invitation page.
  */
 export const PREDEFINED_GUIDE_ITEMS: GuestGuideItem[] = [
@@ -76,6 +76,18 @@ export const PREDEFINED_GUIDE_ITEMS: GuestGuideItem[] = [
     label: "Não saia sem se despedir dos noivos!",
     iconType: "lucide",
     iconName: "HeartHandshake",
+  },
+  {
+    id: "no-children",
+    label: "Não leve crianças!",
+    iconType: "lucide",
+    iconName: "Baby",
+  },
+  {
+    id: "take-photos",
+    label: "Tire muitas fotos!",
+    iconType: "lucide",
+    iconName: "Aperture",
   },
 ];
 

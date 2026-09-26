@@ -38,3 +38,22 @@ export function defaultInvitationDate(daysAhead = 30): DateInfo {
     display: `${d.getUTCDate()} de ${PT_MONTHS[d.getUTCMonth()]} de ${d.getUTCFullYear()}`,
   };
 }
+
+/**
+ * The pre-formatted date shape for a picked calendar day ("YYYY-MM-DD"),
+ * stored at UTC midnight like the admin form does. Used when customer intake
+ * answers are turned into an invitation.
+ */
+export function buildInvitationDateInfo(isoDate: string, time = ""): DateInfo {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const d = new Date(Date.UTC(year, month - 1, day));
+  return {
+    iso: d.toISOString(),
+    time,
+    day: String(d.getUTCDate()).padStart(2, "0"),
+    month: PT_MONTHS[d.getUTCMonth()],
+    year: String(d.getUTCFullYear()),
+    dayOfWeek: PT_DAYS[d.getUTCDay()],
+    display: `${d.getUTCDate()} de ${PT_MONTHS[d.getUTCMonth()]} de ${d.getUTCFullYear()}`,
+  };
+}

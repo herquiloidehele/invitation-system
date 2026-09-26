@@ -426,7 +426,8 @@
     "fullyCustomizableBody": "Estrutura, cores, textos, imagens e detalhes podem ser adaptados ao vosso evento.",
     "preDesignedBody": "Personalizamos o conteúdo e a identidade visual mantendo a estrutura deste design.",
     "orderingBody": "Envie-nos uma mensagem no WhatsApp. Confirmamos os detalhes, recebemos o conteúdo e preparamos a primeira versão para revisão.",
-    "newBadge": "Novo"
+    "newBadge": "Novo",
+    "customizeShort": "Personalizar"
   },
   "Invitation": {
     "sectionTitle_ourStory": "Nossa História",
@@ -566,5 +567,213 @@
     "description": "Este convite foi bloqueado e de momento não está disponível.",
     "reasonLabel": "Motivo",
     "footer": "Brindeal Studio — Convites Digitais"
+  },
+  "Intake": {
+    "metaTitle": "Personalizar o seu convite",
+    "eyebrowInvitation": "Personalizar convite",
+    "eyebrowSaveTheDate": "Personalizar Save the Date",
+    "viewModel": "Ver modelo",
+    "stepCounter": "Passo {current} de {total}",
+    "saving": "A guardar…",
+    "saved": "Guardado",
+    "saveError": "Não foi possível guardar",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "toReview": "Rever respostas",
+    "submit": "Enviar respostas",
+    "saveChanges": "Guardar alterações",
+    "sending": "A enviar…",
+    "edit": "Editar",
+    "optional": "Opcional",
+    "yes": "Sim",
+    "no": "Não",
+    "remove": "Remover",
+    "moveUp": "Subir",
+    "moveDown": "Descer",
+    "welcomeBack": "Bem-vindo de volta, {name}! Continue de onde parou.",
+    "steps": {
+      "contact": {
+        "title": "Os seus contactos",
+        "description": "Usamos o WhatsApp para lhe enviar a primeira versão e combinar os detalhes."
+      },
+      "event": {
+        "title": "O evento",
+        "description": "O essencial: o que se celebra, quem e quando."
+      },
+      "locations": {
+        "title": "Locais",
+        "description": "Onde acontece? Pode indicar até três locais."
+      },
+      "schedule": {
+        "title": "Cronograma",
+        "description": "Os momentos do dia, por ordem. Pode deixar em branco se ainda não souber."
+      },
+      "details": {
+        "title": "Detalhes",
+        "description": "Código de vestimenta, presentes e música."
+      },
+      "detailsSaveTheDate": {
+        "title": "Detalhes",
+        "description": "Confirmação, música e outros pedidos."
+      },
+      "guestGuide": {
+        "title": "Manual do convidado",
+        "description": "Escolha as regras que quer mostrar aos convidados."
+      },
+      "rsvp": {
+        "title": "Confirmação de presença",
+        "description": "Como os convidados confirmam a presença."
+      },
+      "extras": {
+        "title": "Últimos detalhes",
+        "description": "Tudo o que ainda nos queira dizer."
+      }
+    },
+    "fields": {
+      "contactName": "Nome",
+      "contactNamePlaceholder": "O seu nome",
+      "whatsapp": "WhatsApp",
+      "whatsappHint": "Escolha o indicativo e escreva o número.",
+      "whatsappPrefix": "Indicativo",
+      "whatsappNumberPlaceholder": "84 123 4567",
+      "eventType": "Tipo de evento",
+      "typeLabel": "Que evento é?",
+      "typeLabelPlaceholder": "Ex.: Chá de panela",
+      "coupleFirst": "Primeiro nome",
+      "coupleSecond": "Segundo nome",
+      "coupleSecondHint": "Deixe em branco se o convite for só de uma pessoa.",
+      "singleName": "Nome a mostrar no convite",
+      "singleNameHint": "Ex.: nome do(a) aniversariante, do(a) formando(a) ou da empresa.",
+      "namePlaceholder": "Ex.: Ana",
+      "date": "Data do evento",
+      "time": "Hora",
+      "quote": "Frase ou versículo",
+      "quotePlaceholder": "Uma frase especial para abrir o convite",
+      "place": "Local",
+      "placeHint": "Basta a cidade ou o país.",
+      "placePlaceholder": "Ex.: Maputo",
+      "parentsToggle": "Incluir os nomes dos pais",
+      "parentsHint": "Aparecem no início do convite.",
+      "father": "Pai",
+      "mother": "Mãe",
+      "bridesFather": "Pai da noiva",
+      "bridesMother": "Mãe da noiva",
+      "groomsFather": "Pai do noivo",
+      "groomsMother": "Mãe do noivo",
+      "locationN": "Local {n}",
+      "locationKind": "Tipo de local",
+      "locationName": "Nome do local",
+      "locationNamePlaceholder": "Ex.: Igreja de Santo António",
+      "locationAddress": "Morada",
+      "locationAddressPlaceholder": "Rua, número, cidade",
+      "locationMaps": "Link do Google Maps",
+      "locationMapsHint": "No Google Maps, toque em Partilhar e copie o link.",
+      "addLocation": "Adicionar local",
+      "scheduleTime": "Hora",
+      "scheduleLabel": "Momento",
+      "scheduleLabelPlaceholder": "Ex.: Cerimónia",
+      "scheduleVenue": "Local",
+      "scheduleVenueNone": "Sem local",
+      "addScheduleRow": "Adicionar momento",
+      "suggestions": "Sugestões",
+      "scheduleEmpty": "Ainda sem momentos. Use as sugestões ou adicione um.",
+      "dressCodeToggle": "Há código de vestimenta?",
+      "dressCodeText": "Código de vestimenta",
+      "dressCodePlaceholder": "Ex.: Traje formal, tons pastel",
+      "dressCodeColors": "Cores sugeridas",
+      "addColor": "Adicionar cor",
+      "giftsToggle": "Mostrar informação de presentes?",
+      "giftsText": "Dados bancários ou lista de presentes",
+      "giftsPlaceholder": "Ex.: IBAN, M-Pesa ou link da lista",
+      "musicToggle": "Quer música no convite?",
+      "musicText": "Música",
+      "musicPlaceholder": "Ex.: Perfect — Ed Sheeran, ou um link",
+      "guestGuideToggle": "Mostrar o manual do convidado",
+      "customRules": "Outras regras",
+      "addRule": "Adicionar regra",
+      "rulePlaceholder": "Ex.: Tragam guarda-chuva",
+      "rsvpDeadline": "Data limite para confirmar",
+      "rsvpDeadlineHint": "Depois desta data o formulário de confirmação fecha.",
+      "askDietary": "Perguntar por restrições alimentares",
+      "askDietaryHint": "Os convidados indicam alergias ou dietas ao confirmar.",
+      "colors": "Cores do convite",
+      "colorsPlaceholder": "Ex.: verde-oliva e dourado",
+      "colorsSwatches": "Escolher cores",
+      "faqs": "Perguntas frequentes",
+      "faqQuestion": "Pergunta",
+      "faqAnswer": "Resposta",
+      "addFaq": "Adicionar pergunta",
+      "notes": "Observações e pedidos especiais",
+      "notesPlaceholder": "Algo mais que devamos saber?",
+      "notesCustomizableHint": "Este modelo é totalmente personalizável: pode sugerir novas secções ou alterações ao design."
+    },
+    "eventChoices": {
+      "wedding": "Casamento",
+      "engagement": "Noivado",
+      "anniversary": "Aniversário",
+      "baptism": "Batizado",
+      "xiguiane": "Xiguiane",
+      "graduation": "Graduação",
+      "other": "Outro"
+    },
+    "locationKinds": {
+      "religious": "Cerimónia religiosa",
+      "civil": "Cerimónia civil",
+      "reception": "Celebração",
+      "other": "Outro"
+    },
+    "schedulePresets": {
+      "ceremony": "Cerimónia",
+      "cocktail": "Cocktail",
+      "dinner": "Jantar",
+      "party": "Festa"
+    },
+    "faqPresets": {
+      "howToGetThere": "Como chegar?",
+      "kids": "Posso levar crianças?",
+      "parking": "Há estacionamento?"
+    },
+    "guidePresets": {
+      "confirm-presence": "Confirme a sua presença!",
+      "no-photographer": "Não atrapalhe o fotógrafo!",
+      "white-bride": "Branco é a cor da noiva!",
+      "no-decor": "Não leve a decoração!",
+      "no-plus-one": "Convidado não convida!",
+      "wait-sweets": "Espere liberar a mesa dos doces!",
+      "be-punctual": "Seja pontual!",
+      "no-gossip": "Evite comentários maldosos!",
+      "attend-ceremony": "Vá também à cerimónia!",
+      "have-fun": "Divirta-se muito!",
+      "silent-phone": "Deixe o telemóvel em silêncio!",
+      "say-goodbye": "Não saia sem se despedir dos noivos!",
+      "no-children": "Não leve crianças!",
+      "take-photos": "Tire muitas fotos!"
+    },
+    "errors": {
+      "required": "Campo obrigatório.",
+      "invalid": "Valor inválido.",
+      "tooLong": "Texto demasiado longo.",
+      "tooMany": "Demasiados itens.",
+      "fixStep": "Reveja os campos assinalados.",
+      "network": "Sem ligação. Verifique a internet e tente de novo.",
+      "generic": "Algo correu mal. Tente de novo.",
+      "rateLimited": "Demasiadas tentativas. Aguarde uns minutos.",
+      "readOnly": "Este formulário já não pode ser alterado."
+    },
+    "review": {
+      "title": "Reveja as suas respostas",
+      "description": "Confirme que está tudo certo antes de enviar.",
+      "empty": "Sem resposta",
+      "submittedBanner": "Enviado a {date}. Pode alterar as respostas até começarmos a produção.",
+      "readOnlyBanner": "O seu pedido já está em produção. Para alterações, fale connosco no WhatsApp.",
+      "talkOnWhatsapp": "Falar no WhatsApp"
+    },
+    "success": {
+      "title": "Recebemos as suas respostas!",
+      "body": "Vamos preparar a primeira versão com o modelo {model} e enviamos pelo WhatsApp.",
+      "whatsappCta": "Avisar no WhatsApp",
+      "whatsappMessage": "Olá! Acabei de preencher o formulário do modelo {model}. Ref. {ref}",
+      "editAnswers": "Rever ou alterar respostas"
+    }
   }
 }

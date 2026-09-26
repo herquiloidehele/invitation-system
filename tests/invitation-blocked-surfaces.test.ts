@@ -11,6 +11,7 @@ const PAGES = [
   "app/[locale]/[slug]/gifts/page.tsx",
   "app/[locale]/[slug]/pass/page.tsx",
   "app/[locale]/confirmacoes/[token]/page.tsx",
+  "app/[locale]/personalizar/novo/[kind]/[slug]/page.tsx",
 ];
 
 describe("blocked invitation — pages", () => {

@@ -426,7 +426,8 @@
     "fullyCustomizableBody": "The structure, colours, wording, images and details can be adapted to your event.",
     "preDesignedBody": "We personalize the content and visual identity while keeping this design’s structure.",
     "orderingBody": "Message us on WhatsApp. We confirm the details, collect your content and prepare the first version for review.",
-    "newBadge": "New"
+    "newBadge": "New",
+    "customizeShort": "Personalise"
   },
   "Invitation": {
     "sectionTitle_ourStory": "Our Story",
@@ -566,5 +567,213 @@
     "description": "This invitation has been blocked and is currently unavailable.",
     "reasonLabel": "Reason",
     "footer": "Brindeal Studio — Digital Invitations"
+  },
+  "Intake": {
+    "metaTitle": "Personalise your invitation",
+    "eyebrowInvitation": "Personalise invitation",
+    "eyebrowSaveTheDate": "Personalise Save the Date",
+    "viewModel": "View design",
+    "stepCounter": "Step {current} of {total}",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "saveError": "Could not save",
+    "back": "Back",
+    "continue": "Continue",
+    "toReview": "Review answers",
+    "submit": "Send answers",
+    "saveChanges": "Save changes",
+    "sending": "Sending…",
+    "edit": "Edit",
+    "optional": "Optional",
+    "yes": "Yes",
+    "no": "No",
+    "remove": "Remove",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "welcomeBack": "Welcome back, {name}! Pick up where you left off.",
+    "steps": {
+      "contact": {
+        "title": "Your contact details",
+        "description": "We use WhatsApp to send you the first version and agree on the details."
+      },
+      "event": {
+        "title": "The event",
+        "description": "The essentials: what you are celebrating, who and when."
+      },
+      "locations": {
+        "title": "Venues",
+        "description": "Where does it take place? You can add up to three venues."
+      },
+      "schedule": {
+        "title": "Schedule",
+        "description": "The moments of the day, in order. Leave it blank if you don't know yet."
+      },
+      "details": {
+        "title": "Details",
+        "description": "Dress code, gifts and music."
+      },
+      "detailsSaveTheDate": {
+        "title": "Details",
+        "description": "RSVP, music and other requests."
+      },
+      "guestGuide": {
+        "title": "Guest guide",
+        "description": "Choose the rules you want to show your guests."
+      },
+      "rsvp": {
+        "title": "RSVP",
+        "description": "How guests confirm their attendance."
+      },
+      "extras": {
+        "title": "Final details",
+        "description": "Anything else you would like to tell us."
+      }
+    },
+    "fields": {
+      "contactName": "Name",
+      "contactNamePlaceholder": "Your name",
+      "whatsapp": "WhatsApp",
+      "whatsappHint": "Choose the country code and type the number.",
+      "whatsappPrefix": "Country code",
+      "whatsappNumberPlaceholder": "84 123 4567",
+      "eventType": "Type of event",
+      "typeLabel": "What is the event?",
+      "typeLabelPlaceholder": "E.g.: Bridal shower",
+      "coupleFirst": "First name",
+      "coupleSecond": "Second name",
+      "coupleSecondHint": "Leave blank if the invitation is for one person.",
+      "singleName": "Name shown on the invitation",
+      "singleNameHint": "E.g.: the birthday person, the graduate or the company.",
+      "namePlaceholder": "E.g.: Ana",
+      "date": "Event date",
+      "time": "Time",
+      "quote": "Quote or verse",
+      "quotePlaceholder": "A special line to open the invitation",
+      "place": "Place",
+      "placeHint": "The city or country is enough.",
+      "placePlaceholder": "E.g.: Lisbon",
+      "parentsToggle": "Include the parents' names",
+      "parentsHint": "Shown at the top of the invitation.",
+      "father": "Father",
+      "mother": "Mother",
+      "bridesFather": "Bride's father",
+      "bridesMother": "Bride's mother",
+      "groomsFather": "Groom's father",
+      "groomsMother": "Groom's mother",
+      "locationN": "Venue {n}",
+      "locationKind": "Type of venue",
+      "locationName": "Venue name",
+      "locationNamePlaceholder": "E.g.: St Anthony's Church",
+      "locationAddress": "Address",
+      "locationAddressPlaceholder": "Street, number, city",
+      "locationMaps": "Google Maps link",
+      "locationMapsHint": "In Google Maps, tap Share and copy the link.",
+      "addLocation": "Add venue",
+      "scheduleTime": "Time",
+      "scheduleLabel": "Moment",
+      "scheduleLabelPlaceholder": "E.g.: Ceremony",
+      "scheduleVenue": "Venue",
+      "scheduleVenueNone": "No venue",
+      "addScheduleRow": "Add moment",
+      "suggestions": "Suggestions",
+      "scheduleEmpty": "No moments yet. Use a suggestion or add one.",
+      "dressCodeToggle": "Is there a dress code?",
+      "dressCodeText": "Dress code",
+      "dressCodePlaceholder": "E.g.: Formal wear, pastel tones",
+      "dressCodeColors": "Suggested colours",
+      "addColor": "Add colour",
+      "giftsToggle": "Show gift information?",
+      "giftsText": "Bank details or gift list",
+      "giftsPlaceholder": "E.g.: IBAN or a link to your list",
+      "musicToggle": "Would you like music on the invitation?",
+      "musicText": "Music",
+      "musicPlaceholder": "E.g.: Perfect — Ed Sheeran, or a link",
+      "guestGuideToggle": "Show the guest guide",
+      "customRules": "Other rules",
+      "addRule": "Add rule",
+      "rulePlaceholder": "E.g.: Bring an umbrella",
+      "rsvpDeadline": "RSVP deadline",
+      "rsvpDeadlineHint": "After this date the RSVP form closes.",
+      "askDietary": "Ask about dietary requirements",
+      "askDietaryHint": "Guests mention allergies or diets when they RSVP.",
+      "colors": "Invitation colours",
+      "colorsPlaceholder": "E.g.: olive green and gold",
+      "colorsSwatches": "Pick colours",
+      "faqs": "Frequently asked questions",
+      "faqQuestion": "Question",
+      "faqAnswer": "Answer",
+      "addFaq": "Add question",
+      "notes": "Notes and special requests",
+      "notesPlaceholder": "Anything else we should know?",
+      "notesCustomizableHint": "This design is fully customisable: you can suggest new sections or design changes."
+    },
+    "eventChoices": {
+      "wedding": "Wedding",
+      "engagement": "Engagement",
+      "anniversary": "Birthday",
+      "baptism": "Baptism",
+      "xiguiane": "Xiguiane",
+      "graduation": "Graduation",
+      "other": "Other"
+    },
+    "locationKinds": {
+      "religious": "Religious ceremony",
+      "civil": "Civil ceremony",
+      "reception": "Reception",
+      "other": "Other"
+    },
+    "schedulePresets": {
+      "ceremony": "Ceremony",
+      "cocktail": "Cocktails",
+      "dinner": "Dinner",
+      "party": "Party"
+    },
+    "faqPresets": {
+      "howToGetThere": "How do I get there?",
+      "kids": "Can I bring children?",
+      "parking": "Is there parking?"
+    },
+    "guidePresets": {
+      "confirm-presence": "Please RSVP!",
+      "no-photographer": "Don't get in the photographer's way!",
+      "white-bride": "White is for the bride!",
+      "no-decor": "Don't take the decorations!",
+      "no-plus-one": "No plus-ones!",
+      "wait-sweets": "Wait for the dessert table to open!",
+      "be-punctual": "Be on time!",
+      "no-gossip": "No gossip!",
+      "attend-ceremony": "Come to the ceremony too!",
+      "have-fun": "Have lots of fun!",
+      "silent-phone": "Keep your phone on silent!",
+      "say-goodbye": "Say goodbye to the couple before leaving!",
+      "no-children": "No children, please!",
+      "take-photos": "Take lots of photos!"
+    },
+    "errors": {
+      "required": "Required field.",
+      "invalid": "Invalid value.",
+      "tooLong": "Text is too long.",
+      "tooMany": "Too many items.",
+      "fixStep": "Please check the highlighted fields.",
+      "network": "No connection. Check your internet and try again.",
+      "generic": "Something went wrong. Please try again.",
+      "rateLimited": "Too many attempts. Please wait a few minutes.",
+      "readOnly": "This form can no longer be changed."
+    },
+    "review": {
+      "title": "Review your answers",
+      "description": "Make sure everything is right before sending.",
+      "empty": "No answer",
+      "submittedBanner": "Sent on {date}. You can change your answers until we start production.",
+      "readOnlyBanner": "Your order is already in production. For changes, message us on WhatsApp.",
+      "talkOnWhatsapp": "Message us on WhatsApp"
+    },
+    "success": {
+      "title": "We received your answers!",
+      "body": "We'll prepare the first version with the {model} design and send it on WhatsApp.",
+      "whatsappCta": "Let us know on WhatsApp",
+      "whatsappMessage": "Hi! I just filled in the form for the {model} design. Ref. {ref}",
+      "editAnswers": "Review or change answers"
+    }
   }
 }

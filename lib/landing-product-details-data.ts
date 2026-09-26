@@ -12,6 +12,7 @@ import {
 import { isLandingFeatureNew } from "@/lib/landing-new-badge";
 import { localizeLandingMetadata } from "@/lib/landing-translations";
 import { buildPurchaseMessage, buildWhatsappUrl } from "@/lib/landing-whatsapp";
+import { buildSelfStartPath } from "@/lib/intake/links";
 import type { AppLocale } from "@/i18n/locales";
 
 export type LandingProductDetails = {
@@ -33,6 +34,8 @@ export type LandingProductDetails = {
   previewHref: string;
   detailsHref: string;
   whatsappHref: string;
+  /** Starts the native intake form for this model. */
+  customizeHref: string;
 };
 
 const productSelect = {
@@ -177,6 +180,7 @@ export async function getLandingProductDetails(
     previewHref: kind === "convite" ? `/${slug}` : `/s/${slug}`,
     detailsHref: buildLandingProductDetailsPath(kind, slug),
     whatsappHref: buildWhatsappUrl(buildPurchaseMessage(title)),
+    customizeHref: buildSelfStartPath(kind, slug, locale),
   };
 }
 

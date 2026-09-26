@@ -20,11 +20,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { ExternalLink, Pencil, Plus, Search, Trash2, Users } from "lucide-react";
+import {
+  ClipboardList,
+  ExternalLink,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { SaveTheDateRow } from "./page";
 import { getSaveTheDateEditPath } from "@/lib/admin-row-navigation";
+import {
+  CreateIntakeDialog,
+  type IntakeDemoOption,
+} from "@/components/admin/CreateIntakeDialog";
 
 interface Props {
   items: SaveTheDateRow[];
@@ -36,6 +48,8 @@ export function SaveTheDatesClient({ items: initial }: Props) {
   const [search, setSearch] = useState("");
   const [demoTab, setDemoTab] = useState<"real" | "demo">("real");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [intakeDialogFor, setIntakeDialogFor] =
+    useState<IntakeDemoOption | null>(null);
 
   const realCount = useMemo(
     () => items.filter((item) => !item.isDemo).length,
@@ -217,6 +231,27 @@ export function SaveTheDatesClient({ items: initial }: Props) {
                           <Users className="size-4" />
                         </Link>
                       )}
+                      {item.isDemo ? (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Criar formulário de cliente"
+                          onClick={() =>
+                            setIntakeDialogFor({
+                              kind: "save-the-date",
+                              id: item.id,
+                              name:
+                                item.landingModelName ||
+                                [item.couple.bride, item.couple.groom]
+                                  .filter(Boolean)
+                                  .join(" & "),
+                            })
+                          }
+                        >
+                          <ClipboardList className="size-4" />
+                          <span className="sr-only">Criar formulário de cliente</span>
+                        </Button>
+                      ) : null}
                       <Link
                         href={`/admin/save-the-dates/${item.id}/edit`}
                         className={cn(
@@ -274,6 +309,16 @@ export function SaveTheDatesClient({ items: initial }: Props) {
           </TableBody>
         </Table>
       </div>
+      {intakeDialogFor ? (
+        <CreateIntakeDialog
+          key={intakeDialogFor.id}
+          open
+          onOpenChange={(open) => {
+            if (!open) setIntakeDialogFor(null);
+          }}
+          preset={intakeDialogFor}
+        />
+      ) : null}
     </div>
   );
 }

@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { Prisma } from "@/lib/generated/prisma/client";
 import {
   buildInvitationCreateData,
   type InvitationCreateBody,
 } from "@/lib/invitation-create-data";
 import {
   INVITATION_SLUG_PATTERN,
-  buildDuplicateThemeData,
-  buildDuplicateThemeName,
+  createCustomerThemeCopy,
+  customerInvitationResetData,
   isSameInvitationCustomer,
 } from "@/lib/invitation-duplication";
 import {
@@ -121,49 +120,15 @@ export async function POST(
     });
 
     const invitation = await prisma.$transaction(async (tx) => {
-      let suffix = 1;
-      let themeName = buildDuplicateThemeName(
-        selectedTheme.name,
+      const copiedTheme = await createCustomerThemeCopy(
+        tx,
+        selectedTheme,
         body.slug,
-        suffix,
+        customerDisplayName,
       );
-
-      while (
-        await tx.theme.findUnique({
-          where: { name: themeName },
-          select: { id: true },
-        })
-      ) {
-        suffix += 1;
-        themeName = buildDuplicateThemeName(
-          selectedTheme.name,
-          body.slug,
-          suffix,
-        );
-      }
-
-      const copiedTheme = await tx.theme.create({
-        data: buildDuplicateThemeData(
-          selectedTheme,
-          themeName,
-          customerDisplayName,
-        ),
-      });
       const data = buildInvitationCreateData(body, copiedTheme.id);
 
-      Object.assign(data, {
-        isDemo: false,
-        priceFromCents: null,
-        discountPriceFromCents: null,
-        currency: "EUR",
-        priceOverrides: Prisma.JsonNull,
-        landingModelName: null,
-        landingImageUrl: null,
-        landingDescription: null,
-        landingSubtitle: null,
-        landingTranslations: Prisma.JsonNull,
-        landingCustomizationLevel: "fully_customizable",
-      });
+      Object.assign(data, customerInvitationResetData());
 
       return tx.invitation.create({
         data,

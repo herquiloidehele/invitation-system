@@ -13,6 +13,7 @@ export type SaveTheDateRow = {
   ownerToken: string;
   rsvpEnabled: boolean;
   isDemo: boolean;
+  landingModelName: string | null;
 };
 
 export default async function AdminSaveTheDatesPage() {
@@ -33,6 +34,7 @@ export default async function AdminSaveTheDatesPage() {
       ownerToken: item.ownerToken,
       rsvpEnabled: rsvp?.enabled === true,
       isDemo: item.isDemo,
+      landingModelName: item.landingModelName,
     };
   });
 

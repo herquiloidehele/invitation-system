@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   AudioWaveform,
   ChevronsUpDown,
+  ClipboardList,
   Database,
   FolderKanban,
   GalleryVerticalEnd,
@@ -27,6 +28,7 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
@@ -63,6 +65,11 @@ const navMain = [
     icon: PenTool,
   },
   {
+    title: "Formulários",
+    url: "/admin/formularios",
+    icon: ClipboardList,
+  },
+  {
     title: "Confirmações",
     url: "/admin/rsvps",
     icon: Users,
@@ -87,7 +94,12 @@ const navDocuments = [
   },
 ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  intakeBadge = 0,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  intakeBadge?: number;
+}) {
   const pathname = usePathname();
 
   return (
@@ -158,11 +170,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   render={<Link href={item.url} />}
                   tooltip={item.title}
-                  isActive={pathname === item.url || pathname.startsWith(`${item.url}/`)}
+                  isActive={
+                    pathname === item.url || pathname.startsWith(`${item.url}/`)
+                  }
                 >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>
+                {item.url === "/admin/formularios" && intakeBadge > 0 ? (
+                  <SidebarMenuBadge className="bg-primary text-primary-foreground peer-data-active/menu-button:text-primary-foreground">
+                    {intakeBadge}
+                  </SidebarMenuBadge>
+                ) : null}
               </SidebarMenuItem>
             ))}
           </SidebarMenu>

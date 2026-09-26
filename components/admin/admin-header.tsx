@@ -88,6 +88,15 @@ function getBreadcrumbs(pathname: string) {
           href: `/admin/save-the-dates/${segments[2]}/edit`,
         });
       }
+    } else if (segments[1] === "formularios") {
+      crumbs.push({ label: "Formulários", href: "/admin/formularios" });
+
+      if (segments[2]) {
+        crumbs.push({
+          label: "Respostas",
+          href: `/admin/formularios/${segments[2]}`,
+        });
+      }
     } else if (segments[1] === "save-the-date-themes") {
       crumbs.push({ label: "Modelos STD", href: "/admin/save-the-date-themes" });
 

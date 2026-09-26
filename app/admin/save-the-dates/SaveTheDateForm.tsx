@@ -126,6 +126,8 @@ interface Props {
   mode: "create" | "edit";
   initialData: SaveTheDateFormData;
   themes: SaveTheDateThemeData[];
+  /** Extra header buttons supplied by the page (e.g. intake form shortcuts). */
+  headerActions?: React.ReactNode;
 }
 
 // ---------------------------------------------------------------------------
@@ -343,7 +345,12 @@ function LocationFields({
 // Component
 // ---------------------------------------------------------------------------
 
-export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
+export default function SaveTheDateForm({
+  mode,
+  initialData,
+  themes,
+  headerActions,
+}: Props) {
   const router = useRouter();
   const [data, setData] = useState<SaveTheDateFormData>(initialData);
   const [saving, setSaving] = useState(false);
@@ -667,13 +674,16 @@ export default function SaveTheDateForm({ mode, initialData, themes }: Props) {
                 ? "Novo Save the Date"
                 : "Editar Save the Date"}
             </h1>
-            <Button onClick={handleSubmit} disabled={saving}>
-              {saving
-                ? "A guardar..."
-                : mode === "create"
-                  ? "Criar"
-                  : "Guardar Alterações"}
-            </Button>
+            <div className="flex items-center gap-2">
+              {headerActions}
+              <Button onClick={handleSubmit} disabled={saving}>
+                {saving
+                  ? "A guardar..."
+                  : mode === "create"
+                    ? "Criar"
+                    : "Guardar Alterações"}
+              </Button>
+            </div>
           </div>
 
           {/* Owner link — only shown in edit mode when RSVP is enabled */}
