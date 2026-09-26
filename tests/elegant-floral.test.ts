@@ -6,6 +6,7 @@ import {
   wrapCarouselIndex,
   countdownPartsFrom,
   efGuestGuideCardStyle,
+  resolveEfScheduleStyle,
 } from "../lib/elegant-floral";
 
 describe("isElegantFloralLayout", () => {
@@ -98,6 +99,33 @@ describe("efGuestGuideCardStyle", () => {
     expect(efGuestGuideCardStyle(theme, { plain: false }).plain).toBe(false);
     expect(efGuestGuideCardStyle(theme, {}).plain).toBe(false);
     expect(efGuestGuideCardStyle(theme, null).plain).toBe(false);
+  });
+});
+
+describe("resolveEfScheduleStyle", () => {
+  it("keeps the timeline for invitations that never chose a style", () => {
+    expect(resolveEfScheduleStyle(undefined)).toBe("timeline");
+    expect(resolveEfScheduleStyle(null)).toBe("timeline");
+    expect(resolveEfScheduleStyle("default")).toBe("timeline");
+  });
+
+  it("returns the centered stack only when explicitly chosen", () => {
+    expect(resolveEfScheduleStyle("stacked")).toBe("stacked");
+  });
+
+  it("treats styles this layout never rendered as the timeline", () => {
+    expect(resolveEfScheduleStyle("illustrated")).toBe("timeline");
+  });
+});
+
+describe("elegant-floral schedule wiring", () => {
+  const block = readFileSync(
+    "components/elegant-floral/ScheduleBlock.tsx",
+    "utf8",
+  );
+
+  it("picks the schedule markup from the invitation's scheduleStyle", () => {
+    expect(block).toContain("resolveEfScheduleStyle(invitation.scheduleStyle)");
   });
 });
 

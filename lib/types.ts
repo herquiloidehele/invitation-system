@@ -64,7 +64,13 @@ export interface LocationInfo {
   photos?: LocationPhoto[];
 }
 
-export type ScheduleStyle = "default" | "illustrated";
+/**
+ * "default" and "illustrated" are the platform-wide styles. "stacked" is the
+ * elegant-floral layout's centered label/time/venue list, the look that
+ * layout shipped with before its scroll-driven timeline; other layouts treat
+ * it as "default".
+ */
+export type ScheduleStyle = "default" | "illustrated" | "stacked";
 
 export type ScheduleIcon =
   | "neutral"

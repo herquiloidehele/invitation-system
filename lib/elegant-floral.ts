@@ -4,6 +4,7 @@ import type {
   TemplateTheme,
   LocationInfo,
   LocationPhoto,
+  ScheduleStyle,
   TextStyleOverrides,
 } from "./types";
 import { applyOverride } from "./text-styles";
@@ -41,6 +42,25 @@ export function efGuestGuideCardStyle(
       `color-mix(in srgb, ${theme.secondary} 28%, transparent)`,
     plain: override?.plain === true,
   };
+}
+
+/** The two schedule renderings this layout offers. */
+export type EfScheduleStyle = "timeline" | "stacked";
+
+/**
+ * Which schedule markup the elegant-floral layout renders for an invitation's
+ * stored `scheduleStyle`.
+ *
+ * The scroll-driven timeline is what every existing invitation shows, so it
+ * stays the answer for an unset value and for "default". "illustrated" is a
+ * platform style this layout never rendered, so it maps to the timeline too
+ * rather than to a blank section. Only an explicit "stacked" brings back the
+ * centered label/time/venue list.
+ */
+export function resolveEfScheduleStyle(
+  scheduleStyle: ScheduleStyle | string | null | undefined,
+): EfScheduleStyle {
+  return scheduleStyle === "stacked" ? "stacked" : "timeline";
 }
 
 /**

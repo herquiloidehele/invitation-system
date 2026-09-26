@@ -414,6 +414,14 @@ const SCHEDULE_STYLE_OPTIONS: { value: ScheduleStyle; label: string }[] = [
   { value: "illustrated", label: "Ilustrado" },
 ];
 
+/** The elegant-floral layout renders its own two schedule looks (see
+ *  ScheduleBlock); "illustrated" never applied there, so it isn't offered. */
+const EF_SCHEDULE_STYLE_OPTIONS: { value: ScheduleStyle; label: string }[] =
+  [
+    { value: "default", label: "Linha do tempo" },
+    { value: "stacked", label: "Lista centrada" },
+  ];
+
 const SCHEDULE_ICON_OPTIONS: { value: ScheduleIcon; label: string }[] = [
   { value: "neutral", label: "Neutro (relógio)" },
   { value: "rings", label: "Alianças" },
@@ -1461,6 +1469,22 @@ export default function InvitationForm({
 
   const isElegantFloral = currentTheme.layout === "elegant-floral";
   const isMinimalismBrown = currentTheme.layout === "minimalism-brown";
+
+  // Each layout offers its own schedule looks. A value stored under another
+  // layout (or an older admin) may not be on this list; show it as the first
+  // option, which is what the page renders for it.
+  const scheduleStyleOptions = isElegantFloral
+    ? EF_SCHEDULE_STYLE_OPTIONS
+    : SCHEDULE_STYLE_OPTIONS;
+  const scheduleStyleValue: ScheduleStyle = scheduleStyleOptions.some(
+    (option) => option.value === form.scheduleStyle,
+  )
+    ? (form.scheduleStyle as ScheduleStyle)
+    : scheduleStyleOptions[0].value;
+  // The scroll-driven timeline (minimalism-brown's default, elegant-floral's
+  // "Linha do tempo") is what reads the marker image.
+  const hasScheduleMarker =
+    isMinimalismBrown || (isElegantFloral && scheduleStyleValue === "default");
   const hasSpacingStyles = Boolean(
     (form.spacingStyles?.sections &&
       Object.keys(form.spacingStyles.sections).length > 0) ||
@@ -3750,7 +3774,7 @@ export default function InvitationForm({
                   <div className="space-y-1">
                     <Label className="text-xs">Layout do programa</Label>
                     <Select
-                      value={form.scheduleStyle ?? "default"}
+                      value={scheduleStyleValue}
                       onValueChange={(value) =>
                         setForm((prev) => ({
                           ...prev,
@@ -3759,10 +3783,16 @@ export default function InvitationForm({
                       }
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecionar layout" />
+                        <SelectValue placeholder="Selecionar layout">
+                          {(value: string | null) =>
+                            scheduleStyleOptions.find(
+                              (option) => option.value === value,
+                            )?.label ?? value
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
-                        {SCHEDULE_STYLE_OPTIONS.map((option) => (
+                        {scheduleStyleOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -3770,7 +3800,7 @@ export default function InvitationForm({
                       </SelectContent>
                     </Select>
                   </div>
-                  {isMinimalismBrown && (
+                  {hasScheduleMarker && (
                     <div className="space-y-1">
                       <Label className="text-xs">
                         Imagem que percorre a linha do tempo
@@ -3788,7 +3818,7 @@ export default function InvitationForm({
                       />
                     </div>
                   )}
-                  {form.scheduleStyle === "illustrated" && (
+                  {scheduleStyleValue === "illustrated" && (
                     <div className="space-y-1">
                       <Label className="text-xs">
                         Cor dos ícones e conectores
