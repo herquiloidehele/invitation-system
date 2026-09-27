@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { autoScrollFrame, isUserScroll } from "@/lib/auto-scroll";
+import { autoScrollFrame, isUserScroll, recordWrite } from "@/lib/auto-scroll";
 
 // ---------------------------------------------------------------------------
 // Opening auto-scroll
@@ -23,7 +23,7 @@ const AUTO_SCROLL_DELAY_MS = 1500;
  * of the way the moment they take over.
  *
  * Yields on any sign of intent — wheel, touch, pointer, key, or a scroll
- * position that isn't the one we just set — and never resumes: re-grabbing the
+ * position that isn't one we recently set — and never resumes: re-grabbing the
  * page after someone has started reading is worse than not animating at all.
  *
  * Disabled entirely under reduced motion.
@@ -47,7 +47,10 @@ export function useAutoScroll({
 
     let raf = 0;
     let startTimer = 0;
-    const state = { lastMs: 0, lastY: 0 };
+    // `trail` holds our last few writes: a mobile browser reports the scroll
+    // position back a frame or two late, so a reading that matches any of
+    // them is still us.
+    const state = { lastMs: 0, lastY: 0, trail: [0] };
 
     const stop = () => {
       cancelled.current = true;
@@ -57,7 +60,7 @@ export function useAutoScroll({
     };
 
     const onScroll = () => {
-      if (!cancelled.current && isUserScroll(window.scrollY, state.lastY))
+      if (!cancelled.current && isUserScroll(window.scrollY, state.trail))
         stop();
     };
 
@@ -72,7 +75,7 @@ export function useAutoScroll({
       // position and conclude nobody moved. That fights anyone scrolling
       // without a wheel or touch event: anchor jumps, browser scroll
       // restoration, screen readers, keyboard-driven scrolling.
-      if (isUserScroll(window.scrollY, state.lastY)) {
+      if (isUserScroll(window.scrollY, state.trail)) {
         stop();
         return;
       }
@@ -95,6 +98,7 @@ export function useAutoScroll({
       );
       state.lastMs = now;
       state.lastY = nextY;
+      state.trail = recordWrite(state.trail, nextY);
       // `behavior: "instant"` matters: globals.css sets `scroll-behavior:
       // smooth` document-wide, which would route each sub-pixel step of this
       // crawl through the smooth scroller — the position then lags what we
@@ -112,6 +116,7 @@ export function useAutoScroll({
       if (cancelled.current) return;
       state.lastMs = performance.now();
       state.lastY = window.scrollY;
+      state.trail = [state.lastY];
       setRunning(true);
       raf = requestAnimationFrame(frame);
     };

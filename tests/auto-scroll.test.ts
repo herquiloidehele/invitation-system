@@ -1,6 +1,11 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { autoScrollFrame, isUserScroll } from "../lib/auto-scroll";
+import {
+  autoScrollFrame,
+  ECHO_FRAMES,
+  isUserScroll,
+  recordWrite,
+} from "../lib/auto-scroll";
 
 describe("autoScrollFrame", () => {
   it("advances by elapsed time, not by frame count", () => {
@@ -28,12 +33,27 @@ describe("autoScrollFrame", () => {
 
 describe("isUserScroll", () => {
   it("ignores our own write and sub-pixel rounding", () => {
-    expect(isUserScroll(200, 200)).toBe(false);
-    expect(isUserScroll(202, 200)).toBe(false);
+    expect(isUserScroll(200, [200])).toBe(false);
+    expect(isUserScroll(202, [200])).toBe(false);
   });
   it("detects a real move in either direction", () => {
-    expect(isUserScroll(260, 200)).toBe(true);
-    expect(isUserScroll(120, 200)).toBe(true);
+    expect(isUserScroll(260, [196, 198, 200])).toBe(true);
+    expect(isUserScroll(120, [196, 198, 200])).toBe(true);
+  });
+  it("tolerates a mobile browser echoing a write from a frame or two ago", () => {
+    // Captured on an iPhone: after a slow frame the crawl had written 91.4,
+    // while iOS still reported its echo of the earlier 86.9 write, truncated.
+    expect(isUserScroll(86, [82.9, 84.9, 86.9, 91.4])).toBe(false);
+  });
+});
+
+describe("recordWrite", () => {
+  it("keeps only the last ECHO_FRAMES writes, oldest first", () => {
+    let trail: number[] = [0];
+    for (let y = 2; y <= 20; y += 2) trail = recordWrite(trail, y);
+    expect(trail).toHaveLength(ECHO_FRAMES);
+    expect(trail.at(-1)).toBe(20);
+    expect(trail[0]).toBe(20 - 2 * (ECHO_FRAMES - 1));
   });
 });
 

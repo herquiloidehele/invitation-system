@@ -39,16 +39,37 @@ export function autoScrollFrame(
 }
 
 /**
- * True when a scroll position differs enough from what we last set to be the
- * reader rather than us.
+ * How many of our own recent writes a reported scroll position may still be
+ * echoing.
  *
- * Browsers round and rubber-band scroll positions, so an exact comparison
- * would read our own writes as user input and cancel the crawl immediately.
+ * Mobile browsers own the scroll position off the main thread and report it
+ * back late. On an iPhone, `scrollY` at the start of a frame reads the position
+ * we wrote two frames earlier, truncated to a whole pixel — about 3px behind at
+ * 120px/s, and more after any slow frame. Comparing against our latest write
+ * alone mistakes that echo for the reader and stops the crawl a few seconds in.
+ */
+export const ECHO_FRAMES = 4;
+
+/** Append a write to the trail of recent ones, keeping the last `ECHO_FRAMES`. */
+export function recordWrite(trail: readonly number[], y: number): number[] {
+  return [...trail, y].slice(-ECHO_FRAMES);
+}
+
+/**
+ * True when a scroll position can't be explained by any of our recent writes,
+ * so it must be the reader (or an anchor jump, scroll restoration, a screen
+ * reader) rather than us.
+ *
+ * Browsers also round and rubber-band scroll positions, hence the tolerance
+ * either side of the trail.
  */
 export function isUserScroll(
   observedY: number,
-  ourLastY: number,
+  ourRecentY: readonly number[],
   tolerance = 4,
 ): boolean {
-  return Math.abs(observedY - ourLastY) > tolerance;
+  return (
+    observedY < Math.min(...ourRecentY) - tolerance ||
+    observedY > Math.max(...ourRecentY) + tolerance
+  );
 }
