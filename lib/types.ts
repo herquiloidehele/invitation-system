@@ -839,6 +839,9 @@ export interface TextStyleOverrides {
     mbWishDate?: TextStyle;
     mbVenueAddress?: TextStyle;
     mbLinkLabel?: TextStyle;
+    /** The couple's names in the ceremony card — independent of mbNames,
+     *  which is the hero's. */
+    mbAnnounceNames?: TextStyle;
     /** The "&" between the announcement names (larger than the hero's). */
     mbAnnounceAmp?: TextStyle;
     mbCalendarMonth?: TextStyle;

@@ -146,7 +146,8 @@ export default function CeremonyInfo({
           </RevealGroup>
         )}
 
-        {/* The couple on one line; long names wrap at the ampersand. */}
+        {/* The couple on one line; long names wrap at the ampersand. Styled
+            under their own key so they never move with the hero's names. */}
         <p
           style={{
             margin: `${showParents ? t.gap.section / 2 : t.gap.block}px 0 0`,
@@ -158,8 +159,8 @@ export default function CeremonyInfo({
             textAlign: "center",
           }}
         >
-          <span style={mbStyle(bigName, ts, "mbNames")}>
-            <EditableText elementKey="mbNames">{firstName}</EditableText>
+          <span style={mbStyle(bigName, ts, "mbAnnounceNames")}>
+            <EditableText elementKey="mbAnnounceNames">{firstName}</EditableText>
           </span>
           {secondName !== undefined && (
             <>
@@ -178,8 +179,8 @@ export default function CeremonyInfo({
               >
                 <EditableText elementKey="mbAnnounceAmp">&amp;</EditableText>
               </span>
-              <span style={mbStyle(bigName, ts, "mbNames")}>
-                <EditableText elementKey="mbNames">{secondName}</EditableText>
+              <span style={mbStyle(bigName, ts, "mbAnnounceNames")}>
+                <EditableText elementKey="mbAnnounceNames">{secondName}</EditableText>
               </span>
             </>
           )}
