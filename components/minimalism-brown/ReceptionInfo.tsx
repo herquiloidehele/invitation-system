@@ -6,7 +6,6 @@ import { mbCalendarDetail, mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import CalendarButton from "@/components/shared/CalendarButton";
-import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
 import MonthCalendar from "./MonthCalendar";
 import { Reveal } from "./motion";
@@ -61,11 +60,7 @@ export default function ReceptionInfo({
           depth={0.04}
           layer={20}
         />
-        <SectionTitle theme={theme} textStyles={ts}>
-          {ct("sectionTitle_receptionInfo")}
-        </SectionTitle>
-
-        <p style={{ ...intro, marginTop: t.gap.block }}>
+        <p style={intro}>
           <EditableText elementKey="mbVenueLine">
             {ct("mb_receptionIntro")}
           </EditableText>
