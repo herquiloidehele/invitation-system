@@ -152,12 +152,15 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         label: "Linha acima dos nomes",
         placeholder: "O Casamento De",
       },
-      { key: "mb_groomCaption", label: "Legenda do noivo", placeholder: "O Noivo" },
-      { key: "mb_brideCaption", label: "Legenda da noiva", placeholder: "A Noiva" },
       {
         key: "mb_receptionIntro",
-        label: "Introdução do copo de água",
+        label: "Secção do calendário — introdução",
         placeholder: "A receção terá lugar em:",
+      },
+      {
+        key: "mb_calendarDetail",
+        label: "Secção do calendário — descrição (vazio = oculta)",
+        placeholder: "Quinta da Alegria, Sintra",
       },
       {
         key: "mb_sendWishes",

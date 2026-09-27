@@ -17,10 +17,13 @@
     "year": "2027"
   },
   "quote": "A vossa presença seria o maior presente que poderíamos receber.",
+  "customTexts": {
+    "mb_calendarDetail": "Quinta da Alegria"
+  },
   "parents": {
     "enabled": true,
-    "blessingMessage": "Com a bênção das nossas famílias",
-    "inviteMessage": "É com enorme alegria que anunciamos o casamento dos nossos filhos",
+    "blessingMessage": "Com a bênção de Deus e seus pais",
+    "inviteMessage": "Convidam para a celebração do seu casamento",
     "bridesFather": "Henrique Albuquerque",
     "bridesMother": "Teresa Albuquerque",
     "groomsFather": "Manuel Seabra",

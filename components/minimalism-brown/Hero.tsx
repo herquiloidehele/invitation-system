@@ -8,10 +8,14 @@ import {
 } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { mbStyle, mbTokens, resolveMbHeroMode } from "@/lib/minimalism-brown";
+import {
+  mbCoupleNames,
+  mbStyle,
+  mbTokens,
+  resolveMbHeroMode,
+} from "@/lib/minimalism-brown";
 import { resolveHeroVideoMuted } from "@/lib/hero-video-audio";
 import { useCustomText } from "@/lib/custom-texts";
-import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { resolveTextStyles } from "@/lib/text-styles";
 import HeroTextOverlay from "@/components/shared/HeroTextOverlay";
 import { EASE } from "@/components/shared/animations";
@@ -48,7 +52,7 @@ export default function Hero({
   const ct = useCustomText(invitation.customTexts);
   // Only a wedding pairs two names. A baptism or anniversary has one
   // honouree, and showing "&" plus a second name invents a person.
-  const isWedding = isWeddingEventType(invitation.eventType);
+  const [firstName, secondName] = mbCoupleNames(invitation);
   // The free-text layer is hero media furniture, so it belongs on the
   // still-image hero too — not only the video path.
   const hideDefaultText = invitation.heroTextLayer?.hideDefaultText === true;
@@ -152,11 +156,9 @@ export default function Hero({
           {...enter(0.18)}
         >
           <span style={mbStyle(name, ts, "mbNames")}>
-            <EditableText elementKey="mbNames">
-              {invitation.couple.groom}
-            </EditableText>
+            <EditableText elementKey="mbNames">{firstName}</EditableText>
           </span>
-          {isWedding && (
+          {secondName !== undefined && (
             <>
               <span
                 aria-hidden
@@ -169,9 +171,7 @@ export default function Hero({
                 <EditableText elementKey="mbAmpersand">&amp;</EditableText>
               </span>
               <span style={mbStyle(name, ts, "mbNames")}>
-                <EditableText elementKey="mbNames">
-                  {invitation.couple.bride}
-                </EditableText>
+                <EditableText elementKey="mbNames">{secondName}</EditableText>
               </span>
             </>
           )}
@@ -196,11 +196,7 @@ export default function Hero({
         <Polaroid
           fit={invitation.heroMediaFit ?? undefined}
           src={invitation.heroImage}
-          alt={
-            isWedding
-              ? `${invitation.couple.groom} & ${invitation.couple.bride}`
-              : invitation.couple.groom
-          }
+          alt={[firstName, secondName].filter(Boolean).join(" & ")}
           theme={theme}
           video={inFrameVideo}
           videoRef={frameVideoRef}

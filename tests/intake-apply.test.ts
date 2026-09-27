@@ -226,6 +226,53 @@ describe("buildInvitationFromIntake", () => {
   });
 });
 
+describe("buildInvitationFromIntake on minimalism-brown", () => {
+  const mbDemo = {
+    ...demo,
+    customTexts: {
+      ...demo.customTexts,
+      mb_heroEyebrow: "O Casamento De",
+      mb_calendarDetail: "Quinta da Alegria",
+    },
+  };
+
+  it("starts the calendar description from the customer's reception venue", () => {
+    const result = buildInvitationFromIntake(mbDemo, fullAnswers, {
+      slug: "maria-pedro",
+      layout: "minimalism-brown",
+    });
+    expect(result.customTexts?.mb_calendarDetail).toBe("Quinta do Sol");
+    // The demo's other texts are design, not content — they stay.
+    expect(result.customTexts?.mb_heroEyebrow).toBe("O Casamento De");
+  });
+
+  it("uses the only venue when the customer gave one", () => {
+    const result = buildInvitationFromIntake(
+      mbDemo,
+      { ...fullAnswers, locations: [{ name: "Reitoria" }] },
+      { slug: "maria-pedro", layout: "minimalism-brown" },
+    );
+    expect(result.customTexts?.mb_calendarDetail).toBe("Reitoria");
+  });
+
+  it("drops the demo's description when the customer gave no venue", () => {
+    const result = buildInvitationFromIntake(
+      mbDemo,
+      { ...fullAnswers, locations: [] },
+      { slug: "maria-pedro", layout: "minimalism-brown" },
+    );
+    expect(result.customTexts?.mb_calendarDetail).toBeUndefined();
+  });
+
+  it("leaves other layouts' custom texts untouched", () => {
+    const result = buildInvitationFromIntake(demo, fullAnswers, {
+      slug: "maria-pedro",
+      layout: "default",
+    });
+    expect(result.customTexts).toEqual(demo.customTexts);
+  });
+});
+
 describe("buildSaveTheDateFromIntake", () => {
   const stdDemo = {
     themeId: "std_theme",

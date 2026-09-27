@@ -13,6 +13,10 @@ import {
   parallaxOffset,
   mbVenues,
   resolveMbHeroMode,
+  mbCoupleNames,
+  mbParentsShown,
+  mbBlessingLine,
+  mbCalendarDetail,
 } from "../lib/minimalism-brown";
 
 const theme = {
@@ -301,5 +305,88 @@ describe("resolveMbHeroMode", () => {
         heroVideoInFrame: true,
       }),
     ).toBe("polaroid-video");
+  });
+});
+
+describe("mbCoupleNames", () => {
+  const couple = { bride: "Constança", groom: "Rodrigo", monogram: "CR" };
+
+  it("puts the first name field (the bride) first, as the rest of the platform does", () => {
+    expect(mbCoupleNames({ couple, eventType: "wedding" })).toEqual([
+      "Constança",
+      "Rodrigo",
+    ]);
+  });
+
+  it("shows only the primary name for a single-honouree event", () => {
+    expect(mbCoupleNames({ couple, eventType: "baptism" })).toEqual([
+      "Constança",
+    ]);
+  });
+});
+
+const parents = {
+  enabled: true,
+  blessingMessage: "Com a bênção de Deus e seus pais",
+  inviteMessage: "Convidam para a celebração do seu casamento",
+  bridesFather: "Henrique",
+  bridesMother: "",
+  groomsFather: "",
+  groomsMother: "",
+};
+
+describe("mbParentsShown", () => {
+  it("shows the parents when the mode is on and a name is filled in", () => {
+    expect(mbParentsShown(parents)).toBe(true);
+  });
+
+  it("hides them when the mode is off, even with names stored", () => {
+    expect(mbParentsShown({ ...parents, enabled: false })).toBe(false);
+  });
+
+  it("hides them when the mode is on but every name is blank", () => {
+    expect(mbParentsShown({ ...parents, bridesFather: "  " })).toBe(false);
+    expect(mbParentsShown(undefined)).toBe(false);
+  });
+});
+
+describe("mbBlessingLine", () => {
+  const fallback = "Com a bênção de Deus";
+
+  it("uses the parents' blessing when parents mode is on", () => {
+    expect(mbBlessingLine(parents, fallback)).toBe(
+      "Com a bênção de Deus e seus pais",
+    );
+  });
+
+  it("uses the section title when parents mode is off", () => {
+    expect(mbBlessingLine({ ...parents, enabled: false }, fallback)).toBe(
+      fallback,
+    );
+    expect(mbBlessingLine(undefined, fallback)).toBe(fallback);
+  });
+
+  it("falls back to the section title when the blessing is blank", () => {
+    expect(mbBlessingLine({ ...parents, blessingMessage: " " }, fallback)).toBe(
+      fallback,
+    );
+  });
+
+  it("is null when there is no text at all", () => {
+    expect(mbBlessingLine({ ...parents, enabled: false }, "  ")).toBeNull();
+  });
+});
+
+describe("mbCalendarDetail", () => {
+  it("returns the free-text description, trimmed", () => {
+    expect(mbCalendarDetail({ mb_calendarDetail: " Quinta da Alegria " })).toBe(
+      "Quinta da Alegria",
+    );
+  });
+
+  it("is null when blank or unset, so the line is hidden", () => {
+    expect(mbCalendarDetail({ mb_calendarDetail: "  " })).toBeNull();
+    expect(mbCalendarDetail({})).toBeNull();
+    expect(mbCalendarDetail(undefined)).toBeNull();
   });
 });

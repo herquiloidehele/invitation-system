@@ -66,7 +66,7 @@ async function applyInvitation(intake: LoadedIntake) {
   const body = buildInvitationFromIntake(
     buildDuplicateInvitationInitialData(row),
     intake.answers,
-    { slug },
+    { slug, layout: row.theme.layout },
   );
   const displayName =
     buildInvitationDisplayName({

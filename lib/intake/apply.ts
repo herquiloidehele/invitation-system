@@ -6,8 +6,10 @@ import {
   buildInvitationSlug,
 } from "@/lib/invitation-event-types";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
+import { isMinimalismBrownLayout } from "@/lib/minimalism-brown";
 import type {
   AudioConfig,
+  CustomTexts,
   GuestGuideItem,
   InvitationData,
   LocationInfo,
@@ -114,6 +116,24 @@ function parentsFrom(
 }
 
 /**
+ * minimalism-brown's calendar description is free text, so the demo's copy
+ * would describe the demo's venue. Start it from the customer's reception
+ * venue (the second, else the first) — a one-time copy the host edits from
+ * there, not a link.
+ */
+function customTextsFrom(
+  demo: CustomTexts | undefined,
+  layout: string | null | undefined,
+  venueName: string,
+): CustomTexts | undefined {
+  if (!isMinimalismBrownLayout({ layout })) return demo;
+  const texts: CustomTexts = { ...demo };
+  delete texts.mb_calendarDetail;
+  if (venueName) texts.mb_calendarDetail = venueName;
+  return texts;
+}
+
+/**
  * Overlay intake answers onto a demo copy (the output of
  * buildDuplicateInvitationInitialData). Design and layout stay the demo's;
  * content becomes the customer's; demo text that would leak is cleared.
@@ -121,7 +141,14 @@ function parentsFrom(
 export function buildInvitationFromIntake(
   demo: InvitationData,
   answers: IntakeAnswers,
-  { slug }: { slug: string },
+  {
+    slug,
+    layout,
+  }: {
+    slug: string;
+    /** The demo theme's layout; some layouts carry venue-specific texts. */
+    layout?: string | null;
+  },
 ): InvitationData {
   const event = answers.event;
   const eventType = event?.type ?? demo.eventType;
@@ -149,6 +176,11 @@ export function buildInvitationFromIntake(
       ? toLocation(firstLocation)
       : { name: "", address: "", googleMapsUrl: "" },
     location2: secondLocation ? toLocation(secondLocation) : undefined,
+    customTexts: customTextsFrom(
+      demo.customTexts,
+      layout,
+      clean(secondLocation?.name) || clean(firstLocation?.name),
+    ),
     schedule: (answers.schedule ?? [])
       .filter((row) => clean(row.label))
       .map((row) => ({

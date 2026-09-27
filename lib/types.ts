@@ -825,7 +825,6 @@ export interface TextStyleOverrides {
     mbParentLabel?: TextStyle;
     mbParentName?: TextStyle;
     mbAnnounce?: TextStyle;
-    mbRoleCaption?: TextStyle;
     mbVenueLine?: TextStyle;
     mbTimeValue?: TextStyle;
     mbScheduleTime?: TextStyle;
@@ -1057,9 +1056,9 @@ export interface CustomTexts {
 
   // -- Minimalism Brown template --
   mb_heroEyebrow?: string;
-  mb_groomCaption?: string;
-  mb_brideCaption?: string;
   mb_receptionIntro?: string;
+  /** Free-text line under the calendar section's intro. Not tied to a venue. */
+  mb_calendarDetail?: string;
   mb_sendWishes?: string;
   mb_giftTapToOpen?: string;
   /** Shown under the RSVP message field when the guestbook publishes it. */

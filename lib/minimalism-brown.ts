@@ -2,13 +2,16 @@ import type { CSSProperties } from "react";
 import type {
   CardSectionKey,
   CardStyleOverrides,
+  CustomTexts,
   GuestbookConfig,
   InvitationData,
   LocationInfo,
+  ParentsInfo,
   TemplateTheme,
   TextStyleOverrides,
 } from "./types";
 import { applyOverride } from "./text-styles";
+import { isWeddingEventType } from "./invitation-event-types";
 
 /**
  * Returns true when the theme should render via the MinimalismBrownPage
@@ -393,4 +396,55 @@ export function mbVenues(
   return [invitation.location, invitation.location2].filter(
     (venue): venue is LocationInfo => !!venue?.name?.trim(),
   );
+}
+
+// ---------------------------------------------------------------------------
+// Opening text
+// ---------------------------------------------------------------------------
+
+/**
+ * The names in display order. The first name field (`bride`) comes first, as
+ * on every other layout, and is the only one a single-honouree event shows.
+ */
+export function mbCoupleNames(
+  invitation: Pick<InvitationData, "couple" | "eventType">,
+): string[] {
+  const { bride, groom } = invitation.couple;
+  return isWeddingEventType(invitation.eventType) ? [bride, groom] : [bride];
+}
+
+/** Parents' names show only with parents mode on and at least one filled in. */
+export function mbParentsShown(
+  parents: ParentsInfo | null | undefined,
+): boolean {
+  if (!parents?.enabled) return false;
+  return [
+    parents.bridesFather,
+    parents.bridesMother,
+    parents.groomsFather,
+    parents.groomsMother,
+  ].some((name) => name?.trim());
+}
+
+/**
+ * The line that opens the ceremony card: the parents' blessing when parents
+ * mode is on, else the section title ("Com a bênção de Deus"). A blank
+ * blessing falls back to the title too, so the card never opens empty.
+ */
+export function mbBlessingLine(
+  parents: Pick<ParentsInfo, "enabled" | "blessingMessage"> | null | undefined,
+  sectionTitle: string,
+): string | null {
+  const blessing = parents?.enabled ? parents.blessingMessage?.trim() : "";
+  return blessing || sectionTitle.trim() || null;
+}
+
+/**
+ * The free-text line under the calendar section's intro. Deliberately not
+ * derived from the venues: the host writes whatever the section should say.
+ */
+export function mbCalendarDetail(
+  customTexts: Pick<CustomTexts, "mb_calendarDetail"> | null | undefined,
+): string | null {
+  return customTexts?.mb_calendarDetail?.trim() || null;
 }

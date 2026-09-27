@@ -555,9 +555,8 @@
     "sectionTitle_receptionInfo": "Reception Info",
     "sectionTitle_guestbook": "Guestbook",
     "mb_heroEyebrow": "The Wedding Of",
-    "mb_groomCaption": "The Groom",
-    "mb_brideCaption": "The Bride",
     "mb_receptionIntro": "The reception will take place at:",
+    "mb_calendarDetail": "",
     "mb_sendWishes": "Send wishes",
     "mb_giftTapToOpen": "Tap to open",
     "rsvp_messagePublicNote": "Your message may appear in the invitation's guestbook."

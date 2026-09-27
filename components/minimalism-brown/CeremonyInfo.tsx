@@ -2,9 +2,15 @@
 
 import type { CSSProperties } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
+import {
+  mbBlessingLine,
+  mbCoupleNames,
+  mbParentsShown,
+  mbStyle,
+  mbTokens,
+  mixWithTransparent,
+} from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
-import { isWeddingEventType } from "@/lib/invitation-event-types";
 import { EditableText } from "@/components/shared/EditableText";
 import SectionTitle from "./SectionTitle";
 import SectionCard from "./SectionCard";
@@ -43,12 +49,13 @@ function ParentColumn({
 }
 
 /**
- * Ceremony block: both sets of parents, the announcement of the couple, and
- * the ceremony venue / time / date.
+ * The opening announcement, in the order Portuguese invitations use:
+ * blessing → parents' names → the couple on one line → the invite message.
  *
- * Each sub-block is independently optional. With `parents` disabled the
- * section collapses to the announcement and date rather than leaving an empty
- * frame behind.
+ * Parents mode drives it. On, the blessing is the parents' own line ("Com a
+ * bênção de Deus e seus pais"). Off, the parents' names drop out and the
+ * blessing falls back to the section title ("Com a bênção de Deus"), so the
+ * couple read as the ones inviting.
  */
 export default function CeremonyInfo({
   invitation,
@@ -61,15 +68,10 @@ export default function CeremonyInfo({
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
   const parents = invitation.parents;
-  // Non-wedding events have a single honouree; the role captions ("O Noivo" /
-  // "A Noiva") and the second name don't apply.
-  const isWedding = isWeddingEventType(invitation.eventType);
-  const showParents =
-    parents?.enabled &&
-    (parents.bridesFather ||
-      parents.bridesMother ||
-      parents.groomsFather ||
-      parents.groomsMother);
+  const showParents = mbParentsShown(parents);
+  const blessing = mbBlessingLine(parents, ct("sectionTitle_ceremonyInfo"));
+  const [firstName, secondName] = mbCoupleNames(invitation);
+  const inviteMessage = parents?.inviteMessage?.trim();
 
   const parentLabel: CSSProperties = {
     margin: 0,
@@ -103,116 +105,98 @@ export default function CeremonyInfo({
     lineHeight: 1.15,
     color: theme.textPrimary,
   };
-  const roleCaption: CSSProperties = {
-    margin: 0,
-    fontFamily: t.eyebrow.font,
-    fontSize: 10,
-    fontWeight: 300,
-    letterSpacing: `${t.eyebrow.tracking}px`,
-    textTransform: "uppercase",
-    color: theme.textSecondary,
-  };
 
   return (
     <Reveal as="section" style={{ marginTop: t.gap.section }}>
       <SectionCard theme={theme} radius={13}>
-      <SectionTitle theme={theme} textStyles={ts}>
-        {ct("sectionTitle_ceremonyInfo")}
-      </SectionTitle>
+        {blessing && (
+          <SectionTitle theme={theme} textStyles={ts}>
+            {blessing}
+          </SectionTitle>
+        )}
 
-      {showParents && (
-        <RevealGroup
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            marginTop: t.gap.block,
-          }}
-        >
-          <ParentColumn
-            father={parents?.bridesFather}
-            mother={parents?.bridesMother}
-            labelStyle={mbStyle(parentLabel, ts, "mbParentLabel")}
-            nameStyle={mbStyle(parentName, ts, "mbParentName")}
-          />
-          <span
-            aria-hidden
+        {showParents && (
+          <RevealGroup
             style={{
-              width: 1,
-              alignSelf: "stretch",
-              backgroundColor: mixWithTransparent(theme.primary, 22),
+              display: "flex",
+              alignItems: "flex-start",
+              marginTop: t.gap.block,
             }}
-          />
-          <ParentColumn
-            father={parents?.groomsFather}
-            mother={parents?.groomsMother}
-            labelStyle={mbStyle(parentLabel, ts, "mbParentLabel")}
-            nameStyle={mbStyle(parentName, ts, "mbParentName")}
-          />
-        </RevealGroup>
-      )}
+          >
+            <ParentColumn
+              father={parents?.bridesFather}
+              mother={parents?.bridesMother}
+              labelStyle={mbStyle(parentLabel, ts, "mbParentLabel")}
+              nameStyle={mbStyle(parentName, ts, "mbParentName")}
+            />
+            <span
+              aria-hidden
+              style={{
+                width: 1,
+                alignSelf: "stretch",
+                backgroundColor: mixWithTransparent(theme.primary, 22),
+              }}
+            />
+            <ParentColumn
+              father={parents?.groomsFather}
+              mother={parents?.groomsMother}
+              labelStyle={mbStyle(parentLabel, ts, "mbParentLabel")}
+              nameStyle={mbStyle(parentName, ts, "mbParentName")}
+            />
+          </RevealGroup>
+        )}
 
-      {parents?.inviteMessage && (
+        {/* The couple on one line; long names wrap at the ampersand. */}
         <p
           style={{
-            ...mbStyle(announce, ts, "mbAnnounce"),
-            marginTop: t.gap.section / 2,
-            textTransform: "uppercase",
-            paddingInline: 12,
+            margin: `${showParents ? t.gap.section / 2 : t.gap.block}px 0 0`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            columnGap: 10,
+            textAlign: "center",
           }}
         >
-          <EditableText elementKey="mbAnnounce">
-            {parents.inviteMessage}
-          </EditableText>
+          <span style={mbStyle(bigName, ts, "mbNames")}>
+            <EditableText elementKey="mbNames">{firstName}</EditableText>
+          </span>
+          {secondName !== undefined && (
+            <>
+              <span
+                aria-hidden
+                style={mbStyle(
+                  {
+                    fontFamily: theme.scriptFont ?? theme.displayFont,
+                    fontSize: 35,
+                    lineHeight: 1,
+                    color: theme.textPrimary,
+                  },
+                  ts,
+                  "mbAnnounceAmp",
+                )}
+              >
+                <EditableText elementKey="mbAnnounceAmp">&amp;</EditableText>
+              </span>
+              <span style={mbStyle(bigName, ts, "mbNames")}>
+                <EditableText elementKey="mbNames">{secondName}</EditableText>
+              </span>
+            </>
+          )}
         </p>
-      )}
 
-      <div style={{ textAlign: "center", marginTop: t.gap.block }}>
-        <p style={mbStyle(bigName, ts, "mbNames")}>
-          <EditableText elementKey="mbNames">
-            {invitation.couple.groom}
-          </EditableText>
-        </p>
-        {isWedding && (
-          <p style={mbStyle(roleCaption, ts, "mbRoleCaption")}>
-            <EditableText elementKey="mbRoleCaption">
-              {ct("mb_groomCaption")}
-            </EditableText>
+        {inviteMessage && (
+          <p
+            style={{
+              ...mbStyle(announce, ts, "mbAnnounce"),
+              marginTop: t.gap.block - 4,
+              textTransform: "uppercase",
+              paddingInline: 12,
+            }}
+          >
+            <EditableText elementKey="mbAnnounce">{inviteMessage}</EditableText>
           </p>
         )}
-
-        {isWedding && (
-          <>
-            <p
-              aria-hidden
-              style={mbStyle(
-                {
-                  margin: `${t.gap.row}px 0`,
-                  fontFamily: theme.scriptFont ?? theme.displayFont,
-                  fontSize: 35,
-                  lineHeight: 1,
-                  color: theme.textPrimary,
-                },
-                ts,
-                "mbAnnounceAmp",
-              )}
-            >
-              <EditableText elementKey="mbAnnounceAmp">&amp;</EditableText>
-            </p>
-
-            <p style={mbStyle(bigName, ts, "mbNames")}>
-              <EditableText elementKey="mbNames">
-                {invitation.couple.bride}
-              </EditableText>
-            </p>
-            <p style={mbStyle(roleCaption, ts, "mbRoleCaption")}>
-              <EditableText elementKey="mbRoleCaption">
-                {ct("mb_brideCaption")}
-              </EditableText>
-            </p>
-          </>
-        )}
-      </div>
-
       </SectionCard>
     </Reveal>
   );

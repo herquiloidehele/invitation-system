@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { mbStyle, mbTokens } from "@/lib/minimalism-brown";
+import { mbCalendarDetail, mbStyle, mbTokens } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import CalendarButton from "@/components/shared/CalendarButton";
@@ -22,6 +22,10 @@ import { LeafWatermark } from "./Decor";
  *
  * The pill adds the event to the guest's calendar. Confirming attendance
  * happens in the inline RSVP form at the foot of the page.
+ *
+ * Both lines above the calendar are free text. The second one used to print
+ * a venue name, which read wrong as soon as the intro was about anything but
+ * the reception.
  */
 export default function ReceptionInfo({
   invitation,
@@ -33,7 +37,7 @@ export default function ReceptionInfo({
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
-  const venue = invitation.location2 ?? invitation.location;
+  const detail = mbCalendarDetail(invitation.customTexts);
 
   const intro: CSSProperties = {
     margin: 0,
@@ -67,21 +71,23 @@ export default function ReceptionInfo({
           </EditableText>
         </p>
 
-        <p
-          style={mbStyle(
-            {
-              ...intro,
-              marginTop: 14,
-              fontWeight: 300,
-              textTransform: "none",
-              color: theme.textSecondary,
-            },
-            ts,
-            "mbTimeValue",
-          )}
-        >
-          <EditableText elementKey="mbTimeValue">{venue.name}</EditableText>
-        </p>
+        {detail && (
+          <p
+            style={mbStyle(
+              {
+                ...intro,
+                marginTop: 14,
+                fontWeight: 300,
+                textTransform: "none",
+                color: theme.textSecondary,
+              },
+              ts,
+              "mbTimeValue",
+            )}
+          >
+            <EditableText elementKey="mbTimeValue">{detail}</EditableText>
+          </p>
+        )}
 
         {/* The brown fill belongs to the calendar alone. */}
         <div

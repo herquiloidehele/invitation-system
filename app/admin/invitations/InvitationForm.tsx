@@ -1978,6 +1978,52 @@ export default function InvitationForm({
                         </div>
                       </div>
                     )}
+
+                    {/* Minimalism Brown without parents: blessing → names →
+                        invite. The blessing is the ceremony section title. */}
+                    {isMinimalismBrown && !form.parents?.enabled && (
+                      <div className="space-y-3 rounded-lg border p-3 bg-muted/30">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="mbBlessingLine">Linha de bênção</Label>
+                          <Input
+                            id="mbBlessingLine"
+                            value={form.customTexts?.sectionTitle_ceremonyInfo ?? ""}
+                            onChange={(e) =>
+                              updateCustomText(
+                                "sectionTitle_ceremonyInfo",
+                                e.target.value,
+                              )
+                            }
+                            placeholder={sourcePlaceholder(
+                              sourceForm.customTexts?.sectionTitle_ceremonyInfo,
+                              "Com a bênção de Deus",
+                            )}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            É o mesmo texto de “Informações da Cerimónia” em
+                            Textos Personalizados.
+                          </p>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="mbInviteMessage">
+                            Mensagem de convite
+                          </Label>
+                          <Textarea
+                            id="mbInviteMessage"
+                            value={form.parents?.inviteMessage ?? ""}
+                            onChange={(e) =>
+                              updateParents("inviteMessage", e.target.value)
+                            }
+                            placeholder={sourcePlaceholder(
+                              sourceForm.parents?.inviteMessage,
+                              "Convidam para a celebração do seu casamento",
+                            )}
+                            rows={2}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </AccordionContent>
               </AccordionItem>
