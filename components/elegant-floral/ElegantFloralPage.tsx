@@ -17,7 +17,11 @@ import FaqSection from "./FaqSection";
 import GuestGuideSection from "@/components/shared/GuestGuideSection";
 import ScriptTitle from "./ScriptTitle";
 import { EfRevealProvider, Reveal } from "./motion";
-import { efGuestGuideCardStyle, efStyle } from "@/lib/elegant-floral";
+import {
+  efGuestGuideCardStyle,
+  efOpeningLine,
+  efStyle,
+} from "@/lib/elegant-floral";
 import { resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
@@ -64,6 +68,7 @@ export default function ElegantFloralPage({
 
   const resolvedTs = resolveTextStyles(theme, ts);
   const ct = useCustomText(invitation.customTexts);
+  const openingLine = efOpeningLine(invitation);
   return (
     <SpacingStyleProvider
       spacingStyles={invitation.spacingStyles}
@@ -94,37 +99,38 @@ export default function ElegantFloralPage({
               <Countdown invitation={invitation} theme={theme} />
             </div>
 
-            {/* Blessing line — driven by the parents block's "Mensagem de bênção"
-          (parents.blessingMessage), shown only when parents mode is enabled. */}
-            {invitation.parents?.enabled &&
-              invitation.parents.blessingMessage && (
-                <Reveal>
-                  <p
-                    style={efStyle(
-                      {
-                        margin: 0,
-                        marginTop: "1rem",
-                        textAlign: "center",
-                        padding: "1.4rem clamp(1.25rem, 6vw, 2.75rem) 0",
-                        fontFamily: theme.bodyFont,
-                        fontStyle: "italic",
-                        color: theme.textSecondary,
-                        fontSize: "clamp(1.02rem, 4vw, 1.28rem)",
-                        lineHeight: 1.5,
-                        maxWidth: "85%",
-                        marginLeft: "auto",
-                        marginRight: "auto",
-                      },
-                      ts,
-                      "efBlessing",
-                    )}
-                  >
-                    <EditableText elementKey="efBlessing">
-                      {invitation.parents.blessingMessage}
-                    </EditableText>
-                  </p>
-                </Reveal>
-              )}
+            {/* Opening line — the parents' blessing (parents order, parents mode
+          on) or the verse from the quote (verse-first order). */}
+            {openingLine && (
+              <Reveal>
+                <p
+                  style={efStyle(
+                    {
+                      margin: 0,
+                      marginTop: "1rem",
+                      textAlign: "center",
+                      padding: "1.4rem clamp(1.25rem, 6vw, 2.75rem) 0",
+                      fontFamily: theme.bodyFont,
+                      fontStyle: "italic",
+                      color: theme.textSecondary,
+                      fontSize: "clamp(1.02rem, 4vw, 1.28rem)",
+                      lineHeight: 1.5,
+                      // A verse usually ends with its reference on its own line.
+                      whiteSpace: "pre-line",
+                      maxWidth: "85%",
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                    },
+                    ts,
+                    "efBlessing",
+                  )}
+                >
+                  <EditableText elementKey="efBlessing">
+                    {openingLine}
+                  </EditableText>
+                </p>
+              </Reveal>
+            )}
 
             <Announcement invitation={invitation} theme={theme} />
 

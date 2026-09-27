@@ -4,6 +4,7 @@ import type {
   TemplateTheme,
   LocationInfo,
   LocationPhoto,
+  ParentsInfo,
   ScheduleStyle,
   TextStyleOverrides,
 } from "./types";
@@ -61,6 +62,40 @@ export function resolveEfScheduleStyle(
   scheduleStyle: ScheduleStyle | string | null | undefined,
 ): EfScheduleStyle {
   return scheduleStyle === "stacked" ? "stacked" : "timeline";
+}
+
+/**
+ * The two opening-text arrangements this layout offers: blessing → parents →
+ * invite → names, or verse → names → invite when there are no parents.
+ */
+export type EfTextOrder = "with-parents" | "verse-first";
+
+/**
+ * Which opening-text arrangement to render, driven by the parents-mode switch:
+ * on keeps the parents order, off (or no parents block at all) gives the
+ * verse-first order.
+ */
+export function resolveEfTextOrder(
+  parents: Pick<ParentsInfo, "enabled"> | null | undefined,
+): EfTextOrder {
+  return parents?.enabled ? "with-parents" : "verse-first";
+}
+
+/**
+ * The italic line above the announcement: the parents' blessing when parents
+ * mode is on, else the verse (the invitation's quote). Null when that text is
+ * blank, so the line isn't rendered at all.
+ */
+export function efOpeningLine(invitation: {
+  parents?: Pick<ParentsInfo, "enabled" | "blessingMessage">;
+  quote?: string | null;
+}): string | null {
+  const { parents, quote } = invitation;
+  const line =
+    resolveEfTextOrder(parents) === "with-parents"
+      ? parents?.blessingMessage
+      : quote;
+  return line?.trim() ? line : null;
 }
 
 /**
