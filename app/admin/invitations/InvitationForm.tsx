@@ -168,6 +168,7 @@ import {
   getInvitationEditPath,
 } from "@/lib/admin-row-navigation";
 import { setCardStyleField, type CardStyleValue } from "@/lib/card-styles";
+import { resolveEfTextOrder } from "@/lib/elegant-floral";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1472,6 +1473,10 @@ export default function InvitationForm({
 
   const isElegantFloral = currentTheme.layout === "elegant-floral";
   const isMinimalismBrown = currentTheme.layout === "minimalism-brown";
+  // Ternura with parents mode off renders verse → names → invite, so the
+  // parents section offers those two texts instead of the parents' names.
+  const efVerseFirst =
+    isElegantFloral && resolveEfTextOrder(form.parents) === "verse-first";
 
   // Each layout offers its own schedule looks. A value stored under another
   // layout (or an older admin) may not be on this list; show it as the first
@@ -1927,6 +1932,46 @@ export default function InvitationForm({
                             placeholder={sourcePlaceholder(
                               sourceForm.parents?.inviteMessage,
                               "Convidam para celebração do seu casamento",
+                            )}
+                            rows={2}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Ternura without parents: verse → names → invite. */}
+                    {efVerseFirst && (
+                      <div className="space-y-3 rounded-lg border p-3 bg-muted/30">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="efVerse">Versículo</Label>
+                          <Textarea
+                            id="efVerse"
+                            value={form.quote}
+                            onChange={(e) => update("quote", e.target.value)}
+                            placeholder={sourcePlaceholder(
+                              sourceForm.quote,
+                              "O amor é paciente, o amor é bondoso.\n1 Coríntios 13:4",
+                            )}
+                            rows={3}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            É o mesmo texto do campo “Citação”.
+                          </p>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="efInviteMessage">
+                            Mensagem de convite
+                          </Label>
+                          <Textarea
+                            id="efInviteMessage"
+                            value={form.parents?.inviteMessage ?? ""}
+                            onChange={(e) =>
+                              updateParents("inviteMessage", e.target.value)
+                            }
+                            placeholder={sourcePlaceholder(
+                              sourceForm.parents?.inviteMessage,
+                              "Convidam para a celebração do seu casamento",
                             )}
                             rows={2}
                           />

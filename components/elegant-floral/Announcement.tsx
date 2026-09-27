@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { efStyle } from "@/lib/elegant-floral";
+import { efStyle, resolveEfTextOrder } from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
 import { efGroup, efItem, efNames, useRevealProps } from "./motion";
 
@@ -13,7 +13,12 @@ interface AnnouncementProps {
 
 const SIDE_PAD = "clamp(1rem, 5vw, 2rem)";
 
-/** Parents announcement → couple names (script) → date, staggered into view. */
+/**
+ * Parents announcement → invite message → couple names (script) → date,
+ * staggered into view. With parents mode off (verse-first) there are no
+ * parents and the invite message moves below the names, so the couple read as
+ * the ones inviting.
+ */
 export default function Announcement({ invitation, theme }: AnnouncementProps) {
   const reveal = useRevealProps();
   const ts = invitation.textStyles;
@@ -31,6 +36,25 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
   const groomParents = parents
     ? namesOf(parents.groomsFather, parents.groomsMother)
     : [];
+  const verseFirst = resolveEfTextOrder(parents) === "verse-first";
+
+  const inviteMessage = parents?.inviteMessage && (
+    <motion.p
+      variants={efItem}
+      style={efStyle(
+        {
+          margin: verseFirst ? "0 0 3.5rem 0" : "2.2rem 0 5rem 0",
+          fontSize: "clamp(0.98rem, 3.8vw, 1.2rem)",
+        },
+        ts,
+        "efInviteMessage",
+      )}
+    >
+      <EditableText elementKey="efInviteMessage">
+        {parents.inviteMessage}
+      </EditableText>
+    </motion.p>
+  );
 
   return (
     <motion.section
@@ -43,74 +67,57 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       variants={efGroup}
       {...reveal}
     >
-      {parents?.enabled &&
-        (brideParents.length > 0 || groomParents.length > 0) && (
-          <motion.div
-            variants={efItem}
-            style={{
-              fontSize: "clamp(1rem, 4vw, 1.25rem)",
-              lineHeight: 1.5,
-              margin: "3rem 0 4.5rem 0",
-            }}
-          >
-            {/* Parent names + "e" divider are each their own selectable
+      {!verseFirst && (brideParents.length > 0 || groomParents.length > 0) && (
+        <motion.div
+          variants={efItem}
+          style={{
+            fontSize: "clamp(1rem, 4vw, 1.25rem)",
+            lineHeight: 1.5,
+            margin: "3rem 0 4.5rem 0",
+          }}
+        >
+          {/* Parent names + "e" divider are each their own selectable
                 element so the admin can (a) actually see the selection outline
                 and (b) style the names and the "e" independently. Wrapping the
                 whole block in one inline <span> broke the outline because a
                 span can't render a box around block-level <p> children. */}
-            {brideParents.map((name, i) => (
-              <p
-                key={`bride-${i}`}
-                style={efStyle({ margin: 0 }, ts, "efParents")}
-              >
-                <EditableText elementKey="efParents">{name}</EditableText>
-              </p>
-            ))}
-            {brideParents.length > 0 && groomParents.length > 0 && (
-              <p
-                style={efStyle(
-                  { margin: "0.2em 0", color: theme.textMuted },
-                  ts,
-                  "efParentsDivider",
-                )}
-              >
-                <EditableText elementKey="efParentsDivider">e</EditableText>
-              </p>
-            )}
-            {groomParents.map((name, i) => (
-              <p
-                key={`groom-${i}`}
-                style={efStyle({ margin: 0 }, ts, "efParents")}
-              >
-                <EditableText elementKey="efParents">{name}</EditableText>
-              </p>
-            ))}
-          </motion.div>
-        )}
-
-      {parents?.inviteMessage && (
-        <motion.p
-          variants={efItem}
-          style={efStyle(
-            {
-              margin: "2.2rem 0 5rem 0",
-              fontSize: "clamp(0.98rem, 3.8vw, 1.2rem)",
-            },
-            ts,
-            "efInviteMessage",
+          {brideParents.map((name, i) => (
+            <p
+              key={`bride-${i}`}
+              style={efStyle({ margin: 0 }, ts, "efParents")}
+            >
+              <EditableText elementKey="efParents">{name}</EditableText>
+            </p>
+          ))}
+          {brideParents.length > 0 && groomParents.length > 0 && (
+            <p
+              style={efStyle(
+                { margin: "0.2em 0", color: theme.textMuted },
+                ts,
+                "efParentsDivider",
+              )}
+            >
+              <EditableText elementKey="efParentsDivider">e</EditableText>
+            </p>
           )}
-        >
-          <EditableText elementKey="efInviteMessage">
-            {parents.inviteMessage}
-          </EditableText>
-        </motion.p>
+          {groomParents.map((name, i) => (
+            <p
+              key={`groom-${i}`}
+              style={efStyle({ margin: 0 }, ts, "efParents")}
+            >
+              <EditableText elementKey="efParents">{name}</EditableText>
+            </p>
+          ))}
+        </motion.div>
       )}
+
+      {!verseFirst && inviteMessage}
 
       <motion.h1
         variants={efNames}
         style={efStyle(
           {
-            margin: "4rem 0",
+            margin: verseFirst ? "3rem 0 1.5rem" : "4rem 0",
             fontFamily: theme.scriptFont ?? theme.displayFont,
             fontWeight: 400,
             fontSize: "clamp(2.3rem, 11vw, 3.9rem)",
@@ -123,6 +130,8 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       >
         <EditableText elementKey="efNames">{names}</EditableText>
       </motion.h1>
+
+      {verseFirst && inviteMessage}
 
       <motion.p
         variants={efItem}

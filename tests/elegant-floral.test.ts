@@ -7,6 +7,8 @@ import {
   countdownPartsFrom,
   efGuestGuideCardStyle,
   resolveEfScheduleStyle,
+  resolveEfTextOrder,
+  efOpeningLine,
 } from "../lib/elegant-floral";
 
 describe("isElegantFloralLayout", () => {
@@ -115,6 +117,65 @@ describe("resolveEfScheduleStyle", () => {
 
   it("treats styles this layout never rendered as the timeline", () => {
     expect(resolveEfScheduleStyle("illustrated")).toBe("timeline");
+  });
+});
+
+describe("resolveEfTextOrder", () => {
+  it("uses the parents order when parents mode is on", () => {
+    expect(resolveEfTextOrder({ enabled: true })).toBe("with-parents");
+  });
+
+  it("uses the verse-first order when parents mode is off", () => {
+    expect(resolveEfTextOrder({ enabled: false })).toBe("verse-first");
+    expect(resolveEfTextOrder(undefined)).toBe("verse-first");
+    expect(resolveEfTextOrder(null)).toBe("verse-first");
+  });
+});
+
+describe("efOpeningLine", () => {
+  const parents = {
+    enabled: true,
+    blessingMessage: "Com a bênção dos Pais",
+  };
+  const quote = "O amor é paciente, o amor é bondoso. 1 Coríntios 13:4";
+
+  it("shows the blessing when parents mode is on", () => {
+    expect(efOpeningLine({ parents, quote })).toBe("Com a bênção dos Pais");
+  });
+
+  it("shows the quote as the verse when parents mode is off", () => {
+    expect(
+      efOpeningLine({ parents: { ...parents, enabled: false }, quote }),
+    ).toBe(quote);
+    expect(efOpeningLine({ parents: undefined, quote })).toBe(quote);
+  });
+
+  it("shows nothing when the chosen line is blank", () => {
+    expect(
+      efOpeningLine({ parents: { ...parents, enabled: false }, quote: "   " }),
+    ).toBeNull();
+    expect(
+      efOpeningLine({ parents: { ...parents, blessingMessage: "" }, quote }),
+    ).toBeNull();
+  });
+});
+
+describe("elegant-floral text order wiring", () => {
+  const page = readFileSync(
+    "components/elegant-floral/ElegantFloralPage.tsx",
+    "utf8",
+  );
+  const announcement = readFileSync(
+    "components/elegant-floral/Announcement.tsx",
+    "utf8",
+  );
+
+  it("renders the opening line from the chosen text order", () => {
+    expect(page).toContain("efOpeningLine(invitation)");
+  });
+
+  it("orders the announcement from the chosen text order", () => {
+    expect(announcement).toContain("resolveEfTextOrder(parents)");
   });
 });
 
