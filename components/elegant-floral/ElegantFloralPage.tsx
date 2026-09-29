@@ -19,7 +19,7 @@ import ScriptTitle from "./ScriptTitle";
 import { EfRevealProvider, Reveal } from "./motion";
 import {
   efGuestGuideCardStyle,
-  efOpeningLine,
+  efOpeningLines,
   efStyle,
 } from "@/lib/elegant-floral";
 import { resolveTextStyles } from "@/lib/text-styles";
@@ -68,7 +68,30 @@ export default function ElegantFloralPage({
 
   const resolvedTs = resolveTextStyles(theme, ts);
   const ct = useCustomText(invitation.customTexts);
-  const openingLine = efOpeningLine(invitation);
+  const opening = efOpeningLines(invitation);
+  // Verse and blessing share the italic opening look; each keeps its own
+  // text-style key so the admin can style them apart.
+  const openingLineStyle = (key: "efVerse" | "efBlessing", marginTop: string) =>
+    efStyle(
+      {
+        margin: 0,
+        marginTop,
+        textAlign: "center",
+        padding: "1.4rem clamp(1.25rem, 6vw, 2.75rem) 0",
+        fontFamily: theme.bodyFont,
+        fontStyle: "italic",
+        color: theme.textSecondary,
+        fontSize: "clamp(1.02rem, 4vw, 1.28rem)",
+        lineHeight: 1.5,
+        // A verse usually ends with its reference on its own line.
+        whiteSpace: "pre-line",
+        maxWidth: "85%",
+        marginLeft: "auto",
+        marginRight: "auto",
+      },
+      ts,
+      key,
+    );
   return (
     <SpacingStyleProvider
       spacingStyles={invitation.spacingStyles}
@@ -99,34 +122,27 @@ export default function ElegantFloralPage({
               <Countdown invitation={invitation} theme={theme} />
             </div>
 
-            {/* Opening line — the parents' blessing (parents order, parents mode
-          on) or the verse from the quote (verse-first order). */}
-            {openingLine && (
+            {/* Opening lines — the verse (the quote), then the parents'
+          blessing when parents mode is on. */}
+            {opening.verse && (
+              <Reveal>
+                <p style={openingLineStyle("efVerse", "1rem")}>
+                  <EditableText elementKey="efVerse">
+                    {opening.verse}
+                  </EditableText>
+                </p>
+              </Reveal>
+            )}
+            {opening.blessing && (
               <Reveal>
                 <p
-                  style={efStyle(
-                    {
-                      margin: 0,
-                      marginTop: "1rem",
-                      textAlign: "center",
-                      padding: "1.4rem clamp(1.25rem, 6vw, 2.75rem) 0",
-                      fontFamily: theme.bodyFont,
-                      fontStyle: "italic",
-                      color: theme.textSecondary,
-                      fontSize: "clamp(1.02rem, 4vw, 1.28rem)",
-                      lineHeight: 1.5,
-                      // A verse usually ends with its reference on its own line.
-                      whiteSpace: "pre-line",
-                      maxWidth: "85%",
-                      marginLeft: "auto",
-                      marginRight: "auto",
-                    },
-                    ts,
+                  style={openingLineStyle(
                     "efBlessing",
+                    opening.verse ? "0.75rem" : "1rem",
                   )}
                 >
                   <EditableText elementKey="efBlessing">
-                    {openingLine}
+                    {opening.blessing}
                   </EditableText>
                 </p>
               </Reveal>

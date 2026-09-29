@@ -804,6 +804,7 @@ export interface TextStyleOverrides {
     efDate?: TextStyle;
     efDateTime?: TextStyle;
     efBlessing?: TextStyle;
+    efVerse?: TextStyle;
     efBody?: TextStyle;
     efDressTitle?: TextStyle;
     efSubLabel?: TextStyle;

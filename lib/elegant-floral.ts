@@ -82,20 +82,24 @@ export function resolveEfTextOrder(
 }
 
 /**
- * The italic line above the announcement: the parents' blessing when parents
- * mode is on, else the verse (the invitation's quote). Null when that text is
- * blank, so the line isn't rendered at all.
+ * The lines above the announcement: the verse (the invitation's quote) always
+ * leads, followed by the parents' blessing when parents mode is on. A blank
+ * line comes back null so it isn't rendered at all.
  */
-export function efOpeningLine(invitation: {
+export function efOpeningLines(invitation: {
   parents?: Pick<ParentsInfo, "enabled" | "blessingMessage">;
   quote?: string | null;
-}): string | null {
+}): { verse: string | null; blessing: string | null } {
   const { parents, quote } = invitation;
-  const line =
-    resolveEfTextOrder(parents) === "with-parents"
-      ? parents?.blessingMessage
-      : quote;
-  return line?.trim() ? line : null;
+  const present = (line: string | null | undefined) =>
+    line?.trim() ? line : null;
+  return {
+    verse: present(quote),
+    blessing:
+      resolveEfTextOrder(parents) === "with-parents"
+        ? present(parents?.blessingMessage)
+        : null,
+  };
 }
 
 /**

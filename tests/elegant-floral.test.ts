@@ -8,7 +8,7 @@ import {
   efGuestGuideCardStyle,
   resolveEfScheduleStyle,
   resolveEfTextOrder,
-  efOpeningLine,
+  efOpeningLines,
 } from "../lib/elegant-floral";
 
 describe("isElegantFloralLayout", () => {
@@ -132,31 +132,41 @@ describe("resolveEfTextOrder", () => {
   });
 });
 
-describe("efOpeningLine", () => {
+describe("efOpeningLines", () => {
   const parents = {
     enabled: true,
     blessingMessage: "Com a bênção dos Pais",
   };
   const quote = "O amor é paciente, o amor é bondoso. 1 Coríntios 13:4";
 
-  it("shows the blessing when parents mode is on", () => {
-    expect(efOpeningLine({ parents, quote })).toBe("Com a bênção dos Pais");
+  it("shows the verse above the blessing when parents mode is on", () => {
+    expect(efOpeningLines({ parents, quote })).toEqual({
+      verse: quote,
+      blessing: "Com a bênção dos Pais",
+    });
   });
 
-  it("shows the quote as the verse when parents mode is off", () => {
+  it("shows only the verse when parents mode is off", () => {
     expect(
-      efOpeningLine({ parents: { ...parents, enabled: false }, quote }),
-    ).toBe(quote);
-    expect(efOpeningLine({ parents: undefined, quote })).toBe(quote);
+      efOpeningLines({ parents: { ...parents, enabled: false }, quote }),
+    ).toEqual({ verse: quote, blessing: null });
+    expect(efOpeningLines({ parents: undefined, quote })).toEqual({
+      verse: quote,
+      blessing: null,
+    });
   });
 
-  it("shows nothing when the chosen line is blank", () => {
+  it("drops blank lines", () => {
+    expect(efOpeningLines({ parents, quote: "   " })).toEqual({
+      verse: null,
+      blessing: "Com a bênção dos Pais",
+    });
     expect(
-      efOpeningLine({ parents: { ...parents, enabled: false }, quote: "   " }),
-    ).toBeNull();
-    expect(
-      efOpeningLine({ parents: { ...parents, blessingMessage: "" }, quote }),
-    ).toBeNull();
+      efOpeningLines({
+        parents: { ...parents, blessingMessage: "" },
+        quote: null,
+      }),
+    ).toEqual({ verse: null, blessing: null });
   });
 });
 
@@ -171,7 +181,7 @@ describe("elegant-floral text order wiring", () => {
   );
 
   it("renders the opening line from the chosen text order", () => {
-    expect(page).toContain("efOpeningLine(invitation)");
+    expect(page).toContain("efOpeningLines(invitation)");
   });
 
   it("orders the announcement from the chosen text order", () => {

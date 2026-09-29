@@ -1477,6 +1477,26 @@ export default function InvitationForm({
   // parents section offers those two texts instead of the parents' names.
   const efVerseFirst =
     isElegantFloral && resolveEfTextOrder(form.parents) === "verse-first";
+  // Ternura opens with the verse in both parents modes, so both parents panels
+  // lead with it. It edits the quote, the same text as the Citação field.
+  const efVerseField = isElegantFloral && (
+    <div className="space-y-1.5">
+      <Label htmlFor="efVerse">Versículo</Label>
+      <Textarea
+        id="efVerse"
+        value={form.quote}
+        onChange={(e) => update("quote", e.target.value)}
+        placeholder={sourcePlaceholder(
+          sourceForm.quote,
+          "O amor é paciente, o amor é bondoso.\n1 Coríntios 13:4",
+        )}
+        rows={3}
+      />
+      <p className="text-xs text-muted-foreground">
+        É o mesmo texto do campo “Citação”.
+      </p>
+    </div>
+  );
 
   // Each layout offers its own schedule looks. A value stored under another
   // layout (or an older admin) may not be on this list; show it as the first
@@ -1857,6 +1877,8 @@ export default function InvitationForm({
 
                     {form.parents?.enabled && (
                       <div className="space-y-3 rounded-lg border p-3 bg-muted/30">
+                        {efVerseField}
+
                         <div className="space-y-1.5">
                           <Label htmlFor="blessingMessage">
                             Mensagem de bênção
@@ -1942,22 +1964,7 @@ export default function InvitationForm({
                     {/* Ternura without parents: verse → names → invite. */}
                     {efVerseFirst && (
                       <div className="space-y-3 rounded-lg border p-3 bg-muted/30">
-                        <div className="space-y-1.5">
-                          <Label htmlFor="efVerse">Versículo</Label>
-                          <Textarea
-                            id="efVerse"
-                            value={form.quote}
-                            onChange={(e) => update("quote", e.target.value)}
-                            placeholder={sourcePlaceholder(
-                              sourceForm.quote,
-                              "O amor é paciente, o amor é bondoso.\n1 Coríntios 13:4",
-                            )}
-                            rows={3}
-                          />
-                          <p className="text-xs text-muted-foreground">
-                            É o mesmo texto do campo “Citação”.
-                          </p>
-                        </div>
+                        {efVerseField}
 
                         <div className="space-y-1.5">
                           <Label htmlFor="efInviteMessage">
