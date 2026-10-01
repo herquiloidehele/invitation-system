@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -192,4 +193,26 @@ describe("formatRsvpCustomAnswers", () => {
     expect(formatRsvpCustomAnswers(null)).toEqual([]);
     expect(formatRsvpCustomAnswers("bad")).toEqual([]);
   });
+});
+
+// Guest-facing RSVP surfaces read rsvp.customFields for every invitation
+// type, so each admin form must expose the builder or its type can't use them.
+describe("admin invitation forms expose RSVP custom fields", () => {
+  for (const file of [
+    "app/admin/invitations/InvitationForm.tsx",
+    "app/admin/invitations/ExternalInvitationForm.tsx",
+  ]) {
+    const source = readFileSync(file, "utf8");
+    it(`${file} renders the translation-aware builder`, () => {
+      expect(source).toContain("<RsvpCustomFieldsBuilder");
+      expect(source).toContain("sourceValue={sourceForm.rsvp.customFields}");
+      expect(source).toContain("structureLocked={structureLocked}");
+    });
+
+    it(`${file} blocks saving incomplete custom fields`, () => {
+      expect(source).toContain(
+        "Preencha as perguntas e opções dos campos personalizados do RSVP.",
+      );
+    });
+  }
 });

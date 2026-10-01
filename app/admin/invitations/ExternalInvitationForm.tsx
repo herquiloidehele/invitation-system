@@ -70,6 +70,7 @@ import GiftsListEditor from "@/components/admin/GiftsListEditor";
 import BankTransferEditor from "@/components/admin/BankTransferEditor";
 import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
 import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
+import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
@@ -547,7 +548,10 @@ export default function ExternalInvitationForm({
   );
 
   const updateRsvp = useCallback(
-    (field: keyof InvitationData["rsvp"], value: boolean | string) => {
+    (
+      field: keyof InvitationData["rsvp"],
+      value: boolean | string | InvitationData["rsvp"]["customFields"],
+    ) => {
       setForm((prev) => ({
         ...prev,
         rsvp: { ...prev.rsvp, [field]: value },
@@ -892,6 +896,25 @@ export default function ExternalInvitationForm({
     }
     if (subType === "external_video" && !form.videoUrl) {
       toast.error("Carrega um vídeo para continuar");
+      return;
+    }
+
+    const invalidCustomField = (sourceForm.rsvp.customFields ?? []).find(
+      (field) => {
+        if (!field.label.trim()) return true;
+        if (
+          (field.type === "radio" || field.type === "select") &&
+          !(field.options ?? []).some((option) => option.label.trim())
+        ) {
+          return true;
+        }
+        return false;
+      },
+    );
+    if (invalidCustomField) {
+      toast.error(
+        "Preencha as perguntas e opções dos campos personalizados do RSVP.",
+      );
       return;
     }
 
@@ -3837,6 +3860,14 @@ export default function ExternalInvitationForm({
                       <RsvpInputColorFields
                         rsvp={form.rsvp}
                         onChange={updateRsvp}
+                      />
+                      <RsvpCustomFieldsBuilder
+                        fields={form.rsvp.customFields ?? []}
+                        sourceValue={sourceForm.rsvp.customFields}
+                        structureLocked={structureLocked}
+                        onChange={(customFields) =>
+                          updateRsvp("customFields", customFields)
+                        }
                       />
                     </>
                   )}
