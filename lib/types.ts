@@ -177,6 +177,13 @@ export interface GiftRegistry {
    * and reservations keep working.
    */
   hideFromInvitation?: boolean;
+  /**
+   * When true, the "Lista de Presentes" option is left out of the gifts
+   * section. The standalone /{slug}/gifts page stays reachable directly.
+   */
+  hideGiftList?: boolean;
+  /** When true, the "Transferência bancária" option is left out of the gifts section. */
+  hideBankTransfer?: boolean;
   /** Legacy external registry link (kept for backwards-compat; non-breaking). */
   link?: string;
   /** Product grid shown on /{slug}/gifts. */

@@ -2836,6 +2836,38 @@ export default function ExternalInvitationForm({
                             />
                           </div>
 
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="space-y-0.5">
+                              <Label>Ocultar Lista de Presentes</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Esconde o botão da lista no convite.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={form.giftRegistry.hideGiftList === true}
+                              onCheckedChange={(enabled) =>
+                                updateGiftRegistry("hideGiftList", enabled)
+                              }
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="space-y-0.5">
+                              <Label>Ocultar Transferência Bancária</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Esconde os dados bancários no convite.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={
+                                form.giftRegistry.hideBankTransfer === true
+                              }
+                              onCheckedChange={(enabled) =>
+                                updateGiftRegistry("hideBankTransfer", enabled)
+                              }
+                            />
+                          </div>
+
                           <div className="space-y-1.5">
                             <Label htmlFor="externalGiftText">
                               Texto da Lista de Presentes

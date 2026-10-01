@@ -7,7 +7,12 @@ import confetti from "canvas-confetti";
 import { useTranslations } from "next-intl";
 import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
-import { giftsPagePath, hasBankTransfer, hasGiftItems } from "@/lib/gift-registry";
+import {
+  giftsPagePath,
+  hasGiftItems,
+  shouldShowBankTransferOption,
+  shouldShowGiftListOption,
+} from "@/lib/gift-registry";
 import { useRouter } from "@/i18n/routing";
 import { EditableText } from "@/components/shared/EditableText";
 import { CopyableValue } from "@/components/gifts/CopyableValue";
@@ -79,8 +84,8 @@ export default function GiftsSection({
 
   if (!giftRegistry?.enabled) return null;
 
-  const showRegistry = hasGiftItems(giftRegistry) || Boolean(giftRegistry.link);
-  const showBank = hasBankTransfer(giftRegistry);
+  const showRegistry = shouldShowGiftListOption(giftRegistry);
+  const showBank = shouldShowBankTransferOption(giftRegistry);
 
   const messageStyle = efStyle(
     {

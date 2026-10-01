@@ -16,6 +16,29 @@ export function hasBankTransfer(
   );
 }
 
+/** True when the gifts section should offer the "Lista de Presentes" option. */
+export function shouldShowGiftListOption(
+  registry:
+    | Pick<GiftRegistry, "items" | "link" | "hideGiftList">
+    | null
+    | undefined,
+): boolean {
+  return (
+    registry?.hideGiftList !== true &&
+    (hasGiftItems(registry) || Boolean(registry?.link))
+  );
+}
+
+/** True when the gifts section should offer the "Transferência bancária" option. */
+export function shouldShowBankTransferOption(
+  registry:
+    | Pick<GiftRegistry, "bankTransfer" | "hideBankTransfer">
+    | null
+    | undefined,
+): boolean {
+  return registry?.hideBankTransfer !== true && hasBankTransfer(registry);
+}
+
 /**
  * True when the gifts section should render on the main external invitation
  * page: the registry is enabled and not explicitly hidden from the invitation.

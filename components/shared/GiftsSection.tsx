@@ -16,8 +16,9 @@ import type { CustomTexts, GiftRegistry, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import {
   giftsPagePath,
-  hasBankTransfer,
   hasGiftItems,
+  shouldShowBankTransferOption,
+  shouldShowGiftListOption,
 } from "@/lib/gift-registry";
 import { isSectionIconHidden } from "@/lib/section-icons";
 import { EASE } from "@/components/shared/animations";
@@ -60,9 +61,8 @@ export default function GiftsSection({
     navigateToGifts(href, () => router.push(href));
   }, [slug, guestToken, router, navigateToGifts]);
 
-  const hasRegistry =
-    hasGiftItems(giftRegistry) || Boolean(giftRegistry.link);
-  const hasBank = hasBankTransfer(giftRegistry);
+  const hasRegistry = shouldShowGiftListOption(giftRegistry);
+  const hasBank = shouldShowBankTransferOption(giftRegistry);
 
   return (
     <>
