@@ -55,6 +55,7 @@ const baseRow = {
   scratchReveal: null,
   heroConfetti: null,
   countdown: null,
+  rsvpPage: null,
   personalGuestCard: null,
   textStyles: null,
   cardStyles: null,
@@ -370,5 +371,19 @@ describe("toAdminInvitationInitialData — coverVideos round-trip", () => {
     const row = { ...baseRow, coverVideos: null };
     const result = toAdminInvitationInitialData(row);
     expect(result.coverVideos).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — RSVP page style", () => {
+  it("hydrates a stored style and drops invalid values", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      rsvpPage: { base: "theme", layout: "minimal", colors: { title: "red" } },
+    });
+    expect(result.rsvpPage).toEqual({ base: "theme", layout: "minimal" });
+  });
+
+  it("leaves legacy invitations without a style", () => {
+    expect(toAdminInvitationInitialData(baseRow).rsvpPage).toBeUndefined();
   });
 });

@@ -15,6 +15,7 @@ import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization"
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
+import { sanitizeRsvpPageStyle } from "@/lib/rsvp-page-style";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
 
@@ -151,6 +152,12 @@ export async function PUT(
         }),
         ...(body.rsvp !== undefined && {
           rsvp: sanitizeJsonField(body.rsvp, existing.rsvp),
+        }),
+        ...(body.rsvpPage !== undefined && {
+          rsvpPage: sanitizeJsonField(
+            sanitizeRsvpPageStyle(body.rsvpPage) ?? null,
+            null,
+          ),
         }),
         ...(body.schedule !== undefined && {
           schedule: sanitizeJsonField(

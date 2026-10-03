@@ -144,6 +144,11 @@ export const sourceInvitationRow = {
   scratchReveal: { enabled: true },
   heroConfetti: { enabled: true },
   countdown: { enabled: true },
+  rsvpPage: {
+    base: "theme",
+    layout: "editorial",
+    colors: { accent: "#aa3355" },
+  },
   personalGuestCard: {
     backgroundImageUrl: "https://cdn.example.com/card.jpg",
   },

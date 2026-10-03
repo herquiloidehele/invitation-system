@@ -113,6 +113,7 @@ model Invitation {
   location                Json // { name, address, googleMapsUrl, wazeUrl?, latitude?, longitude?, imageUrl? }
   location2               Json? // Optional second location — same shape as location
   rsvp                    Json // { enabled, deadline? }
+  rsvpPage                Json? // RsvpPageStyle — standalone /confirmar page appearance. Null => legacy neutral page.
   schedule                Json // ScheduleEvent[]
   scheduleStyle           String? // "default" | "illustrated"
   scheduleMarkerUrl       String? // Image riding the minimalism-brown schedule timeline as it scrolls. Null => the drawn theme bloom.

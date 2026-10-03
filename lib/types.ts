@@ -1312,6 +1312,50 @@ export interface GuestbookConfig {
   hiddenResponseIds?: string[];
 }
 
+// ---------------------------------------------------------------------------
+// Standalone RSVP page (/confirmar/[slug]) appearance
+// ---------------------------------------------------------------------------
+
+export type RsvpPageBase = "neutral" | "theme";
+export type RsvpPageLayout = "classic" | "minimal" | "editorial";
+export type RsvpPageRadius = "square" | "soft" | "round";
+export type RsvpPageShadow = "none" | "soft" | "strong";
+export type RsvpPageColorKey =
+  | "pageBg"
+  | "cardBg"
+  | "border"
+  | "title"
+  | "text"
+  | "muted"
+  | "accent"
+  | "buttonBg"
+  | "buttonText";
+
+/** Appearance of the standalone RSVP page. Absent => the legacy neutral page. */
+export interface RsvpPageStyle {
+  base: RsvpPageBase;
+  /** Defaults to "classic". */
+  layout?: RsvpPageLayout;
+  /** `#rrggbb` overrides applied on top of the base. */
+  colors?: Partial<Record<RsvpPageColorKey, string>>;
+  /** FontPicker stacks (builtin, Google or `custom-font-<id>`). */
+  fonts?: { title?: string; body?: string };
+  shape?: {
+    radius?: RsvpPageRadius;
+    /** Card border; defaults to true. */
+    border?: boolean;
+    /** Defaults to "soft". */
+    shadow?: RsvpPageShadow;
+  };
+  header?: {
+    showEyebrow?: boolean;
+    showDate?: boolean;
+    /** Defaults to true for the editorial layout, false otherwise. */
+    showMonogram?: boolean;
+    imageUrl?: string;
+  };
+}
+
 export interface InvitationData {
   slug: string;
   /** Builder attachments. Only populated when renderMode is "ai". */
@@ -1351,6 +1395,8 @@ export interface InvitationData {
      */
     acceptingResponses?: boolean;
   };
+  /** Standalone /confirmar page appearance. Absent => legacy neutral page. */
+  rsvpPage?: RsvpPageStyle;
   schedule: ScheduleEvent[];
   /** Visual layout for the schedule section. Defaults to "default". */
   scheduleStyle?: ScheduleStyle;

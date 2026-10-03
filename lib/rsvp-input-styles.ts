@@ -55,7 +55,7 @@ function cssVariables(accentColor: string): CSSProperties {
   } as CSSProperties;
 }
 
-function isRsvpInputStyle(value: unknown): value is RsvpInputStyle {
+export function isRsvpInputStyle(value: unknown): value is RsvpInputStyle {
   return value === "default" || value === "minimal" || value === "soft";
 }
 

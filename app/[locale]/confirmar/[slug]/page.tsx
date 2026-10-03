@@ -25,7 +25,9 @@ import {
 import { buildLocalePath, createNoIndexMetadata } from "@/lib/seo";
 import { formatLocalizedLongDate } from "@/lib/date-format";
 import { getPublicGuestByToken } from "@/lib/guests";
-import RsvpPage from "./RsvpPage";
+import { resolveRsvpPageStyle } from "@/lib/rsvp-page-style";
+import { getTheme } from "@/lib/themes";
+import RsvpPage from "@/components/rsvp-page/RsvpPage";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = createNoIndexMetadata();
@@ -79,6 +81,12 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
     ? localizeInvitation(sourceInvitation, locale)
     : sourceInvitation;
   const { couple, date, rsvp, customTexts } = invitation;
+  const theme = await getTheme(invitation.template);
+  const tokens = resolveRsvpPageStyle({
+    config: invitation.rsvpPage,
+    theme,
+    rsvp,
+  });
 
   const deadlinePassed = isDeadlinePassed(rsvp.deadline);
   const closed = isRsvpClosed(rsvp);
@@ -106,6 +114,7 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       eventType={invitation.eventType}
       bride={couple.bride}
       groom={couple.groom}
+      monogram={couple.monogram}
       dateDisplay={dateDisplay}
       deadline={rsvp.deadline}
       deadlinePassed={deadlinePassed}
@@ -116,9 +125,7 @@ export default async function ConfirmarPage({ params, searchParams }: Props) {
       showNumAdults={shouldShowRsvpNumAdults(rsvp)}
       showNumChildren={shouldShowRsvpNumChildren(rsvp)}
       customFields={getRsvpCustomFields(rsvp)}
-      backgroundImageUrl={rsvp.backgroundImageUrl}
-      inputColors={rsvp}
-      inputStyle={rsvp.inputStyle}
+      tokens={tokens}
       customTexts={customTexts}
       checkInEnabled={invitation.checkInEnabled}
       qrStyle={invitation.qrCodeStyle}

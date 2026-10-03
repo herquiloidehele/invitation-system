@@ -109,6 +109,12 @@ import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
 import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
+import RsvpPageStyleSection from "@/components/admin/RsvpPageStyleSection";
+import RsvpPagePreview from "@/components/admin/RsvpPagePreview";
+import {
+  RSVP_PAGE_ACCORDION_VALUE,
+  useRsvpPreviewTab,
+} from "@/hooks/use-rsvp-preview-tab";
 import TextStyleToolbar from "@/components/admin/TextStyleToolbar";
 import CardStyleToolbar from "@/components/admin/CardStyleToolbar";
 import { InlineTextEditProvider } from "@/components/shared/EditableText";
@@ -503,6 +509,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       inputStyle: "default",
       customFields: [],
     },
+    rsvpPage: { base: "theme" },
     schedule: [],
     scheduleStyle: "default",
     dressCode: { enabled: false, text: "" },
@@ -648,6 +655,7 @@ export default function InvitationForm({
     false,
   );
   const previewRootRef = useRef<HTMLDivElement | null>(null);
+  const { previewTab, setPreviewTab, onAccordionChange } = useRsvpPreviewTab();
   const imageItemCount = form.imageLayer?.items?.length ?? 0;
   const hasImageItems = imageItemCount > 0;
   const imageLayerEditorActive = isImageLayerEditorActive(
@@ -1685,7 +1693,11 @@ export default function InvitationForm({
               <OwnerLinkPanel ownerUrl={ownerUrl} />
             )}
 
-            <Accordion defaultValue={[]} className="space-y-2">
+            <Accordion
+              defaultValue={[]}
+              onValueChange={onAccordionChange}
+              className="space-y-2"
+            >
               {sourceForm.invitationType === "standard" && (
                 <AccordionItem
                   value="languages"
@@ -3789,6 +3801,16 @@ export default function InvitationForm({
                 </AccordionContent>
               </AccordionItem>
 
+              <RsvpPageStyleSection
+                accordionValue={RSVP_PAGE_ACCORDION_VALUE}
+                value={form.rsvpPage}
+                onChange={(rsvpPage) =>
+                  setForm((prev) => ({ ...prev, rsvpPage }))
+                }
+                theme={currentTheme}
+                rsvp={form.rsvp}
+              />
+
               {/* ── Nossa História ── */}
               <AccordionItem
                 value="coupleGallery"
@@ -4591,7 +4613,11 @@ export default function InvitationForm({
 
       {/* ──────────── Right: Live Preview (35%) ──────────── */}
       <div className="w-[35%] min-w-[380px] border-l flex flex-col h-full">
-        <Tabs defaultValue="invite" className="flex flex-col h-full">
+        <Tabs
+          value={previewTab}
+          onValueChange={(tab) => setPreviewTab(String(tab))}
+          className="flex flex-col h-full"
+        >
           {/* Tab bar */}
           <div className="px-4 pt-3 pb-0 border-b bg-muted/50 flex items-center justify-between gap-2 shrink-0">
             <TabsList className="h-8">
@@ -4600,6 +4626,9 @@ export default function InvitationForm({
               </TabsTrigger>
               <TabsTrigger value="invite" className="text-xs px-3 h-7">
                 Convite
+              </TabsTrigger>
+              <TabsTrigger value="rsvp" className="text-xs px-3 h-7">
+                RSVP
               </TabsTrigger>
             </TabsList>
             <div className="flex items-center gap-1">
@@ -4796,6 +4825,14 @@ export default function InvitationForm({
                 </InlineTextEditProvider>
               </SpacingStyleProvider>
             )}
+          </TabsContent>
+
+          <TabsContent value="rsvp" className="flex-1 overflow-hidden m-0">
+            <RsvpPagePreview
+              invitation={previewInvitation}
+              theme={currentTheme}
+              locale={activeLocale}
+            />
           </TabsContent>
         </Tabs>
       </div>
