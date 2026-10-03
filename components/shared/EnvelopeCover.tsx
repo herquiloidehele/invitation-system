@@ -136,11 +136,13 @@ function TopFlap({
 
       <motion.div
         className="absolute top-0 left-0 w-full"
+        // No preserve-3d / backface-visibility here: the flap tilts at most
+        // 40° (its back never faces the viewer) and gets its depth from the
+        // perspective() in its own transform. With them, iOS Safari could leave
+        // the flap unpainted after its image loaded, until a scroll repainted it.
         style={{
           zIndex: 20,
           transformOrigin: "top center",
-          transformStyle: "preserve-3d",
-          backfaceVisibility: "hidden",
           willChange: "transform",
           height: "calc(50% + 13vh)",
         }}
@@ -173,11 +175,7 @@ function TopFlap({
           height={500}
           alt={t("envelope_topFlapAlt")}
           className={"w-full h-full object-cover object-bottom"}
-          style={{
-            backfaceVisibility: "hidden",
-            transform: "translateZ(0)",
-            ...imgStyle,
-          }}
+          style={imgStyle}
         />
       </motion.div>
     </>
@@ -274,10 +272,7 @@ export default function EnvelopeCover({
   return (
     <motion.div
       className="absolute inset-0 z-[100] cursor-pointer overflow-hidden"
-      style={{
-        ...coverBackgroundStyle,
-        transformStyle: "preserve-3d",
-      }}
+      style={coverBackgroundStyle}
       onClick={handleTap}
       /* Exit animation: fast fade-out so there's no gap before the invitation */
       exit={{ opacity: 0 }}
