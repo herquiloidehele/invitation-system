@@ -1,13 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
+import { Eye } from "lucide-react";
 
 import { ProductLightbox } from "./ProductLightbox";
+
+// Matches Tailwind's `lg`, where the page switches to its desktop layout.
+const DESKTOP_QUERY = "(min-width: 1024px)";
+
+function subscribeToDesktop(onChange: () => void) {
+  const mql = window.matchMedia(DESKTOP_QUERY);
+  mql.addEventListener("change", onChange);
+  return () => mql.removeEventListener("change", onChange);
+}
+
+function isDesktopViewport() {
+  return window.matchMedia(DESKTOP_QUERY).matches;
+}
 
 export function ProductMediaGallery({
   title,
   images,
+  previewHref,
+  previewLabel,
   selectImageLabel,
   openImageLabel,
   previousImageLabel,
@@ -17,6 +33,9 @@ export function ProductMediaGallery({
 }: {
   title: string;
   images: string[];
+  /** Invitation page a slide opens on mobile (same tab). */
+  previewHref: string;
+  previewLabel: string;
   selectImageLabel: (position: number) => string;
   openImageLabel: string;
   previousImageLabel: string;
@@ -27,6 +46,13 @@ export function ProductMediaGallery({
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const pagerRef = useRef<HTMLDivElement | null>(null);
+  // Mobile until the client says otherwise: slides are plain links there and
+  // only open the lightbox on desktop.
+  const isDesktop = useSyncExternalStore(
+    subscribeToDesktop,
+    isDesktopViewport,
+    () => false,
+  );
 
   // Keep the dots and the desktop thumbnails in sync with a swipe.
   useEffect(() => {
@@ -81,28 +107,45 @@ export function ProductMediaGallery({
       }
     >
       <div className="min-w-0">
-        <div
-          ref={pagerRef}
-          className="flex aspect-4/5 snap-x snap-mandatory overflow-x-auto overflow-y-hidden rounded-[2rem] bg-surface-warm shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 [scrollbar-width:none] lg:aspect-5/4 [&::-webkit-scrollbar]:hidden"
-        >
-          {images.map((image, index) => (
-            <button
-              key={`${image}-${index}`}
-              type="button"
-              onClick={() => setLightboxOpen(true)}
-              aria-label={openImageLabel}
-              className="relative w-full shrink-0 snap-center cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-            >
-              <Image
-                src={image}
-                alt={title}
-                fill
-                priority={index === 0}
-                sizes="(min-width: 1024px) 58vw, 100vw"
-                className="object-cover"
-              />
-            </button>
-          ))}
+        <div className="relative">
+          <div
+            ref={pagerRef}
+            className="flex aspect-4/5 snap-x snap-mandatory overflow-x-auto overflow-y-hidden rounded-[2rem] bg-surface-warm shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_8%,transparent)] outline outline-1 -outline-offset-1 outline-black/10 [scrollbar-width:none] lg:aspect-5/4 [&::-webkit-scrollbar]:hidden"
+          >
+            {images.map((image, index) => (
+              <a
+                key={`${image}-${index}`}
+                href={previewHref}
+                onClick={(event) => {
+                  if (!isDesktopViewport()) return;
+                  event.preventDefault();
+                  setLightboxOpen(true);
+                }}
+                aria-label={isDesktop ? openImageLabel : previewLabel}
+                className="relative w-full shrink-0 snap-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset lg:cursor-zoom-in"
+              >
+                <Image
+                  src={image}
+                  alt={title}
+                  fill
+                  priority={index === 0}
+                  sizes="(min-width: 1024px) 58vw, 100vw"
+                  className="object-cover"
+                />
+              </a>
+            ))}
+          </div>
+
+          {/* Mobile cue that a tap opens the invitation. Taps pass through to
+              the slide link underneath. */}
+          <span
+            data-gallery-chip
+            aria-hidden="true"
+            className="pointer-events-none absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-1.5 text-[12px] font-semibold text-foreground shadow-[0_6px_18px_color-mix(in_srgb,var(--foreground)_14%,transparent)] backdrop-blur-md lg:hidden"
+          >
+            <Eye className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            {previewLabel}
+          </span>
         </div>
 
         {showThumbnails ? (

@@ -95,6 +95,8 @@ export function LandingProductDetailsPage({
           <ProductMediaGallery
             title={details.title}
             images={details.images}
+            previewHref={details.previewHref}
+            previewLabel={t("viewLive")}
             selectImageLabel={(position) => t("selectImage", { position })}
             openImageLabel={t("openImage")}
             previousImageLabel={t("previousImage")}
