@@ -72,15 +72,6 @@ export function ProductDetailsPanel({
       </div>
 
       <div className="mt-7 hidden gap-3 lg:grid">
-        <a
-          href={details.whatsappHref}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-[13px] font-semibold text-background shadow-[0_14px_34px_color-mix(in_srgb,var(--foreground)_18%,transparent)] transition-[transform,background-color] duration-200 hover:bg-foreground/90 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          <MessageCircle className="h-4 w-4" aria-hidden="true" />
-          {requestLabel}
-        </a>
         <button
           type="button"
           onClick={onPreview}
@@ -89,6 +80,15 @@ export function ProductDetailsPanel({
           <Eye className="h-4 w-4" aria-hidden="true" />
           {previewLabel}
         </button>
+        <a
+          href={details.whatsappHref}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-background px-6 text-[13px] font-semibold text-foreground shadow-[inset_0_0_0_1px_var(--border)] transition-[transform,background-color] duration-200 hover:bg-surface-warm active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          {requestLabel}
+        </a>
       </div>
 
       <ProductDetailsAccordions items={accordionItems} />
