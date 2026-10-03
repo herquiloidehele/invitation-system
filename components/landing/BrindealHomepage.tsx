@@ -43,11 +43,11 @@ export function BrindealHomepage({
     <main className="overflow-hidden bg-background font-[var(--font-outfit)] text-foreground">
       <LandingNav currentCurrency={currentCurrency} />
       <HeroSection reduceMotion={reduceMotion} feature={heroFeature} />
-      <BestSellersSection items={bestSellerFeatures} />
       <GallerySection
         itemsByCategory={galleryByCategory}
         settings={gallerySettings}
       />
+      <BestSellersSection items={bestSellerFeatures} />
       <CustomInvitationSection currentCurrency={currentCurrency} />
       <ProcessSection />
       <FeaturesSection />

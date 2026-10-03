@@ -4,16 +4,16 @@ import { useTranslations } from "next-intl";
 import type { BestSellerFeature } from "@/lib/landing-features";
 import { AnimatedSection } from "./AnimatedSection";
 import { LandingModelCard } from "./LandingModelCard";
-import {
-  ModelCarousel,
-  MODEL_CAROUSEL_SLIDE_CLASS_NAME,
-} from "./ModelCarousel";
+import { MODEL_CAROUSEL_SLIDE_CLASS_NAME, ModelCarousel } from "./ModelCarousel";
 
 export function BestSellersSection({ items }: { items: BestSellerFeature[] }) {
   const t = useTranslations("LandingBestSellers");
 
   return (
-    <AnimatedSection id="destaques" className="bg-muted px-5 py-14 sm:px-8 sm:py-24">
+    <AnimatedSection
+      id="destaques"
+      className="bg-background px-5 py-14 sm:px-8 sm:py-24"
+    >
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mt-5 text-4xl font-medium tracking-[-0.025em] sm:text-5xl">
