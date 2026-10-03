@@ -535,6 +535,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
     cinematicImageUrl: "",
     saveTheDateBackgroundImageUrl: "",
     showCalendarCta: true,
+    showDecorativeLines: true,
     sectionImages: {},
     parents: {
       enabled: false,
@@ -1481,6 +1482,13 @@ export default function InvitationForm({
 
   const isElegantFloral = currentTheme.layout === "elegant-floral";
   const isMinimalismBrown = currentTheme.layout === "minimalism-brown";
+  // Themes whose public page is the standard InvitationPage (the only renderer
+  // that honours showDecorativeLines).
+  const usesStandardPage =
+    !isElegantFloral &&
+    !isMinimalismBrown &&
+    currentTheme.layout !== "video-entrance" &&
+    currentTheme.layout !== "curtain-canva";
   // Ternura with parents mode off renders verse → names → invite, so the
   // parents section offers those two texts instead of the parents' names.
   const efVerseFirst =
@@ -2320,6 +2328,26 @@ export default function InvitationForm({
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                  )}
+                  {!isAi && usesStandardPage && (
+                    <div className="flex items-center justify-between gap-4 rounded-lg border border-dashed border-border p-3">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="showDecorativeLines">
+                          Linhas decorativas
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Mostra as linhas douradas entre as secções e o traço
+                          por baixo dos títulos.
+                        </p>
+                      </div>
+                      <Switch
+                        id="showDecorativeLines"
+                        checked={form.showDecorativeLines !== false}
+                        onCheckedChange={(checked) =>
+                          update("showDecorativeLines", checked)
+                        }
+                      />
                     </div>
                   )}
                   <div className="space-y-1.5">

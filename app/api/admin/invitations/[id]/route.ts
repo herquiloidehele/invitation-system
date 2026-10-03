@@ -267,6 +267,9 @@ export async function PUT(
         ...(body.showCalendarCta !== undefined && {
           showCalendarCta: body.showCalendarCta === true,
         }),
+        ...(typeof body.showDecorativeLines === "boolean" && {
+          showDecorativeLines: body.showDecorativeLines,
+        }),
         ...(body.sectionImages !== undefined && {
           sectionImages: sanitizeJsonField(body.sectionImages, null),
         }),

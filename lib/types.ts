@@ -1455,6 +1455,8 @@ export interface InvitationData {
   saveTheDateBackgroundImageUrl?: string;
   /** Shows the Add to calendar CTA in Save the Date and external countdown sections. */
   showCalendarCta?: boolean;
+  /** Standard page only: gold section dividers and title underlines. Absent => shown. */
+  showDecorativeLines?: boolean;
   /** Optional decorative images placed between sections and in the footer. Each falls back to a default Unsplash photo if not provided. */
   sectionImages?: SectionImages;
   /** Optional couple-photos gallery section (opt-in carousel). */

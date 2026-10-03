@@ -86,6 +86,7 @@ type InvitationWithTheme = {
   pageBackgroundImageUrl: string | null;
   saveTheDateBackgroundImageUrl: string | null;
   showCalendarCta: boolean;
+  showDecorativeLines: boolean;
   sectionImages: unknown;
   coupleGallery: unknown;
   coverVideos: unknown;
@@ -178,6 +179,7 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     saveTheDateBackgroundImageUrl:
       row.saveTheDateBackgroundImageUrl ?? undefined,
     showCalendarCta: row.showCalendarCta,
+    showDecorativeLines: row.showDecorativeLines,
     sectionImages: (row.sectionImages as SectionImages | null) ?? undefined,
     coupleGallery: (row.coupleGallery as CoupleGallery | null) ?? undefined,
     coverVideos:

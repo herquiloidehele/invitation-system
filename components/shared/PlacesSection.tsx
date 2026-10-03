@@ -19,6 +19,7 @@ import {
 import { useCustomText } from "@/lib/custom-texts";
 import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { EditableText } from "./EditableText";
+import { SectionTitleUnderline } from "./DecorativeLines";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -76,6 +77,7 @@ export default function PlacesSection({
           accent={accent}
           plain={plain}
           isPreview={isPreview}
+          showLines={invitation.showDecorativeLines !== false}
         />
       ))}
     </div>
@@ -94,6 +96,7 @@ interface BlockProps {
   accent: string;
   plain: boolean;
   isPreview: boolean;
+  showLines: boolean;
 }
 
 function PlacesBlock({
@@ -108,12 +111,22 @@ function PlacesBlock({
   accent,
   plain,
   isPreview,
+  showLines,
 }: BlockProps) {
   const hasTitle = !!section.title?.trim();
 
   return (
     <section className="px-4 pb-10">
-      {hasTitle && <PlacesBlockHeader title={section.title} theme={theme} ts={ts} accent={accent} isPreview={isPreview} />}
+      {hasTitle && (
+        <PlacesBlockHeader
+          title={section.title}
+          theme={theme}
+          ts={ts}
+          accent={accent}
+          isPreview={isPreview}
+          showLines={showLines}
+        />
+      )}
 
       <motion.div
         className={
@@ -153,69 +166,70 @@ interface HeaderProps {
   ts: ReturnType<typeof resolveTextStyles>;
   accent: string;
   isPreview: boolean;
+  /** Draw the dot divider and title underline (invitation.showDecorativeLines). */
+  showLines: boolean;
 }
 
 /** Decorative section header: dot divider, centered title, accent underline. */
-function PlacesBlockHeader({ title, theme, ts, accent, isPreview }: HeaderProps) {
+function PlacesBlockHeader({
+  title,
+  theme,
+  ts,
+  accent,
+  isPreview,
+  showLines,
+}: HeaderProps) {
   return (
     <>
       {/* Dot divider */}
-      <div className="flex items-center justify-center gap-3 py-6">
-        <motion.span
-          initial={{ scaleX: 0 }}
-          {...(isPreview
-            ? { animate: { scaleX: 1 } }
-            : { whileInView: { scaleX: 1 }, viewport: { once: false } })}
-          transition={{ duration: 0.8, ease: EASE }}
-          style={{
-            width: 36,
-            height: 1,
-            background: theme.decorativeColor,
-            transformOrigin: "right center",
-          }}
-        />
-        <span
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: "50%",
-            background: accent,
-          }}
-        />
-        <motion.span
-          initial={{ scaleX: 0 }}
-          {...(isPreview
-            ? { animate: { scaleX: 1 } }
-            : { whileInView: { scaleX: 1 }, viewport: { once: false } })}
-          transition={{ duration: 0.8, ease: EASE }}
-          style={{
-            width: 36,
-            height: 1,
-            background: theme.decorativeColor,
-            transformOrigin: "left center",
-          }}
-        />
-      </div>
+      {showLines && (
+        <div className="flex items-center justify-center gap-3 py-6">
+          <motion.span
+            initial={{ scaleX: 0 }}
+            {...(isPreview
+              ? { animate: { scaleX: 1 } }
+              : { whileInView: { scaleX: 1 }, viewport: { once: false } })}
+            transition={{ duration: 0.8, ease: EASE }}
+            style={{
+              width: 36,
+              height: 1,
+              background: theme.decorativeColor,
+              transformOrigin: "right center",
+            }}
+          />
+          <span
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              background: accent,
+            }}
+          />
+          <motion.span
+            initial={{ scaleX: 0 }}
+            {...(isPreview
+              ? { animate: { scaleX: 1 } }
+              : { whileInView: { scaleX: 1 }, viewport: { once: false } })}
+            transition={{ duration: 0.8, ease: EASE }}
+            style={{
+              width: 36,
+              height: 1,
+              background: theme.decorativeColor,
+              transformOrigin: "left center",
+            }}
+          />
+        </div>
+      )}
 
       {/* Title + underline */}
       <div className="flex flex-col items-center">
         <span style={ts.placesSectionTitle}>
           <EditableText elementKey="placesSectionTitle">{title}</EditableText>
         </span>
-        <motion.div
-          className="mt-3 mb-6"
-          initial={{ scaleX: 0 }}
-          {...(isPreview
-            ? { animate: { scaleX: 1 } }
-            : { whileInView: { scaleX: 1 }, viewport: { once: false } })}
-          transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-          style={{
-            width: 28,
-            height: 1,
-            background: accent,
-            opacity: 0.25,
-            transformOrigin: "center",
-          }}
+        <SectionTitleUnderline
+          color={accent}
+          show={showLines}
+          isPreview={isPreview}
         />
       </div>
     </>

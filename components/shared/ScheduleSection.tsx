@@ -41,6 +41,7 @@ import { useCustomText } from "@/lib/custom-texts";
 import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { EditableCard } from "./EditableCard";
 import { EditableText } from "./EditableText";
+import { SectionTitleUnderline } from "./DecorativeLines";
 import ScheduleItem from "./ScheduleItem";
 import { EASE, WordReveal } from "./animations";
 
@@ -84,6 +85,8 @@ interface ScheduleSectionProps {
   cardStyle: ScheduleCardStyle;
   customTexts?: CustomTexts;
   isPreview?: boolean;
+  /** Draw the short underline under the section title. */
+  showDecorativeLines?: boolean;
 }
 
 const PRESET_ICONS: Record<Exclude<ScheduleIcon, "custom">, LucideIcon> = {
@@ -329,6 +332,7 @@ export default function ScheduleSection({
   cardStyle,
   customTexts,
   isPreview = false,
+  showDecorativeLines = true,
 }: ScheduleSectionProps) {
   const resolvedStyle =
     scheduleStyle === "illustrated" ? "illustrated" : "default";
@@ -364,19 +368,9 @@ export default function ScheduleSection({
             </EditableText>
           </span>
 
-          <motion.div
-            className="mt-3 mb-6"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-            style={{
-              width: 28,
-              height: 1,
-              background: ts.accent,
-              opacity: 0.25,
-              transformOrigin: "center",
-            }}
+          <SectionTitleUnderline
+            color={ts.accent}
+            show={showDecorativeLines}
           />
         </div>
       </motion.section>

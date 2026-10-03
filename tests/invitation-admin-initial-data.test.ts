@@ -46,6 +46,7 @@ const baseRow = {
   cinematicImageUrl: null,
   saveTheDateBackgroundImageUrl: null,
   showCalendarCta: false,
+  showDecorativeLines: true,
   sectionImages: null,
   coupleGallery: null,
   coverVideos: null,
@@ -144,6 +145,17 @@ describe("toAdminInvitationInitialData — countdown controls", () => {
 
     expect(result.showCalendarCta).toBe(false);
     expect(result.countdown).toEqual({ enabled: true, layout: "inline" });
+  });
+});
+
+describe("toAdminInvitationInitialData — decorative lines", () => {
+  it("hydrates hidden decorative lines", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      showDecorativeLines: false,
+    });
+
+    expect(result.showDecorativeLines).toBe(false);
   });
 });
 

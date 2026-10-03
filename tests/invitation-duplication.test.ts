@@ -49,6 +49,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "cinematicImageUrl",
       "saveTheDateBackgroundImageUrl",
       "showCalendarCta",
+      "showDecorativeLines",
       "sectionImages",
       "coupleGallery",
       "coverVideos",

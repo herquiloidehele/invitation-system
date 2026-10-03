@@ -4,18 +4,13 @@ import { useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
-import type {
-  CardStyle,
-  CustomTexts,
-  FAQItem,
-  TemplateTheme,
-  TextStyleOverrides,
-} from "@/lib/types";
-import { resolveTextStyles, type ResolvedTextStyles } from "@/lib/text-styles";
+import type { CardStyle, CustomTexts, FAQItem, TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import { type ResolvedTextStyles, resolveTextStyles } from "@/lib/text-styles";
 import { useCustomText } from "@/lib/custom-texts";
 import { resolveCardSurfaceStyle } from "@/lib/card-styles";
 import { EditableText } from "@/components/shared/EditableText";
 import { EditableCard } from "@/components/shared/EditableCard";
+import { SectionTitleUnderline } from "@/components/shared/DecorativeLines";
 import { EASE, staggerContainer, WordReveal } from "@/components/shared/animations";
 
 const fadeInUp: Variants = {
@@ -34,6 +29,7 @@ interface FaqSectionProps {
   customTexts?: CustomTexts;
   cardStyle: CardStyle;
   isPreview?: boolean;
+  showDecorativeLines?: boolean;
 }
 
 export default function FaqSection({
@@ -43,6 +39,7 @@ export default function FaqSection({
   customTexts,
   cardStyle,
   isPreview = false,
+  showDecorativeLines = true,
 }: FaqSectionProps) {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const t = useCustomText(customTexts);
@@ -63,27 +60,11 @@ export default function FaqSection({
       <div className="flex flex-col items-center">
         <span style={ts.sectionTitles}>
           <EditableText elementKey="sectionTitles">
-            <WordReveal
-              text={t("sectionTitle_faqs")}
-              isPreview={isPreview}
-            />
+            <WordReveal text={t("sectionTitle_faqs")} isPreview={isPreview} />
           </EditableText>
         </span>
 
-        <motion.div
-          className="mt-3 mb-6"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={{ once: false }}
-          transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-          style={{
-            width: 28,
-            height: 1,
-            background: ts.accent,
-            opacity: 0.25,
-            transformOrigin: "center",
-          }}
-        />
+        <SectionTitleUnderline color={ts.accent} show={showDecorativeLines} />
       </div>
 
       <EditableCard sectionKey="faqs">
@@ -116,9 +97,7 @@ export default function FaqSection({
               key={faq.id ?? i}
               faq={faq}
               isOpen={openFaqIndex === i}
-              onToggle={() =>
-                setOpenFaqIndex(openFaqIndex === i ? null : i)
-              }
+              onToggle={() => setOpenFaqIndex(openFaqIndex === i ? null : i)}
               theme={theme}
               ts={ts}
               isLast={i === faqs.length - 1}
@@ -179,9 +158,7 @@ function FAQAccordionItem({
 
         <motion.span
           className="flex-shrink-0"
-          animate={
-            isOpen ? { rotate: 180, y: 0 } : { rotate: 0, y: [0, 2, 0] }
-          }
+          animate={isOpen ? { rotate: 180, y: 0 } : { rotate: 0, y: [0, 2, 0] }}
           transition={
             isOpen
               ? { duration: 0.35, ease: EASE }

@@ -45,6 +45,7 @@ import ImageCanvas from "./ImageCanvas";
 import SectionImageHost from "./SectionImageHost";
 import PlacesSection from "./PlacesSection";
 import FaqSection from "./FaqSection";
+import { SectionDivider, SectionTitleUnderline } from "./DecorativeLines";
 import DynamicFontLoader from "./DynamicFontLoader";
 import { EditableText } from "./EditableText";
 import { EditableCard } from "./EditableCard";
@@ -133,62 +134,6 @@ const ambientFade: Variants = {
 // ---------------------------------------------------------------------------
 
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
-
-// ---------------------------------------------------------------------------
-// Decorative section divider
-// ---------------------------------------------------------------------------
-
-function SectionDivider({ theme }: { theme: TemplateTheme }) {
-  return (
-    <div className="flex items-center justify-center gap-3 py-6">
-      <motion.div
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: false }}
-        transition={{ duration: 0.8, ease: EASE }}
-        style={{
-          width: 36,
-          height: 1,
-          background: theme.decorativeColor,
-          transformOrigin: "right center",
-        }}
-      />
-      <motion.div
-        initial={{ scale: 0 }}
-        whileInView={{ scale: 1 }}
-        viewport={{ once: false }}
-        transition={{ duration: 0.5, delay: 0.3, ease: EASE }}
-      >
-        <motion.div
-          animate={{ opacity: [0.25, 0.55, 0.25] }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: "50%",
-            background: theme.accent,
-          }}
-        />
-      </motion.div>
-      <motion.div
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: false }}
-        transition={{ duration: 0.8, ease: EASE }}
-        style={{
-          width: 36,
-          height: 1,
-          background: theme.decorativeColor,
-          transformOrigin: "left center",
-        }}
-      />
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Animated section wrappers
@@ -310,6 +255,7 @@ export default function InvitationPage({
   );
 
   const ts = resolveTextStyles(theme, invitation.textStyles);
+  const showDecorativeLines = invitation.showDecorativeLines !== false;
 
   /** Resolve card bg/border/borderRadius for a given section, falling back to theme defaults. */
   const cs = (section: CardSectionKey, defaultRadius: number) => ({
@@ -475,7 +421,7 @@ export default function InvitationPage({
             </SectionImageHost>
       )}
 
-      <SectionDivider theme={theme} />
+      <SectionDivider theme={theme} show={showDecorativeLines} />
 
       {/* ================================================================= */}
       {/* 3b. Nossa História — couple's story                               */}
@@ -499,19 +445,9 @@ export default function InvitationPage({
                 </EditableText>
               </span>
 
-              <motion.div
-                className="mt-3 mb-6"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-                style={{
-                  width: 28,
-                  height: 1,
-                  background: ts.accent,
-                  opacity: 0.25,
-                  transformOrigin: "center",
-                }}
+              <SectionTitleUnderline
+                color={ts.accent}
+                show={showDecorativeLines}
               />
             </div>
           </AnimatedSection>
@@ -562,7 +498,7 @@ export default function InvitationPage({
             </EditableCard>
           </AnimatedSection>
 
-          <SectionDivider theme={theme} />
+          <SectionDivider theme={theme} show={showDecorativeLines} />
             </SectionImageHost>
       )}
 
@@ -598,6 +534,7 @@ export default function InvitationPage({
           cardStyle={cs("schedule", 20)}
           customTexts={invitation.customTexts}
           isPreview={isPreview}
+          showDecorativeLines={showDecorativeLines}
         />
             </SectionImageHost>
       )}
@@ -619,7 +556,7 @@ export default function InvitationPage({
             </SectionImageHost>
       )}
 
-      <SectionDivider theme={theme} />
+      <SectionDivider theme={theme} show={showDecorativeLines} />
 
       {/* ================================================================= */}
       {/* 5b. Location Card Section                                         */}
@@ -636,19 +573,9 @@ export default function InvitationPage({
             </EditableText>
           </span>
 
-          <motion.div
-            className="mt-3 mb-6"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-            style={{
-              width: 28,
-              height: 1,
-              background: ts.accent,
-              opacity: 0.25,
-              transformOrigin: "center",
-            }}
+          <SectionTitleUnderline
+            color={ts.accent}
+            show={showDecorativeLines}
           />
         </div>
 
@@ -712,7 +639,7 @@ export default function InvitationPage({
           {(invitation.dressCode.enabled ||
             invitation.giftRegistry.enabled) && (
             <AnimatedSection className="pb-10" isPreview={isPreview}>
-          <SectionDivider theme={theme} />
+          <SectionDivider theme={theme} show={showDecorativeLines} />
           <div className={`flex flex-col gap-6`}>
             {/* Dress Code — slides from left */}
             {invitation.dressCode.enabled && (
@@ -868,7 +795,7 @@ export default function InvitationPage({
                 sectionKey="guestGuide"
                 layer={invitation.imageLayer}
               >
-            <SectionDivider theme={theme} />
+            <SectionDivider theme={theme} show={showDecorativeLines} />
             <div className="flex flex-col items-center">
               <span style={ts.sectionTitles} className={"text-center"}>
                 <EditableText elementKey="sectionTitles">
@@ -880,19 +807,9 @@ export default function InvitationPage({
                 </EditableText>
               </span>
 
-              <motion.div
-                className="mt-3 mb-6"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-                style={{
-                  width: 28,
-                  height: 1,
-                  background: ts.accent,
-                  opacity: 0.25,
-                  transformOrigin: "center",
-                }}
+              <SectionTitleUnderline
+                color={ts.accent}
+                show={showDecorativeLines}
               />
             </div>
 
@@ -918,7 +835,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {invitation.faqs && invitation.faqs.length > 0 && (
         <SectionImageHost sectionKey="faqs" layer={invitation.imageLayer}>
-          <SectionDivider theme={theme} />
+          <SectionDivider theme={theme} show={showDecorativeLines} />
 
           <FaqSection
             faqs={invitation.faqs}
@@ -927,6 +844,7 @@ export default function InvitationPage({
             customTexts={invitation.customTexts}
             cardStyle={cs("faqs", 20)}
             isPreview={isPreview}
+            showDecorativeLines={showDecorativeLines}
           />
         </SectionImageHost>
       )}

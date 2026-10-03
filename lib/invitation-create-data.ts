@@ -81,6 +81,7 @@ export function buildInvitationCreateData(
     cinematicImageUrl: body.cinematicImageUrl ?? null,
     saveTheDateBackgroundImageUrl: body.saveTheDateBackgroundImageUrl ?? null,
     showCalendarCta: body.showCalendarCta ?? true,
+    showDecorativeLines: body.showDecorativeLines ?? true,
     sectionImages: sanitizeJsonField(body.sectionImages, null),
     coupleGallery: sanitizeJsonField(invitation.coupleGallery, null),
     coverVideos: sanitizeJsonField(body.coverVideos, null),

@@ -10,6 +10,7 @@ describe("buildInvitationCreateData", () => {
       eventType: "wedding",
       couple: { bride: "Maria", groom: "Pedro", monogram: "M&P" },
       showCalendarCta: false,
+      showDecorativeLines: false,
       countdown: { enabled: true, layout: "inline" },
       rsvpPage: { base: "theme", layout: "editorial" },
       heroVideoMuted: false,
@@ -28,6 +29,7 @@ describe("buildInvitationCreateData", () => {
       body.saveTheDateBackgroundImageUrl,
     );
     expect(data.showCalendarCta).toBe(body.showCalendarCta);
+    expect(data.showDecorativeLines).toBe(false);
     expect(data.countdown).toEqual(body.countdown);
     expect(data.rsvpPage).toEqual({ base: "theme", layout: "editorial" });
     expect(data.giftRegistry).toEqual(body.giftRegistry);
@@ -53,6 +55,7 @@ describe("buildInvitationCreateData", () => {
       priceOverrides: { USD: { fromCents: -1 } },
       landingCustomizationLevel: "invalid" as never,
       heroVideoMuted: undefined,
+      showDecorativeLines: undefined,
     });
 
     const data = buildInvitationCreateData(body, "theme_copy");
@@ -62,6 +65,7 @@ describe("buildInvitationCreateData", () => {
     expect(data.heroVideoMuted).toBe(true);
     expect(data.rsvp).toEqual({ enabled: true });
     expect(data.showCalendarCta).toBe(true);
+    expect(data.showDecorativeLines).toBe(true);
     expect(data.priceOverrides).toBe(Prisma.JsonNull);
     expect(data.landingCustomizationLevel).toBe("fully_customizable");
   });

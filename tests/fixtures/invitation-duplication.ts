@@ -120,6 +120,7 @@ export const sourceInvitationRow = {
   saveTheDateBackgroundImageUrl:
     "https://cdn.example.com/save-date-background.jpg",
   showCalendarCta: true,
+  showDecorativeLines: false,
   sectionImages: { image1: "https://cdn.example.com/section.jpg" },
   coupleGallery: {
     enabled: true,
