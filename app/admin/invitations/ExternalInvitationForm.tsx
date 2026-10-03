@@ -70,6 +70,12 @@ import GiftsListEditor from "@/components/admin/GiftsListEditor";
 import BankTransferEditor from "@/components/admin/BankTransferEditor";
 import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
 import { RsvpInputStyleField } from "@/components/admin/RsvpInputStyleField";
+import RsvpPageStyleSection from "@/components/admin/RsvpPageStyleSection";
+import RsvpPagePreview from "@/components/admin/RsvpPagePreview";
+import {
+  RSVP_PAGE_ACCORDION_VALUE,
+  useRsvpPreviewTab,
+} from "@/hooks/use-rsvp-preview-tab";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
@@ -185,6 +191,7 @@ function getDefaultState(
       inputBorderColor: "",
       inputStyle: "default",
     },
+    rsvpPage: { base: "theme" },
     schedule: [],
     dressCode: { enabled: false, text: "" },
     giftRegistry: {
@@ -363,6 +370,7 @@ export default function ExternalInvitationForm({
     false,
   );
   const previewRootRef = useRef<HTMLDivElement | null>(null);
+  const { previewTab, setPreviewTab, onAccordionChange } = useRsvpPreviewTab();
   const imageItemCount = form.imageLayer?.items?.length ?? 0;
   const hasImageItems = imageItemCount > 0;
   const imageLayerEditorActive = isImageLayerEditorActive(
@@ -1076,7 +1084,11 @@ export default function ExternalInvitationForm({
             </div>
 
             {/* ── Accordion: all settings ── */}
-            <Accordion defaultValue={[]} className="space-y-2">
+            <Accordion
+              defaultValue={[]}
+              onValueChange={onAccordionChange}
+              className="space-y-2"
+            >
               {/* ── Languages ── */}
               <AccordionItem
                 value="languages"
@@ -3874,6 +3886,16 @@ export default function ExternalInvitationForm({
                 </AccordionContent>
               </AccordionItem>
 
+              <RsvpPageStyleSection
+                accordionValue={RSVP_PAGE_ACCORDION_VALUE}
+                value={form.rsvpPage}
+                onChange={(rsvpPage) =>
+                  setForm((prev) => ({ ...prev, rsvpPage }))
+                }
+                theme={currentTheme}
+                rsvp={form.rsvp}
+              />
+
               <AccordionItem
                 value="guest-management"
                 className="border rounded-lg px-4"
@@ -4266,7 +4288,11 @@ export default function ExternalInvitationForm({
 
       {/* ──────────── Right: Live Preview ──────────── */}
       <div className="hidden lg:flex w-[35%] min-w-[380px] border-l flex-col h-full">
-        <Tabs defaultValue="invite" className="flex flex-col h-full">
+        <Tabs
+          value={previewTab}
+          onValueChange={(tab) => setPreviewTab(String(tab))}
+          className="flex flex-col h-full"
+        >
           <div className="px-4 pt-3 pb-0 border-b bg-muted/50 flex items-center justify-between gap-2 shrink-0">
             <TabsList className="h-8">
               <TabsTrigger value="envelope" className="text-xs px-3 h-7">
@@ -4274,6 +4300,9 @@ export default function ExternalInvitationForm({
               </TabsTrigger>
               <TabsTrigger value="invite" className="text-xs px-3 h-7">
                 Convite
+              </TabsTrigger>
+              <TabsTrigger value="rsvp" className="text-xs px-3 h-7">
+                RSVP
               </TabsTrigger>
             </TabsList>
             <span className="text-xs text-muted-foreground shrink-0">
@@ -4467,6 +4496,16 @@ export default function ExternalInvitationForm({
                 </InvitationLanguagePreviewProvider>
               </NextIntlClientProvider>
             </SpacingStyleProvider>
+          </TabsContent>
+
+          <TabsContent value="rsvp" className="flex-1 overflow-hidden m-0">
+            <div className="h-full max-h-165">
+              <RsvpPagePreview
+                invitation={previewInvitation}
+                theme={currentTheme}
+                locale={activeLocale}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

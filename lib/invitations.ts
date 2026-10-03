@@ -9,6 +9,7 @@ import { sanitizeLandingDetailImages } from "./landing-product-details";
 import { normalizeOwnerGuestFormMode } from "./owner-guest-form-mode";
 import { normalizeCurrency } from "./currency/config";
 import { normalizeRenderMode } from "./ai-invitation";
+import { sanitizeRsvpPageStyle } from "./rsvp-page-style";
 import { publicUrlForKey } from "./s3";
 import type {
   CardStyleOverrides,
@@ -53,6 +54,7 @@ type InvitationWithTheme = {
   location: unknown;
   location2: unknown;
   rsvp: unknown;
+  rsvpPage: unknown;
   schedule: unknown;
   scheduleStyle: string | null;
   dressCode: unknown;
@@ -141,6 +143,7 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     location: row.location as InvitationData["location"],
     location2: (row.location2 as LocationInfo | null) ?? undefined,
     rsvp: row.rsvp as InvitationData["rsvp"],
+    rsvpPage: sanitizeRsvpPageStyle(row.rsvpPage),
     schedule: row.schedule as InvitationData["schedule"],
     scheduleStyle: (row.scheduleStyle as ScheduleStyle | null) ?? "default",
     dressCode: row.dressCode as InvitationData["dressCode"],

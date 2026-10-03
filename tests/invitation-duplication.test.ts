@@ -58,6 +58,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "scratchReveal",
       "heroConfetti",
       "countdown",
+      "rsvpPage",
       "personalGuestCard",
       "textStyles",
       "cardStyles",

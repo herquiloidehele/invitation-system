@@ -13,6 +13,7 @@ import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization"
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
+import { sanitizeRsvpPageStyle } from "@/lib/rsvp-page-style";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -46,6 +47,7 @@ type AdminInvitationInitialDataRow = {
   location: unknown;
   location2: unknown;
   rsvp: unknown;
+  rsvpPage: unknown;
   schedule: unknown;
   scheduleStyle: string | null;
   scheduleMarkerUrl: string | null;
@@ -135,6 +137,7 @@ export function toAdminInvitationInitialData(
     location2:
       (row.location2 as InvitationData["location2"] | null) ?? undefined,
     rsvp: row.rsvp as InvitationData["rsvp"],
+    rsvpPage: sanitizeRsvpPageStyle(row.rsvpPage),
     schedule: row.schedule as InvitationData["schedule"],
     scheduleStyle: (row.scheduleStyle as ScheduleStyle | null) ?? "default",
     scheduleMarkerUrl: row.scheduleMarkerUrl ?? undefined,

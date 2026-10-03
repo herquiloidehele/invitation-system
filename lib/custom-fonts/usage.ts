@@ -56,6 +56,7 @@ export async function findCustomFontUsages(
           slug: true,
           textStyles: true,
           heroTextLayer: true,
+          rsvpPage: true,
         },
       }),
       prisma.saveTheDateTheme.findMany({
@@ -89,7 +90,8 @@ export async function findCustomFontUsages(
   for (const invitation of invitations) {
     if (
       containsCssFamily(invitation.textStyles, cssFamily) ||
-      containsCssFamily(invitation.heroTextLayer, cssFamily)
+      containsCssFamily(invitation.heroTextLayer, cssFamily) ||
+      containsCssFamily(invitation.rsvpPage, cssFamily)
     ) {
       usages.push({
         kind: "invitation",

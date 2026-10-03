@@ -13,6 +13,7 @@ import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization"
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
+import { sanitizeRsvpPageStyle } from "@/lib/rsvp-page-style";
 import { sanitizeSpacingStyles } from "@/lib/spacing-styles";
 import type { InvitationData } from "@/lib/types";
 
@@ -33,6 +34,10 @@ export function buildInvitationCreateData(
     location: sanitizeJsonField(body.location, {}),
     location2: sanitizeJsonField(body.location2, null),
     rsvp: sanitizeJsonField(body.rsvp, { enabled: true }),
+    rsvpPage: sanitizeJsonField(
+      sanitizeRsvpPageStyle(body.rsvpPage) ?? null,
+      null,
+    ),
     schedule: sanitizeJsonField(invitation.schedule, []),
     scheduleStyle: body.scheduleStyle ?? "default",
     dressCode: sanitizeJsonField(invitation.dressCode, {

@@ -11,6 +11,7 @@ describe("buildInvitationCreateData", () => {
       couple: { bride: "Maria", groom: "Pedro", monogram: "M&P" },
       showCalendarCta: false,
       countdown: { enabled: true, layout: "inline" },
+      rsvpPage: { base: "theme", layout: "editorial" },
       heroVideoMuted: false,
     });
 
@@ -28,6 +29,7 @@ describe("buildInvitationCreateData", () => {
     );
     expect(data.showCalendarCta).toBe(body.showCalendarCta);
     expect(data.countdown).toEqual(body.countdown);
+    expect(data.rsvpPage).toEqual({ base: "theme", layout: "editorial" });
     expect(data.giftRegistry).toEqual(body.giftRegistry);
     expect(data.cardStyles).toEqual(body.cardStyles);
     expect(data.guestManagementEnabled).toBe(true);
@@ -62,6 +64,19 @@ describe("buildInvitationCreateData", () => {
     expect(data.showCalendarCta).toBe(true);
     expect(data.priceOverrides).toBe(Prisma.JsonNull);
     expect(data.landingCustomizationLevel).toBe("fully_customizable");
+  });
+
+  it("stores a missing or invalid rsvpPage as JSON null", () => {
+    const missing = buildInvitationCreateData(
+      duplicateForm({ rsvpPage: undefined }),
+      "theme_copy",
+    );
+    expect(missing.rsvpPage).toBe(Prisma.JsonNull);
+    const invalid = buildInvitationCreateData(
+      duplicateForm({ rsvpPage: { base: "dark" } as never }),
+      "theme_copy",
+    );
+    expect(invalid.rsvpPage).toBe(Prisma.JsonNull);
   });
 
   it("stores EUR when a new invitation submits the legacy AOA currency", () => {
