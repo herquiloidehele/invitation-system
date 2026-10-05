@@ -174,3 +174,25 @@ export function efStyle(
 ): CSSProperties {
   return applyOverride(base, textStyles?.elements?.[key]);
 }
+
+/**
+ * Style for a schedule row's venue line.
+ *
+ * The venue used to be styled as `efBody`, which it shared with the dress-code
+ * and gift copy — so centring those pulled the venue out from under its label
+ * on the timeline. It now has its own key and takes its alignment from the row
+ * (left beside the rail, centred in the stack). `efBody`'s font, size and
+ * colour still apply underneath, so invitations styled before the key existed
+ * look the same apart from that alignment.
+ */
+export function efScheduleVenueStyle(
+  base: CSSProperties,
+  textStyles: TextStyleOverrides | null | undefined,
+): CSSProperties {
+  const body = textStyles?.elements?.efBody;
+  return efStyle(
+    applyOverride(base, body && { ...body, textAlign: undefined }),
+    textStyles,
+    "efScheduleVenue",
+  );
+}

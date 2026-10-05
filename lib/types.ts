@@ -822,6 +822,8 @@ export interface TextStyleOverrides {
     efLocationAddress?: TextStyle;
     efScheduleLabel?: TextStyle;
     efScheduleTime?: TextStyle;
+    /** A schedule row's venue line; inherits efBody's look, not its alignment. */
+    efScheduleVenue?: TextStyle;
     efPill?: TextStyle;
     efFaqQuestion?: TextStyle;
     efFaqAnswer?: TextStyle;

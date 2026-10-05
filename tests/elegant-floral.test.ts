@@ -7,6 +7,7 @@ import {
   countdownPartsFrom,
   efGuestGuideCardStyle,
   resolveEfScheduleStyle,
+  efScheduleVenueStyle,
   resolveEfTextOrder,
   efOpeningLines,
 } from "../lib/elegant-floral";
@@ -189,6 +190,36 @@ describe("elegant-floral text order wiring", () => {
   });
 });
 
+describe("efScheduleVenueStyle", () => {
+  const base = { fontSize: "0.85rem", color: "#666" };
+
+  it("returns the base untouched when nothing is overridden", () => {
+    expect(efScheduleVenueStyle(base, null)).toEqual(base);
+  });
+
+  it("keeps efBody's look but not its alignment", () => {
+    const style = efScheduleVenueStyle(base, {
+      elements: {
+        efBody: { color: "#123456", fontSize: 18, textAlign: "center" },
+      },
+    });
+    expect(style.color).toBe("#123456");
+    expect(style.fontSize).toBe(18);
+    expect(style.textAlign).toBeUndefined();
+  });
+
+  it("lets the venue's own override win, alignment included", () => {
+    const style = efScheduleVenueStyle(base, {
+      elements: {
+        efBody: { color: "#123456", textAlign: "center" },
+        efScheduleVenue: { color: "#abcdef", textAlign: "right" },
+      },
+    });
+    expect(style.color).toBe("#abcdef");
+    expect(style.textAlign).toBe("right");
+  });
+});
+
 describe("elegant-floral schedule wiring", () => {
   const block = readFileSync(
     "components/elegant-floral/ScheduleBlock.tsx",
@@ -197,6 +228,11 @@ describe("elegant-floral schedule wiring", () => {
 
   it("picks the schedule markup from the invitation's scheduleStyle", () => {
     expect(block).toContain("resolveEfScheduleStyle(invitation.scheduleStyle)");
+  });
+
+  it("styles and selects the venue under its own key, not efBody", () => {
+    expect(block).toContain("efScheduleVenueStyle(");
+    expect(block).not.toContain('"efBody"');
   });
 });
 

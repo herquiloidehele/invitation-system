@@ -7,7 +7,11 @@ import type {
   ScheduleEvent,
   TemplateTheme,
 } from "@/lib/types";
-import { efStyle, resolveEfScheduleStyle } from "@/lib/elegant-floral";
+import {
+  efScheduleVenueStyle,
+  efStyle,
+  resolveEfScheduleStyle,
+} from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
 import ScriptTitle from "./ScriptTitle";
 import ScrollTimeline from "@/components/shared/ScrollTimeline";
@@ -78,7 +82,7 @@ export default function ScheduleBlock({
       ts,
       "efScheduleTime",
     ),
-    venue: efStyle(
+    venue: efScheduleVenueStyle(
       {
         margin: "0.1rem 0 0",
         fontFamily: theme.bodyFont,
@@ -87,7 +91,6 @@ export default function ScheduleBlock({
         overflowWrap: "break-word",
       },
       ts,
-      "efBody",
     ),
   };
 
@@ -149,7 +152,7 @@ function StackedList({
           )}
           {ev.venue && (
             <p style={styles.venue}>
-              <EditableText elementKey="efBody">{ev.venue}</EditableText>
+              <EditableText elementKey="efScheduleVenue">{ev.venue}</EditableText>
             </p>
           )}
         </motion.div>
@@ -266,7 +269,7 @@ function TimelineList({
               </p>
               {ev.venue && (
                 <p style={styles.venue}>
-                  <EditableText elementKey="efBody">{ev.venue}</EditableText>
+                  <EditableText elementKey="efScheduleVenue">{ev.venue}</EditableText>
                 </p>
               )}
             </div>
