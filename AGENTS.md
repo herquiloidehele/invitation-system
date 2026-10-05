@@ -20,7 +20,7 @@ There is no typecheck script; rely on `next build` or `tsc --noEmit` if you need
 
 - Env files live at the repo root: `.env.development` and `.env.production`. Both are gitignored but tracked locally and contain real secrets (DB, AWS, JWT). Do not commit them.
 - `prisma.config.ts` selects the env file by `NODE_ENV` (defaults to `development`). The npm scripts above already set this; if you invoke Prisma manually, set `NODE_ENV` yourself.
-- Required vars: `DATABASE_URL`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `AWS_*`, `S3_BUCKET_NAME`. `GOOGLE_FONTS_API_KEY` and `NEXT_PUBLIC_SITE_URL` are optional. `PEXELS_API_KEY`, `UNSPLASH_ACCESS_KEY` and `PIXABAY_API_KEY` each add a provider to the AI builder's stock image search. The search tools are always registered; a provider whose key is missing is skipped, and with none set the tool tells the agent so.
+- Required vars: `DATABASE_URL`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `AWS_*`, `S3_BUCKET_NAME`. `GOOGLE_FONTS_API_KEY` and `NEXT_PUBLIC_SITE_URL` are optional. `NEXT_PUBLIC_CARTO_BASEMAPS_KEY` (free at carto.com/basemaps/apikey) switches the venue map to CARTO's minimal basemap; without it the map uses keyless OpenStreetMap tiles. It is inlined at build time, so set it before `npm run build`. `PEXELS_API_KEY`, `UNSPLASH_ACCESS_KEY` and `PIXABAY_API_KEY` each add a provider to the AI builder's stock image search. The search tools are always registered; a provider whose key is missing is skipped, and with none set the tool tells the agent so.
 
 ## Architecture
 

@@ -4,16 +4,8 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+import { resolveMapTiles } from "@/lib/map-tiles";
 import type { TemplateTheme } from "@/lib/types";
-
-// ---------------------------------------------------------------------------
-// Tile layer URLs — free, no API key required
-// ---------------------------------------------------------------------------
-
-const TILES_LIGHT =
-  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
-const TILES_DARK =
-  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
 // ---------------------------------------------------------------------------
 // Build an SVG marker that uses the theme primary color
@@ -48,8 +40,10 @@ function isDarkTheme(theme: TemplateTheme): boolean {
 // CSS filter to make the map blend with the theme
 // ---------------------------------------------------------------------------
 
-function getMapFilter(theme: TemplateTheme): string {
+function getMapFilter(theme: TemplateTheme, inverted: boolean): string {
   if (isDarkTheme(theme)) {
+    // Inverted light tiles are already mid-dark: just mute them
+    if (inverted) return "saturate(0.15) brightness(0.9) contrast(0.9)";
     // Dark theme: slightly brighten, desaturate a bit
     return "saturate(2.5) brightness(2.5) contrast(0.8)";
   }
@@ -80,6 +74,10 @@ export default function MinimalistMap({
 }: MinimalistMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const tiles = resolveMapTiles(
+    isDarkTheme(theme),
+    process.env.NEXT_PUBLIC_CARTO_BASEMAPS_KEY,
+  );
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -97,12 +95,13 @@ export default function MinimalistMap({
       keyboard: false,
     });
 
-    const tileUrl = isDarkTheme(theme) ? TILES_DARK : TILES_LIGHT;
+    L.tileLayer(tiles.url, { maxZoom: 80, ...tiles.options }).addTo(map);
 
-    L.tileLayer(tileUrl, {
-      maxZoom: 80,
-      subdomains: "abcd",
-    }).addTo(map);
+    // Only the tiles: the pin and popup share the container and must keep
+    // their colours
+    if (tiles.invert) {
+      map.getPane("tilePane")!.style.filter = "invert(1) hue-rotate(180deg)";
+    }
 
     // Custom pin marker using theme primary color
     const icon = createPinIcon(theme.secondary);
@@ -176,7 +175,7 @@ export default function MinimalistMap({
           style={{
             width: "100%",
             height: "100%",
-            filter: getMapFilter(theme),
+            filter: getMapFilter(theme, tiles.invert),
             transition: "filter 0.5s ease",
           }}
         />

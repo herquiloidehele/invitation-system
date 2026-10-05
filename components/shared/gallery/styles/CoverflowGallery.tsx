@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import GalleryPhoto from "../GalleryPhoto";
 import type { GalleryStyleProps } from "../types";
 
@@ -19,6 +19,11 @@ export default function CoverflowGallery({
   // Once the reader has taken control, stop advancing under them — the same
   // courtesy the opening auto-scroll extends.
   const touched = useRef(false);
+  // Autoplay waits for the reader. Advancing from page load means they scroll
+  // down to a carousel that is already mid-cycle; leaving pauses it, and the
+  // timer restarting on return gives the photo in front its full beat.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(rootRef, { amount: 0.5 });
 
   const go = (dir: number) => {
     touched.current = true;
@@ -30,17 +35,20 @@ export default function CoverflowGallery({
   };
 
   useEffect(() => {
-    if (!autoplay || reduce || images.length <= 1) return;
+    if (!autoplay || reduce || !inView || images.length <= 1) return;
     const id = setInterval(() => {
       if (touched.current) return;
       // Wraps, unlike the manual arrows, which clamp at the ends.
       setIndex((i) => (i + 1) % images.length);
     }, SLIDE_MS);
     return () => clearInterval(id);
-  }, [autoplay, reduce, images.length]);
+  }, [autoplay, reduce, inView, images.length]);
 
   return (
-    <div style={{ width: "100%", overflow: "hidden", padding: "10px 0 4px" }}>
+    <div
+      ref={rootRef}
+      style={{ width: "100%", overflow: "hidden", padding: "10px 0 4px" }}
+    >
       <div
         style={{
           position: "relative",

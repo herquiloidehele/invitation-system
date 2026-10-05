@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
 import GalleryPhoto from "../GalleryPhoto";
 import type { GalleryStyleProps } from "../types";
 
@@ -15,15 +20,20 @@ export default function KenBurnsGallery({
 }: GalleryStyleProps) {
   const [index, setIndex] = useState(0);
   const reduce = useReducedMotion();
+  // Nothing moves until the reader is looking: both the slide timer and the
+  // slow zoom would otherwise spend themselves off screen. Leaving pauses the
+  // timer, and it restarts on return so the photo in front gets its full beat.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(rootRef, { amount: 0.5 });
 
   useEffect(() => {
-    if (!autoplay || reduce || images.length <= 1) return;
+    if (!autoplay || reduce || !inView || images.length <= 1) return;
     const id = setInterval(
       () => setIndex((i) => (i + 1) % images.length),
       SLIDE_MS,
     );
     return () => clearInterval(id);
-  }, [autoplay, reduce, images.length]);
+  }, [autoplay, reduce, inView, images.length]);
 
   const current = images[index];
   const advance = () =>
@@ -31,6 +41,7 @@ export default function KenBurnsGallery({
 
   return (
     <div
+      ref={rootRef}
       onClick={advance}
       style={{
         position: "relative",
@@ -48,7 +59,7 @@ export default function KenBurnsGallery({
         <motion.div
           key={index}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1, scale: reduce ? 1 : 1.12 }}
+          animate={{ opacity: 1, scale: reduce || !inView ? 1 : 1.12 }}
           exit={{ opacity: 0 }}
           transition={{
             opacity: { duration: 1.2 },
