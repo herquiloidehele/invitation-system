@@ -207,7 +207,7 @@ export default function DressCodeSection({
           >
             {noteTitle}
           </ScriptTitle>
-          <p style={{ ...noteStyle, maxWidth: 440, margin: "0.6rem auto 0" }}>
+          <p style={{ maxWidth: 440, ...noteStyle, margin: "0.6rem auto 0" }}>
             <EditableText elementKey="efBody">
               {dressCode.reservedNote}
             </EditableText>

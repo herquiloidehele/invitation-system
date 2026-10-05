@@ -479,6 +479,40 @@ describe("invitation translation drafts", () => {
     });
   });
 
+  it("keeps a bank-transfer account name shared across languages", () => {
+    const source = duplicateForm({
+      giftRegistry: {
+        enabled: true,
+        text: "Presentes",
+        bankTransfer: [
+          {
+            id: "nib",
+            label: "NIB",
+            value: "0043 0000",
+            accountName: "Maria Silva",
+          },
+        ],
+      },
+    });
+    const draft = buildInvitationTranslationDraft(source, "en");
+
+    expect(draft.giftRegistry.bankTransfer?.[0].accountName).toBe(
+      "Maria Silva",
+    );
+
+    draft.giftRegistry.bankTransfer![0].label = "Account number";
+    draft.giftRegistry.bankTransfer![0].accountName = "Maria J. Silva";
+    const saved = applyInvitationTranslationDraft(source, "en", draft);
+
+    expect(saved.giftRegistry.bankTransfer?.[0]).toMatchObject({
+      label: "NIB",
+      accountName: "Maria J. Silva",
+    });
+    expect(saved.translations?.en?.giftRegistry?.bankTransfer?.nib).toEqual({
+      label: "Account number",
+    });
+  });
+
   it("does not allow translation drafts to reorder or add source structures", () => {
     const source = duplicateForm({
       schedule: [

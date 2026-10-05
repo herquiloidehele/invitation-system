@@ -15,6 +15,7 @@ import { useRouter } from "@/i18n/routing";
 import type { CustomTexts, GiftRegistry, TemplateTheme } from "@/lib/types";
 import type { ResolvedTextStyles } from "@/lib/text-styles";
 import {
+  bankTransferAccountName,
   giftsPagePath,
   hasGiftItems,
   shouldShowBankTransferOption,
@@ -233,6 +234,18 @@ export default function GiftsSection({
                             {row.value}
                           </EditableText>
                         </div>
+                        {bankTransferAccountName(row) && (
+                          <div
+                            style={{
+                              ...ts.giftBankValue,
+                              wordBreak: "break-word",
+                            }}
+                          >
+                            <EditableText elementKey="giftBankValue">
+                              {bankTransferAccountName(row)}
+                            </EditableText>
+                          </div>
+                        )}
                       </div>
                       {row.copyable && (
                         <CopyableValue

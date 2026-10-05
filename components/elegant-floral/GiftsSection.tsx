@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
 import { efStyle } from "@/lib/elegant-floral";
 import {
+  bankTransferAccountName,
   giftsPagePath,
   hasGiftItems,
   shouldShowBankTransferOption,
@@ -242,6 +243,18 @@ export default function GiftsSection({
                         >
                           {row.value}
                         </div>
+                        {bankTransferAccountName(row) && (
+                          <div
+                            style={{
+                              fontFamily: theme.uiFont,
+                              fontSize: "0.8rem",
+                              color: theme.textSecondary,
+                              wordBreak: "break-word",
+                            }}
+                          >
+                            {bankTransferAccountName(row)}
+                          </div>
+                        )}
                       </div>
                       {row.copyable && (
                         <CopyableValue

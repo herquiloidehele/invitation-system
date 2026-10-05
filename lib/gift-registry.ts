@@ -1,4 +1,4 @@
-import type { GiftRegistry } from "@/lib/types";
+import type { BankTransferDetail, GiftRegistry } from "@/lib/types";
 
 /** True when the registry has at least one product to show on the grid page. */
 export function hasGiftItems(
@@ -14,6 +14,13 @@ export function hasBankTransfer(
   return Boolean(
     registry?.bankTransfer?.some((r) => r.label?.trim() || r.value?.trim()),
   );
+}
+
+/** Account name to show on a bank-transfer row, or undefined when left blank. */
+export function bankTransferAccountName(
+  row: Pick<BankTransferDetail, "accountName">,
+): string | undefined {
+  return row.accountName?.trim() || undefined;
 }
 
 /** True when the gifts section should offer the "Lista de Presentes" option. */

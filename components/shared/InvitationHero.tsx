@@ -341,8 +341,8 @@ export default function InvitationHero({
                 variants={heroTextItem}
                 className="mt-5"
                 style={{
-                  ...ts.inviteMessageVideo,
                   maxWidth: 300,
+                  ...ts.inviteMessageVideo,
                   textAlign: "center",
                 }}
               >
@@ -404,8 +404,8 @@ export default function InvitationHero({
                 variants={heroTextItem}
                 className="mt-5"
                 style={{
-                  ...ts.quoteVideo,
                   maxWidth: 280,
+                  ...ts.quoteVideo,
                   whiteSpace: "pre-line",
                 }}
               >
@@ -638,8 +638,8 @@ export function InvitationHeroNames({
             {/* Invite message */}
             <p
               style={{
-                ...ts.inviteMessage,
                 maxWidth: 300,
+                ...ts.inviteMessage,
               }}
             >
               <EditableText elementKey="inviteMessage">
@@ -652,8 +652,8 @@ export function InvitationHeroNames({
           <>
             <p
               style={{
-                ...ts.quote,
                 maxWidth: 300,
+                ...ts.quote,
               }}
             >
               <EditableText elementKey="quote">{invitation.quote}</EditableText>

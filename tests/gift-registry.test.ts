@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  bankTransferAccountName,
   giftsPagePath,
   hasBankTransfer,
   hasGiftItems,
@@ -63,6 +64,20 @@ describe("hasBankTransfer", () => {
         bankTransfer: [{ id: "bank-2", label: "", value: "GB82 WEST" }],
       }),
     ).toBe(true);
+  });
+});
+
+describe("bankTransferAccountName", () => {
+  it("is undefined when the account name is missing or blank", () => {
+    expect(bankTransferAccountName({})).toBeUndefined();
+    expect(bankTransferAccountName({ accountName: "" })).toBeUndefined();
+    expect(bankTransferAccountName({ accountName: "   " })).toBeUndefined();
+  });
+
+  it("returns the trimmed account name", () => {
+    expect(bankTransferAccountName({ accountName: "  Maria Silva " })).toBe(
+      "Maria Silva",
+    );
   });
 });
 

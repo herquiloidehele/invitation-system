@@ -108,6 +108,11 @@ export default function BankTransferEditor({
             onChange={(e) => update(i, { value: e.target.value })}
             placeholder="Valor, ex.: GB82 WEST 1234 5698 7654 32"
           />
+          <Input
+            value={it.accountName ?? ""}
+            onChange={(e) => update(i, { accountName: e.target.value })}
+            placeholder="Nome da conta (opcional), ex.: Maria Silva"
+          />
           <div className="flex items-center justify-between">
             <Label className="text-xs text-muted-foreground">
               Botão copiar

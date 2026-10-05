@@ -160,6 +160,8 @@ export interface BankTransferDetail {
   label: string;
   /** Row value, e.g. "Lucía & Felipe", "GB82 WEST 1234 …". */
   value: string;
+  /** Optional account-holder name shown under `value`, e.g. "Maria Silva". */
+  accountName?: string;
   /** When true, render a Copy button that copies `value`. */
   copyable?: boolean;
 }
@@ -763,6 +765,12 @@ export interface TextStyle {
   textAlign?: TextAlign;
   textTransform?: TextTransform;
   letterSpacing?: number;
+  /**
+   * CSS max-width as a percentage of the element's container, e.g. "85%".
+   * Stored with its unit because several layouts spread an override straight
+   * into a `style` object, where a bare number would be read as pixels.
+   */
+  maxWidth?: string;
   hidden?: boolean;
 }
 

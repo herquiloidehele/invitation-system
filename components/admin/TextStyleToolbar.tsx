@@ -14,7 +14,16 @@ import {
   RotateCcw,
   X,
 } from "lucide-react";
-import type { SpacingField } from "@/lib/spacing-styles";
+import {
+  SPACING_MAX,
+  SPACING_MIN,
+  type SpacingField,
+} from "@/lib/spacing-styles";
+import {
+  MAX_WIDTH_PERCENT_MAX,
+  formatMaxWidthPercent,
+  parseMaxWidthPercent,
+} from "@/lib/text-styles";
 import type {
   TextAlign,
   TextStyle,
@@ -82,23 +91,31 @@ function computePosition(
 
 function SpacingInput({
   label,
+  title,
   value,
   onChange,
+  min = SPACING_MIN,
+  max = SPACING_MAX,
+  step = 1,
 }: {
   label: string;
+  title?: string;
   value: number | undefined;
   onChange: (value: number | undefined) => void;
+  min?: number;
+  max?: number;
+  step?: number;
 }) {
   return (
-    <label className="flex items-center gap-1" title={`${label} (px)`}>
+    <label className="flex items-center gap-1" title={title ?? `${label} (px)`}>
       <span className="text-[10px] text-muted-foreground whitespace-nowrap">
         {label}
       </span>
       <input
         type="number"
-        min={-80}
-        max={160}
-        step={1}
+        min={min}
+        max={max}
+        step={step}
         value={value ?? ""}
         onChange={(e) => {
           const next = e.target.value;
@@ -413,6 +430,20 @@ export default function TextStyleToolbar() {
       {/* Divider */}
       <div className="h-5 w-px bg-border" />
 
+      {/* Max width — overrides the layout's own cap on the text block */}
+      <SpacingInput
+        label="Larg. máx."
+        title="Largura máxima (% do espaço disponível)"
+        min={10}
+        max={MAX_WIDTH_PERCENT_MAX}
+        step={5}
+        value={parseMaxWidthPercent(overrides.maxWidth)}
+        onChange={(value) => set("maxWidth", formatMaxWidthPercent(value))}
+      />
+
+      {/* Divider */}
+      <div className="h-5 w-px bg-border" />
+
       {/* Hide on the public page */}
       <button
         type="button"
@@ -447,6 +478,7 @@ export default function TextStyleToolbar() {
           set("textAlign", undefined);
           set("color", undefined);
           set("letterSpacing", undefined);
+          set("maxWidth", undefined);
           set("hidden", undefined);
           setSpacing("spaceBefore", undefined);
           setSpacing("spaceAfter", undefined);

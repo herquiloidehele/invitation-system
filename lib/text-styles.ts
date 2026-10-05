@@ -230,7 +230,32 @@ export function applyOverride(
   if (override.textAlign !== undefined) result.textAlign = override.textAlign;
   if (override.textTransform !== undefined)
     result.textTransform = override.textTransform;
+  if (override.maxWidth !== undefined) result.maxWidth = override.maxWidth;
   return result;
+}
+
+export const MAX_WIDTH_PERCENT_MIN = 1;
+export const MAX_WIDTH_PERCENT_MAX = 100;
+
+/** 85 → "85%", the form `TextStyle.maxWidth` is stored in. */
+export function formatMaxWidthPercent(
+  value: number | undefined,
+): string | undefined {
+  if (value === undefined || !Number.isFinite(value)) return undefined;
+  const clamped = Math.max(
+    MAX_WIDTH_PERCENT_MIN,
+    Math.min(MAX_WIDTH_PERCENT_MAX, value),
+  );
+  return `${clamped}%`;
+}
+
+/** "85%" → 85. Anything that is not a percentage reads as unset. */
+export function parseMaxWidthPercent(
+  value: string | undefined,
+): number | undefined {
+  if (!value?.endsWith("%")) return undefined;
+  const parsed = Number(value.slice(0, -1));
+  return value.length > 1 && Number.isFinite(parsed) ? parsed : undefined;
 }
 
 /**
