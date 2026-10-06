@@ -19,12 +19,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getIntakePath } from "@/lib/admin-row-navigation";
-import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "@/lib/guest-links";
 import type { IntakeKind } from "@/lib/intake/catalog";
 import {
   buildAdminInviteMessage,
-  buildCustomerWhatsappUrl,
-  joinWhatsapp,
+  buildWhatsappShareUrl,
 } from "@/lib/intake/links";
 import { cn } from "@/lib/utils";
 
@@ -61,8 +59,6 @@ export function CreateIntakeDialog({
   const [kind, setKind] = useState<IntakeKind>(preset?.kind ?? "convite");
   const [demoId, setDemoId] = useState(preset?.id ?? "");
   const [name, setName] = useState("");
-  const [prefix, setPrefix] = useState(DEFAULT_COUNTRY_CODE);
-  const [number, setNumber] = useState("");
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState<{ id: string; url: string } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -72,14 +68,11 @@ export function CreateIntakeDialog({
     [demos, kind],
   );
   const selectedDemo = preset ?? demos.find((demo) => demo.id === demoId);
-  const digits = number.trim() ? joinWhatsapp(prefix, number) : "";
 
   function reset() {
     setKind(preset?.kind ?? "convite");
     setDemoId(preset?.id ?? "");
     setName("");
-    setPrefix(DEFAULT_COUNTRY_CODE);
-    setNumber("");
     setCreated(null);
     setCopied(false);
   }
@@ -106,14 +99,13 @@ export function CreateIntakeDialog({
           productKind: selectedDemo.kind,
           demoId: selectedDemo.id,
           contactName: name.trim() || undefined,
-          contactWhatsapp: digits || undefined,
         }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) {
         toast.error(
           response.status === 400
-            ? "Verifique o nome e o número de WhatsApp."
+            ? "Verifique o nome do cliente."
             : "Não foi possível criar o formulário.",
         );
         return;
@@ -139,22 +131,13 @@ export function CreateIntakeDialog({
   }
 
   const whatsappHref = created && selectedDemo
-    ? digits
-      ? buildCustomerWhatsappUrl(
-          digits,
-          buildAdminInviteMessage({
-            name,
-            demoName: selectedDemo.name,
-            url: created.url,
-          }),
-        )
-      : `https://wa.me/?text=${encodeURIComponent(
-          buildAdminInviteMessage({
-            name,
-            demoName: selectedDemo.name,
-            url: created.url,
-          }),
-        )}`
+    ? buildWhatsappShareUrl(
+        buildAdminInviteMessage({
+          name,
+          demoName: selectedDemo.name,
+          url: created.url,
+        }),
+      )
     : "#";
 
   return (
@@ -196,7 +179,7 @@ export function CreateIntakeDialog({
               className={cn(buttonVariants({ variant: "default" }), "h-9 w-full")}
             >
               <MessageCircle className="size-4" />
-              {digits ? "Enviar por WhatsApp" : "Partilhar no WhatsApp"}
+              Partilhar no WhatsApp
             </a>
           </div>
         ) : (
@@ -258,32 +241,6 @@ export function CreateIntakeDialog({
                 maxLength={80}
                 className="h-9"
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="intake-phone">WhatsApp (opcional)</Label>
-              <div className="flex gap-2">
-                <select
-                  aria-label="Indicativo"
-                  className={cn(selectClass, "w-28 shrink-0")}
-                  value={prefix}
-                  onChange={(event) => setPrefix(event.target.value)}
-                >
-                  {COUNTRY_CODES.map((option) => (
-                    <option key={option.code} value={option.code}>
-                      {`${option.flag} ${option.code}`}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  id="intake-phone"
-                  type="tel"
-                  inputMode="tel"
-                  value={number}
-                  onChange={(event) => setNumber(event.target.value)}
-                  maxLength={20}
-                  className="h-9"
-                />
-              </div>
             </div>
           </div>
         )}

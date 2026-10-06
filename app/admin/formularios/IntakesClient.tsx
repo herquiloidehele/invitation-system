@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
-import { ClipboardList, MessageCircle, Plus, Search } from "lucide-react";
+import { ClipboardList, Plus, Search } from "lucide-react";
 
 import {
   CreateIntakeDialog,
@@ -22,7 +22,6 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getIntakePath } from "@/lib/admin-row-navigation";
 import { INTAKE_STATUS_LABELS } from "@/lib/intake/answers";
-import { buildCustomerWhatsappUrl } from "@/lib/intake/links";
 import type { IntakeListRow } from "./page";
 
 type TabId = "new" | "submitted" | "draft" | "in_production" | "archived";
@@ -76,7 +75,7 @@ export function IntakesClient({
     const query = search.trim().toLocaleLowerCase("pt-PT");
     return rows.filter((row) => {
       if (query) {
-        return [row.contactName, row.contactWhatsapp, row.demoName, row.reference]
+        return [row.contactName, row.demoName, row.reference]
           .filter(Boolean)
           .some((value) => value!.toLocaleLowerCase("pt-PT").includes(query));
       }
@@ -147,7 +146,6 @@ export function IntakesClient({
             <TableHeader>
               <TableRow>
                 <TableHead>Cliente</TableHead>
-                <TableHead>WhatsApp</TableHead>
                 <TableHead>Modelo</TableHead>
                 <TableHead>Origem</TableHead>
                 <TableHead>Estado</TableHead>
@@ -178,22 +176,6 @@ export function IntakesClient({
                         </p>
                       </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    {row.contactWhatsapp ? (
-                      <a
-                        href={buildCustomerWhatsappUrl(row.contactWhatsapp, "")}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(event) => event.stopPropagation()}
-                        className="inline-flex items-center gap-1.5 text-sm hover:underline"
-                      >
-                        <MessageCircle className="size-3.5 text-emerald-600" />+
-                        {row.contactWhatsapp}
-                      </a>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">—</span>
-                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

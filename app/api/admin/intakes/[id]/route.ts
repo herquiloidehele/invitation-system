@@ -12,7 +12,6 @@ import { invalidBody, jsonError } from "@/lib/intake/http";
 const patchSchema = z.object({
   status: z.string().optional(),
   contactName: z.string().max(200).optional(),
-  contactWhatsapp: z.string().max(40).optional(),
 });
 
 async function exists(id: string): Promise<boolean> {
@@ -46,21 +45,10 @@ export async function PATCH(
     if (!status) return invalidBody([{ field: "status", message: "invalid" }]);
     data.status = status;
   }
-  if (
-    parsed.data.contactName !== undefined ||
-    parsed.data.contactWhatsapp !== undefined
-  ) {
-    const contact = parseContact(
-      { name: parsed.data.contactName, whatsapp: parsed.data.contactWhatsapp },
-      "lenient",
-    );
+  if (parsed.data.contactName !== undefined) {
+    const contact = parseContact({ name: parsed.data.contactName }, "lenient");
     if (!contact.ok) return invalidBody(contact.issues);
-    if (parsed.data.contactName !== undefined) {
-      data.contactName = contact.contact.name || null;
-    }
-    if (parsed.data.contactWhatsapp !== undefined) {
-      data.contactWhatsapp = contact.contact.whatsapp || null;
-    }
+    data.contactName = contact.contact.name || null;
   }
 
   try {
@@ -72,7 +60,6 @@ export async function PATCH(
         id: true,
         status: true,
         contactName: true,
-        contactWhatsapp: true,
       },
     });
     return NextResponse.json(updated);

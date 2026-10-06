@@ -45,7 +45,7 @@ import { INTAKE_STATUS_LABELS, type IntakeAnswerSection } from "@/lib/intake/ans
 import type { IntakeKind } from "@/lib/intake/catalog";
 import {
   buildAdminInviteMessage,
-  buildCustomerWhatsappUrl,
+  buildWhatsappShareUrl,
 } from "@/lib/intake/links";
 import { cn } from "@/lib/utils";
 import { statusBadgeVariant } from "../IntakesClient";
@@ -61,7 +61,6 @@ export interface IntakeDetail {
   demoExists: boolean;
   demoImageUrl: string | null;
   contactName: string;
-  contactWhatsapp: string;
   createdAt: string;
   submittedAt: string | null;
   answersUpdatedAt: string | null;
@@ -170,14 +169,13 @@ export function IntakeDetailClient({
     }
   }
 
-  const inviteMessage = buildAdminInviteMessage({
-    name: intake.contactName,
-    demoName: intake.demoName,
-    url: intake.url,
-  });
-  const sendLinkHref = intake.contactWhatsapp
-    ? buildCustomerWhatsappUrl(intake.contactWhatsapp, inviteMessage)
-    : `https://wa.me/?text=${encodeURIComponent(inviteMessage)}`;
+  const sendLinkHref = buildWhatsappShareUrl(
+    buildAdminInviteMessage({
+      name: intake.contactName,
+      demoName: intake.demoName,
+      url: intake.url,
+    }),
+  );
 
   return (
     <div className="space-y-6 pb-10">
@@ -206,16 +204,6 @@ export function IntakeDetailClient({
               {intake.submittedAt ? ` · Submetido ${formatDateTime(intake.submittedAt)}` : ""}
             </p>
           </div>
-          {intake.contactWhatsapp ? (
-            <a
-              href={buildCustomerWhatsappUrl(intake.contactWhatsapp, "")}
-              target="_blank"
-              rel="noreferrer"
-              className={buttonVariants({ variant: "outline" })}
-            >
-              <MessageCircle className="size-4 text-emerald-600" />+{intake.contactWhatsapp}
-            </a>
-          ) : null}
         </div>
       </div>
 

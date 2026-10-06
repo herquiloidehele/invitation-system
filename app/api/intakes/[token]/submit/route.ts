@@ -32,10 +32,7 @@ export async function POST(
 
     const validation = validateAll(
       intake.kind,
-      {
-        name: intake.row.contactName ?? "",
-        whatsapp: intake.row.contactWhatsapp ?? "",
-      },
+      { name: intake.row.contactName ?? "" },
       intake.answers,
       { customizable: intake.customizable },
     );

@@ -10,15 +10,14 @@ import { generateIntakeToken } from "@/lib/intake/tokens";
 
 // ---------------------------------------------------------------------------
 // POST /api/admin/intakes — the studio creates a personal intake link for a
-// customer (auth: proxy.ts gates /api/admin/*). Name and WhatsApp are
-// optional here: the customer confirms them on the first step.
+// customer (auth: proxy.ts gates /api/admin/*). The name is optional here:
+// the customer confirms it on the first step.
 // ---------------------------------------------------------------------------
 
 const bodySchema = z.object({
   productKind: z.string(),
   demoId: z.string().min(1).max(64),
   contactName: z.string().max(200).optional(),
-  contactWhatsapp: z.string().max(40).optional(),
 });
 
 export async function POST(request: Request) {
@@ -35,10 +34,7 @@ export async function POST(request: Request) {
     return invalidBody([{ field: "body", message: "invalid" }]);
   }
 
-  const contact = parseContact(
-    { name: parsed.data.contactName, whatsapp: parsed.data.contactWhatsapp },
-    "lenient",
-  );
+  const contact = parseContact({ name: parsed.data.contactName }, "lenient");
   if (!contact.ok) return invalidBody(contact.issues);
 
   try {
@@ -58,7 +54,6 @@ export async function POST(request: Request) {
         locale: "pt",
         status: "draft",
         contactName: contact.contact.name || null,
-        contactWhatsapp: contact.contact.whatsapp || null,
       },
       select: { id: true, token: true },
     });

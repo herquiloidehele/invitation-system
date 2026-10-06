@@ -103,7 +103,6 @@ function loadedIntake(overrides: Record<string, unknown> = {}) {
     saveTheDateId: null,
     status: "submitted",
     contactName: "Maria",
-    contactWhatsapp: "258841234567",
     submittedAt: new Date(),
     answers,
     invitation: demoSummaryRow,
@@ -140,7 +139,6 @@ describe("POST /api/admin/intakes", () => {
         productKind: "convite",
         demoId: "inv_demo",
         contactName: "Maria",
-        contactWhatsapp: "+258 84 123 4567",
       }),
     );
 
@@ -156,8 +154,22 @@ describe("POST /api/admin/intakes", () => {
       invitationId: "inv_demo",
       demoName: "Aurora",
       contactName: "Maria",
-      contactWhatsapp: "258841234567",
     });
+  });
+
+  it("does not store a WhatsApp number", async () => {
+    db.invitationFindUnique.mockResolvedValue(demoSummaryRow);
+    const response = await createIntake(
+      request({
+        productKind: "convite",
+        demoId: "inv_demo",
+        contactWhatsapp: "+258 84 123 4567",
+      }),
+    );
+    expect(response.status).toBe(201);
+    expect(db.intakeCreate.mock.calls[0][0].data).not.toHaveProperty(
+      "contactWhatsapp",
+    );
   });
 
   it("allows creating a link before knowing the customer", async () => {
@@ -168,7 +180,6 @@ describe("POST /api/admin/intakes", () => {
     expect(response.status).toBe(201);
     expect(db.intakeCreate.mock.calls[0][0].data).toMatchObject({
       contactName: null,
-      contactWhatsapp: null,
     });
   });
 
@@ -188,13 +199,13 @@ describe("PATCH/DELETE /api/admin/intakes/[id]", () => {
   it("changes status and contact", async () => {
     db.intakeFindUnique.mockResolvedValue({ id: "intake_1" });
     const response = await patchIntake(
-      request({ status: "archived", contactWhatsapp: "+351 910 000 000" }),
+      request({ status: "archived", contactName: " Ana " }),
       idParams(),
     );
     expect(response.status).toBe(200);
     expect(db.intakeUpdate.mock.calls[0][0].data).toEqual({
       status: "archived",
-      contactWhatsapp: "351910000000",
+      contactName: "Ana",
     });
   });
 

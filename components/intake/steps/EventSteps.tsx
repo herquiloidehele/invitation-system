@@ -12,7 +12,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { COUNTRY_CODES } from "@/lib/guest-links";
 import {
   INTAKE_EVENT_CHOICES,
   INTAKE_LOCATION_KINDS,
@@ -69,7 +68,6 @@ export function ContactStep({
   onHoneypot?: (value: string) => void;
 }) {
   const t = useTranslations("Intake");
-  const whatsappError = errorFor("whatsapp");
 
   return (
     <div className="space-y-5">
@@ -82,46 +80,6 @@ export function ContactStep({
         maxLength={80}
         error={errorFor("name")}
       />
-
-      <FieldShell
-        label={t("fields.whatsapp")}
-        hint={t("fields.whatsappHint")}
-        error={whatsappError}
-      >
-        <div className="flex gap-2">
-          <select
-            aria-label={t("fields.whatsappPrefix")}
-            value={contact.prefix}
-            onChange={(event) =>
-              onChange({ ...contact, prefix: event.target.value })
-            }
-            className="h-12 w-[7.5rem] shrink-0 rounded-xl border border-border bg-white px-3 text-base text-foreground outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
-          >
-            {!COUNTRY_CODES.some((option) => option.code === contact.prefix) ? (
-              <option value={contact.prefix}>{contact.prefix || "+"}</option>
-            ) : null}
-            {COUNTRY_CODES.map((option) => (
-              <option key={option.code} value={option.code}>
-                {`${option.flag} ${option.code}`}
-              </option>
-            ))}
-          </select>
-          <input
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel-national"
-            value={contact.number}
-            onChange={(event) =>
-              onChange({ ...contact, number: event.target.value })
-            }
-            placeholder={t("fields.whatsappNumberPlaceholder")}
-            aria-label={t("fields.whatsapp")}
-            aria-invalid={whatsappError ? true : undefined}
-            maxLength={20}
-            className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-white px-4 text-base text-foreground outline-none placeholder:text-faint-foreground focus:border-primary focus:ring-3 focus:ring-primary/20 aria-invalid:border-destructive"
-          />
-        </div>
-      </FieldShell>
 
       {onHoneypot ? (
         // Hidden from people and assistive tech; naive bots fill it in.

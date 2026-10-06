@@ -628,7 +628,7 @@ model Intake {
   locale               String       @default("pt")
   status               String       @default("draft") // draft | submitted | in_production | archived
   contactName          String?
-  contactWhatsapp      String? // digits only, country code included, no "+"
+  contactWhatsapp      String? // legacy: no longer collected or read; holds numbers from older intakes
   lastStep             String? // resume pointer (step id)
   submittedAt          DateTime?
   answersUpdatedAt     DateTime? // bumped on every answer write

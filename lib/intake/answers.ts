@@ -314,7 +314,6 @@ export function intakeAnswersToText({
   const head = [
     `Formulário — ${demoName}`,
     `Cliente: ${clean(contact.name) || "—"}`,
-    `WhatsApp: ${contact.whatsapp ? `+${contact.whatsapp}` : "—"}`,
   ];
   const body = formatIntakeAnswers(kind, answers, { customizable }).map(
     (section) =>

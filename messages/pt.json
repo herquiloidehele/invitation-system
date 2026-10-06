@@ -592,8 +592,8 @@
     "welcomeBack": "Bem-vindo de volta, {name}! Continue de onde parou.",
     "steps": {
       "contact": {
-        "title": "Os seus contactos",
-        "description": "Usamos o WhatsApp para lhe enviar a primeira versão e combinar os detalhes."
+        "title": "Os seus dados",
+        "description": "Assim sabemos de quem é o pedido."
       },
       "event": {
         "title": "O evento",
@@ -631,10 +631,6 @@
     "fields": {
       "contactName": "Nome",
       "contactNamePlaceholder": "O seu nome",
-      "whatsapp": "WhatsApp",
-      "whatsappHint": "Escolha o indicativo e escreva o número.",
-      "whatsappPrefix": "Indicativo",
-      "whatsappNumberPlaceholder": "84 123 4567",
       "eventType": "Tipo de evento",
       "typeLabel": "Que evento é?",
       "typeLabelPlaceholder": "Ex.: Chá de panela",
