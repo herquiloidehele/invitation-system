@@ -10,7 +10,9 @@ import {
   efScheduleVenueStyle,
   resolveEfTextOrder,
   efOpeningLines,
+  efGuestLineName,
 } from "../lib/elegant-floral";
+import type { PersonalGuestCardConfig } from "../lib/types";
 
 describe("isElegantFloralLayout", () => {
   it("is true only for the elegant-floral layout", () => {
@@ -168,6 +170,109 @@ describe("efOpeningLines", () => {
         quote: null,
       }),
     ).toEqual({ verse: null, blessing: null });
+  });
+});
+
+describe("efGuestLineName", () => {
+  const on = { guestLine: true };
+  const maria = { name: "Maria" };
+
+  it("prints the guest's name when the guest line is switched on", () => {
+    expect(efGuestLineName({ guest: maria, personalGuestCard: on })).toBe(
+      "Maria",
+    );
+  });
+
+  it("adds the companion on the same line", () => {
+    expect(
+      efGuestLineName({
+        guest: { name: "Maria", companion: "João" },
+        personalGuestCard: on,
+      }),
+    ).toBe("Maria & João");
+  });
+
+  it("stays hidden until the guest line is switched on", () => {
+    expect(efGuestLineName({ guest: maria })).toBeNull();
+    expect(
+      efGuestLineName({ guest: maria, personalGuestCard: null }),
+    ).toBeNull();
+    expect(
+      efGuestLineName({
+        guest: maria,
+        personalGuestCard: { guestLine: false },
+      }),
+    ).toBeNull();
+    // The guest card's own visibility is a separate setting.
+    const cardAlwaysVisible: PersonalGuestCardConfig = { visibility: "always" };
+    expect(
+      efGuestLineName({ guest: maria, personalGuestCard: cardAlwaysVisible }),
+    ).toBeNull();
+  });
+
+  it("stays hidden on a link with no personal guest", () => {
+    expect(efGuestLineName({ personalGuestCard: on })).toBeNull();
+    expect(efGuestLineName({ guest: null, personalGuestCard: on })).toBeNull();
+  });
+
+  it("trims the names and ignores a blank companion", () => {
+    expect(
+      efGuestLineName({
+        guest: { name: "  Maria  ", companion: "   " },
+        personalGuestCard: on,
+      }),
+    ).toBe("Maria");
+    expect(
+      efGuestLineName({
+        guest: { name: " Maria ", companion: " João " },
+        personalGuestCard: on,
+      }),
+    ).toBe("Maria & João");
+  });
+
+  it("stays hidden when the guest has no name to print", () => {
+    expect(
+      efGuestLineName({
+        guest: { name: "   ", companion: "João" },
+        personalGuestCard: on,
+      }),
+    ).toBeNull();
+  });
+
+  describe("with a sample guest (admin preview)", () => {
+    const sample = { name: "Ana", companion: "Rui" };
+
+    it("stands in when there is no real guest", () => {
+      expect(efGuestLineName({ personalGuestCard: on }, sample)).toBe(
+        "Ana & Rui",
+      );
+    });
+
+    it("never replaces a real guest", () => {
+      expect(
+        efGuestLineName({ guest: maria, personalGuestCard: on }, sample),
+      ).toBe("Maria");
+    });
+
+    it("does not switch the line on by itself", () => {
+      expect(efGuestLineName({}, sample)).toBeNull();
+    });
+  });
+});
+
+describe("elegant-floral guest line wiring", () => {
+  const announcement = readFileSync(
+    "components/elegant-floral/Announcement.tsx",
+    "utf8",
+  );
+
+  it("places the guest line after the couple names, before the date", () => {
+    const names = announcement.indexOf('elementKey="efNames"');
+    const guestLine = announcement.indexOf("<GuestInviteLine");
+    const dateLabel = announcement.indexOf('elementKey="efDateLabel"');
+    expect(names).toBeGreaterThan(-1);
+    expect(guestLine).toBeGreaterThan(names);
+    expect(dateLabel).toBeGreaterThan(guestLine);
   });
 });
 

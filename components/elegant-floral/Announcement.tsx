@@ -2,13 +2,20 @@
 
 import { motion } from "framer-motion";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { efStyle, resolveEfTextOrder } from "@/lib/elegant-floral";
+import {
+  efGuestLineName,
+  efStyle,
+  resolveEfTextOrder,
+} from "@/lib/elegant-floral";
 import { EditableText } from "@/components/shared/EditableText";
+import GuestInviteLine, { GUEST_LINE_SAMPLE } from "./GuestInviteLine";
 import { efGroup, efItem, efNames, useRevealProps } from "./motion";
 
 interface AnnouncementProps {
   invitation: InvitationData;
   theme: TemplateTheme;
+  /** Admin preview — a sample guest stands in on the guest line. */
+  isPreview?: boolean;
 }
 
 const SIDE_PAD = "clamp(1rem, 5vw, 2rem)";
@@ -17,9 +24,14 @@ const SIDE_PAD = "clamp(1rem, 5vw, 2rem)";
  * Parents announcement → invite message → couple names (script) → date,
  * staggered into view. With parents mode off (verse-first) there are no
  * parents and the invite message moves below the names, so the couple read as
- * the ones inviting.
+ * the ones inviting. A guest opening their personal link gets their own name
+ * right under the couple's when the invitation has the guest line on.
  */
-export default function Announcement({ invitation, theme }: AnnouncementProps) {
+export default function Announcement({
+  invitation,
+  theme,
+  isPreview,
+}: AnnouncementProps) {
   const reveal = useRevealProps();
   const ts = invitation.textStyles;
   const { parents, couple, date, eventType } = invitation;
@@ -37,6 +49,10 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
     ? namesOf(parents.groomsFather, parents.groomsMother)
     : [];
   const verseFirst = resolveEfTextOrder(parents) === "verse-first";
+  const guestLineName = efGuestLineName(
+    invitation,
+    isPreview ? GUEST_LINE_SAMPLE : null,
+  );
 
   const inviteMessage = parents?.inviteMessage && (
     <motion.p
@@ -117,7 +133,12 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
         variants={efNames}
         style={efStyle(
           {
-            margin: verseFirst ? "3rem 0 1.5rem" : "4rem 0",
+            // The guest line reads on from the names, so it sits closer.
+            margin: verseFirst
+              ? "3rem 0 1.5rem"
+              : guestLineName
+                ? "4rem 0 2rem"
+                : "4rem 0",
             fontFamily: theme.scriptFont ?? theme.displayFont,
             fontWeight: 400,
             fontSize: "clamp(2.3rem, 11vw, 3.9rem)",
@@ -130,6 +151,14 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
       >
         <EditableText elementKey="efNames">{names}</EditableText>
       </motion.h1>
+
+      {guestLineName && (
+        <GuestInviteLine
+          name={guestLineName}
+          invitation={invitation}
+          theme={theme}
+        />
+      )}
 
       {verseFirst && inviteMessage}
 

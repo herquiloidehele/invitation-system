@@ -148,7 +148,11 @@ export default function ElegantFloralPage({
               </Reveal>
             )}
 
-            <Announcement invitation={invitation} theme={theme} />
+            <Announcement
+              invitation={invitation}
+              theme={theme}
+              isPreview={isPreview}
+            />
 
             <CoupleGallery
               invitation={invitation}

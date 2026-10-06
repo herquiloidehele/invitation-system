@@ -687,6 +687,12 @@ export interface PersonalGuestCardConfig {
   hideInPreview?: boolean;
   /** Unset is treated as `always` (or `hideInPreview` for legacy rows). */
   visibility?: PersonalGuestCardVisibility;
+  /**
+   * Elegant-floral only: print the guest's name on its own line under the
+   * couple names. Off unless set, and independent of `visibility` — this
+   * layout never renders the card itself.
+   */
+  guestLine?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -820,6 +826,10 @@ export interface TextStyleOverrides {
     efDateTime?: TextStyle;
     efBlessing?: TextStyle;
     efVerse?: TextStyle;
+    /** Guest line under the couple names: caption, name, closing caption. */
+    efGuestLead?: TextStyle;
+    efGuestName?: TextStyle;
+    efGuestTrail?: TextStyle;
     efBody?: TextStyle;
     efDressTitle?: TextStyle;
     efSubLabel?: TextStyle;
@@ -1154,6 +1164,9 @@ export interface CustomTexts {
   guestCard_inviteButton?: string;
   guestCard_entryPassTitle?: string;
   entryPass_downloadButton?: string;
+  /** Elegant-floral guest line: the captions above and below the name. */
+  efGuestLine_lead?: string;
+  efGuestLine_trail?: string;
 
   // -- Calendar event copy --
   calendar_weddingTitle?: string;

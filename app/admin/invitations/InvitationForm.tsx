@@ -4441,6 +4441,34 @@ export default function InvitationForm({
                     </div>
                   )}
 
+                  {isElegantFloral && (
+                    <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                      <div>
+                        <Label className="cursor-pointer">
+                          Nome do convidado no convite
+                        </Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Mostra o nome do convidado logo abaixo dos nomes do
+                          casal, para quem abre o convite pelo seu link pessoal.
+                          Os textos antes e depois do nome editam-se em
+                          &ldquo;Convite Pessoal&rdquo;.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={form.personalGuestCard?.guestLine === true}
+                        onCheckedChange={(value) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            personalGuestCard: {
+                              ...(prev.personalGuestCard ?? {}),
+                              guestLine: value,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                  )}
+
                   <div className="space-y-1.5 rounded-lg border p-3">
                     <Label htmlFor="personal-guest-card-visibility">
                       Cartão do convidado

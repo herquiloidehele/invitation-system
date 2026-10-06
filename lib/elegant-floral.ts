@@ -5,6 +5,8 @@ import type {
   LocationInfo,
   LocationPhoto,
   ParentsInfo,
+  PersonalGuestCardConfig,
+  PublicGuestData,
   ScheduleStyle,
   TextStyleOverrides,
 } from "./types";
@@ -100,6 +102,29 @@ export function efOpeningLines(invitation: {
         ? present(parents?.blessingMessage)
         : null,
   };
+}
+
+/**
+ * The name printed on the guest line under the couple names, or null when the
+ * line shouldn't render: it is opt-in per invitation, and only for a guest
+ * opening their personal link. A companion shares the line.
+ *
+ * `sampleGuest` stands in when there is no real guest — the admin preview
+ * passes one so the line can be styled. It never switches the line on.
+ */
+export function efGuestLineName(
+  invitation: {
+    guest?: Pick<PublicGuestData, "name" | "companion"> | null;
+    personalGuestCard?: Pick<PersonalGuestCardConfig, "guestLine"> | null;
+  },
+  sampleGuest?: Pick<PublicGuestData, "name" | "companion"> | null,
+): string | null {
+  if (invitation.personalGuestCard?.guestLine !== true) return null;
+  const guest = invitation.guest ?? sampleGuest;
+  const name = guest?.name?.trim();
+  if (!name) return null;
+  const companion = guest?.companion?.trim();
+  return companion ? `${name} & ${companion}` : name;
 }
 
 /**

@@ -475,6 +475,16 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         label: "Botão descarregar passe",
         placeholder: "Descarregar",
       },
+      {
+        key: "efGuestLine_lead",
+        label: "Nome do convidado — texto antes (Elegant Floral)",
+        placeholder: "Têm a honra e a alegria de convidar",
+      },
+      {
+        key: "efGuestLine_trail",
+        label: "Nome do convidado — texto depois (Elegant Floral)",
+        placeholder: "para a celebração do seu casamento",
+      },
     ],
   },
   {

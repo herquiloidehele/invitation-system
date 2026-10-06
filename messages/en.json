@@ -515,6 +515,8 @@
     "guestCard_inviteButton": "Invite more people",
     "guestCard_entryPassTitle": "Your entry pass",
     "entryPass_downloadButton": "Download",
+    "efGuestLine_lead": "Have the honour and joy of inviting",
+    "efGuestLine_trail": "to the celebration of their wedding",
     "rsvp_entryPassTitle": "Show this code at the door",
     "calendar_weddingTitle": "{names} Wedding",
     "calendar_genericTitle": "{name} Event",
