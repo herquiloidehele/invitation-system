@@ -97,7 +97,7 @@ export default function Announcement({ invitation, theme }: AnnouncementProps) {
                 "efParentsDivider",
               )}
             >
-              <EditableText elementKey="efParentsDivider">e</EditableText>
+              <EditableText elementKey="efParentsDivider">&</EditableText>
             </p>
           )}
           {groomParents.map((name, i) => (
