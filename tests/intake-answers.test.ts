@@ -137,15 +137,11 @@ describe("formatIntakeAnswers", () => {
     const text = intakeAnswersToText({
       kind: "convite",
       demoName: "Aurora",
-      contact: { name: "Ana", whatsapp: "258841234567" },
+      contact: { name: "Ana" },
       answers,
       customizable: true,
     });
-    expect(text.split("\n").slice(0, 3)).toEqual([
-      "Formulário — Aurora",
-      "Cliente: Ana",
-      "WhatsApp: +258841234567",
-    ]);
+    expect(text.split("\n\n")[0]).toBe("Formulário — Aurora\nCliente: Ana");
     expect(text).toContain("EVENTO");
     expect(text).toContain("Nomes: Ana & João");
   });

@@ -592,8 +592,8 @@
     "welcomeBack": "Welcome back, {name}! Pick up where you left off.",
     "steps": {
       "contact": {
-        "title": "Your contact details",
-        "description": "We use WhatsApp to send you the first version and agree on the details."
+        "title": "Your details",
+        "description": "So we know whose order this is."
       },
       "event": {
         "title": "The event",
@@ -631,10 +631,6 @@
     "fields": {
       "contactName": "Name",
       "contactNamePlaceholder": "Your name",
-      "whatsapp": "WhatsApp",
-      "whatsappHint": "Choose the country code and type the number.",
-      "whatsappPrefix": "Country code",
-      "whatsappNumberPlaceholder": "84 123 4567",
       "eventType": "Type of event",
       "typeLabel": "What is the event?",
       "typeLabelPlaceholder": "E.g.: Bridal shower",

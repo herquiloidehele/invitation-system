@@ -38,10 +38,7 @@ export default async function AdminIntakeDetailPage({
       })),
     }),
   );
-  const contact = {
-    name: row.contactName ?? "",
-    whatsapp: row.contactWhatsapp ?? "",
-  };
+  const contact = { name: row.contactName ?? "" };
 
   const createdHref = row.createdInvitationId
     ? getInvitationEditPath(row.createdInvitationId)
@@ -62,7 +59,6 @@ export default async function AdminIntakeDetailPage({
         demoExists: demo !== null,
         demoImageUrl: demo?.imageUrl ?? null,
         contactName: contact.name,
-        contactWhatsapp: contact.whatsapp,
         createdAt: row.createdAt.toISOString(),
         submittedAt: row.submittedAt?.toISOString() ?? null,
         answersUpdatedAt: row.answersUpdatedAt?.toISOString() ?? null,

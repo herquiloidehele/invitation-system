@@ -29,7 +29,6 @@ const bodySchema = z.object({
   demoSlug: z.string().trim().min(1).max(120),
   locale: z.string().max(5).optional(),
   contactName: z.string().max(200).optional(),
-  contactWhatsapp: z.string().max(40).optional(),
   // Honeypot: hidden from people, filled in by naive bots.
   website: z.string().max(200).optional(),
 });
@@ -50,10 +49,7 @@ export async function POST(request: Request) {
     return invalidBody([{ field: "body", message: "invalid" }]);
   }
 
-  const contact = parseContact(
-    { name: parsed.data.contactName, whatsapp: parsed.data.contactWhatsapp },
-    "strict",
-  );
+  const contact = parseContact({ name: parsed.data.contactName }, "strict");
   if (!contact.ok) return invalidBody(contact.issues);
 
   try {
@@ -76,7 +72,6 @@ export async function POST(request: Request) {
         locale,
         status: "draft",
         contactName: contact.contact.name,
-        contactWhatsapp: contact.contact.whatsapp,
         lastStep: "event",
         ipHash: hashIp(ip, process.env.JWT_SECRET ?? "intake"),
         userAgent: request.headers.get("user-agent")?.slice(0, 300) ?? null,

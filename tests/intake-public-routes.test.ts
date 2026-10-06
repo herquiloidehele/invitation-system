@@ -67,7 +67,6 @@ const validCreate = {
   demoSlug: "aurora",
   locale: "pt",
   contactName: "Maria",
-  contactWhatsapp: "+258 84 123 4567",
   website: "",
 };
 
@@ -78,7 +77,6 @@ function storedIntake(overrides: Record<string, unknown> = {}) {
     productKind: "convite",
     status: "draft",
     contactName: "Maria",
-    contactWhatsapp: "258841234567",
     submittedAt: null,
     answers: [],
     invitation: demoInvitation,
@@ -126,11 +124,21 @@ describe("POST /api/intakes (self-start)", () => {
       locale: "pt",
       status: "draft",
       contactName: "Maria",
-      contactWhatsapp: "258841234567",
       lastStep: "event",
       userAgent: "vitest",
     });
     expect(data.ipHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(data).not.toHaveProperty("contactWhatsapp");
+  });
+
+  it("ignores a WhatsApp number sent by an older wizard", async () => {
+    const response = await createIntake(
+      request({ ...validCreate, contactWhatsapp: "12" }),
+    );
+    expect(response.status).toBe(201);
+    expect(db.intakeCreate.mock.calls[0][0].data).not.toHaveProperty(
+      "contactWhatsapp",
+    );
   });
 
   it("rejects a filled honeypot without touching the database", async () => {
@@ -143,12 +151,12 @@ describe("POST /api/intakes (self-start)", () => {
 
   it("rejects invalid contact details with field issues", async () => {
     const response = await createIntake(
-      request({ ...validCreate, contactName: "", contactWhatsapp: "12" }),
+      request({ ...validCreate, contactName: "" }),
     );
     expect(response.status).toBe(400);
     const json = await response.json();
     expect(json.issues.map((issue: { field: string }) => issue.field)).toEqual(
-      ["name", "whatsapp"],
+      ["name"],
     );
   });
 
@@ -285,15 +293,20 @@ describe("PATCH /api/intakes/[token] (autosave)", () => {
     expect(data.lastStep).toBe("extras");
   });
 
-  it("updates contact columns but never blanks them", async () => {
+  it("updates the contact name but never blanks it", async () => {
     db.intakeFindUnique.mockResolvedValue(storedIntake());
+    await patchIntake(request({ contact: { name: " Ana " } }), tokenParams());
+    expect(db.intakeUpdate.mock.calls[0][0].data.contactName).toBe("Ana");
+
+    db.intakeUpdate.mockClear();
     await patchIntake(
       request({ contact: { name: "", whatsapp: "+351 910 000 000" } }),
       tokenParams(),
     );
     const { data } = db.intakeUpdate.mock.calls[0][0];
-    expect(data.contactWhatsapp).toBe("351910000000");
     expect("contactName" in data).toBe(false);
+    expect(data).not.toHaveProperty("contactWhatsapp");
+    expect(data.answersUpdatedAt).toBeUndefined();
   });
 
   it("answers 404 for unknown or malformed tokens", async () => {

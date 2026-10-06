@@ -7,7 +7,7 @@ import { IntakeWizard } from "@/components/intake/IntakeWizard";
 import { resolveLocale } from "@/i18n/locales";
 import { getInvitationBlock } from "@/lib/invitation-block";
 import { parseIntakeKind } from "@/lib/intake/catalog";
-import { defaultWhatsappPrefix, demoPreviewHref } from "@/lib/intake/page-data";
+import { demoPreviewHref } from "@/lib/intake/page-data";
 import { findDemo } from "@/lib/intake/service";
 import { createNoIndexMetadata } from "@/lib/seo";
 
@@ -57,12 +57,11 @@ export default async function IntakeSelfStartPage({ params }: { params: Params }
       }}
       token={null}
       reference={null}
-      initialContact={{ name: "", whatsapp: "" }}
+      initialContact={{ name: "" }}
       initialAnswers={{}}
       initialStep={null}
       status="draft"
       submittedAt={null}
-      defaultPrefix={await defaultWhatsappPrefix()}
       defaultEventType={demo.eventType}
     />
   );

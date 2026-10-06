@@ -2,13 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildAdminInviteMessage,
-  buildCustomerWhatsappUrl,
   buildIntakePath,
   buildIntakeUrl,
   buildSelfStartPath,
+  buildWhatsappShareUrl,
   intakeRef,
-  splitWhatsapp,
-  whatsappPrefixForCurrency,
 } from "@/lib/intake/links";
 import {
   generateIntakeToken,
@@ -37,8 +35,8 @@ describe("intake links", () => {
   });
 
   it("builds WhatsApp links and the admin invite message", () => {
-    expect(buildCustomerWhatsappUrl("258841234567", "Olá & bem-vinda")).toBe(
-      "https://wa.me/258841234567?text=Ol%C3%A1%20%26%20bem-vinda",
+    expect(buildWhatsappShareUrl("Olá & bem-vinda")).toBe(
+      "https://wa.me/?text=Ol%C3%A1%20%26%20bem-vinda",
     );
     expect(
       buildAdminInviteMessage({
@@ -52,30 +50,6 @@ describe("intake links", () => {
     expect(
       buildAdminInviteMessage({ name: "", demoName: "Aurora", url: "u" }),
     ).toMatch(/^Olá! Para criarmos/);
-  });
-
-  it("splits stored digits back into a known prefix and number", () => {
-    expect(splitWhatsapp("258841234567")).toEqual({
-      prefix: "+258",
-      number: "841234567",
-    });
-    expect(splitWhatsapp("351910000000")).toEqual({
-      prefix: "+351",
-      number: "910000000",
-    });
-    expect(splitWhatsapp("4915112345678")).toEqual({
-      prefix: "",
-      number: "4915112345678",
-    });
-    expect(splitWhatsapp(null)).toEqual({ prefix: "", number: "" });
-  });
-
-  it("guesses the WhatsApp prefix from the viewer currency", () => {
-    expect(whatsappPrefixForCurrency("MZN")).toBe("+258");
-    expect(whatsappPrefixForCurrency("BRL")).toBe("+55");
-    expect(whatsappPrefixForCurrency("USD")).toBe("+1");
-    expect(whatsappPrefixForCurrency("EUR")).toBe("+351");
-    expect(whatsappPrefixForCurrency(undefined)).toBe("+351");
   });
 });
 

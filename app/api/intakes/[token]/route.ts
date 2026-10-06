@@ -73,9 +73,6 @@ export async function PATCH(
       if (!contact.ok) return invalidBody(contact.issues);
       // Autosave can fire mid-typing; an emptied field never blanks the column.
       if (contact.contact.name) data.contactName = contact.contact.name;
-      if (contact.contact.whatsapp) {
-        data.contactWhatsapp = contact.contact.whatsapp;
-      }
     }
 
     let answers: IntakeAnswers = {};
@@ -103,9 +100,7 @@ export async function PATCH(
     }
 
     const changedContent =
-      Object.keys(answers).length > 0 ||
-      data.contactName !== undefined ||
-      data.contactWhatsapp !== undefined;
+      Object.keys(answers).length > 0 || data.contactName !== undefined;
     if (changedContent) data.answersUpdatedAt = new Date();
 
     const results = await saveIntakeAnswers(intake.id, answers, data);

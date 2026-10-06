@@ -38,7 +38,6 @@ import {
   validateAll,
   validateStep,
 } from "@/lib/intake/catalog";
-import { joinWhatsapp, splitWhatsapp } from "@/lib/intake/links";
 import { buildWhatsappUrl } from "@/lib/landing-whatsapp";
 import { cn } from "@/lib/utils";
 import {
@@ -78,12 +77,11 @@ export interface IntakeWizardProps {
   demo: IntakeWizardDemo;
   token: string | null;
   reference: string | null;
-  initialContact: { name: string; whatsapp: string };
+  initialContact: ContactDraft;
   initialAnswers: IntakeAnswers;
   initialStep: string | null;
   status: string;
   submittedAt: string | null;
-  defaultPrefix: string;
   defaultEventType: IntakeEventType;
 }
 
@@ -124,14 +122,7 @@ export function IntakeWizard(props: IntakeWizardProps) {
   const [reference, setReference] = useState(props.reference);
   const [status, setStatus] = useState(props.status);
   const [submittedAt, setSubmittedAt] = useState(props.submittedAt);
-  const [contact, setContact] = useState<ContactDraft>(() => {
-    const split = splitWhatsapp(props.initialContact.whatsapp);
-    return {
-      name: props.initialContact.name,
-      prefix: split.prefix || props.defaultPrefix,
-      number: split.number,
-    };
-  });
+  const [contact, setContact] = useState<ContactDraft>(props.initialContact);
   const [answers, setAnswers] = useState<IntakeAnswers>(() =>
     withDefaults(kind, props.initialAnswers, props.defaultEventType),
   );
@@ -180,15 +171,6 @@ export function IntakeWizard(props: IntakeWizardProps) {
     readOnlyRef.current = readOnly;
   }, [token, answers, contact, readOnly]);
 
-  const contactValue = useCallback(
-    (draft: ContactDraft) => ({
-      name: draft.name,
-      // A bare prefix is "no number yet" (→ "required"), not an invalid one.
-      whatsapp: draft.number.trim() ? joinWhatsapp(draft.prefix, draft.number) : "",
-    }),
-    [],
-  );
-
   const runSave = useCallback(
     async (options: {
       keys?: IntakeAnswerKey[];
@@ -211,9 +193,9 @@ export function IntakeWizard(props: IntakeWizardProps) {
         else dirtyKeys.current.add(key);
       }
 
-      let sendContact: { name: string; whatsapp: string } | undefined;
+      let sendContact: ContactDraft | undefined;
       if (contactDirty.current) {
-        const value = contactValue(contactRef.current);
+        const value = contactRef.current;
         if (parseContact(value, "lenient").ok) {
           sendContact = value;
           contactDirty.current = false;
@@ -247,7 +229,7 @@ export function IntakeWizard(props: IntakeWizardProps) {
       setSaveState("saved");
       return true;
     },
-    [contactValue],
+    [],
   );
 
   /** Saves run one after another so an older request never overwrites a newer one. */
@@ -296,7 +278,6 @@ export function IntakeWizard(props: IntakeWizardProps) {
     setErrors((previous) => {
       const rest = { ...previous };
       delete rest.name;
-      delete rest.whatsapp;
       return rest;
     });
     setChangeTick((tick) => tick + 1);
@@ -334,10 +315,9 @@ export function IntakeWizard(props: IntakeWizardProps) {
   }
 
   const step = steps[stepIndex];
-  const validationContact = contactValue(contact);
 
   async function goNext() {
-    const issues = validateStep(kind, step.id, validationContact, answers, {
+    const issues = validateStep(kind, step.id, contact, answers, {
       customizable: demo.customizable,
     });
     if (issues.length) return showIssues(issues);
@@ -351,8 +331,7 @@ export function IntakeWizard(props: IntakeWizardProps) {
         productKind: kind,
         demoSlug: demo.slug,
         locale,
-        contactName: validationContact.name,
-        contactWhatsapp: validationContact.whatsapp,
+        contactName: contact.name,
         website: honeypot,
       });
       setBusy(false);
@@ -407,7 +386,7 @@ export function IntakeWizard(props: IntakeWizardProps) {
   }
 
   async function submit() {
-    const result = validateAll(kind, validationContact, answers, {
+    const result = validateAll(kind, contact, answers, {
       customizable: demo.customizable,
     });
     if (!result.ok) {
@@ -533,12 +512,7 @@ export function IntakeWizard(props: IntakeWizardProps) {
               kind={kind}
               steps={steps}
               answers={answers}
-              contact={{
-                name: contact.name,
-                whatsapp: contact.number
-                  ? `${contact.prefix} ${contact.number}`
-                  : "",
-              }}
+              contact={contact}
               locale={locale}
               onEdit={readOnly ? undefined : editStep}
             />

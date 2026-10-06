@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { IntakeWizard } from "@/components/intake/IntakeWizard";
 import { resolveLocale } from "@/i18n/locales";
 import { intakeRef } from "@/lib/intake/links";
-import { defaultWhatsappPrefix, demoPreviewHref } from "@/lib/intake/page-data";
+import { demoPreviewHref } from "@/lib/intake/page-data";
 import { loadIntakeByToken } from "@/lib/intake/service";
 import { isIntakeTokenShape } from "@/lib/intake/tokens";
 import { createNoIndexMetadata } from "@/lib/seo";
@@ -51,15 +51,11 @@ export default async function IntakeTokenPage({ params }: { params: Params }) {
       }}
       token={row.token}
       reference={intakeRef(row.id)}
-      initialContact={{
-        name: row.contactName ?? "",
-        whatsapp: row.contactWhatsapp ?? "",
-      }}
+      initialContact={{ name: row.contactName ?? "" }}
       initialAnswers={intake.answers}
       initialStep={row.lastStep}
       status={row.status}
       submittedAt={row.submittedAt?.toISOString() ?? null}
-      defaultPrefix={await defaultWhatsappPrefix()}
       defaultEventType={demo?.eventType ?? "wedding"}
     />
   );

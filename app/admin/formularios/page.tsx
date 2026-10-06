@@ -14,7 +14,6 @@ export type IntakeListRow = {
   source: string;
   status: string;
   contactName: string | null;
-  contactWhatsapp: string | null;
   lastActivity: string;
   unseen: boolean;
 };
@@ -31,7 +30,6 @@ export default async function AdminIntakesPage() {
         source: true,
         status: true,
         contactName: true,
-        contactWhatsapp: true,
         createdAt: true,
         answersUpdatedAt: true,
         adminViewedAt: true,
@@ -48,7 +46,6 @@ export default async function AdminIntakesPage() {
     source: intake.source,
     status: intake.status,
     contactName: intake.contactName,
-    contactWhatsapp: intake.contactWhatsapp,
     lastActivity: (intake.answersUpdatedAt ?? intake.createdAt).toISOString(),
     unseen: isIntakeUnseen(intake),
   }));

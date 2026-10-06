@@ -15,8 +15,6 @@ export interface StepProps {
 
 export interface ContactDraft {
   name: string;
-  prefix: string;
-  number: string;
 }
 
 /** Today's date as "YYYY-MM-DD" in the visitor's time zone. */

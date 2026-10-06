@@ -54,7 +54,7 @@ export function IntakeReview({
   kind: IntakeKind;
   steps: IntakeStepDef[];
   answers: IntakeAnswers;
-  contact: { name: string; whatsapp: string };
+  contact: { name: string };
   locale: AppLocale;
   onEdit?: (stepId: IntakeStepId) => void;
 }) {
@@ -76,7 +76,6 @@ export function IntakeReview({
       case "contact":
         return [
           { label: t("fields.contactName"), value: contact.name },
-          { label: t("fields.whatsapp"), value: contact.whatsapp },
         ].filter((row) => row.value);
       case "event": {
         const choice = resolveEventChoice(event);

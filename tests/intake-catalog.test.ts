@@ -14,7 +14,7 @@ import {
 } from "@/lib/intake/catalog";
 import type { IntakeAnswers } from "@/lib/intake/catalog";
 
-const contact = { name: "Ana Silva", whatsapp: "258841234567" };
+const contact = { name: "Ana Silva" };
 
 const validInvitation: IntakeAnswers = {
   event: {
@@ -87,18 +87,15 @@ describe("intake catalogue — steps", () => {
 });
 
 describe("intake catalogue — contact", () => {
-  it("strips formatting from the WhatsApp number and requires a name", () => {
+  it("requires only a name and drops any WhatsApp number", () => {
     expect(
       parseContact({ name: " Ana ", whatsapp: "+258 84 123 4567" }, "strict"),
-    ).toEqual({ ok: true, contact: { name: "Ana", whatsapp: "258841234567" } });
+    ).toEqual({ ok: true, contact: { name: "Ana" } });
 
     const missing = parseContact({ name: "", whatsapp: "123" }, "strict");
     expect(missing.ok).toBe(false);
     if (!missing.ok) {
-      expect(missing.issues.map((issue) => issue.field).sort()).toEqual([
-        "name",
-        "whatsapp",
-      ]);
+      expect(missing.issues.map((issue) => issue.field)).toEqual(["name"]);
     }
   });
 
@@ -250,10 +247,10 @@ describe("intake catalogue — step and full validation", () => {
 
   it("validates the contact step from the contact columns", () => {
     expect(
-      validateStep("convite", "contact", { name: "", whatsapp: "" }, {}, {
+      validateStep("convite", "contact", { name: "" }, {}, {
         customizable: true,
       }).map((issue) => issue.field),
-    ).toEqual(["name", "whatsapp"]);
+    ).toEqual(["name"]);
   });
 
   it("returns the first invalid step for a full submission", () => {

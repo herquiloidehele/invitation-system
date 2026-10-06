@@ -39,7 +39,6 @@ export function createIntakeRequest(payload: {
   demoSlug: string;
   locale: string;
   contactName: string;
-  contactWhatsapp: string;
   website: string;
 }) {
   return call<{ token: string; path: string; reference: string }>(

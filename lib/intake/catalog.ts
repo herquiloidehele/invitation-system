@@ -198,8 +198,6 @@ export function isIntakeAnswerKey(value: string): value is IntakeAnswerKey {
 
 export interface IntakeContact {
   name?: string;
-  /** Digits only, country code included, no "+". */
-  whatsapp?: string;
 }
 
 export interface IntakeIssue {
@@ -287,7 +285,6 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 const URL_RE = /^https?:\/\/\S+\.\S+$/i;
-const WHATSAPP_RE = /^\d{8,15}$/;
 
 const GUIDE_PRESET_IDS = PREDEFINED_GUIDE_ITEMS.map((item) => item.id) as [
   string,
@@ -501,21 +498,7 @@ const ANSWER_SCHEMAS: Record<
 };
 
 function contactSchema(mode: IntakeValidationMode) {
-  const whatsapp = z.preprocess(
-    (value) => (typeof value === "string" ? value.replace(/\D/g, "") : value),
-    mode === "strict"
-      ? z
-          .string({ error: "required" })
-          .min(1, { error: "required", abort: true })
-          .regex(WHATSAPP_RE, "invalid")
-      : z
-          .union([z.literal(""), z.string().regex(WHATSAPP_RE, "invalid")], {
-            error: "invalid",
-          })
-          .optional(),
-  );
-
-  return z.object({ name: requiredText(mode, 80), whatsapp });
+  return z.object({ name: requiredText(mode, 80) });
 }
 
 function toIssues(error: z.ZodError, prefix: string[] = []): IntakeIssue[] {
@@ -577,9 +560,6 @@ export function parseContact(
 
   const contact: IntakeContact = {};
   if (parsed.data.name !== undefined) contact.name = parsed.data.name;
-  if (typeof parsed.data.whatsapp === "string" && parsed.data.whatsapp) {
-    contact.whatsapp = parsed.data.whatsapp;
-  }
   return { ok: true, contact };
 }
 
