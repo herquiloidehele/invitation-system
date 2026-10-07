@@ -211,6 +211,14 @@ function sanitizeCountdown(value: unknown) {
   });
 }
 
+function sanitizeOptionLabels(value: unknown) {
+  return readRecord(value, (optionValue) => {
+    const option = readObject(optionValue);
+    if (!option) return undefined;
+    return compact({ label: readString(option.label) });
+  });
+}
+
 function sanitizeRsvpCustomFields(value: unknown) {
   return readRecord(value, (entry) => {
     const field = readObject(entry);
@@ -218,10 +226,16 @@ function sanitizeRsvpCustomFields(value: unknown) {
     return compact({
       label: readString(field.label),
       placeholder: readString(field.placeholder),
-      options: readRecord(field.options, (optionValue) => {
-        const option = readObject(optionValue);
-        if (!option) return undefined;
-        return compact({ label: readString(option.label) });
+      addLabel: readString(field.addLabel),
+      options: sanitizeOptionLabels(field.options),
+      columns: readRecord(field.columns, (columnValue) => {
+        const column = readObject(columnValue);
+        if (!column) return undefined;
+        return compact({
+          label: readString(column.label),
+          placeholder: readString(column.placeholder),
+          options: sanitizeOptionLabels(column.options),
+        });
       }),
     });
   });
@@ -554,18 +568,39 @@ function transformRsvp(
     ...source,
     customFields: source.customFields?.map((field) => {
       const translated = overlay?.[field.id];
+      const fallback = (text: string | undefined) =>
+        behavior === "blank" ? "" : text;
       return {
         ...field,
         label: translated?.label ?? (behavior === "blank" ? "" : field.label),
-        placeholder:
-          translated?.placeholder ??
-          (behavior === "blank" ? "" : field.placeholder),
+        placeholder: translated?.placeholder ?? fallback(field.placeholder),
         options: field.options?.map((option) => ({
           ...option,
           label:
             translated?.options?.[option.id]?.label ??
             (behavior === "blank" ? "" : option.label),
         })),
+        addLabel:
+          field.type === "list"
+            ? (translated?.addLabel ?? fallback(field.addLabel))
+            : field.addLabel,
+        columns: field.columns?.map((column) => {
+          const translatedColumn = translated?.columns?.[column.id];
+          return {
+            ...column,
+            label:
+              translatedColumn?.label ??
+              (behavior === "blank" ? "" : column.label),
+            placeholder:
+              translatedColumn?.placeholder ?? fallback(column.placeholder),
+            options: column.options?.map((option) => ({
+              ...option,
+              label:
+                translatedColumn?.options?.[option.id]?.label ??
+                (behavior === "blank" ? "" : option.label),
+            })),
+          };
+        }),
       };
     }),
   };
@@ -837,18 +872,37 @@ function restoreRsvpText(
     customFields: source.customFields?.map((field) => {
       const draftField = draftFields.get(field.id);
       const draftOptions = byId(draftField?.options);
+      const draftColumns = byId(draftField?.columns);
       return {
         ...field,
         ...draftField,
         id: field.id,
         label: field.label,
         placeholder: field.placeholder,
+        addLabel: field.addLabel,
         options: field.options?.map((option) => ({
           ...option,
           ...draftOptions.get(option.id),
           id: option.id,
           label: option.label,
         })),
+        columns: field.columns?.map((column) => {
+          const draftColumn = draftColumns.get(column.id);
+          const draftColumnOptions = byId(draftColumn?.options);
+          return {
+            ...column,
+            ...draftColumn,
+            id: column.id,
+            label: column.label,
+            placeholder: column.placeholder,
+            options: column.options?.map((option) => ({
+              ...option,
+              ...draftColumnOptions.get(option.id),
+              id: option.id,
+              label: option.label,
+            })),
+          };
+        }),
       };
     }),
   };
@@ -1039,8 +1093,16 @@ function extractOverlay(draft: InvitationData): InvitationTranslationOverlay {
     rsvpCustomFields: recordById(draft.rsvp.customFields, (field) => ({
       label: field.label,
       placeholder: field.placeholder,
+      addLabel: field.addLabel,
       options: recordById(field.options, (option) => ({
         label: option.label,
+      })),
+      columns: recordById(field.columns, (column) => ({
+        label: column.label,
+        placeholder: column.placeholder,
+        options: recordById(column.options, (option) => ({
+          label: option.label,
+        })),
       })),
     })),
     customTexts: draft.customTexts,

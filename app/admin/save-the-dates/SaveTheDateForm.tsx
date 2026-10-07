@@ -55,6 +55,7 @@ import {
 import EnvelopeCover from "@/components/shared/EnvelopeCover";
 import MediaUpload from "@/components/admin/MediaUpload";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
+import { findInvalidRsvpCustomField } from "@/lib/rsvp-custom-fields";
 import SaveTheDateView from "@/components/save-the-date/SaveTheDateView";
 import SocialPreviewSection from "@/components/admin/SocialPreviewSection";
 import { LandingMetadataFieldset } from "@/components/admin/LandingMetadataFieldset";
@@ -579,17 +580,7 @@ export default function SaveTheDateForm({
       return;
     }
 
-    const invalidCustomField = (data.rsvp?.customFields ?? []).find((field) => {
-      if (!field.label.trim()) return true;
-      if (
-        (field.type === "radio" || field.type === "select") &&
-        !(field.options ?? []).some((option) => option.label.trim())
-      ) {
-        return true;
-      }
-      return false;
-    });
-    if (invalidCustomField) {
+    if (findInvalidRsvpCustomField(data.rsvp?.customFields)) {
       toast.error(
         "Preencha as perguntas e opções dos campos personalizados do RSVP.",
       );

@@ -9,6 +9,7 @@ import {
   buildRsvpPayload,
   emptyRsvpValues,
   validateRsvpValues,
+  visibleRsvpFieldsForBundle,
 } from "@/lib/ai-rsvp";
 import type { RsvpApi, RsvpValues } from "@/lib/ai-rsvp-types";
 import { hasSubmittedRsvp, markRsvpSubmitted } from "@/lib/rsvp-submitted";
@@ -24,7 +25,7 @@ export function useRsvp(): RsvpApi {
   const slug = invitation.slug;
   const rsvp = invitation.rsvp;
 
-  const fields = useMemo(() => buildRsvpFields(rsvp), [rsvp]);
+  const allFields = useMemo(() => buildRsvpFields(rsvp), [rsvp]);
 
   const [values, setValues] = useState<RsvpValues>(() => ({
     ...emptyRsvpValues(),
@@ -37,6 +38,14 @@ export function useRsvp(): RsvpApi {
       : hasSubmittedRsvp(slug)
         ? "already_submitted"
         : "idle",
+  );
+
+  // Bundles only know "always" and "attending", so they are handed just the
+  // conditional fields that currently apply. Validation and the payload keep
+  // working from the full set.
+  const fields = useMemo(
+    () => visibleRsvpFieldsForBundle(allFields, values),
+    [allFields, values],
   );
 
   const setValue = useCallback<RsvpApi["setValue"]>((key, value) => {
@@ -54,7 +63,7 @@ export function useRsvp(): RsvpApi {
   // keystroke) so memoization would buy nothing, and the bundle calls
   // `rsvp.submit()` on click where identity stability is irrelevant.
   const submit: RsvpApi["submit"] = async () => {
-    const validation = validateRsvpValues(values, fields);
+    const validation = validateRsvpValues(values, allFields);
     if (!validation.ok) {
       setErrors(validation.errors);
       return { ok: false, checkInToken: null };
@@ -67,7 +76,12 @@ export function useRsvp(): RsvpApi {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
-          buildRsvpPayload({ slug, values, fields, guestToken: guest?.token }),
+          buildRsvpPayload({
+            slug,
+            values,
+            fields: allFields,
+            guestToken: guest?.token,
+          }),
         ),
       });
       if (!res.ok) {

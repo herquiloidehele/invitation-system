@@ -77,6 +77,7 @@ import {
   useRsvpPreviewTab,
 } from "@/hooks/use-rsvp-preview-tab";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
+import { findInvalidRsvpCustomField } from "@/lib/rsvp-custom-fields";
 import { EMPTY_HERO_TEXT_LAYER, heroFontsFromTheme } from "@/lib/hero-text";
 import GuestListEditor from "@/components/admin/GuestListEditor";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
@@ -907,19 +908,7 @@ export default function ExternalInvitationForm({
       return;
     }
 
-    const invalidCustomField = (sourceForm.rsvp.customFields ?? []).find(
-      (field) => {
-        if (!field.label.trim()) return true;
-        if (
-          (field.type === "radio" || field.type === "select") &&
-          !(field.options ?? []).some((option) => option.label.trim())
-        ) {
-          return true;
-        }
-        return false;
-      },
-    );
-    if (invalidCustomField) {
+    if (findInvalidRsvpCustomField(sourceForm.rsvp.customFields)) {
       toast.error(
         "Preencha as perguntas e opções dos campos personalizados do RSVP.",
       );

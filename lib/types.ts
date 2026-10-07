@@ -1025,13 +1025,34 @@ export type RsvpCustomFieldType =
   | "textarea"
   | "switch"
   | "radio"
-  | "select";
+  | "select"
+  | "list";
 
-export type RsvpCustomFieldVisibility = "always" | "attending";
+export type RsvpCustomFieldVisibility = "always" | "attending" | "conditional";
+
+export type RsvpCustomListColumnType = "text" | "number" | "select";
 
 export interface RsvpCustomFieldOption {
   id: string;
   label: string;
+}
+
+/** Shows a field only when an earlier field has a specific answer. */
+export interface RsvpCustomFieldCondition {
+  /** An earlier switch, radio or select field. */
+  fieldId: string;
+  /** Option id (radio/select) or boolean (switch). */
+  value: string | boolean;
+}
+
+/** One input inside a list row. */
+export interface RsvpCustomListColumn {
+  id: string;
+  label: string;
+  type: RsvpCustomListColumnType;
+  placeholder?: string;
+  /** Select columns only. */
+  options?: RsvpCustomFieldOption[];
 }
 
 export interface RsvpCustomField {
@@ -1040,20 +1061,36 @@ export interface RsvpCustomField {
   type: RsvpCustomFieldType;
   required: boolean;
   visibility: RsvpCustomFieldVisibility;
+  /** Only when visibility is "conditional". */
+  showWhen?: RsvpCustomFieldCondition;
   /**
    * Hint shown inside the empty input. Only used by the text, textarea and
    * select types (select renders it as the empty option).
    */
   placeholder?: string;
   options?: RsvpCustomFieldOption[];
+  /** List type only: the inputs that make up one row (1 to 3). */
+  columns?: RsvpCustomListColumn[];
+  /** List type only: text of the add-row button. */
+  addLabel?: string;
+}
+
+/** One guest-entered list row: column id -> raw value (option id for select columns). */
+export type RsvpCustomListRow = Record<string, string>;
+
+export interface RsvpCustomAnswerCell {
+  label: string;
+  value: string;
 }
 
 export interface RsvpCustomAnswer {
   fieldId: string;
   label: string;
   type: RsvpCustomFieldType;
-  value: string | boolean | null;
+  value: string | boolean | null | RsvpCustomListRow[];
   displayValue: string;
+  /** List answers only: what the guest entered, row by row, as displayed. */
+  rows?: RsvpCustomAnswerCell[][];
 }
 
 export interface RsvpCustomAnswerInput {
@@ -1290,7 +1327,16 @@ export interface InvitationTranslationOverlay {
     {
       label?: string;
       placeholder?: string;
+      addLabel?: string;
       options?: Record<string, { label?: string }>;
+      columns?: Record<
+        string,
+        {
+          label?: string;
+          placeholder?: string;
+          options?: Record<string, { label?: string }>;
+        }
+      >;
     }
   >;
   customTexts?: CustomTexts;

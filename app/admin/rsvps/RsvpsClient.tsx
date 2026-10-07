@@ -263,7 +263,16 @@ function CustomAnswersBlock({ answers }: { answers: unknown }) {
       </div>
       {formatted.map((answer) => (
         <div key={`${answer.label}-${answer.value}`}>
-          <span className="font-medium">{answer.label}:</span> {answer.value}
+          <span className="font-medium">{answer.label}:</span>{" "}
+          {answer.rows ? (
+            <ul className="mt-0.5 list-disc space-y-0.5 pl-4">
+              {answer.rows.map((row, index) => (
+                <li key={index}>{row}</li>
+              ))}
+            </ul>
+          ) : (
+            answer.value
+          )}
         </div>
       ))}
     </div>

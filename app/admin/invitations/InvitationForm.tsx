@@ -45,6 +45,7 @@ import {
 } from "@/lib/invitation-translations";
 import { buildInvitationFormPayload } from "@/lib/invitation-form-payload";
 import { getRsvpCtaAction } from "@/lib/rsvp-config";
+import { findInvalidRsvpCustomField } from "@/lib/rsvp-custom-fields";
 import { useInvitationTranslationDraft } from "@/hooks/use-invitation-translation-draft";
 
 import {
@@ -1586,19 +1587,7 @@ export default function InvitationForm({
       return;
     }
 
-    const invalidCustomField = (sourceForm.rsvp.customFields ?? []).find(
-      (field) => {
-        if (!field.label.trim()) return true;
-        if (
-          (field.type === "radio" || field.type === "select") &&
-          !(field.options ?? []).some((option) => option.label.trim())
-        ) {
-          return true;
-        }
-        return false;
-      },
-    );
-    if (invalidCustomField) {
+    if (findInvalidRsvpCustomField(sourceForm.rsvp.customFields)) {
       toast.error(
         "Preencha as perguntas e opções dos campos personalizados do RSVP.",
       );
@@ -3612,6 +3601,7 @@ export default function InvitationForm({
                           fields={form.rsvp.customFields ?? []}
                           sourceValue={sourceForm.rsvp.customFields}
                           structureLocked={structureLocked}
+                          allowListType={!isAi}
                           onChange={(customFields) =>
                             updateRsvp("customFields", customFields)
                           }

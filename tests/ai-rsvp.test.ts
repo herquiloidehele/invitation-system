@@ -5,6 +5,7 @@ import {
   buildRsvpPayload,
   emptyRsvpValues,
   validateRsvpValues,
+  visibleRsvpFieldsForBundle,
 } from "@/lib/ai-rsvp";
 import type { RsvpValues } from "@/lib/ai-rsvp-types";
 
@@ -136,5 +137,114 @@ describe("buildRsvpPayload", () => {
     expect("numAdults" in payload).toBe(false);
     expect("email" in payload).toBe(false);
     expect(payload.attending).toBe(false);
+  });
+});
+
+describe("list and conditional custom fields in generated bundles", () => {
+  const trigger = {
+    id: "kids",
+    type: "switch",
+    label: "Crianças?",
+    required: false,
+    visibility: "always",
+  };
+  const followUp = {
+    id: "ages",
+    type: "text",
+    label: "Idades",
+    required: true,
+    visibility: "conditional",
+    showWhen: { fieldId: "kids", value: true },
+  };
+  const attendingOnly = {
+    id: "song",
+    type: "text",
+    label: "Música",
+    required: false,
+    visibility: "attending",
+  };
+  const list = {
+    id: "rows",
+    type: "list",
+    label: "Lista",
+    required: true,
+    visibility: "always",
+    columns: [{ id: "a", label: "A", type: "text" }],
+  };
+  const build = (custom: unknown[]) =>
+    buildRsvpFields({ enabled: true } as never, custom as never);
+
+  it("never hands a list field to a bundle", () => {
+    expect(build([trigger, list]).custom.map((field) => field.id)).toEqual([
+      "kids",
+    ]);
+  });
+
+  it("returns the descriptor untouched when nothing is conditional", () => {
+    const fields = build([trigger, attendingOnly]);
+    expect(visibleRsvpFieldsForBundle(fields, values())).toBe(fields);
+  });
+
+  it("exposes a conditional field only while it applies, as an always-visible one", () => {
+    const fields = build([trigger, followUp, attendingOnly]);
+
+    // Attending-only fields keep their old behaviour: the bundle decides.
+    expect(
+      visibleRsvpFieldsForBundle(fields, values()).custom.map(
+        (field) => field.id,
+      ),
+    ).toEqual(["kids", "song"]);
+
+    const shown = visibleRsvpFieldsForBundle(
+      fields,
+      values({ custom: { kids: true } }),
+    ).custom;
+    expect(shown.map((field) => field.id)).toEqual(["kids", "ages", "song"]);
+    expect(shown[1].visibility).toBe("always");
+    expect("showWhen" in shown[1]).toBe(false);
+
+    // The full descriptor used for validation is not mutated.
+    expect(fields.custom[1].visibility).toBe("conditional");
+  });
+
+  it("hands back the same descriptor while the same conditional fields are showing", () => {
+    // Bundles may key effects on `fields`; it must not change on every keystroke.
+    const fields = build([trigger, followUp]);
+
+    const hidden = visibleRsvpFieldsForBundle(fields, values({ name: "A" }));
+    expect(visibleRsvpFieldsForBundle(fields, values({ name: "Ana" }))).toBe(
+      hidden,
+    );
+
+    const shown = visibleRsvpFieldsForBundle(
+      fields,
+      values({ custom: { kids: true } }),
+    );
+    expect(shown).not.toBe(hidden);
+    expect(
+      visibleRsvpFieldsForBundle(
+        fields,
+        values({ name: "Ana", custom: { kids: true, ages: "3" } }),
+      ),
+    ).toBe(shown);
+    expect(shown.custom[1]).toBe(
+      visibleRsvpFieldsForBundle(fields, values({ custom: { kids: true } }))
+        .custom[1],
+    );
+  });
+
+  it("does not require a hidden conditional field, and requires it once shown", () => {
+    const fields = build([trigger, followUp]);
+
+    expect(
+      validateRsvpValues(values({ name: "Ana", attending: true }), fields).ok,
+    ).toBe(true);
+
+    const shown = validateRsvpValues(
+      values({ name: "Ana", attending: true, custom: { kids: true } }),
+      fields,
+    );
+    expect(shown.ok).toBe(false);
+    expect(shown.errors["custom.ages"]).toBeTruthy();
   });
 });

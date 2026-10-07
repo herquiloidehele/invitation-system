@@ -12,10 +12,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { RsvpCustomFieldConditionEditor } from "@/components/admin/RsvpCustomFieldConditionEditor";
+import {
+  createRsvpListColumn,
+  RsvpCustomListColumnsEditor,
+} from "@/components/admin/RsvpCustomListColumnsEditor";
+import {
+  createRsvpOption,
+  RSVP_BUILDER_SELECT_POPUP_CLASS,
+  RsvpCustomOptionsEditor,
+} from "@/components/admin/RsvpCustomOptionsEditor";
+import {
+  getRsvpConditionTriggers,
+  reconcileRsvpCustomFieldConditions,
+} from "@/lib/rsvp-custom-fields";
 import type {
   RsvpCustomField,
-  RsvpCustomFieldOption,
   RsvpCustomFieldType,
+  RsvpCustomFieldVisibility,
 } from "@/lib/types";
 
 const FIELD_TYPES: { value: RsvpCustomFieldType; label: string }[] = [
@@ -24,24 +38,27 @@ const FIELD_TYPES: { value: RsvpCustomFieldType; label: string }[] = [
   { value: "switch", label: "Sim/Não" },
   { value: "radio", label: "Escolha única (botões)" },
   { value: "select", label: "Escolha única (lista)" },
+  { value: "list", label: "Lista (várias linhas)" },
 ];
 
-function newId(prefix: string) {
-  return `${prefix}-${crypto.randomUUID()}`;
-}
+const VISIBILITIES: { value: RsvpCustomFieldVisibility; label: string }[] = [
+  { value: "always", label: "Sempre mostrar" },
+  { value: "attending", label: "Só se confirmar presença" },
+  { value: "conditional", label: "Depende de outra resposta" },
+];
 
 function needsOptions(type: RsvpCustomFieldType) {
   return type === "radio" || type === "select";
 }
 
-/** Sim/Não and button choices have no empty state to hint at. */
+/** Sim/Não, button choices and lists have no empty state to hint at. */
 function supportsPlaceholder(type: RsvpCustomFieldType) {
   return type === "text" || type === "textarea" || type === "select";
 }
 
 function createField(): RsvpCustomField {
   return {
-    id: newId("rsvp-field"),
+    id: `rsvp-field-${crypto.randomUUID()}`,
     label: "",
     type: "text",
     required: false,
@@ -49,40 +66,56 @@ function createField(): RsvpCustomField {
   };
 }
 
-function createOption(): RsvpCustomFieldOption {
-  return { id: newId("rsvp-option"), label: "" };
-}
-
 export function RsvpCustomFieldsBuilder({
   fields,
   sourceValue,
   structureLocked = false,
+  allowListType = true,
   onChange,
 }: {
   fields: RsvpCustomField[];
   sourceValue?: RsvpCustomField[];
   structureLocked?: boolean;
+  /** False where the guest form cannot draw a list (AI-built invitations). */
+  allowListType?: boolean;
   onChange: (fields: RsvpCustomField[]) => void;
 }) {
   const sourceById = new Map(
     (sourceValue ?? []).map((field) => [field.id, field]),
   );
-  const sourceOptionLabel = (fieldId: string, optionId: string) =>
-    sourceById.get(fieldId)?.options?.find((option) => option.id === optionId)
-      ?.label;
+
+  // Every edit goes through here so a condition can never outlive its trigger.
+  const commit = (next: RsvpCustomField[]) =>
+    onChange(reconcileRsvpCustomFieldConditions(next));
 
   const updateField = (id: string, patch: Partial<RsvpCustomField>) => {
-    onChange(
+    commit(
       fields.map((field) => {
         if (field.id !== id) return field;
         const next = { ...field, ...patch };
+
         if (!needsOptions(next.type)) {
           delete next.options;
         } else if (!next.options || next.options.length === 0) {
-          next.options = [createOption()];
+          next.options = [createRsvpOption()];
         }
         if (!supportsPlaceholder(next.type)) {
           delete next.placeholder;
+        }
+        if (next.type !== "list") {
+          delete next.columns;
+          delete next.addLabel;
+        } else if (!next.columns || next.columns.length === 0) {
+          next.columns = [createRsvpListColumn()];
+        }
+        if (next.visibility === "conditional" && !next.showWhen) {
+          const trigger = getRsvpConditionTriggers(fields, id)[0];
+          if (trigger) {
+            next.showWhen = {
+              fieldId: trigger.id,
+              value: trigger.answers[0].value,
+            };
+          }
         }
         return next;
       }),
@@ -95,22 +128,7 @@ export function RsvpCustomFieldsBuilder({
     const next = [...fields];
     const [field] = next.splice(index, 1);
     next.splice(nextIndex, 0, field);
-    onChange(next);
-  };
-
-  const updateOption = (fieldId: string, optionId: string, label: string) => {
-    onChange(
-      fields.map((field) =>
-        field.id === fieldId
-          ? {
-              ...field,
-              options: (field.options ?? []).map((option) =>
-                option.id === optionId ? { ...option, label } : option,
-              ),
-            }
-          : field,
-      ),
-    );
+    commit(next);
   };
 
   return (
@@ -128,7 +146,7 @@ export function RsvpCustomFieldsBuilder({
           variant="outline"
           size="sm"
           disabled={structureLocked}
-          onClick={() => onChange([...fields, createField()])}
+          onClick={() => commit([...fields, createField()])}
         >
           <Plus className="mr-1.5 size-4" />
           Adicionar
@@ -141,204 +159,242 @@ export function RsvpCustomFieldsBuilder({
         </p>
       )}
 
+      {!allowListType && (
+        <p className="text-xs text-muted-foreground">
+          Convites criados com IA ainda não suportam campos do tipo Lista.
+        </p>
+      )}
+
       {fields.length === 0 && (
         <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
           Nenhum campo personalizado configurado.
         </p>
       )}
 
-      {fields.map((field, index) => (
-        <div
-          key={field.id}
-          className="space-y-3 rounded-md border bg-background p-3"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-medium text-muted-foreground">
-              Campo {index + 1}
-            </span>
-            <div className="flex items-center gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                disabled={structureLocked || index === 0}
-                onClick={() => moveField(index, -1)}
-              >
-                <ArrowUp className="size-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                disabled={structureLocked || index === fields.length - 1}
-                onClick={() => moveField(index, 1)}
-              >
-                <ArrowDown className="size-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="text-destructive"
-                disabled={structureLocked}
-                onClick={() =>
-                  onChange(fields.filter((item) => item.id !== field.id))
-                }
-              >
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          </div>
+      {fields.map((field, index) => {
+        const source = sourceById.get(field.id);
+        // In a translation locale the labels being edited start blank, so
+        // name the triggers by their Portuguese text instead.
+        const triggers = getRsvpConditionTriggers(fields, field.id).map(
+          (trigger) => {
+            const sourceTrigger = sourceById.get(trigger.id);
+            return {
+              ...trigger,
+              label: trigger.label.trim() || sourceTrigger?.label || "",
+              answers: trigger.answers.map((answer) => ({
+                ...answer,
+                label:
+                  answer.label.trim() ||
+                  sourceTrigger?.options?.find(
+                    (option) => option.id === answer.value,
+                  )?.label ||
+                  "",
+              })),
+            };
+          },
+        );
+        const fieldTypes = FIELD_TYPES.filter(
+          (type) =>
+            type.value !== "list" || allowListType || field.type === "list",
+        );
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label>Pergunta</Label>
-              <Input
-                value={field.label}
-                onChange={(event) =>
-                  updateField(field.id, { label: event.target.value })
-                }
-                placeholder={
-                  sourceById.get(field.id)?.label ||
-                  "Ex: Vai precisar de transporte?"
+        return (
+          <div
+            key={field.id}
+            className="space-y-3 rounded-md border bg-background p-3"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-medium text-muted-foreground">
+                Campo {index + 1}
+              </span>
+              <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={structureLocked || index === 0}
+                  onClick={() => moveField(index, -1)}
+                >
+                  <ArrowUp className="size-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={structureLocked || index === fields.length - 1}
+                  onClick={() => moveField(index, 1)}
+                >
+                  <ArrowDown className="size-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive"
+                  disabled={structureLocked}
+                  onClick={() =>
+                    commit(fields.filter((item) => item.id !== field.id))
+                  }
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Pergunta</Label>
+                <Input
+                  value={field.label}
+                  onChange={(event) =>
+                    updateField(field.id, { label: event.target.value })
+                  }
+                  placeholder={
+                    source?.label || "Ex: Vai precisar de transporte?"
+                  }
+                />
+              </div>
+
+              {supportsPlaceholder(field.type) && (
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label>Texto de exemplo</Label>
+                  <Input
+                    value={field.placeholder ?? ""}
+                    onChange={(event) =>
+                      updateField(field.id, {
+                        placeholder: event.target.value,
+                      })
+                    }
+                    placeholder={
+                      source?.placeholder ||
+                      (field.type === "select"
+                        ? "Ex: Selecione uma opção"
+                        : "Ex: João e Maria")
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {field.type === "select"
+                      ? "Aparece como primeira opção da lista, antes de escolher."
+                      : "Aparece dentro do campo enquanto está vazio."}
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <Label>Tipo</Label>
+                <Select
+                  items={fieldTypes}
+                  value={field.type}
+                  disabled={structureLocked}
+                  onValueChange={(value) =>
+                    updateField(field.id, {
+                      type: value as RsvpCustomFieldType,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className={RSVP_BUILDER_SELECT_POPUP_CLASS}>
+                    {fieldTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Visibilidade</Label>
+                <Select
+                  items={VISIBILITIES}
+                  value={field.visibility}
+                  disabled={structureLocked}
+                  onValueChange={(value) =>
+                    updateField(field.id, {
+                      visibility: value as RsvpCustomFieldVisibility,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className={RSVP_BUILDER_SELECT_POPUP_CLASS}>
+                    {VISIBILITIES.map((visibility) => (
+                      <SelectItem
+                        key={visibility.value}
+                        value={visibility.value}
+                        disabled={
+                          visibility.value === "conditional" &&
+                          triggers.length === 0
+                        }
+                      >
+                        {visibility.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {index > 0 && triggers.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Para depender de outra resposta, adicione antes um campo
+                    Sim/Não ou de escolha única.
+                  </p>
+                )}
+              </div>
+
+              {field.visibility === "conditional" && (
+                <RsvpCustomFieldConditionEditor
+                  triggers={triggers}
+                  value={field.showWhen}
+                  disabled={structureLocked}
+                  onChange={(showWhen) => updateField(field.id, { showWhen })}
+                />
+              )}
+            </div>
+
+            <div className="flex items-center justify-between gap-4 rounded-md border p-3">
+              <div>
+                <Label>Obrigatório</Label>
+                <p className="text-xs text-muted-foreground">
+                  O convidado precisa responder quando o campo estiver visível.
+                </p>
+              </div>
+              <Switch
+                checked={field.required}
+                onCheckedChange={(required) =>
+                  updateField(field.id, { required })
                 }
               />
             </div>
 
-            {supportsPlaceholder(field.type) && (
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label>Texto de exemplo</Label>
-                <Input
-                  value={field.placeholder ?? ""}
-                  onChange={(event) =>
-                    updateField(field.id, { placeholder: event.target.value })
-                  }
-                  placeholder={
-                    sourceById.get(field.id)?.placeholder ||
-                    (field.type === "select"
-                      ? "Ex: Selecione uma opção"
-                      : "Ex: João e Maria")
-                  }
-                />
-                <p className="text-xs text-muted-foreground">
-                  {field.type === "select"
-                    ? "Aparece como primeira opção da lista, antes de escolher."
-                    : "Aparece dentro do campo enquanto está vazio."}
-                </p>
-              </div>
+            {needsOptions(field.type) && (
+              <RsvpCustomOptionsEditor
+                options={field.options ?? []}
+                sourceOptions={source?.options}
+                structureLocked={structureLocked}
+                onChange={(options) => updateField(field.id, { options })}
+              />
             )}
 
-            <div className="space-y-1.5">
-              <Label>Tipo</Label>
-              <Select
-                value={field.type}
-                disabled={structureLocked}
-                onValueChange={(value) =>
-                  updateField(field.id, { type: value as RsvpCustomFieldType })
+            {field.type === "list" && (
+              <RsvpCustomListColumnsEditor
+                columns={field.columns ?? []}
+                addLabel={field.addLabel}
+                sourceColumns={source?.columns}
+                sourceAddLabel={source?.addLabel}
+                structureLocked={structureLocked}
+                onColumnsChange={(columns) =>
+                  updateField(field.id, { columns })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FIELD_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Visibilidade</Label>
-              <Select
-                value={field.visibility}
-                onValueChange={(value) =>
-                  updateField(field.id, {
-                    visibility: value as RsvpCustomField["visibility"],
-                  })
+                onAddLabelChange={(addLabel) =>
+                  updateField(field.id, { addLabel })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="always">Sempre mostrar</SelectItem>
-                  <SelectItem value="attending">
-                    Só se confirmar presença
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              />
+            )}
           </div>
-
-          <div className="flex items-center justify-between gap-4 rounded-md border p-3">
-            <div>
-              <Label>Obrigatório</Label>
-              <p className="text-xs text-muted-foreground">
-                O convidado precisa responder quando o campo estiver visível.
-              </p>
-            </div>
-            <Switch
-              checked={field.required}
-              onCheckedChange={(required) =>
-                updateField(field.id, { required })
-              }
-            />
-          </div>
-
-          {needsOptions(field.type) && (
-            <div className="space-y-2">
-              <Label>Opções</Label>
-              {(field.options ?? []).map((option, optionIndex) => (
-                <div key={option.id} className="flex gap-2">
-                  <Input
-                    value={option.label}
-                    onChange={(event) =>
-                      updateOption(field.id, option.id, event.target.value)
-                    }
-                    placeholder={
-                      sourceOptionLabel(field.id, option.id) ||
-                      `Opção ${optionIndex + 1}`
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive"
-                    disabled={structureLocked}
-                    onClick={() =>
-                      updateField(field.id, {
-                        options: (field.options ?? []).filter(
-                          (item) => item.id !== option.id,
-                        ),
-                      })
-                    }
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={structureLocked}
-                onClick={() =>
-                  updateField(field.id, {
-                    options: [...(field.options ?? []), createOption()],
-                  })
-                }
-              >
-                <Plus className="mr-1.5 size-4" />
-                Adicionar opção
-              </Button>
-            </div>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
