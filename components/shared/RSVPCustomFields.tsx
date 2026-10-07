@@ -2,14 +2,24 @@
 
 import type { CSSProperties } from "react";
 import { Switch } from "@/components/ui/switch";
-import { isRsvpCustomFieldVisible } from "@/lib/rsvp-custom-fields";
-import type { RsvpCustomField } from "@/lib/types";
+import { RSVPCustomListField } from "@/components/shared/RSVPCustomListField";
+import { getVisibleRsvpCustomFields } from "@/lib/rsvp-custom-fields";
+import type { RsvpCustomField, RsvpCustomListRow } from "@/lib/types";
 
-export type RsvpCustomValues = Record<string, string | boolean | undefined>;
+export type RsvpCustomValue =
+  | string
+  | boolean
+  | RsvpCustomListRow[]
+  | undefined;
+export type RsvpCustomValues = Record<string, RsvpCustomValue>;
 export type RsvpCustomErrors = Record<string, string | undefined>;
 
-function stringValue(value: string | boolean | undefined): string {
+function stringValue(value: RsvpCustomValue): string {
   return typeof value === "string" ? value : "";
+}
+
+function listValue(value: RsvpCustomValue): RsvpCustomListRow[] {
+  return Array.isArray(value) ? value : [];
 }
 
 export function RSVPCustomFields({
@@ -30,7 +40,7 @@ export function RSVPCustomFields({
   attending: boolean;
   values: RsvpCustomValues;
   errors: RsvpCustomErrors;
-  onChange: (fieldId: string, value: string | boolean | undefined) => void;
+  onChange: (fieldId: string, value: RsvpCustomValue) => void;
   labelStyle: CSSProperties;
   inputClassName: string;
   inputStyle: CSSProperties;
@@ -39,9 +49,7 @@ export function RSVPCustomFields({
   switchClassName: string;
   switchStyle: CSSProperties;
 }) {
-  const visibleFields = fields.filter((field) =>
-    isRsvpCustomFieldVisible(field, attending),
-  );
+  const visibleFields = getVisibleRsvpCustomFields(fields, { attending, values });
   if (visibleFields.length === 0) return null;
 
   return (
@@ -52,7 +60,18 @@ export function RSVPCustomFields({
             {field.label}
             {field.required ? " *" : ""}
           </label>
-          {field.type === "textarea" ? (
+          {field.type === "list" ? (
+            <RSVPCustomListField
+              field={field}
+              rows={listValue(values[field.id])}
+              onChange={(rows) => onChange(field.id, rows)}
+              labelStyle={labelStyle}
+              inputClassName={inputClassName}
+              inputStyle={inputStyle}
+              choiceClassName={choiceClassName}
+              choiceStyle={choiceStyle}
+            />
+          ) : field.type === "textarea" ? (
             <textarea
               rows={3}
               value={stringValue(values[field.id])}

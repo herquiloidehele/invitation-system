@@ -617,12 +617,20 @@ export function RsvpList({
                     <div className="mt-2 space-y-1 rounded-md bg-stone-50 px-3 py-2 text-sm text-stone-600">
                       {formatRsvpCustomAnswers(r.customAnswers).map(
                         (answer) => (
-                          <p key={`${r.id}-${answer.label}`}>
+                          <div key={`${r.id}-${answer.label}`}>
                             <span className="font-medium text-stone-700">
                               {answer.label}:
                             </span>{" "}
-                            {answer.value}
-                          </p>
+                            {answer.rows ? (
+                              <ul className="mt-0.5 list-disc space-y-0.5 pl-5">
+                                {answer.rows.map((row, index) => (
+                                  <li key={index}>{row}</li>
+                                ))}
+                              </ul>
+                            ) : (
+                              answer.value
+                            )}
+                          </div>
                         ),
                       )}
                     </div>

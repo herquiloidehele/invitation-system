@@ -16,7 +16,10 @@ import {
   resolveRsvpSubmitStyle,
 } from "@/lib/rsvp-input-styles";
 import type { RsvpPageTokens } from "@/lib/rsvp-page-style";
-import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import {
+  toRsvpCustomAnswerInputs,
+  validateRsvpCustomAnswers,
+} from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
   type RsvpCustomErrors,
@@ -104,13 +107,7 @@ export default function RsvpPageForm({
   const submit = async (data: RsvpPageFormData) => {
     const customValidation = validateRsvpCustomAnswers({
       fields: customFields,
-      submittedAnswers: customFields.map((field) => ({
-        fieldId: field.id,
-        value:
-          field.type === "switch"
-            ? customValues[field.id] === true
-            : customValues[field.id],
-      })),
+      submittedAnswers: toRsvpCustomAnswerInputs(customFields, customValues),
       attending: data.attending === "yes",
     });
     if (!customValidation.success) {

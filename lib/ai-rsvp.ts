@@ -6,8 +6,12 @@ import {
   shouldShowRsvpNumAdults,
   shouldShowRsvpNumChildren,
 } from "./rsvp-config";
-import { validateRsvpCustomAnswers } from "./rsvp-custom-fields";
-import type { InvitationData } from "./types";
+import {
+  getVisibleRsvpCustomFields,
+  toRsvpCustomAnswerInputs,
+  validateRsvpCustomAnswers,
+} from "./rsvp-custom-fields";
+import type { InvitationData, RsvpCustomField } from "./types";
 import type {
   RsvpErrors,
   RsvpFieldsDescriptor,
@@ -42,8 +46,69 @@ export function buildRsvpFields(
     numAdults: shouldShowRsvpNumAdults(rsvp),
     numChildren: shouldShowRsvpNumChildren(rsvp),
     dietaryRestrictions: shouldShowRsvpDietaryRestrictions(rsvp),
-    custom: customFields,
+    // Generated bundles draw their own form and only know the five simple
+    // types, so a list field must never reach them.
+    custom: customFields.filter((field) => field.type !== "list"),
   };
+}
+
+// One bundle-facing descriptor per set of showing conditional fields, per
+// source descriptor. A bundle may key an effect on `fields`, so it has to keep
+// its identity while the guest types and only change when a field appears or
+// disappears.
+const bundleFieldsCache = new WeakMap<
+  RsvpFieldsDescriptor,
+  Map<string, RsvpFieldsDescriptor>
+>();
+
+/**
+ * The descriptor a generated bundle should draw from right now. Bundles
+ * predate conditional visibility: they are handed only the conditional fields
+ * that currently apply, relabelled with a visibility they understand.
+ * Validation and the payload must keep using the full descriptor.
+ */
+export function visibleRsvpFieldsForBundle(
+  fields: RsvpFieldsDescriptor,
+  values: RsvpValues,
+): RsvpFieldsDescriptor {
+  if (!fields.custom.some((field) => field.visibility === "conditional")) {
+    return fields;
+  }
+
+  const visibleIds = new Set(
+    getVisibleRsvpCustomFields(fields.custom, {
+      attending: values.attending === true,
+      values: values.custom,
+    }).map((field) => field.id),
+  );
+  const shownFields = fields.custom.filter(
+    (field) => field.visibility !== "conditional" || visibleIds.has(field.id),
+  );
+
+  const cacheKey = JSON.stringify(
+    shownFields
+      .filter((field) => field.visibility === "conditional")
+      .map((field) => field.id),
+  );
+  let cache = bundleFieldsCache.get(fields);
+  if (!cache) {
+    cache = new Map();
+    bundleFieldsCache.set(fields, cache);
+  }
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
+
+  const forBundle: RsvpFieldsDescriptor = {
+    ...fields,
+    custom: shownFields.map((field) => {
+      if (field.visibility !== "conditional") return field;
+      const shown: RsvpCustomField = { ...field, visibility: "always" };
+      delete shown.showWhen;
+      return shown;
+    }),
+  };
+  cache.set(cacheKey, forBundle);
+  return forBundle;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,13 +130,7 @@ export function validateRsvpValues(
 
   const customResult = validateRsvpCustomAnswers({
     fields: fields.custom,
-    submittedAnswers: fields.custom.map((field) => ({
-      fieldId: field.id,
-      value:
-        field.type === "switch"
-          ? values.custom[field.id] === true
-          : values.custom[field.id],
-    })),
+    submittedAnswers: toRsvpCustomAnswerInputs(fields.custom, values.custom),
     attending: values.attending === true,
   });
   if (!customResult.success) {
@@ -112,13 +171,10 @@ export function buildRsvpPayload(args: {
   if (guestToken) payload.guestToken = guestToken;
 
   if (fields.custom.length > 0) {
-    payload.customAnswers = fields.custom.map((field) => ({
-      fieldId: field.id,
-      value:
-        field.type === "switch"
-          ? values.custom[field.id] === true
-          : values.custom[field.id],
-    }));
+    payload.customAnswers = toRsvpCustomAnswerInputs(
+      fields.custom,
+      values.custom,
+    );
   }
 
   return payload;

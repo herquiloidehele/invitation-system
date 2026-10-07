@@ -427,6 +427,80 @@ describe("invitation localization", () => {
       options: [{ id: "fish", label: "Fish" }],
     });
   });
+
+  it("localizes list columns, their options and the add button", () => {
+    const source = duplicateForm({
+      rsvp: {
+        enabled: true,
+        customFields: [
+          {
+            id: "kids",
+            label: "Crianças",
+            type: "list",
+            required: false,
+            visibility: "always",
+            addLabel: "Adicionar criança",
+            columns: [
+              { id: "age", label: "Idade", type: "number", placeholder: "Ex: 5" },
+              {
+                id: "menu",
+                label: "Menu",
+                type: "select",
+                options: [{ id: "fish", label: "Peixe" }],
+              },
+            ],
+          },
+        ],
+      },
+      translations: {
+        en: {
+          rsvpCustomFields: {
+            kids: {
+              label: "Children",
+              addLabel: "Add child",
+              columns: {
+                age: { label: "Age", placeholder: "E.g. 5" },
+                menu: { label: "Meal", options: { fish: { label: "Fish" } } },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    expect(localizeInvitation(source, "en").rsvp.customFields?.[0]).toMatchObject({
+      label: "Children",
+      addLabel: "Add child",
+      columns: [
+        { id: "age", type: "number", label: "Age", placeholder: "E.g. 5" },
+        { id: "menu", label: "Meal", options: [{ id: "fish", label: "Fish" }] },
+      ],
+    });
+  });
+
+  it("falls back to Portuguese for untranslated list text", () => {
+    const source = duplicateForm({
+      rsvp: {
+        enabled: true,
+        customFields: [
+          {
+            id: "kids",
+            label: "Crianças",
+            type: "list",
+            required: false,
+            visibility: "always",
+            addLabel: "Adicionar criança",
+            columns: [{ id: "age", label: "Idade", type: "number" }],
+          },
+        ],
+      },
+    });
+
+    expect(localizeInvitation(source, "en").rsvp.customFields?.[0]).toMatchObject({
+      addLabel: "Adicionar criança",
+      columns: [{ id: "age", label: "Idade" }],
+    });
+  });
 });
 
 describe("invitation translation drafts", () => {
@@ -538,5 +612,62 @@ describe("invitation translation drafts", () => {
     expect(
       localizeInvitation(saved, "en").schedule.map((item) => item.label),
     ).toEqual(["First", "Second"]);
+  });
+  it("round-trips list translations through a draft without touching the source", () => {
+    const source = duplicateForm({
+      rsvp: {
+        enabled: true,
+        customFields: [
+          {
+            id: "kids",
+            label: "Crianças",
+            type: "list",
+            required: false,
+            visibility: "always",
+            addLabel: "Adicionar criança",
+            columns: [
+              { id: "age", label: "Idade", type: "number" },
+              {
+                id: "menu",
+                label: "Menu",
+                type: "select",
+                options: [{ id: "fish", label: "Peixe" }],
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    const draft = buildInvitationTranslationDraft(source, "en");
+    const draftField = draft.rsvp.customFields![0];
+    expect(draftField.addLabel).toBe("");
+    expect(draftField.columns![0].label).toBe("");
+    expect(draftField.columns![1].options![0].label).toBe("");
+
+    draftField.label = "Children";
+    draftField.addLabel = "Add child";
+    draftField.columns![0].label = "Age";
+    draftField.columns![1].label = "Meal";
+    draftField.columns![1].options![0].label = "Fish";
+
+    const saved = applyInvitationTranslationDraft(source, "en", draft);
+
+    expect(saved.rsvp.customFields?.[0]).toMatchObject({
+      label: "Crianças",
+      addLabel: "Adicionar criança",
+      columns: [
+        { id: "age", label: "Idade", type: "number" },
+        { id: "menu", label: "Menu", options: [{ id: "fish", label: "Peixe" }] },
+      ],
+    });
+    expect(saved.translations?.en?.rsvpCustomFields?.kids).toMatchObject({
+      label: "Children",
+      addLabel: "Add child",
+      columns: {
+        age: { label: "Age" },
+        menu: { label: "Meal", options: { fish: { label: "Fish" } } },
+      },
+    });
   });
 });

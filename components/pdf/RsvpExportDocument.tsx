@@ -329,6 +329,9 @@ function makeStyles(theme: PdfTheme) {
       fontSize: 7,
       color: theme.textSecondary,
     },
+    customAnswerRow: {
+      paddingLeft: 8,
+    },
 
     // ── Footer ───────────────────────────────────────────────────────────────
     footer: {
@@ -520,12 +523,21 @@ function GuestTable({
             {customAnswers.length > 0 && (
               <View style={styles.customAnswersBlock}>
                 {customAnswers.map((answer) => (
-                  <Text
-                    key={`${r.id}-${answer.label}`}
-                    style={styles.customAnswerText}
-                  >
-                    {answer.label}: {answer.value}
-                  </Text>
+                  <View key={`${r.id}-${answer.label}`}>
+                    <Text style={styles.customAnswerText}>
+                      {answer.rows
+                        ? `${answer.label}:`
+                        : `${answer.label}: ${answer.value}`}
+                    </Text>
+                    {answer.rows?.map((row, index) => (
+                      <Text
+                        key={index}
+                        style={[styles.customAnswerText, styles.customAnswerRow]}
+                      >
+                        • {row}
+                      </Text>
+                    ))}
+                  </View>
                 ))}
               </View>
             )}

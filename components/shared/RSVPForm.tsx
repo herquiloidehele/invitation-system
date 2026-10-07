@@ -37,7 +37,10 @@ import {
   storeGuestPassToken,
 } from "@/lib/entry-pass";
 import EntryPassQr from "@/components/shared/EntryPassQr";
-import { validateRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import {
+  toRsvpCustomAnswerInputs,
+  validateRsvpCustomAnswers,
+} from "@/lib/rsvp-custom-fields";
 import {
   RSVPCustomFields,
   type RsvpCustomErrors,
@@ -362,13 +365,7 @@ export default function RSVPForm(props: RSVPFormProps) {
     try {
       const customValidation = validateRsvpCustomAnswers({
         fields: customFields,
-        submittedAnswers: customFields.map((field) => ({
-          fieldId: field.id,
-          value:
-            field.type === "switch"
-              ? customValues[field.id] === true
-              : customValues[field.id],
-        })),
+        submittedAnswers: toRsvpCustomAnswerInputs(customFields, customValues),
         attending: data.attending === "yes",
       });
       if (!customValidation.success) {
