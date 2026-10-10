@@ -54,6 +54,7 @@ const baseRow = {
   parents: null,
   ourStory: null,
   transportInfo: null,
+  guestPhotoUpload: null,
   scratchReveal: null,
   heroConfetti: null,
   countdown: null,
@@ -417,5 +418,27 @@ describe("toAdminInvitationInitialData — transport section", () => {
 
   it("leaves it unset on a row saved before the section existed", () => {
     expect(toAdminInvitationInitialData(baseRow).transportInfo).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — guest photo upload", () => {
+  it("hydrates the stored link and text", () => {
+    const guestPhotoUpload = {
+      enabled: true,
+      url: "https://photos.app.goo.gl/abc123",
+      text: "Partilhem as vossas fotos",
+    };
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      guestPhotoUpload,
+    });
+
+    expect(result.guestPhotoUpload).toEqual(guestPhotoUpload);
+  });
+
+  it("leaves it unset on a row saved before the block existed", () => {
+    expect(
+      toAdminInvitationInitialData(baseRow).guestPhotoUpload,
+    ).toBeUndefined();
   });
 });

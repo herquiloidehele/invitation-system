@@ -17,6 +17,7 @@ import type {
   EnvelopeConfig,
   GiftItem,
   GuestGuideItem,
+  GuestPhotoUpload,
   ImageLayer,
   ImageSettings,
   ImageSettingsKey,
@@ -39,7 +40,10 @@ import type {
   TransportInfo,
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
-import { EMPTY_TRANSPORT_INFO } from "@/lib/minimalism-brown";
+import {
+  EMPTY_GUEST_PHOTO_UPLOAD,
+  EMPTY_TRANSPORT_INFO,
+} from "@/lib/minimalism-brown";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
 import {
   normalizeInvitationLocales,
@@ -108,6 +112,7 @@ import BankTransferEditor from "@/components/admin/BankTransferEditor";
 import ElegantFloralDressFields from "@/components/admin/ElegantFloralDressFields";
 import LocationPhotosEditor from "@/components/admin/LocationPhotosEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
+import GuestPhotoUploadFormSection from "@/components/admin/GuestPhotoUploadFormSection";
 import TransportFormSection from "@/components/admin/TransportFormSection";
 import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
@@ -1026,6 +1031,20 @@ export default function InvitationForm({
       },
     }));
   }, []);
+
+  // "Send us your photos" block (minimalism-brown). Unset until first edited.
+  const updateGuestPhotoUpload = useCallback(
+    (patch: Partial<GuestPhotoUpload>) => {
+      setForm((prev) => ({
+        ...prev,
+        guestPhotoUpload: {
+          ...(prev.guestPhotoUpload ?? EMPTY_GUEST_PHOTO_UPLOAD),
+          ...patch,
+        },
+      }));
+    },
+    [],
+  );
 
   // Guest Guide management
   const updateGuestGuideEnabled = useCallback((enabled: boolean) => {
@@ -3861,6 +3880,16 @@ export default function InvitationForm({
                   />
                 </AccordionContent>
               </AccordionItem>
+
+              {/* ── Fotos dos Convidados (minimalism-brown) ── */}
+              {isMinimalismBrown && (
+                <GuestPhotoUploadFormSection
+                  value={form.guestPhotoUpload}
+                  sourceValue={sourceForm.guestPhotoUpload}
+                  sourcePlaceholder={sourcePlaceholder}
+                  onChange={updateGuestPhotoUpload}
+                />
+              )}
 
               <AccordionItem
                 value="ourStory"

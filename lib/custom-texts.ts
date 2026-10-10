@@ -173,6 +173,11 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "Toque para abrir",
       },
       {
+        key: "mb_sendPhotos",
+        label: "Botão de envio de fotos",
+        placeholder: "Enviar fotos",
+      },
+      {
         key: "rsvp_messagePublicNote",
         label: "Aviso de mensagem pública",
         placeholder:

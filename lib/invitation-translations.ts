@@ -209,6 +209,12 @@ function sanitizeTransportInfo(value: unknown) {
   });
 }
 
+function sanitizeGuestPhotoUpload(value: unknown) {
+  const input = readObject(value);
+  if (!input) return undefined;
+  return compact({ text: readString(input.text) });
+}
+
 function sanitizeCountdown(value: unknown) {
   const input = readObject(value);
   if (!input) return undefined;
@@ -310,6 +316,7 @@ function sanitizeOverlay(
     parents: sanitizeParents(input.parents),
     ourStory: sanitizeOurStory(input.ourStory),
     transportInfo: sanitizeTransportInfo(input.transportInfo),
+    guestPhotoUpload: sanitizeGuestPhotoUpload(input.guestPhotoUpload),
     countdown: sanitizeCountdown(input.countdown),
     rsvpCustomFields: sanitizeRsvpCustomFields(input.rsvpCustomFields),
     customTexts: sanitizeCustomTexts(input.customTexts),
@@ -567,6 +574,18 @@ function transformTransportInfo(
   };
 }
 
+function transformGuestPhotoUpload(
+  source: InvitationData["guestPhotoUpload"],
+  overlay: InvitationTranslationOverlay["guestPhotoUpload"],
+  behavior: MissingTranslationBehavior,
+): InvitationData["guestPhotoUpload"] {
+  if (!source) return undefined;
+  return {
+    ...source,
+    text: overlay?.text ?? (behavior === "blank" ? "" : source.text),
+  };
+}
+
 function transformCountdown(
   source: InvitationData["countdown"],
   overlay: InvitationTranslationOverlay["countdown"],
@@ -682,6 +701,11 @@ function transformInvitationText(
     transportInfo: transformTransportInfo(
       source.transportInfo,
       overlay?.transportInfo,
+      behavior,
+    ),
+    guestPhotoUpload: transformGuestPhotoUpload(
+      source.guestPhotoUpload,
+      overlay?.guestPhotoUpload,
       behavior,
     ),
     countdown: transformCountdown(
@@ -1006,6 +1030,17 @@ function restorePortugueseText(
             description: source.transportInfo?.description ?? "",
           }
         : undefined,
+    // Same as transportInfo: no seeded default, so keep a first-time toggle.
+    guestPhotoUpload:
+      source.guestPhotoUpload || draft.guestPhotoUpload
+        ? {
+            enabled: false,
+            url: "",
+            ...source.guestPhotoUpload,
+            ...draft.guestPhotoUpload,
+            text: source.guestPhotoUpload?.text ?? "",
+          }
+        : undefined,
     countdown: source.countdown
       ? {
           ...source.countdown,
@@ -1129,6 +1164,9 @@ function extractOverlay(draft: InvitationData): InvitationTranslationOverlay {
           title: draft.transportInfo.title,
           description: draft.transportInfo.description,
         }
+      : undefined,
+    guestPhotoUpload: draft.guestPhotoUpload
+      ? { text: draft.guestPhotoUpload.text }
       : undefined,
     countdown: draft.countdown
       ? {

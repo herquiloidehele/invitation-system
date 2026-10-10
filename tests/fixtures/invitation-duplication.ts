@@ -149,6 +149,11 @@ export const sourceInvitationRow = {
     title: "Transporte",
     description: "Autocarro às 14h",
   },
+  guestPhotoUpload: {
+    enabled: true,
+    url: "https://photos.app.goo.gl/abc123",
+    text: "Partilhem as vossas fotos",
+  },
   scratchReveal: { enabled: true },
   heroConfetti: { enabled: true },
   countdown: { enabled: true },

@@ -4,6 +4,7 @@ import type {
   CardStyleOverrides,
   CustomTexts,
   GuestbookConfig,
+  GuestPhotoUpload,
   InvitationData,
   LocationInfo,
   ParentsInfo,
@@ -501,4 +502,60 @@ export function mbTransport(
     title,
     description,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Guest photo upload
+// ---------------------------------------------------------------------------
+
+/** What the admin form starts from the first time the block is edited. */
+export const EMPTY_GUEST_PHOTO_UPLOAD: GuestPhotoUpload = {
+  enabled: false,
+  url: "",
+  text: "",
+};
+
+/**
+ * A host-typed link as a safe web address, or null when it isn't one.
+ *
+ * Hosts paste whatever the platform gave them, often without the scheme, so a
+ * bare "photos.app.goo.gl/abc" gains https. Anything that still isn't a plain
+ * http(s) address to a real host — a javascript: or mailto: link, loose words
+ * — is refused rather than published as a button that does something else.
+ */
+export function mbWebLink(raw: string | null | undefined): string | null {
+  const value = raw?.trim();
+  if (!value) return null;
+
+  const candidate = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  let url: URL;
+  try {
+    url = new URL(candidate);
+  } catch {
+    return null;
+  }
+  if (url.username || url.password || !url.hostname.includes(".")) return null;
+  return candidate;
+}
+
+/** The photo-sharing block, ready to render. */
+export interface MbGuestPhotoUpload {
+  href: string;
+  text: string;
+}
+
+/**
+ * The photo-sharing block when it should show, else null. Without a usable
+ * link there is nothing for the button to do, so the whole block stays hidden.
+ */
+export function mbGuestPhotoUpload(
+  invitation: Pick<InvitationData, "guestPhotoUpload">,
+): MbGuestPhotoUpload | null {
+  const upload = invitation.guestPhotoUpload;
+  if (!upload?.enabled) return null;
+
+  const href = mbWebLink(upload.url);
+  if (!href) return null;
+
+  return { href, text: upload.text?.trim() ?? "" };
 }

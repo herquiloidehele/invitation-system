@@ -19,6 +19,7 @@ import Hero from "./Hero";
 import SaveTheDate from "./SaveTheDate";
 import CeremonyInfo from "./CeremonyInfo";
 import PhotoGallery from "./PhotoGallery";
+import GuestPhotoUpload from "./GuestPhotoUpload";
 import ReceptionInfo from "./ReceptionInfo";
 import VenueCard from "./VenueCard";
 import TransportInfo from "./TransportInfo";
@@ -188,6 +189,7 @@ function MinimalismBrownBody({
               slot="image2"
             />
             <PhotoGallery invitation={invitation} theme={theme} />
+            <GuestPhotoUpload invitation={invitation} theme={theme} />
             <ReceptionInfo invitation={invitation} theme={theme} />
             <div style={{ paddingInline: t.gutter }}>
               {mbVenues(invitation).map((venue, i) => (

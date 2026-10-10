@@ -18,6 +18,8 @@ import {
   mbBlessingLine,
   mbCalendarDetail,
   mbTransport,
+  mbWebLink,
+  mbGuestPhotoUpload,
 } from "../lib/minimalism-brown";
 
 const theme = {
@@ -447,5 +449,71 @@ describe("mbTransport", () => {
     expect(width("full")).toBe("100%");
     expect(width(undefined)).toBe("70%");
     expect(width("huge")).toBe("70%");
+  });
+});
+
+describe("mbWebLink", () => {
+  it("keeps a full web link as typed", () => {
+    expect(mbWebLink(" https://photos.app.goo.gl/abc123 ")).toBe(
+      "https://photos.app.goo.gl/abc123",
+    );
+    expect(mbWebLink("http://example.com/album?x=1")).toBe(
+      "http://example.com/album?x=1",
+    );
+  });
+
+  it("adds https to a link typed without it", () => {
+    expect(mbWebLink("photos.app.goo.gl/abc123")).toBe(
+      "https://photos.app.goo.gl/abc123",
+    );
+  });
+
+  it("is null for anything that is not a web link", () => {
+    expect(mbWebLink("javascript:alert(1)")).toBeNull();
+    expect(mbWebLink("mailto:ana@example.com")).toBeNull();
+    expect(mbWebLink("as minhas fotos")).toBeNull();
+    expect(mbWebLink("fotos")).toBeNull();
+    expect(mbWebLink("  ")).toBeNull();
+    expect(mbWebLink(undefined)).toBeNull();
+  });
+});
+
+describe("mbGuestPhotoUpload", () => {
+  const upload = {
+    enabled: true,
+    url: "photos.app.goo.gl/abc123",
+    text: " Partilhem connosco as vossas fotos!\nObrigado. ",
+  };
+
+  it("returns the cleaned link and trimmed text when it is on", () => {
+    expect(mbGuestPhotoUpload({ guestPhotoUpload: upload })).toEqual({
+      href: "https://photos.app.goo.gl/abc123",
+      text: "Partilhem connosco as vossas fotos!\nObrigado.",
+    });
+  });
+
+  it("is null when it is off or unset", () => {
+    expect(
+      mbGuestPhotoUpload({ guestPhotoUpload: { ...upload, enabled: false } }),
+    ).toBeNull();
+    expect(mbGuestPhotoUpload({ guestPhotoUpload: undefined })).toBeNull();
+    expect(mbGuestPhotoUpload({})).toBeNull();
+  });
+
+  it("is null without a usable link, so no dead button is published", () => {
+    expect(
+      mbGuestPhotoUpload({ guestPhotoUpload: { ...upload, url: " " } }),
+    ).toBeNull();
+    expect(
+      mbGuestPhotoUpload({
+        guestPhotoUpload: { ...upload, url: "javascript:alert(1)" },
+      }),
+    ).toBeNull();
+  });
+
+  it("shows the button alone when there is no text", () => {
+    expect(
+      mbGuestPhotoUpload({ guestPhotoUpload: { ...upload, text: "" } }),
+    ).toEqual({ href: "https://photos.app.goo.gl/abc123", text: "" });
   });
 });

@@ -294,6 +294,9 @@ export async function PUT(
         ...(body.transportInfo !== undefined && {
           transportInfo: sanitizeJsonField(body.transportInfo, null),
         }),
+        ...(body.guestPhotoUpload !== undefined && {
+          guestPhotoUpload: sanitizeJsonField(body.guestPhotoUpload, null),
+        }),
         ...(body.scratchReveal !== undefined && {
           scratchReveal: sanitizeJsonField(body.scratchReveal, null),
         }),

@@ -89,6 +89,7 @@ export function buildInvitationCreateData(
     parents: sanitizeJsonField(body.parents, null),
     ourStory: sanitizeJsonField(body.ourStory, null),
     transportInfo: sanitizeJsonField(body.transportInfo, null),
+    guestPhotoUpload: sanitizeJsonField(body.guestPhotoUpload, null),
     scratchReveal: sanitizeJsonField(body.scratchReveal, null),
     heroConfetti: sanitizeJsonField(body.heroConfetti, null),
     countdown: sanitizeJsonField(body.countdown, null),

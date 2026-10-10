@@ -626,6 +626,16 @@ export interface TransportInfo {
   description: string;
 }
 
+/** Text + link button, under the gallery, for guests to send their photos. */
+export interface GuestPhotoUpload {
+  /** Whether to show the block. */
+  enabled: boolean;
+  /** The platform guests upload to (shared album, drive folder…). */
+  url: string;
+  /** Free text above the button; line breaks are kept. Blank hides it. */
+  text: string;
+}
+
 export interface ParentsInfo {
   /** Whether to show the parents mode in the hero section. */
   enabled: boolean;
@@ -891,6 +901,9 @@ export interface TextStyleOverrides {
     /** The transport section's description — its own key, so styling it
      *  leaves the other body copy alone. */
     mbTransportText?: TextStyle;
+    /** The photo-sharing block under the gallery: its text and its button. */
+    mbPhotoShareText?: TextStyle;
+    mbPhotoShareButton?: TextStyle;
     mbCalendarMonth?: TextStyle;
     mbCalendarWeekday?: TextStyle;
     mbCalendarDay?: TextStyle;
@@ -1148,6 +1161,8 @@ export interface CustomTexts {
   mb_calendarDetail?: string;
   mb_sendWishes?: string;
   mb_giftTapToOpen?: string;
+  /** Label of the button that takes guests to the photo-sharing platform. */
+  mb_sendPhotos?: string;
   /** Shown under the RSVP message field when the guestbook publishes it. */
   rsvp_messagePublicNote?: string;
 
@@ -1329,6 +1344,7 @@ export interface InvitationTranslationOverlay {
   parents?: { blessingMessage?: string; inviteMessage?: string };
   ourStory?: { title?: string; description?: string };
   transportInfo?: { title?: string; description?: string };
+  guestPhotoUpload?: { text?: string };
   /**
    * Per-locale Canva URL. Empty or missing means "inherit the Portuguese
    * link" — which is why the merge uses `||` rather than `??`.
@@ -1564,6 +1580,8 @@ export interface InvitationData {
   ourStory?: OurStory;
   /** Optional transport section (image, title, description). Minimalism-brown only. */
   transportInfo?: TransportInfo;
+  /** Optional link for guests to send their photos. Minimalism-brown only. */
+  guestPhotoUpload?: GuestPhotoUpload;
   /** Toggles and styles the ScratchDateReveal section on external_link invitation pages. */
   scratchReveal?: ScratchRevealConfig;
   /** Toggles the curtain-canva hero celebration confetti. Unset → fires (default on); only `{ enabled: false }` disables it. */

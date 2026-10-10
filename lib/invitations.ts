@@ -94,6 +94,7 @@ type InvitationWithTheme = {
   parents: unknown;
   ourStory: unknown;
   transportInfo: unknown;
+  guestPhotoUpload: unknown;
   scratchReveal: unknown;
   heroConfetti: unknown;
   countdown: unknown;
@@ -190,6 +191,9 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
     transportInfo:
       (row.transportInfo as InvitationData["transportInfo"] | null) ?? undefined,
+    guestPhotoUpload:
+      (row.guestPhotoUpload as InvitationData["guestPhotoUpload"] | null) ??
+      undefined,
     scratchReveal:
       (row.scratchReveal as InvitationData["scratchReveal"] | null) ??
       undefined,

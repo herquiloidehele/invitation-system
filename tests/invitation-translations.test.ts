@@ -839,3 +839,81 @@ describe("transport section translations", () => {
     });
   });
 });
+
+describe("guest photo upload translations", () => {
+  const guestPhotoUpload = {
+    enabled: true,
+    url: "https://photos.app.goo.gl/abc123",
+    text: "Partilhem as vossas fotos",
+  };
+
+  it("keeps only the translated text when sanitizing", () => {
+    expect(
+      sanitizeInvitationTranslations({
+        en: {
+          guestPhotoUpload: {
+            text: "Share your photos",
+            url: "https://evil.example.com",
+          },
+        },
+      }),
+    ).toEqual({ en: { guestPhotoUpload: { text: "Share your photos" } } });
+  });
+
+  it("shows the translated text and keeps the link shared", () => {
+    const source = duplicateForm({
+      guestPhotoUpload,
+      translations: { en: { guestPhotoUpload: { text: "Share your photos" } } },
+    });
+
+    expect(localizeInvitation(source, "en").guestPhotoUpload).toEqual({
+      ...guestPhotoUpload,
+      text: "Share your photos",
+    });
+    expect(localizeInvitation(source, "it").guestPhotoUpload).toEqual(
+      guestPhotoUpload,
+    );
+  });
+
+  it("round-trips a draft without touching the Portuguese text", () => {
+    const source = duplicateForm({ guestPhotoUpload });
+    const draft = buildInvitationTranslationDraft(source, "it");
+    expect(draft.guestPhotoUpload).toEqual({ ...guestPhotoUpload, text: "" });
+    draft.guestPhotoUpload = {
+      ...draft.guestPhotoUpload!,
+      text: "Condividete le vostre foto",
+      url: "https://example.com/album",
+    };
+
+    const saved = applyInvitationTranslationDraft(source, "it", draft);
+
+    expect(saved.guestPhotoUpload).toEqual({
+      ...guestPhotoUpload,
+      url: "https://example.com/album",
+    });
+    expect(saved.translations?.it).toMatchObject({
+      guestPhotoUpload: { text: "Condividete le vostre foto" },
+    });
+  });
+
+  it("creates the block when it is first switched on while translating", () => {
+    const source = duplicateForm({ guestPhotoUpload: undefined });
+    const draft = buildInvitationTranslationDraft(source, "en");
+    draft.guestPhotoUpload = {
+      enabled: true,
+      url: guestPhotoUpload.url,
+      text: "Share your photos",
+    };
+
+    const saved = applyInvitationTranslationDraft(source, "en", draft);
+
+    expect(saved.guestPhotoUpload).toEqual({
+      enabled: true,
+      url: guestPhotoUpload.url,
+      text: "",
+    });
+    expect(saved.translations?.en).toMatchObject({
+      guestPhotoUpload: { text: "Share your photos" },
+    });
+  });
+});

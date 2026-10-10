@@ -34,6 +34,7 @@ describe("buildInvitationCreateData", () => {
     expect(data.rsvpPage).toEqual({ base: "theme", layout: "editorial" });
     expect(data.giftRegistry).toEqual(body.giftRegistry);
     expect(data.transportInfo).toEqual(body.transportInfo);
+    expect(data.guestPhotoUpload).toEqual(body.guestPhotoUpload);
     expect(data.cardStyles).toEqual(body.cardStyles);
     expect(data.guestManagementEnabled).toBe(true);
     expect(data.ownerCanAddGuests).toBe(true);
