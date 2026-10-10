@@ -11,6 +11,7 @@ import {
   type LandingCustomizationLevel,
 } from "@/lib/landing-customization";
 import { localizeLandingMetadata } from "@/lib/landing-translations";
+import { LANDING_FEATURE_ORDER_BY } from "@/lib/landing-feature-order";
 import { isLandingFeatureNew } from "@/lib/landing-new-badge";
 import { DEFAULT_LOCALE, type AppLocale } from "@/i18n/locales";
 import { buildLandingProductDetailsPath } from "@/lib/landing-product-details";
@@ -199,7 +200,7 @@ export async function getGalleryFeaturesByCategory(
 ): Promise<Record<GalleryCategory, GalleryFeature[]>> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "gallery", enabled: true },
-    orderBy: { position: "asc" },
+    orderBy: LANDING_FEATURE_ORDER_BY,
     include: landingFeatureInclude,
   });
 
@@ -353,7 +354,7 @@ export async function getBestSellerFeatures(
 ): Promise<BestSellerFeature[]> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "best_seller", enabled: true },
-    orderBy: { position: "asc" },
+    orderBy: LANDING_FEATURE_ORDER_BY,
     include: landingFeatureInclude,
   });
 
@@ -365,7 +366,7 @@ export async function getBestSellerFeatures(
 export async function getLiveDemoFeatures(): Promise<LiveDemoFeature[]> {
   const rows = await prisma.landingFeature.findMany({
     where: { section: "live_demo", enabled: true },
-    orderBy: { position: "asc" },
+    orderBy: LANDING_FEATURE_ORDER_BY,
     include: landingFeatureInclude,
   });
 

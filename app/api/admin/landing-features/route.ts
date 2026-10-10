@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { LANDING_FEATURE_ORDER_BY } from "@/lib/landing-feature-order";
 import { landingFeatureInclude } from "@/lib/landing-features";
 import { parseNewUntilInput } from "@/lib/landing-new-badge";
 
@@ -14,7 +15,7 @@ const CATEGORIES = new Set([
 
 export async function GET() {
   const rows = await prisma.landingFeature.findMany({
-    orderBy: [{ section: "asc" }, { position: "asc" }],
+    orderBy: [{ section: "asc" }, ...LANDING_FEATURE_ORDER_BY],
     include: landingFeatureInclude,
   });
   return NextResponse.json(rows);
@@ -67,11 +68,21 @@ export async function POST(req: NextRequest) {
     await prisma.landingFeature.deleteMany({ where: { section: "hero" } });
   }
 
+  // New rows go to the end of their section unless a position is given.
+  let nextPosition = position;
+  if (typeof nextPosition !== "number") {
+    const last = await prisma.landingFeature.aggregate({
+      where: { section },
+      _max: { position: true },
+    });
+    nextPosition = (last._max.position ?? -1) + 1;
+  }
+
   const row = await prisma.landingFeature.create({
     data: {
       section,
       galleryCategory: section === "gallery" ? (galleryCategory ?? null) : null,
-      position: typeof position === "number" ? position : 0,
+      position: nextPosition,
       enabled: enabled !== false,
       invitationId: invitationId ?? null,
       saveTheDateId: saveTheDateId ?? null,

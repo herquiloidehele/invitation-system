@@ -35,6 +35,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LandingFeatureListEditor } from "@/components/admin/LandingFeatureListEditor";
 import type { LandingCustomizationLevel } from "@/lib/landing-customization";
 import {
+  compareLandingFeatureOrder,
+  moveLandingFeatureId,
+} from "@/lib/landing-feature-order";
+import {
   defaultNewUntil,
   fromNewUntilDateInput,
   isLandingFeatureNew,
@@ -70,6 +74,7 @@ type FeatureRow = {
   section: "hero" | "gallery" | "live_demo" | "best_seller";
   galleryCategory: string | null;
   position: number;
+  createdAt: string;
   enabled: boolean;
   newUntil: string | null;
   invitationId: string | null;
@@ -194,7 +199,6 @@ export function LandingPageClient() {
           galleryCategory: input.galleryCategory ?? null,
           invitationId: pickable.kind === "invitation" ? pickable.id : null,
           saveTheDateId: pickable.kind === "save_the_date" ? pickable.id : null,
-          position: features.filter((f) => f.section === input.section).length,
         }),
       });
       if (!res.ok) {
@@ -226,15 +230,21 @@ export function LandingPageClient() {
     }
   }
 
-  async function move(id: string, delta: number) {
-    const row = features.find((f) => f.id === id);
-    if (!row) return;
+  // `rows` is the list as displayed; the row swaps places with its neighbour
+  // and the whole list is saved, so positions never collide.
+  async function move(rows: FeatureRow[], id: string, delta: -1 | 1) {
+    const ids = moveLandingFeatureId(
+      rows.map((row) => row.id),
+      id,
+      delta,
+    );
+    if (!ids) return;
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/landing-features/${id}`, {
-        method: "PATCH",
+      const res = await fetch("/api/admin/landing-features/reorder", {
+        method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ position: row.position + delta }),
+        body: JSON.stringify({ ids }),
       });
       if (!res.ok) throw new Error("Erro a reordenar");
       await refresh();
@@ -297,14 +307,14 @@ export function LandingPageClient() {
     () =>
       features
         .filter((row) => row.section === "live_demo")
-        .sort((a, b) => a.position - b.position),
+        .sort(compareLandingFeatureOrder),
     [features],
   );
   const bestSellers = useMemo(
     () =>
       features
         .filter((row) => row.section === "best_seller")
-        .sort((a, b) => a.position - b.position),
+        .sort(compareLandingFeatureOrder),
     [features],
   );
   const galleryRows = useMemo(
@@ -472,8 +482,8 @@ export function LandingPageClient() {
                 busy={busy}
                 canMoveUp={index > 0}
                 canMoveDown={index < bestSellers.length - 1}
-                onMoveUp={() => move(row.id, -1)}
-                onMoveDown={() => move(row.id, 1)}
+                onMoveUp={() => move(bestSellers, row.id, -1)}
+                onMoveDown={() => move(bestSellers, row.id, 1)}
                 onNewUntilChange={(value) => setNewUntil(row.id, value)}
                 onRemove={() => deleteFeature(row.id)}
               />
@@ -518,8 +528,8 @@ export function LandingPageClient() {
                 busy={busy}
                 canMoveUp={index > 0}
                 canMoveDown={index < liveDemo.length - 1}
-                onMoveUp={() => move(row.id, -1)}
-                onMoveDown={() => move(row.id, 1)}
+                onMoveUp={() => move(liveDemo, row.id, -1)}
+                onMoveDown={() => move(liveDemo, row.id, 1)}
                 onRemove={() => deleteFeature(row.id)}
               />
             ))
@@ -623,7 +633,7 @@ function GalleryAdminGroup({
   busy: boolean;
   onFeaturesChange: (next: string[]) => Promise<void>;
   onAdd: (category: GalleryCategoryKey, pickableId: string) => void;
-  onMove: (id: string, delta: number) => void;
+  onMove: (rows: FeatureRow[], id: string, delta: -1 | 1) => void;
   onNewUntilChange: (id: string, newUntil: string | null) => void;
   onRemove: (id: string) => void;
 }) {
@@ -631,7 +641,7 @@ function GalleryAdminGroup({
     ...category,
     rows: rows
       .filter((row) => row.galleryCategory === category.value)
-      .sort((a, b) => a.position - b.position),
+      .sort(compareLandingFeatureOrder),
   }));
 
   return (
@@ -666,8 +676,8 @@ function GalleryAdminGroup({
                   busy={busy}
                   canMoveUp={index > 0}
                   canMoveDown={index < category.rows.length - 1}
-                  onMoveUp={() => onMove(row.id, -1)}
-                  onMoveDown={() => onMove(row.id, 1)}
+                  onMoveUp={() => onMove(category.rows, row.id, -1)}
+                  onMoveDown={() => onMove(category.rows, row.id, 1)}
                   onNewUntilChange={(value) => onNewUntilChange(row.id, value)}
                   onRemove={() => onRemove(row.id)}
                 />
