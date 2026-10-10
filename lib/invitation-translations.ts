@@ -36,7 +36,9 @@ type TranslationIdFields = Partial<
   Pick<InvitationData, "schedule" | "faqs" | "dressCode" | "coupleGallery">
 >;
 
-const TRANSLATION_LOCALES = ["en", "es"] as const;
+const TRANSLATION_LOCALES = SUPPORTED_LOCALES.filter(
+  (locale): locale is TranslationLocale => locale !== DEFAULT_LOCALE,
+);
 
 const CUSTOM_TEXT_KEYS = new Set<keyof CustomTexts>(
   CUSTOM_TEXT_GROUPS.flatMap((group) => group.fields.map((field) => field.key)),
@@ -1172,7 +1174,7 @@ export function shouldShowInvitationLanguageSwitcher(
 export function isTranslationLocale(
   locale: AppLocale,
 ): locale is TranslationLocale {
-  return locale === "en" || locale === "es";
+  return locale !== DEFAULT_LOCALE;
 }
 
 export function sanitizeInvitationTranslations(

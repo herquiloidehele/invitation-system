@@ -163,7 +163,7 @@ model Invitation {
   customTexts             Json? // CustomTexts — per-invitation UI text overrides (section titles, buttons, RSVP labels, etc.)
   languageSwitcherEnabled Boolean  @default(false)
   enabledLocales          String[] @default(["pt"])
-  translations            Json? // Sparse English/Spanish invitation text overlays
+  translations            Json? // Sparse per-locale invitation text overlays (every locale except pt)
   eventType               String   @default("wedding") // "wedding" | "anniversary" | "baptism" | "engagement" | "other"
   invitationType          String   @default("standard") // "standard" | "external_video" | "external_link"
   externalLink            String? // URL for the external link / iframe (external_link type)

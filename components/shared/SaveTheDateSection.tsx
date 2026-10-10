@@ -296,7 +296,6 @@ function SaveTheDateCountdown({
   plain,
   imageSettings,
   customTexts: ct,
-  isPreview,
 }: SaveTheDateProps) {
   const t = useCustomText(ct);
   const locale = useLocale();
@@ -353,10 +352,9 @@ function SaveTheDateCountdown({
         padding: "32px 24px",
       }}
     >
-      <SaveLabel ts={ts} customTexts={ct} isPreview={isPreview} />
-
-      {/* Date context */}
-      <span className="mt-3" style={ts.countdownDate}>
+      {/* Date context — this style opens on the date, with no "Save the Date"
+          eyebrow above it. */}
+      <span style={ts.countdownDate}>
         <EditableText elementKey="countdownDate">
           {invitation.date.day} · {monthDisplay} ·{" "}
           {invitation.date.year}

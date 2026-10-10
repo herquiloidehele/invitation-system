@@ -22,6 +22,22 @@ describe("invitation language settings", () => {
     expect(normalizeInvitationLocales(undefined)).toEqual(["pt"]);
   });
 
+  it("keeps Italian as a selectable locale, ordered after Spanish", () => {
+    expect(normalizeInvitationLocales(["it", "pt"])).toEqual(["pt", "it"]);
+    expect(normalizeInvitationLocales(["it", "es", "en"])).toEqual([
+      "pt",
+      "en",
+      "es",
+      "it",
+    ]);
+    expect(
+      getEffectiveInvitationLocales({
+        languageSwitcherEnabled: true,
+        enabledLocales: ["pt", "it"],
+      }),
+    ).toEqual(["pt", "it"]);
+  });
+
   it("makes an invitation multilingual only when enabled with another locale", () => {
     expect(
       getEffectiveInvitationLocales({
@@ -70,6 +86,71 @@ describe("invitation language settings", () => {
         schedule: { ceremony: { label: "Ceremony" } },
       },
     });
+  });
+});
+
+describe("Italian translations", () => {
+  it("keeps the Italian overlay when sanitizing", () => {
+    expect(
+      sanitizeInvitationTranslations({
+        it: { quote: "Per sempre", unknown: "drop" },
+        fr: { quote: "Non" },
+      }),
+    ).toEqual({ it: { quote: "Per sempre" } });
+  });
+
+  it("shows Italian text to an Italian guest and Portuguese where none exists", () => {
+    const source = duplicateForm({
+      invitationType: "standard",
+      languageSwitcherEnabled: true,
+      enabledLocales: ["pt", "it"],
+      quote: "Para sempre",
+      schedule: [
+        { id: "ceremony", time: "15:00", label: "Cerimónia", venue: "Capela" },
+      ],
+      translations: {
+        it: { schedule: { ceremony: { label: "Cerimonia" } } },
+      },
+    });
+
+    const localized = localizeInvitation(source, "it");
+
+    expect(localized.schedule[0]).toMatchObject({
+      time: "15:00",
+      label: "Cerimonia",
+      venue: "Capela",
+    });
+    expect(localized.quote).toBe("Para sempre");
+  });
+
+  it("saves an Italian draft beside the other languages without touching Portuguese", () => {
+    const source = duplicateForm({
+      quote: "Para sempre",
+      translations: { en: { quote: "Forever" } },
+    });
+    const draft = buildInvitationTranslationDraft(source, "it");
+    expect(draft.quote).toBe("");
+    draft.quote = "Per sempre";
+
+    const saved = applyInvitationTranslationDraft(source, "it", draft);
+
+    expect(saved.quote).toBe("Para sempre");
+    expect(saved.translations).toEqual({
+      en: { quote: "Forever" },
+      it: { quote: "Per sempre" },
+    });
+  });
+
+  it("offers the switcher for a Portuguese and Italian invitation", () => {
+    expect(
+      shouldShowInvitationLanguageSwitcher(
+        duplicateForm({
+          invitationType: "standard",
+          languageSwitcherEnabled: true,
+          enabledLocales: ["pt", "it"],
+        }),
+      ),
+    ).toBe(true);
   });
 });
 

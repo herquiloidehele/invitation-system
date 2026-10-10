@@ -23,6 +23,32 @@ describe("invitation language persistence", () => {
     expect(data.translations).toEqual({ en: { quote: "Forever" } });
   });
 
+  it("persists an Italian invitation and reloads it for editing", () => {
+    const body = duplicateForm({
+      invitationType: "standard",
+      languageSwitcherEnabled: true,
+      enabledLocales: ["it", "pt"],
+      translations: { it: { quote: "Per sempre" } },
+    });
+
+    const data = buildInvitationCreateData(body, "theme-copy");
+
+    expect(data.enabledLocales).toEqual(["pt", "it"]);
+    expect(data.translations).toEqual({ it: { quote: "Per sempre" } });
+
+    const initial = toAdminInvitationInitialData({
+      ...sourceInvitationRow,
+      languageSwitcherEnabled: true,
+      enabledLocales: ["pt", "it"],
+      translations: { it: { quote: "Per sempre" } },
+    });
+
+    expect(initial).toMatchObject({
+      enabledLocales: ["pt", "it"],
+      translations: { it: { quote: "Per sempre" } },
+    });
+  });
+
   it("hydrates settings and translations for editing and duplication", () => {
     const initial = toAdminInvitationInitialData({
       ...sourceInvitationRow,

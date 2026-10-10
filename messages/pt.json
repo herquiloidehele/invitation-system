@@ -2,7 +2,8 @@
   "Locale": {
     "pt": "Português",
     "en": "English",
-    "es": "Español"
+    "es": "Español",
+    "it": "Italiano"
   },
   "LocaleCurrencyMenu": {
     "menuAriaLabel": "Idioma e moeda",
@@ -206,7 +207,7 @@
     "guestsTitle": "Gestão de convidados",
     "guestsText": "Mesa e acompanhantes organizados. Link pessoal disponível nos modelos com personalização de nome incluída.",
     "languagesTitle": "Multi-idioma",
-    "languagesText": "Português, inglês e espanhol para receber todos bem.",
+    "languagesText": "Português, inglês, espanhol e italiano para receber todos bem.",
     "customTitle": "Personalização total",
     "customText": "Tipografia, cores e fotografias escolhidas para o vosso dia.",
     "personalizationTitle": "Personalização do nome do convidado",
@@ -345,7 +346,7 @@
     "contact": "Contacto",
     "description": "Convites digitais pessoais, elegantes e feitos com cuidado.",
     "copyright": "© 2026 Brindeal Studio · Feito com cuidado",
-    "languages": "Português · English · Español"
+    "languages": "Português · English · Español · Italiano"
   },
   "Whatsapp": {
     "name": "Nome",

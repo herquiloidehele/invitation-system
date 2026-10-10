@@ -13,19 +13,21 @@ import { buildLanguageAlternates } from "@/lib/seo";
 describe("i18n locale helpers", () => {
   it("declares Portuguese as the default locale", () => {
     expect(DEFAULT_LOCALE).toBe("pt");
-    expect(SUPPORTED_LOCALES).toEqual(["pt", "en", "es"]);
+    expect(SUPPORTED_LOCALES).toEqual(["pt", "en", "es", "it"]);
   });
 
   it("validates supported locale strings", () => {
     expect(isSupportedLocale("pt")).toBe(true);
     expect(isSupportedLocale("en")).toBe(true);
     expect(isSupportedLocale("es")).toBe(true);
+    expect(isSupportedLocale("it")).toBe(true);
     expect(isSupportedLocale("fr")).toBe(false);
     expect(isSupportedLocale(undefined)).toBe(false);
   });
 
   it("falls back to Portuguese for unknown locales", () => {
     expect(resolveLocale("en")).toBe("en");
+    expect(resolveLocale("it")).toBe("it");
     expect(resolveLocale("fr")).toBe("pt");
     expect(resolveLocale(undefined)).toBe("pt");
   });
@@ -34,6 +36,7 @@ describe("i18n locale helpers", () => {
     expect(getDateFormatLocale("pt")).toBe("pt-PT");
     expect(getDateFormatLocale("en")).toBe("en-US");
     expect(getDateFormatLocale("es")).toBe("es-ES");
+    expect(getDateFormatLocale("it")).toBe("it-IT");
   });
 
   it("builds locale hrefs without duplicating locale prefixes", () => {
@@ -44,6 +47,9 @@ describe("i18n locale helpers", () => {
     expect(buildLocaleHref("/es/demo", "en")).toBe("/en/demo");
     expect(buildLocaleHref("/en/s/demo", "es")).toBe("/es/s/demo");
     expect(buildLocaleHref("/en/s/demo?x=1", "pt")).toBe("/s/demo?x=1");
+    expect(buildLocaleHref("/", "it")).toBe("/it");
+    expect(buildLocaleHref("/it/demo", "pt")).toBe("/demo");
+    expect(buildLocaleHref("/it/demo", "en")).toBe("/en/demo");
     expect(buildLocaleHref("/confirmar/demo#rsvp", "es")).toBe(
       "/es/confirmar/demo#rsvp",
     );
@@ -56,6 +62,16 @@ describe("i18n locale helpers", () => {
       pt: "https://example.com/ana-joao",
       en: "https://example.com/en/ana-joao",
       "x-default": "https://example.com/ana-joao",
+    });
+  });
+
+  it("advertises every supported locale when no subset is given", () => {
+    expect(buildLanguageAlternates("https://example.com", "/")).toEqual({
+      pt: "https://example.com",
+      en: "https://example.com/en",
+      es: "https://example.com/es",
+      it: "https://example.com/it",
+      "x-default": "https://example.com",
     });
   });
 });

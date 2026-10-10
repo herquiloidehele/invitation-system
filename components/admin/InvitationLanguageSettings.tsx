@@ -22,6 +22,7 @@ const LOCALES: Array<{
   { locale: "pt", label: "Português", detail: "Idioma principal" },
   { locale: "en", label: "English", detail: "Inglês" },
   { locale: "es", label: "Español", detail: "Espanhol" },
+  { locale: "it", label: "Italiano", detail: "Italiano" },
 ];
 
 export function InvitationLanguageSettings({
@@ -65,7 +66,7 @@ export function InvitationLanguageSettings({
         />
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-2">
         {LOCALES.map(({ locale, label, detail }) => {
           const locked = locale === "pt";
           return (

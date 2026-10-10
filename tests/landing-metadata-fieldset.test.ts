@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("landing metadata translation editor", () => {
-  it("edits all landing strings in Portuguese, English, and Spanish", () => {
+  it("edits all landing strings in every supported locale", () => {
     const source = readFileSync(
       "components/admin/LandingMetadataFieldset.tsx",
       "utf8",
@@ -12,7 +12,8 @@ describe("landing metadata translation editor", () => {
     expect(source).toContain("landingTranslations: LandingTranslations | null");
     expect(source).toContain("buildLandingTranslationDraft");
     expect(source).toContain("applyLandingTranslationDraft");
-    expect(source).toContain('["pt", "en", "es"]');
+    expect(source).toContain("SUPPORTED_LOCALES.map");
+    expect(source).not.toContain('["pt", "en", "es"]');
     expect(source).toContain("Nome do modelo");
     expect(source).toContain("Subtítulo");
     expect(source).toContain("Descrição curta");
