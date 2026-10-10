@@ -91,7 +91,7 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
-    "viewDetails": "View details",
+    "viewDetails": "View Invitation",
     "buyCta": "Send Message",
     "newBadge": "New"
   },
@@ -106,7 +106,7 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "clickToPreview": "Click to preview",
-    "viewDetails": "View details",
+    "viewDetails": "View Invitation",
     "buyCta": "Send Message",
     "fullyCustomizable": {
       "title": "Fully customizable invitations",
@@ -397,6 +397,7 @@
     "saveTheDateEyebrow": "Save the Date",
     "requestViaWhatsapp": "Whatsapp",
     "viewLive": "View Invitation",
+    "tapToTry": "Click to Try",
     "viewDetails": "View details",
     "selectImage": "View image {position}",
     "openImage": "Enlarge image",

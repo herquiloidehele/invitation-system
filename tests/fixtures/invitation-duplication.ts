@@ -142,6 +142,13 @@ export const sourceInvitationRow = {
     groomsMother: "Mãe J",
   },
   ourStory: { enabled: true, title: "História", description: "Texto" },
+  transportInfo: {
+    enabled: true,
+    imageUrl: "https://cdn.example.com/bus.png",
+    imageSize: "small",
+    title: "Transporte",
+    description: "Autocarro às 14h",
+  },
   scratchReveal: { enabled: true },
   heroConfetti: { enabled: true },
   countdown: { enabled: true },

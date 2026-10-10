@@ -4,12 +4,7 @@ import type { MutableRefObject, RefObject } from "react";
 import type { InvitationData, TemplateTheme } from "@/lib/types";
 import { pageBackgroundStyle } from "@/lib/page-background";
 import type { Wish } from "@/lib/minimalism-brown";
-import {
-  mbStyle,
-  mbTokens,
-  mbVenues,
-  resolveMbHeroMode,
-} from "@/lib/minimalism-brown";
+import { mbStyle, mbTokens, mbVenues, resolveMbHeroMode } from "@/lib/minimalism-brown";
 import DynamicFontLoader from "@/components/shared/DynamicFontLoader";
 import ImageCanvas from "@/components/shared/ImageCanvas";
 import SectionImageHost from "@/components/shared/SectionImageHost";
@@ -17,7 +12,7 @@ import SectionImage from "@/components/shared/SectionImage";
 import InvitationHero from "@/components/shared/InvitationHero";
 import { SpacingStyleProvider } from "@/components/shared/SpacingStyleProvider";
 import { EditableText } from "@/components/shared/EditableText";
-import { PaperGround, LeafWatermark, Sprig } from "./Decor";
+import { LeafWatermark, PaperGround, Sprig } from "./Decor";
 import { MbKeyframes, MbMotionProvider, Reveal } from "./motion";
 import { useAutoScroll } from "@/components/shared/useAutoScroll";
 import Hero from "./Hero";
@@ -26,6 +21,7 @@ import CeremonyInfo from "./CeremonyInfo";
 import PhotoGallery from "./PhotoGallery";
 import ReceptionInfo from "./ReceptionInfo";
 import VenueCard from "./VenueCard";
+import TransportInfo from "./TransportInfo";
 import DressCode from "./DressCode";
 import Schedule from "./Schedule";
 import Guestbook from "./Guestbook";
@@ -180,9 +176,17 @@ function MinimalismBrownBody({
               />
             )}
             <SaveTheDate invitation={invitation} theme={theme} />
-            <MbSectionImage invitation={invitation} theme={theme} slot="image1" />
+            <MbSectionImage
+              invitation={invitation}
+              theme={theme}
+              slot="image1"
+            />
             <CeremonyInfo invitation={invitation} theme={theme} />
-            <MbSectionImage invitation={invitation} theme={theme} slot="image2" />
+            <MbSectionImage
+              invitation={invitation}
+              theme={theme}
+              slot="image2"
+            />
             <PhotoGallery invitation={invitation} theme={theme} />
             <ReceptionInfo invitation={invitation} theme={theme} />
             <div style={{ paddingInline: t.gutter }}>
@@ -196,11 +200,16 @@ function MinimalismBrownBody({
                 />
               ))}
             </div>
+            <TransportInfo invitation={invitation} theme={theme} />
             <div style={{ paddingInline: t.gutter }}>
               <DressCode invitation={invitation} theme={theme} />
             </div>
             <Schedule invitation={invitation} theme={theme} />
-            <MbSectionImage invitation={invitation} theme={theme} slot="image3" />
+            <MbSectionImage
+              invitation={invitation}
+              theme={theme}
+              slot="image3"
+            />
             <div style={{ paddingInline: t.gutter }}>
               <Guestbook
                 invitation={invitation}
@@ -212,7 +221,11 @@ function MinimalismBrownBody({
             <div style={{ paddingInline: t.gutter }}>
               <GiftBox invitation={invitation} theme={theme} />
             </div>
-            <MbSectionImage invitation={invitation} theme={theme} slot="image4" />
+            <MbSectionImage
+              invitation={invitation}
+              theme={theme}
+              slot="image4"
+            />
             <div style={{ paddingInline: t.gutter }}>
               <OptionalSections invitation={invitation} theme={theme} />
             </div>

@@ -24,6 +24,7 @@ export function ProductMediaGallery({
   images,
   previewHref,
   previewLabel,
+  previewChipLabel,
   selectImageLabel,
   openImageLabel,
   previousImageLabel,
@@ -36,6 +37,8 @@ export function ProductMediaGallery({
   /** Invitation page a slide opens on mobile (same tab). */
   previewHref: string;
   previewLabel: string;
+  /** Text of the mobile cue chip over the gallery. */
+  previewChipLabel: string;
   selectImageLabel: (position: number) => string;
   openImageLabel: string;
   previousImageLabel: string;
@@ -144,7 +147,7 @@ export function ProductMediaGallery({
             className="pointer-events-none absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-1.5 text-[12px] font-semibold text-foreground shadow-[0_6px_18px_color-mix(in_srgb,var(--foreground)_14%,transparent)] backdrop-blur-md lg:hidden"
           >
             <Eye className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            {previewLabel}
+            {previewChipLabel}
           </span>
         </div>
 

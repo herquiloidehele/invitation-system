@@ -36,8 +36,10 @@ import type {
   TemplateTheme,
   TextStyle,
   TextStyleOverrides,
+  TransportInfo,
 } from "@/lib/types";
 import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
+import { EMPTY_TRANSPORT_INFO } from "@/lib/minimalism-brown";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
 import {
   normalizeInvitationLocales,
@@ -106,6 +108,7 @@ import BankTransferEditor from "@/components/admin/BankTransferEditor";
 import ElegantFloralDressFields from "@/components/admin/ElegantFloralDressFields";
 import LocationPhotosEditor from "@/components/admin/LocationPhotosEditor";
 import GuestGuideFormSection from "@/components/admin/GuestGuideFormSection";
+import TransportFormSection from "@/components/admin/TransportFormSection";
 import PlacesFormSection from "@/components/admin/PlacesFormSection";
 import { RsvpCustomFieldsBuilder } from "@/components/admin/RsvpCustomFieldsBuilder";
 import { RsvpInputColorFields } from "@/components/admin/RsvpInputColorFields";
@@ -1010,6 +1013,17 @@ export default function InvitationForm({
     setForm((prev) => ({
       ...prev,
       guestbook: { ...(prev.guestbook ?? {}), enabled },
+    }));
+  }, []);
+
+  // Transport section (minimalism-brown). Unset until first edited.
+  const updateTransportInfo = useCallback((patch: Partial<TransportInfo>) => {
+    setForm((prev) => ({
+      ...prev,
+      transportInfo: {
+        ...(prev.transportInfo ?? EMPTY_TRANSPORT_INFO),
+        ...patch,
+      },
     }));
   }, []);
 
@@ -4234,6 +4248,16 @@ export default function InvitationForm({
                     onCheckedChange={updateGuestbookEnabled}
                   />
                 </div>
+              )}
+
+              {/* ── Transporte (minimalism-brown) ── */}
+              {isMinimalismBrown && (
+                <TransportFormSection
+                  value={form.transportInfo}
+                  sourceValue={sourceForm.transportInfo}
+                  sourcePlaceholder={sourcePlaceholder}
+                  onChange={updateTransportInfo}
+                />
               )}
 
               {/* ── Manual do Bom Convidado ── */}

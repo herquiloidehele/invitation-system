@@ -97,6 +97,7 @@ export function LandingProductDetailsPage({
             images={details.images}
             previewHref={details.previewHref}
             previewLabel={t("viewLive")}
+            previewChipLabel={t("tapToTry")}
             selectImageLabel={(position) => t("selectImage", { position })}
             openImageLabel={t("openImage")}
             previousImageLabel={t("previousImage")}

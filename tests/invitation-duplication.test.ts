@@ -56,6 +56,7 @@ describe("buildDuplicateInvitationInitialData", () => {
       "places",
       "parents",
       "ourStory",
+      "transportInfo",
       "scratchReveal",
       "heroConfetti",
       "countdown",

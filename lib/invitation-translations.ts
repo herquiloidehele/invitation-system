@@ -200,6 +200,15 @@ function sanitizeOurStory(value: unknown) {
   });
 }
 
+function sanitizeTransportInfo(value: unknown) {
+  const input = readObject(value);
+  if (!input) return undefined;
+  return compact({
+    title: readString(input.title),
+    description: readString(input.description),
+  });
+}
+
 function sanitizeCountdown(value: unknown) {
   const input = readObject(value);
   if (!input) return undefined;
@@ -300,6 +309,7 @@ function sanitizeOverlay(
     places: sanitizePlaces(input.places),
     parents: sanitizeParents(input.parents),
     ourStory: sanitizeOurStory(input.ourStory),
+    transportInfo: sanitizeTransportInfo(input.transportInfo),
     countdown: sanitizeCountdown(input.countdown),
     rsvpCustomFields: sanitizeRsvpCustomFields(input.rsvpCustomFields),
     customTexts: sanitizeCustomTexts(input.customTexts),
@@ -543,6 +553,20 @@ function transformOurStory(
   };
 }
 
+function transformTransportInfo(
+  source: InvitationData["transportInfo"],
+  overlay: InvitationTranslationOverlay["transportInfo"],
+  behavior: MissingTranslationBehavior,
+): InvitationData["transportInfo"] {
+  if (!source) return undefined;
+  return {
+    ...source,
+    title: overlay?.title ?? (behavior === "blank" ? "" : source.title),
+    description:
+      overlay?.description ?? (behavior === "blank" ? "" : source.description),
+  };
+}
+
 function transformCountdown(
   source: InvitationData["countdown"],
   overlay: InvitationTranslationOverlay["countdown"],
@@ -655,6 +679,11 @@ function transformInvitationText(
     places: transformPlaces(source.places, overlay?.places, behavior),
     parents: transformParents(source.parents, overlay?.parents, behavior),
     ourStory: transformOurStory(source.ourStory, overlay?.ourStory, behavior),
+    transportInfo: transformTransportInfo(
+      source.transportInfo,
+      overlay?.transportInfo,
+      behavior,
+    ),
     countdown: transformCountdown(
       source.countdown,
       overlay?.countdown,
@@ -964,6 +993,19 @@ function restorePortugueseText(
           description: source.ourStory.description,
         }
       : undefined,
+    // Unlike its neighbours this block has no seeded default, so a host can
+    // switch it on for the first time from a translation tab. Keep that
+    // toggle, with the Portuguese text still to be written.
+    transportInfo:
+      source.transportInfo || draft.transportInfo
+        ? {
+            enabled: false,
+            ...source.transportInfo,
+            ...draft.transportInfo,
+            title: source.transportInfo?.title ?? "",
+            description: source.transportInfo?.description ?? "",
+          }
+        : undefined,
     countdown: source.countdown
       ? {
           ...source.countdown,
@@ -1080,6 +1122,12 @@ function extractOverlay(draft: InvitationData): InvitationTranslationOverlay {
       ? {
           title: draft.ourStory.title,
           description: draft.ourStory.description,
+        }
+      : undefined,
+    transportInfo: draft.transportInfo
+      ? {
+          title: draft.transportInfo.title,
+          description: draft.transportInfo.description,
         }
       : undefined,
     countdown: draft.countdown

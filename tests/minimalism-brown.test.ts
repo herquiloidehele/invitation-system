@@ -17,6 +17,7 @@ import {
   mbParentsShown,
   mbBlessingLine,
   mbCalendarDetail,
+  mbTransport,
 } from "../lib/minimalism-brown";
 
 const theme = {
@@ -388,5 +389,63 @@ describe("mbCalendarDetail", () => {
     expect(mbCalendarDetail({ mb_calendarDetail: "  " })).toBeNull();
     expect(mbCalendarDetail({})).toBeNull();
     expect(mbCalendarDetail(undefined)).toBeNull();
+  });
+});
+
+describe("mbTransport", () => {
+  const info = {
+    enabled: true,
+    imageUrl: "https://cdn.example.com/bus.png",
+    imageSize: "small" as const,
+    title: " Transporte ",
+    description: " Autocarro às 14h\nRegresso às 02h ",
+  };
+
+  it("returns the trimmed block when the section is on", () => {
+    expect(mbTransport({ transportInfo: info })).toEqual({
+      imageUrl: "https://cdn.example.com/bus.png",
+      imageWidth: "40%",
+      title: "Transporte",
+      description: "Autocarro às 14h\nRegresso às 02h",
+    });
+  });
+
+  it("is null when the section is off or unset", () => {
+    expect(mbTransport({ transportInfo: { ...info, enabled: false } })).toBeNull();
+    expect(mbTransport({ transportInfo: undefined })).toBeNull();
+    expect(mbTransport({})).toBeNull();
+  });
+
+  it("is null when it is on but has nothing to show", () => {
+    expect(
+      mbTransport({
+        transportInfo: { enabled: true, imageUrl: " ", title: " ", description: "" },
+      }),
+    ).toBeNull();
+  });
+
+  it("shows with an image alone", () => {
+    expect(
+      mbTransport({
+        transportInfo: {
+          enabled: true,
+          imageUrl: "https://cdn.example.com/bus.png",
+          title: "",
+          description: "",
+        },
+      }),
+    ).toMatchObject({ imageUrl: "https://cdn.example.com/bus.png", title: "" });
+  });
+
+  it("sizes the image from the admin's choice, medium by default", () => {
+    const width = (imageSize?: unknown) =>
+      mbTransport({ transportInfo: { ...info, imageSize: imageSize as never } })
+        ?.imageWidth;
+
+    expect(width("small")).toBe("40%");
+    expect(width("medium")).toBe("70%");
+    expect(width("full")).toBe("100%");
+    expect(width(undefined)).toBe("70%");
+    expect(width("huge")).toBe("70%");
   });
 });

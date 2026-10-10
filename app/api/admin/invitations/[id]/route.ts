@@ -291,6 +291,9 @@ export async function PUT(
         ...(body.ourStory !== undefined && {
           ourStory: sanitizeJsonField(body.ourStory, null),
         }),
+        ...(body.transportInfo !== undefined && {
+          transportInfo: sanitizeJsonField(body.transportInfo, null),
+        }),
         ...(body.scratchReveal !== undefined && {
           scratchReveal: sanitizeJsonField(body.scratchReveal, null),
         }),

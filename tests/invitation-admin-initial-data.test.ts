@@ -53,6 +53,7 @@ const baseRow = {
   places: null,
   parents: null,
   ourStory: null,
+  transportInfo: null,
   scratchReveal: null,
   heroConfetti: null,
   countdown: null,
@@ -397,5 +398,24 @@ describe("toAdminInvitationInitialData — RSVP page style", () => {
 
   it("leaves legacy invitations without a style", () => {
     expect(toAdminInvitationInitialData(baseRow).rsvpPage).toBeUndefined();
+  });
+});
+
+describe("toAdminInvitationInitialData — transport section", () => {
+  it("hydrates the stored transport block", () => {
+    const transportInfo = {
+      enabled: true,
+      imageUrl: "https://cdn.example.com/bus.png",
+      imageSize: "full",
+      title: "Transporte",
+      description: "Autocarro às 14h",
+    };
+    const result = toAdminInvitationInitialData({ ...baseRow, transportInfo });
+
+    expect(result.transportInfo).toEqual(transportInfo);
+  });
+
+  it("leaves it unset on a row saved before the section existed", () => {
+    expect(toAdminInvitationInitialData(baseRow).transportInfo).toBeUndefined();
   });
 });

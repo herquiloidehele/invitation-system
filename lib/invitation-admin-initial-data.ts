@@ -86,6 +86,7 @@ type AdminInvitationInitialDataRow = {
   places: unknown;
   parents: unknown;
   ourStory: unknown;
+  transportInfo: unknown;
   scratchReveal: unknown;
   heroConfetti: unknown;
   countdown: unknown;
@@ -183,6 +184,9 @@ export function toAdminInvitationInitialData(
     places: (row.places as InvitationData["places"] | null) ?? undefined,
     parents: (row.parents as ParentsInfo | null) ?? undefined,
     ourStory: (row.ourStory as OurStory | null) ?? undefined,
+    transportInfo:
+      (row.transportInfo as InvitationData["transportInfo"] | null) ??
+      undefined,
     scratchReveal:
       (row.scratchReveal as InvitationData["scratchReveal"] | null) ??
       undefined,

@@ -9,6 +9,8 @@ import type {
   ParentsInfo,
   TemplateTheme,
   TextStyleOverrides,
+  TransportImageSize,
+  TransportInfo,
 } from "./types";
 import { applyOverride } from "./text-styles";
 import { isWeddingEventType } from "./invitation-event-types";
@@ -447,4 +449,56 @@ export function mbCalendarDetail(
   customTexts: Pick<CustomTexts, "mb_calendarDetail"> | null | undefined,
 ): string | null {
   return customTexts?.mb_calendarDetail?.trim() || null;
+}
+
+// ---------------------------------------------------------------------------
+// Transport
+// ---------------------------------------------------------------------------
+
+/** What the admin form starts from the first time the section is edited. */
+export const EMPTY_TRANSPORT_INFO: TransportInfo = {
+  enabled: false,
+  title: "Transporte",
+  description: "",
+};
+
+const TRANSPORT_IMAGE_WIDTHS: Record<TransportImageSize, string> = {
+  small: "40%",
+  medium: "70%",
+  full: "100%",
+};
+
+/** The transport section, ready to render. */
+export interface MbTransport {
+  imageUrl?: string;
+  /** CSS width of the image inside the card. */
+  imageWidth: string;
+  title: string;
+  description: string;
+}
+
+/**
+ * The transport block when it should show, else null. On but empty counts as
+ * hidden, so a host who flips the switch before filling it in doesn't publish
+ * a blank card.
+ */
+export function mbTransport(
+  invitation: Pick<InvitationData, "transportInfo">,
+): MbTransport | null {
+  const info = invitation.transportInfo;
+  if (!info?.enabled) return null;
+
+  const imageUrl = info.imageUrl?.trim() || undefined;
+  const title = info.title?.trim() ?? "";
+  const description = info.description?.trim() ?? "";
+  if (!imageUrl && !title && !description) return null;
+
+  return {
+    imageUrl,
+    imageWidth:
+      TRANSPORT_IMAGE_WIDTHS[info.imageSize ?? "medium"] ??
+      TRANSPORT_IMAGE_WIDTHS.medium,
+    title,
+    description,
+  };
 }

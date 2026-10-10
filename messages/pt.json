@@ -91,7 +91,7 @@
     "showMore": "Ver mais",
     "showLess": "Ver menos",
     "clickToPreview": "Clica para visualizar",
-    "viewDetails": "Ver detalhes",
+    "viewDetails": "Ver Convite",
     "buyCta": "Enviar Mensagem",
     "newBadge": "Novo"
   },
@@ -106,7 +106,7 @@
     "showMore": "Ver mais",
     "showLess": "Ver menos",
     "clickToPreview": "Clica para visualizar",
-    "viewDetails": "Ver detalhes",
+    "viewDetails": "Ver Convite",
     "buyCta": "Enviar Mensagem",
     "fullyCustomizable": {
       "title": "Convites totalmente personalizáveis",
@@ -397,6 +397,7 @@
     "saveTheDateEyebrow": "Save the Date",
     "requestViaWhatsapp": "Whatsapp",
     "viewLive": "Ver Convite",
+    "tapToTry": "Clica para Testar",
     "viewDetails": "Ver detalhes",
     "selectImage": "Ver imagem {position}",
     "openImage": "Ampliar imagem",

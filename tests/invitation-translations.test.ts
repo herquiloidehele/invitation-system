@@ -752,3 +752,90 @@ describe("invitation translation drafts", () => {
     });
   });
 });
+
+describe("transport section translations", () => {
+  const transportInfo = {
+    enabled: true,
+    imageUrl: "https://cdn.example.com/bus.png",
+    imageSize: "small" as const,
+    title: "Transporte",
+    description: "Autocarro às 14h",
+  };
+
+  it("keeps the translated title and description when sanitizing", () => {
+    expect(
+      sanitizeInvitationTranslations({
+        en: {
+          transportInfo: {
+            title: "Transport",
+            description: "Bus at 2pm",
+            imageUrl: "https://evil.example.com/x.png",
+          },
+        },
+      }),
+    ).toEqual({
+      en: { transportInfo: { title: "Transport", description: "Bus at 2pm" } },
+    });
+  });
+
+  it("shows the translated text and keeps the image shared", () => {
+    const source = duplicateForm({
+      transportInfo,
+      translations: {
+        en: { transportInfo: { title: "Transport" } },
+      },
+    });
+
+    expect(localizeInvitation(source, "en").transportInfo).toEqual({
+      ...transportInfo,
+      title: "Transport",
+      description: "Autocarro às 14h",
+    });
+  });
+
+  it("round-trips a draft without touching the Portuguese text", () => {
+    const source = duplicateForm({ transportInfo });
+    const draft = buildInvitationTranslationDraft(source, "it");
+    expect(draft.transportInfo).toMatchObject({
+      title: "",
+      description: "",
+      imageUrl: transportInfo.imageUrl,
+    });
+    draft.transportInfo = {
+      ...draft.transportInfo!,
+      title: "Trasporto",
+      description: "Autobus alle 14",
+      imageSize: "full",
+    };
+
+    const saved = applyInvitationTranslationDraft(source, "it", draft);
+
+    expect(saved.transportInfo).toEqual({ ...transportInfo, imageSize: "full" });
+    expect(saved.translations?.it).toMatchObject({
+      transportInfo: { title: "Trasporto", description: "Autobus alle 14" },
+    });
+  });
+
+  it("creates the section when it is first switched on while translating", () => {
+    const source = duplicateForm({ transportInfo: undefined });
+    const draft = buildInvitationTranslationDraft(source, "en");
+    draft.transportInfo = {
+      enabled: true,
+      imageUrl: transportInfo.imageUrl,
+      title: "Transport",
+      description: "Bus at 2pm",
+    };
+
+    const saved = applyInvitationTranslationDraft(source, "en", draft);
+
+    expect(saved.transportInfo).toEqual({
+      enabled: true,
+      imageUrl: transportInfo.imageUrl,
+      title: "",
+      description: "",
+    });
+    expect(saved.translations?.en).toMatchObject({
+      transportInfo: { title: "Transport", description: "Bus at 2pm" },
+    });
+  });
+});

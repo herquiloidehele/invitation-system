@@ -610,6 +610,22 @@ export interface OurStory {
   description: string;
 }
 
+/** How wide the transport section's image sits inside its card. */
+export type TransportImageSize = "small" | "medium" | "full";
+
+export interface TransportInfo {
+  /** Whether to show the transport section. */
+  enabled: boolean;
+  /** Image shown above the title. Optional. */
+  imageUrl?: string;
+  /** Image width — unset reads as "medium". */
+  imageSize?: TransportImageSize;
+  /** Section title. Blank hides the heading. */
+  title: string;
+  /** Free text under the title; line breaks are kept. */
+  description: string;
+}
+
 export interface ParentsInfo {
   /** Whether to show the parents mode in the hero section. */
   enabled: boolean;
@@ -872,6 +888,9 @@ export interface TextStyleOverrides {
     mbAnnounceNames?: TextStyle;
     /** The "&" between the announcement names (larger than the hero's). */
     mbAnnounceAmp?: TextStyle;
+    /** The transport section's description — its own key, so styling it
+     *  leaves the other body copy alone. */
+    mbTransportText?: TextStyle;
     mbCalendarMonth?: TextStyle;
     mbCalendarWeekday?: TextStyle;
     mbCalendarDay?: TextStyle;
@@ -1309,6 +1328,7 @@ export interface InvitationTranslationOverlay {
   };
   parents?: { blessingMessage?: string; inviteMessage?: string };
   ourStory?: { title?: string; description?: string };
+  transportInfo?: { title?: string; description?: string };
   /**
    * Per-locale Canva URL. Empty or missing means "inherit the Portuguese
    * link" — which is why the merge uses `||` rather than `??`.
@@ -1542,6 +1562,8 @@ export interface InvitationData {
   parents?: ParentsInfo;
   /** Optional "Nossa História" section — the couple's story. */
   ourStory?: OurStory;
+  /** Optional transport section (image, title, description). Minimalism-brown only. */
+  transportInfo?: TransportInfo;
   /** Toggles and styles the ScratchDateReveal section on external_link invitation pages. */
   scratchReveal?: ScratchRevealConfig;
   /** Toggles the curtain-canva hero celebration confetti. Unset → fires (default on); only `{ enabled: false }` disables it. */
