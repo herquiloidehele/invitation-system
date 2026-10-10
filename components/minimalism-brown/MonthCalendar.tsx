@@ -15,7 +15,7 @@ import { useIdle } from "./motion";
  * Month grid for the wedding's month, with the day itself marked.
  *
  * Weekday and month names come from Intl in the active locale rather than a
- * hard-coded array, so the calendar reads correctly in pt/en/es. Renders
+ * hard-coded array, so the calendar reads correctly in every locale. Renders
  * nothing when the date can't be parsed.
  */
 export default function MonthCalendar({

@@ -76,6 +76,24 @@ describe("switcher render modes", () => {
   });
 });
 
+describe("Italian option", () => {
+  it("offers Italian by name and links to the /it page", () => {
+    const html = render(
+      switcher(
+        duplicateForm({
+          invitationType: "standard",
+          languageSwitcherEnabled: true,
+          enabledLocales: ["pt", "it"],
+        }),
+      ),
+    );
+
+    expect(html).toContain('aria-label="Italiano"');
+    expect(html).toMatch(/href="\/it[\/?]/);
+    expect(html).not.toContain('aria-label="English"');
+  });
+});
+
 describe("inline mode wiring", () => {
   const source = readFileSync(
     "components/shared/InvitationLanguageSwitcher.tsx",

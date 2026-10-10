@@ -17,13 +17,13 @@ import {
   buildLandingTranslationDraft,
   type LandingTranslations,
 } from "@/lib/landing-translations";
-import type { AppLocale } from "@/i18n/locales";
+import { SUPPORTED_LOCALES, type AppLocale } from "@/i18n/locales";
 
-const EDITING_LOCALES = ["pt", "en", "es"] as const;
 const EDITING_LOCALE_LABELS: Record<AppLocale, string> = {
   pt: "PT",
   en: "EN",
   es: "ES",
+  it: "IT",
 };
 
 export type LandingMetadata = {
@@ -303,7 +303,7 @@ export function LandingMetadataFieldset({
                 className="inline-flex rounded-md border border-neutral-200 bg-white p-0.5"
                 aria-label="Idioma em edição"
               >
-                {EDITING_LOCALES.map((locale) => (
+                {SUPPORTED_LOCALES.map((locale) => (
                   <button
                     key={locale}
                     type="button"

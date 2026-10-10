@@ -84,6 +84,7 @@ const LABELS: Record<AppLocale, string> = {
   pt: "Português",
   en: "English",
   es: "Español",
+  it: "Italiano",
 };
 
 const optionClassName =

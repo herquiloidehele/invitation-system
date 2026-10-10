@@ -7,7 +7,7 @@ import { getDateFormatLocale, resolveLocale } from "@/i18n/locales";
 // pre-formatted PT strings (`date.day`, `date.month`, `date.year`,
 // `date.dayOfWeek`, `date.display`). The pre-formatted strings are written
 // when the owner creates the invitation in Portuguese; they're not enough
-// for a guest viewing the invitation in EN or ES.
+// for a guest viewing the invitation in another language.
 //
 // These helpers re-derive each field from `date.iso` using the URL locale.
 // The PT-pre-formatted value is accepted as `fallback` and returned when

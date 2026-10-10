@@ -1260,7 +1260,11 @@ export interface CustomTexts {
   common_close?: string;
 }
 
-export type TranslationLocale = "en" | "es";
+/** Every locale except Portuguese, which is the canonical record. */
+export type TranslationLocale = Exclude<
+  import("@/i18n/locales").AppLocale,
+  "pt"
+>;
 
 /**
  * Sparse translated text keyed by stable IDs. Portuguese remains the
@@ -1575,7 +1579,7 @@ export interface InvitationData {
   languageSwitcherEnabled?: boolean;
   /** Locales selected by the admin. Portuguese is normalized as mandatory. */
   enabledLocales?: import("@/i18n/locales").AppLocale[];
-  /** Sparse English and Spanish text overlays. */
+  /** Sparse text overlays for every locale except Portuguese. */
   translations?: InvitationTranslations;
   /** Whether the guest-management feature is active for this invitation. */
   guestManagementEnabled?: boolean;

@@ -1,4 +1,8 @@
-import type { AppLocale } from "@/i18n/locales";
+import {
+  DEFAULT_LOCALE,
+  SUPPORTED_LOCALES,
+  type AppLocale,
+} from "@/i18n/locales";
 
 export type LandingTranslationLocale = Exclude<AppLocale, "pt">;
 
@@ -32,10 +36,9 @@ export type LocalizedLandingMetadata<T extends LandingTextMetadata> = Omit<
 
 export type LandingTranslationDraft = Required<LandingTranslationOverlay>;
 
-const TRANSLATION_LOCALES = [
-  "en",
-  "es",
-] as const satisfies readonly AppLocale[];
+const TRANSLATION_LOCALES = SUPPORTED_LOCALES.filter(
+  (locale): locale is LandingTranslationLocale => locale !== DEFAULT_LOCALE,
+);
 const TRANSLATABLE_FIELDS = [
   "landingModelName",
   "landingSubtitle",

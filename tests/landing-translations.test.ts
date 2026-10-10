@@ -33,6 +33,40 @@ describe("landing metadata translations", () => {
     });
   });
 
+  it("stores and serves Italian product text", () => {
+    const source = {
+      landingModelName: "Clássico",
+      landingSubtitle: "Elegante",
+      landingDescription: "Convite em papel",
+      landingTranslations: {
+        it: { landingModelName: "Classico", landingSubtitle: " " },
+      },
+    };
+
+    expect(sanitizeLandingTranslations(source.landingTranslations)).toEqual({
+      it: { landingModelName: "Classico" },
+    });
+    expect(localizeLandingMetadata(source, "it")).toMatchObject({
+      landingModelName: "Classico",
+      landingSubtitle: "Elegante",
+      landingDescription: "Convite em papel",
+    });
+    expect(
+      applyLandingTranslationDraft(
+        { en: { landingModelName: "Classic" } },
+        "it",
+        {
+          landingModelName: "Classico",
+          landingSubtitle: "",
+          landingDescription: "",
+        },
+      ),
+    ).toEqual({
+      en: { landingModelName: "Classic" },
+      it: { landingModelName: "Classico" },
+    });
+  });
+
   it("returns undefined when no valid translation remains", () => {
     expect(
       sanitizeLandingTranslations({

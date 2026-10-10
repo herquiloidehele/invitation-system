@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ["pt", "en", "es"] as const;
+export const SUPPORTED_LOCALES = ["pt", "en", "es", "it"] as const;
 
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 
@@ -18,6 +18,7 @@ export function resolveLocale(locale: unknown): AppLocale {
 export function getDateFormatLocale(locale: AppLocale): string {
   if (locale === "en") return "en-US";
   if (locale === "es") return "es-ES";
+  if (locale === "it") return "it-IT";
   return "pt-PT";
 }
 
