@@ -8,7 +8,8 @@ type RsvpColorField =
   | "inputBackgroundColor"
   | "inputTextColor"
   | "inputPlaceholderColor"
-  | "inputBorderColor";
+  | "inputBorderColor"
+  | "inputSwitchLabelColor";
 
 const COLOR_ROWS: { field: RsvpColorField; label: string; fallback: string }[] =
   [
@@ -32,6 +33,11 @@ const COLOR_ROWS: { field: RsvpColorField; label: string; fallback: string }[] =
       label: "Borda dos campos",
       fallback: "#dddddd",
     },
+    {
+      field: "inputSwitchLabelColor",
+      label: "Texto do campo Sim/Não",
+      fallback: "#111111",
+    },
   ];
 
 function colorPickerValue(value: string | undefined, fallback: string): string {
@@ -50,7 +56,8 @@ export function RsvpInputColorFields({
       <div className="space-y-0.5">
         <Label>Cores dos campos RSVP</Label>
         <p className="text-xs text-muted-foreground">
-          Personaliza o fundo, texto digitado e placeholders dos inputs.
+          Personaliza o fundo, texto digitado, placeholders e o texto Sim/Não
+          dos inputs.
         </p>
       </div>
       <div className="space-y-2">

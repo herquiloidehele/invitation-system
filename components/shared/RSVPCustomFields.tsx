@@ -35,6 +35,7 @@ export function RSVPCustomFields({
   choiceStyle,
   switchClassName,
   switchStyle,
+  switchLabelColor,
 }: {
   fields: RsvpCustomField[];
   attending: boolean;
@@ -48,6 +49,7 @@ export function RSVPCustomFields({
   choiceStyle: (selected: boolean) => CSSProperties;
   switchClassName: string;
   switchStyle: CSSProperties;
+  switchLabelColor: string;
 }) {
   const visibleFields = getVisibleRsvpCustomFields(fields, { attending, values });
   if (visibleFields.length === 0) return null;
@@ -82,7 +84,9 @@ export function RSVPCustomFields({
             />
           ) : field.type === "switch" ? (
             <div className={switchClassName} style={switchStyle}>
-              <span>{values[field.id] === true ? "Sim" : "Não"}</span>
+              <span style={{ color: switchLabelColor }}>
+                {values[field.id] === true ? "Sim" : "Não"}
+              </span>
               <Switch
                 checked={values[field.id] === true}
                 onCheckedChange={(checked) => onChange(field.id, checked)}

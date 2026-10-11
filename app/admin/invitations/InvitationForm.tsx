@@ -515,6 +515,7 @@ function getDefaultFormState(firstTheme?: TemplateTheme): InvitationData {
       inputTextColor: "",
       inputPlaceholderColor: "",
       inputBorderColor: "",
+      inputSwitchLabelColor: "",
       inputStyle: "default",
       customFields: [],
     },

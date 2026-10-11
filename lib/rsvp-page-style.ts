@@ -60,12 +60,18 @@ export type RsvpPageFieldSource = Partial<
     | "inputTextColor"
     | "inputPlaceholderColor"
     | "inputBorderColor"
+    | "inputSwitchLabelColor"
     | "backgroundImageUrl"
   >
 >;
 
 export type RsvpPageColors = Record<
-  RsvpPageColorKey | "fieldBg" | "fieldText" | "fieldPlaceholder" | "fieldBorder",
+  | RsvpPageColorKey
+  | "fieldBg"
+  | "fieldText"
+  | "fieldPlaceholder"
+  | "fieldBorder"
+  | "fieldSwitchLabel",
   string
 >;
 
@@ -280,6 +286,7 @@ export function resolveRsvpPageStyle({
       fieldText: field.textColor,
       fieldPlaceholder: field.placeholderColor,
       fieldBorder: field.borderColor,
+      fieldSwitchLabel: field.switchLabelColor,
     },
     fonts: {
       title: style?.fonts?.title ?? base.fonts.title,

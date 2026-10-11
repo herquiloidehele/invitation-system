@@ -190,6 +190,7 @@ function getDefaultState(
       inputTextColor: "",
       inputPlaceholderColor: "",
       inputBorderColor: "",
+      inputSwitchLabelColor: "",
       inputStyle: "default",
     },
     rsvpPage: { base: "theme" },

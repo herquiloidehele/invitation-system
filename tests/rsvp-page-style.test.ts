@@ -38,6 +38,7 @@ const LEGACY = {
     fieldText: "#2C2C2B",
     fieldPlaceholder: "#A5A39F",
     fieldBorder: "#E6E4E0",
+    fieldSwitchLabel: "#2C2C2B",
   },
   fonts: {
     title: "'Georgia', 'Times New Roman', serif",
@@ -104,6 +105,7 @@ describe("resolveRsvpPageStyle — theme base", () => {
       fieldText: "#F4EFE6",
       fieldPlaceholder: "#9A8F7C",
       fieldBorder: "#2E4053",
+      fieldSwitchLabel: "#F4EFE6",
     });
     expect(tokens.fonts).toEqual({
       title: "'Cormorant Garamond', serif",
@@ -190,6 +192,23 @@ describe("resolveRsvpPageStyle — overrides", () => {
     expect(tokens.colors.fieldBg).toBe(
       "color-mix(in srgb, #F4EFE6 5%, #1B2631)",
     );
+  });
+
+  it("follows the field text for the switch label until it gets its own colour", () => {
+    const followsText = resolveRsvpPageStyle({
+      config: { base: "theme" },
+      theme,
+      rsvp: { inputTextColor: "#123456" },
+    });
+    expect(followsText.colors.fieldSwitchLabel).toBe("#123456");
+
+    const ownColour = resolveRsvpPageStyle({
+      config: { base: "theme" },
+      theme,
+      rsvp: { inputTextColor: "#123456", inputSwitchLabelColor: "#222222" },
+    });
+    expect(ownColour.colors.fieldSwitchLabel).toBe("#222222");
+    expect(ownColour.colors.fieldText).toBe("#123456");
   });
 
   it("applies the radius presets and pins the button radius", () => {

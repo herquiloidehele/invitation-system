@@ -1523,6 +1523,7 @@ export interface InvitationData {
     inputTextColor?: string;
     inputPlaceholderColor?: string;
     inputBorderColor?: string;
+    inputSwitchLabelColor?: string;
     inputStyle?: RsvpInputStyle;
     customFields?: RsvpCustomField[];
     /**

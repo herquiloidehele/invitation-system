@@ -46,6 +46,7 @@ export default async function NewAiInvitationPage() {
       inputTextColor: "",
       inputPlaceholderColor: "",
       inputBorderColor: "",
+      inputSwitchLabelColor: "",
       inputStyle: "default",
     },
     schedule: [],

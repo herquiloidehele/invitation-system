@@ -935,6 +935,7 @@ export default function RSVPForm(props: RSVPFormProps) {
               choiceStyle={rsvpInputStyle.choiceStyle}
               switchClassName={rsvpInputStyle.switchClassName}
               switchStyle={rsvpInputStyle.switchStyle}
+              switchLabelColor={rsvpInputColors.switchLabelColor}
             />
 
             <div className="flex flex-col gap-1.5">

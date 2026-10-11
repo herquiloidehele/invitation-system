@@ -343,6 +343,7 @@ export default function RsvpPageForm({
         choiceStyle={choiceStyle}
         switchClassName={rsvpInputStyle.switchClassName}
         switchStyle={switchStyle}
+        switchLabelColor={colors.fieldSwitchLabel}
       />
 
       {/* Message */}

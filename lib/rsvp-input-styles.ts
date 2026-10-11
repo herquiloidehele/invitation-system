@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { RsvpInputColors } from "./rsvp-input-colors";
+import type { RsvpInputBaseColors } from "./rsvp-input-colors";
 
 export type RsvpInputStyle = "default" | "minimal" | "soft";
 export type RsvpInputRenderer = "modal" | "page";
@@ -61,7 +61,7 @@ export function isRsvpInputStyle(value: unknown): value is RsvpInputStyle {
 
 export function resolveRsvpInputStyle(
   value: unknown,
-  colors: RsvpInputColors,
+  colors: RsvpInputBaseColors,
   accentColor: string,
   hasCustomBackground = false,
   renderer: RsvpInputRenderer = "modal",

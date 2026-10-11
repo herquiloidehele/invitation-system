@@ -10,7 +10,8 @@ describe("resolveRsvpInputColors", () => {
   };
 
   it("falls back to defaults when RSVP colors are missing or blank", () => {
-    expect(resolveRsvpInputColors(undefined, defaults)).toEqual(defaults);
+    const expected = { ...defaults, switchLabelColor: "#111111" };
+    expect(resolveRsvpInputColors(undefined, defaults)).toEqual(expected);
     expect(
       resolveRsvpInputColors(
         {
@@ -18,10 +19,11 @@ describe("resolveRsvpInputColors", () => {
           inputTextColor: "   ",
           inputPlaceholderColor: undefined,
           inputBorderColor: "",
+          inputSwitchLabelColor: "  ",
         },
         defaults,
       ),
-    ).toEqual(defaults);
+    ).toEqual(expected);
   });
 
   it("uses provided RSVP colors without changing unrelated defaults", () => {
@@ -40,6 +42,25 @@ describe("resolveRsvpInputColors", () => {
       textColor: "#f7f7f7",
       placeholderColor: "#b8a15c",
       borderColor: "#d4af37",
+      switchLabelColor: "#f7f7f7",
     });
+  });
+
+  it("colours the switch label on its own, leaving the field text alone", () => {
+    const colors = resolveRsvpInputColors(
+      { inputSwitchLabelColor: "#222222" },
+      defaults,
+    );
+    expect(colors.switchLabelColor).toBe("#222222");
+    expect(colors.textColor).toBe("#111111");
+  });
+
+  it("keeps an explicit switch label colour when the field text is also set", () => {
+    const colors = resolveRsvpInputColors(
+      { inputTextColor: "#f7f7f7", inputSwitchLabelColor: "#222222" },
+      defaults,
+    );
+    expect(colors.switchLabelColor).toBe("#222222");
+    expect(colors.textColor).toBe("#f7f7f7");
   });
 });
