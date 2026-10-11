@@ -58,16 +58,22 @@ export default function Countdown({
 
       {(config?.subtitle || ct("countdown_defaultSubtitle")) && (
         <p
-          style={{
-            margin: `${t.gap.row}px 0 0`,
-            textAlign: "center",
-            fontFamily: theme.bodyFont,
-            fontSize: 14,
-            fontWeight: 300,
-            color: theme.textSecondary,
-          }}
+          style={mbStyle(
+            {
+              margin: `${t.gap.row}px 0 0`,
+              textAlign: "center",
+              fontFamily: theme.bodyFont,
+              fontSize: 14,
+              fontWeight: 300,
+              color: theme.textSecondary,
+            },
+            invitation.textStyles,
+            "mbCountdownSubtitle",
+          )}
         >
-          {config?.subtitle || ct("countdown_defaultSubtitle")}
+          <EditableText elementKey="mbCountdownSubtitle">
+            {config?.subtitle || ct("countdown_defaultSubtitle")}
+          </EditableText>
         </p>
       )}
 

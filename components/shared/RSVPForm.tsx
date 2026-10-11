@@ -295,6 +295,10 @@ export default function RSVPForm(props: RSVPFormProps) {
   );
   const bodyTextOverride = resolveTextElementOverride(textStyles, "bodyText");
   const ctaLabelOverride = resolveTextElementOverride(textStyles, "ctaLabel");
+  const messageNoteOverride = resolveTextElementOverride(
+    textStyles,
+    "rsvpMessageNote",
+  );
 
   const [submitState, setSubmitState] = useState<SubmitState>(() =>
     hasSubmittedRsvp(slug) ? "already_submitted" : "idle",
@@ -950,9 +954,15 @@ export default function RSVPForm(props: RSVPFormProps) {
               {messageIsPublic && (
                 <p
                   className="text-xs"
-                  style={{ color: p.textMuted, fontFamily: uiFont }}
+                  style={{
+                    color: p.textMuted,
+                    fontFamily: uiFont,
+                    ...messageNoteOverride,
+                  }}
                 >
-                  {resolveText("rsvp_messagePublicNote")}
+                  <EditableText elementKey="rsvpMessageNote">
+                    {resolveText("rsvp_messagePublicNote")}
+                  </EditableText>
                 </p>
               )}
             </div>

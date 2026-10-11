@@ -232,6 +232,25 @@ describe("minimalism-brown reception title and venue names", () => {
   });
 });
 
+describe("minimalism-brown countdown subtitle", () => {
+  it("is styled from its own key", () => {
+    const html = renderSections({
+      elements: { mbCountdownSubtitle: { fontSize: 95, color: "#123456" } },
+    });
+
+    expect(html).toMatch(
+      /<p style="[^"]*font-size:95px[^"]*color:#123456[^"]*">Até ao nosso grande dia<\/p>/,
+    );
+    expect(count(html, "font-size:95px")).toBe(1);
+  });
+
+  it("is selectable in the editor", () => {
+    expect(renderSections({}, null, { editor: true })).toMatch(
+      /data-text-element="mbCountdownSubtitle"[^>]*>Até ao nosso grande dia</,
+    );
+  });
+});
+
 describe("minimalism-brown headings in the inline editor", () => {
   const html = () => renderSections({}, null, { editor: true });
   const selectable = (markup: string) =>

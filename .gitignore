@@ -62,3 +62,6 @@ neon_data.sql
 
 #Ai design
 design/
+
+#videos
+marketing/*

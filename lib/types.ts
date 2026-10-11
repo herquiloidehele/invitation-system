@@ -911,6 +911,8 @@ export interface TextStyleOverrides {
     mbWishName?: TextStyle;
     mbWishBody?: TextStyle;
     mbFooter?: TextStyle;
+    /** The line under the countdown heading. */
+    mbCountdownSubtitle?: TextStyle;
     mbCountdownValue?: TextStyle;
     mbCountdownLabel?: TextStyle;
     mbGiftPrompt?: TextStyle;
@@ -947,6 +949,8 @@ export interface TextStyleOverrides {
     sectionLabel?: TextStyle;
     /** RSVP form field labels ("Nome(s)", "Irá comparecer?", "Mensagem"). */
     rsvpFieldLabel?: TextStyle;
+    /** The RSVP form's note that a message may appear in the guestbook. */
+    rsvpMessageNote?: TextStyle;
     /** Curtain scratch-reveal labels and sub-labels. */
     scratchLabel?: TextStyle;
     inviteLabel?: TextStyle;
