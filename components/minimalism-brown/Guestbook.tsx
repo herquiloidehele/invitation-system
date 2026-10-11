@@ -43,7 +43,7 @@ export default function Guestbook({
 
   return (
     <Reveal as="section" style={{ marginTop: t.gap.section }}>
-      <SectionTitle theme={theme} textStyles={ts}>
+      <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleGuestbook">
         {invitation.guestbook?.title?.trim() || ct("sectionTitle_guestbook")}
       </SectionTitle>
 

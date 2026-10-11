@@ -20,6 +20,9 @@ import {
   mbTransport,
   mbWebLink,
   mbGuestPhotoUpload,
+  MB_SECTION_TITLE_KEYS,
+  splitMbSharedStyles,
+  splitMbSharedSpacing,
 } from "../lib/minimalism-brown";
 
 const theme = {
@@ -515,5 +518,150 @@ describe("mbGuestPhotoUpload", () => {
     expect(
       mbGuestPhotoUpload({ guestPhotoUpload: { ...upload, text: "" } }),
     ).toEqual({ href: "https://photos.app.goo.gl/abc123", text: "" });
+  });
+});
+
+describe("splitMbSharedStyles", () => {
+  it("gives every section heading its own key", () => {
+    expect(new Set(MB_SECTION_TITLE_KEYS).size).toBe(12);
+    expect(MB_SECTION_TITLE_KEYS).not.toContain("mbSectionTitle");
+  });
+
+  it("copies a style saved on the old shared key to each heading", () => {
+    const shared = { fontSize: 22, color: "#553C2E" };
+    const out = splitMbSharedStyles({
+      elements: { mbSectionTitle: shared, mbNames: { fontSize: 60 } },
+    });
+
+    for (const key of MB_SECTION_TITLE_KEYS) {
+      expect(out?.elements?.[key]).toEqual(shared);
+    }
+    expect(out?.elements?.mbSectionTitle).toBeUndefined();
+    expect(out?.elements?.mbNames).toEqual({ fontSize: 60 });
+  });
+
+  it("lets a heading's own style win over the shared one, field by field", () => {
+    const out = splitMbSharedStyles({
+      elements: {
+        mbSectionTitle: { fontSize: 22, color: "#553C2E" },
+        mbTitleSchedule: { fontSize: 30 },
+      },
+    });
+
+    expect(out?.elements?.mbTitleSchedule).toEqual({
+      fontSize: 30,
+      color: "#553C2E",
+    });
+    expect(out?.elements?.mbTitleGifts).toEqual({
+      fontSize: 22,
+      color: "#553C2E",
+    });
+  });
+
+  it("keeps the dress-code line hidden when the shared key hid it, without restyling it", () => {
+    const out = splitMbSharedStyles({
+      elements: { mbSectionTitle: { fontSize: 22, hidden: true } },
+    });
+
+    expect(out?.elements?.mbDressCodeText).toEqual({ hidden: true });
+  });
+
+  it("leaves the dress-code line alone when the shared key was only styled", () => {
+    const out = splitMbSharedStyles({
+      elements: { mbSectionTitle: { fontSize: 22 } },
+    });
+
+    expect(out?.elements?.mbDressCodeText).toBeUndefined();
+  });
+
+  it("gives the reception title and each venue name its own style", () => {
+    const shared = { fontSize: 20, color: "#ffffff" };
+    const out = splitMbSharedStyles({
+      elements: { mbVenueLine: shared, mbVenue2Name: { fontSize: 15 } },
+    });
+
+    expect(out?.elements?.mbVenueName).toEqual(shared);
+    expect(out?.elements?.mbVenue2Name).toEqual({
+      fontSize: 15,
+      color: "#ffffff",
+    });
+    expect(out?.elements?.mbVenueLine).toBeUndefined();
+    // The reception title carried the shared key without ever being styled
+    // by it, so it only inherits being hidden.
+    expect(out?.elements?.mbReceptionIntro).toBeUndefined();
+  });
+
+  it("keeps the reception title hidden when the shared venue key hid it", () => {
+    const out = splitMbSharedStyles({
+      elements: { mbVenueLine: { hidden: true } },
+    });
+
+    expect(out?.elements?.mbReceptionIntro).toEqual({ hidden: true });
+  });
+
+  it("keeps role-level overrides next to the split elements", () => {
+    const out = splitMbSharedStyles({
+      fonts: { sectionTitle: "Lora" },
+      elements: { mbSectionTitle: { fontSize: 22 } },
+    });
+
+    expect(out?.fonts).toEqual({ sectionTitle: "Lora" });
+  });
+
+  it("returns the same object when there is nothing to split", () => {
+    const styles = { elements: { mbTitleRsvp: { fontSize: 18 } } };
+    expect(splitMbSharedStyles(styles)).toBe(styles);
+    expect(splitMbSharedStyles(undefined)).toBeUndefined();
+    expect(splitMbSharedStyles(null)).toBeUndefined();
+  });
+});
+
+describe("splitMbSharedSpacing", () => {
+  it("copies spacing saved on the old shared key to each heading and the dress-code line", () => {
+    const shared = { spaceBefore: 12, spaceAfter: 4 };
+    const out = splitMbSharedSpacing({
+      sections: { schedule: { spaceBefore: 40 } },
+      elements: { mbSectionTitle: shared, mbNames: { spaceAfter: 8 } },
+    });
+
+    for (const key of [...MB_SECTION_TITLE_KEYS, "mbDressCodeText"]) {
+      expect(out?.elements?.[key]).toEqual(shared);
+    }
+    expect(out?.elements?.mbSectionTitle).toBeUndefined();
+    expect(out?.elements?.mbNames).toEqual({ spaceAfter: 8 });
+    expect(out?.sections).toEqual({ schedule: { spaceBefore: 40 } });
+  });
+
+  it("copies spacing saved on the shared venue key to the reception title and both venue names", () => {
+    const shared = { spaceBefore: 10 };
+    const out = splitMbSharedSpacing({
+      elements: { mbVenueLine: shared },
+    });
+
+    for (const key of ["mbReceptionIntro", "mbVenueName", "mbVenue2Name"]) {
+      expect(out?.elements?.[key]).toEqual(shared);
+    }
+    expect(out?.elements?.mbVenueLine).toBeUndefined();
+  });
+
+  it("lets a heading's own spacing win over the shared one", () => {
+    const out = splitMbSharedSpacing({
+      elements: {
+        mbSectionTitle: { spaceBefore: 12, spaceAfter: 4 },
+        mbTitleGifts: { spaceBefore: 0 },
+      },
+    });
+
+    expect(out?.elements?.mbTitleGifts).toEqual({
+      spaceBefore: 0,
+      spaceAfter: 4,
+    });
+  });
+
+  it("returns the same object when there is nothing to split", () => {
+    const spacing = { elements: { mbTitleRsvp: { spaceBefore: 6 } } };
+    expect(splitMbSharedSpacing(spacing)).toBe(spacing);
+    expect(splitMbSharedSpacing(undefined)).toBeUndefined();
+    expect(splitMbSharedSpacing(null)).toBeUndefined();
   });
 });

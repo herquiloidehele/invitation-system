@@ -43,7 +43,7 @@ export default function RsvpSection({
       id={MB_RSVP_ID}
       style={{ marginTop: t.gap.section, scrollMarginTop: t.gap.block }}
     >
-      <SectionTitle theme={theme} textStyles={ts}>
+      <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleRsvp">
         {ct("sectionTitle_rsvp")}
       </SectionTitle>
       <SectionCard theme={theme} style={{ marginTop: t.gap.block }}>

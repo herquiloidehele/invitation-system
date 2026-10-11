@@ -8,6 +8,7 @@ import type {
   InvitationData,
   LocationInfo,
   ParentsInfo,
+  SpacingStyleOverrides,
   TemplateTheme,
   TextStyleOverrides,
   TransportImageSize,
@@ -212,6 +213,107 @@ export function mbStyle(
   key: MbTextKey,
 ): CSSProperties {
   return applyOverride(base, textStyles?.elements?.[key]);
+}
+
+/**
+ * The style key of each section heading. They used to share `mbSectionTitle`,
+ * so styling one heading restyled them all.
+ */
+export const MB_SECTION_TITLE_KEYS = [
+  "mbTitleBlessing",
+  "mbTitleDressCode",
+  "mbTitleSchedule",
+  "mbTitleGifts",
+  "mbTitleCountdown",
+  "mbTitleStory",
+  "mbTitleGuestGuide",
+  "mbTitleFaqs",
+  "mbTitleGallery",
+  "mbTitleGuestbook",
+  "mbTitleRsvp",
+  "mbTitleTransport",
+] as const satisfies readonly MbTextKey[];
+
+export type MbSectionTitleKey = (typeof MB_SECTION_TITLE_KEYS)[number];
+
+/** The style key of a venue card's name, by its position in mbVenues. */
+export function mbVenueNameKey(index: number): MbTextKey {
+  return index === 0 ? "mbVenueName" : "mbVenue2Name";
+}
+
+/**
+ * Keys that several different texts used to share, and the keys that replaced
+ * them. `styled` texts drew their look from the shared key. `tagged` texts
+ * only carried it for the inline editor: their spacing and visibility followed
+ * it, their font and colour never did.
+ */
+const MB_SHARED_KEYS: {
+  shared: MbTextKey;
+  styled: readonly MbTextKey[];
+  tagged: readonly MbTextKey[];
+}[] = [
+  {
+    shared: "mbSectionTitle",
+    styled: MB_SECTION_TITLE_KEYS,
+    tagged: ["mbDressCodeText"],
+  },
+  {
+    shared: "mbVenueLine",
+    styled: ["mbVenueName", "mbVenue2Name"],
+    tagged: ["mbReceptionIntro"],
+  },
+];
+
+/**
+ * Copy a style saved on a shared key onto the key of each text that used it,
+ * and drop the shared one. An invitation styled before the split looks the
+ * same, and each text can then be changed on its own. A text's own style wins
+ * field by field. See MB_SHARED_KEYS for what a `tagged` text inherits.
+ */
+export function splitMbSharedStyles(
+  textStyles: TextStyleOverrides | null | undefined,
+): TextStyleOverrides | undefined {
+  if (!textStyles) return undefined;
+  const splits = MB_SHARED_KEYS.filter(
+    ({ shared }) => textStyles.elements?.[shared],
+  );
+  if (splits.length === 0) return textStyles;
+
+  const elements = { ...textStyles.elements };
+  for (const { shared, styled, tagged } of splits) {
+    const style = elements[shared]!;
+    delete elements[shared];
+    for (const key of styled) {
+      elements[key] = { ...style, ...elements[key] };
+    }
+    if (!style.hidden) continue;
+    for (const key of tagged) {
+      elements[key] = { hidden: true, ...elements[key] };
+    }
+  }
+  return { ...textStyles, elements };
+}
+
+/** The spacing counterpart of splitMbSharedStyles. Spacing reached every text
+ *  carrying the shared key, `tagged` ones included. */
+export function splitMbSharedSpacing(
+  spacingStyles: SpacingStyleOverrides | null | undefined,
+): SpacingStyleOverrides | undefined {
+  if (!spacingStyles) return undefined;
+  const splits = MB_SHARED_KEYS.filter(
+    ({ shared }) => spacingStyles.elements?.[shared],
+  );
+  if (splits.length === 0) return spacingStyles;
+
+  const elements = { ...spacingStyles.elements };
+  for (const { shared, styled, tagged } of splits) {
+    const spacing = elements[shared];
+    delete elements[shared];
+    for (const key of [...styled, ...tagged]) {
+      elements[key] = { ...spacing, ...elements[key] };
+    }
+  }
+  return { ...spacingStyles, elements };
 }
 
 /**

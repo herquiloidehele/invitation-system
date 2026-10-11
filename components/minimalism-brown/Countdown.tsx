@@ -52,7 +52,7 @@ export default function Countdown({
 
   return (
     <Reveal as="section" style={{ marginTop: t.gap.section }}>
-      <SectionTitle theme={theme} textStyles={invitation.textStyles}>
+      <SectionTitle theme={theme} textStyles={invitation.textStyles} elementKey="mbTitleCountdown">
         {config?.title || ct("countdown_defaultTitle")}
       </SectionTitle>
 

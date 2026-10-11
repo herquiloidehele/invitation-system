@@ -61,7 +61,7 @@ export default function PhotoGallery({
           .mb-gallery section { padding-left: 0; padding-right: 0; }
         `}</style>
         <Reveal>
-          <SectionTitle theme={theme} textStyles={invitation.textStyles}>
+          <SectionTitle theme={theme} textStyles={invitation.textStyles} elementKey="mbTitleGallery">
             {title}
           </SectionTitle>
           {/* `isPreview` renders it outright: the shared gallery reveals with
@@ -80,7 +80,7 @@ export default function PhotoGallery({
        full-screen overlay would be trapped inside this section's box. */
     <section style={{ marginTop: t.gap.section, paddingInline: 24 }}>
       <Reveal>
-      <SectionTitle theme={theme} textStyles={invitation.textStyles}>
+      <SectionTitle theme={theme} textStyles={invitation.textStyles} elementKey="mbTitleGallery">
         {title}
       </SectionTitle>
 

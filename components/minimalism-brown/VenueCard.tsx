@@ -4,7 +4,12 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { MapPin } from "lucide-react";
 import type { InvitationData, LocationInfo, TemplateTheme } from "@/lib/types";
-import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
+import {
+  mbStyle,
+  mbTokens,
+  mbVenueNameKey,
+  mixWithTransparent,
+} from "@/lib/minimalism-brown";
 import { resolveLocationPhotos } from "@/lib/elegant-floral";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
@@ -37,12 +42,14 @@ export default function VenueCard({
   theme: TemplateTheme;
   venue: LocationInfo;
   /** Position in the venue list. Later cards sit closer, as one group, and
-   *  leave the house watermark to the first. */
+   *  leave the house watermark to the first. It also picks the name's style
+   *  key, so each venue's name is styled on its own. */
   index?: number;
 }) {
   const t = mbTokens(theme);
   const ts = invitation.textStyles;
   const ct = useCustomText(invitation.customTexts);
+  const nameKey = mbVenueNameKey(index);
 
   const photo = resolveLocationPhotos(venue)[0];
   const mapUrl = venue.googleMapsUrl || venue.wazeUrl;
@@ -96,10 +103,10 @@ export default function VenueCard({
                 color: theme.textPrimary,
               },
               ts,
-              "mbVenueLine",
+              nameKey,
             )}
           >
-            <EditableText elementKey="mbVenueLine">{venue.name}</EditableText>
+            <EditableText elementKey={nameKey}>{venue.name}</EditableText>
           </h3>
 
           {venue.address && (

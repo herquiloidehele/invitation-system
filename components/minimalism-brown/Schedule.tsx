@@ -43,7 +43,7 @@ export default function Schedule({
     return (
       <Reveal as="section" style={{ marginTop: t.gap.section }}>
         <SectionCard theme={theme}>
-          <SectionTitle theme={theme} textStyles={ts}>
+          <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleSchedule">
             {ct("sectionTitle_schedule")}
           </SectionTitle>
           <div style={{ marginTop: t.gap.block }}>
@@ -83,7 +83,7 @@ export default function Schedule({
         }}
       />
       <SectionCard theme={theme}>
-      <SectionTitle theme={theme} textStyles={ts}>
+      <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleSchedule">
         {ct("sectionTitle_schedule")}
       </SectionTitle>
 

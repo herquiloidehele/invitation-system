@@ -14,6 +14,10 @@ import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import { sanitizeRsvpPageStyle } from "@/lib/rsvp-page-style";
+import {
+  splitMbSharedSpacing,
+  splitMbSharedStyles,
+} from "@/lib/minimalism-brown";
 import type {
   CardStyleOverrides,
   CoupleGallery,
@@ -200,10 +204,13 @@ export function toAdminInvitationInitialData(
     personalGuestCard:
       (row.personalGuestCard as InvitationData["personalGuestCard"] | null) ??
       undefined,
-    textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
+    textStyles: splitMbSharedStyles(
+      row.textStyles as TextStyleOverrides | null,
+    ),
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
-    spacingStyles:
-      (row.spacingStyles as SpacingStyleOverrides | null) ?? undefined,
+    spacingStyles: splitMbSharedSpacing(
+      row.spacingStyles as SpacingStyleOverrides | null,
+    ),
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     customTexts:
       (row.customTexts as InvitationData["customTexts"] | null) ?? undefined,

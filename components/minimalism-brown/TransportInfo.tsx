@@ -53,6 +53,7 @@ export default function TransportInfo({
             <SectionTitle
               theme={theme}
               textStyles={ts}
+              elementKey="mbTitleTransport"
               style={{ marginTop: imageUrl ? t.gap.block : 0 }}
             >
               {title}

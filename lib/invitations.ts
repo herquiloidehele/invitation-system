@@ -10,6 +10,10 @@ import { normalizeOwnerGuestFormMode } from "./owner-guest-form-mode";
 import { normalizeCurrency } from "./currency/config";
 import { normalizeRenderMode } from "./ai-invitation";
 import { sanitizeRsvpPageStyle } from "./rsvp-page-style";
+import {
+  splitMbSharedSpacing,
+  splitMbSharedStyles,
+} from "./minimalism-brown";
 import { publicUrlForKey } from "./s3";
 import type {
   CardStyleOverrides,
@@ -210,10 +214,13 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
       : null,
     externalLink: row.externalLink ?? undefined,
     isDemo: row.isDemo,
-    textStyles: (row.textStyles as TextStyleOverrides | null) ?? undefined,
+    textStyles: splitMbSharedStyles(
+      row.textStyles as TextStyleOverrides | null,
+    ),
     cardStyles: (row.cardStyles as CardStyleOverrides | null) ?? undefined,
-    spacingStyles:
-      (row.spacingStyles as SpacingStyleOverrides | null) ?? undefined,
+    spacingStyles: splitMbSharedSpacing(
+      row.spacingStyles as SpacingStyleOverrides | null,
+    ),
     imageSettings: (row.imageSettings as ImageSettingsMap | null) ?? undefined,
     customTexts: (row.customTexts as CustomTexts | null) ?? undefined,
     languageSwitcherEnabled: row.languageSwitcherEnabled,

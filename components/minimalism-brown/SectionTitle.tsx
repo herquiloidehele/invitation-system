@@ -1,16 +1,21 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { TemplateTheme, TextStyleOverrides } from "@/lib/types";
-import { mbStyle, mbTokens, type MbTextKey } from "@/lib/minimalism-brown";
+import {
+  mbStyle,
+  mbTokens,
+  type MbSectionTitleKey,
+} from "@/lib/minimalism-brown";
 import { EditableText } from "@/components/shared/EditableText";
 
 interface SectionTitleProps {
   children: ReactNode;
   theme: TemplateTheme;
   textStyles?: TextStyleOverrides | null;
+  /** Which heading this is. Required, so no two sections share a style. */
+  elementKey: MbSectionTitleKey;
   as?: "h2" | "h3";
   /** Inverted sections (the reception panel) pass the panel foreground. */
   color?: string;
-  elementKey?: MbTextKey;
   style?: CSSProperties;
 }
 
@@ -18,7 +23,8 @@ interface SectionTitleProps {
  * Tracked uppercase serif section header ("CEREMONY INFO", "DRESS CODE").
  *
  * Size and weight come from the theme's section-title role via mbTokens, so
- * changing them in the admin moves every section heading at once.
+ * changing them in the admin moves every section heading at once. On top of
+ * that, each heading has its own style key for the inline editor.
  */
 export default function SectionTitle({
   children,
@@ -26,7 +32,7 @@ export default function SectionTitle({
   textStyles,
   as: Tag = "h2",
   color,
-  elementKey = "mbSectionTitle",
+  elementKey,
   style,
 }: SectionTitleProps) {
   const t = mbTokens(theme);

@@ -60,8 +60,8 @@ export default function ReceptionInfo({
           depth={0.04}
           layer={20}
         />
-        <p style={intro}>
-          <EditableText elementKey="mbVenueLine">
+        <p style={mbStyle(intro, ts, "mbReceptionIntro")}>
+          <EditableText elementKey="mbReceptionIntro">
             {ct("mb_receptionIntro")}
           </EditableText>
         </p>

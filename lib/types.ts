@@ -875,11 +875,36 @@ export interface TextStyleOverrides {
     mbEyebrow?: TextStyle;
     mbNames?: TextStyle;
     mbAmpersand?: TextStyle;
+    /** Legacy: one key every section heading used to share. Nothing renders
+     *  it any more — splitMbSectionTitleStyles copies it onto the per-heading
+     *  keys below when an invitation is loaded. */
     mbSectionTitle?: TextStyle;
+    /** One key per section heading, so each is styled on its own. */
+    mbTitleBlessing?: TextStyle;
+    mbTitleDressCode?: TextStyle;
+    mbTitleSchedule?: TextStyle;
+    mbTitleGifts?: TextStyle;
+    mbTitleCountdown?: TextStyle;
+    mbTitleStory?: TextStyle;
+    mbTitleGuestGuide?: TextStyle;
+    mbTitleFaqs?: TextStyle;
+    mbTitleGallery?: TextStyle;
+    mbTitleGuestbook?: TextStyle;
+    mbTitleRsvp?: TextStyle;
+    mbTitleTransport?: TextStyle;
+    /** The line of guidance under the dress-code heading. */
+    mbDressCodeText?: TextStyle;
     mbParentLabel?: TextStyle;
     mbParentName?: TextStyle;
     mbAnnounce?: TextStyle;
+    /** Legacy: shared by the reception title and both venue names. Split on
+     *  load like mbSectionTitle. */
     mbVenueLine?: TextStyle;
+    /** The line that opens the reception card, above the calendar. */
+    mbReceptionIntro?: TextStyle;
+    /** A venue card's name: the first location, then the second. */
+    mbVenueName?: TextStyle;
+    mbVenue2Name?: TextStyle;
     mbTimeValue?: TextStyle;
     mbScheduleTime?: TextStyle;
     mbScheduleLabel?: TextStyle;

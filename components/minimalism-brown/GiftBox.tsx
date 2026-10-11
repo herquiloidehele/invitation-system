@@ -54,7 +54,7 @@ export default function GiftBox({
       }}
     >
       <HouseBackdrop top="55%" width={546} />
-      <SectionTitle theme={theme} textStyles={invitation.textStyles}>
+      <SectionTitle theme={theme} textStyles={invitation.textStyles} elementKey="mbTitleGifts">
         {ct("sectionTitle_giftRegistry")}
       </SectionTitle>
 

@@ -110,7 +110,7 @@ export default function CeremonyInfo({
     <Reveal as="section" style={{ marginTop: t.gap.section }}>
       <SectionCard theme={theme} radius={13}>
         {blessing && (
-          <SectionTitle theme={theme} textStyles={ts}>
+          <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleBlessing">
             {blessing}
           </SectionTitle>
         )}

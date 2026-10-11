@@ -1,7 +1,7 @@
 "use client";
 
 import type { InvitationData, TemplateTheme } from "@/lib/types";
-import { mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
+import { mbStyle, mbTokens, mixWithTransparent } from "@/lib/minimalism-brown";
 import { useCustomText } from "@/lib/custom-texts";
 import { EditableText } from "@/components/shared/EditableText";
 import SectionTitle from "./SectionTitle";
@@ -24,21 +24,25 @@ export default function DressCode({
 
   return (
     <Reveal as="section" style={{ marginTop: t.gap.section, textAlign: "center" }}>
-      <SectionTitle theme={theme} textStyles={invitation.textStyles}>
+      <SectionTitle theme={theme} textStyles={invitation.textStyles} elementKey="mbTitleDressCode">
         {ct("sectionTitle_dressCode")}
       </SectionTitle>
 
       {dress.text && (
         <p
-          style={{
-            margin: `${t.gap.row}px 0 0`,
-            fontFamily: t.title.font,
-            fontSize: 14,
-            fontWeight: 300,
-            color: theme.textSecondary,
-          }}
+          style={mbStyle(
+            {
+              margin: `${t.gap.row}px 0 0`,
+              fontFamily: t.title.font,
+              fontSize: 14,
+              fontWeight: 300,
+              color: theme.textSecondary,
+            },
+            invitation.textStyles,
+            "mbDressCodeText",
+          )}
         >
-          <EditableText elementKey="mbSectionTitle">{dress.text}</EditableText>
+          <EditableText elementKey="mbDressCodeText">{dress.text}</EditableText>
         </p>
       )}
 

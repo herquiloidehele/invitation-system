@@ -74,7 +74,7 @@ export default function OptionalSections({
 
       {invitation.ourStory?.enabled && invitation.ourStory.description && (
         <section style={{ ...gap, textAlign: "center" }}>
-          <SectionTitle theme={theme} textStyles={ts}>
+          <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleStory">
             {invitation.ourStory.title}
           </SectionTitle>
           <p
@@ -116,7 +116,7 @@ export default function OptionalSections({
 
       {invitation.guestGuide?.enabled && (
         <Reveal style={gap}>
-          <SectionTitle theme={theme} textStyles={ts}>
+          <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleGuestGuide">
             {ct("sectionTitle_guestGuide")}
           </SectionTitle>
           <div style={{ marginTop: t.gap.block }}>
@@ -149,7 +149,7 @@ export default function OptionalSections({
                double it. */
             .mb-faq section { padding-left: 0; padding-right: 0; padding-bottom: 0; }
           `}</style>
-          <SectionTitle theme={theme} textStyles={ts}>
+          <SectionTitle theme={theme} textStyles={ts} elementKey="mbTitleFaqs">
             {ct("sectionTitle_faqs")}
           </SectionTitle>
           {/* The card and its paper grain come from SectionCard, so the shared
