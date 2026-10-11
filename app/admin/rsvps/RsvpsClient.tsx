@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback, type KeyboardEvent } from "react";
+import { useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -28,13 +28,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,22 +47,17 @@ import {
   getSaveTheDateRsvpPath,
 } from "@/lib/admin-row-navigation";
 import { formatRsvpCustomAnswers } from "@/lib/rsvp-custom-fields";
+import { cn } from "@/lib/utils";
+import { ListPagination } from "@/components/admin/ListPagination";
+import { RsvpTargetPicker } from "@/components/admin/RsvpTargetPicker";
+import { useListUrlState } from "@/hooks/use-list-url-state";
+import type { Pagination } from "@/lib/admin-list/params";
 import type {
-  InvitationSummary,
-  RsvpResponseWithInvitation,
-  SaveDateSummary,
-  StdRsvpResponseWithSaveDate,
-} from "./page";
-
-interface RsvpsClientProps {
-  invitations: InvitationSummary[];
-  responses: RsvpResponseWithInvitation[];
-  selectedSlug: string | null;
-  saveDates: SaveDateSummary[];
-  stdResponses: StdRsvpResponseWithSaveDate[];
-  selectedStdSlug: string | null;
-  activeTab: "invitations" | "std";
-}
+  InvitationRsvpTarget,
+  RsvpPageResult,
+  RsvpResponseRow,
+  RsvpTargetOption,
+} from "@/lib/admin-list/rsvps";
 
 const formatDate = (date: Date | string) =>
   new Date(date).toLocaleDateString("pt-PT", {
@@ -177,26 +165,28 @@ function AttendingBadge({ attending }: { attending: boolean }) {
  * the response id into the invitation's `guestbook.hiddenResponseIds`.
  */
 function GuestbookVisibilityToggle({
-  response,
+  responseId,
+  invitation,
 }: {
-  response: RsvpResponseWithInvitation;
+  responseId: string;
+  invitation: InvitationRsvpTarget;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const guestbook = response.invitation.guestbook;
+  const guestbook = invitation.guestbook;
 
   if (guestbook?.enabled !== true) return null;
 
-  const hidden = (guestbook.hiddenResponseIds ?? []).includes(response.id);
+  const hidden = (guestbook.hiddenResponseIds ?? []).includes(responseId);
 
   async function toggle() {
     const current = guestbook?.hiddenResponseIds ?? [];
     const next = hidden
-      ? current.filter((id) => id !== response.id)
-      : [...current, response.id];
+      ? current.filter((id) => id !== responseId)
+      : [...current, responseId];
     try {
       const res = await fetch(
-        `/api/admin/invitations/${response.invitation.id}`,
+        `/api/admin/invitations/${invitation.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -280,70 +270,57 @@ function CustomAnswersBlock({ answers }: { answers: unknown }) {
 }
 
 // ---------------------------------------------------------------------------
+// Props shared by both tabs
+// ---------------------------------------------------------------------------
+
+interface TabProps {
+  responses: RsvpResponseRow[];
+  pagination: Pagination;
+  stats: RsvpPageResult["stats"];
+  /** A list navigation is in flight: dim the table. */
+  isPending: boolean;
+  hrefForPage: (page: number) => string;
+  onNavigate: (href: string) => void;
+  /** Re-reads the list after a delete, dimming the table meanwhile. */
+  onRefresh: () => void;
+}
+
+// ---------------------------------------------------------------------------
 // Invitations tab
 // ---------------------------------------------------------------------------
 
 function InvitationsTab({
-  invitations,
-  responses: initialResponses,
-  selectedSlug,
-}: {
-  invitations: InvitationSummary[];
-  responses: RsvpResponseWithInvitation[];
-  selectedSlug: string | null;
-}) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [responses, setResponses] = useState(initialResponses);
+  invitation,
+  responses,
+  pagination,
+  stats,
+  isPending,
+  hrefForPage,
+  onNavigate,
+  onRefresh,
+}: TabProps & { invitation: InvitationRsvpTarget | null }) {
 
-  const totalAttending = responses.filter((r) => r.attending).length;
-  const totalDeclined = responses.filter((r) => !r.attending).length;
-
-  const handleFilterChange = useCallback(
-    (slug: string | null) => {
-      if (!slug) return;
-      startTransition(() => {
-        const params = new URLSearchParams();
-        params.set("tab", "invitations");
-        params.set("invitation", slug);
-        router.push(`/admin/rsvps?${params}`);
-      });
+  const handleDelete = useCallback(
+    async (id: string, guestName: string) => {
+      try {
+        const res = await fetch(`/api/admin/rsvps/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Failed");
+        toast.success(`Confirmação de "${guestName}" eliminada.`);
+        onRefresh();
+      } catch {
+        toast.error("Erro ao eliminar confirmação. Tente novamente.");
+      }
     },
-    [router],
+    [onRefresh],
   );
-
-  const handleDelete = useCallback(async (id: string, guestName: string) => {
-    try {
-      const res = await fetch(`/api/admin/rsvps/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed");
-      setResponses((prev) => prev.filter((r) => r.id !== id));
-      toast.success(`Confirmação de "${guestName}" eliminada.`);
-    } catch {
-      toast.error("Erro ao eliminar confirmação. Tente novamente.");
-    }
-  }, []);
-
-  const openInvitationResponses = (slug: string) => {
-    router.push(getInvitationRsvpPath(slug));
-  };
-
-  const handleInvitationRowKeyDown = (
-    event: KeyboardEvent<HTMLTableRowElement>,
-    slug: string,
-  ) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      openInvitationResponses(slug);
-    }
-  };
 
   return (
     <div className="space-y-4">
       <StatsBar
-        total={responses.length}
-        attending={totalAttending}
-        declined={totalDeclined}
-        filterLabel={selectedSlug ? `Para ${selectedSlug}` : "Sem convites"}
+        total={stats.total}
+        attending={stats.attending}
+        declined={stats.declined}
+        filterLabel={invitation ? `Para ${invitation.slug}` : "Sem convites"}
       />
 
       <Card>
@@ -354,37 +331,34 @@ function InvitationsTab({
               <CardDescription>Todas as respostas recebidas dos convidados</CardDescription>
             </div>
             <div className="w-full sm:w-64">
-              <Select
-                value={selectedSlug ?? undefined}
-                onValueChange={handleFilterChange}
-                disabled={isPending || invitations.length === 0}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filtrar por convite" />
-                </SelectTrigger>
-                <SelectContent>
-                  {invitations.map((inv) => (
-                    <SelectItem key={inv.slug} value={inv.slug}>
-                      {inv.couple.bride} &amp; {inv.couple.groom} (
-                      {inv._count.rsvpResponses})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <RsvpTargetPicker
+                key={invitation?.slug ?? "none"}
+                kind="invitation"
+                selected={invitation}
+                onSelect={(slug) => onNavigate(getInvitationRsvpPath(slug))}
+                placeholder="Filtrar por convite"
+                disabled={isPending || invitation === null}
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {responses.length === 0 ? (
+          {invitation === null || responses.length === 0 ? (
             <EmptyState
               message={
-                selectedSlug
+                invitation
                   ? "Este convite ainda não tem respostas."
                   : "Nenhum convidado respondeu ainda."
               }
             />
           ) : (
-            <div className="border rounded-lg overflow-hidden">
+            <div
+              className={cn(
+                "border rounded-lg overflow-hidden transition-opacity",
+                isPending && "opacity-60",
+              )}
+              aria-busy={isPending}
+            >
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -399,16 +373,7 @@ function InvitationsTab({
                 </TableHeader>
                 <TableBody>
                   {responses.map((r) => (
-                    <TableRow
-                      key={r.id}
-                      role="link"
-                      tabIndex={0}
-                      className="cursor-pointer"
-                      onClick={() => openInvitationResponses(r.invitationSlug)}
-                      onKeyDown={(event) =>
-                        handleInvitationRowKeyDown(event, r.invitationSlug)
-                      }
-                    >
+                    <TableRow key={r.id}>
                       <TableCell>
                         <div className="font-medium">{r.guestName}</div>
                         {r.email && (
@@ -417,10 +382,10 @@ function InvitationsTab({
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {r.invitation.couple.bride} &amp; {r.invitation.couple.groom}
+                          {invitation.bride} &amp; {invitation.groom}
                         </div>
                         <code className="text-xs text-muted-foreground bg-muted px-1 py-0.5 rounded">
-                          {r.invitationSlug}
+                          {invitation.slug}
                         </code>
                       </TableCell>
                       <TableCell className="text-center">
@@ -446,16 +411,18 @@ function InvitationsTab({
                         ) : (
                           <span className="text-muted-foreground text-sm">—</span>
                         )}
-                        {r.message && <GuestbookVisibilityToggle response={r} />}
+                        {r.message && (
+                          <GuestbookVisibilityToggle
+                            responseId={r.id}
+                            invitation={invitation}
+                          />
+                        )}
                         <CustomAnswersBlock answers={r.customAnswers} />
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                         {formatDate(r.submittedAt)}
                       </TableCell>
-                      <TableCell
-                        onClick={(event) => event.stopPropagation()}
-                        onKeyDown={(event) => event.stopPropagation()}
-                      >
+                      <TableCell>
                         <DeleteButton
                           id={r.id}
                           guestName={r.guestName}
@@ -468,6 +435,13 @@ function InvitationsTab({
               </Table>
             </div>
           )}
+
+          <ListPagination
+            className="mt-3"
+            pagination={pagination}
+            hrefFor={hrefForPage}
+            onNavigate={onNavigate}
+          />
         </CardContent>
       </Card>
     </div>
@@ -479,66 +453,37 @@ function InvitationsTab({
 // ---------------------------------------------------------------------------
 
 function SaveTheDateTab({
-  saveDates,
-  stdResponses: initialResponses,
-  selectedStdSlug,
-}: {
-  saveDates: SaveDateSummary[];
-  stdResponses: StdRsvpResponseWithSaveDate[];
-  selectedStdSlug: string | null;
-}) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [responses, setResponses] = useState(initialResponses);
+  std,
+  responses,
+  pagination,
+  stats,
+  isPending,
+  hrefForPage,
+  onNavigate,
+  onRefresh,
+}: TabProps & { std: RsvpTargetOption | null }) {
 
-  const totalAttending = responses.filter((r) => r.attending).length;
-  const totalDeclined = responses.filter((r) => !r.attending).length;
-
-  const handleFilterChange = useCallback(
-    (slug: string | null) => {
-      if (!slug) return;
-      startTransition(() => {
-        const params = new URLSearchParams();
-        params.set("tab", "std");
-        params.set("std", slug);
-        router.push(`/admin/rsvps?${params}`);
-      });
+  const handleDelete = useCallback(
+    async (id: string, guestName: string) => {
+      try {
+        const res = await fetch(`/api/admin/save-the-date/rsvps/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Failed");
+        toast.success(`Confirmação de "${guestName}" eliminada.`);
+        onRefresh();
+      } catch {
+        toast.error("Erro ao eliminar confirmação. Tente novamente.");
+      }
     },
-    [router],
+    [onRefresh],
   );
-
-  const handleDelete = useCallback(async (id: string, guestName: string) => {
-    try {
-      const res = await fetch(`/api/admin/save-the-date/rsvps/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed");
-      setResponses((prev) => prev.filter((r) => r.id !== id));
-      toast.success(`Confirmação de "${guestName}" eliminada.`);
-    } catch {
-      toast.error("Erro ao eliminar confirmação. Tente novamente.");
-    }
-  }, []);
-
-  const openSaveTheDateResponses = (slug: string) => {
-    router.push(getSaveTheDateRsvpPath(slug));
-  };
-
-  const handleSaveTheDateRowKeyDown = (
-    event: KeyboardEvent<HTMLTableRowElement>,
-    slug: string,
-  ) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      openSaveTheDateResponses(slug);
-    }
-  };
 
   return (
     <div className="space-y-4">
       <StatsBar
-        total={responses.length}
-        attending={totalAttending}
-        declined={totalDeclined}
-        filterLabel={selectedStdSlug ? `Para ${selectedStdSlug}` : "Sem Save the Dates"}
+        total={stats.total}
+        attending={stats.attending}
+        declined={stats.declined}
+        filterLabel={std ? `Para ${std.slug}` : "Sem Save the Dates"}
       />
 
       <Card>
@@ -549,38 +494,34 @@ function SaveTheDateTab({
               <CardDescription>Todas as respostas recebidas dos convidados</CardDescription>
             </div>
             <div className="w-full sm:w-64">
-              <Select
-                value={selectedStdSlug ?? undefined}
-                onValueChange={handleFilterChange}
-                disabled={isPending || saveDates.length === 0}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filtrar por Save the Date" />
-                </SelectTrigger>
-                <SelectContent>
-                  {saveDates.map((s) => (
-                    <SelectItem key={s.slug} value={s.slug}>
-                      {s.couple.bride} &amp; {s.couple.groom} ({s._count.rsvpResponses})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <RsvpTargetPicker
+                key={std?.slug ?? "none"}
+                kind="std"
+                selected={std}
+                onSelect={(slug) => onNavigate(getSaveTheDateRsvpPath(slug))}
+                placeholder="Filtrar por Save the Date"
+                disabled={isPending || std === null}
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {responses.length === 0 ? (
+          {std === null || responses.length === 0 ? (
             <EmptyState
               message={
-                selectedStdSlug
+                std
                   ? "Este Save the Date ainda não tem respostas."
-                  : saveDates.length === 0
-                    ? "Nenhum Save the Date tem confirmação de presença activada."
-                    : "Nenhum convidado respondeu ainda."
+                  : "Nenhum Save the Date tem confirmação de presença activada."
               }
             />
           ) : (
-            <div className="border rounded-lg overflow-hidden">
+            <div
+              className={cn(
+                "border rounded-lg overflow-hidden transition-opacity",
+                isPending && "opacity-60",
+              )}
+              aria-busy={isPending}
+            >
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -595,16 +536,7 @@ function SaveTheDateTab({
                 </TableHeader>
                 <TableBody>
                   {responses.map((r) => (
-                    <TableRow
-                      key={r.id}
-                      role="link"
-                      tabIndex={0}
-                      className="cursor-pointer"
-                      onClick={() => openSaveTheDateResponses(r.saveTheDateSlug)}
-                      onKeyDown={(event) =>
-                        handleSaveTheDateRowKeyDown(event, r.saveTheDateSlug)
-                      }
-                    >
+                    <TableRow key={r.id}>
                       <TableCell>
                         <div className="font-medium">{r.guestName}</div>
                         {r.email && (
@@ -613,10 +545,10 @@ function SaveTheDateTab({
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {r.saveTheDate.couple.bride} &amp; {r.saveTheDate.couple.groom}
+                          {std.bride} &amp; {std.groom}
                         </div>
                         <code className="text-xs text-muted-foreground bg-muted px-1 py-0.5 rounded">
-                          {r.saveTheDateSlug}
+                          {std.slug}
                         </code>
                       </TableCell>
                       <TableCell className="text-center">
@@ -650,10 +582,7 @@ function SaveTheDateTab({
                       <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                         {formatDate(r.submittedAt)}
                       </TableCell>
-                      <TableCell
-                        onClick={(event) => event.stopPropagation()}
-                        onKeyDown={(event) => event.stopPropagation()}
-                      >
+                      <TableCell>
                         <DeleteButton
                           id={r.id}
                           guestName={r.guestName}
@@ -666,6 +595,13 @@ function SaveTheDateTab({
               </Table>
             </div>
           )}
+
+          <ListPagination
+            className="mt-3"
+            pagination={pagination}
+            hrefFor={hrefForPage}
+            onNavigate={onNavigate}
+          />
         </CardContent>
       </Card>
     </div>
@@ -726,33 +662,51 @@ function DeleteButton({
 // ---------------------------------------------------------------------------
 
 export function RsvpsClient({
-  invitations,
+  params,
+  invitation,
+  std,
   responses,
-  selectedSlug,
-  saveDates,
-  stdResponses,
-  selectedStdSlug,
-  activeTab,
-}: RsvpsClientProps) {
-  const router = useRouter();
+  pagination,
+  stats,
+  stdResponseCount,
+}: RsvpPageResult) {
+  const list = useListUrlState({
+    pathname: "/admin/rsvps",
+    params:
+      params.tab === "std"
+        ? { tab: "std", std: std?.slug ?? null, page: params.page }
+        : {
+            tab: "invitations",
+            invitation: invitation?.slug ?? null,
+            page: params.page,
+          },
+  });
 
-  const handleTabChange = useCallback(
-    (tab: string) => {
-      const params = new URLSearchParams();
-      params.set("tab", tab);
-      if (tab === "invitations" && selectedSlug) {
-        params.set("invitation", selectedSlug);
-      }
-      if (tab === "std" && selectedStdSlug) {
-        params.set("std", selectedStdSlug);
-      }
-      router.push(`/admin/rsvps?${params}`);
-    },
-    [router, selectedSlug, selectedStdSlug],
-  );
+  // Each tab opens on its own selection; the invitations tab falls back to
+  // the newest invitation when the URL names none.
+  const handleTabChange = (tab: string) => {
+    if (tab === "std") {
+      list.navigate(std ? getSaveTheDateRsvpPath(std.slug) : "/admin/rsvps?tab=std");
+    } else {
+      list.navigate("/admin/rsvps?tab=invitations");
+    }
+  };
+
+  const tabProps: TabProps = {
+    responses,
+    pagination,
+    stats,
+    isPending: list.isPending,
+    hrefForPage: (page) => list.hrefFor({ page }),
+    onNavigate: list.navigate,
+    onRefresh: list.refresh,
+  };
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange}>
+    <Tabs
+      value={params.tab}
+      onValueChange={(value) => handleTabChange(String(value))}
+    >
       <TabsList className="mb-6">
         <TabsTrigger value="invitations" className="gap-2">
           <Heart className="size-3.5" />
@@ -761,30 +715,25 @@ export function RsvpsClient({
         <TabsTrigger value="std" className="gap-2">
           <CalendarHeart className="size-3.5" />
           Save the Date
-          {stdResponses.length > 0 && (
+          {stdResponseCount > 0 && (
             <Badge variant="secondary" className="ml-1 h-4 px-1.5 text-[10px]">
-              {stdResponses.length}
+              {stdResponseCount}
             </Badge>
           )}
         </TabsTrigger>
       </TabsList>
 
+      {/* Only the active tab has rows: the server loads one list per request. */}
       <TabsContent value="invitations">
-        <InvitationsTab
-          key={selectedSlug ?? "all"}
-          invitations={invitations}
-          responses={responses}
-          selectedSlug={selectedSlug}
-        />
+        {params.tab === "invitations" ? (
+          <InvitationsTab invitation={invitation} {...tabProps} />
+        ) : null}
       </TabsContent>
 
       <TabsContent value="std">
-        <SaveTheDateTab
-          key={selectedStdSlug ?? "all"}
-          saveDates={saveDates}
-          stdResponses={stdResponses}
-          selectedStdSlug={selectedStdSlug}
-        />
+        {params.tab === "std" ? (
+          <SaveTheDateTab std={std} {...tabProps} />
+        ) : null}
       </TabsContent>
     </Tabs>
   );

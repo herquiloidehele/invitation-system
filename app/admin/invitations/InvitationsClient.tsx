@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, type KeyboardEvent } from "react";
+import { useState, useCallback, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -67,7 +67,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import type { InvitationRow } from "./page";
+import type { InvitationListResult } from "@/lib/admin-list/invitations";
+import { ListPagination } from "@/components/admin/ListPagination";
+import { useListUrlState } from "@/hooks/use-list-url-state";
 import { buildInvitationDisplayName } from "@/lib/invitation-event-types";
 import {
   getInvitationDuplicatePath,
@@ -79,25 +81,26 @@ import {
   type IntakeDemoOption,
 } from "@/components/admin/CreateIntakeDialog";
 
-const TEMPLATE_LABELS: Record<string, string> = {
-  "pink-floral": "Pink Floral",
-  "modern-minimal": "Modern Minimal",
-  "boho-chic": "Boho Chic",
-  "midnight-elegance": "Midnight Elegance",
-};
-
-interface InvitationsClientProps {
-  invitations: InvitationRow[];
-}
-
 export function InvitationsClient({
-  invitations: initialInvitations,
-}: InvitationsClientProps) {
+  rows,
+  pagination,
+  params,
+  tabCounts,
+  stats,
+  themes,
+}: InvitationListResult) {
   const router = useRouter();
-  const [invitations, setInvitations] = useState(initialInvitations);
-  const [search, setSearch] = useState("");
-  const [templateFilter, setTemplateFilter] = useState("all");
-  const [demoTab, setDemoTab] = useState<"real" | "demo">("real");
+  const list = useListUrlState({
+    pathname: "/admin/invitations",
+    params: {
+      tab: params.tab,
+      q: params.q,
+      template: params.template,
+      page: params.page,
+    },
+    defaults: { tab: "real" },
+  });
+  const refreshList = list.refresh;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [blockingId, setBlockingId] = useState<string | null>(null);
   const [blockDialogFor, setBlockDialogFor] = useState<{
@@ -107,46 +110,14 @@ export function InvitationsClient({
   const [intakeDialogFor, setIntakeDialogFor] =
     useState<IntakeDemoOption | null>(null);
 
-  // Derived stats
-  const totalRsvps = useMemo(
-    () => invitations.reduce((sum, inv) => sum + inv._count.rsvpResponses, 0),
-    [invitations],
-  );
-  const rsvpEnabled = useMemo(
-    () => invitations.filter((inv) => inv.rsvp?.enabled).length,
-    [invitations],
-  );
-  const confirmationRate = useMemo(
-    () =>
-      invitations.length > 0
-        ? ((totalRsvps / Math.max(invitations.length, 1)) * 100).toFixed(1)
-        : "0",
-    [invitations, totalRsvps],
-  );
-  const realCount = useMemo(
-    () => invitations.filter((inv) => !inv.isDemo).length,
-    [invitations],
-  );
-  const demoCount = useMemo(
-    () => invitations.filter((inv) => inv.isDemo).length,
-    [invitations],
-  );
+  // Same formula as before, now from the global totals.
+  const confirmationRate =
+    stats.total > 0 ? ((stats.totalRsvps / stats.total) * 100).toFixed(1) : "0";
 
-  // Filtered list
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    return invitations.filter((inv) => {
-      const matchesDemoTab = demoTab === "demo" ? inv.isDemo : !inv.isDemo;
-      const matchesSearch =
-        !q ||
-        inv.couple.bride.toLowerCase().includes(q) ||
-        inv.couple.groom.toLowerCase().includes(q) ||
-        inv.slug.toLowerCase().includes(q);
-      const matchesTemplate =
-        templateFilter === "all" || inv.template === templateFilter;
-      return matchesDemoTab && matchesSearch && matchesTemplate;
-    });
-  }, [invitations, search, templateFilter, demoTab]);
+  const templateItems = [
+    { value: "all", label: "Todos os modelos" },
+    ...themes.map((theme) => ({ value: theme.name, label: theme.label })),
+  ];
 
   const handleDelete = useCallback(
     async (id: string, coupleName: string) => {
@@ -159,9 +130,8 @@ export function InvitationsClient({
           const data = await res.json();
           throw new Error(data.error ?? "Falha ao eliminar");
         }
-        setInvitations((prev) => prev.filter((inv) => inv.id !== id));
         toast.success(`Convite de ${coupleName} eliminado.`);
-        router.refresh();
+        refreshList();
       } catch (err) {
         toast.error(
           err instanceof Error
@@ -172,7 +142,7 @@ export function InvitationsClient({
         setDeletingId(null);
       }
     },
-    [router],
+    [refreshList],
   );
 
   const handleSetBlocked = useCallback(
@@ -188,28 +158,13 @@ export function InvitationsClient({
           const data = await res.json();
           throw new Error(data.error ?? "Falha ao atualizar o bloqueio");
         }
-        const updated = (await res.json()) as {
-          blockedAt: string | null;
-          blockedReason: string | null;
-        };
-        setInvitations((prev) =>
-          prev.map((inv) =>
-            inv.id === id
-              ? {
-                  ...inv,
-                  blockedAt: updated.blockedAt,
-                  blockedReason: updated.blockedReason,
-                }
-              : inv,
-          ),
-        );
         setBlockDialogFor(null);
         toast.success(
           blocked
             ? `Convite de ${coupleName} bloqueado.`
             : `Convite de ${coupleName} desbloqueado.`,
         );
-        router.refresh();
+        refreshList();
       } catch (err) {
         toast.error(
           err instanceof Error
@@ -220,7 +175,7 @@ export function InvitationsClient({
         setBlockingId(null);
       }
     },
-    [router],
+    [refreshList],
   );
 
   const formatDate = (date: Date | string) =>
@@ -257,7 +212,7 @@ export function InvitationsClient({
             <Heart className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{invitations.length}</div>
+            <div className="text-2xl font-bold">{stats.total}</div>
             <p className="text-xs text-muted-foreground">Convites criados</p>
           </CardContent>
         </Card>
@@ -269,7 +224,7 @@ export function InvitationsClient({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">
-              {rsvpEnabled}
+              {stats.rsvpEnabled}
             </div>
             <p className="text-xs text-muted-foreground">
               Com confirmação aberta
@@ -285,7 +240,7 @@ export function InvitationsClient({
             <Users className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalRsvps}</div>
+            <div className="text-2xl font-bold">{stats.totalRsvps}</div>
             <p className="text-xs text-muted-foreground">Respostas recebidas</p>
           </CardContent>
         </Card>
@@ -363,12 +318,12 @@ export function InvitationsClient({
           </div>
 
           <Tabs
-            value={demoTab}
-            onValueChange={(value) => setDemoTab(value as "real" | "demo")}
+            value={params.tab}
+            onValueChange={(value) => list.setParam("tab", String(value))}
           >
             <TabsList>
-              <TabsTrigger value="real">Real ({realCount})</TabsTrigger>
-              <TabsTrigger value="demo">Demo ({demoCount})</TabsTrigger>
+              <TabsTrigger value="real">Real ({tabCounts.real})</TabsTrigger>
+              <TabsTrigger value="demo">Demo ({tabCounts.demo})</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -378,23 +333,25 @@ export function InvitationsClient({
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
               <Input
                 placeholder="Pesquisar por casal ou slug..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={list.searchText}
+                onChange={(e) => list.setSearchText(e.target.value)}
                 className="pl-9"
               />
             </div>
             <Select
-              value={templateFilter}
-              onValueChange={(v) => setTemplateFilter(v ?? "all")}
+              items={templateItems}
+              value={params.template || "all"}
+              onValueChange={(v) =>
+                list.setParam("template", !v || v === "all" ? null : String(v))
+              }
             >
               <SelectTrigger className="w-full sm:w-52">
                 <SelectValue placeholder="Todos os modelos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os modelos</SelectItem>
-                {Object.entries(TEMPLATE_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
+                {templateItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -403,22 +360,22 @@ export function InvitationsClient({
         </CardHeader>
 
         <CardContent>
-          {filtered.length === 0 ? (
+          {rows.length === 0 ? (
             <div className="border rounded-lg p-12 text-center text-muted-foreground">
               <Heart className="size-10 mx-auto mb-3 opacity-30" />
               <p className="text-lg font-medium">
-                {invitations.length === 0
+                {stats.total === 0
                   ? "Nenhum convite criado ainda"
-                  : demoTab === "demo"
+                  : params.tab === "demo"
                     ? "Nenhum convite demo encontrado"
                     : "Nenhum convite real encontrado"}
               </p>
               <p className="text-sm mt-1">
-                {invitations.length === 0
+                {stats.total === 0
                   ? "Crie o primeiro convite para começar."
                   : "Tente ajustar os filtros de pesquisa."}
               </p>
-              {invitations.length === 0 && (
+              {stats.total === 0 && (
                 <Link
                   href="/admin/invitations/new"
                   className={cn(
@@ -432,7 +389,13 @@ export function InvitationsClient({
               )}
             </div>
           ) : (
-            <div className="border rounded-lg overflow-hidden">
+            <div
+              className={cn(
+                "border rounded-lg overflow-hidden transition-opacity",
+                list.isPending && "opacity-60",
+              )}
+              aria-busy={list.isPending}
+            >
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -441,7 +404,7 @@ export function InvitationsClient({
                     <TableHead>Modelo</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead className="text-center">Confirmações</TableHead>
-                    <TableHead className="text-center">RSVP</TableHead>
+                    <TableHead className="text-center">Tipo</TableHead>
                     <TableHead className="text-muted-foreground">
                       Criado em
                     </TableHead>
@@ -449,12 +412,15 @@ export function InvitationsClient({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((inv) => {
+                  {rows.map((inv) => {
                     const coupleName = buildInvitationDisplayName({
                       eventType: inv.eventType,
                       primaryName: inv.couple.bride,
                       secondaryName: inv.couple.groom,
                     });
+                    const isExternal =
+                      inv.invitationType === "external_video" ||
+                      inv.invitationType === "external_link";
                     return (
                       <TableRow
                         key={inv.id}
@@ -495,7 +461,7 @@ export function InvitationsClient({
 
                         <TableCell>
                           <Badge variant="secondary">
-                            {TEMPLATE_LABELS[inv.template] ?? inv.template}
+                            {inv.templateLabel}
                           </Badge>
                         </TableCell>
 
@@ -510,19 +476,19 @@ export function InvitationsClient({
                         </TableCell>
 
                         <TableCell className="text-center">
-                          {inv.rsvp?.enabled ? (
+                          {isExternal ? (
                             <Badge
                               variant="outline"
-                              className="border-emerald-500 text-emerald-600 bg-emerald-50 dark:bg-emerald-950"
+                              className="border-sky-500 text-sky-600 bg-sky-50 dark:bg-sky-950"
                             >
-                              Ativo
+                              Externo
                             </Badge>
                           ) : (
                             <Badge
                               variant="outline"
                               className="text-muted-foreground"
                             >
-                              Inativo
+                              Interno
                             </Badge>
                           )}
                         </TableCell>
@@ -748,13 +714,12 @@ export function InvitationsClient({
             </div>
           )}
 
-          {/* Results count when filtering */}
-          {(search || templateFilter !== "all") && filtered.length > 0 && (
-            <p className="text-xs text-muted-foreground mt-3">
-              {filtered.length} convite{filtered.length !== 1 ? "s" : ""} no
-              separador {demoTab === "demo" ? "Demo" : "Real"}
-            </p>
-          )}
+          <ListPagination
+            className="mt-3"
+            pagination={pagination}
+            hrefFor={(page) => list.hrefFor({ page })}
+            onNavigate={list.navigate}
+          />
         </CardContent>
       </Card>
 
