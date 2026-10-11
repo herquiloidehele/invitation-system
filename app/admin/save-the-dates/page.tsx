@@ -1,42 +1,20 @@
-import { prisma } from "@/lib/db";
+import type { RawSearchParams } from "@/lib/admin-list/params";
+import {
+  loadSaveTheDateListPage,
+  parseSaveTheDateListParams,
+} from "@/lib/admin-list/save-the-dates";
 import { SaveTheDatesClient } from "./SaveTheDatesClient";
 
 export const dynamic = "force-dynamic";
 
-export type SaveTheDateRow = {
-  id: string;
-  slug: string;
-  themeName: string;
-  couple: { bride: string; groom: string };
-  date: { display: string; iso?: string };
-  createdAt: Date | string;
-  ownerToken: string;
-  rsvpEnabled: boolean;
-  isDemo: boolean;
-  landingModelName: string | null;
-};
+export default async function AdminSaveTheDatesPage({
+  searchParams,
+}: {
+  searchParams: Promise<RawSearchParams>;
+}) {
+  const list = await loadSaveTheDateListPage(
+    parseSaveTheDateListParams(await searchParams),
+  );
 
-export default async function AdminSaveTheDatesPage() {
-  const items = await prisma.saveTheDate.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { theme: { select: { name: true, label: true } } },
-  });
-
-  const rows: SaveTheDateRow[] = items.map((item) => {
-    const rsvp = item.rsvp as { enabled?: boolean } | null;
-    return {
-      id: item.id,
-      slug: item.slug,
-      themeName: item.theme.label,
-      couple: item.couple as { bride: string; groom: string },
-      date: item.date as { display: string; iso?: string },
-      createdAt: item.createdAt,
-      ownerToken: item.ownerToken,
-      rsvpEnabled: rsvp?.enabled === true,
-      isDemo: item.isDemo,
-      landingModelName: item.landingModelName,
-    };
-  });
-
-  return <SaveTheDatesClient items={rows} />;
+  return <SaveTheDatesClient {...list} />;
 }

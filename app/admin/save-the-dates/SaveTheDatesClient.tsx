@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type KeyboardEvent } from "react";
+import { useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -31,47 +31,32 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import type { SaveTheDateRow } from "./page";
+import type { SaveTheDateListResult } from "@/lib/admin-list/save-the-dates";
+import { ListPagination } from "@/components/admin/ListPagination";
+import { useListUrlState } from "@/hooks/use-list-url-state";
 import { getSaveTheDateEditPath } from "@/lib/admin-row-navigation";
 import {
   CreateIntakeDialog,
   type IntakeDemoOption,
 } from "@/components/admin/CreateIntakeDialog";
 
-interface Props {
-  items: SaveTheDateRow[];
-}
-
-export function SaveTheDatesClient({ items: initial }: Props) {
+export function SaveTheDatesClient({
+  rows,
+  pagination,
+  params,
+  tabCounts,
+}: SaveTheDateListResult) {
   const router = useRouter();
-  const [items, setItems] = useState(initial);
-  const [search, setSearch] = useState("");
-  const [demoTab, setDemoTab] = useState<"real" | "demo">("real");
+  const list = useListUrlState({
+    pathname: "/admin/save-the-dates",
+    params: { tab: params.tab, q: params.q, page: params.page },
+    defaults: { tab: "real" },
+  });
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [intakeDialogFor, setIntakeDialogFor] =
     useState<IntakeDemoOption | null>(null);
 
-  const realCount = useMemo(
-    () => items.filter((item) => !item.isDemo).length,
-    [items],
-  );
-  const demoCount = useMemo(
-    () => items.filter((item) => item.isDemo).length,
-    [items],
-  );
-
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    return items.filter((i) => {
-      const matchesDemoTab = demoTab === "demo" ? i.isDemo : !i.isDemo;
-      const matchesSearch =
-        !q ||
-        i.couple.bride.toLowerCase().includes(q) ||
-        i.couple.groom.toLowerCase().includes(q) ||
-        i.slug.toLowerCase().includes(q);
-      return matchesDemoTab && matchesSearch;
-    });
-  }, [items, search, demoTab]);
+  const totalCount = tabCounts.real + tabCounts.demo;
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
@@ -80,9 +65,8 @@ export function SaveTheDatesClient({ items: initial }: Props) {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete");
-      setItems((prev) => prev.filter((i) => i.id !== id));
       toast.success("Save the Date eliminado com sucesso");
-      router.refresh();
+      list.refresh();
     } catch {
       toast.error("Erro ao eliminar");
     } finally {
@@ -118,8 +102,8 @@ export function SaveTheDatesClient({ items: initial }: Props) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Save the Date</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {items.length} save the date{items.length !== 1 ? "s" : ""} criado
-            {items.length !== 1 ? "s" : ""}.
+            {totalCount} save the date{totalCount !== 1 ? "s" : ""} criado
+            {totalCount !== 1 ? "s" : ""}.
           </p>
         </div>
         <Link
@@ -132,12 +116,12 @@ export function SaveTheDatesClient({ items: initial }: Props) {
       </div>
 
       <Tabs
-        value={demoTab}
-        onValueChange={(value) => setDemoTab(value as "real" | "demo")}
+        value={params.tab}
+        onValueChange={(value) => list.setParam("tab", String(value))}
       >
         <TabsList>
-          <TabsTrigger value="real">Real ({realCount})</TabsTrigger>
-          <TabsTrigger value="demo">Demo ({demoCount})</TabsTrigger>
+          <TabsTrigger value="real">Real ({tabCounts.real})</TabsTrigger>
+          <TabsTrigger value="demo">Demo ({tabCounts.demo})</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -147,15 +131,21 @@ export function SaveTheDatesClient({ items: initial }: Props) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Pesquisar por nomes ou slug..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={list.searchText}
+            onChange={(e) => list.setSearchText(e.target.value)}
             className="pl-9"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div
+        className={cn(
+          "rounded-md border transition-opacity",
+          list.isPending && "opacity-60",
+        )}
+        aria-busy={list.isPending}
+      >
         <Table>
           <TableHeader>
             <TableRow>
@@ -168,16 +158,16 @@ export function SaveTheDatesClient({ items: initial }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
-                  {demoTab === "demo"
+                  {params.tab === "demo"
                     ? "Nenhum save the date demo encontrado."
                     : "Nenhum save the date real encontrado."}
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((item) => (
+              rows.map((item) => (
                 <TableRow
                   key={item.id}
                   role="link"
@@ -309,6 +299,11 @@ export function SaveTheDatesClient({ items: initial }: Props) {
           </TableBody>
         </Table>
       </div>
+      <ListPagination
+        pagination={pagination}
+        hrefFor={(page) => list.hrefFor({ page })}
+        onNavigate={list.navigate}
+      />
       {intakeDialogFor ? (
         <CreateIntakeDialog
           key={intakeDialogFor.id}
