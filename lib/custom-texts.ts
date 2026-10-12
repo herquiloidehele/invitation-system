@@ -111,6 +111,16 @@ export const CUSTOM_TEXT_GROUPS: CustomTextGroup[] = [
         placeholder: "Presentes",
       },
       {
+        key: "giftRegistry_listTitle",
+        label: "Presentes — Lista de Presentes",
+        placeholder: "Lista de Presentes",
+      },
+      {
+        key: "giftRegistry_bankTransferTitle",
+        label: "Presentes — Transferência Bancária",
+        placeholder: "Transferência Bancária",
+      },
+      {
         key: "sectionTitle_guestGuide",
         label: "Manual do Bom Convidado",
         placeholder: "Manual do Bom Convidado",

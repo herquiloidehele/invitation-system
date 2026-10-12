@@ -197,6 +197,7 @@ export default function ElegantFloralPage({
                 textStyles={ts}
                 slug={invitation.slug}
                 guestToken={invitation.guest?.token}
+                customTexts={invitation.customTexts}
               />
             </div>
 

@@ -1176,6 +1176,9 @@ export interface CustomTexts {
   sectionTitle_location?: string;
   sectionTitle_dressCode?: string;
   sectionTitle_giftRegistry?: string;
+  /** Headers of the two accordions inside the gifts section. */
+  giftRegistry_listTitle?: string;
+  giftRegistry_bankTransferTitle?: string;
   sectionTitle_guestGuide?: string;
   sectionTitle_faqs?: string;
   sectionTitle_gallery?: string;

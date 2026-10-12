@@ -4,8 +4,13 @@ import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { Gift } from "lucide-react";
 import confetti from "canvas-confetti";
-import { useTranslations } from "next-intl";
-import type { GiftRegistry, TemplateTheme, TextStyleOverrides } from "@/lib/types";
+import type {
+  CustomTexts,
+  GiftRegistry,
+  TemplateTheme,
+  TextStyleOverrides,
+} from "@/lib/types";
+import { useCustomText } from "@/lib/custom-texts";
 import { efStyle } from "@/lib/elegant-floral";
 import {
   bankTransferAccountName,
@@ -35,6 +40,8 @@ interface GiftsSectionProps {
   guestToken?: string;
   title?: string;
   buttonLabel?: string;
+  /** Per-invitation overrides for the two accordion headers. */
+  customTexts?: CustomTexts | null;
 }
 
 /** "Presentes" — a card with the gift message on top and up to two confetti
@@ -47,10 +54,11 @@ export default function GiftsSection({
   guestToken,
   title = "Presentes",
   buttonLabel = "Ver Lista",
+  customTexts,
 }: GiftsSectionProps) {
   const reveal = useRevealProps();
   const router = useRouter();
-  const tInvitation = useTranslations("Invitation");
+  const t = useCustomText(customTexts);
   const firingRef = useRef(false);
 
   const handleVerLista = useCallback(() => {
@@ -148,7 +156,7 @@ export default function GiftsSection({
         >
           {showRegistry && (
             <ConfettiAccordion
-              header={tInvitation("giftRegistry_listTitle")}
+              header={t("giftRegistry_listTitle")}
               theme={theme}
               textStyles={ts}
             >
@@ -178,7 +186,7 @@ export default function GiftsSection({
 
           {showBank && (
             <ConfettiAccordion
-              header={tInvitation("giftRegistry_bankTransferTitle")}
+              header={t("giftRegistry_bankTransferTitle")}
               theme={theme}
               textStyles={ts}
             >
