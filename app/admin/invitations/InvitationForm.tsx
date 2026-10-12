@@ -3483,44 +3483,51 @@ export default function InvitationForm({
 
                   {/* RSVP */}
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Confirmação Ativada</Label>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-0.5">
+                        <Label>Confirmação Ativada</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Quando desativada, a secção RSVP deixa de aparecer no
+                          convite.
+                        </p>
+                      </div>
                       <Switch
                         checked={form.rsvp.enabled}
                         onCheckedChange={(v) => updateRsvp("enabled", v)}
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label>Ação do botão principal</Label>
-                      <p className="text-xs text-muted-foreground">
-                        Escolha se o botão principal abre o formulário de RSVP,
-                        adiciona o evento ao calendário, ou se o formulário
-                        aparece embutido na própria página, sem botão.
-                      </p>
-                      <Select
-                        value={getRsvpCtaAction(form.rsvp)}
-                        onValueChange={(value) => {
-                          if (value) updateRsvp("ctaAction", value);
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="rsvp">
-                            Abrir formulário de RSVP
-                          </SelectItem>
-                          <SelectItem value="calendar">
-                            Adicionar ao calendário
-                          </SelectItem>
-                          <SelectItem value="inline">
-                            Formulário embutido na página
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
                     {form.rsvp.enabled && (
                       <>
+                        <div className="space-y-1.5">
+                          <Label>Ação do botão principal</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Escolha se o botão principal abre o formulário de
+                            RSVP, adiciona o evento ao calendário, ou se o
+                            formulário aparece embutido na própria página, sem
+                            botão.
+                          </p>
+                          <Select
+                            value={getRsvpCtaAction(form.rsvp)}
+                            onValueChange={(value) => {
+                              if (value) updateRsvp("ctaAction", value);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="rsvp">
+                                Abrir formulário de RSVP
+                              </SelectItem>
+                              <SelectItem value="calendar">
+                                Adicionar ao calendário
+                              </SelectItem>
+                              <SelectItem value="inline">
+                                Formulário embutido na página
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div className="space-y-1.5">
                           <Label htmlFor="rsvpDeadline">Prazo (opcional)</Label>
                           <Input

@@ -25,6 +25,17 @@ export function getRsvpCtaAction(
 }
 
 /**
+ * Whether the standard invitation page renders its RSVP section (label,
+ * button or inline form, entry pass). Default-shown: only an explicit
+ * `enabled: false` hides it, so rows saved without the flag keep their RSVP.
+ */
+export function shouldShowRsvpSection(
+  config: RsvpConfigWithEmail | null | undefined,
+): boolean {
+  return config?.enabled !== false;
+}
+
+/**
  * True when the host has closed RSVP confirmations for this invitation.
  * `acceptingResponses` is default-open: only an explicit `false` closes it,
  * so missing/`true` values (every existing invitation) stay open.

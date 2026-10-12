@@ -32,7 +32,9 @@ describe("inline RSVP form wiring", () => {
     expect(source).toContain("hideTitle");
 
     // The modal (and its trigger state) never render in inline mode.
-    expect(source).toContain("{!isCalendarCta && !isInlineRsvp && (");
+    expect(source).toContain(
+      "{showRsvpSection && !isCalendarCta && !isInlineRsvp && (",
+    );
   });
 
   it("wraps the inline form in a toggleable themed card", () => {

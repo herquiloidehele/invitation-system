@@ -55,7 +55,7 @@ import InvitationHero, {
   InvitationHeroNames,
 } from "./InvitationHero";
 import { RSVP_SUBMITTED_SLUGS_KEY } from "@/lib/constants";
-import { getRsvpCtaAction } from "@/lib/rsvp-config";
+import { getRsvpCtaAction, shouldShowRsvpSection } from "@/lib/rsvp-config";
 import { getStandardInvitationImageSectionKeys } from "@/lib/standard-invitation-image-sections";
 import { shouldRenderCoupleGallery } from "@/lib/couple-gallery";
 import { shouldRenderPlaces } from "@/lib/places";
@@ -206,6 +206,8 @@ export default function InvitationPage({
   const rsvpCtaAction = getRsvpCtaAction(invitation.rsvp);
   const isCalendarCta = rsvpCtaAction === "calendar";
   const isInlineRsvp = rsvpCtaAction === "inline";
+  // Hosts turn the whole RSVP section off with "Confirmação Ativada".
+  const showRsvpSection = shouldShowRsvpSection(invitation.rsvp);
 
   // Carry the reader down the page when the invitation opens, until they take
   // over. Never in the admin preview, where an editor is trying to work.
@@ -868,6 +870,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* 6. CTA Section                                                    */}
       {/* ================================================================= */}
+      {showRsvpSection && (
       <AnimatedSection className="px-4 pb-10" isPreview={isPreview}>
         <div className="flex flex-col items-center">
           <span className="mb-6 text-center" style={ts.ctaLabel}>
@@ -1013,6 +1016,7 @@ export default function InvitationPage({
           )}
         </div>
       </AnimatedSection>
+      )}
 
       {/* ================================================================= */}
       {/* 8. Footer — monogram with decorative ring                         */}
@@ -1116,7 +1120,7 @@ export default function InvitationPage({
       {/* ================================================================= */}
       {/* RSVP Modal                                                        */}
       {/* ================================================================= */}
-      {!isCalendarCta && !isInlineRsvp && (
+      {showRsvpSection && !isCalendarCta && !isInlineRsvp && (
         <RSVPModal
           open={rsvpOpen}
           onClose={() => {
