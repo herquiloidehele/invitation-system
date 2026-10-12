@@ -5,10 +5,11 @@ import { notFound } from "next/navigation";
 import { IntakeWizard } from "@/components/intake/IntakeWizard";
 import { resolveLocale } from "@/i18n/locales";
 import { intakeRef } from "@/lib/intake/links";
+import { buildIntakeMetadata } from "@/lib/intake/metadata";
 import { demoPreviewHref } from "@/lib/intake/page-data";
 import { loadIntakeByToken } from "@/lib/intake/service";
 import { isIntakeTokenShape } from "@/lib/intake/tokens";
-import { createNoIndexMetadata } from "@/lib/seo";
+import { SITE_URL } from "@/lib/seo";
 
 // The customer's personal intake link. It keeps working whatever happens to
 // the demo afterwards (blocked, renamed, deleted): the answers belong to the
@@ -23,9 +24,12 @@ export async function generateMetadata({
 }: {
   params: Params;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale: resolveLocale(locale), namespace: "Intake" });
-  return { ...createNoIndexMetadata(), title: t("metaTitle") };
+  const locale = resolveLocale((await params).locale);
+  const t = await getTranslations({ locale, namespace: "Intake" });
+  return buildIntakeMetadata(
+    { title: t("metaTitle"), description: t("metaDescription"), locale },
+    SITE_URL,
+  );
 }
 
 export default async function IntakeTokenPage({ params }: { params: Params }) {

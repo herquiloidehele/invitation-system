@@ -574,6 +574,7 @@
   },
   "Intake": {
     "metaTitle": "Compila i dettagli dell'evento",
+    "metaDescription": "Raccontaci i dettagli del tuo evento per personalizzare il tuo invito.",
     "eyebrowInvitation": "Personalizza l'invito",
     "eyebrowSaveTheDate": "Personalizza il Save the Date",
     "viewModel": "Vedi il modello",

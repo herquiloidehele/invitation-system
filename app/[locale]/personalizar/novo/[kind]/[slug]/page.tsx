@@ -7,9 +7,10 @@ import { IntakeWizard } from "@/components/intake/IntakeWizard";
 import { resolveLocale } from "@/i18n/locales";
 import { getInvitationBlock } from "@/lib/invitation-block";
 import { parseIntakeKind } from "@/lib/intake/catalog";
+import { buildIntakeMetadata } from "@/lib/intake/metadata";
 import { demoPreviewHref } from "@/lib/intake/page-data";
 import { findDemo } from "@/lib/intake/service";
-import { createNoIndexMetadata } from "@/lib/seo";
+import { SITE_URL } from "@/lib/seo";
 
 // Self-start: the customer arrives from "Personalizar" on a landing details
 // page. Nothing is stored until the contact step is valid; the wizard then
@@ -24,9 +25,12 @@ export async function generateMetadata({
 }: {
   params: Params;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale: resolveLocale(locale), namespace: "Intake" });
-  return { ...createNoIndexMetadata(), title: t("metaTitle") };
+  const locale = resolveLocale((await params).locale);
+  const t = await getTranslations({ locale, namespace: "Intake" });
+  return buildIntakeMetadata(
+    { title: t("metaTitle"), description: t("metaDescription"), locale },
+    SITE_URL,
+  );
 }
 
 export default async function IntakeSelfStartPage({ params }: { params: Params }) {
