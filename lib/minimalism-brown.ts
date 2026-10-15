@@ -5,6 +5,7 @@ import type {
   CustomTexts,
   GuestbookConfig,
   GuestPhotoUpload,
+  HeroVideoRotation,
   InvitationData,
   LocationInfo,
   ParentsInfo,
@@ -460,6 +461,98 @@ export function resolveMbHeroMode(
   return invitation.heroVideoInFrame === true
     ? "polaroid-video"
     : "fullscreen-video";
+}
+
+/**
+ * A stored or submitted video rotation, as one of the four quarter turns.
+ * Anything else snaps to the nearest one, and a non-number means upright.
+ */
+export function normalizeHeroVideoRotation(value: unknown): HeroVideoRotation {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 0;
+  const quarter = Math.round(value / 90) * 90;
+  return (((quarter % 360) + 360) % 360) as HeroVideoRotation;
+}
+
+export interface MbPolaroidFrame {
+  src: string;
+  /** Intrinsic size of the frame artwork. */
+  w: number;
+  h: number;
+  /**
+   * The photo box, as a share of the frame, before it is turned by
+   * `tiltDeg` about its own centre to match the tilt printed in the artwork.
+   */
+  aperture: {
+    leftPct: number;
+    topPct: number;
+    widthPct: number;
+    heightPct: number;
+    tiltDeg: number;
+  };
+}
+
+export const MB_POLAROID_FRAMES = {
+  /**
+   * Taken from the reference's own markup
+   * (`left-[11.5%] top-[8%] w-[72%] h-[77%] rotate-[-4.78deg] bg-white`)
+   * rather than inferred.
+   */
+  portrait: {
+    src: "/images/themes/minimalism-brown/frame-avatar.webp",
+    w: 1094,
+    h: 1554,
+    aperture: {
+      leftPct: 11.5,
+      topPct: 8,
+      widthPct: 72,
+      heightPct: 77,
+      tiltDeg: -4.78,
+    },
+  },
+  /** Generated from the portrait one by scripts/build-landscape-polaroid.ts, which prints these numbers. */
+  landscape: {
+    src: "/images/themes/minimalism-brown/frame-avatar-landscape.webp",
+    w: 1396,
+    h: 1079,
+    aperture: {
+      leftPct: 4.32,
+      topPct: 7.13,
+      widthPct: 85.96,
+      heightPct: 72.57,
+      tiltDeg: -4.78,
+    },
+  },
+} satisfies Record<"portrait" | "landscape", MbPolaroidFrame>;
+
+export function mbPolaroidFrame(
+  landscape: boolean | undefined,
+): MbPolaroidFrame {
+  return landscape === true
+    ? MB_POLAROID_FRAMES.landscape
+    : MB_POLAROID_FRAMES.portrait;
+}
+
+/**
+ * The box a rotated video is laid out in, centred in the frame's photo window.
+ * A quarter turn swaps the box's sides, so it is sized to the window's height
+ * by its width and covers it exactly once turned; `object-fit` then works on
+ * the upright picture. Width is a share of the window's width, height of its
+ * height.
+ */
+export function mbRotatedVideoBox(
+  frame: MbPolaroidFrame,
+  rotation: HeroVideoRotation,
+): { widthPct: number; heightPct: number; rotateDeg: HeroVideoRotation } {
+  if (rotation === 0 || rotation === 180) {
+    return { widthPct: 100, heightPct: 100, rotateDeg: rotation };
+  }
+  const windowW = frame.aperture.widthPct * frame.w;
+  const windowH = frame.aperture.heightPct * frame.h;
+  return {
+    widthPct: (windowH / windowW) * 100,
+    heightPct: (windowW / windowH) * 100,
+    rotateDeg: rotation,
+  };
 }
 
 export function isGuestbookEnabled(

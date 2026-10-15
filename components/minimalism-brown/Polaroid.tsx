@@ -1,37 +1,16 @@
 "use client";
 
-import type { CSSProperties, RefObject } from "react";
-import type { ObjectFit, TemplateTheme } from "@/lib/types";
-import { mbTokens } from "@/lib/minimalism-brown";
+import type { CSSProperties, ReactNode, RefObject } from "react";
+import type { HeroVideoRotation, ObjectFit, TemplateTheme } from "@/lib/types";
+import {
+  mbPolaroidFrame,
+  mbRotatedVideoBox,
+  mbTokens,
+  type MbPolaroidFrame,
+} from "@/lib/minimalism-brown";
 import { PrefetchedVideoSlot } from "@/components/shared/PrefetchedVideoSlot";
 import VideoPosterLayer from "@/components/shared/VideoPosterLayer";
 import { useVideoFrameReady } from "@/components/shared/useVideoFrameReady";
-
-const FRAME = {
-  src: "/images/themes/minimalism-brown/frame-avatar.webp",
-  w: 1094,
-  h: 1554,
-};
-
-/**
- * Geometry of the frame's photo window, measured from the artwork's alpha
- * channel rather than eyeballed. The printed frame is tilted, so an
- * axis-aligned photo would poke past two of its corners; seating the photo on
- * the same rotation makes it sit inside the window exactly.
- */
-/**
- * Geometry of the frame's photo window, taken from the reference's own markup
- * (`left-[11.5%] top-[8%] w-[72%] h-[77%] rotate-[-4.78deg] bg-white`) rather
- * than inferred. The printed frame is tilted, so the photo carries the same
- * rotation and sits on white, exactly as the original does.
- */
-const APERTURE = {
-  leftPct: 11.5,
-  topPct: 8,
-  widthPct: 72,
-  heightPct: 77,
-  tiltDeg: -4.78,
-};
 
 export interface PolaroidVideo {
   src: string;
@@ -62,6 +41,10 @@ interface PolaroidProps {
   video?: PolaroidVideo | null;
   /** The hero video element; required with `video`. */
   videoRef?: RefObject<HTMLVideoElement | null>;
+  /** Use the horizontal frame instead of the vertical one. */
+  landscape?: boolean;
+  /** Clockwise turn for a video recorded on its side. The photo never turns. */
+  videoRotation?: HeroVideoRotation;
 }
 
 /**
@@ -83,28 +66,34 @@ export default function Polaroid({
   style,
   video,
   videoRef,
+  landscape = false,
+  videoRotation = 0,
 }: PolaroidProps) {
   const t = mbTokens(theme);
   const hasPhoto = Boolean(src && src.trim());
+  const frame = mbPolaroidFrame(landscape);
+  const aperture = frame.aperture;
 
   return (
     <div
       style={{
         position: "relative",
         width,
-        aspectRatio: `${FRAME.w} / ${FRAME.h}`,
+        aspectRatio: `${frame.w} / ${frame.h}`,
         marginInline: "auto",
         ...style,
       }}
     >
+      {/* The printed frame is tilted, so the photo carries the same rotation
+          and sits on white, exactly as the original does. */}
       <div
         style={{
           position: "absolute",
-          left: `${APERTURE.leftPct}%`,
-          top: `${APERTURE.topPct}%`,
-          width: `${APERTURE.widthPct}%`,
-          height: `${APERTURE.heightPct}%`,
-          transform: `rotate(${APERTURE.tiltDeg}deg)`,
+          left: `${aperture.leftPct}%`,
+          top: `${aperture.topPct}%`,
+          width: `${aperture.widthPct}%`,
+          height: `${aperture.heightPct}%`,
+          transform: `rotate(${aperture.tiltDeg}deg)`,
           overflow: "hidden",
           // Beneath the frame, matching the reference's z-10 / z-20 pairing.
           // Painting the photo on top instead lets it spill over the printed
@@ -114,11 +103,13 @@ export default function Polaroid({
         }}
       >
         {video && videoRef ? (
-          <FrameVideo
-            video={video}
-            videoRef={videoRef}
-            fit={fit as ObjectFit}
-          />
+          <RotatedVideoBox frame={frame} rotation={videoRotation}>
+            <FrameVideo
+              video={video}
+              videoRef={videoRef}
+              fit={fit as ObjectFit}
+            />
+          </RotatedVideoBox>
         ) : (
           hasPhoto && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -142,9 +133,9 @@ export default function Polaroid({
       <img
         aria-hidden
         alt=""
-        src={FRAME.src}
-        width={FRAME.w}
-        height={FRAME.h}
+        src={frame.src}
+        width={frame.w}
+        height={frame.h}
         style={{
           position: "absolute",
           inset: 0,
@@ -158,6 +149,37 @@ export default function Polaroid({
           filter: t.frameShadow,
         }}
       />
+    </div>
+  );
+}
+
+/**
+ * Turns a sideways video upright inside the photo window. Upright videos get
+ * no wrapper, so they render exactly as before the setting existed.
+ */
+function RotatedVideoBox({
+  frame,
+  rotation,
+  children,
+}: {
+  frame: MbPolaroidFrame;
+  rotation: HeroVideoRotation;
+  children: ReactNode;
+}) {
+  if (rotation === 0) return children;
+  const box = mbRotatedVideoBox(frame, rotation);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        width: `${box.widthPct}%`,
+        height: `${box.heightPct}%`,
+        transform: `translate(-50%, -50%) rotate(${box.rotateDeg}deg)`,
+      }}
+    >
+      {children}
     </div>
   );
 }

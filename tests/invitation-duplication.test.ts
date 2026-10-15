@@ -36,6 +36,8 @@ describe("buildDuplicateInvitationInitialData", () => {
       "videoPoster",
       "heroVideoMuted",
       "heroVideoInFrame",
+      "heroFrameLandscape",
+      "heroVideoRotation",
       "heroMediaFit",
       "curtainVideoUrl",
       "curtainVideoPoster",

@@ -32,6 +32,8 @@ const baseRow = {
   videoPoster: null,
   heroVideoMuted: true,
   heroVideoInFrame: false,
+  heroFrameLandscape: false,
+  heroVideoRotation: 0,
   heroMediaFit: null,
   curtainVideoUrl: null,
   curtainVideoPoster: null,
@@ -315,6 +317,28 @@ describe("toAdminInvitationInitialData — hero video audio", () => {
     });
 
     expect(result.heroVideoMuted).toBe(false);
+  });
+});
+
+describe("toAdminInvitationInitialData — polaroid orientation", () => {
+  it("hydrates the horizontal frame and the video's rotation", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      heroFrameLandscape: true,
+      heroVideoRotation: 270,
+    });
+
+    expect(result.heroFrameLandscape).toBe(true);
+    expect(result.heroVideoRotation).toBe(270);
+  });
+
+  it("snaps a stored rotation that is not a quarter turn back to one", () => {
+    const result = toAdminInvitationInitialData({
+      ...baseRow,
+      heroVideoRotation: -90,
+    });
+
+    expect(result.heroVideoRotation).toBe(270);
   });
 });
 

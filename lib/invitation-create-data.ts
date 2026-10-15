@@ -10,6 +10,7 @@ import {
 } from "@/lib/invitation-translations";
 import { sanitizeJsonField } from "@/lib/json-sanitize";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { normalizeHeroVideoRotation } from "@/lib/minimalism-brown";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
@@ -64,6 +65,8 @@ export function buildInvitationCreateData(
     videoPoster: body.videoPoster ?? null,
     heroVideoMuted: body.heroVideoMuted !== false,
     heroVideoInFrame: body.heroVideoInFrame === true,
+    heroFrameLandscape: body.heroFrameLandscape === true,
+    heroVideoRotation: normalizeHeroVideoRotation(body.heroVideoRotation),
     heroMediaFit: isObjectFit(body.heroMediaFit) ? body.heroMediaFit : null,
     curtainVideoUrl: body.curtainVideoUrl ?? null,
     curtainVideoPoster: body.curtainVideoPoster ?? null,

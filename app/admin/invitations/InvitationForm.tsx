@@ -106,6 +106,7 @@ import MediaUpload from "@/components/admin/MediaUpload";
 import CoverVideosEditor from "@/components/admin/CoverVideosEditor";
 import ImagePositionEditor from "@/components/admin/ImagePositionEditor";
 import HeroMediaFitSelect from "@/components/admin/HeroMediaFitSelect";
+import HeroVideoRotationSelect from "@/components/admin/HeroVideoRotationSelect";
 import HeroVideoMutedField from "@/components/admin/HeroVideoMutedField";
 import HeroScrollIndicatorFields from "@/components/admin/HeroScrollIndicatorFields";
 import CoupleGalleryEditor from "@/components/admin/CoupleGalleryEditor";
@@ -2586,7 +2587,42 @@ export default function InvitationForm({
                         />
                       </div>
                     )}
+                    {isMinimalismBrown &&
+                      form.videoUrl &&
+                      form.heroVideoInFrame && (
+                        <HeroVideoRotationSelect
+                          id="heroVideoRotation"
+                          value={form.heroVideoRotation}
+                          onChange={(value) =>
+                            update("heroVideoRotation", value)
+                          }
+                        />
+                      )}
                   </div>
+
+                  {/* Shown whenever the polaroid is: the photo hero, or the
+                      video playing inside the frame. */}
+                  {isMinimalismBrown &&
+                    (!form.videoUrl || form.heroVideoInFrame) && (
+                      <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
+                        <div className="space-y-0.5">
+                          <Label htmlFor="heroFrameLandscape">
+                            Polaroid horizontal
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Moldura deitada, para fotos e vídeos horizontais.
+                            Desligado, a polaroid fica na vertical.
+                          </p>
+                        </div>
+                        <Switch
+                          id="heroFrameLandscape"
+                          checked={form.heroFrameLandscape === true}
+                          onCheckedChange={(checked) =>
+                            update("heroFrameLandscape", checked)
+                          }
+                        />
+                      </div>
+                    )}
 
                   {/* ── Section Images ── */}
                   <div className="space-y-1.5">

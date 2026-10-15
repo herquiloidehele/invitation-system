@@ -14,6 +14,8 @@ describe("buildInvitationCreateData", () => {
       countdown: { enabled: true, layout: "inline" },
       rsvpPage: { base: "theme", layout: "editorial" },
       heroVideoMuted: false,
+      heroFrameLandscape: true,
+      heroVideoRotation: 270,
     });
 
     const data = buildInvitationCreateData(body, "theme_copy");
@@ -25,6 +27,8 @@ describe("buildInvitationCreateData", () => {
     expect(data.heroImage).toBe(body.heroImage);
     expect(data.videoUrl).toBe(body.videoUrl);
     expect(data.heroVideoMuted).toBe(false);
+    expect(data.heroFrameLandscape).toBe(true);
+    expect(data.heroVideoRotation).toBe(270);
     expect(data.saveTheDateBackgroundImageUrl).toBe(
       body.saveTheDateBackgroundImageUrl,
     );
@@ -57,6 +61,8 @@ describe("buildInvitationCreateData", () => {
       priceOverrides: { USD: { fromCents: -1 } },
       landingCustomizationLevel: "invalid" as never,
       heroVideoMuted: undefined,
+      heroFrameLandscape: undefined,
+      heroVideoRotation: 30 as never,
       showDecorativeLines: undefined,
     });
 
@@ -65,6 +71,8 @@ describe("buildInvitationCreateData", () => {
     expect(data.heroHeight).toBeNull();
     expect(data.heroMediaFit).toBeNull();
     expect(data.heroVideoMuted).toBe(true);
+    expect(data.heroFrameLandscape).toBe(false);
+    expect(data.heroVideoRotation).toBe(0);
     expect(data.rsvp).toEqual({ enabled: true });
     expect(data.showCalendarCta).toBe(true);
     expect(data.showDecorativeLines).toBe(true);

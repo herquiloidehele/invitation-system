@@ -105,6 +105,8 @@ export const sourceInvitationRow = {
   videoPoster: "https://cdn.example.com/poster.jpg",
   heroVideoMuted: false,
   heroVideoInFrame: true,
+  heroFrameLandscape: true,
+  heroVideoRotation: 90,
   heroMediaFit: "cover",
   curtainVideoUrl: "https://cdn.example.com/curtain.mp4",
   curtainVideoPoster: "https://cdn.example.com/curtain.jpg",

@@ -129,6 +129,8 @@ model Invitation {
   videoPoster             String? // Poster for videoUrl (the hero video). Optional.
   heroVideoMuted          Boolean  @default(true) // Whether videoUrl starts muted.
   heroVideoInFrame        Boolean  @default(false) // Minimalism-brown only: play videoUrl inside the polaroid instead of the full-screen video hero.
+  heroFrameLandscape      Boolean  @default(false) // Minimalism-brown only: the polaroid (photo or framed video) uses the horizontal frame.
+  heroVideoRotation       Int      @default(0) // Minimalism-brown only: clockwise quarter turn (0/90/180/270) for the video inside the polaroid.
   heroMediaFit            String? // "cover" | "contain" | "fill" | "scale-down" | "none"; null => "cover". CSS object-fit for hero video + standard hero image.
   curtainVideoUrl         String? // Curtain-canva only: the curtain animation video played on tap. Empty → bundled default.
   curtainVideoPoster      String? // Poster for curtainVideoUrl — the closed-curtain still shown (esp. on iOS) while the curtain video loads.

@@ -14,6 +14,7 @@ import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
 import { sanitizeRsvpPageStyle } from "@/lib/rsvp-page-style";
+import { normalizeHeroVideoRotation } from "@/lib/minimalism-brown";
 import {
   splitMbSharedSpacing,
   splitMbSharedStyles,
@@ -69,6 +70,8 @@ type AdminInvitationInitialDataRow = {
   videoPoster: string | null;
   heroVideoMuted: boolean;
   heroVideoInFrame: boolean;
+  heroFrameLandscape: boolean;
+  heroVideoRotation: number;
   heroMediaFit: string | null;
   curtainVideoUrl: string | null;
   curtainVideoPoster: string | null;
@@ -164,6 +167,8 @@ export function toAdminInvitationInitialData(
     videoPoster: row.videoPoster ?? undefined,
     heroVideoMuted: row.heroVideoMuted,
     heroVideoInFrame: row.heroVideoInFrame,
+    heroFrameLandscape: row.heroFrameLandscape,
+    heroVideoRotation: normalizeHeroVideoRotation(row.heroVideoRotation),
     heroMediaFit: (row.heroMediaFit as ObjectFit | null) ?? undefined,
     curtainVideoUrl: row.curtainVideoUrl ?? undefined,
     curtainVideoPoster: row.curtainVideoPoster ?? undefined,

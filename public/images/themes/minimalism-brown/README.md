@@ -9,6 +9,12 @@ exposure. This is a launch blocker, not an implementation blocker.
 
 See `docs/superpowers/specs/2026-09-18-minimalism-brown-template-design.md`.
 
+`frame-avatar-landscape.webp` (the horizontal polaroid) is generated from
+`frame-avatar.webp` by `scripts/build-landscape-polaroid.ts`, so it carries the
+same licensing problem. When `frame-avatar.webp` is replaced, rerun the script
+and paste the size and photo window it prints into
+`MB_POLAROID_FRAMES.landscape` in `lib/minimalism-brown.ts`.
+
 ## Intrinsic dimensions
 
 Every `<img>` using these must set explicit width/height (or an aspect-ratio
@@ -18,6 +24,7 @@ box) so the decorative layers cannot shift layout as they load.
 |---|---|---|
 | flower2-decoration.webp | 320 × 743 | 79 KB |
 | frame-avatar.webp | 1094 × 1554 | 68 KB |
+| frame-avatar-landscape.webp | 1396 × 1079 | 61 KB |
 | giftbox.webp | 480 × 504 | 33 KB |
 | house-background.webp | 900 × 887 | 190 KB |
 | leaf-background.webp | 441 × 1254 | 62 KB |

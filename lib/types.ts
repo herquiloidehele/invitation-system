@@ -207,6 +207,9 @@ export interface AudioConfig {
 /** CSS `object-fit` values offered for hero media (video + standard hero image). */
 export type ObjectFit = "cover" | "contain" | "fill" | "scale-down" | "none";
 
+/** Clockwise quarter turns applied to a hero video that was recorded on its side. */
+export type HeroVideoRotation = 0 | 90 | 180 | 270;
+
 /**
  * Visual overlay controls for the hero section.
  * - `scrimOpacity` darkens the hero video background (0–1). Ignored for image heroes.
@@ -1570,6 +1573,10 @@ export interface InvitationData {
   heroVideoMuted?: boolean;
   /** Minimalism-brown only: play the hero video inside the polaroid frame instead of the full-screen video hero. Missing values default to false. */
   heroVideoInFrame?: boolean;
+  /** Minimalism-brown only: the polaroid (photo or framed video) uses the horizontal frame. Missing values default to false. */
+  heroFrameLandscape?: boolean;
+  /** Minimalism-brown only: clockwise turn applied to the video inside the polaroid. Missing values default to 0. */
+  heroVideoRotation?: HeroVideoRotation;
   /** How the hero video/image is fitted to the hero box. Unset => "cover". */
   heroMediaFit?: ObjectFit;
   /** Curtain-canva only: the curtain animation video played on tap. Falls back to the bundled default when empty. */

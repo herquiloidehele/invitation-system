@@ -200,17 +200,21 @@ export default function Hero({
           theme={theme}
           video={inFrameVideo}
           videoRef={frameVideoRef}
+          landscape={invitation.heroFrameLandscape}
+          videoRotation={invitation.heroVideoRotation}
         />
+        {/* The sprig is taller than the horizontal frame, so there it is
+            smaller and hangs lower; at full size it climbs over the names. */}
         <Sprig
           theme={theme}
-          width={134}
+          width={invitation.heroFrameLandscape ? 92 : 134}
           flip
           index={1}
           layer={30}
           style={{
             position: "absolute",
-            left: 17,
-            bottom: "-6%",
+            left: invitation.heroFrameLandscape ? 8 : 17,
+            bottom: invitation.heroFrameLandscape ? "-24%" : "-6%",
           }}
         />
       </motion.div>

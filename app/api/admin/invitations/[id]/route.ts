@@ -12,6 +12,7 @@ import {
   validateInvitationLanguageSettings,
 } from "@/lib/invitation-translations";
 import { normalizeLandingCustomizationLevel } from "@/lib/landing-customization";
+import { normalizeHeroVideoRotation } from "@/lib/minimalism-brown";
 import { sanitizeLandingTranslations } from "@/lib/landing-translations";
 import { sanitizeLandingDetailImages } from "@/lib/landing-product-details";
 import { normalizeOwnerGuestFormMode } from "@/lib/owner-guest-form-mode";
@@ -218,6 +219,12 @@ export async function PUT(
         }),
         ...(typeof body.heroVideoInFrame === "boolean" && {
           heroVideoInFrame: body.heroVideoInFrame,
+        }),
+        ...(typeof body.heroFrameLandscape === "boolean" && {
+          heroFrameLandscape: body.heroFrameLandscape,
+        }),
+        ...(body.heroVideoRotation !== undefined && {
+          heroVideoRotation: normalizeHeroVideoRotation(body.heroVideoRotation),
         }),
         ...(body.heroMediaFit !== undefined && {
           heroMediaFit: isObjectFit(body.heroMediaFit)

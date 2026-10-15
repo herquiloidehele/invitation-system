@@ -10,6 +10,7 @@ import { normalizeOwnerGuestFormMode } from "./owner-guest-form-mode";
 import { normalizeCurrency } from "./currency/config";
 import { normalizeRenderMode } from "./ai-invitation";
 import { sanitizeRsvpPageStyle } from "./rsvp-page-style";
+import { normalizeHeroVideoRotation } from "./minimalism-brown";
 import {
   splitMbSharedSpacing,
   splitMbSharedStyles,
@@ -75,6 +76,8 @@ type InvitationWithTheme = {
   videoPoster: string | null;
   heroVideoMuted: boolean;
   heroVideoInFrame: boolean;
+  heroFrameLandscape: boolean;
+  heroVideoRotation: number;
   heroMediaFit: string | null;
   curtainVideoUrl: string | null;
   curtainVideoPoster: string | null;
@@ -169,6 +172,8 @@ export function toInvitationData(row: InvitationWithTheme): InvitationData {
     videoPoster: row.videoPoster ?? undefined,
     heroVideoMuted: row.heroVideoMuted,
     heroVideoInFrame: row.heroVideoInFrame,
+    heroFrameLandscape: row.heroFrameLandscape,
+    heroVideoRotation: normalizeHeroVideoRotation(row.heroVideoRotation),
     heroMediaFit: (row.heroMediaFit as ObjectFit | null) ?? undefined,
     curtainVideoUrl: row.curtainVideoUrl ?? undefined,
     curtainVideoPoster: row.curtainVideoPoster ?? undefined,

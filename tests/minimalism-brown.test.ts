@@ -15,6 +15,9 @@ import {
   parallaxOffset,
   mbVenues,
   resolveMbHeroMode,
+  normalizeHeroVideoRotation,
+  mbPolaroidFrame,
+  mbRotatedVideoBox,
   mbCoupleNames,
   mbParentsShown,
   mbBlessingLine,
@@ -335,6 +338,83 @@ describe("resolveMbHeroMode", () => {
         heroVideoInFrame: true,
       }),
     ).toBe("polaroid-video");
+  });
+});
+
+describe("normalizeHeroVideoRotation", () => {
+  it("keeps the four quarter turns", () => {
+    for (const turn of [0, 90, 180, 270]) {
+      expect(normalizeHeroVideoRotation(turn)).toBe(turn);
+    }
+  });
+
+  it("wraps whole turns and negative angles into 0–270", () => {
+    expect(normalizeHeroVideoRotation(360)).toBe(0);
+    expect(normalizeHeroVideoRotation(450)).toBe(90);
+    expect(normalizeHeroVideoRotation(-90)).toBe(270);
+  });
+
+  it("snaps an in-between angle to the nearest quarter turn", () => {
+    expect(normalizeHeroVideoRotation(85)).toBe(90);
+    expect(normalizeHeroVideoRotation(44)).toBe(0);
+    expect(normalizeHeroVideoRotation(350)).toBe(0);
+  });
+
+  it("falls back to no rotation for anything that is not a number", () => {
+    for (const value of [undefined, null, "90", NaN, Infinity, {}]) {
+      expect(normalizeHeroVideoRotation(value)).toBe(0);
+    }
+  });
+});
+
+describe("mbPolaroidFrame", () => {
+  const windowPx = (frame: ReturnType<typeof mbPolaroidFrame>) => ({
+    w: (frame.aperture.widthPct / 100) * frame.w,
+    h: (frame.aperture.heightPct / 100) * frame.h,
+  });
+
+  it("keeps the vertical frame unless landscape is asked for", () => {
+    for (const value of [undefined, false]) {
+      const frame = mbPolaroidFrame(value);
+      expect(frame.src).toMatch(/frame-avatar\.webp$/);
+      expect(windowPx(frame).h).toBeGreaterThan(windowPx(frame).w);
+    }
+  });
+
+  it("uses the horizontal artwork with a wide photo window", () => {
+    const frame = mbPolaroidFrame(true);
+    expect(frame.src).toMatch(/frame-avatar-landscape\.webp$/);
+    expect(frame.w).toBeGreaterThan(frame.h);
+    expect(windowPx(frame).w).toBeGreaterThan(windowPx(frame).h);
+  });
+});
+
+describe("mbRotatedVideoBox", () => {
+  const frame = mbPolaroidFrame(false);
+  const apW = (frame.aperture.widthPct / 100) * frame.w;
+  const apH = (frame.aperture.heightPct / 100) * frame.h;
+
+  it("fills the window as-is when the video is upright or upside down", () => {
+    expect(mbRotatedVideoBox(frame, 0)).toEqual({
+      widthPct: 100,
+      heightPct: 100,
+      rotateDeg: 0,
+    });
+    expect(mbRotatedVideoBox(frame, 180)).toEqual({
+      widthPct: 100,
+      heightPct: 100,
+      rotateDeg: 180,
+    });
+  });
+
+  it("swaps the box's sides for a quarter turn so it still covers the window once rotated", () => {
+    for (const turn of [90, 270] as const) {
+      const box = mbRotatedVideoBox(frame, turn);
+      expect(box.rotateDeg).toBe(turn);
+      // Widths are a share of the window's width, heights of its height.
+      expect((box.widthPct / 100) * apW).toBeCloseTo(apH, 6);
+      expect((box.heightPct / 100) * apH).toBeCloseTo(apW, 6);
+    }
   });
 });
 
