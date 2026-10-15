@@ -6,6 +6,8 @@ import {
   buildMonthGrid,
   isGuestbookEnabled,
   resolveWishes,
+  mbPreviewWishes,
+  MB_SAMPLE_WISHES,
   contrastRatio,
   resolvePanelForeground,
   readableOn,
@@ -157,6 +159,28 @@ describe("resolveWishes", () => {
       { enabled: true },
     );
     expect(out[0].message).toBe("olá");
+  });
+});
+
+describe("mbPreviewWishes", () => {
+  it("hides the section while the guestbook is off", () => {
+    expect(mbPreviewWishes(wishRows, { enabled: false })).toBeUndefined();
+    expect(mbPreviewWishes(wishRows, undefined)).toBeUndefined();
+  });
+
+  it("shows the wishes the public page would publish", () => {
+    const out = mbPreviewWishes(wishRows, {
+      enabled: true,
+      hiddenResponseIds: ["a"],
+    });
+    expect(out?.map((w) => w.id)).toEqual(["d"]);
+  });
+
+  it("falls back to samples when no guest has left a message", () => {
+    expect(mbPreviewWishes([], { enabled: true })).toEqual(MB_SAMPLE_WISHES);
+    expect(mbPreviewWishes(undefined, { enabled: true })).toEqual(
+      MB_SAMPLE_WISHES,
+    );
   });
 });
 

@@ -43,6 +43,8 @@ import { DEFAULT_IMAGE_SETTINGS } from "@/lib/types";
 import {
   EMPTY_GUEST_PHOTO_UPLOAD,
   EMPTY_TRANSPORT_INFO,
+  mbPreviewWishes,
+  type WishSource,
 } from "@/lib/minimalism-brown";
 import { CUSTOM_TEXT_GROUPS } from "@/lib/custom-texts";
 import {
@@ -604,6 +606,8 @@ interface InvitationFormProps {
   aiPreview?: { revisionId: string | null; locale: string };
   /** Extra header buttons supplied by the page (e.g. intake form shortcuts). */
   headerActions?: React.ReactNode;
+  /** RSVP rows carrying a message, for the minimalism-brown guestbook preview. */
+  guestbookResponses?: WishSource[];
 }
 
 export default function InvitationForm({
@@ -617,6 +621,7 @@ export default function InvitationForm({
   variant = "standard",
   aiPreview,
   headerActions,
+  guestbookResponses,
 }: InvitationFormProps) {
   const isAi = variant === "ai";
   const router = useRouter();
@@ -1517,6 +1522,10 @@ export default function InvitationForm({
 
   const isElegantFloral = currentTheme.layout === "elegant-floral";
   const isMinimalismBrown = currentTheme.layout === "minimalism-brown";
+  const previewWishes = useMemo(
+    () => mbPreviewWishes(guestbookResponses, previewInvitation.guestbook),
+    [guestbookResponses, previewInvitation.guestbook],
+  );
   // Themes whose public page is the standard InvitationPage (the only renderer
   // that honours showDecorativeLines).
   const usesStandardPage =
@@ -4903,6 +4912,7 @@ export default function InvitationForm({
                                 theme={currentTheme}
                                 isPreview
                                 animateHeroText
+                                wishes={previewWishes}
                               />
                             ) : isElegantFloral ? (
                               <ElegantFloralPage

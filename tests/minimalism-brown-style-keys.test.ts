@@ -251,6 +251,30 @@ describe("minimalism-brown countdown subtitle", () => {
   });
 });
 
+describe("minimalism-brown guestbook wishes", () => {
+  it("colors the guest name and the message from their own keys", () => {
+    const html = renderSections({
+      elements: {
+        mbWishName: { color: "#123456" },
+        mbWishBody: { color: "#654321" },
+      },
+    });
+
+    expect(html).toMatch(/<span style="[^"]*color:#123456[^"]*">Rita<\/span>/);
+    expect(html).toMatch(/<p style="[^"]*color:#654321[^"]*">Parabéns!<\/p>/);
+    expect(count(html, "color:#123456")).toBe(1);
+    expect(count(html, "color:#654321")).toBe(1);
+  });
+
+  it("makes the name, message and date selectable in the editor", () => {
+    const html = renderSections({}, null, { editor: true });
+
+    expect(html).toMatch(/data-text-element="mbWishName"[^>]*>Rita</);
+    expect(html).toMatch(/data-text-element="mbWishBody"[^>]*>Parabéns!</);
+    expect(html).toContain('data-text-element="mbWishDate"');
+  });
+});
+
 describe("minimalism-brown headings in the inline editor", () => {
   const html = () => renderSections({}, null, { editor: true });
   const selectable = (markup: string) =>

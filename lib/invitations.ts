@@ -13,6 +13,7 @@ import { sanitizeRsvpPageStyle } from "./rsvp-page-style";
 import {
   splitMbSharedSpacing,
   splitMbSharedStyles,
+  type WishSource,
 } from "./minimalism-brown";
 import { publicUrlForKey } from "./s3";
 import type {
@@ -322,5 +323,21 @@ async function getInvitationById(id: string) {
   return prisma.invitation.findUnique({
     where: { id },
     include: includeTheme,
+  });
+}
+
+/**
+ * The RSVP rows that carry a message — the source of the minimalism-brown
+ * guestbook, newest first. Private: callers decide whether to publish them
+ * (resolveWishes) or only show them to the host (mbPreviewWishes).
+ */
+export async function getGuestbookResponses(
+  slug: string,
+): Promise<WishSource[]> {
+  return prisma.rsvpResponse.findMany({
+    where: { invitationSlug: slug, message: { not: null } },
+    select: { id: true, guestName: true, message: true, submittedAt: true },
+    orderBy: { submittedAt: "desc" },
+    take: 60,
   });
 }

@@ -9,7 +9,7 @@ import {
 } from "@/lib/cover-videos";
 import { shouldUseBackgroundAudio } from "@/lib/invitation-audio";
 import { resolveBrowserUiColor } from "@/lib/browser-ui-color";
-import { getInvitation } from "@/lib/invitations";
+import { getGuestbookResponses, getInvitation } from "@/lib/invitations";
 import { getInvitationBlock } from "@/lib/invitation-block";
 import InvitationBlockedPage from "@/components/InvitationBlockedPage";
 import {
@@ -327,20 +327,7 @@ export default async function InvitationSlugPage({
     isMinimalismBrownLayout(theme) &&
     isGuestbookEnabled(sourceInvitation.guestbook)
       ? resolveWishes(
-          await prisma.rsvpResponse.findMany({
-            where: {
-              invitationSlug: sourceInvitation.slug,
-              message: { not: null },
-            },
-            select: {
-              id: true,
-              guestName: true,
-              message: true,
-              submittedAt: true,
-            },
-            orderBy: { submittedAt: "desc" },
-            take: 60,
-          }),
+          await getGuestbookResponses(sourceInvitation.slug),
           sourceInvitation.guestbook,
         )
       : undefined;

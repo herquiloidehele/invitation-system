@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getThemes } from "@/lib/themes";
 import { toAdminInvitationInitialData } from "@/lib/invitation-admin-initial-data";
+import { getGuestbookResponses } from "@/lib/invitations";
+import { isMinimalismBrownLayout } from "@/lib/minimalism-brown";
 import InvitationForm from "../../InvitationForm";
 import ExternalInvitationForm from "../../ExternalInvitationForm";
 import { IntakeHeaderActions } from "@/components/admin/IntakeHeaderActions";
@@ -68,6 +70,12 @@ export default async function EditInvitationPage({
     />
   );
 
+  // The host sees the guestbook in the preview with the messages it would
+  // publish, so it can be styled before (or without) going live.
+  const guestbookResponses = isMinimalismBrownLayout(row.theme)
+    ? await getGuestbookResponses(row.slug)
+    : undefined;
+
   const isExternal =
     initialData.invitationType === "external_video" ||
     initialData.invitationType === "external_link";
@@ -93,6 +101,7 @@ export default async function EditInvitationPage({
       ownerUrl={ownerUrl}
       themes={themes}
       headerActions={headerActions}
+      guestbookResponses={guestbookResponses}
     />
   );
 }

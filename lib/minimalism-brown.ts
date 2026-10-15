@@ -435,7 +435,8 @@ export interface Wish {
   submittedAt: Date;
 }
 
-interface WishSource {
+/** An RSVP row that may carry a guestbook message. */
+export interface WishSource {
   id: string;
   guestName: string;
   message: string | null;
@@ -489,6 +490,41 @@ export function resolveWishes(
       submittedAt: r.submittedAt,
     }))
     .sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+}
+
+/**
+ * Stand-in wishes for the admin preview when no guest has left a message yet,
+ * so the host can see and style the wishes wall before the first RSVP. Never
+ * rendered on the public page.
+ */
+export const MB_SAMPLE_WISHES: readonly Wish[] = [
+  {
+    id: "sample-wish-1",
+    guestName: "Ana e Pedro",
+    message:
+      "Muitas felicidades ao casal! Que este dia seja o início de uma vida cheia de amor.",
+    submittedAt: new Date("2026-01-12T18:30:00.000Z"),
+  },
+  {
+    id: "sample-wish-2",
+    guestName: "Família Costa",
+    message: "Parabéns! Mal podemos esperar para celebrar convosco.",
+    submittedAt: new Date("2026-01-10T09:15:00.000Z"),
+  },
+];
+
+/**
+ * Wishes for the admin preview: the ones the public page would show, or the
+ * samples when there are none yet. Undefined while the guestbook is off, so
+ * the preview hides the section exactly like the public page.
+ */
+export function mbPreviewWishes(
+  rows: WishSource[] | null | undefined,
+  config: GuestbookConfig | null | undefined,
+): Wish[] | undefined {
+  if (!isGuestbookEnabled(config)) return undefined;
+  const wishes = resolveWishes(rows ?? [], config);
+  return wishes.length > 0 ? wishes : [...MB_SAMPLE_WISHES];
 }
 
 /**
