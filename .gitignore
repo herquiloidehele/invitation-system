@@ -52,8 +52,9 @@ docs/
 .agents/
 .junie/
 
-# one-shot db migration data dump (contains PII)
-neon_data.sql
+# db migration toolkit + dumps (contains PII and secrets)
+/brindeal-db-migration/
+*.dump
 
 # fallow cache
 .fallow/

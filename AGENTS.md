@@ -5,12 +5,12 @@ Next.js 16 (App Router, React 19) wedding invitation system. Postgres via Prisma
 ## Commands
 
 - `npm run dev` — dev server (uses `.env.development`, loaded by Next automatically)
-- `npm run dev:prod` — dev server against production env (`env-cmd -f .env.production`)
 - `npm run build` — runs `prisma generate && prisma migrate deploy && next build`. **Never `next build` directly** or the Prisma client at `lib/generated/prisma/` will be stale/missing.
 - `npm run lint` — flat-config ESLint (`eslint.config.mjs`, extends `eslint-config-next`)
 - `npm test` — Vitest, node env, only files matching `tests/**/*.test.ts`. No DOM, no globals. Run a single test with `npx vitest run tests/<name>.test.ts`.
-- `npm run db:migrate:dev` / `db:migrate:prod` — `prisma migrate dev` with `NODE_ENV` set so `prisma.config.ts` loads the right `.env.<env>` file.
-- `npm run db:seed:dev` / `db:seed:prod` — `tsx --env-file=.env.<env> prisma/seed.ts`. Idempotent theme + sample data seed.
+- `npm run db:migrate:dev` — `prisma migrate dev` with `NODE_ENV=development` so `prisma.config.ts` loads `.env.development`.
+- `npm run db:seed:dev` — `tsx --env-file=.env.development prisma/seed.ts`. Idempotent theme + sample data seed.
+- Production migrations run automatically: Railway's pre-deploy step (`deploy.preDeployCommand` in `railway.json`) runs `prisma migrate deploy` before each deploy goes live. **Pushing a migration to `main` applies it to production on the next deploy**; a failing migration keeps the previous deployment serving.
 - `npm run db:generate` — regenerate Prisma client into `lib/generated/prisma/` (gitignored).
 - `scripts/hash-password.ts` — `npx tsx scripts/hash-password.ts <pw>` produces a bcrypt hash already escaped for `.env` files (`$` → `\$`). The escaped form is required because Next.js env loading interpolates `$`.
 
@@ -18,7 +18,8 @@ There is no typecheck script; rely on `next build` or `tsc --noEmit` if you need
 
 ## Environment
 
-- Env files live at the repo root: `.env.development` and `.env.production`. Both are gitignored but tracked locally and contain real secrets (DB, AWS, JWT). Do not commit them.
+- Env files live at the repo root: `.env.development` and `.env.production`. Both are gitignored but tracked locally and contain real secrets (DB, AWS, JWT). Do not commit them. `.env.production` has no `DATABASE_URL`: there is no laptop access to the production database.
+- The production database is the Railway `Postgres` service (database `railway`), reachable only on Railway's private network (`postgres.railway.internal`). The app's `DATABASE_URL` on Railway is the reference `${{Postgres.DATABASE_URL}}`. For one-off production queries: `railway ssh --service Postgres --environment production` then `psql -U "$PGUSER" -d railway`.
 - `prisma.config.ts` selects the env file by `NODE_ENV` (defaults to `development`). The npm scripts above already set this; if you invoke Prisma manually, set `NODE_ENV` yourself.
 - Required vars: `DATABASE_URL`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `AWS_*`, `S3_BUCKET_NAME`. `GOOGLE_FONTS_API_KEY` and `NEXT_PUBLIC_SITE_URL` are optional. `NEXT_PUBLIC_CARTO_BASEMAPS_KEY` (free at carto.com/basemaps/apikey) switches the venue map to CARTO's minimal basemap; without it the map uses keyless OpenStreetMap tiles. It is inlined at build time, so set it before `npm run build`. `PEXELS_API_KEY`, `UNSPLASH_ACCESS_KEY` and `PIXABAY_API_KEY` each add a provider to the AI builder's stock image search. The search tools are always registered; a provider whose key is missing is skipped, and with none set the tool tells the agent so.
 

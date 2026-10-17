@@ -5,6 +5,9 @@
   },
   "deploy": {
     "startCommand": "NODE_OPTIONS='--max-old-space-size=512 --max-semi-space-size=16' next start",
-    "numReplicas": 1
+    "numReplicas": 1,
+    "preDeployCommand": [
+      "prisma migrate deploy"
+    ]
   }
 }
