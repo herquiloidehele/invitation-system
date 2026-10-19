@@ -8,6 +8,8 @@
     "start": "NODE_OPTIONS='--max-old-space-size=512 --max-semi-space-size=16' next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "dev:prod": "env-cmd -f .env.production next dev",
+    "db:seed:prod": "tsx --env-file=.env.production prisma/seed.ts",
     "db:seed:dev": "tsx --env-file=.env.development prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
     "db:migrate:dev": "cross-env NODE_ENV=development prisma migrate dev",
