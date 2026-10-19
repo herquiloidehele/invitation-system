@@ -25,6 +25,9 @@ interface GiftsListViewProps {
 }
 
 const CARD_RADIUS = 16;
+// Image-only gifts are designed cards, usually with a drawn inset frame; their
+// corner scales with the card (2.8% of its width) to follow that frame.
+const IMAGE_ONLY_CARD_RADIUS = "2.8cqw";
 
 const group: Variants = {
   hidden: {},
@@ -243,7 +246,11 @@ export default function GiftsListView({
           }}
         >
           {items.map((gift) => (
-            <motion.li key={gift.id} variants={reduceMotion ? undefined : card}>
+            <motion.li
+              key={gift.id}
+              variants={reduceMotion ? undefined : card}
+              style={{ containerType: "inline-size" }}
+            >
               <GiftCard
                 gift={gift}
                 theme={theme}
@@ -336,11 +343,13 @@ function GiftCard({
   onChoose(): void;
   onRelease(): void;
 }) {
+  // Image-only gifts (name and price drawn in the artwork) get no caption strip.
+  const hasCaption = Boolean(gift.name?.trim() || gift.price?.trim() || state);
   const cardStyle: CSSProperties = {
     display: "block",
     background: theme.cardBg,
     border: `1px solid ${theme.cardBorder}`,
-    borderRadius: CARD_RADIUS,
+    borderRadius: hasCaption ? CARD_RADIUS : IMAGE_ONLY_CARD_RADIUS,
     overflow: "hidden",
     textDecoration: "none",
     color: "inherit",
@@ -397,46 +406,48 @@ function GiftCard({
           </span>
         )}
       </div>
-      <div style={{ padding: "10px 12px 13px" }}>
-        <div
-          style={{
-            fontFamily: theme.bodyFont,
-            color: theme.textPrimary,
-            fontSize: 15,
-            fontWeight: 500,
-            lineHeight: 1.25,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {gift.name}
-        </div>
-        {gift.price?.trim() && (
+      {hasCaption && (
+        <div style={{ padding: "10px 12px 13px" }}>
           <div
             style={{
-              fontFamily: theme.uiFont,
-              color: theme.primary,
-              fontSize: 13,
-              marginTop: 3,
+              fontFamily: theme.bodyFont,
+              color: theme.textPrimary,
+              fontSize: 15,
+              fontWeight: 500,
+              lineHeight: 1.25,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
             }}
           >
-            {gift.price}
+            {gift.name}
           </div>
-        )}
-        {state && (
-          <GiftCardReservationActions
-            gift={gift}
-            theme={theme}
-            state={state}
-            pending={pending}
-            labels={labels}
-            onChoose={onChoose}
-            onRelease={onRelease}
-          />
-        )}
-      </div>
+          {gift.price?.trim() && (
+            <div
+              style={{
+                fontFamily: theme.uiFont,
+                color: theme.primary,
+                fontSize: 13,
+                marginTop: 3,
+              }}
+            >
+              {gift.price}
+            </div>
+          )}
+          {state && (
+            <GiftCardReservationActions
+              gift={gift}
+              theme={theme}
+              state={state}
+              pending={pending}
+              labels={labels}
+              onChoose={onChoose}
+              onRelease={onRelease}
+            />
+          )}
+        </div>
+      )}
     </>
   );
 
