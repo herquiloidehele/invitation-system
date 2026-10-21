@@ -179,18 +179,6 @@ export default function GiftsListView({
           >
             {t("gifts_eyebrow")}
           </div>
-          <h1
-            style={{
-              fontFamily: scriptFont,
-              color: theme.primary,
-              fontSize: "clamp(2.4rem, 10vw, 3.4rem)",
-              lineHeight: 1.05,
-              margin: 0,
-              fontWeight: 400,
-            }}
-          >
-            {title}
-          </h1>
           <div
             style={{
               width: 64,
