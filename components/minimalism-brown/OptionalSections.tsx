@@ -11,7 +11,7 @@ import PlacesSection from "@/components/shared/PlacesSection";
 import GuestGuideSection from "@/components/shared/GuestGuideSection";
 import FaqSection from "@/components/shared/FaqSection";
 import SectionTitle from "./SectionTitle";
-import SectionCard from "./SectionCard";
+import SectionCard, { PaperTexture } from "./SectionCard";
 import Countdown from "./Countdown";
 import { Reveal } from "./motion";
 
@@ -128,6 +128,9 @@ export default function OptionalSections({
               cardBorder={invitation.cardStyles?.guestGuide?.cardBorder}
               cardBorderRadius={t.card.radius}
               plain={invitation.cardStyles?.guestGuide?.plain === true}
+              /* Same grain scale as a full-width section card, like the
+                 countdown tiles. */
+              cardTexture={<PaperTexture size="343px auto" />}
               isPreview
             />
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement, useEffect, useState } from "react";
+import { createElement, useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 
@@ -140,6 +140,9 @@ interface GuideItemCardProps {
   isPreview?: boolean;
   /** Stretches the card across both grid columns (odd item count → last row). */
   fullWidth?: boolean;
+  /** Absolutely positioned layer painted over the card fill (e.g. a paper
+   *  grain). The card clips it to its rounded corners. */
+  cardTexture?: ReactNode;
 }
 
 function GuideItemCard({
@@ -152,7 +155,9 @@ function GuideItemCard({
   plain,
   isPreview,
   fullWidth,
+  cardTexture,
 }: GuideItemCardProps) {
+  const texture = plain ? null : cardTexture;
   return (
     <motion.div
       {...(isPreview
@@ -172,11 +177,18 @@ function GuideItemCard({
             "0 1px 2px rgba(0,0,0,0.02), 0 4px 16px rgba(0,0,0,0.03)",
         }),
         padding: "18px 12px",
+        ...(texture ? ({ position: "relative", overflow: "hidden" } as const) : {}),
       }}
     >
+      {texture}
       <div
         className="flex items-center justify-center rounded-full shrink-0"
-        style={{ width: 48, height: 48, background: `${theme.accent}14` }}
+        style={{
+          position: "relative",
+          width: 48,
+          height: 48,
+          background: `${theme.accent}14`,
+        }}
       >
         <GuideIcon item={item} size={22} color={theme.accent} />
       </div>
@@ -184,6 +196,7 @@ function GuideItemCard({
       <EditableText elementKey="guideItemLabel">
         <span
           style={{
+            position: "relative",
             fontFamily: ts?.bodyFont ?? theme.bodyFont,
             fontSize: 12,
             fontWeight: 500,
@@ -216,6 +229,8 @@ export interface GuestGuideSectionProps {
   cardBorderRadius?: number;
   /** Removes each repeated guide item's decorative card surface. */
   plain?: boolean;
+  /** Layer painted over each card's fill; skipped when `plain`. */
+  cardTexture?: ReactNode;
   /** When true, all animations use `animate` instead of `whileInView` so
    *  the section is always fully visible (no scroll-trigger dependency).
    *  Use this in the admin live preview. */
@@ -230,6 +245,7 @@ export default function GuestGuideSection({
   cardBorder,
   cardBorderRadius,
   plain,
+  cardTexture,
   isPreview = false,
 }: GuestGuideSectionProps) {
   const effectiveCardBg = cardBg || theme.cardBg;
@@ -258,6 +274,7 @@ export default function GuestGuideSection({
             cardBorder={effectiveCardBorder}
             cardBorderRadius={cardBorderRadius}
             plain={plain}
+            cardTexture={cardTexture}
             isPreview={isPreview}
             fullWidth={
               guestGuide.items.length % 2 === 1 &&
