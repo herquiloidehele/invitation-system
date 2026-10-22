@@ -137,4 +137,11 @@ describe("language names", () => {
       expect(names.it).toBe("Italiano");
     }
   });
+
+  it("names French in its own language everywhere", () => {
+    for (const locale of SUPPORTED_LOCALES) {
+      const names = loadMessages(locale).Locale as JsonObject;
+      expect(names.fr).toBe("Français");
+    }
+  });
 });

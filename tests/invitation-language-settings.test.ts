@@ -19,10 +19,16 @@ function render(enabledLocales: AppLocale[], activeLocale: AppLocale = "pt") {
 }
 
 describe("InvitationLanguageSettings", () => {
-  it("offers a toggle for every language, Italian included", () => {
+  it("offers a toggle for every language, Italian and French included", () => {
     const html = render(["pt"]);
 
-    for (const label of ["Português", "English", "Español", "Italiano"]) {
+    for (const label of [
+      "Português",
+      "English",
+      "Español",
+      "Italiano",
+      "Français",
+    ]) {
       expect(html).toContain(`aria-label="Activar ${label}"`);
     }
   });
@@ -32,5 +38,11 @@ describe("InvitationLanguageSettings", () => {
       /<button[^>]*aria-pressed="true"[^>]*>it<\/button>/,
     );
     expect(render(["pt", "en"])).not.toMatch(/<button[^>]*>it<\/button>/);
+  });
+
+  it("lists French as an editing language once it is enabled", () => {
+    expect(render(["pt", "fr"], "fr")).toMatch(
+      /<button[^>]*aria-pressed="true"[^>]*>fr<\/button>/,
+    );
   });
 });

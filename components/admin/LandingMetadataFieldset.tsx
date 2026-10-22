@@ -24,6 +24,7 @@ const EDITING_LOCALE_LABELS: Record<AppLocale, string> = {
   en: "EN",
   es: "ES",
   it: "IT",
+  fr: "FR",
 };
 
 export type LandingMetadata = {

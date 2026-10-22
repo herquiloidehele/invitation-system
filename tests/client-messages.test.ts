@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { getClientMessages } from "@/i18n/client-messages";
 import { SUPPORTED_LOCALES } from "@/i18n/locales";
+import fr from "../messages/fr.json";
 import it_ from "../messages/it.json";
 import pt from "../messages/pt.json";
 
@@ -11,6 +12,10 @@ describe("client message bundles", () => {
   it("serves the Italian bundle for Italian", () => {
     expect(getClientMessages("it")).toBe(it_);
     expect(getClientMessages("pt")).toBe(pt);
+  });
+
+  it("serves the French bundle for French", () => {
+    expect(getClientMessages("fr")).toBe(fr);
   });
 
   it("has a bundle for every supported locale", () => {

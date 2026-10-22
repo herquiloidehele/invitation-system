@@ -19,8 +19,8 @@ describe("landing metadata translations", () => {
         es: {
           landingDescription: "Invitación digital",
         },
-        fr: {
-          landingModelName: "Classique",
+        de: {
+          landingModelName: "Klassisch",
         },
       }),
     ).toEqual({
@@ -64,6 +64,28 @@ describe("landing metadata translations", () => {
     ).toEqual({
       en: { landingModelName: "Classic" },
       it: { landingModelName: "Classico" },
+    });
+  });
+
+  it("stores and serves French product text", () => {
+    const translations = sanitizeLandingTranslations({
+      fr: { landingModelName: "Classique", landingSubtitle: " " },
+    });
+
+    expect(translations).toEqual({ fr: { landingModelName: "Classique" } });
+    expect(
+      localizeLandingMetadata(
+        {
+          landingModelName: "Clássico",
+          landingSubtitle: "Elegante",
+          landingDescription: "Convite em papel",
+          landingTranslations: translations,
+        },
+        "fr",
+      ),
+    ).toMatchObject({
+      landingModelName: "Classique",
+      landingSubtitle: "Elegante",
     });
   });
 

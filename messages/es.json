@@ -3,7 +3,8 @@
     "pt": "Português",
     "en": "English",
     "es": "Español",
-    "it": "Italiano"
+    "it": "Italiano",
+    "fr": "Français"
   },
   "LocaleCurrencyMenu": {
     "menuAriaLabel": "Idioma y moneda",
@@ -198,7 +199,7 @@
     "guestsTitle": "Gestión de invitados",
     "guestsText": "Mesa y acompañantes organizados. Enlace personal disponible en modelos con personalización de nombre incluida.",
     "languagesTitle": "Multiidioma",
-    "languagesText": "Portugués, inglés, español e italiano para recibir bien a todos.",
+    "languagesText": "Portugués, inglés, español, italiano y francés para recibir bien a todos.",
     "customTitle": "Personalización total",
     "customText": "Tipografía, colores y fotografías elegidas para vuestro día.",
     "personalizationTitle": "Personalización del nombre del invitado",
@@ -337,7 +338,7 @@
     "contact": "Contacto",
     "description": "Invitaciones digitales personales, elegantes y hechas con cuidado.",
     "copyright": "© 2026 Brindeal Studio · Hecho con cuidado",
-    "languages": "Português · English · Español · Italiano"
+    "languages": "Português · English · Español · Italiano · Français"
   },
   "Whatsapp": {
     "name": "Nombre",

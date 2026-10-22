@@ -23,6 +23,7 @@ const LOCALES: Array<{
   { locale: "en", label: "English", detail: "Inglês" },
   { locale: "es", label: "Español", detail: "Espanhol" },
   { locale: "it", label: "Italiano", detail: "Italiano" },
+  { locale: "fr", label: "Français", detail: "Francês" },
 ];
 
 export function InvitationLanguageSettings({

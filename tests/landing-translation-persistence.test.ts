@@ -43,8 +43,8 @@ describe("landing translation persistence", () => {
             landingSubtitle: " ",
             unknown: "discard",
           },
-          fr: {
-            landingDescription: "Description",
+          de: {
+            landingDescription: "Beschreibung",
           },
         } as unknown as LandingTranslations,
       }),

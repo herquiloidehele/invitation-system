@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 const KEYS = ["title", "description", "reasonLabel", "footer"].sort();
 
 describe("InvitationBlocked messages", () => {
-  for (const locale of ["pt", "en", "es", "it"]) {
+  for (const locale of ["pt", "en", "es", "it", "fr"]) {
     it(`messages/${locale}.json carries the namespace and the metadata title`, () => {
       const messages = JSON.parse(
         readFileSync(`messages/${locale}.json`, "utf8"),

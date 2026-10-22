@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { EditingLocaleNotice } from "@/components/admin/EditingLocaleNotice";
 
-function render(activeLocale: "pt" | "en" | "es" | "it"): string {
+function render(activeLocale: "pt" | "en" | "es" | "it" | "fr"): string {
   return renderToStaticMarkup(
     createElement(EditingLocaleNotice, { activeLocale, onReset: () => {} }),
   );
@@ -20,6 +20,7 @@ describe("EditingLocaleNotice", () => {
     expect(render("en")).toContain("A editar em English");
     expect(render("es")).toContain("A editar em Español");
     expect(render("it")).toContain("A editar em Italiano");
+    expect(render("fr")).toContain("A editar em Français");
   });
 
   it("offers a way back to Portuguese", () => {

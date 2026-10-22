@@ -13,7 +13,7 @@ import { buildLanguageAlternates } from "@/lib/seo";
 describe("i18n locale helpers", () => {
   it("declares Portuguese as the default locale", () => {
     expect(DEFAULT_LOCALE).toBe("pt");
-    expect(SUPPORTED_LOCALES).toEqual(["pt", "en", "es", "it"]);
+    expect(SUPPORTED_LOCALES).toEqual(["pt", "en", "es", "it", "fr"]);
   });
 
   it("validates supported locale strings", () => {
@@ -21,14 +21,16 @@ describe("i18n locale helpers", () => {
     expect(isSupportedLocale("en")).toBe(true);
     expect(isSupportedLocale("es")).toBe(true);
     expect(isSupportedLocale("it")).toBe(true);
-    expect(isSupportedLocale("fr")).toBe(false);
+    expect(isSupportedLocale("fr")).toBe(true);
+    expect(isSupportedLocale("de")).toBe(false);
     expect(isSupportedLocale(undefined)).toBe(false);
   });
 
   it("falls back to Portuguese for unknown locales", () => {
     expect(resolveLocale("en")).toBe("en");
     expect(resolveLocale("it")).toBe("it");
-    expect(resolveLocale("fr")).toBe("pt");
+    expect(resolveLocale("fr")).toBe("fr");
+    expect(resolveLocale("de")).toBe("pt");
     expect(resolveLocale(undefined)).toBe("pt");
   });
 
@@ -37,6 +39,7 @@ describe("i18n locale helpers", () => {
     expect(getDateFormatLocale("en")).toBe("en-US");
     expect(getDateFormatLocale("es")).toBe("es-ES");
     expect(getDateFormatLocale("it")).toBe("it-IT");
+    expect(getDateFormatLocale("fr")).toBe("fr-FR");
   });
 
   it("builds locale hrefs without duplicating locale prefixes", () => {
@@ -50,6 +53,9 @@ describe("i18n locale helpers", () => {
     expect(buildLocaleHref("/", "it")).toBe("/it");
     expect(buildLocaleHref("/it/demo", "pt")).toBe("/demo");
     expect(buildLocaleHref("/it/demo", "en")).toBe("/en/demo");
+    expect(buildLocaleHref("/", "fr")).toBe("/fr");
+    expect(buildLocaleHref("/fr/demo", "pt")).toBe("/demo");
+    expect(buildLocaleHref("/it/demo", "fr")).toBe("/fr/demo");
     expect(buildLocaleHref("/confirmar/demo#rsvp", "es")).toBe(
       "/es/confirmar/demo#rsvp",
     );
@@ -71,6 +77,7 @@ describe("i18n locale helpers", () => {
       en: "https://example.com/en",
       es: "https://example.com/es",
       it: "https://example.com/it",
+      fr: "https://example.com/fr",
       "x-default": "https://example.com",
     });
   });
