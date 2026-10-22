@@ -174,7 +174,7 @@ export default function GiftsListView({
               fontSize: 11,
               letterSpacing: "0.32em",
               textTransform: "uppercase",
-              marginBottom: 6,
+              marginBottom: 5,
             }}
           >
             {t("gifts_eyebrow")}
