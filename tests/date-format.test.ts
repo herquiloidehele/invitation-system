@@ -18,6 +18,16 @@ describe("localized invitation dates", () => {
     expect(formatLocalizedDayOfWeek(ISO, "it")).toBe("sabato");
   });
 
+  it("writes the date in French for a French guest", () => {
+    expect(formatLocalizedLongDate(ISO, "fr")).toBe("27 juin 2026");
+    expect(formatLocalizedMonthLong(ISO, "fr")).toBe("juin");
+    expect(formatLocalizedDayOfWeek(ISO, "fr")).toBe("samedi");
+    // Abbreviated French months end in a dot ("juil."), which is stripped.
+    expect(formatLocalizedMonthShort("2026-07-04T15:00:00.000Z", "fr")).toBe(
+      "juil",
+    );
+  });
+
   it("keeps the other languages unchanged", () => {
     expect(formatLocalizedLongDate(ISO, "pt")).toBe("27 de junho de 2026");
     expect(formatLocalizedLongDate(ISO, "en")).toBe("June 27, 2026");

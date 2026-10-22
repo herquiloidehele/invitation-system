@@ -10,6 +10,7 @@ const LOCALE_LABELS: Record<AppLocale, string> = {
   en: "English",
   es: "Español",
   it: "Italiano",
+  fr: "Français",
 };
 
 /**

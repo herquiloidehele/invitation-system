@@ -3,7 +3,8 @@
     "pt": "Português",
     "en": "English",
     "es": "Español",
-    "it": "Italiano"
+    "it": "Italiano",
+    "fr": "Français"
   },
   "LocaleCurrencyMenu": {
     "menuAriaLabel": "Language and currency",
@@ -198,7 +199,7 @@
     "guestsTitle": "Guest management",
     "guestsText": "Table and companions organized. Personal link available on templates with name personalization included.",
     "languagesTitle": "Multi-language",
-    "languagesText": "Portuguese, English, Spanish and Italian to welcome everyone well.",
+    "languagesText": "Portuguese, English, Spanish, Italian and French to welcome everyone well.",
     "customTitle": "Full customization",
     "customText": "Typography, colors and photos chosen for your day.",
     "personalizationTitle": "Guest name personalization",
@@ -337,7 +338,7 @@
     "contact": "Contact",
     "description": "Personal, elegant digital invitations made with care.",
     "copyright": "© 2026 Brindeal Studio · Made with care",
-    "languages": "Português · English · Español · Italiano"
+    "languages": "Português · English · Español · Italiano · Français"
   },
   "Whatsapp": {
     "name": "Name",

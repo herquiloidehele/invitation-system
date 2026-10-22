@@ -3,7 +3,8 @@
     "pt": "Português",
     "en": "English",
     "es": "Español",
-    "it": "Italiano"
+    "it": "Italiano",
+    "fr": "Français"
   },
   "LocaleCurrencyMenu": {
     "menuAriaLabel": "Lingua e valuta",
@@ -198,7 +199,7 @@
     "guestsTitle": "Gestione degli invitati",
     "guestsText": "Tavoli e accompagnatori organizzati. Link personale disponibile nei modelli con personalizzazione del nome inclusa.",
     "languagesTitle": "Multilingua",
-    "languagesText": "Portoghese, inglese, spagnolo e italiano per accogliere tutti al meglio.",
+    "languagesText": "Portoghese, inglese, spagnolo, italiano e francese per accogliere tutti al meglio.",
     "customTitle": "Personalizzazione totale",
     "customText": "Tipografia, colori e fotografie scelti per il vostro giorno.",
     "personalizationTitle": "Personalizzazione del nome dell'invitato",
@@ -337,7 +338,7 @@
     "contact": "Contatti",
     "description": "Inviti digitali personali, eleganti e fatti con cura.",
     "copyright": "© 2026 Brindeal Studio · Fatto con cura",
-    "languages": "Português · English · Español · Italiano"
+    "languages": "Português · English · Español · Italiano · Français"
   },
   "Whatsapp": {
     "name": "Nome",

@@ -94,6 +94,24 @@ describe("Italian option", () => {
   });
 });
 
+describe("French option", () => {
+  it("offers French by name and links to the /fr page", () => {
+    const html = render(
+      switcher(
+        duplicateForm({
+          invitationType: "standard",
+          languageSwitcherEnabled: true,
+          enabledLocales: ["pt", "fr"],
+        }),
+      ),
+    );
+
+    expect(html).toContain('aria-label="Français"');
+    expect(html).toMatch(/href="\/fr[\/?]/);
+    expect(html).not.toContain('aria-label="Italiano"');
+  });
+});
+
 describe("inline mode wiring", () => {
   const source = readFileSync(
     "components/shared/InvitationLanguageSwitcher.tsx",
