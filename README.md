@@ -51,3 +51,4 @@ through same-origin routes, so no additional public bucket or CORS policy is
 required. Keep the database migrations in sync with the deployed application
 before enabling uploads.
 
+# Project deployed in railway
