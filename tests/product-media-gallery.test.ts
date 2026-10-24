@@ -13,6 +13,7 @@ function renderGallery(images: string[]): string {
       images,
       previewHref: PREVIEW_HREF,
       previewLabel: "Ver Convite",
+      previewChipLabel: "Clica para Testar",
       selectImageLabel: (position: number) => `Imagem ${position}`,
       openImageLabel: "Ampliar imagem",
       previousImageLabel: "Anterior",
@@ -51,14 +52,14 @@ describe("ProductMediaGallery slides", () => {
 });
 
 describe("ProductMediaGallery mobile chip", () => {
-  it("labels the image with a mobile-only Ver Convite chip", () => {
+  it("labels the image with a mobile-only chip", () => {
     const html = renderGallery(["/a.jpg", "/b.jpg"]);
     const chip = html.match(
       /<span\b[^>]*data-gallery-chip[^>]*>[\s\S]*?<\/span>/,
     )?.[0];
 
     expect(chip).toBeDefined();
-    expect(chip).toContain("Ver Convite");
+    expect(chip).toContain("Clica para Testar");
     expect(chip).toContain("lg:hidden");
     expect(chip).toContain("pointer-events-none");
   });

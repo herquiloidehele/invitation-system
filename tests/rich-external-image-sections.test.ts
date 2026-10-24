@@ -107,7 +107,7 @@ describe("getRichExternalInvitationImageSectionKeys", () => {
   it("omits section hosts whose content is absent", () => {
     const invitation: InvitationData = {
       ...MOCK_INVITATION,
-      heroImage: undefined,
+      heroImage: "",
       videoUrl: undefined,
       externalLink: "",
       scratchReveal: { enabled: false },
