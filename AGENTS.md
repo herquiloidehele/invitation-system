@@ -14,9 +14,9 @@ Next.js 16 (App Router, React 19) wedding invitation system. Postgres via Prisma
 - `npm run db:migrate:dev` — `prisma migrate dev` with `NODE_ENV=development` so `prisma.config.ts` loads
   `.env.development`.
 - `npm run db:seed:dev` — `tsx --env-file=.env.development prisma/seed.ts`. Idempotent theme + sample data seed.
-- Production migrations run automatically: Railway's pre-deploy step (`deploy.preDeployCommand` in `railway.json`) runs
-  `prisma migrate deploy` before each deploy goes live. **Pushing a migration to `main` applies it to production on the
-  next deploy.**
+- Production migrations run automatically: the `Application` service's pre-deploy command (`preDeploy` in
+  `.railway/railway.ts`, see Railway service config below) runs `prisma migrate deploy` before each deploy goes live.
+  **Pushing a migration to `main` applies it to production on the next deploy.**
     - The pre-deploy step runs while the previous deployment is still serving, and a migration that succeeded is not
       undone if the new version then fails to start. Migrations must therefore be **backward-compatible with the
       currently deployed code**: add tables/columns first, drop or rename them in a later deploy.
@@ -33,6 +33,16 @@ Next.js 16 (App Router, React 19) wedding invitation system. Postgres via Prisma
       deployment older than `85f63082` (2026-10-17 19:30 Lisbon).** A rollback restores that deployment's variables too,
       which points the app back at the frozen Neon database: every RSVP since the switch disappears from view and all
       writes fail.
+- Railway service config (build, start and pre-deploy commands, replicas, domain) lives in `.railway/railway.ts`
+  (Railway Infrastructure as Code; the SDK is the `railway` dev dependency). Railway does **not** read this file on
+  deploy: `railway config plan` previews the diff against production and `railway config apply` writes it to the
+  service. Run both from the repo root with the CLI linked to project `Brindeal Studio`, environment `production`.
+    - Keep the `partial` export (without it an apply treats the `Postgres` service as removed), `variables:
+      { managed: false }` (variables stay in the dashboard), and the `source` and `deploy` fields (dropping them
+      disconnects the GitHub repo and turns off app sleeping). Run a plan after every edit.
+    - While the legacy `railway.json` exists, Railway still reads it on every deploy and it overrides the service
+      settings, so change both files together. Railway stops reading it on 2026-12-01; delete it once
+      `railway config apply` has run.
 - `npm run db:generate` — regenerate Prisma client into `lib/generated/prisma/` (gitignored).
 - `scripts/hash-password.ts` — `npx tsx scripts/hash-password.ts <pw>` produces a bcrypt hash already escaped for `.env`
   files (`$` → `\$`). The escaped form is required because Next.js env loading interpolates `$`.
