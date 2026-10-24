@@ -1,4 +1,4 @@
-import sharp from "sharp";
+import sharp, { type OverlayOptions } from "sharp";
 import { join } from "node:path";
 
 /**
@@ -67,7 +67,7 @@ async function main() {
   const rowH = srcRowH.map((h, i) => (i === 1 ? h - delta : h));
   if (rowH[1] <= 0) throw new Error("Window too short to squash");
 
-  const pieces: sharp.OverlayOptions[] = [];
+  const pieces: OverlayOptions[] = [];
   let top = 0;
   for (let r = 0; r < rowH.length; r++) {
     let left = 0;
